@@ -164,7 +164,12 @@ function field(k,v){return `<div class="field"><div class="k">${esc(k)}</div><di
 function rebuildFilters(){
   const books=["All",...Array.from(new Set(atlasData.places.flatMap(p=>p.books||[]))).sort()];
   document.getElementById("bookStrip").innerHTML=books.map(b=>`<button class="book-chip ${state.book===b?"active":""}" data-book="${esc(b)}">${b==="All"?"Όλα":esc(b)}</button>`).join("");
-  document.querySelectorAll("[data-book]").forEach(b=>b.onclick=()=>{state.book=b.dataset.book;rebuildFilters();render();});
+  document.querySelectorAll("[data-book]").forEach(b=>b.onclick=()=>{
+    state.book=b.dataset.book;
+    rebuildFilters();
+    render();
+    setTimeout(fitVisible,0);
+  });
 
   const years=Array.from(new Set([...atlasData.places,...atlasData.routes].flatMap(x=>yearsFrom(x.period)))).sort();
   const yearSelect=document.getElementById("yearFilter");
@@ -306,9 +311,17 @@ function render(){
   const modeLabels={STORY:"Story",PEOPLE:"People",EMPIRES:"Empires",INTELLIGENCE:"Intelligence",EVIDENCE:"Evidence",TIMELINE:"Timeline"};
   document.getElementById("countBadge").textContent=`${modeLabels[state.mode]} · ${state.showPlaces?visiblePlaces.length:0} τόποι · ${routeCount} route stories`;
 }
+function fitVisible(){
+  const q=state.search.trim().toLowerCase();
+  const latlngs=atlasData.places.filter(p=>
+    Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&bookHit(p)&&yearHit(p,state.year)&&
+    (!state.verifiedOnly||p.coordinateStatus==="VERIFIED")&&textHit(p,q)
+  ).map(p=>[p.lat,p.lon]);
+  if(latlngs.length)map.fitBounds(latlngs,{padding:[90,90],maxZoom:7});
+}
 function fitAll(){
   const latlngs=atlasData.places.filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lon)).map(p=>[p.lat,p.lon]);
-  if(latlngs.length)map.fitBounds(latlngs,{padding:[70,70]});
+  if(latlngs.length)map.fitBounds(latlngs,{padding:[80,80],maxZoom:6});
 }
 function openFilters(){
   document.getElementById("controlPanel").classList.add("open");
