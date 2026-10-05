@@ -76,6 +76,37 @@ const yearsFrom=s=>{
 const yearHit=(obj,year)=>year==="All"||yearsFrom(obj.period).includes(year);
 const bookHit=(obj)=>state.book==="All"||(obj.books||[]).includes(state.book);
 
+function settlementClass(p){
+  const t=(p.type||"").toLowerCase();
+  if(t.includes("fortress"))return "settlement-fortress";
+  if(t.includes("port")||t.includes("harbor"))return "settlement-port";
+  if(t.includes("village"))return "settlement-village";
+  if(t.includes("city"))return "settlement-city";
+  if(t.includes("island"))return "settlement-island";
+  if(t.includes("sea")||t.includes("strait"))return "settlement-sea";
+  if(t.includes("region"))return "settlement-region";
+  return "settlement-generic";
+}
+function settlementIcon(p){
+  const cls=settlementClass(p);
+  const capital=CAPITAL_PLACES.has(p.place)?" is-capital":"";
+  const major=MAJOR_PLACES.has(p.place)?" is-major":"";
+  const htmlMap={
+    "settlement-city":'<span class="town-wall"></span><span class="tower t1"></span><span class="tower t2"></span><span class="roof r1"></span><span class="roof r2"></span>',
+    "settlement-port":'<span class="town-wall"></span><span class="tower t1"></span><span class="mast"></span><span class="harbor-line"></span>',
+    "settlement-fortress":'<span class="fort-wall"></span><span class="fort-tower ft1"></span><span class="fort-tower ft2"></span><span class="fort-gate"></span>',
+    "settlement-village":'<span class="house h1"></span><span class="house h2"></span><span class="house h3"></span>',
+    "settlement-island":'<span class="island-mark"></span>',
+    "settlement-sea":'<span class="sea-mark">≈</span>',
+    "settlement-region":'<span class="region-mark">✦</span>',
+    "settlement-generic":'<span class="generic-mark">•</span>'
+  };
+  return L.divIcon({
+    className:"",
+    html:`<div class="settlement-icon ${cls}${capital}${major}" title="${esc(p.place)}">${htmlMap[cls]}</div>`,
+    iconSize:[34,30],iconAnchor:[17,20]
+  });
+}
 function markerIcon(p){
   if(state.mode==="EMPIRES"){
     const power=powerForPlace(p);
@@ -97,11 +128,7 @@ function markerIcon(p){
       });
     }
   }
-  return L.divIcon({
-    className:"",
-    html:`<div class="marker-wrap"><div class="marker-icon marker-${coordClass(p)}"></div></div>`,
-    iconSize:[22,22],iconAnchor:[11,11]
-  });
+  return settlementIcon(p);
 }
 function openDetail(html){
   const d=document.getElementById("detailPanel");
