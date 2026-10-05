@@ -20,7 +20,7 @@ const COMMONS=file=>"https://commons.wikimedia.org/wiki/Special:Redirect/file/"+
 const POWERS={
   spain_pre1580:{
     id:"spain_pre1580",name:"Ισπανική Μοναρχία — Φίλιππος Β΄",type:"coat of arms",
-    file:"Full Ornamented Coat of arms of Philip II of Spain (1558–1580).svg"
+    file:"Coat of Arms of Philip II of Spain (1558-1580).svg"
   },
   spain_1580:{
     id:"spain_1580",name:"Ισπανική Μοναρχία — Φίλιππος Β΄",type:"coat of arms, from 1580",
@@ -32,7 +32,7 @@ const POWERS={
   },
   venice:{
     id:"venice",name:"Γαληνοτάτη Δημοκρατία της Βενετίας",type:"Lion of Saint Mark",
-    file:"Lion of Saint Mark.svg"
+    file:"Coat of arms of Republic of Venice.svg"
   },
   ottoman:{
     id:"ottoman",name:"Οθωμανική Αυτοκρατορία — Μουράτ Γ΄",type:"tughra, not a Western coat of arms",
