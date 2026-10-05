@@ -5,9 +5,9 @@ const byId=new Map();
 let empireRepIds=new Set();
 
 const map=L.map("map",{zoomControl:true,preferCanvas:true}).setView([39.1,18.5],5);
-L.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",{
-  maxZoom:19,
-  attribution:"&copy; OpenStreetMap contributors &copy; CARTO"
+L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",{
+  maxZoom:16,
+  attribution:"Tiles &copy; Esri"
 }).addTo(map);
 placeMarkers.addTo(map);routeLines.addTo(map);historicalLabels.addTo(map);
 map.zoomControl.setPosition("bottomright");
@@ -187,8 +187,8 @@ function historicalLabelIcon(p){
   const capital=(p.place==="Madrid"||p.place==="Constantinople"||p.place==="Naples"||p.place==="Venice")?" capital":"";
   return L.divIcon({
     className:"",
-    html:`<div class="historical-place-label${cls}${capital}">${esc(p.historicalNames||p.place)}</div>`,
-    iconSize:[180,22],iconAnchor:[-8,10]
+    html:`<div class="historical-place-label${cls}${capital}">${esc(p.place)}</div>`,
+    iconSize:[130,20],iconAnchor:[-7,9]
   });
 }
 
@@ -263,7 +263,7 @@ function render(){
     m.bindPopup(`<strong>${esc(p.place)}</strong><br><small>${esc(p.period||"")}</small>`);
     m.on("click",()=>showPlace(p));
     m.addTo(placeMarkers);
-    if(state.mode!=="EMPIRES"){
+    if(state.mode!=="EMPIRES" && map.getZoom()>=6){
       L.marker([p.lat,p.lon],{icon:historicalLabelIcon(p),interactive:false}).addTo(historicalLabels);
     }
   });
@@ -382,3 +382,4 @@ document.getElementById("closeFilters").addEventListener("click",closeFilters);
 document.getElementById("closeDetail").addEventListener("click",closeDetail);
 document.getElementById("scrim").addEventListener("click",()=>{closeFilters();closeDetail();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeFilters();closeDetail();}});
+map.on("zoomend",render);
