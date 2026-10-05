@@ -1,4 +1,4 @@
-const state={book:"All",search:"",year:"All",routeStory:"All",verifiedOnly:false,showPlaces:true,showRoutes:true,routeTypes:new Set(["DEPICTED TRAVEL"])};
+const state={mode:"STORY",book:"All",search:"",year:"All",routeStory:"All",verifiedOnly:false,showPlaces:true,showRoutes:true,routeTypes:new Set(["DEPICTED TRAVEL"])};
 const placeMarkers=L.layerGroup(),routeLines=L.layerGroup();
 let atlasData={places:[],routes:[]};
 const byId=new Map();
@@ -15,6 +15,51 @@ const textHit=(obj,q)=>!q||Object.values(obj).some(v=>{
   return String(v??"").toLowerCase().includes(q);
 });
 const coordClass=p=>p.coordinateStatus==="VERIFIED"?"documented":p.coordinateStatus==="NEEDS RESEARCH"?"research":"mixed";
+const COMMONS=file=>"https://commons.wikimedia.org/wiki/Special:Redirect/file/"+encodeURIComponent(file);
+const POWERS={
+  spain_pre1580:{
+    id:"spain_pre1580",name:"Ισπανική Μοναρχία — Φίλιππος Β΄",type:"coat of arms",
+    file:"Full Ornamented Coat of arms of Philip II of Spain (1558–1580).svg"
+  },
+  spain_1580:{
+    id:"spain_1580",name:"Ισπανική Μοναρχία — Φίλιππος Β΄",type:"coat of arms, from 1580",
+    file:"Royal Arms of Spain (1580-1668).svg"
+  },
+  france:{
+    id:"france",name:"Βασίλειο της Γαλλίας",type:"royal arms",
+    file:"Coat of Arms of the Kingdom of France (from Royal Standard).svg"
+  },
+  venice:{
+    id:"venice",name:"Γαληνοτάτη Δημοκρατία της Βενετίας",type:"Lion of Saint Mark",
+    file:"Lion of Saint Mark.svg"
+  },
+  ottoman:{
+    id:"ottoman",name:"Οθωμανική Αυτοκρατορία — Μουράτ Γ΄",type:"tughra, not a Western coat of arms",
+    file:"Tughra of Murad III.svg"
+  },
+  hospitaller:{
+    id:"hospitaller",name:"Τάγμα του Αγίου Ιωάννη / Ιωαννίτες",type:"coat of arms",
+    file:"Coat of arms of the Knights Hospitaller.svg"
+  },
+  ragusa:{
+    id:"ragusa",name:"Δημοκρατία της Ραγούσας",type:"coat of arms",
+    file:"Coat of Arms of the Republic of Ragusa.svg"
+  }
+};
+Object.values(POWERS).forEach(p=>p.image=COMMONS(p.file));
+
+const selectedYear=()=>state.year==="All"?null:Number(state.year);
+const spanishPower=()=>selectedYear()&&selectedYear()>=1580?POWERS.spain_1580:POWERS.spain_pre1580;
+const powerForPlace=p=>{
+  const a=(p.authority||"").toLowerCase();
+  if(a.includes("venice")||a.includes("venetian"))return POWERS.venice;
+  if(a.includes("ottoman"))return POWERS.ottoman;
+  if(a.includes("hospitaller")||a.includes("order of st john")||a.includes("sovereign order"))return POWERS.hospitaller;
+  if(a.includes("ragusa"))return POWERS.ragusa;
+  if(a.includes("philip ii")||a.includes("spanish habsburg")||a.includes("kingdom of naples"))return spanishPower();
+  if(a.includes("france")||a.includes("french"))return POWERS.france;
+  return null;
+};
 const routeDashed=t=>t!=="DEPICTED TRAVEL";
 const routeStory=r=>{
   const n=r.name||"";
@@ -27,11 +72,30 @@ const routeStory=r=>{
   if(n.startsWith("Ferlaino 1577")) return "Ferlaino / Hospitallers 1577";
   return r.character||r.name||"Other";
 };
-const yearsFrom=s=>Array.from(new Set((String(s||"").match(/15\d{2}/g)||[])));
+const yearsFrom=s=>{
+  const text=String(s||"");
+  const out=new Set(text.match(/15\d{2}/g)||[]);
+  for(const m of text.matchAll(/(15\d{2})\s*[–-]\s*(15\d{2})/g)){
+    const a=Number(m[1]),b=Number(m[2]);
+    if(b>=a&&b-a<=40)for(let y=a;y<=b;y++)out.add(String(y));
+  }
+  return Array.from(out);
+};
 const yearHit=(obj,year)=>year==="All"||yearsFrom(obj.period).includes(year);
 const bookHit=(obj)=>state.book==="All"||(obj.books||[]).includes(state.book);
 
 function markerIcon(p){
+  if(state.mode==="EMPIRES"){
+    const power=powerForPlace(p);
+    if(power){
+      const tughra=power.id==="ottoman"?" tughra":"";
+      return L.divIcon({
+        className:"",
+        html:`<div class="power-marker${tughra}"><img src="${power.image}" alt=""></div>`,
+        iconSize:[48,48],iconAnchor:[24,24]
+      });
+    }
+  }
   return L.divIcon({
     className:"",
     html:`<div class="marker-wrap"><div class="marker-icon marker-${coordClass(p)}"></div></div>`,
@@ -50,10 +114,12 @@ function closeDetail(){
   document.getElementById("scrim").classList.remove("on");
 }
 function showPlace(p){
+  const power=powerForPlace(p);
   openDetail(`
     <div class="mini-kicker">PLACE DOSSIER</div>
     <h1>${esc(p.place||"Unavailable")}</h1>
     <div class="sub">${esc(p.historicalNames||p.modernName||"")}</div>
+    ${power?`<div class="power-badge"><img src="${power.image}" alt=""><div><div class="power-name">${esc(power.name)}</div><div class="sub">${esc(power.type)}</div></div></div>`:""}
     <div class="badges">
       <span class="badge">${esc(p.type||"TYPE UNAVAILABLE")}</span>
       <span class="badge">${esc(p.coordinateStatus||"COORDINATE STATUS UNAVAILABLE")}</span>
@@ -102,6 +168,11 @@ function rebuildFilters(){
   const types=Array.from(new Set(atlasData.routes.map(r=>r.type).filter(Boolean))).sort();
   document.getElementById("routeFilters").innerHTML=types.map(t=>`<label><input type="checkbox" data-route="${esc(t)}" ${state.routeTypes.has(t)?"checked":""}> <span>${esc(t)}</span></label>`).join("");
   document.querySelectorAll("[data-route]").forEach(c=>c.onchange=()=>{c.checked?state.routeTypes.add(c.dataset.route):state.routeTypes.delete(c.dataset.route);render();});
+
+  const legendPowers=[POWERS.spain_pre1580,POWERS.france,POWERS.venice,POWERS.ottoman,POWERS.hospitaller,POWERS.ragusa];
+  document.getElementById("powerLegend").innerHTML=legendPowers.map(p=>`
+    <div class="power-card"><img src="${p.image}" alt=""><div><div class="pn">${esc(p.name)}</div><div class="pt">${esc(p.type)}</div></div></div>
+  `).join("");
 }
 
 function routeStyle(type){
@@ -115,14 +186,28 @@ function routeStyle(type){
 function render(){
   placeMarkers.clearLayers();routeLines.clearLayers();
   const q=state.search.trim().toLowerCase();
-  const visiblePlaces=atlasData.places.filter(p=>
-    Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&bookHit(p)&&yearHit(p,state.year)&&
-    (!state.verifiedOnly||p.coordinateStatus==="VERIFIED")&&textHit(p,q)
-  );
+
+  const intelligencePlaceIds=new Set();
+  atlasData.routes.filter(r=>r.type==="INTELLIGENCE / NETWORK"&&bookHit(r)&&yearHit(r,state.year)).forEach(r=>{
+    (r.from||[]).forEach(x=>intelligencePlaceIds.add(x.id));
+    (r.to||[]).forEach(x=>intelligencePlaceIds.add(x.id));
+  });
+
+  const visiblePlaces=atlasData.places.filter(p=>{
+    const base=Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&bookHit(p)&&yearHit(p,state.year)&&
+      (!state.verifiedOnly||p.coordinateStatus==="VERIFIED")&&textHit(p,q);
+    if(!base)return false;
+    if(state.mode==="PEOPLE")return Boolean((p.characters||"").trim());
+    if(state.mode==="EMPIRES")return Boolean(powerForPlace(p));
+    if(state.mode==="INTELLIGENCE")return intelligencePlaceIds.has(p.id)||(p.trilogyRole||"").toLowerCase().includes("intelligence");
+    return true;
+  });
 
   if(state.showPlaces)visiblePlaces.forEach(p=>{
     const m=L.marker([p.lat,p.lon],{icon:markerIcon(p),title:p.place,riseOnHover:true});
-    m.bindTooltip(p.place,{direction:"top",offset:[0,-8]});
+    const power=powerForPlace(p);
+    const tip=state.mode==="EMPIRES"&&power?power.name+" · "+p.place:p.place;
+    m.bindTooltip(tip,{direction:"top",offset:[0,-8]});
     m.bindPopup(`<strong>${esc(p.place)}</strong><br><small>${esc(p.period||"")}</small>`);
     m.on("click",()=>showPlace(p));
     m.addTo(placeMarkers);
@@ -130,10 +215,13 @@ function render(){
 
   let routeCount=0;
   if(state.showRoutes){
-    const filtered=atlasData.routes.filter(r=>
-      state.routeTypes.has(r.type)&&bookHit(r)&&yearHit(r,state.year)&&textHit(r,q)&&
-      (state.routeStory==="All"||routeStory(r)===state.routeStory)
-    );
+    const filtered=atlasData.routes.filter(r=>{
+      if(state.mode==="EMPIRES"||state.mode==="EVIDENCE")return false;
+      if(state.mode==="INTELLIGENCE"&&r.type!=="INTELLIGENCE / NETWORK")return false;
+      if(state.mode==="PEOPLE"&&r.type!=="DEPICTED TRAVEL")return false;
+      return state.routeTypes.has(r.type)&&bookHit(r)&&yearHit(r,state.year)&&textHit(r,q)&&
+        (state.routeStory==="All"||routeStory(r)===state.routeStory);
+    });
 
     const grouped=new Map();
     filtered.forEach(r=>{
@@ -180,7 +268,8 @@ function render(){
       line.addTo(routeLines);routeCount++;
     });
   }
-  document.getElementById("countBadge").textContent=`${state.showPlaces?visiblePlaces.length:0} τόποι · ${routeCount} route stories`;
+  const modeLabels={STORY:"Story",PEOPLE:"People",EMPIRES:"Empires",INTELLIGENCE:"Intelligence",EVIDENCE:"Evidence",TIMELINE:"Timeline"};
+  document.getElementById("countBadge").textContent=`${modeLabels[state.mode]} · ${state.showPlaces?visiblePlaces.length:0} τόποι · ${routeCount} route stories`;
 }
 function fitAll(){
   const latlngs=atlasData.places.filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lon)).map(p=>[p.lat,p.lon]);
@@ -204,7 +293,15 @@ fetch("./data.json").then(r=>r.json()).then(data=>{
 });
 
 document.getElementById("searchInput").addEventListener("input",e=>{state.search=e.target.value;render();});
-document.getElementById("yearFilter").addEventListener("change",e=>{state.year=e.target.value;render();});
+document.getElementById("yearFilter").addEventListener("change",e=>{state.year=e.target.value;rebuildFilters();render();});
+document.querySelectorAll("[data-mode]").forEach(btn=>btn.addEventListener("click",()=>{
+  state.mode=btn.dataset.mode;
+  document.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("active",x===btn));
+  if(state.mode==="INTELLIGENCE")state.routeTypes=new Set(["INTELLIGENCE / NETWORK"]);
+  if(state.mode==="PEOPLE")state.routeTypes=new Set(["DEPICTED TRAVEL"]);
+  if(state.mode==="STORY"&&state.routeTypes.size===0)state.routeTypes=new Set(["DEPICTED TRAVEL"]);
+  rebuildFilters();render();
+}));
 document.getElementById("routeStoryFilter").addEventListener("change",e=>{state.routeStory=e.target.value;render();});
 document.getElementById("verifiedOnly").addEventListener("change",e=>{state.verifiedOnly=e.target.checked;render();});
 document.getElementById("placesToggle").addEventListener("change",e=>{state.showPlaces=e.target.checked;e.target.checked?placeMarkers.addTo(map):map.removeLayer(placeMarkers);render();});
