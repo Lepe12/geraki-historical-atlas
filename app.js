@@ -28,6 +28,15 @@ const POWERS={
 };
 Object.values(POWERS).forEach(p=>p.image=p.file?COMMONS(p.file):null);
 
+const POWER_LABELS={
+  spain_pre1580:"ΙΣΠΑΝΙΚΗ ΜΟΝΑΡΧΙΑ",
+  spain_1580:"ΙΣΠΑΝΙΚΗ ΜΟΝΑΡΧΙΑ",
+  france:"ΒΑΣΙΛΕΙΟ ΤΗΣ ΓΑΛΛΙΑΣ",
+  venice:"ΓΑΛΗΝΟΤΑΤΗ ΒΕΝΕΤΙΑ",
+  ottoman:"ΟΘΩΜΑΝΙΚΗ ΑΥΤΟΚΡΑΤΟΡΙΑ",
+  hospitaller:"ΙΩΑΝΝΙΤΕΣ",
+  ragusa:"ΔΗΜΟΚΡΑΤΙΑ ΤΗΣ ΡΑΓΟΥΣΑΣ"
+};
 const selectedYear=()=>state.year==="All"?null:Number(state.year);
 const spanishPower=()=>selectedYear()&&selectedYear()>=1580?POWERS.spain_1580:POWERS.spain_pre1580;
 const powerForPlace=p=>{
@@ -68,18 +77,17 @@ function markerIcon(p){
   if(state.mode==="EMPIRES"){
     const power=powerForPlace(p);
     if(power){
-      if(empireRepIds.has(p.id)&&power.image){
-        const safe=power.image.replace(/"/g,"%22");
+      if(empireRepIds.has(p.id)){
         return L.divIcon({
           className:"",
-          html:`<div class="power-flag"><span class="power-img" style="background-image:url('${safe}')"></span></div>`,
-          iconSize:[46,34],iconAnchor:[23,17]
+          html:`<div class="empire-label empire-${power.id}"><span class="empire-symbol"></span><span class="empire-name">${esc(POWER_LABELS[power.id]||power.name)}</span></div>`,
+          iconSize:[190,34],iconAnchor:[20,17]
         });
       }
       return L.divIcon({
         className:"",
-        html:`<div class="empire-site-marker"></div>`,
-        iconSize:[11,11],iconAnchor:[5,5]
+        html:`<div class="empire-site-marker empire-${power.id}"></div>`,
+        iconSize:[10,10],iconAnchor:[5,5]
       });
     }
   }
@@ -163,7 +171,7 @@ function rebuildFilters(){
 
   const legendPowers=[POWERS.spain_pre1580,POWERS.france,POWERS.venice,POWERS.ottoman,POWERS.hospitaller,POWERS.ragusa];
   document.getElementById("powerLegend").innerHTML=legendPowers.map(p=>`
-    <div class="power-card">${p.image?`<img src="${p.image}" alt="">`:`<span class="flag-unavailable">—</span>`}<div><div class="pn">${esc(p.name)}</div><div class="pt">${esc(p.type)}</div></div></div>
+    <div class="power-card"><span class="power-swatch empire-${p.id}"></span><div><div class="pn">${esc(POWER_LABELS[p.id]||p.name)}</div><div class="pt">${esc(p.name)}</div></div></div>
   `).join("");
 }
 
