@@ -2,6 +2,7 @@ const state={mode:"STORY",book:"All",search:"",year:"All",routeStory:"All",verif
 const placeMarkers=L.layerGroup(),routeLines=L.layerGroup();
 let atlasData={places:[],routes:[]};
 const byId=new Map();
+let empireRepIds=new Set();
 
 const map=L.map("map",{zoomControl:true,preferCanvas:true}).setView([39.1,18.5],5);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"&copy; OpenStreetMap contributors"}).addTo(map);
@@ -88,11 +89,19 @@ function markerIcon(p){
   if(state.mode==="EMPIRES"){
     const power=powerForPlace(p);
     if(power){
-      const tughra=power.id==="ottoman"?" tughra":"";
+      if(empireRepIds.has(p.id)){
+        const tughra=power.id==="ottoman"?" tughra":"";
+        const safe=power.image.replace(/"/g,"%22");
+        return L.divIcon({
+          className:"",
+          html:`<div class="power-marker${tughra}"><span class="power-img" style="background-image:url('${safe}')"></span></div>`,
+          iconSize:[38,38],iconAnchor:[19,19]
+        });
+      }
       return L.divIcon({
         className:"",
-        html:`<div class="power-marker${tughra}"><img src="${power.image}" alt=""></div>`,
-        iconSize:[48,48],iconAnchor:[24,24]
+        html:`<div class="empire-site-marker"></div>`,
+        iconSize:[11,11],iconAnchor:[5,5]
       });
     }
   }
@@ -202,6 +211,32 @@ function render(){
     if(state.mode==="INTELLIGENCE")return intelligencePlaceIds.has(p.id)||(p.trilogyRole||"").toLowerCase().includes("intelligence");
     return true;
   });
+
+  empireRepIds=new Set();
+  if(state.mode==="EMPIRES"){
+    const preferred={
+      venice:["Corfu","Candia"],
+      ottoman:["Constantinople","Preveza waters"],
+      hospitaller:["Malta"],
+      ragusa:["Ragusa"],
+      spain_pre1580:["Madrid","Naples","Otranto"],
+      spain_1580:["Madrid","Naples","Otranto"],
+      france:["Paris"]
+    };
+    const groups=new Map();
+    visiblePlaces.forEach(p=>{
+      const pw=powerForPlace(p); if(!pw)return;
+      if(!groups.has(pw.id))groups.set(pw.id,[]);
+      groups.get(pw.id).push(p);
+    });
+    groups.forEach((items,powerId)=>{
+      const pref=preferred[powerId]||[];
+      let rep=null;
+      for(const name of pref){rep=items.find(p=>p.place===name);if(rep)break;}
+      if(!rep)rep=items[0];
+      if(rep)empireRepIds.add(rep.id);
+    });
+  }
 
   if(state.showPlaces)visiblePlaces.forEach(p=>{
     const m=L.marker([p.lat,p.lon],{icon:markerIcon(p),title:p.place,riseOnHover:true});
