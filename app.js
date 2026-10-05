@@ -1,12 +1,15 @@
 const state={mode:"STORY",book:"All",search:"",year:"All",routeStory:"All",verifiedOnly:false,showPlaces:true,showRoutes:true,routeTypes:new Set(["DEPICTED TRAVEL"])};
-const placeMarkers=L.layerGroup(),routeLines=L.layerGroup();
+const placeMarkers=L.layerGroup(),routeLines=L.layerGroup(),historicalLabels=L.layerGroup();
 let atlasData={places:[],routes:[]};
 const byId=new Map();
 let empireRepIds=new Set();
 
 const map=L.map("map",{zoomControl:true,preferCanvas:true}).setView([39.1,18.5],5);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"&copy; OpenStreetMap contributors"}).addTo(map);
-placeMarkers.addTo(map);routeLines.addTo(map);
+L.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",{
+  maxZoom:19,
+  attribution:"&copy; OpenStreetMap contributors &copy; CARTO"
+}).addTo(map);
+placeMarkers.addTo(map);routeLines.addTo(map);historicalLabels.addTo(map);
 map.zoomControl.setPosition("bottomright");
 
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
@@ -171,15 +174,43 @@ function rebuildFilters(){
 }
 
 function routeStyle(type){
-  const base={weight:2.2,opacity:.82,color:"#c3a15e"};
+  const base={weight:2.35,opacity:.84,color:"#7d2f2a",lineCap:"round",lineJoin:"round"};
   if(type==="INTELLIGENCE / NETWORK")return {...base,dashArray:"2 8",weight:2.4,opacity:.7};
   if(type==="PLANNED — NOT EXECUTED")return {...base,dashArray:"10 9",opacity:.52};
   if(type==="STRONG RECONSTRUCTION")return {...base,dashArray:"7 7",opacity:.66};
   return base;
 }
 
+function historicalLabelIcon(p){
+  const t=(p.type||"").toLowerCase();
+  const cls=t.includes("port")||t.includes("harbor")?" port":"";
+  const capital=(p.place==="Madrid"||p.place==="Constantinople"||p.place==="Naples"||p.place==="Venice")?" capital":"";
+  return L.divIcon({
+    className:"",
+    html:`<div class="historical-place-label${cls}${capital}">${esc(p.historicalNames||p.place)}</div>`,
+    iconSize:[180,22],iconAnchor:[-8,10]
+  });
+}
+
+function curvedRoutePoints(a,b,steps=28){
+  const dx=b.lon-a.lon,dy=b.lat-a.lat;
+  const dist=Math.sqrt(dx*dx+dy*dy);
+  const bend=Math.min(2.3,dist*.10);
+  const mx=(a.lon+b.lon)/2, my=(a.lat+b.lat)/2;
+  const nx=dist?(-dy/dist):0, ny=dist?(dx/dist):0;
+  const cx=mx+nx*bend, cy=my+ny*bend;
+  const pts=[];
+  for(let i=0;i<=steps;i++){
+    const t=i/steps,mt=1-t;
+    const lon=mt*mt*a.lon+2*mt*t*cx+t*t*b.lon;
+    const lat=mt*mt*a.lat+2*mt*t*cy+t*t*b.lat;
+    pts.push([lat,lon]);
+  }
+  return pts;
+}
+
 function render(){
-  placeMarkers.clearLayers();routeLines.clearLayers();
+  placeMarkers.clearLayers();routeLines.clearLayers();historicalLabels.clearLayers();
   const q=state.search.trim().toLowerCase();
 
   const intelligencePlaceIds=new Set();
@@ -232,6 +263,9 @@ function render(){
     m.bindPopup(`<strong>${esc(p.place)}</strong><br><small>${esc(p.period||"")}</small>`);
     m.on("click",()=>showPlace(p));
     m.addTo(placeMarkers);
+    if(state.mode!=="EMPIRES"){
+      L.marker([p.lat,p.lon],{icon:historicalLabelIcon(p),interactive:false}).addTo(historicalLabels);
+    }
   });
 
   let routeCount=0;
@@ -270,7 +304,14 @@ function render(){
       });
       if(points.length<2)return;
       const representative=items[0].r;
-      const line=L.polyline(points,routeStyle(representative.type));
+      const curved=[];
+      for(let i=0;i<points.length-1;i++){
+        const pa={lat:points[i][0],lon:points[i][1]},pb={lat:points[i+1][0],lon:points[i+1][1]};
+        const seg=curvedRoutePoints(pa,pb);
+        if(i>0)seg.shift();
+        curved.push(...seg);
+      }
+      const line=L.polyline(curved.length?curved:points,routeStyle(representative.type));
       const label=items.length>1?story:representative.name;
       line.bindTooltip(label,{sticky:true});
       line.on("click",()=>{
