@@ -80,12 +80,20 @@ function markerIcon(p){
   if(state.mode==="EMPIRES"){
     const power=powerForPlace(p);
     if(power){
-      const safe=power.image.replace(/"/g,"%22");
-      const ottoman=power.id==="ottoman"?" ottoman-shield":"";
+      const showShield=map.getZoom()>=7||empireRepIds.has(p.id);
+      if(showShield){
+        const safe=power.image.replace(/"/g,"%22");
+        const ottoman=power.id==="ottoman"?" ottoman-shield":"";
+        return L.divIcon({
+          className:"",
+          html:`<div class="heraldic-shield${ottoman}" title="${esc(power.name)}"><span class="heraldic-art" style="background-image:url('${safe}')"></span></div>`,
+          iconSize:[30,36],iconAnchor:[15,18]
+        });
+      }
       return L.divIcon({
         className:"",
-        html:`<div class="heraldic-shield${ottoman}" title="${esc(power.name)}"><span class="heraldic-art" style="background-image:url('${safe}')"></span></div>`,
-        iconSize:[34,40],iconAnchor:[17,20]
+        html:`<div class="sovereignty-node"></div>`,
+        iconSize:[8,8],iconAnchor:[4,4]
       });
     }
   }
@@ -181,14 +189,32 @@ function routeStyle(type){
   return base;
 }
 
+const MAJOR_PLACES=new Set(["Madrid","Lisbon","Naples","Constantinople","Corfu","Malta","Ragusa","Candia","Tunis","Otranto"]);
+const CAPITAL_PLACES=new Set(["Madrid","Constantinople","Naples"]);
+function labelPriority(p){
+  if(CAPITAL_PLACES.has(p.place))return 3;
+  if(MAJOR_PLACES.has(p.place))return 2;
+  if(["City","Port","Fortress"].includes(p.type))return 1;
+  return 0;
+}
+function shouldShowLabel(p,routeNodeIds){
+  const z=map.getZoom();
+  const pri=labelPriority(p);
+  if(z>=8)return true;
+  if(z===7)return pri>=1||routeNodeIds.has(p.id);
+  if(z===6)return pri>=2||routeNodeIds.has(p.id);
+  return pri>=3||routeNodeIds.has(p.id);
+}
 function historicalLabelIcon(p){
   const t=(p.type||"").toLowerCase();
-  const cls=t.includes("port")||t.includes("harbor")?" port":"";
-  const capital=(p.place==="Madrid"||p.place==="Constantinople"||p.place==="Naples"||p.place==="Venice")?" capital":"";
+  const port=t.includes("port")||t.includes("harbor")?" port":"";
+  const fortress=t.includes("fortress")?" fortress":"";
+  const capital=CAPITAL_PLACES.has(p.place)?" capital":"";
+  const major=MAJOR_PLACES.has(p.place)?" major":"";
   return L.divIcon({
     className:"",
-    html:`<div class="historical-place-label${cls}${capital}">${esc(p.place)}</div>`,
-    iconSize:[130,20],iconAnchor:[-7,9]
+    html:`<div class="historical-place-label${port}${fortress}${capital}${major}">${esc(p.place)}</div>`,
+    iconSize:[118,18],iconAnchor:[-6,8]
   });
 }
 
@@ -255,6 +281,15 @@ function render(){
     });
   }
 
+  const activeRouteNodeIds=new Set();
+  atlasData.routes.filter(r=>
+    bookHit(r)&&yearHit(r,state.year)&&
+    (state.routeStory==="All"||routeStory(r)===state.routeStory)
+  ).forEach(r=>{
+    (r.from||[]).forEach(x=>activeRouteNodeIds.add(x.id));
+    (r.to||[]).forEach(x=>activeRouteNodeIds.add(x.id));
+  });
+
   if(state.showPlaces)visiblePlaces.forEach(p=>{
     const m=L.marker([p.lat,p.lon],{icon:markerIcon(p),title:p.place,riseOnHover:true});
     const power=powerForPlace(p);
@@ -263,7 +298,7 @@ function render(){
     m.bindPopup(`<strong>${esc(p.place)}</strong><br><small>${esc(p.period||"")}</small>`);
     m.on("click",()=>showPlace(p));
     m.addTo(placeMarkers);
-    if(state.mode!=="EMPIRES" && map.getZoom()>=6){
+    if(state.mode!=="EMPIRES" && shouldShowLabel(p,activeRouteNodeIds)){
       L.marker([p.lat,p.lon],{icon:historicalLabelIcon(p),interactive:false}).addTo(historicalLabels);
     }
   });
