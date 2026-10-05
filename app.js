@@ -1,4 +1,4 @@
-const state={book:"All",search:"",year:"All",verifiedOnly:false,showPlaces:true,showRoutes:true,routeTypes:new Set()};
+const state={book:"All",search:"",year:"All",routeStory:"All",verifiedOnly:false,showPlaces:true,showRoutes:true,routeTypes:new Set(["DEPICTED TRAVEL"])};
 const placeMarkers=L.layerGroup(),routeLines=L.layerGroup();
 let atlasData={places:[],routes:[]};
 const byId=new Map();
@@ -16,6 +16,17 @@ const textHit=(obj,q)=>!q||Object.values(obj).some(v=>{
 });
 const coordClass=p=>p.coordinateStatus==="VERIFIED"?"documented":p.coordinateStatus==="NEEDS RESEARCH"?"research":"mixed";
 const routeDashed=t=>t!=="DEPICTED TRAVEL";
+const routeStory=r=>{
+  const n=r.name||"";
+  if(n.startsWith("Acuña 1577")) return "Acuña mission 1577";
+  if(n.startsWith("Cyprus intelligence")) return "Cyprus intelligence 1578";
+  if(n.startsWith("Otranto surveillance")) return "Otranto surveillance 1578";
+  if(n.startsWith("Cyprus proposal")) return "Cyprus proposal 1578";
+  if(n.startsWith("Lantzas/Ferlaino 1577")) return "Lantzas–Ferlaino 1577";
+  if(n.startsWith("Artemis 1577")) return "Artemis search 1577";
+  if(n.startsWith("Ferlaino 1577")) return "Ferlaino / Hospitallers 1577";
+  return r.character||r.name||"Other";
+};
 const yearsFrom=s=>Array.from(new Set((String(s||"").match(/15\d{2}/g)||[])));
 const yearHit=(obj,year)=>year==="All"||yearsFrom(obj.period).includes(year);
 const bookHit=(obj)=>state.book==="All"||(obj.books||[]).includes(state.book);
@@ -84,8 +95,11 @@ function rebuildFilters(){
   const yearSelect=document.getElementById("yearFilter");
   yearSelect.innerHTML='<option value="All">Όλες οι περίοδοι</option>'+years.map(y=>`<option value="${y}" ${state.year===y?"selected":""}>${y}</option>`).join("");
 
+  const stories=["All",...Array.from(new Set(atlasData.routes.map(routeStory).filter(Boolean))).sort()];
+  const storySelect=document.getElementById("routeStoryFilter");
+  storySelect.innerHTML=stories.map(s=>`<option value="${esc(s)}" ${state.routeStory===s?"selected":""}>${s==="All"?"Όλες οι διαδρομές":esc(s)}</option>`).join("");
+
   const types=Array.from(new Set(atlasData.routes.map(r=>r.type).filter(Boolean))).sort();
-  if(!state.routeTypes.size)types.forEach(t=>state.routeTypes.add(t));
   document.getElementById("routeFilters").innerHTML=types.map(t=>`<label><input type="checkbox" data-route="${esc(t)}" ${state.routeTypes.has(t)?"checked":""}> <span>${esc(t)}</span></label>`).join("");
   document.querySelectorAll("[data-route]").forEach(c=>c.onchange=()=>{c.checked?state.routeTypes.add(c.dataset.route):state.routeTypes.delete(c.dataset.route);render();});
 }
@@ -116,19 +130,57 @@ function render(){
 
   let routeCount=0;
   if(state.showRoutes){
-    atlasData.routes.filter(r=>state.routeTypes.has(r.type)&&bookHit(r)&&yearHit(r,state.year)&&textHit(r,q)).forEach(r=>{
+    const filtered=atlasData.routes.filter(r=>
+      state.routeTypes.has(r.type)&&bookHit(r)&&yearHit(r,state.year)&&textHit(r,q)&&
+      (state.routeStory==="All"||routeStory(r)===state.routeStory)
+    );
+
+    const grouped=new Map();
+    filtered.forEach(r=>{
       const a=(r.from||[])[0],b=(r.to||[])[0];
-      if(!a||!b)return;
+      if(!a||!b||a.id===b.id)return;
       const pa=byId.get(a.id),pb=byId.get(b.id);
       if(!pa||!pb||!Number.isFinite(pa.lat)||!Number.isFinite(pb.lat))return;
       if(state.verifiedOnly&&(pa.coordinateStatus!=="VERIFIED"||pb.coordinateStatus!=="VERIFIED"))return;
-      const line=L.polyline([[pa.lat,pa.lon],[pb.lat,pb.lon]],routeStyle(r.type));
-      line.bindTooltip(r.name,{sticky:true});
-      line.on("click",()=>showRoute(r));
+      const key=routeStory(r)+"||"+r.type;
+      if(!grouped.has(key))grouped.set(key,[]);
+      grouped.get(key).push({r,pa,pb});
+    });
+
+    grouped.forEach(items=>{
+      items.sort((x,y)=>(x.r.sequence||0)-(y.r.sequence||0));
+      const story=routeStory(items[0].r);
+      const points=[];
+      const seen=new Set();
+      items.forEach((it,i)=>{
+        const pair=[[it.pa.lat,it.pa.lon],[it.pb.lat,it.pb.lon]];
+        pair.forEach((pt,j)=>{
+          const k=pt.join(",");
+          if(!seen.has(k) || (i===0&&j===0)){points.push(pt);seen.add(k);}
+        });
+      });
+      if(points.length<2)return;
+      const representative=items[0].r;
+      const line=L.polyline(points,routeStyle(representative.type));
+      const label=items.length>1?story:representative.name;
+      line.bindTooltip(label,{sticky:true});
+      line.on("click",()=>{
+        if(items.length===1)showRoute(representative);
+        else openDetail(`
+          <div class="mini-kicker">ROUTE STORY</div>
+          <h1>${esc(story)}</h1>
+          <div class="sub">${esc(representative.character||"")}</div>
+          <div class="badges"><span class="badge">${esc(representative.type)}</span><span class="badge">${items.length} legs</span></div>
+          ${field("Period",representative.period)}
+          ${field("Sequence",items.map(x=>x.r.name).join("\n→ "))}
+          ${field("Evidence",items.map(x=>x.r.evidence).filter(Boolean).join("\n\n"))}
+          ${field("Atlas note","The displayed polyline joins the stored Airtable nodes in sequence. It is a narrative/analytical route, not an asserted exact historical track.")}
+        `);
+      });
       line.addTo(routeLines);routeCount++;
     });
   }
-  document.getElementById("countBadge").textContent=`${state.showPlaces?visiblePlaces.length:0} τόποι · ${routeCount} διαδρομές`;
+  document.getElementById("countBadge").textContent=`${state.showPlaces?visiblePlaces.length:0} τόποι · ${routeCount} route stories`;
 }
 function fitAll(){
   const latlngs=atlasData.places.filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lon)).map(p=>[p.lat,p.lon]);
@@ -153,6 +205,7 @@ fetch("./data.json").then(r=>r.json()).then(data=>{
 
 document.getElementById("searchInput").addEventListener("input",e=>{state.search=e.target.value;render();});
 document.getElementById("yearFilter").addEventListener("change",e=>{state.year=e.target.value;render();});
+document.getElementById("routeStoryFilter").addEventListener("change",e=>{state.routeStory=e.target.value;render();});
 document.getElementById("verifiedOnly").addEventListener("change",e=>{state.verifiedOnly=e.target.checked;render();});
 document.getElementById("placesToggle").addEventListener("change",e=>{state.showPlaces=e.target.checked;e.target.checked?placeMarkers.addTo(map):map.removeLayer(placeMarkers);render();});
 document.getElementById("routesToggle").addEventListener("change",e=>{state.showRoutes=e.target.checked;e.target.checked?routeLines.addTo(map):map.removeLayer(routeLines);render();});
