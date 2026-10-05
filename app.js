@@ -103,11 +103,11 @@ function settlementIcon(p){
     "settlement-region":'<span class="region-mark">✦</span>',
     "settlement-generic":'<span class="generic-mark">•</span>'
   };
-  const heraldry=power?'<span class="settlement-heraldry"></span>':"";
+  const heraldry=power?`<span class="settlement-heraldry"><span class="settlement-heraldry-art" style="background-image:url('${power.image.replace(/"/g,"%22")}')"></span></span>`:"";
   return L.divIcon({
     className:"",
     html:`<div class="settlement-icon ${cls}${capital}${major}${powerClass}" title="${esc(p.place)}">${htmlMap[cls]}${heraldry}</div>`,
-    iconSize:[38,34],iconAnchor:[19,23]
+    iconSize:[54,46],iconAnchor:[27,31]
   });
 }
 function markerIcon(p){
