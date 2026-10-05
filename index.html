@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b0a08">
 <title>Το Γεράκι της Μεσογείου — Historical Atlas</title>
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -10,64 +11,93 @@
 </head>
 <body>
 <div id="app">
-  <header class="topbar">
-    <div>
-      <div class="eyebrow">GERAKI HISTORICAL ATLAS</div>
-      <h1>Το Γεράκι της Μεσογείου</h1>
-      <p>Τόποι, πρόσωπα, περίοδοι και διαδρομές από τα δεδομένα του Airtable.</p>
-    </div>
-    <button id="fitBtn" type="button">Όλος ο χάρτης</button>
-  </header>
-  <main class="layout">
-    <aside class="sidebar">
-      <label class="search">
-        <span>Αναζήτηση</span>
-        <input id="searchInput" type="search" placeholder="Τόπος, χαρακτήρας, περίοδος…">
-      </label>
-
-      <section>
-        <h2>Βιβλίο</h2>
-        <div id="bookFilters" class="chips"></div>
-      </section>
-
-      <section>
-        <h2>Τόποι</h2>
-        <label><input id="placesToggle" type="checkbox" checked> Εμφάνιση τόπων</label>
-        <label><input id="verifiedOnly" type="checkbox"> Μόνο verified συντεταγμένες</label>
-      </section>
-
-      <section>
-        <h2>Διαδρομές</h2>
-        <label><input id="routesToggle" type="checkbox" checked> Εμφάνιση διαδρομών</label>
-        <div id="routeFilters" class="checks"></div>
-      </section>
-
-      <section class="legend">
-        <h2>Υπόμνημα</h2>
-        <div><span class="dot documented"></span> Documented / verified</div>
-        <div><span class="dot mixed"></span> Mixed / approximate</div>
-        <div><span class="dot research"></span> Needs research</div>
-        <div><span class="route-line solid"></span> Depicted travel</div>
-        <div><span class="route-line dashed"></span> Reconstructed / network / planned</div>
-      </section>
-
-      <section class="data-note">
-        <strong>Κανόνας:</strong> ο χάρτης δεν γεωκωδικοποιεί και δεν αντικαθιστά συντεταγμένες. Οι γραμμές διαδρομών είναι σχηματικές συνδέσεις μεταξύ των αποθηκευμένων κόμβων.
-      </section>
-    </aside>
-
-    <section class="mapwrap">
+  <div class="atlas-shell">
+    <section class="map-stage">
       <div id="map"></div>
-      <div id="countBadge" class="count"></div>
-    </section>
 
-    <aside id="detailPanel" class="detail empty">
-      <div class="detail-placeholder">
-        <h2>Historical Atlas</h2>
-        <p>Επίλεξε τόπο ή διαδρομή για να δεις τα δεδομένα του.</p>
+      <header class="hero">
+        <div class="hero-kicker">GERAKI · HISTORICAL ATLAS</div>
+        <h1>Το Γεράκι της Μεσογείου</h1>
+        <div class="hero-rule"></div>
+        <p>Τόποι, πρόσωπα, διαδρομές και ιστορικό πλαίσιο της τριλογίας.</p>
+      </header>
+
+      <button id="filtersBtn" class="floating-btn filters-btn" type="button" aria-label="Άνοιγμα φίλτρων">
+        <span class="btn-icon">☰</span><span>Φίλτρα</span>
+      </button>
+
+      <button id="fitBtn" class="floating-btn fit-btn" type="button" aria-label="Προσαρμογή χάρτη">
+        <span class="btn-icon">⌖</span><span>Όλος ο χάρτης</span>
+      </button>
+
+      <div class="compass" aria-hidden="true">
+        <div class="compass-n">N</div>
+        <div class="compass-rose">✦</div>
       </div>
-    </aside>
-  </main>
+
+      <div id="countBadge" class="count"></div>
+
+      <div id="bookStrip" class="book-strip"></div>
+
+      <aside id="controlPanel" class="control-panel">
+        <div class="panel-head">
+          <div>
+            <div class="mini-kicker">NAVIGATION</div>
+            <h2>Εξερεύνηση</h2>
+          </div>
+          <button id="closeFilters" class="icon-btn" type="button" aria-label="Κλείσιμο">×</button>
+        </div>
+
+        <label class="search">
+          <span>Αναζήτηση</span>
+          <input id="searchInput" type="search" placeholder="Τόπος, χαρακτήρας, περίοδος…">
+        </label>
+
+        <section>
+          <h3>Χρονικό φίλτρο</h3>
+          <select id="yearFilter">
+            <option value="All">Όλες οι περίοδοι</option>
+          </select>
+        </section>
+
+        <section>
+          <h3>Τόποι</h3>
+          <label class="switch-row"><span>Εμφάνιση τόπων</span><input id="placesToggle" type="checkbox" checked></label>
+          <label class="switch-row"><span>Μόνο verified συντεταγμένες</span><input id="verifiedOnly" type="checkbox"></label>
+        </section>
+
+        <section>
+          <h3>Διαδρομές</h3>
+          <label class="switch-row"><span>Εμφάνιση διαδρομών</span><input id="routesToggle" type="checkbox" checked></label>
+          <div id="routeFilters" class="checks"></div>
+        </section>
+
+        <section class="legend">
+          <h3>Υπόμνημα</h3>
+          <div><span class="dot documented"></span> Documented / verified</div>
+          <div><span class="dot mixed"></span> Mixed / approximate</div>
+          <div><span class="dot research"></span> Needs research</div>
+          <div><span class="route-line solid"></span> Depicted travel</div>
+          <div><span class="route-line dashed"></span> Reconstructed / network / planned</div>
+        </section>
+
+        <div class="data-note">
+          Ο χάρτης δεν γεωκωδικοποιεί και δεν αντικαθιστά αποθηκευμένες συντεταγμένες. Οι γραμμές διαδρομών είναι σχηματικές συνδέσεις μεταξύ των καταγεγραμμένων κόμβων.
+        </div>
+      </aside>
+
+      <aside id="detailPanel" class="detail-panel" aria-live="polite">
+        <button id="closeDetail" class="detail-close" type="button" aria-label="Κλείσιμο λεπτομερειών">×</button>
+        <div class="detail-placeholder">
+          <div class="mini-kicker">DOSSIER</div>
+          <h2>Historical Atlas</h2>
+          <p>Επίλεξε έναν τόπο ή μία διαδρομή πάνω στον χάρτη.</p>
+        </div>
+      </aside>
+
+      <div id="scrim" class="scrim"></div>
+    </section>
+  </div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="./app.js"></script>
