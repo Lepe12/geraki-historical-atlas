@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Το Γεράκι της Μεσογείου — Historical Atlas</title>
+<link rel="preconnect" href="https://unpkg.com">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">GERAKI HISTORICAL ATLAS</div>
+      <h1>Το Γεράκι της Μεσογείου</h1>
+      <p>Τόποι, πρόσωπα, περίοδοι και διαδρομές από τα δεδομένα του Airtable.</p>
+    </div>
+    <button id="fitBtn" type="button">Όλος ο χάρτης</button>
+  </header>
+  <main class="layout">
+    <aside class="sidebar">
+      <label class="search">
+        <span>Αναζήτηση</span>
+        <input id="searchInput" type="search" placeholder="Τόπος, χαρακτήρας, περίοδος…">
+      </label>
+
+      <section>
+        <h2>Βιβλίο</h2>
+        <div id="bookFilters" class="chips"></div>
+      </section>
+
+      <section>
+        <h2>Τόποι</h2>
+        <label><input id="placesToggle" type="checkbox" checked> Εμφάνιση τόπων</label>
+        <label><input id="verifiedOnly" type="checkbox"> Μόνο verified συντεταγμένες</label>
+      </section>
+
+      <section>
+        <h2>Διαδρομές</h2>
+        <label><input id="routesToggle" type="checkbox" checked> Εμφάνιση διαδρομών</label>
+        <div id="routeFilters" class="checks"></div>
+      </section>
+
+      <section class="legend">
+        <h2>Υπόμνημα</h2>
+        <div><span class="dot documented"></span> Documented / verified</div>
+        <div><span class="dot mixed"></span> Mixed / approximate</div>
+        <div><span class="dot research"></span> Needs research</div>
+        <div><span class="route-line solid"></span> Depicted travel</div>
+        <div><span class="route-line dashed"></span> Reconstructed / network / planned</div>
+      </section>
+
+      <section class="data-note">
+        <strong>Κανόνας:</strong> ο χάρτης δεν γεωκωδικοποιεί και δεν αντικαθιστά συντεταγμένες. Οι γραμμές διαδρομών είναι σχηματικές συνδέσεις μεταξύ των αποθηκευμένων κόμβων.
+      </section>
+    </aside>
+
+    <section class="mapwrap">
+      <div id="map"></div>
+      <div id="countBadge" class="count"></div>
+    </section>
+
+    <aside id="detailPanel" class="detail empty">
+      <div class="detail-placeholder">
+        <h2>Historical Atlas</h2>
+        <p>Επίλεξε τόπο ή διαδρομή για να δεις τα δεδομένα του.</p>
+      </div>
+    </aside>
+  </main>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
