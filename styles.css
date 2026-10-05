@@ -266,3 +266,34 @@ button{color:inherit}
 .power-card{grid-template-columns:20px 1fr!important}
 .power-card img,.flag-unavailable{display:none!important}
 @media(max-width:620px){.empire-name{font-size:10px}.empire-label{max-width:150px;padding-right:6px}}
+
+/* Heraldic atlas markers: small shields at every place governed by that power */
+.empire-label,.power-swatch{display:none!important}
+.heraldic-shield,.legend-shield{
+  position:relative;overflow:hidden;
+  clip-path:polygon(50% 0,94% 10%,91% 58%,77% 81%,50% 100%,23% 81%,9% 58%,6% 10%);
+  background:#e6dcc5;border:0;filter:drop-shadow(0 3px 4px rgba(0,0,0,.55));
+}
+.heraldic-shield{
+  width:34px;height:40px;
+}
+.legend-shield{
+  width:25px;height:30px;
+}
+.heraldic-shield:before,.legend-shield:before{
+  content:"";position:absolute;inset:1px;
+  clip-path:inherit;background:#201a13;z-index:0;
+}
+.heraldic-shield:after,.legend-shield:after{
+  content:"";position:absolute;inset:2px;
+  clip-path:inherit;background:#eee6d4;z-index:1;
+}
+.heraldic-art{
+  position:absolute;z-index:2;inset:4px;
+  background-repeat:no-repeat!important;background-position:center!important;background-size:contain!important;
+}
+.ottoman-shield .heraldic-art{filter:sepia(.12) saturate(.9) contrast(1.05)}
+.power-card{grid-template-columns:30px 1fr!important;align-items:center!important}
+.power-card .legend-shield{justify-self:center}
+.power-card img,.flag-unavailable{display:none!important}
+.heraldic-shield:hover{transform:scale(1.12);transition:transform .12s ease}
