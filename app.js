@@ -91,20 +91,23 @@ function settlementIcon(p){
   const cls=settlementClass(p);
   const capital=CAPITAL_PLACES.has(p.place)?" is-capital":"";
   const major=MAJOR_PLACES.has(p.place)?" is-major":"";
+  const power=powerForPlace(p);
+  const powerClass=power?` power-${power.id}`:"";
   const htmlMap={
-    "settlement-city":'<span class="town-wall"></span><span class="tower t1"></span><span class="tower t2"></span><span class="roof r1"></span><span class="roof r2"></span>',
-    "settlement-port":'<span class="town-wall"></span><span class="tower t1"></span><span class="mast"></span><span class="harbor-line"></span>',
-    "settlement-fortress":'<span class="fort-wall"></span><span class="fort-tower ft1"></span><span class="fort-tower ft2"></span><span class="fort-gate"></span>',
-    "settlement-village":'<span class="house h1"></span><span class="house h2"></span><span class="house h3"></span>',
+    "settlement-city":'<span class="city-base"></span><span class="city-wall"></span><span class="city-tower ct1"></span><span class="city-tower ct2"></span><span class="city-roof cr1"></span><span class="city-roof cr2"></span>',
+    "settlement-port":'<span class="port-water"></span><span class="city-base"></span><span class="city-wall"></span><span class="city-tower ct1"></span><span class="port-mast"></span><span class="port-sail"></span>',
+    "settlement-fortress":'<span class="fort-base"></span><span class="fort-wall"></span><span class="fort-tower ft1"></span><span class="fort-tower ft2"></span><span class="fort-gate"></span>',
+    "settlement-village":'<span class="village-ground"></span><span class="house h1"></span><span class="house h2"></span><span class="house h3"></span>',
     "settlement-island":'<span class="island-mark"></span>',
     "settlement-sea":'<span class="sea-mark">≈</span>',
     "settlement-region":'<span class="region-mark">✦</span>',
     "settlement-generic":'<span class="generic-mark">•</span>'
   };
+  const heraldry=power?'<span class="settlement-heraldry"></span>':"";
   return L.divIcon({
     className:"",
-    html:`<div class="settlement-icon ${cls}${capital}${major}" title="${esc(p.place)}">${htmlMap[cls]}</div>`,
-    iconSize:[34,30],iconAnchor:[17,20]
+    html:`<div class="settlement-icon ${cls}${capital}${major}${powerClass}" title="${esc(p.place)}">${htmlMap[cls]}${heraldry}</div>`,
+    iconSize:[38,34],iconAnchor:[19,23]
   });
 }
 function markerIcon(p){
