@@ -18,36 +18,15 @@ const textHit=(obj,q)=>!q||Object.values(obj).some(v=>{
 const coordClass=p=>p.coordinateStatus==="VERIFIED"?"documented":p.coordinateStatus==="NEEDS RESEARCH"?"research":"mixed";
 const COMMONS=file=>"https://commons.wikimedia.org/wiki/Special:Redirect/file/"+encodeURIComponent(file);
 const POWERS={
-  spain_pre1580:{
-    id:"spain_pre1580",name:"Ισπανική Μοναρχία — Φίλιππος Β΄",type:"coat of arms",
-    file:"Coat of Arms of Philip II of Spain (1558-1580).svg"
-  },
-  spain_1580:{
-    id:"spain_1580",name:"Ισπανική Μοναρχία — Φίλιππος Β΄",type:"coat of arms, from 1580",
-    file:"Royal Arms of Spain (1580-1668).svg"
-  },
-  france:{
-    id:"france",name:"Βασίλειο της Γαλλίας",type:"royal arms",
-    file:"Coat of Arms of the Kingdom of France (from Royal Standard).svg"
-  },
-  venice:{
-    id:"venice",name:"Γαληνοτάτη Δημοκρατία της Βενετίας",type:"Lion of Saint Mark",
-    file:"Coat of arms of Republic of Venice.svg"
-  },
-  ottoman:{
-    id:"ottoman",name:"Οθωμανική Αυτοκρατορία — Μουράτ Γ΄",type:"tughra, not a Western coat of arms",
-    file:"Tughra of Murad III.svg"
-  },
-  hospitaller:{
-    id:"hospitaller",name:"Τάγμα του Αγίου Ιωάννη / Ιωαννίτες",type:"coat of arms",
-    file:"Coat of arms of the Knights Hospitaller.svg"
-  },
-  ragusa:{
-    id:"ragusa",name:"Δημοκρατία της Ραγούσας",type:"coat of arms",
-    file:"Coat of Arms of the Republic of Ragusa.svg"
-  }
+  spain_pre1580:{id:"spain_pre1580",name:"Ισπανική Μοναρχία — Φίλιππος Β΄",type:"Burgundy Cross banner",file:"Flag of Cross of Burgundy.svg"},
+  spain_1580:{id:"spain_1580",name:"Ισπανική Μοναρχία — Φίλιππος Β΄",type:"Burgundy Cross banner",file:"Flag of Cross of Burgundy.svg"},
+  france:{id:"france",name:"Βασίλειο της Γαλλίας",type:"royal banner, 14th–16th c.",file:"Flag of France (XIV-XVI).svg"},
+  venice:{id:"venice",name:"Γαληνοτάτη Δημοκρατία της Βενετίας",type:"banner of Saint Mark",file:"Flag of the Republic of Venice.svg"},
+  ottoman:{id:"ottoman",name:"Οθωμανική Αυτοκρατορία — Μουράτ Γ΄",type:"Ottoman banner, 1517–1793",file:"Flag of Ottoman Empire (1517-1793).svg"},
+  hospitaller:{id:"hospitaller",name:"Τάγμα του Αγίου Ιωάννη / Ιωαννίτες",type:"flag of the Order of St John",file:"Flag of the Order of St. John (various).svg"},
+  ragusa:{id:"ragusa",name:"Δημοκρατία της Ραγούσας",type:"16th-c. flag not securely assigned",file:null}
 };
-Object.values(POWERS).forEach(p=>p.image=COMMONS(p.file));
+Object.values(POWERS).forEach(p=>p.image=p.file?COMMONS(p.file):null);
 
 const selectedYear=()=>state.year==="All"?null:Number(state.year);
 const spanishPower=()=>selectedYear()&&selectedYear()>=1580?POWERS.spain_1580:POWERS.spain_pre1580;
@@ -89,13 +68,12 @@ function markerIcon(p){
   if(state.mode==="EMPIRES"){
     const power=powerForPlace(p);
     if(power){
-      if(empireRepIds.has(p.id)){
-        const tughra=power.id==="ottoman"?" tughra":"";
+      if(empireRepIds.has(p.id)&&power.image){
         const safe=power.image.replace(/"/g,"%22");
         return L.divIcon({
           className:"",
-          html:`<div class="power-marker${tughra}"><span class="power-img" style="background-image:url('${safe}')"></span></div>`,
-          iconSize:[38,38],iconAnchor:[19,19]
+          html:`<div class="power-flag"><span class="power-img" style="background-image:url('${safe}')"></span></div>`,
+          iconSize:[46,34],iconAnchor:[23,17]
         });
       }
       return L.divIcon({
@@ -128,7 +106,7 @@ function showPlace(p){
     <div class="mini-kicker">PLACE DOSSIER</div>
     <h1>${esc(p.place||"Unavailable")}</h1>
     <div class="sub">${esc(p.historicalNames||p.modernName||"")}</div>
-    ${power?`<div class="power-badge"><img src="${power.image}" alt=""><div><div class="power-name">${esc(power.name)}</div><div class="sub">${esc(power.type)}</div></div></div>`:""}
+    ${power?`<div class="power-badge">${power.image?`<img src="${power.image}" alt="">`:""}<div><div class="power-name">${esc(power.name)}</div><div class="sub">${esc(power.type)}</div></div></div>`:""}
     <div class="badges">
       <span class="badge">${esc(p.type||"TYPE UNAVAILABLE")}</span>
       <span class="badge">${esc(p.coordinateStatus||"COORDINATE STATUS UNAVAILABLE")}</span>
@@ -185,7 +163,7 @@ function rebuildFilters(){
 
   const legendPowers=[POWERS.spain_pre1580,POWERS.france,POWERS.venice,POWERS.ottoman,POWERS.hospitaller,POWERS.ragusa];
   document.getElementById("powerLegend").innerHTML=legendPowers.map(p=>`
-    <div class="power-card"><img src="${p.image}" alt=""><div><div class="pn">${esc(p.name)}</div><div class="pt">${esc(p.type)}</div></div></div>
+    <div class="power-card">${p.image?`<img src="${p.image}" alt="">`:`<span class="flag-unavailable">—</span>`}<div><div class="pn">${esc(p.name)}</div><div class="pt">${esc(p.type)}</div></div></div>
   `).join("");
 }
 
