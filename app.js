@@ -267,46 +267,60 @@ function closeDetail(){
 }
 function showPlace(p){
   const power=powerForPlace(p);
+  const intro=p.historicalContext||p.trilogyRole||"";
+  const visual=power?.image
+    ?`<div class="detail-hero"><img src="${power.image}" alt=""><div class="detail-hero-caption">${esc(power.name||"")}</div></div>`
+    :`<div class="detail-hero detail-hero-empty"><div>Εικόνα τεκμηρίωσης μη διαθέσιμη</div></div>`;
   openDetail(`
-    <div class="mini-kicker">PLACE DOSSIER</div>
+    <div class="detail-kicker">ΤΟΠΟΣ</div>
     <h1>${esc(p.place||"Unavailable")}</h1>
-    <div class="sub">${esc(p.historicalNames||p.modernName||"")}</div>
-    ${power?`<div class="power-badge">${power.image?`<img src="${power.image}" alt="">`:""}<div><div class="power-name">${esc(power.name)}</div><div class="sub">${esc(power.type)}</div></div></div>`:""}
-    <div class="badges">
-      <span class="badge">${esc(p.type||"TYPE UNAVAILABLE")}</span>
-      ${(p.books||[]).map(b=>`<span class="badge">${esc(b)}</span>`).join("")}
+    <div class="detail-subtitle">${esc(p.historicalNames||p.modernName||"")}</div>
+    ${visual}
+    ${intro?`<p class="detail-lead">${esc(intro)}</p>`:""}
+    <div class="detail-rule"></div>
+    ${detailRow("◷","Περίοδος",p.period)}
+    ${detailRow("♟","Πρόσωπα",p.characters)}
+    ${detailRow("⌖","Ρόλος στην τριλογία",p.trilogyRole)}
+    ${detailRow("⚑","Εξουσία / έλεγχος",p.authority)}
+    ${detailRow("▤","Τεκμηρίωση",p.sources||p.historicalStatus)}
+    ${detailRow("◎","Συντεταγμένες",Number.isFinite(p.lat)&&Number.isFinite(p.lon)?p.lat+", "+p.lon:"Unavailable")}
+    ${p.notes?`<div class="detail-note">${esc(p.notes)}</div>`:""}
+    <div class="detail-footer-badges">
+      <span>${esc(p.type||"TYPE UNAVAILABLE")}</span>
+      ${(p.books||[]).map(b=>`<span>${esc(b)}</span>`).join("")}
+      <span>${esc(p.coordinateStatus||"Unavailable")}</span>
     </div>
-    <div class="dossier-status">
-      <div class="dossier-status-item"><div class="dk">Coordinates</div><div class="dv">${esc(p.coordinateStatus||"Unavailable")}</div></div>
-      <div class="dossier-status-item"><div class="dk">Historical status</div><div class="dv">${esc(p.historicalStatus||"Unavailable")}</div></div>
-    </div>
-    ${field("Period",p.period)}
-    ${field("Characters",p.characters)}
-    ${field("Trilogy role",p.trilogyRole)}
-    ${field("Historical context",p.historicalContext)}
-    ${field("Political control / authority",p.authority)}
-    ${field("Sources / evidence",p.sources)}
-    ${field("Atlas notes",p.notes)}
-    ${field("Coordinates",Number.isFinite(p.lat)&&Number.isFinite(p.lon)?p.lat+", "+p.lon:"Unavailable")}
   `);
 }
 function showRoute(r){
+  const from=(r.from||[]).map(x=>x.name).join(", ")||"Unavailable";
+  const to=(r.to||[]).map(x=>x.name).join(", ")||"Unavailable";
   openDetail(`
-    <div class="mini-kicker">ROUTE DOSSIER</div>
+    <div class="detail-kicker">ΔΙΑΔΡΟΜΗ</div>
     <h1>${esc(r.name||"Route")}</h1>
-    <div class="sub">${esc(r.character||"")}</div>
-    <div class="badges"><span class="badge">${esc(r.type||"TYPE UNAVAILABLE")}</span>${(r.books||[]).map(b=>`<span class="badge">${esc(b)}</span>`).join("")}</div>
-    <div class="dossier-status">
-      <div class="dossier-status-item"><div class="dk">Evidence</div><div class="dv">${esc(r.status||r.type||"Unavailable")}</div></div>
-      <div class="dossier-status-item"><div class="dk">Medium</div><div class="dv">${esc(r.medium||"Unavailable")}</div></div>
+    <div class="detail-subtitle">${esc(r.character||"")}</div>
+    <div class="detail-route-visual">
+      <span class="route-dot"></span><span class="route-dash"></span><span class="route-dot"></span>
+      <div><b>${esc(from)}</b><span>→</span><b>${esc(to)}</b></div>
     </div>
-    ${field("Period",r.period)}
-    ${field("From",(r.from||[]).map(x=>x.name).join(", ")||"Unavailable")}
-    ${field("To",(r.to||[]).map(x=>x.name).join(", ")||"Unavailable")}
-    ${field("Evidence / scene",r.evidence)}
-    ${field("Atlas display note",r.note)}
-    ${field("Geometry note",r.medium==="sea"?"Curated maritime corridor using stored waypoints; not an asserted exact historical track.":"Narrative/analytical leg between stored nodes; not an asserted exact historical track.")}
+    ${r.evidence?`<p class="detail-lead">${esc(r.evidence)}</p>`:""}
+    <div class="detail-rule"></div>
+    ${detailRow("◷","Περίοδος",r.period)}
+    ${detailRow("⌖","Από",from)}
+    ${detailRow("⌖","Προς",to)}
+    ${detailRow("⚓","Μέσο",r.medium)}
+    ${detailRow("▤","Τεκμηρίωση",r.status||r.type)}
+    ${detailRow("✎","Σημείωση atlas",r.note)}
+    <div class="detail-note">${esc(r.medium==="sea"?"Curated maritime corridor using stored waypoints; not an asserted exact historical track.":"Narrative/analytical leg between stored nodes; not an asserted exact historical track.")}</div>
+    <div class="detail-footer-badges">
+      <span>${esc(r.type||"TYPE UNAVAILABLE")}</span>
+      ${(r.books||[]).map(b=>`<span>${esc(b)}</span>`).join("")}
+    </div>
   `);
+}
+function detailRow(icon,label,value){
+  if(value===undefined||value===null||String(value).trim()==="")return "";
+  return `<div class="detail-row"><div class="detail-row-icon">${icon}</div><div><div class="detail-row-label">${esc(label)}</div><div class="detail-row-value">${esc(value)}</div></div></div>`;
 }
 function field(k,v){return `<div class="field"><div class="k">${esc(k)}</div><div class="v">${esc(v||"Unavailable")}</div></div>`}
 
@@ -813,7 +827,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-stability-reset-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-atlas-ui-pass-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
