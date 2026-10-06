@@ -328,22 +328,23 @@ function densifyRoute(points,stepsPerSegment=24){
   out.push(points[points.length-1]);
   return out;
 }
-function mercatorShipIcon(){
+function routeShipIcon(variant=1){
+  const cls=variant===2?"route-ship route-ship-2":"route-ship route-ship-1";
   return L.divIcon({
     className:"moving-vessel-anchor",
-    html:`<div class="approved-route-ship" aria-label="historical sailing ship"></div>`,
-    iconSize:[54,36],
-    iconAnchor:[27,18]
+    html:`<div class="${cls}" aria-label="historical sailing ship"></div>`,
+    iconSize:[72,64],
+    iconAnchor:[36,32]
   });
 }
 function bearingDeg(a,b){
   const dy=b[0]-a[0],dx=b[1]-a[1];
   return Math.atan2(dx,dy)*180/Math.PI;
 }
-function animateVessel(points,duration=14000){
+function animateVessel(points,duration=14000,variant=1){
   if(!points||points.length<2)return;
   const dense=densifyRoute(points,20);
-  const marker=L.marker(dense[0],{icon:mercatorShipIcon(),interactive:false,zIndexOffset:900}).addTo(vesselMarkers);
+  const marker=L.marker(dense[0],{icon:routeShipIcon(variant),interactive:false,zIndexOffset:900}).addTo(vesselMarkers);
   const start=performance.now();
   let rafId=0;
   let stopped=false;
@@ -357,7 +358,7 @@ function animateVessel(points,duration=14000){
     marker.setLatLng([a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f]);
     const el=marker.getElement();
     if(el){
-      const g=el.querySelector(".approved-route-ship");
+      const g=el.querySelector(".route-ship");
       if(g)g.style.transform=`rotate(${bearingDeg(a,b)}deg)`;
     }
     rafId=requestAnimationFrame(tick);
@@ -494,7 +495,11 @@ function render(){
       });
       line.addTo(routeLines);
       const lantzasVoyage=representative.type==="DEPICTED TRAVEL"&&medium==="sea"&&items.some(x=>/petros lantzas/i.test(x.r.character||""));
-      if(lantzasVoyage)animateVessel(points,15000+Math.min(8000,points.length*700));
+      if(lantzasVoyage){
+        const routeKey=String(representative.name||representative.id||"");
+        const variant=(Array.from(routeKey).reduce((n,ch)=>n+ch.charCodeAt(0),0)%2)+1;
+        animateVessel(points,15000+Math.min(8000,points.length*700),variant);
+      }
       routeCount++;
     });
   }
