@@ -124,7 +124,8 @@ function routeVisibleInCurrentMode(r){
   if(state.mode==="STORY"){
     if(state.book==="All")return false;
     if(!r.story)return false;
-    if(state.routeStory!=="All"&&r.story!==state.routeStory)return false;
+    if(state.routeStory==="All")return false;
+    if(r.story!==state.routeStory)return false;
     return state.routeTypes.has(r.type);
   }
   if(state.mode==="INTELLIGENCE")return r.type==="INTELLIGENCE / NETWORK"&&state.routeTypes.has(r.type);
@@ -455,9 +456,10 @@ function animateVessel(points,variant=1){
   const distanceTable=routeDistanceTable(points);
   if(distanceTable.total<=0)return;
 
-  // One visual speed for every sea route: 32 km of route per screen-second.
-  const VISUAL_KM_PER_SECOND=32;
-  const duration=(distanceTable.total/VISUAL_KM_PER_SECOND)*1000;
+  // Deliberately slow atlas animation: readable rather than game-like.
+  const VISUAL_KM_PER_SECOND=10;
+  const rawDuration=(distanceTable.total/VISUAL_KM_PER_SECOND)*1000;
+  const duration=Math.max(24000,Math.min(120000,rawDuration));
 
   const marker=L.marker(points[0],{icon:routeShipIcon(variant),interactive:false,zIndexOffset:900}).addTo(vesselMarkers);
   const facing=routeFacing(points);
@@ -657,8 +659,10 @@ function render(){
     // regardless of evidence styling. This prevents duplicate ships and keeps one
     // constant-speed movement over the actual curated maritime geometry.
     const voyageGroups=new Map();
+    const animateActiveStory=state.mode==="STORY"&&state.book!=="All"&&state.routeStory!=="All";
     filtered.forEach(r=>{
-      if(state.routeStory!=="All"&&routeStory(r)!==state.routeStory)return;
+      if(!animateActiveStory)return;
+      if(routeStory(r)!==state.routeStory)return;
       if(r.medium!=="sea" || !r.vessel || !/petros lantzas/i.test(r.character||""))return;
       if(r.type==="INTELLIGENCE / NETWORK" || r.type==="PLANNED — NOT EXECUTED")return;
       const a=(r.from||[])[0],b=(r.to||[])[0];
@@ -716,7 +720,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-clean-map-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-route-ship-fix-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
