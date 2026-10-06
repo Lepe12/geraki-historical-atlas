@@ -32,41 +32,55 @@ function styleMediterraneanBasemap(){
 
     try{
       if(layer.type==="background"){
-        vectorMap.setPaintProperty(layer.id,"background-color","#d4c18b");
+        vectorMap.setPaintProperty(layer.id,"background-color","#c9ad73");
         vectorMap.setPaintProperty(layer.id,"background-opacity",1);
         return;
       }
 
       if(layer.type==="fill"){
-        if(/water|ocean|sea/.test(id)){
-          vectorMap.setPaintProperty(layer.id,"fill-color","#739a98");
+        if(/water|ocean|sea|lake|riverbank/.test(id)){
+          vectorMap.setPaintProperty(layer.id,"fill-color","#5f8f95");
           vectorMap.setPaintProperty(layer.id,"fill-opacity",1);
         }else if(/wood|forest|scrub|vegetation/.test(id)){
-          vectorMap.setPaintProperty(layer.id,"fill-color","#8f9870");
-          vectorMap.setPaintProperty(layer.id,"fill-opacity",.52);
-        }else if(/grass|park|green/.test(id)){
-          vectorMap.setPaintProperty(layer.id,"fill-color","#a6a77c");
-          vectorMap.setPaintProperty(layer.id,"fill-opacity",.44);
-        }else if(/farmland|farm|agric|crop/.test(id)){
-          vectorMap.setPaintProperty(layer.id,"fill-color","#c0a978");
-          vectorMap.setPaintProperty(layer.id,"fill-opacity",.42);
-        }else if(/landcover|landuse/.test(id)){
-          vectorMap.setPaintProperty(layer.id,"fill-color","#bea779");
-          vectorMap.setPaintProperty(layer.id,"fill-opacity",.30);
+          vectorMap.setPaintProperty(layer.id,"fill-color","#7f8f60");
+          vectorMap.setPaintProperty(layer.id,"fill-opacity",.70);
+        }else if(/grass|park|green|meadow/.test(id)){
+          vectorMap.setPaintProperty(layer.id,"fill-color","#9ca370");
+          vectorMap.setPaintProperty(layer.id,"fill-opacity",.62);
+        }else if(/farmland|farm|agric|crop|orchard|vineyard/.test(id)){
+          vectorMap.setPaintProperty(layer.id,"fill-color","#b99e69");
+          vectorMap.setPaintProperty(layer.id,"fill-opacity",.62);
+        }else if(/sand|beach|dune/.test(id)){
+          vectorMap.setPaintProperty(layer.id,"fill-color","#d6bd83");
+          vectorMap.setPaintProperty(layer.id,"fill-opacity",.82);
+        }else if(/land|earth|landcover|landuse/.test(id)){
+          vectorMap.setPaintProperty(layer.id,"fill-color","#c7ad77");
+          vectorMap.setPaintProperty(layer.id,"fill-opacity",.58);
         }
       }
 
-      if(layer.type==="line"&&/water|coast/.test(id)){
-        vectorMap.setPaintProperty(layer.id,"line-color","#3f6664");
-        vectorMap.setPaintProperty(layer.id,"line-opacity",.72);
-        vectorMap.setPaintProperty(layer.id,"line-width",1.05);
+      if(layer.type==="line"){
+        if(/water|river|stream/.test(id)){
+          vectorMap.setPaintProperty(layer.id,"line-color","#628d90");
+          vectorMap.setPaintProperty(layer.id,"line-opacity",.76);
+        }
+        if(/coast|shore/.test(id)){
+          vectorMap.setPaintProperty(layer.id,"line-color","#355d60");
+          vectorMap.setPaintProperty(layer.id,"line-opacity",.92);
+          vectorMap.setPaintProperty(layer.id,"line-width",1.15);
+        }
+        if(/contour/.test(id)){
+          vectorMap.setPaintProperty(layer.id,"line-color","#8c7653");
+          vectorMap.setPaintProperty(layer.id,"line-opacity",.24);
+          vectorMap.setPaintProperty(layer.id,"line-width",.55);
+        }
       }
 
       if(layer.type==="hillshade"){
-        vectorMap.setPaintProperty(layer.id,"hillshade-shadow-color","#6c5538");
-        vectorMap.setPaintProperty(layer.id,"hillshade-highlight-color","#f1dfb1");
+        vectorMap.setPaintProperty(layer.id,"hillshade-shadow-color","#6e5537");
+        vectorMap.setPaintProperty(layer.id,"hillshade-highlight-color","#efd9a4");
         vectorMap.setPaintProperty(layer.id,"hillshade-accent-color","#8b7450");
-        vectorMap.setPaintProperty(layer.id,"hillshade-exaggeration",.45);
+        vectorMap.setPaintProperty(layer.id,"hillshade-exaggeration",.70);
       }
     }catch(e){}
   });
@@ -83,9 +97,9 @@ function styleMediterraneanBasemap(){
         source:water.source,
         "source-layer":water["source-layer"],
         paint:{
-          "line-color":"#3b5f5d",
-          "line-width":["interpolate",["linear"],["zoom"],4,.55,8,1.05,13,1.35],
-          "line-opacity":.78
+          "line-color":"#355d60",
+          "line-width":["interpolate",["linear"],["zoom"],4,.7,8,1.25,13,1.65],
+          "line-opacity":.94
         }
       };
       if(water.filter)coastline.filter=water.filter;
@@ -897,7 +911,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-liberty-map-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-major-map-pass-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
