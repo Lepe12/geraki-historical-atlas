@@ -104,3 +104,85 @@ def render(kind,seed):
 for i,k in enumerate(("village","coastal","town","city","port","fortress"),1):
     render(k,i*17)
 print("Generated diorama settlement assets")
+
+
+def render_morph_assets():
+    """Create transparent Mediterranean morphology cutouts for the live map.
+    They are visual overlays only; placement is driven at runtime by DEM elevation/relief.
+    """
+    def canvas():
+        return Image.new("RGBA",(420,240),(0,0,0,0))
+
+    # Mountain / rocky ridge
+    random.seed(9101)
+    im=canvas(); dr=ImageDraw.Draw(im)
+    sh=Image.new("RGBA",im.size,(0,0,0,0)); sd=ImageDraw.Draw(sh)
+    sd.ellipse([55,168,370,220],fill=(35,27,20,70))
+    ridge=[(28,184),(72,154),(112,118),(148,80),(184,103),(218,59),(258,104),(298,83),(340,135),(394,184)]
+    base=[(394,202),(28,202)]
+    dr.polygon(ridge+base,fill=(154,139,101,255),outline=(83,74,55,255))
+    # lit and shadow facets
+    dr.polygon([(72,154),(112,118),(148,80),(158,145),(130,172)],fill=(198,186,151,255))
+    dr.polygon([(148,80),(184,103),(218,59),(228,146),(158,145)],fill=(120,114,88,255))
+    dr.polygon([(218,59),(258,104),(298,83),(300,158),(228,146)],fill=(187,175,140,255))
+    dr.polygon([(298,83),(340,135),(394,184),(300,158)],fill=(112,106,83,255))
+    for _ in range(180):
+        x=random.randint(45,380); y=random.randint(82,194)
+        if im.getpixel((x,y))[3]:
+            r=random.choice((1,1,1,2))
+            col=random.choice(((224,213,181,150),(102,94,71,130),(126,137,78,130),(79,94,56,120)))
+            dr.ellipse([x-r,y-r,x+r,y+r],fill=col)
+    # cypress / shrub specks
+    for _ in range(18):
+        x=random.randint(60,360); y=random.randint(135,188)
+        dr.ellipse([x-3,y-8,x+3,y],fill=(66,78,44,220))
+    sh=sh.filter(ImageFilter.GaussianBlur(7)); im=Image.alpha_composite(sh,im)
+    im=im.resize((320,183),Image.Resampling.LANCZOS)
+    im.save(f"{OUT}/morph-mountain.webp","WEBP",quality=84,method=6)
+
+    # Limestone rock cluster
+    random.seed(9202)
+    im=canvas(); dr=ImageDraw.Draw(im)
+    sh=Image.new("RGBA",im.size,(0,0,0,0)); sd=ImageDraw.Draw(sh)
+    sd.ellipse([80,178,345,222],fill=(32,25,19,72))
+    rocks=[(116,170,54,49),(166,151,45,64),(222,170,58,48),(271,147,43,70),(316,177,38,39)]
+    for cx,cy,rx,ry in rocks:
+        dr.ellipse([cx-rx,cy-ry,cx+rx,cy+ry],fill=(185,174,145,255),outline=(92,83,67,255),width=2)
+        dr.polygon([(cx-rx*.75,cy),(cx-rx*.2,cy-ry*.75),(cx+rx*.1,cy+ry*.35)],fill=(221,210,179,170))
+        dr.polygon([(cx+rx*.1,cy-ry*.7),(cx+rx*.8,cy),(cx+rx*.25,cy+ry*.65)],fill=(115,107,88,160))
+    for _ in range(90):
+        x=random.randint(72,350); y=random.randint(118,205)
+        if im.getpixel((x,y))[3]:
+            r=random.choice((1,1,2))
+            dr.ellipse([x-r,y-r,x+r,y+r],fill=random.choice(((230,220,190,120),(98,91,74,110),(132,121,92,120))))
+    sh=sh.filter(ImageFilter.GaussianBlur(6)); im=Image.alpha_composite(sh,im)
+    im=im.resize((260,149),Image.Resampling.LANCZOS)
+    im.save(f"{OUT}/morph-rock.webp","WEBP",quality=84,method=6)
+
+    # Mediterranean tree cluster
+    random.seed(9303)
+    im=canvas(); dr=ImageDraw.Draw(im)
+    sh=Image.new("RGBA",im.size,(0,0,0,0)); sd=ImageDraw.Draw(sh)
+    sd.ellipse([55,188,370,224],fill=(31,24,18,58))
+    def olive(cx,base,s=1.0):
+        dr.line([(cx,base),(cx+random.randint(-4,4),base-int(48*s))],fill=(95,67,43,255),width=max(2,int(5*s)))
+        cy=base-int(55*s)
+        for ox,oy,rx,ry,col in [
+            (-18,-2,28,18,(103,112,72,255)),(15,-5,30,20,(118,124,77,255)),(0,-19,30,18,(83,99,62,255))
+        ]:
+            dr.ellipse([cx+ox*s-rx*s,cy+oy*s-ry*s,cx+ox*s+rx*s,cy+oy*s+ry*s],fill=col,outline=(66,76,47,220),width=1)
+    def cypress(cx,base,s=1.0):
+        dr.polygon([(cx,base-int(92*s)),(cx-int(14*s),base),(cx+int(14*s),base)],fill=(53,72,43,255),outline=(41,56,35,230))
+        dr.line([(cx,base),(cx,base-int(76*s))],fill=(75,58,39,220),width=2)
+    olive(104,195,1.05); olive(210,199,.9); olive(300,194,1.0)
+    cypress(158,200,.92); cypress(260,201,.82); cypress(342,202,.75)
+    for _ in range(28):
+        x=random.randint(64,360); y=random.randint(186,212)
+        r=random.randint(3,7)
+        dr.ellipse([x-r,y-r,x+r,y+r],fill=random.choice(((93,108,61,220),(118,122,67,220),(73,92,52,220))))
+    sh=sh.filter(ImageFilter.GaussianBlur(6)); im=Image.alpha_composite(sh,im)
+    im=im.resize((300,171),Image.Resampling.LANCZOS)
+    im.save(f"{OUT}/morph-trees.webp","WEBP",quality=84,method=6)
+
+render_morph_assets()
+print("Generated morphology assets")
