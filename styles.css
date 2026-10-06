@@ -1430,3 +1430,30 @@ button{color:inherit}
 @media (prefers-reduced-motion:reduce){
   .ship-motion{animation:none!important}
 }
+
+
+/* ===== True route-bearing vessel orientation ===== */
+.ship-heading{
+  position:relative;
+  width:96px;
+  height:82px;
+  transform-origin:50% 50%;
+  transform:rotate(var(--ship-heading,0deg));
+  transition:transform .35s linear;
+  will-change:transform;
+}
+.ship-motion{
+  position:relative;
+  width:96px;
+  height:82px;
+  transform-origin:50% 58%;
+}
+.route-ship.faces-left,
+.route-ship.faces-right{
+  transform:none!important;
+}
+.ship-wake{
+  left:auto!important;
+  right:-22px!important;
+  transform:skewX(24deg) rotate(2deg)!important;
+}
