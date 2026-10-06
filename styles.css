@@ -1031,3 +1031,146 @@ button{color:inherit}
   .story-deck-title{font-size:16px}
   .story-deck-meta{font-size:8px}
 }
+
+
+/* ===== Cartographic base rebuild — 2026-10-06 ===== */
+.map-stage{
+  background:
+    radial-gradient(circle at 50% 45%,#d9ccb0 0,#cabb98 58%,#b7a27c 100%)!important;
+}
+#map{
+  background:#c9b890!important;
+}
+.leaflet-container{
+  background:#c9b890!important;
+}
+.leaflet-tile-pane{
+  filter:sepia(.92) saturate(.34) brightness(1.03) contrast(.90) hue-rotate(-7deg)!important;
+  mix-blend-mode:multiply;
+  opacity:.86;
+}
+.leaflet-tile{
+  image-rendering:auto;
+}
+#map:after{
+  background:
+    radial-gradient(circle at 50% 43%,rgba(255,248,227,.06) 0 35%,rgba(102,74,42,.08) 72%,rgba(53,37,23,.22) 100%),
+    repeating-linear-gradient(0deg,rgba(75,54,31,.018) 0 1px,transparent 1px 4px),
+    repeating-linear-gradient(90deg,rgba(75,54,31,.012) 0 1px,transparent 1px 6px)!important;
+  mix-blend-mode:multiply!important;
+}
+.chart-overlay{
+  position:absolute;
+  inset:0;
+  z-index:430;
+  pointer-events:none;
+  opacity:1!important;
+}
+.map-frame-line{
+  position:absolute;
+  background:rgba(77,55,33,.36);
+  box-shadow:0 0 0 1px rgba(245,232,201,.16);
+}
+.frame-top,.frame-bottom{
+  left:14px;right:14px;height:1px;
+}
+.frame-top{top:14px}.frame-bottom{bottom:14px}
+.frame-left,.frame-right{
+  top:14px;bottom:14px;width:1px;
+}
+.frame-left{left:14px}.frame-right{right:14px}
+.portolan-rose{
+  position:absolute;
+  width:96px;height:96px;
+  color:rgba(86,61,36,.52);
+  font-family:"Cormorant Garamond",Georgia,serif;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(86,61,36,.18);
+  border-radius:50%;
+  box-shadow:
+    inset 0 0 0 9px rgba(255,245,219,.05),
+    0 0 0 1px rgba(246,232,201,.08);
+}
+.portolan-rose:before,
+.portolan-rose:after{
+  content:"";
+  position:absolute;
+  background:rgba(86,61,36,.28);
+}
+.portolan-rose:before{width:1px;height:118px}
+.portolan-rose:after{width:118px;height:1px}
+.portolan-rose span{
+  font-size:62px;
+  line-height:1;
+  transform:rotate(22.5deg);
+  text-shadow:0 1px 0 rgba(255,245,220,.34);
+}
+.portolan-rose b{
+  position:absolute;
+  top:-20px;
+  font-size:12px;
+  letter-spacing:.16em;
+  font-weight:700;
+}
+.rose-a{left:7%;bottom:13%}
+.rose-b{right:9%;top:24%;width:68px;height:68px;opacity:.48}
+.rose-b span{font-size:42px}
+.rose-b:before{height:86px}.rose-b:after{width:86px}
+.paper-grain{
+  position:absolute;
+  inset:0;
+  opacity:.22;
+  background:
+    radial-gradient(circle at 18% 22%,rgba(91,64,38,.08) 0 1px,transparent 2px),
+    radial-gradient(circle at 74% 63%,rgba(91,64,38,.06) 0 1px,transparent 2px),
+    radial-gradient(circle at 42% 81%,rgba(255,246,219,.08) 0 1px,transparent 2px);
+  background-size:19px 23px,27px 31px,17px 29px;
+  mix-blend-mode:multiply;
+}
+.leaflet-control-zoom a{
+  background:rgba(232,217,187,.88)!important;
+  color:#4d3824!important;
+  border:1px solid rgba(84,61,37,.22)!important;
+  text-shadow:none!important;
+}
+.leaflet-control-attribution{
+  background:rgba(226,210,178,.72)!important;
+  color:#66543d!important;
+  border-top-left-radius:5px;
+}
+.leaflet-control-attribution a{color:#55422d!important}
+
+/* Make map typography feel printed on the sheet instead of floating above it. */
+.historical-place-label{
+  color:#493521!important;
+  text-shadow:
+    0 1px 0 rgba(243,231,204,.80),
+    0 0 3px rgba(243,231,204,.72)!important;
+}
+.cartographic-label-only{
+  color:#59432d!important;
+  text-shadow:0 1px 0 rgba(244,232,207,.76)!important;
+}
+.mercator-settlement-art{
+  filter:sepia(.66) saturate(.62) brightness(.80) contrast(1.28) drop-shadow(0 1px 0 rgba(248,236,209,.38))!important;
+}
+
+/* Route ink integrated into the paper map */
+.leaflet-overlay-pane svg path{
+  vector-effect:non-scaling-stroke;
+}
+.route-ship{
+  mix-blend-mode:multiply!important;
+}
+
+/* UI recedes against the brighter parchment sheet */
+.floating-btn,.book-strip,.mode-strip{
+  box-shadow:0 8px 22px rgba(42,29,16,.18)!important;
+}
+@media(max-width:620px){
+  .rose-a{left:4%;bottom:18%;transform:scale(.72);transform-origin:left bottom}
+  .rose-b{display:none}
+  .map-frame-line{opacity:.55}
+}
