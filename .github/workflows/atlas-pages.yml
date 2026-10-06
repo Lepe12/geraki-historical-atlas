@@ -9,6 +9,7 @@ on:
       - "app.js"
       - "data.json"
       - "icons/**"
+      - "generate_diorama_assets.py"
       - ".github/workflows/atlas-pages.yml"
   workflow_dispatch:
 
@@ -98,6 +99,11 @@ jobs:
           copy_set UNIQUE mercator-unique 4
 
           printf '%s\n'             'Settlement artwork source: K. M. Alexander, Mercator Settlement PNG Pack 1.1.'             'Derived from Gerardus Mercator / early Hondius material; distributed CC0.'             'https://kmalexander.com/2026/06/30/mercator-settlement-a-free-16th-century-settlement-brush-set-for-fantasy-maps/'             > _site/icons/MERCATOR-SOURCE.txt
+
+      - name: Generate diorama settlement assets
+        run: |
+          python -m pip install --quiet pillow
+          python generate_diorama_assets.py
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
