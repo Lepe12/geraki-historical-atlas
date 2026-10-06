@@ -343,15 +343,15 @@ function settlementIcon(p){
   }
 
   const assetFor={
-    "village":"atlas-village.svg",
-    "coastal-village":"atlas-coastal-village.svg",
-    "town":"atlas-town.svg",
-    "city":"atlas-city.svg",
-    "fortified-city":"atlas-fortress.svg",
-    "capital":"atlas-city.svg",
-    "port":"atlas-port.svg",
-    "fortress":"atlas-fortress.svg",
-    "generic":"atlas-town.svg"
+    "village":"diorama-village.webp",
+    "coastal-village":"diorama-coastal.webp",
+    "town":"diorama-town.webp",
+    "city":"diorama-city.webp",
+    "fortified-city":"diorama-fortress.webp",
+    "capital":"diorama-city.webp",
+    "port":"diorama-port.webp",
+    "fortress":"diorama-fortress.webp",
+    "generic":"diorama-town.webp"
   };
   const widthBySymbol={
     "village":32,
@@ -970,7 +970,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-diorama-settlements-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-raster-diorama-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
