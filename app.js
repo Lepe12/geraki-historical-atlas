@@ -193,9 +193,11 @@ function showPlace(p){
     ${power?`<div class="power-badge">${power.image?`<img src="${power.image}" alt="">`:""}<div><div class="power-name">${esc(power.name)}</div><div class="sub">${esc(power.type)}</div></div></div>`:""}
     <div class="badges">
       <span class="badge">${esc(p.type||"TYPE UNAVAILABLE")}</span>
-      <span class="badge">${esc(p.coordinateStatus||"COORDINATE STATUS UNAVAILABLE")}</span>
-      <span class="badge">${esc(p.historicalStatus||"HISTORICAL STATUS UNAVAILABLE")}</span>
       ${(p.books||[]).map(b=>`<span class="badge">${esc(b)}</span>`).join("")}
+    </div>
+    <div class="dossier-status">
+      <div class="dossier-status-item"><div class="dk">Coordinates</div><div class="dv">${esc(p.coordinateStatus||"Unavailable")}</div></div>
+      <div class="dossier-status-item"><div class="dk">Historical status</div><div class="dv">${esc(p.historicalStatus||"Unavailable")}</div></div>
     </div>
     ${field("Period",p.period)}
     ${field("Characters",p.characters)}
@@ -212,7 +214,11 @@ function showRoute(r){
     <div class="mini-kicker">ROUTE DOSSIER</div>
     <h1>${esc(r.name||"Route")}</h1>
     <div class="sub">${esc(r.character||"")}</div>
-    <div class="badges"><span class="badge">${esc(r.type||"TYPE UNAVAILABLE")}</span><span class="badge">${esc(r.status||"STATUS UNAVAILABLE")}</span>${(r.books||[]).map(b=>`<span class="badge">${esc(b)}</span>`).join("")}</div>
+    <div class="badges"><span class="badge">${esc(r.type||"TYPE UNAVAILABLE")}</span>${(r.books||[]).map(b=>`<span class="badge">${esc(b)}</span>`).join("")}</div>
+    <div class="dossier-status">
+      <div class="dossier-status-item"><div class="dk">Evidence</div><div class="dv">${esc(r.status||r.type||"Unavailable")}</div></div>
+      <div class="dossier-status-item"><div class="dk">Medium</div><div class="dv">${esc(r.medium||"Unavailable")}</div></div>
+    </div>
     ${field("Period",r.period)}
     ${field("From",(r.from||[]).map(x=>x.name).join(", ")||"Unavailable")}
     ${field("To",(r.to||[]).map(x=>x.name).join(", ")||"Unavailable")}
@@ -239,7 +245,7 @@ function rebuildFilters(){
   const yearSelect=document.getElementById("yearFilter");
   yearSelect.innerHTML='<option value="All">Όλες οι περίοδοι</option>'+years.map(y=>`<option value="${y}" ${state.year===y?"selected":""}>${y}</option>`).join("");
 
-  const stories=["All",...Array.from(new Set(atlasData.routes.map(routeStory).filter(Boolean))).sort()];
+  const stories=["All",...Array.from(new Set(atlasData.routes.filter(r=>bookHit(r)).map(routeStory).filter(Boolean))).sort()];
   const storySelect=document.getElementById("routeStoryFilter");
   storySelect.innerHTML=stories.map(s=>`<option value="${esc(s)}" ${state.routeStory===s?"selected":""}>${s==="All"?"Όλες οι διαδρομές":esc(s)}</option>`).join("");
 
@@ -563,7 +569,7 @@ function render(){
       if(points.length<2)return;
       const representative=items[0].r;
       const medium=representative.medium||"unknown";
-      const focused=state.routeStory==="All"||state.routeStory===story;
+      const focused=state.routeStory==="All"?(state.book!=="All"):state.routeStory===story;
       const under=routeUnderlayStyle(representative.type,medium,focused);
       if(under)L.polyline(points,under).addTo(routeLines);
       const line=L.polyline(points,routeStyle(representative.type,medium,focused));
