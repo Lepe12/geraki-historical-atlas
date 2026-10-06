@@ -1359,3 +1359,74 @@ button{color:inherit}
 .maplibregl-control-container{
   display:none!important;
 }
+
+
+/* ===== Living historical vessels: black ink, subtle sea motion ===== */
+.ship-motion{
+  position:relative;
+  width:96px;
+  height:82px;
+  transform-origin:50% 58%;
+  animation:atlasShipFloat 4.8s ease-in-out infinite;
+  will-change:transform;
+}
+.route-ship{
+  position:relative;
+  z-index:2;
+  width:96px!important;
+  height:82px!important;
+  opacity:1!important;
+  mix-blend-mode:multiply!important;
+  filter:grayscale(1) brightness(.20) contrast(1.9)
+    drop-shadow(0 1px 0 rgba(255,248,225,.42))
+    drop-shadow(0 2px 2px rgba(28,20,13,.25))!important;
+}
+.ship-wake{
+  position:absolute;
+  z-index:1;
+  top:55%;
+  width:38px;
+  height:9px;
+  opacity:.28;
+  pointer-events:none;
+  border-top:1px solid rgba(54,43,31,.58);
+  border-bottom:1px solid rgba(54,43,31,.20);
+  border-radius:50%;
+  filter:blur(.15px);
+}
+.ship-motion.faces-right .ship-wake{
+  left:-22px;
+  transform:skewX(-24deg) rotate(-2deg);
+}
+.ship-motion.faces-left .ship-wake{
+  right:-22px;
+  transform:skewX(24deg) rotate(2deg);
+}
+.ship-wake:after{
+  content:"";
+  position:absolute;
+  top:4px;
+  width:26px;
+  border-top:1px solid rgba(54,43,31,.26);
+}
+.ship-motion.faces-right .ship-wake:after{left:5px}
+.ship-motion.faces-left .ship-wake:after{right:5px}
+
+@keyframes atlasShipFloat{
+  0%,100%{transform:translateY(0) rotate(-.7deg)}
+  25%{transform:translateY(-1.5px) rotate(.5deg)}
+  50%{transform:translateY(-2px) rotate(.9deg)}
+  75%{transform:translateY(-.7px) rotate(-.2deg)}
+}
+
+/* Overview ships are still alive, but quieter than the selected voyage. */
+.overview-vessel .ship-motion{
+  animation-duration:6.2s;
+}
+.overview-vessel .ship-wake{
+  opacity:.18;
+}
+
+@media (prefers-reduced-motion:reduce){
+  .ship-motion{animation:none!important}
+}
