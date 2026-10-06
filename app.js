@@ -129,7 +129,15 @@ function routeVisibleInCurrentMode(r){
     return state.routeTypes.has(r.type);
   }
   if(state.mode==="INTELLIGENCE")return r.type==="INTELLIGENCE / NETWORK"&&state.routeTypes.has(r.type);
-  if(state.mode==="PEOPLE"||state.mode==="VOYAGES"){
+  if(state.mode==="VOYAGES"){
+    if(state.book==="All")return false;
+    if(!["DEPICTED TRAVEL","STRONG RECONSTRUCTION"].includes(r.type))return false;
+    if(state.routeStory==="All"){
+      if(!r.story)return false;
+    }else if(routeStory(r)!==state.routeStory)return false;
+    return state.routeTypes.has(r.type);
+  }
+  if(state.mode==="PEOPLE"){
     if(!["DEPICTED TRAVEL","STRONG RECONSTRUCTION"].includes(r.type))return false;
     if(state.routeStory!=="All"&&routeStory(r)!==state.routeStory)return false;
     return state.routeTypes.has(r.type);
@@ -549,7 +557,10 @@ function render(){
       (!state.verifiedOnly||p.coordinateStatus==="VERIFIED")&&textHit(p,q)&&storyPlaceAllowed&&bookPlaceAllowed;
     if(!base)return false;
     if(state.mode==="PEOPLE")return Boolean((p.characters||"").trim());
-    if(state.mode==="VOYAGES")return true;
+    if(state.mode==="VOYAGES"){
+      if(state.book==="All")return labelPriority(p)>=2;
+      return activeRouteNodeIds.has(p.id)||labelPriority(p)>=2;
+    }
     if(state.mode==="EMPIRES")return Boolean(powerForPlace(p));
     if(state.mode==="INTELLIGENCE")return intelligencePlaceIds.has(p.id)||(p.trilogyRole||"").toLowerCase().includes("intelligence");
     return true;
@@ -720,7 +731,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-route-ship-fix-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-voyages-clean-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
@@ -735,7 +746,11 @@ document.querySelectorAll("[data-mode]").forEach(btn=>btn.addEventListener("clic
   document.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("active",x===btn));
   if(state.mode==="INTELLIGENCE")state.routeTypes=new Set(["INTELLIGENCE / NETWORK"]);
   if(state.mode==="PEOPLE")state.routeTypes=new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"]);
-  if(state.mode==="VOYAGES")state.routeTypes=new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"]);
+  if(state.mode==="VOYAGES"){
+    state.routeTypes=new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"]);
+    state.routeStory=defaultStoryForBook(state.book);
+    state.storyStep=0;
+  }
   if(state.mode==="STORY"){
     state.routeTypes=new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"]);
     state.routeStory=defaultStoryForBook(state.book);
