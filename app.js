@@ -127,7 +127,7 @@ function settlementIcon(p){
     "fortress":62,
     "generic":52
   };
-  const file=assetFor[symbol]||assetFor.generic;
+  const file=p.atlasAsset||assetFor[symbol]||assetFor.generic;
   const w=widthBySymbol[symbol]||52;
 
   return L.divIcon({
