@@ -479,7 +479,7 @@ function routeShipIcon(variant=1){
   const cls=variant===2?"route-ship route-ship-2":"route-ship route-ship-1";
   return L.divIcon({
     className:"moving-vessel-anchor",
-    html:`<div class="${cls}" aria-label="historical sailing ship"></div>`,
+    html:`<div class="ship-motion"><span class="ship-wake" aria-hidden="true"></span><div class="${cls}" aria-label="historical sailing ship"></div></div>`,
     iconSize:[96,82],
     iconAnchor:[48,41]
   });
@@ -514,9 +514,14 @@ function animateVessel(points,variant=1){
     const el=marker.getElement();
     if(el){
       const g=el.querySelector(".route-ship");
+      const motion=el.querySelector(".ship-motion");
       if(g){
         g.classList.toggle("faces-right",facing==="right");
         g.classList.toggle("faces-left",facing!=="right");
+      }
+      if(motion){
+        motion.classList.toggle("faces-right",facing==="right");
+        motion.classList.toggle("faces-left",facing!=="right");
       }
     }
     rafId=requestAnimationFrame(tick);
@@ -598,7 +603,20 @@ function addOverviewVessels(){
       zIndexOffset:850
     }).addTo(vesselMarkers);
     const el=marker.getElement();
-    if(el)el.classList.add("overview-vessel");
+    if(el){
+      el.classList.add("overview-vessel");
+      const facing=routeFacing(points);
+      const g=el.querySelector(".route-ship");
+      const motion=el.querySelector(".ship-motion");
+      if(g){
+        g.classList.toggle("faces-right",facing==="right");
+        g.classList.toggle("faces-left",facing!=="right");
+      }
+      if(motion){
+        motion.classList.toggle("faces-right",facing==="right");
+        motion.classList.toggle("faces-left",facing!=="right");
+      }
+    }
   });
 }
 
@@ -783,7 +801,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-vector-basemap-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-living-ships-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
