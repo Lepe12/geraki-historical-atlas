@@ -1,5 +1,6 @@
 const state={mode:"STORY",book:"All",search:"",year:"All",routeStory:"All",verifiedOnly:false,showPlaces:true,showRoutes:true,routeTypes:new Set(["DEPICTED TRAVEL"])};
-const placeMarkers=L.layerGroup(),routeLines=L.layerGroup(),historicalLabels=L.layerGroup();
+const placeMarkers=L.layerGroup(),routeLines=L.layerGroup(),historicalLabels=L.layerGroup(),vesselMarkers=L.layerGroup();
+let routeAnimationFrames=[];
 let atlasData={places:[],routes:[]};
 const byId=new Map();
 let empireRepIds=new Set();
@@ -9,7 +10,7 @@ L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_L
   maxZoom:16,
   attribution:"Tiles &copy; Esri"
 }).addTo(map);
-placeMarkers.addTo(map);routeLines.addTo(map);historicalLabels.addTo(map);
+placeMarkers.addTo(map);routeLines.addTo(map);historicalLabels.addTo(map);vesselMarkers.addTo(map);
 map.zoomControl.setPosition("bottomright");
 
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
@@ -239,10 +240,10 @@ function rebuildFilters(){
 }
 
 function routeStyle(type){
-  const base={weight:2.35,opacity:.84,color:"#7d2f2a",lineCap:"round",lineJoin:"round"};
-  if(type==="INTELLIGENCE / NETWORK")return {...base,dashArray:"2 8",weight:2.4,opacity:.7};
-  if(type==="PLANNED — NOT EXECUTED")return {...base,dashArray:"10 9",opacity:.52};
-  if(type==="STRONG RECONSTRUCTION")return {...base,dashArray:"7 7",opacity:.66};
+  const base={weight:2.5,opacity:.88,color:"#4f6b72",lineCap:"round",lineJoin:"round"};
+  if(type==="INTELLIGENCE / NETWORK")return {...base,color:"#78684e",dashArray:"2 8",weight:2.2,opacity:.68};
+  if(type==="PLANNED — NOT EXECUTED")return {...base,color:"#766553",dashArray:"10 9",opacity:.5};
+  if(type==="STRONG RECONSTRUCTION")return {...base,color:"#65747a",dashArray:"7 7",opacity:.62};
   return base;
 }
 
@@ -296,8 +297,75 @@ function curvedRoutePoints(a,b,steps=28){
   return pts;
 }
 
+
+function routeLegPoints(r,pa,pb){
+  const pts=[[pa.lat,pa.lon]];
+  if(Array.isArray(r.waypoints)){
+    r.waypoints.forEach(w=>{
+      if(Array.isArray(w)&&Number.isFinite(w[0])&&Number.isFinite(w[1]))pts.push([w[0],w[1]]);
+    });
+  }
+  pts.push([pb.lat,pb.lon]);
+  return pts;
+}
+function densifyRoute(points,stepsPerSegment=24){
+  const out=[];
+  for(let i=0;i<points.length-1;i++){
+    const a=points[i],b=points[i+1];
+    for(let s=0;s<stepsPerSegment;s++){
+      const t=s/stepsPerSegment;
+      out.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]);
+    }
+  }
+  out.push(points[points.length-1]);
+  return out;
+}
+function galleyIcon(){
+  return L.divIcon({
+    className:"moving-vessel-anchor",
+    html:`<div class="moving-galley">
+      <svg viewBox="0 0 64 34" aria-hidden="true">
+        <path class="ship-hull" d="M7 23 C16 26,42 27,56 22 L51 28 C38 32,19 31,10 28 Z"/>
+        <path class="ship-mast" d="M31 7 L31 24"/>
+        <path class="ship-sail" d="M31 8 L47 18 L31 18 Z"/>
+        <path class="ship-sail rear" d="M30 10 L19 18 L30 18 Z"/>
+        <path class="ship-yard" d="M20 9 L46 19"/>
+        <path class="ship-oar" d="M14 25 L7 31 M20 26 L14 33 M27 27 L22 34 M39 27 L44 33 M46 26 L52 32"/>
+      </svg>
+    </div>`,
+    iconSize:[38,24],
+    iconAnchor:[19,12]
+  });
+}
+function bearingDeg(a,b){
+  const dy=b[0]-a[0],dx=b[1]-a[1];
+  return Math.atan2(dx,dy)*180/Math.PI;
+}
+function animateVessel(points,duration=14000){
+  if(!points||points.length<2)return;
+  const dense=densifyRoute(points,20);
+  const marker=L.marker(dense[0],{icon:galleyIcon(),interactive:false,zIndexOffset:900}).addTo(vesselMarkers);
+  const start=performance.now();
+  function tick(now){
+    if(!map.hasLayer(vesselMarkers))return;
+    const phase=((now-start)%duration)/duration;
+    const pos=phase*(dense.length-1);
+    const i=Math.min(dense.length-2,Math.floor(pos));
+    const f=pos-i;
+    const a=dense[i],b=dense[i+1];
+    marker.setLatLng([a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f]);
+    const el=marker.getElement();
+    if(el){
+      const g=el.querySelector(".moving-galley");
+      if(g)g.style.transform=`rotate(${bearingDeg(a,b)}deg)`;
+    }
+    routeAnimationFrames.push(requestAnimationFrame(tick));
+  }
+  routeAnimationFrames.push(requestAnimationFrame(tick));
+}
 function render(){
-  placeMarkers.clearLayers();routeLines.clearLayers();historicalLabels.clearLayers();
+  routeAnimationFrames.forEach(cancelAnimationFrame);routeAnimationFrames=[];
+  placeMarkers.clearLayers();routeLines.clearLayers();historicalLabels.clearLayers();vesselMarkers.clearLayers();
   const q=state.search.trim().toLowerCase();
 
   const intelligencePlaceIds=new Set();
@@ -391,24 +459,17 @@ function render(){
       items.sort((x,y)=>(x.r.sequence||0)-(y.r.sequence||0));
       const story=routeStory(items[0].r);
       const points=[];
-      const seen=new Set();
       items.forEach((it,i)=>{
-        const pair=[[it.pa.lat,it.pa.lon],[it.pb.lat,it.pb.lon]];
-        pair.forEach((pt,j)=>{
-          const k=pt.join(",");
-          if(!seen.has(k) || (i===0&&j===0)){points.push(pt);seen.add(k);}
-        });
+        const leg=routeLegPoints(it.r,it.pa,it.pb);
+        if(i>0&&points.length&&leg.length){
+          const last=points[points.length-1],first=leg[0];
+          if(last[0]===first[0]&&last[1]===first[1])leg.shift();
+        }
+        points.push(...leg);
       });
       if(points.length<2)return;
       const representative=items[0].r;
-      const curved=[];
-      for(let i=0;i<points.length-1;i++){
-        const pa={lat:points[i][0],lon:points[i][1]},pb={lat:points[i+1][0],lon:points[i+1][1]};
-        const seg=curvedRoutePoints(pa,pb);
-        if(i>0)seg.shift();
-        curved.push(...seg);
-      }
-      const line=L.polyline(curved.length?curved:points,routeStyle(representative.type));
+      const line=L.polyline(points,routeStyle(representative.type));
       const label=items.length>1?story:representative.name;
       line.bindTooltip(label,{sticky:true});
       line.on("click",()=>{
@@ -424,7 +485,10 @@ function render(){
           ${field("Atlas note","The displayed polyline joins the stored Airtable nodes in sequence. It is a narrative/analytical route, not an asserted exact historical track.")}
         `);
       });
-      line.addTo(routeLines);routeCount++;
+      line.addTo(routeLines);
+      const lantzasVoyage=representative.type==="DEPICTED TRAVEL"&&items.some(x=>/petros lantzas/i.test(x.r.character||""));
+      if(lantzasVoyage)animateVessel(points,15000+Math.min(8000,points.length*700));
+      routeCount++;
     });
   }
   const modeLabels={STORY:"Story",PEOPLE:"People",EMPIRES:"Empires",INTELLIGENCE:"Intelligence",EVIDENCE:"Evidence",TIMELINE:"Timeline"};
@@ -472,7 +536,12 @@ document.querySelectorAll("[data-mode]").forEach(btn=>btn.addEventListener("clic
 document.getElementById("routeStoryFilter").addEventListener("change",e=>{state.routeStory=e.target.value;render();});
 document.getElementById("verifiedOnly").addEventListener("change",e=>{state.verifiedOnly=e.target.checked;render();});
 document.getElementById("placesToggle").addEventListener("change",e=>{state.showPlaces=e.target.checked;e.target.checked?placeMarkers.addTo(map):map.removeLayer(placeMarkers);render();});
-document.getElementById("routesToggle").addEventListener("change",e=>{state.showRoutes=e.target.checked;e.target.checked?routeLines.addTo(map):map.removeLayer(routeLines);render();});
+document.getElementById("routesToggle").addEventListener("change",e=>{
+  state.showRoutes=e.target.checked;
+  if(e.target.checked){routeLines.addTo(map);vesselMarkers.addTo(map);}
+  else{map.removeLayer(routeLines);map.removeLayer(vesselMarkers);}
+  render();
+});
 document.getElementById("fitBtn").addEventListener("click",fitAll);
 document.getElementById("filtersBtn").addEventListener("click",openFilters);
 document.getElementById("closeFilters").addEventListener("click",closeFilters);
