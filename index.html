@@ -35,6 +35,11 @@ linear-gradient(rgba(79,56,31,.025),rgba(31,23,17,.10));mix-blend-mode:multiply}
 .ship-marker{width:76px;height:60px;transform:translate(-50%,-50%);pointer-events:none;filter:drop-shadow(0 6px 5px rgba(20,15,10,.35))}
 .ship-marker img{width:100%;height:100%;object-fit:contain;display:block}
 .ship-marker.face-left{transform:translate(-50%,-50%) scaleX(-1)}
+#realMap .morph-marker{z-index:260!important;pointer-events:none!important;overflow:visible!important}
+.morph-asset{display:block;transform:translate(-50%,-82%);transform-origin:50% 100%;filter:drop-shadow(0 9px 8px rgba(35,25,16,.28));opacity:.96}
+.morph-marker.mountain .morph-asset{width:var(--morph-mountain-size,170px)}
+.morph-marker.rock .morph-asset{width:var(--morph-rock-size,100px)}
+.morph-marker.trees .morph-asset{width:var(--morph-tree-size,84px)}
 
 .settlement-wrap{position:relative;transform:translate(-50%,-78%);transform-origin:50% 100%;pointer-events:auto;opacity:1!important;transition:transform .18s ease}
 
@@ -118,6 +123,8 @@ let state={book:"All",year:"All"};
 let atlasMap;
 const byId=new Map();
 const placeMarkers=[];
+const morphMarkers=[];
+let morphRefreshTimer=0;
 let routeSourceReady=false;
 
 const symbolAsset=s=>({
@@ -215,6 +222,7 @@ function initMap(){
         });
       }
       atlasMap.setTerrain({source:"atlas-dem",exaggeration:1.45});
+      atlasMap.once("idle",refreshMorphology);
     }catch(e){console.warn("Terrain layer unavailable",e)}
 
     try{
@@ -270,6 +278,7 @@ function initMap(){
   });
   atlasMap.on("mouseenter","atlas-routes",()=>atlasMap.getCanvas().style.cursor="pointer");
   atlasMap.on("mouseleave","atlas-routes",()=>atlasMap.getCanvas().style.cursor="");
+  atlasMap.on("moveend",scheduleMorphology);
 }
 
 function bookHit(x){return state.book==="All"||(x.books||[]).includes(state.book)}
@@ -281,6 +290,91 @@ function clearPlaces(){
   while(placeMarkers.length){
     try{placeMarkers.pop().remove()}catch(e){}
   }
+}
+function clearMorphology(){
+  while(morphMarkers.length){
+    try{morphMarkers.pop().remove()}catch(e){}
+  }
+}
+function morphHash(lat,lon){
+  const x=Math.sin(lat*12.9898+lon*78.233)*43758.5453;
+  return x-Math.floor(x);
+}
+function terrainElevation(lon,lat){
+  try{
+    const v=atlasMap.queryTerrainElevation([lon,lat],{exaggerated:false});
+    return Number.isFinite(v)?v:null;
+  }catch(e){return null}
+}
+function localRelief(lon,lat,d){
+  const c=terrainElevation(lon,lat);
+  if(c===null)return null;
+  const vals=[
+    terrainElevation(lon+d,lat),terrainElevation(lon-d,lat),
+    terrainElevation(lon,lat+d),terrainElevation(lon,lat-d)
+  ].filter(Number.isFinite);
+  if(!vals.length)return{elev:c,relief:0};
+  return{elev:c,relief:Math.max(...vals,c)-Math.min(...vals,c)};
+}
+function morphAsset(kind){
+  return kind==="mountain"?"./icons/morph-mountain.webp":
+         kind==="rock"?"./icons/morph-rock.webp":
+         "./icons/morph-trees.webp";
+}
+function addMorphMarker(kind,lon,lat,scale=1){
+  const el=document.createElement("div");
+  el.className="morph-marker "+kind;
+  const img=document.createElement("img");
+  img.className="morph-asset";
+  img.src=morphAsset(kind);
+  img.alt="";
+  img.style.transform=`translate(-50%,-82%) scale(${scale.toFixed(2)})`;
+  el.appendChild(img);
+  const m=new maplibregl.Marker({
+    element:el,anchor:"bottom",pitchAlignment:"viewport",rotationAlignment:"viewport"
+  }).setLngLat([lon,lat]).addTo(atlasMap);
+  morphMarkers.push(m);
+}
+function refreshMorphology(){
+  if(!atlasMap||!atlasMap.loaded()||typeof atlasMap.queryTerrainElevation!=="function")return;
+  clearMorphology();
+  const b=atlasMap.getBounds();
+  const west=b.getWest(),east=b.getEast(),south=b.getSouth(),north=b.getNorth();
+  const z=atlasMap.getZoom();
+  const cols=z<5?7:z<7?8:9;
+  const rows=z<5?5:z<7?6:7;
+  const dx=(east-west)/cols,dy=(north-south)/rows;
+  const probe=Math.max(.06,Math.min(.22,Math.max(dx,dy)*.28));
+
+  document.documentElement.style.setProperty("--morph-mountain-size",z<5?"145px":z<7?"165px":"190px");
+  document.documentElement.style.setProperty("--morph-rock-size",z<5?"78px":z<7?"96px":"112px");
+  document.documentElement.style.setProperty("--morph-tree-size",z<5?"62px":z<7?"78px":"92px");
+
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const baseLon=west+(c+.5)*dx,baseLat=south+(r+.5)*dy;
+      const h=morphHash(baseLat,baseLon);
+      const lon=baseLon+(h-.5)*dx*.38;
+      const lat=baseLat+(morphHash(baseLat+.17,baseLon-.23)-.5)*dy*.38;
+      const t=localRelief(lon,lat,probe);
+      if(!t||t.elev<8)continue;
+
+      let kind=null,scale=.86+h*.28;
+      // Actual DEM morphology decides the asset type.
+      if(t.elev>=850 || t.relief>=420)kind="mountain";
+      else if(t.elev>=180 || t.relief>=145)kind="rock";
+      else if(t.elev>=20 && h>.34)kind="trees";
+
+      if(!kind)continue;
+      // Keep overview readable: fewer tree clusters than rocky forms.
+      if(kind==="trees" && morphHash(lat+.31,lon+.19)<.44)continue;
+      addMorphMarker(kind,lon,lat,scale);
+    }
+  }
+}
+function scheduleMorphology(){
+  clearTimeout(morphRefreshTimer);
+  morphRefreshTimer=setTimeout(refreshMorphology,180);
 }
 
 const MAJOR_PLACES=new Set(["Corfu","Naples","Otranto","Ragusa","Candia","Constantinople","Malta","Madrid","Lisbon","Tunis","Parga","Himara"]);
