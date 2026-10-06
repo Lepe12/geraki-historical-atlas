@@ -1258,3 +1258,246 @@ button{color:inherit}
 
 /* Overview is intentionally quiet: the book routes appear only after choosing a book. */
 .book-strip{z-index:690!important}
+
+
+/* ===== Game-world atlas pass: Black Flag x grand-strategy hierarchy ===== */
+
+/* Geographic sheet first, interface second */
+#map,.leaflet-container{
+  background:#c9b68e!important;
+}
+.leaflet-tile-pane{
+  filter:sepia(.34) saturate(.72) brightness(.96) contrast(1.12)!important;
+  opacity:1!important;
+  mix-blend-mode:normal!important;
+}
+#map:after{
+  background:
+    radial-gradient(circle at 50% 46%,transparent 0 58%,rgba(39,28,18,.08) 82%,rgba(31,22,14,.18) 100%)!important;
+}
+.paper-grain{opacity:.05!important}
+.map-frame-line{opacity:.20!important}
+
+/* The mode itself is now part of the map HUD */
+.map-mode-badge{
+  position:absolute;
+  z-index:675;
+  left:24px;
+  top:78px;
+  padding:6px 10px;
+  border:1px solid rgba(76,57,37,.24);
+  border-radius:4px;
+  background:rgba(235,222,194,.82);
+  color:#4a3622;
+  font-size:9px;
+  line-height:1;
+  font-weight:700;
+  letter-spacing:.16em;
+  pointer-events:none;
+  box-shadow:0 4px 14px rgba(37,26,15,.12);
+}
+.game-compass{
+  color:#4d3824!important;
+  text-shadow:0 1px rgba(244,231,202,.65)!important;
+  opacity:.72;
+}
+.game-compass .compass-rose{font-size:31px!important}
+
+/* Compact game-world POIs: no more icon forest */
+.game-poi-anchor{
+  background:transparent!important;
+  border:0!important;
+}
+.game-poi{
+  position:absolute;
+  left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  width:15px;height:15px;
+  border-radius:50%;
+  background:rgba(226,210,176,.94);
+  border:1.5px solid #513d28;
+  box-shadow:
+    0 0 0 2px rgba(239,226,198,.78),
+    0 2px 8px rgba(49,34,20,.28);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:transform .14s ease,box-shadow .14s ease,opacity .14s ease;
+}
+.game-poi.poi-minor{
+  width:10px;height:10px;
+  opacity:.74;
+  box-shadow:0 0 0 1px rgba(239,226,198,.66),0 1px 5px rgba(49,34,20,.18);
+}
+.game-poi.poi-major{width:16px;height:16px}
+.game-poi.poi-capital{
+  width:20px;height:20px;
+  border-width:2px;
+}
+.game-poi.is-active{
+  width:21px;height:21px;
+  opacity:1!important;
+  box-shadow:
+    0 0 0 3px rgba(243,229,196,.92),
+    0 0 0 5px rgba(91,66,38,.18),
+    0 3px 10px rgba(43,30,18,.36);
+}
+.poi-mark{display:block;position:relative}
+.dot-mark{
+  width:4px;height:4px;border-radius:50%;background:#4b3824;
+}
+.anchor-mark{
+  width:7px;height:7px;
+}
+.anchor-mark:before{
+  content:"";
+  position:absolute;
+  left:3px;top:0;
+  width:1px;height:7px;
+  background:#4b3824;
+}
+.anchor-mark:after{
+  content:"";
+  position:absolute;
+  left:1px;bottom:0;
+  width:5px;height:3px;
+  border:1px solid #4b3824;
+  border-top:0;
+  border-radius:0 0 5px 5px;
+}
+.fort-mark{
+  width:7px;height:6px;
+  border:1px solid #4b3824;
+  border-top:2px solid #4b3824;
+}
+@media (hover:hover) and (pointer:fine){
+  .game-poi:hover{transform:translate(-50%,-50%) scale(1.18)}
+}
+
+/* Evidence map-mode: status is the visual language */
+.evidence-poi{
+  position:absolute;
+  left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  width:14px;height:14px;
+  border-radius:50%;
+  border:2px solid rgba(245,232,203,.92);
+  box-shadow:0 0 0 1px rgba(62,45,28,.44);
+}
+.evidence-poi span{
+  position:absolute;inset:3px;border-radius:50%;
+}
+.evidence-documented{background:#55452f}
+.evidence-mixed{background:#9a825e}
+.evidence-research{
+  background:transparent;
+  border-style:dashed;
+}
+.evidence-research span{background:#8e7756;opacity:.45}
+
+/* Routes read like selectable game paths, not GIS polylines */
+.leaflet-overlay-pane path{
+  vector-effect:non-scaling-stroke;
+}
+body[data-map-mode="story"] .leaflet-overlay-pane path,
+body[data-map-mode="voyages"] .leaflet-overlay-pane path{
+  filter:drop-shadow(0 1px 0 rgba(244,231,202,.72));
+}
+body[data-map-mode="intelligence"] .leaflet-overlay-pane path{
+  filter:none;
+}
+
+/* Each map mode has an intentionally different visual emphasis */
+body[data-map-mode="story"] .historical-place-label,
+body[data-map-mode="voyages"] .historical-place-label{
+  color:#3d2b1b!important;
+}
+body[data-map-mode="people"] .game-poi{
+  border-radius:3px;
+}
+body[data-map-mode="evidence"] .historical-place-label{display:none!important}
+body[data-map-mode="empires"] .historical-place-label{display:none!important}
+
+/* Major labels behave like a strategy map */
+.historical-place-label{
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+  font-size:10px!important;
+  font-weight:600!important;
+  letter-spacing:.04em!important;
+  color:#3e2d1d!important;
+  text-shadow:
+    0 1px 0 rgba(240,226,195,.88),
+    0 0 3px rgba(240,226,195,.72)!important;
+}
+.historical-place-label.major{
+  font-size:12px!important;
+  letter-spacing:.055em!important;
+}
+.historical-place-label.capital{
+  font-size:15px!important;
+  text-transform:uppercase;
+  letter-spacing:.09em!important;
+}
+
+/* Ship = active-world-state marker, not decorative sprite */
+.route-ship{
+  width:52px!important;
+  height:46px!important;
+  opacity:.94!important;
+  mix-blend-mode:multiply!important;
+  filter:grayscale(1) sepia(1) saturate(.58) brightness(.62) contrast(1.58)
+    drop-shadow(0 1px 0 rgba(244,231,202,.56))!important;
+}
+.moving-vessel-anchor{
+  width:52px!important;
+  height:46px!important;
+  margin-left:-26px!important;
+  margin-top:-23px!important;
+}
+
+/* HUD hierarchy: map dominates */
+.hero{
+  background:linear-gradient(180deg,rgba(18,14,10,.54),rgba(18,14,10,.18),transparent)!important;
+  padding-top:6px!important;
+}
+.hero h1{font-size:clamp(26px,2.7vw,40px)!important}
+.hero p{font-size:12px!important}
+.mode-strip{
+  background:rgba(22,17,12,.78)!important;
+  border-color:rgba(203,171,112,.20)!important;
+}
+.mode-chip{
+  font-size:8px!important;
+  padding:6px 9px!important;
+}
+.book-strip{
+  background:rgba(22,17,12,.82)!important;
+}
+.story-deck{
+  background:rgba(235,222,194,.92)!important;
+  border-color:rgba(76,57,37,.24)!important;
+}
+.control-panel{
+  width:286px!important;
+}
+.count{
+  background:rgba(229,215,188,.84)!important;
+  color:#5f4c34!important;
+  border-color:rgba(76,57,37,.20)!important;
+  box-shadow:0 3px 12px rgba(38,27,16,.10)!important;
+}
+
+/* In overview the map should breathe */
+body[data-map-mode="story"] .cartographic-label-only.region,
+body[data-map-mode="story"] .cartographic-label-only.sea{
+  opacity:.54;
+}
+
+@media(max-width:900px){
+  .map-mode-badge{left:14px;top:66px}
+}
+@media(max-width:620px){
+  .map-mode-badge{display:none}
+  .game-poi.poi-capital{width:17px;height:17px}
+  .game-poi.poi-major{width:14px;height:14px}
+}
