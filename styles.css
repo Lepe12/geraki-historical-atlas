@@ -2146,3 +2146,63 @@ button{color:inherit}
     drop-shadow(0 2px 3px rgba(62,42,24,.26))!important;
   opacity:1!important;
 }
+
+
+/* ===== Major Mediterranean map pass — canvas + settlements only ===== */
+.leaflet-maplibre-gl-layer,
+.leaflet-maplibre-gl-layer canvas,
+.maplibregl-canvas{
+  filter:saturate(1.08) brightness(1.00) contrast(1.08)!important;
+}
+.leaflet-container,
+.map-stage,
+#map{
+  background:#5f8f95!important;
+}
+#map:after{
+  background:
+    radial-gradient(circle at 48% 42%,rgba(255,244,211,.035) 0 36%,transparent 60%,rgba(62,44,28,.06) 84%,rgba(38,27,18,.10) 100%),
+    linear-gradient(rgba(104,75,44,.012),rgba(73,51,31,.018))!important;
+  mix-blend-mode:multiply!important;
+  pointer-events:none!important;
+}
+
+/* Settlements: warmer, clearer, less black-stamp appearance. */
+.mercator-settlement-art{
+  mix-blend-mode:multiply!important;
+  filter:
+    sepia(.54)
+    saturate(1.48)
+    hue-rotate(-10deg)
+    brightness(.96)
+    contrast(1.18)
+    drop-shadow(0 1px 0 rgba(252,238,207,.64))
+    drop-shadow(0 2px 2px rgba(66,45,25,.18))!important;
+  opacity:.98!important;
+}
+.mercator-settlement-art.village{
+  transform:translate(-50%,10%) scale(.94)!important;
+  opacity:.84!important;
+}
+.mercator-settlement-art.coastal-village{
+  transform:translate(-48%,10%) scale(.96)!important;
+  opacity:.86!important;
+}
+.mercator-settlement-art.town{
+  transform:translate(-50%,10%) scale(1.00)!important;
+}
+.mercator-settlement-art.port{
+  transform:translate(-48%,10%) scale(1.02)!important;
+}
+.mercator-settlement-art.city{
+  transform:translate(-50%,9%) scale(1.06)!important;
+}
+.mercator-settlement-art.fortified-city{
+  transform:translate(-50%,9%) scale(1.10)!important;
+}
+.mercator-settlement-art.capital{
+  transform:translate(-50%,8%) scale(1.14)!important;
+}
+.mercator-settlement-art.fortress{
+  transform:translate(-50%,9%) scale(1.04)!important;
+}
