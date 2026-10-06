@@ -479,7 +479,7 @@ function routeShipIcon(variant=1){
   const cls=variant===2?"route-ship route-ship-2":"route-ship route-ship-1";
   return L.divIcon({
     className:"moving-vessel-anchor",
-    html:`<div class="ship-motion"><span class="ship-wake" aria-hidden="true"></span><div class="${cls}" aria-label="historical sailing ship"></div></div>`,
+    html:`<div class="ship-heading"><div class="ship-motion"><span class="ship-wake" aria-hidden="true"></span><div class="${cls}" aria-label="historical sailing ship"></div></div></div>`,
     iconSize:[96,82],
     iconAnchor:[48,41]
   });
@@ -499,6 +499,24 @@ function routeFacingAtDistance(points,table,distanceKm){
   const dx=p2[1]-p1[1];
   if(Math.abs(dx)<1e-7)return routeFacing(points);
   return dx>=0?"right":"left";
+}
+function routeHeadingAtDistance(points,table,distanceKm){
+  if(!points||points.length<2||!table||table.total<=0)return 0;
+  const lookAhead=Math.max(1,Math.min(10,table.total*0.018));
+  const d1=Math.max(0,distanceKm-lookAhead);
+  const d2=Math.min(table.total,distanceKm+lookAhead);
+  const p1=pointAtDistance(points,table,d1);
+  const p2=pointAtDistance(points,table,d2);
+  const s1=map.latLngToLayerPoint(L.latLng(p1[0],p1[1]));
+  const s2=map.latLngToLayerPoint(L.latLng(p2[0],p2[1]));
+  const dx=s2.x-s1.x;
+  const dy=s2.y-s1.y;
+  if(Math.abs(dx)<.001&&Math.abs(dy)<.001)return 0;
+  // Artwork natively points left (180°). Rotate that left-facing bow to the local route tangent.
+  let deg=Math.atan2(dy,dx)*180/Math.PI-180;
+  while(deg>180)deg-=360;
+  while(deg<=-180)deg+=360;
+  return deg;
 }
 function animateVessel(points,variant=1){
   if(!points||points.length<2)return;
@@ -522,19 +540,12 @@ function animateVessel(points,variant=1){
     const travelled=phase*distanceTable.total;
     marker.setLatLng(pointAtDistance(points,distanceTable,travelled));
     facing=routeFacingAtDistance(points,distanceTable,travelled);
+    const heading=routeHeadingAtDistance(points,distanceTable,travelled);
 
     const el=marker.getElement();
     if(el){
-      const g=el.querySelector(".route-ship");
-      const motion=el.querySelector(".ship-motion");
-      if(g){
-        g.classList.toggle("faces-right",facing==="right");
-        g.classList.toggle("faces-left",facing!=="right");
-      }
-      if(motion){
-        motion.classList.toggle("faces-right",facing==="right");
-        motion.classList.toggle("faces-left",facing!=="right");
-      }
+      const headingEl=el.querySelector(".ship-heading");
+      if(headingEl)headingEl.style.setProperty("--ship-heading",heading+"deg");
     }
     rafId=requestAnimationFrame(tick);
   }
@@ -617,17 +628,9 @@ function addOverviewVessels(){
     const el=marker.getElement();
     if(el){
       el.classList.add("overview-vessel");
-      const facing=routeFacingAtDistance(points,table,table.total*.48);
-      const g=el.querySelector(".route-ship");
-      const motion=el.querySelector(".ship-motion");
-      if(g){
-        g.classList.toggle("faces-right",facing==="right");
-        g.classList.toggle("faces-left",facing!=="right");
-      }
-      if(motion){
-        motion.classList.toggle("faces-right",facing==="right");
-        motion.classList.toggle("faces-left",facing!=="right");
-      }
+      const heading=routeHeadingAtDistance(points,table,table.total*.48);
+      const headingEl=el.querySelector(".ship-heading");
+      if(headingEl)headingEl.style.setProperty("--ship-heading",heading+"deg");
     }
   });
 }
@@ -813,7 +816,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-local-ship-direction-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-ship-bearing-2",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
