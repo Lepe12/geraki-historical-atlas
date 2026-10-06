@@ -105,33 +105,35 @@ function settlementIcon(p){
     });
   }
 
-  const fileBySymbol={
-    "village":"village.svg",
-    "coastal-village":"coastal-village.svg",
-    "town":"town.svg",
-    "city":"city.svg",
-    "fortified-city":"fortified-city.svg",
-    "capital":"capital.svg",
-    "port":"port.svg",
-    "fortress":"fortress.svg",
-    "generic":"town.svg"
+  const hash=Array.from(String(p.id||p.place||"")).reduce((n,ch)=>(n*31+ch.charCodeAt(0))>>>0,7);
+  const assetFor={
+    "village":()=>`mercator-village-${1+(hash%4)}.png`,
+    "coastal-village":()=>`mercator-village-${1+(hash%4)}.png`,
+    "town":()=>`mercator-town-${1+(hash%6)}.png`,
+    "city":()=>`mercator-city-${1+(hash%4)}.png`,
+    "fortified-city":()=>`mercator-unique-${1+(hash%4)}.png`,
+    "capital":()=>`mercator-capital-${1+(hash%2)}.png`,
+    "port":()=>`mercator-town-${1+(hash%6)}.png`,
+    "fortress":()=>`mercator-unique-${1+(hash%4)}.png`,
+    "generic":()=>`mercator-town-${1+(hash%6)}.png`
   };
   const widthBySymbol={
-    "village":56,
-    "coastal-village":72,
-    "town":72,
-    "city":86,
-    "fortified-city":98,
-    "capital":116,
-    "port":96,
-    "fortress":80,
-    "generic":70
+    "village":44,
+    "coastal-village":48,
+    "town":54,
+    "city":66,
+    "fortified-city":72,
+    "capital":84,
+    "port":58,
+    "fortress":62,
+    "generic":52
   };
-  const file=fileBySymbol[symbol]||"town.svg";
-  const w=widthBySymbol[symbol]||70;
+  const getAsset=assetFor[symbol]||assetFor.generic;
+  const w=widthBySymbol[symbol]||52;
+
   return L.divIcon({
     className:"cartographic-anchor",
-    html:`<img class="engraved-settlement-art ${symbol}" src="./icons/${file}" alt="" style="width:${w}px" title="${esc(p.place)}">`,
+    html:`<img class="mercator-settlement-art ${symbol}" src="./icons/${getAsset()}" alt="" style="width:${w}px" title="${esc(p.place)}">`,
     iconSize:[1,1],
     iconAnchor:[0,0]
   });
