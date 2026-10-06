@@ -120,22 +120,24 @@ function defaultStoryForBook(book){
 }
 function routeVisibleInCurrentMode(r){
   if(r.atlasHidden||!hasCuratedSeaGeometry(r)||!bookHit(r)||!yearHit(r,state.year))return false;
-  if(state.mode==="EMPIRES"||state.mode==="EVIDENCE")return false;
+  if(state.mode==="EMPIRES"||state.mode==="EVIDENCE"||state.mode==="PEOPLE")return false;
+
   if(state.mode==="STORY"){
-    if(state.book==="All")return false;
-    if(!r.story)return false;
-    if(state.routeStory==="All")return false;
-    if(r.story!==state.routeStory)return false;
-    return state.routeTypes.has(r.type);
+    if(state.book==="All"||!r.story||state.routeStory==="All")return false;
+    return r.story===state.routeStory&&state.routeTypes.has(r.type);
   }
-  if(state.mode==="INTELLIGENCE")return r.type==="INTELLIGENCE / NETWORK"&&state.routeTypes.has(r.type);
-  if(state.mode==="PEOPLE"||state.mode==="VOYAGES"){
+
+  if(state.mode==="VOYAGES"){
     if(!["DEPICTED TRAVEL","STRONG RECONSTRUCTION"].includes(r.type))return false;
-    if(state.routeStory!=="All"&&routeStory(r)!==state.routeStory)return false;
-    return state.routeTypes.has(r.type);
+    if(state.routeStory==="All")return false;
+    return routeStory(r)===state.routeStory&&state.routeTypes.has(r.type);
   }
-  if(state.routeStory!=="All"&&routeStory(r)!==state.routeStory)return false;
-  return state.routeTypes.has(r.type);
+
+  if(state.mode==="INTELLIGENCE"){
+    return r.type==="INTELLIGENCE / NETWORK"&&state.routeTypes.has(r.type);
+  }
+
+  return false;
 }
 function currentRouteNodeIds(){
   const ids=new Set();
@@ -175,39 +177,36 @@ function settlementIcon(p){
     });
   }
 
-  const assetFor={
-    "village":"mercator-village-1.png",
-    "coastal-village":"mercator-village-2.png",
-    "town":"mercator-town-1.png",
-    "city":"mercator-city-1.png",
-    "fortified-city":"mercator-city-1.png",
-    "capital":"mercator-capital-1.png",
-    "port":"mercator-town-2.png",
-    "fortress":"mercator-town-1.png",
-    "generic":"mercator-town-1.png"
-  };
-  const widthBySymbol={
-    "village":32,
-    "coastal-village":36,
-    "town":44,
-    "city":58,
-    "fortified-city":66,
-    "capital":78,
-    "port":48,
-    "fortress":56,
-    "generic":40
-  };
-  const file=p.atlasAsset||assetFor[symbol]||assetFor.generic;
-  const w=widthBySymbol[symbol]||52;
+  const pri=labelPriority(p);
+  const active=currentRouteNodeIds().has(p.id);
+  const cls=[
+    "game-poi",
+    "poi-"+symbol,
+    pri>=3?"poi-capital":pri>=2?"poi-major":"poi-minor",
+    active?"is-active":""
+  ].filter(Boolean).join(" ");
+  const inner=symbol==="port"||symbol==="coastal-village"
+    ?'<span class="poi-mark anchor-mark"></span>'
+    :symbol==="fortress"||symbol==="fortified-city"
+      ?'<span class="poi-mark fort-mark"></span>'
+      :'<span class="poi-mark dot-mark"></span>';
 
   return L.divIcon({
-    className:"cartographic-anchor",
-    html:`<img class="mercator-settlement-art ${symbol}" src="./icons/${file}" alt="" style="width:${w}px" title="${esc(p.place)}">`,
-    iconSize:[1,1],
-    iconAnchor:[0,0]
+    className:"game-poi-anchor",
+    html:`<div class="${cls}" title="${esc(p.place)}">${inner}</div>`,
+    iconSize:[30,30],
+    iconAnchor:[15,15]
   });
 }
 function markerIcon(p){
+  if(state.mode==="EVIDENCE"){
+    const status=coordClass(p);
+    return L.divIcon({
+      className:"game-poi-anchor",
+      html:`<div class="evidence-poi evidence-${status}" title="${esc(p.place)}"><span></span></div>`,
+      iconSize:[24,24],iconAnchor:[12,12]
+    });
+  }
   if(state.mode==="EMPIRES"){
     const power=powerForPlace(p);
     if(power){
@@ -320,16 +319,15 @@ function rebuildFilters(){
 }
 
 function routeStyle(type,medium,focused=true){
-  const fade=focused?1:.22;
-  if(type==="INTELLIGENCE / NETWORK")return {weight:1.05,opacity:.34*fade,color:"#756951",lineCap:"round",lineJoin:"round",dashArray:"1 9"};
-  if(type==="PLANNED — NOT EXECUTED")return {weight:1.0,opacity:.28*fade,color:"#8b7659",lineCap:"round",lineJoin:"round",dashArray:"11 10"};
-  if(type==="STRONG RECONSTRUCTION")return {weight:focused?2.0:1.1,opacity:.62*fade,color:"#745c3d",lineCap:"round",lineJoin:"round",dashArray:"5 7"};
-  if(medium==="land")return {weight:focused?2.1:1.15,opacity:.72*fade,color:"#72583a",lineCap:"round",lineJoin:"round",dashArray:"5 4"};
-  return {weight:focused?2.35:1.2,opacity:.88*fade,color:"#4f3924",lineCap:"round",lineJoin:"round"};
+  if(type==="INTELLIGENCE / NETWORK")return {weight:1.6,opacity:.62,color:"#6e5a3d",lineCap:"round",lineJoin:"round",dashArray:"2 8"};
+  if(type==="PLANNED — NOT EXECUTED")return {weight:1.4,opacity:.42,color:"#897155",lineCap:"round",lineJoin:"round",dashArray:"10 8"};
+  if(type==="STRONG RECONSTRUCTION")return {weight:2.2,opacity:.72,color:"#6d4f2f",lineCap:"round",lineJoin:"round",dashArray:"6 6"};
+  if(medium==="land")return {weight:2.1,opacity:.80,color:"#66482d",lineCap:"round",lineJoin:"round",dashArray:"4 4"};
+  return {weight:2.6,opacity:.92,color:"#3f2d1d",lineCap:"round",lineJoin:"round"};
 }
 function routeUnderlayStyle(type,medium,focused=true){
   if(type!=="DEPICTED TRAVEL"||!focused)return null;
-  return {weight:5.4,opacity:.42,color:"#efe2c4",lineCap:"round",lineJoin:"round"};
+  return {weight:6.4,opacity:.46,color:"#f2e5c6",lineCap:"round",lineJoin:"round"};
 }
 
 const MAJOR_PLACES=new Set(["Madrid","Lisbon","Naples","Constantinople","Corfu","Malta","Ragusa","Candia","Tunis","Otranto"]);
@@ -527,7 +525,23 @@ function focusStoryStep(delta=0){
   if(pts.length)map.fitBounds(pts,{padding:[120,120],maxZoom:7});
 }
 
+
+function updateModePresentation(){
+  document.body.dataset.mapMode=state.mode.toLowerCase();
+  const labels={
+    STORY:"ΙΣΤΟΡΙΑ",
+    PEOPLE:"ΠΡΟΣΩΠΑ",
+    VOYAGES:"ΤΑΞΙΔΙΑ",
+    EMPIRES:"ΑΥΤΟΚΡΑΤΟΡΙΕΣ",
+    INTELLIGENCE:"ΔΙΚΤΥΑ ΠΛΗΡΟΦΟΡΙΩΝ",
+    EVIDENCE:"ΤΕΚΜΗΡΙΩΣΗ",
+    TIMELINE:"ΧΡΟΝΟΛΟΓΙΟ"
+  };
+  const badge=document.getElementById("mapModeBadge");
+  if(badge)badge.textContent=labels[state.mode]||state.mode;
+}
 function render(){
+  updateModePresentation();
   routeAnimationCancels.forEach(fn=>fn());routeAnimationCancels=[];
   placeMarkers.clearLayers();routeLines.clearLayers();historicalLabels.clearLayers();vesselMarkers.clearLayers();
   const q=state.search.trim().toLowerCase();
@@ -548,10 +562,11 @@ function render(){
     const base=Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&(bookHit(p)||activeRouteNodeIds.has(p.id))&&yearHit(p,state.year)&&
       (!state.verifiedOnly||p.coordinateStatus==="VERIFIED")&&textHit(p,q)&&storyPlaceAllowed&&bookPlaceAllowed;
     if(!base)return false;
-    if(state.mode==="PEOPLE")return Boolean((p.characters||"").trim());
-    if(state.mode==="VOYAGES")return true;
+    if(state.mode==="PEOPLE")return Boolean((p.characters||"").trim())&&(labelPriority(p)>=1||map.getZoom()>=7);
+    if(state.mode==="VOYAGES")return activeRouteNodeIds.has(p.id)||labelPriority(p)>=2;
     if(state.mode==="EMPIRES")return Boolean(powerForPlace(p));
     if(state.mode==="INTELLIGENCE")return intelligencePlaceIds.has(p.id)||(p.trilogyRole||"").toLowerCase().includes("intelligence");
+    if(state.mode==="EVIDENCE")return true;
     return true;
   });
 
@@ -589,7 +604,7 @@ function render(){
     m.bindPopup(`<strong>${esc(p.place)}</strong><br><small>${esc(p.period||"")}</small>`);
     m.on("click",()=>showPlace(p));
     m.addTo(placeMarkers);
-    if(state.mode!=="EMPIRES" && !labelOnlyPlace(p) && shouldShowLabel(p,activeRouteNodeIds)){
+    if(!["EMPIRES","EVIDENCE"].includes(state.mode) && !labelOnlyPlace(p) && shouldShowLabel(p,activeRouteNodeIds)){
       L.marker([p.lat,p.lon],{icon:historicalLabelIcon(p),interactive:false}).addTo(historicalLabels);
     }
   });
@@ -720,7 +735,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-route-ship-fix-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-game-map-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
@@ -733,9 +748,16 @@ document.getElementById("yearFilter").addEventListener("change",e=>{state.year=e
 document.querySelectorAll("[data-mode]").forEach(btn=>btn.addEventListener("click",()=>{
   state.mode=btn.dataset.mode;
   document.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("active",x===btn));
-  if(state.mode==="INTELLIGENCE")state.routeTypes=new Set(["INTELLIGENCE / NETWORK"]);
+  if(state.mode==="INTELLIGENCE"){
+    state.routeTypes=new Set(["INTELLIGENCE / NETWORK"]);
+    state.routeStory="All";
+  }
   if(state.mode==="PEOPLE")state.routeTypes=new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"]);
-  if(state.mode==="VOYAGES")state.routeTypes=new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"]);
+  if(state.mode==="VOYAGES"){
+    state.routeTypes=new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"]);
+    if(state.routeStory==="All"&&state.book!=="All")state.routeStory=defaultStoryForBook(state.book);
+    if(state.book==="All")state.routeStory="All";
+  }
   if(state.mode==="STORY"){
     state.routeTypes=new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"]);
     state.routeStory=defaultStoryForBook(state.book);
