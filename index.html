@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
-<link rel="stylesheet" href="./styles.css?v=20261006-atlas-ui-pass-1">
+<link rel="stylesheet" href="./styles.css?v=20261006-clean-topbar-1">
 </head>
 <body>
 <div id="app">
@@ -25,20 +25,30 @@
         <div class="paper-grain"></div>
       </div>
 
-      <header class="hero">
-        <div class="hero-kicker">ΙΣΤΟΡΙΚΟΣ ΑΤΛΑΣ ΤΗΣ ΜΕΣΟΓΕΙΟΥ</div>
-        <h1>Το Γεράκι της Μεσογείου</h1>
-        <div class="hero-rule"></div>
-        <p>Τόποι, πρόσωπα, διαδρομές και ιστορικό πλαίσιο της τριλογίας.</p>
+      <header class="atlas-topbar">
+        <div class="atlas-brand">
+          <div class="atlas-brand-mark">✦</div>
+          <div>
+            <div class="atlas-brand-kicker">ΙΣΤΟΡΙΚΟΣ ΑΤΛΑΣ ΤΗΣ ΜΕΣΟΓΕΙΟΥ</div>
+            <div class="atlas-brand-title">Το Γεράκι της Μεσογείου</div>
+          </div>
+        </div>
+
+        <nav id="modeStrip" class="atlas-nav" aria-label="Historical atlas mode">
+          <button class="mode-chip active" data-mode="STORY">ΧΑΡΤΗΣ</button>
+          <button class="mode-chip" data-mode="PEOPLE">ΠΡΟΣΩΠΑ</button>
+          <button class="mode-chip" data-mode="VOYAGES">ΔΙΑΔΡΟΜΕΣ</button>
+          <button class="mode-chip" data-mode="EMPIRES">ΔΥΝΑΜΕΙΣ</button>
+          <button class="mode-chip" data-mode="INTELLIGENCE">ΔΙΚΤΥΑ</button>
+          <button class="mode-chip" data-mode="EVIDENCE">ΤΕΚΜΗΡΙΩΣΗ</button>
+          <button class="mode-chip" data-mode="TIMELINE">ΧΡΟΝΟΛΟΓΙΟ</button>
+        </nav>
+
+        <div class="atlas-top-actions">
+          <button id="filtersBtn" class="atlas-top-btn" type="button" aria-label="Άνοιγμα φίλτρων">☰ <span>Φίλτρα</span></button>
+          <button id="fitBtn" class="atlas-top-btn" type="button" aria-label="Προσαρμογή χάρτη">⌖ <span>Χάρτης</span></button>
+        </div>
       </header>
-
-      <button id="filtersBtn" class="floating-btn filters-btn" type="button" aria-label="Άνοιγμα φίλτρων">
-        <span class="btn-icon">☰</span><span>Φίλτρα</span>
-      </button>
-
-      <button id="fitBtn" class="floating-btn fit-btn" type="button" aria-label="Προσαρμογή χάρτη">
-        <span class="btn-icon">⌖</span><span>Όλος ο χάρτης</span>
-      </button>
 
       <div class="compass" aria-hidden="true">
         <div class="compass-n">N</div>
@@ -46,16 +56,6 @@
       </div>
 
       <div id="countBadge" class="count"></div>
-
-      <nav id="modeStrip" class="mode-strip" aria-label="Historical atlas mode">
-        <button class="mode-chip active" data-mode="STORY">ΧΑΡΤΗΣ</button>
-        <button class="mode-chip" data-mode="PEOPLE">ΠΡΟΣΩΠΑ</button>
-        <button class="mode-chip" data-mode="VOYAGES">ΔΙΑΔΡΟΜΕΣ</button>
-        <button class="mode-chip" data-mode="EMPIRES">ΔΥΝΑΜΕΙΣ</button>
-        <button class="mode-chip" data-mode="INTELLIGENCE">ΔΙΚΤΥΑ</button>
-        <button class="mode-chip" data-mode="EVIDENCE">ΤΕΚΜΗΡΙΩΣΗ</button>
-        <button class="mode-chip" data-mode="TIMELINE">ΧΡΟΝΟΛΟΓΙΟ</button>
-      </nav>
 
       <section id="storyDeck" class="story-deck" aria-live="polite">
         <button id="storyPrev" class="story-nav-btn" type="button" aria-label="Προηγούμενο σκέλος">‹</button>
@@ -146,6 +146,6 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.22/leaflet-maplibre-gl.js"></script>
-<script src="./app.js?v=20261006-atlas-ui-pass-1"></script>
+<script src="./app.js?v=20261006-clean-topbar-1"></script>
 </body>
 </html>
