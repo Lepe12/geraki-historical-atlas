@@ -116,7 +116,7 @@ function styleMediterraneanBasemap(){
     try{
       vectorMap.addSource("atlas-terrain-dem",{
         type:"raster-dem",
-        tiles:["https://elevation-tiles-prod.s3.amazonaws.com/terrarium/{z}/{x}/{y}.png"],
+        tiles:["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],
         tileSize:256,
         encoding:"terrarium",
         minzoom:0,
@@ -135,10 +135,28 @@ function styleMediterraneanBasemap(){
         paint:{
           "hillshade-illumination-direction":315,
           "hillshade-illumination-anchor":"map",
-          "hillshade-exaggeration":0.82,
-          "hillshade-shadow-color":"#5a4028",
-          "hillshade-highlight-color":"#f6dfaa",
-          "hillshade-accent-color":"#8b6d46"
+          "hillshade-exaggeration":1,
+          "hillshade-shadow-color":"#3f2b1d",
+          "hillshade-highlight-color":"#ffe8ad",
+          "hillshade-accent-color":"#765330"
+        }
+      });
+    }catch(e){}
+  }
+
+  if(vectorMap.getSource("atlas-terrain-dem")&&!vectorMap.getLayer("atlas-terrain-relief-soft")){
+    try{
+      vectorMap.addLayer({
+        id:"atlas-terrain-relief-soft",
+        type:"hillshade",
+        source:"atlas-terrain-dem",
+        paint:{
+          "hillshade-illumination-direction":225,
+          "hillshade-illumination-anchor":"map",
+          "hillshade-exaggeration":0.52,
+          "hillshade-shadow-color":"#675039",
+          "hillshade-highlight-color":"#f4d99d",
+          "hillshade-accent-color":"#95764f"
         }
       });
     }catch(e){}
@@ -946,7 +964,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-dem-relief-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-dem-relief-2",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
