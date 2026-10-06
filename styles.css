@@ -1501,3 +1501,42 @@ body[data-map-mode="story"] .cartographic-label-only.sea{
   .game-poi.poi-capital{width:17px;height:17px}
   .game-poi.poi-major{width:14px;height:14px}
 }
+
+
+/* ===== Mode-aware control visibility ===== */
+.powers-section{display:none}
+body[data-map-mode="empires"] .powers-section{display:block}
+body[data-map-mode="empires"] #routesSection,
+body[data-map-mode="evidence"] #routesSection,
+body[data-map-mode="people"] #routesSection{display:none}
+body[data-map-mode="intelligence"] .advanced-routes{display:none}
+body[data-map-mode="story"] .powers-section,
+body[data-map-mode="voyages"] .powers-section,
+body[data-map-mode="intelligence"] .powers-section,
+body[data-map-mode="evidence"] .powers-section,
+body[data-map-mode="people"] .powers-section{display:none}
+
+/* Map-mode tonal shifts: same geography, different reading */
+body[data-map-mode="empires"] .leaflet-tile-pane{
+  filter:sepia(.18) saturate(.58) brightness(.94) contrast(1.08)!important;
+}
+body[data-map-mode="intelligence"] .leaflet-tile-pane{
+  filter:sepia(.42) saturate(.38) brightness(.92) contrast(1.10)!important;
+}
+body[data-map-mode="evidence"] .leaflet-tile-pane{
+  filter:grayscale(.72) sepia(.20) brightness(.98) contrast(1.04)!important;
+}
+body[data-map-mode="people"] .leaflet-tile-pane{
+  filter:sepia(.28) saturate(.66) brightness(.98) contrast(1.06)!important;
+}
+.mode-note{
+  top:151px!important;
+  background:rgba(231,217,190,.84)!important;
+  color:#5d4931!important;
+  border:1px solid rgba(78,58,38,.16);
+  box-shadow:0 3px 12px rgba(39,28,17,.08);
+}
+body[data-map-mode="story"] .mode-note,
+body[data-map-mode="voyages"] .mode-note{
+  display:block;
+}
