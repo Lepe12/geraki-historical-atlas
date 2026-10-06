@@ -787,3 +787,28 @@ button{color:inherit}
 }
 /* Never render retired ship classes. */
 .moving-galley,.mercator-map-ship,.historical-map-ship,.approved-route-ship{display:none!important}
+
+/* Unified historical route-ship rendering: same ink, full visibility, no upside-down rotation. */
+.route-ship{
+  width:76px!important;
+  height:68px!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:contain!important;
+  opacity:1!important;
+  mix-blend-mode:normal!important;
+  filter:grayscale(1) sepia(1) saturate(.72) brightness(.62) contrast(1.55) drop-shadow(0 1px 1px rgba(255,255,255,.38))!important;
+  transform-origin:50% 50%!important;
+  transition:none!important;
+}
+.route-ship.faces-left{transform:scaleX(1)!important}
+.route-ship.faces-right{transform:scaleX(-1)!important}
+.moving-vessel-anchor{
+  width:76px!important;
+  height:68px!important;
+  margin-left:-38px!important;
+  margin-top:-34px!important;
+  overflow:visible!important;
+  background:transparent!important;
+  border:0!important;
+}
