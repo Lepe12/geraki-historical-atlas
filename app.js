@@ -316,17 +316,33 @@ function routeLegPoints(r,pa,pb){
   pts.push(end);
   return pts;
 }
-function densifyRoute(points,stepsPerSegment=24){
-  const out=[];
+function haversineKm(a,b){
+  const R=6371;
+  const rad=x=>x*Math.PI/180;
+  const lat1=rad(a[0]),lat2=rad(b[0]);
+  const dLat=lat2-lat1,dLon=rad(b[1]-a[1]);
+  const h=Math.sin(dLat/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.min(1,Math.sqrt(h)));
+}
+function routeDistanceTable(points){
+  const cumulative=[0];
+  let total=0;
   for(let i=0;i<points.length-1;i++){
-    const a=points[i],b=points[i+1];
-    for(let s=0;s<stepsPerSegment;s++){
-      const t=s/stepsPerSegment;
-      out.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]);
-    }
+    total+=haversineKm(points[i],points[i+1]);
+    cumulative.push(total);
   }
-  out.push(points[points.length-1]);
-  return out;
+  return {cumulative,total};
+}
+function pointAtDistance(points,table,distanceKm){
+  const {cumulative,total}=table;
+  if(distanceKm<=0)return points[0];
+  if(distanceKm>=total)return points[points.length-1];
+  let i=0;
+  while(i<cumulative.length-1 && cumulative[i+1]<distanceKm)i++;
+  const a=points[i],b=points[i+1];
+  const seg=cumulative[i+1]-cumulative[i];
+  const t=seg>0?(distanceKm-cumulative[i])/seg:0;
+  return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];
 }
 function routeShipIcon(variant=1){
   const cls=variant===2?"route-ship route-ship-2":"route-ship route-ship-1";
@@ -342,22 +358,27 @@ function routeFacing(points){
   const dx=points[points.length-1][1]-points[0][1];
   return dx>=0?"right":"left";
 }
-function animateVessel(points,duration=14000,variant=1){
+function animateVessel(points,variant=1){
   if(!points||points.length<2)return;
-  const dense=densifyRoute(points,20);
-  const marker=L.marker(dense[0],{icon:routeShipIcon(variant),interactive:false,zIndexOffset:900}).addTo(vesselMarkers);
+  const distanceTable=routeDistanceTable(points);
+  if(distanceTable.total<=0)return;
+
+  // One visual speed for every sea route: 32 km of route per screen-second.
+  const VISUAL_KM_PER_SECOND=32;
+  const duration=(distanceTable.total/VISUAL_KM_PER_SECOND)*1000;
+
+  const marker=L.marker(points[0],{icon:routeShipIcon(variant),interactive:false,zIndexOffset:900}).addTo(vesselMarkers);
   const facing=routeFacing(points);
   const start=performance.now();
   let rafId=0;
   let stopped=false;
+
   function tick(now){
     if(stopped||!map.hasLayer(vesselMarkers))return;
     const phase=((now-start)%duration)/duration;
-    const pos=phase*(dense.length-1);
-    const i=Math.min(dense.length-2,Math.floor(pos));
-    const f=pos-i;
-    const a=dense[i],b=dense[i+1];
-    marker.setLatLng([a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f]);
+    const travelled=phase*distanceTable.total;
+    marker.setLatLng(pointAtDistance(points,distanceTable,travelled));
+
     const el=marker.getElement();
     if(el){
       const g=el.querySelector(".route-ship");
@@ -368,6 +389,7 @@ function animateVessel(points,duration=14000,variant=1){
     }
     rafId=requestAnimationFrame(tick);
   }
+
   rafId=requestAnimationFrame(tick);
   routeAnimationCancels.push(()=>{stopped=true;cancelAnimationFrame(rafId);});
 }
@@ -502,7 +524,7 @@ function render(){
       const lantzasVoyage=representative.type==="DEPICTED TRAVEL"&&medium==="sea"&&items.some(x=>/petros lantzas/i.test(x.r.character||""));
       if(lantzasVoyage){
         const variant=representative.shipVariant===1?1:2;
-        animateVessel(points,15000+Math.min(8000,points.length*700),variant);
+        animateVessel(points,variant);
       }
       routeCount++;
     });
