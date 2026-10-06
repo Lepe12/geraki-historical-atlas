@@ -99,23 +99,22 @@ function settlementIcon(p){
     const kind=symbol.replace("-label","");
     return L.divIcon({
       className:"cartographic-anchor",
-      html:`<div class="cartographic-label-only ${kind}" title="${esc(p.place)}">${esc(p.place)}</div>`,
+      html:`<div class="cartographic-label-only ${kind}" title="${esc(atlasLabelFor(p))}">${esc(atlasLabelFor(p))}</div>`,
       iconSize:[1,1],
       iconAnchor:[0,0]
     });
   }
 
-  const hash=Array.from(String(p.id||p.place||"")).reduce((n,ch)=>(n*31+ch.charCodeAt(0))>>>0,7);
   const assetFor={
-    "village":()=>`mercator-village-${1+(hash%4)}.png`,
-    "coastal-village":()=>`mercator-village-${1+(hash%4)}.png`,
-    "town":()=>`mercator-town-${1+(hash%6)}.png`,
-    "city":()=>`mercator-city-${1+(hash%4)}.png`,
-    "fortified-city":()=>`mercator-unique-${1+(hash%4)}.png`,
-    "capital":()=>`mercator-capital-${1+(hash%2)}.png`,
-    "port":()=>`mercator-town-${1+(hash%6)}.png`,
-    "fortress":()=>`mercator-unique-${1+(hash%4)}.png`,
-    "generic":()=>`mercator-town-${1+(hash%6)}.png`
+    "village":"mercator-village-1.png",
+    "coastal-village":"mercator-village-2.png",
+    "town":"mercator-town-1.png",
+    "city":"mercator-city-1.png",
+    "fortified-city":"mercator-unique-1.png",
+    "capital":"mercator-capital-1.png",
+    "port":"mercator-town-2.png",
+    "fortress":"mercator-unique-2.png",
+    "generic":"mercator-town-1.png"
   };
   const widthBySymbol={
     "village":44,
@@ -128,12 +127,12 @@ function settlementIcon(p){
     "fortress":62,
     "generic":52
   };
-  const getAsset=assetFor[symbol]||assetFor.generic;
+  const file=assetFor[symbol]||assetFor.generic;
   const w=widthBySymbol[symbol]||52;
 
   return L.divIcon({
     className:"cartographic-anchor",
-    html:`<img class="mercator-settlement-art ${symbol}" src="./icons/${getAsset()}" alt="" style="width:${w}px" title="${esc(p.place)}">`,
+    html:`<img class="mercator-settlement-art ${symbol}" src="./icons/${file}" alt="" style="width:${w}px" title="${esc(p.place)}">`,
     iconSize:[1,1],
     iconAnchor:[0,0]
   });
@@ -248,8 +247,10 @@ function routeStyle(type){
 }
 
 const MAJOR_PLACES=new Set(["Madrid","Lisbon","Naples","Constantinople","Corfu","Malta","Ragusa","Candia","Tunis","Otranto"]);
-const CAPITAL_PLACES=new Set(["Madrid","Constantinople","Naples"]);
+const CAPITAL_PLACES=new Set(["Madrid","Constantinople","Naples","Venice"]);
+const FORCE_LABELS=new Set(["Candia","Malta","Lefkada","Ragusa"]);
 function labelPriority(p){
+  if(FORCE_LABELS.has(p.place))return 4;
   if(CAPITAL_PLACES.has(p.place))return 3;
   if(MAJOR_PLACES.has(p.place))return 2;
   if(["City","Port","Fortress"].includes(p.type))return 1;
@@ -258,6 +259,7 @@ function labelPriority(p){
 function shouldShowLabel(p,routeNodeIds){
   const z=map.getZoom();
   const pri=labelPriority(p);
+  if(pri>=4)return true;
   if(z>=8)return true;
   if(z===7)return pri>=1||routeNodeIds.has(p.id);
   if(z===6)return pri>=2||routeNodeIds.has(p.id);
@@ -272,7 +274,7 @@ function historicalLabelIcon(p){
   const major=MAJOR_PLACES.has(p.place)?" major":"";
   return L.divIcon({
     className:"",
-    html:`<div class="historical-place-label${port}${fortress}${capital}${major}">${esc(p.place)}</div>`,
+    html:`<div class="historical-place-label${port}${fortress}${capital}${major}">${esc(atlasLabelFor(p))}</div>`,
     iconSize:[118,18],iconAnchor:[-6,8]
   });
 }
