@@ -240,10 +240,10 @@ function rebuildFilters(){
 }
 
 function routeStyle(type){
-  const base={weight:2.5,opacity:.88,color:"#4f6b72",lineCap:"round",lineJoin:"round"};
-  if(type==="INTELLIGENCE / NETWORK")return {...base,color:"#78684e",dashArray:"2 8",weight:2.2,opacity:.68};
-  if(type==="PLANNED — NOT EXECUTED")return {...base,color:"#766553",dashArray:"10 9",opacity:.5};
-  if(type==="STRONG RECONSTRUCTION")return {...base,color:"#65747a",dashArray:"7 7",opacity:.62};
+  const base={weight:1.55,opacity:.78,color:"#5a4631",lineCap:"round",lineJoin:"round",dashArray:"7 5 1 5"};
+  if(type==="INTELLIGENCE / NETWORK")return {...base,color:"#6f5f49",dashArray:"1 7",weight:1.35,opacity:.56};
+  if(type==="PLANNED — NOT EXECUTED")return {...base,color:"#7b6850",dashArray:"11 8",weight:1.25,opacity:.46};
+  if(type==="STRONG RECONSTRUCTION")return {...base,color:"#695843",dashArray:"5 6",weight:1.3,opacity:.55};
   return base;
 }
 
@@ -324,21 +324,12 @@ function densifyRoute(points,stepsPerSegment=24){
   out.push(points[points.length-1]);
   return out;
 }
-function galleyIcon(){
+function mercatorShipIcon(){
   return L.divIcon({
     className:"moving-vessel-anchor",
-    html:`<div class="moving-galley">
-      <svg viewBox="0 0 64 34" aria-hidden="true">
-        <path class="ship-hull" d="M7 23 C16 26,42 27,56 22 L51 28 C38 32,19 31,10 28 Z"/>
-        <path class="ship-mast" d="M31 7 L31 24"/>
-        <path class="ship-sail" d="M31 8 L47 18 L31 18 Z"/>
-        <path class="ship-sail rear" d="M30 10 L19 18 L30 18 Z"/>
-        <path class="ship-yard" d="M20 9 L46 19"/>
-        <path class="ship-oar" d="M14 25 L7 31 M20 26 L14 33 M27 27 L22 34 M39 27 L44 33 M46 26 L52 32"/>
-      </svg>
-    </div>`,
-    iconSize:[38,24],
-    iconAnchor:[19,12]
+    html:`<div class="mercator-map-ship" aria-label="Mercator-style sailing ship"></div>`,
+    iconSize:[54,36],
+    iconAnchor:[27,18]
   });
 }
 function bearingDeg(a,b){
@@ -348,7 +339,7 @@ function bearingDeg(a,b){
 function animateVessel(points,duration=14000){
   if(!points||points.length<2)return;
   const dense=densifyRoute(points,20);
-  const marker=L.marker(dense[0],{icon:galleyIcon(),interactive:false,zIndexOffset:900}).addTo(vesselMarkers);
+  const marker=L.marker(dense[0],{icon:mercatorShipIcon(),interactive:false,zIndexOffset:900}).addTo(vesselMarkers);
   const start=performance.now();
   let rafId=0;
   let stopped=false;
@@ -537,7 +528,7 @@ document.querySelectorAll("[data-mode]").forEach(btn=>btn.addEventListener("clic
   document.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("active",x===btn));
   if(state.mode==="INTELLIGENCE")state.routeTypes=new Set(["INTELLIGENCE / NETWORK"]);
   if(state.mode==="PEOPLE")state.routeTypes=new Set(["DEPICTED TRAVEL"]);
-  if(state.mode==="STORY"&&state.routeTypes.size===0)state.routeTypes=new Set(["DEPICTED TRAVEL"]);
+  if(state.mode==="STORY")state.routeTypes=new Set(["DEPICTED TRAVEL"]);
   rebuildFilters();render();
 }));
 document.getElementById("routeStoryFilter").addEventListener("change",e=>{state.routeStory=e.target.value;render();});
