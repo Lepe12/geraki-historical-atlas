@@ -16,6 +16,9 @@ html,body{height:100%;margin:0}body{font-family:'Plus Jakarta Sans',sans-serif;b
 .glass-dark{background:rgba(18,16,13,.92);backdrop-filter:blur(14px);border-color:rgba(207,163,94,.28)!important}
 .parchment-panel{background:#e9d5b7;color:#2b1f17;box-shadow:inset 0 0 100px rgba(83,51,22,.18),-14px 0 34px rgba(0,0,0,.40)}
 #realMap{position:absolute;inset:0;background:#4f7c82}
+#realMap .maplibregl-marker{z-index:700!important;overflow:visible!important}
+#realMap .settlement-wrap{min-width:90px;min-height:70px;overflow:visible!important}
+#realMap .label-only{position:relative;z-index:710}
 .maplibregl-canvas{filter:saturate(1.06) contrast(1.08) brightness(.98)}
 .maplibregl-ctrl-attrib{background:rgba(20,17,13,.72)!important;color:#c9b48d!important;font-size:10px!important}
 .maplibregl-ctrl-attrib a{color:#e1bd78!important}
@@ -25,7 +28,7 @@ html,body{height:100%;margin:0}body{font-family:'Plus Jakarta Sans',sans-serif;b
 
 
 
-.map-wash{position:absolute;inset:0;z-index:450;pointer-events:none;background:
+.map-wash{position:absolute;inset:0;z-index:20;pointer-events:none;background:
 radial-gradient(circle at 48% 36%,rgba(255,220,160,.10) 0 20%,transparent 50%),
 radial-gradient(circle at 50% 50%,transparent 48%,rgba(24,18,13,.16) 100%),
 linear-gradient(rgba(79,56,31,.025),rgba(31,23,17,.10));mix-blend-mode:multiply}
@@ -193,44 +196,68 @@ function initMap(){
   atlasMap.on("load",()=>{
     styleHistoricalBase();
 
-    if(!atlasMap.getSource("atlas-dem")){
-      atlasMap.addSource("atlas-dem",{
-        type:"raster-dem",
-        tiles:["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],
-        tileSize:256,
-        encoding:"terrarium",
-        maxzoom:14
-      });
+    // Settlements are the primary atlas layer. Render them first so
+    // optional terrain/route failures can never suppress towns and villages.
+    clearPlaces();
+    DATA.places.filter(placeVisible).forEach(p=>{
+      const m=markerFor(p).addTo(atlasMap);
+      placeMarkers.push(m);
+    });
+
+    try{
+      if(!atlasMap.getSource("atlas-dem")){
+        atlasMap.addSource("atlas-dem",{
+          type:"raster-dem",
+          tiles:["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],
+          tileSize:256,
+          encoding:"terrarium",
+          maxzoom:14
+        });
+      }
+      atlasMap.setTerrain({source:"atlas-dem",exaggeration:1.45});
+    }catch(e){console.warn("Terrain layer unavailable",e)}
+
+    try{
+      if(!atlasMap.getLayer("atlas-relief")){
+        atlasMap.addLayer({
+          id:"atlas-relief",
+          type:"hillshade",
+          source:"atlas-dem",
+          paint:{
+            "hillshade-exaggeration":.92,
+            "hillshade-shadow-color":"#4a3322",
+            "hillshade-highlight-color":"#f0d89f",
+            "hillshade-accent-color":"#846946",
+            "hillshade-illumination-direction":315
+          }
+        });
+      }
+    }catch(e){console.warn("Hillshade unavailable",e)}
+
+    try{
+      if(!atlasMap.getSource("atlas-routes")){
+        atlasMap.addSource("atlas-routes",{type:"geojson",data:{type:"FeatureCollection",features:[]}});
+      }
+      if(!atlasMap.getLayer("atlas-routes")){
+        atlasMap.addLayer({
+          id:"atlas-routes",
+          type:"line",
+          source:"atlas-routes",
+          layout:{"line-cap":"round","line-join":"round"},
+          paint:{
+            "line-color":["get","color"],
+            "line-width":["get","width"],
+            "line-opacity":["get","opacity"],
+            "line-dasharray":[2,5]
+          }
+        });
+      }
+      routeSourceReady=true;
+    }catch(e){
+      routeSourceReady=false;
+      console.warn("Route layer unavailable",e);
     }
-    atlasMap.setTerrain({source:"atlas-dem",exaggeration:1.45});
 
-    atlasMap.addLayer({
-      id:"atlas-relief",
-      type:"hillshade",
-      source:"atlas-dem",
-      paint:{
-        "hillshade-exaggeration":.92,
-        "hillshade-shadow-color":"#4a3322",
-        "hillshade-highlight-color":"#f0d89f",
-        "hillshade-accent-color":"#846946",
-        "hillshade-illumination-direction":315
-      }
-    });
-
-    atlasMap.addSource("atlas-routes",{type:"geojson",data:{type:"FeatureCollection",features:[]}});
-    atlasMap.addLayer({
-      id:"atlas-routes",
-      type:"line",
-      source:"atlas-routes",
-      layout:{"line-cap":"round","line-join":"round"},
-      paint:{
-        "line-color":["get","color"],
-        "line-width":["get","width"],
-        "line-opacity":["get","opacity"],
-        "line-dasharray":[2,5]
-      }
-    });
-    routeSourceReady=true;
     updateMarkerHierarchy();
     render();
     fitAll();
