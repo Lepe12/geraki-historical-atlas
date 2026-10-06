@@ -14,19 +14,89 @@ const vectorBase=L.maplibreGL({
 }).addTo(map);
 
 const vectorMap=vectorBase.getMaplibreMap();
-function simplifyVectorBasemap(){
+let mediterraneanBasemapStyled=false;
+
+function styleMediterraneanBasemap(){
+  if(mediterraneanBasemapStyled)return;
   const style=vectorMap.getStyle();
-  if(!style||!Array.isArray(style.layers))return;
+  if(!style||!Array.isArray(style.layers)||!style.layers.length)return;
+
   style.layers.forEach(layer=>{
     const id=(layer.id||"").toLowerCase();
     const modernDetail=/road|highway|street|transport|rail|transit|aeroway|building|poi|housenumber|boundary|admin/.test(id);
+
     if(layer.type==="symbol"||modernDetail){
       try{vectorMap.setLayoutProperty(layer.id,"visibility","none")}catch(e){}
+      return;
     }
+
+    try{
+      if(layer.type==="background"){
+        vectorMap.setPaintProperty(layer.id,"background-color","#d4c18b");
+        vectorMap.setPaintProperty(layer.id,"background-opacity",1);
+        return;
+      }
+
+      if(layer.type==="fill"){
+        if(/water|ocean|sea/.test(id)){
+          vectorMap.setPaintProperty(layer.id,"fill-color","#739a98");
+          vectorMap.setPaintProperty(layer.id,"fill-opacity",1);
+        }else if(/wood|forest|scrub|vegetation/.test(id)){
+          vectorMap.setPaintProperty(layer.id,"fill-color","#8f9870");
+          vectorMap.setPaintProperty(layer.id,"fill-opacity",.52);
+        }else if(/grass|park|green/.test(id)){
+          vectorMap.setPaintProperty(layer.id,"fill-color","#a6a77c");
+          vectorMap.setPaintProperty(layer.id,"fill-opacity",.44);
+        }else if(/farmland|farm|agric|crop/.test(id)){
+          vectorMap.setPaintProperty(layer.id,"fill-color","#c0a978");
+          vectorMap.setPaintProperty(layer.id,"fill-opacity",.42);
+        }else if(/landcover|landuse/.test(id)){
+          vectorMap.setPaintProperty(layer.id,"fill-color","#bea779");
+          vectorMap.setPaintProperty(layer.id,"fill-opacity",.30);
+        }
+      }
+
+      if(layer.type==="line"&&/water|coast/.test(id)){
+        vectorMap.setPaintProperty(layer.id,"line-color","#3f6664");
+        vectorMap.setPaintProperty(layer.id,"line-opacity",.72);
+        vectorMap.setPaintProperty(layer.id,"line-width",1.05);
+      }
+
+      if(layer.type==="hillshade"){
+        vectorMap.setPaintProperty(layer.id,"hillshade-shadow-color","#6c5538");
+        vectorMap.setPaintProperty(layer.id,"hillshade-highlight-color","#f1dfb1");
+        vectorMap.setPaintProperty(layer.id,"hillshade-accent-color","#8b7450");
+        vectorMap.setPaintProperty(layer.id,"hillshade-exaggeration",.45);
+      }
+    }catch(e){}
   });
+
+  if(!vectorMap.getLayer("atlas-coastline")){
+    const water=style.layers.find(layer=>{
+      const id=(layer.id||"").toLowerCase();
+      return layer.type==="fill"&&/water|ocean|sea/.test(id)&&layer.source&&layer["source-layer"];
+    });
+    if(water){
+      const coastline={
+        id:"atlas-coastline",
+        type:"line",
+        source:water.source,
+        "source-layer":water["source-layer"],
+        paint:{
+          "line-color":"#3b5f5d",
+          "line-width":["interpolate",["linear"],["zoom"],4,.55,8,1.05,13,1.35],
+          "line-opacity":.78
+        }
+      };
+      if(water.filter)coastline.filter=water.filter;
+      try{vectorMap.addLayer(coastline)}catch(e){}
+    }
+  }
+
+  mediterraneanBasemapStyled=true;
 }
-vectorMap.on("load",simplifyVectorBasemap);
-vectorMap.on("styledata",simplifyVectorBasemap);
+vectorMap.on("load",styleMediterraneanBasemap);
+vectorMap.on("styledata",styleMediterraneanBasemap);
 
 placeMarkers.addTo(map);routeLines.addTo(map);historicalLabels.addTo(map);vesselMarkers.addTo(map);
 
@@ -827,7 +897,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-atlas-ui-pass-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-mediterranean-map-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
