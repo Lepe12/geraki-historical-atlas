@@ -14,6 +14,83 @@ const vectorBase=L.maplibreGL({
 }).addTo(map);
 
 const vectorMap=vectorBase.getMaplibreMap();
+let seaMotionStarted=false;
+const seaTextureLayerIds=[];
+
+function installLivingSea(){
+  const style=vectorMap.getStyle();
+  if(!style||!Array.isArray(style.layers))return;
+
+  if(!vectorMap.hasImage("atlas-sea-wave")){
+    const canvas=document.createElement("canvas");
+    canvas.width=64; canvas.height=40;
+    const ctx=canvas.getContext("2d");
+    ctx.clearRect(0,0,64,40);
+    ctx.strokeStyle="rgba(55,70,66,.30)";
+    ctx.lineWidth=.75;
+    ctx.lineCap="round";
+    [[-10,9,30],[18,9,58],[46,9,86],[-24,29,16],[4,29,44],[32,29,72]].forEach(([x,y,x2])=>{
+      ctx.beginPath();
+      ctx.moveTo(x,y);
+      ctx.bezierCurveTo(x+7,y-3,x2-7,y+3,x2,y);
+      ctx.stroke();
+    });
+    vectorMap.addImage("atlas-sea-wave",ctx.getImageData(0,0,64,40),{pixelRatio:2});
+  }
+
+  const currentStyle=vectorMap.getStyle();
+  currentStyle.layers.forEach(layer=>{
+    const id=(layer.id||"").toLowerCase();
+    if(layer.type!=="fill"||!/water|ocean|sea/.test(id))return;
+
+    try{
+      vectorMap.setPaintProperty(layer.id,"fill-color","#b8c5bf");
+      vectorMap.setPaintProperty(layer.id,"fill-opacity",.94);
+    }catch(e){}
+
+    const textureId="atlas-sea-texture-"+layer.id.replace(/[^a-z0-9_-]/gi,"-");
+    if(vectorMap.getLayer(textureId))return;
+
+    const textureLayer={
+      id:textureId,
+      type:"fill",
+      source:layer.source,
+      paint:{
+        "fill-pattern":"atlas-sea-wave",
+        "fill-opacity":.11
+      }
+    };
+    if(layer["source-layer"])textureLayer["source-layer"]=layer["source-layer"];
+    if(layer.filter)textureLayer.filter=layer.filter;
+    if(layer.minzoom!==undefined)textureLayer.minzoom=layer.minzoom;
+    if(layer.maxzoom!==undefined)textureLayer.maxzoom=layer.maxzoom;
+
+    try{
+      vectorMap.addLayer(textureLayer);
+      seaTextureLayerIds.push(textureId);
+    }catch(e){}
+  });
+
+  if(!seaMotionStarted&&seaTextureLayerIds.length){
+    seaMotionStarted=true;
+    const started=performance.now();
+    let last=0;
+    function breatheSea(now){
+      if(now-last>180){
+        last=now;
+        const wave=.105+.025*Math.sin((now-started)/8500*Math.PI*2);
+        seaTextureLayerIds.forEach(id=>{
+          if(vectorMap.getLayer(id)){
+            try{vectorMap.setPaintProperty(id,"fill-opacity",wave)}catch(e){}
+          }
+        });
+      }
+      requestAnimationFrame(breatheSea);
+    }
+    requestAnimationFrame(breatheSea);
+  }
+}
+
 function simplifyVectorBasemap(){
   const style=vectorMap.getStyle();
   if(!style||!Array.isArray(style.layers))return;
@@ -24,6 +101,7 @@ function simplifyVectorBasemap(){
       try{vectorMap.setLayoutProperty(layer.id,"visibility","none")}catch(e){}
     }
   });
+  installLivingSea();
 }
 vectorMap.on("load",simplifyVectorBasemap);
 vectorMap.on("styledata",simplifyVectorBasemap);
@@ -816,7 +894,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-ship-bearing-2",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-living-sea-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
