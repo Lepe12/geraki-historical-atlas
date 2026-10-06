@@ -377,6 +377,7 @@ function render(){
       (!state.verifiedOnly||p.coordinateStatus==="VERIFIED")&&textHit(p,q);
     if(!base)return false;
     if(state.mode==="PEOPLE")return Boolean((p.characters||"").trim());
+    if(state.mode==="VOYAGES")return true;
     if(state.mode==="EMPIRES")return Boolean(powerForPlace(p));
     if(state.mode==="INTELLIGENCE")return intelligencePlaceIds.has(p.id)||(p.trilogyRole||"").toLowerCase().includes("intelligence");
     return true;
@@ -437,6 +438,7 @@ function render(){
       if(state.mode==="EMPIRES"||state.mode==="EVIDENCE")return false;
       if(state.mode==="INTELLIGENCE"&&r.type!=="INTELLIGENCE / NETWORK")return false;
       if(state.mode==="PEOPLE"&&r.type!=="DEPICTED TRAVEL")return false;
+      if(state.mode==="VOYAGES"&&r.type!=="DEPICTED TRAVEL")return false;
       return state.routeTypes.has(r.type)&&bookHit(r)&&yearHit(r,state.year)&&textHit(r,q)&&
         (state.routeStory==="All"||routeStory(r)===state.routeStory);
     });
@@ -489,7 +491,7 @@ function render(){
       routeCount++;
     });
   }
-  const modeLabels={STORY:"Story",PEOPLE:"People",EMPIRES:"Empires",INTELLIGENCE:"Intelligence",EVIDENCE:"Evidence",TIMELINE:"Timeline"};
+  const modeLabels={STORY:"Story",PEOPLE:"People",VOYAGES:"Voyages",EMPIRES:"Empires",INTELLIGENCE:"Intelligence",EVIDENCE:"Evidence",TIMELINE:"Timeline"};
   document.getElementById("countBadge").textContent=`${modeLabels[state.mode]} · ${state.showPlaces?visiblePlaces.length:0} τόποι · ${routeCount} route stories`;
 }
 function fitVisible(){
@@ -528,6 +530,7 @@ document.querySelectorAll("[data-mode]").forEach(btn=>btn.addEventListener("clic
   document.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("active",x===btn));
   if(state.mode==="INTELLIGENCE")state.routeTypes=new Set(["INTELLIGENCE / NETWORK"]);
   if(state.mode==="PEOPLE")state.routeTypes=new Set(["DEPICTED TRAVEL"]);
+  if(state.mode==="VOYAGES")state.routeTypes=new Set(["DEPICTED TRAVEL"]);
   if(state.mode==="STORY")state.routeTypes=new Set(["DEPICTED TRAVEL"]);
   rebuildFilters();render();
 }));
