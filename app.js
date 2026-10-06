@@ -549,9 +549,47 @@ function focusStoryStep(delta=0){
   if(pts.length)map.fitBounds(pts,{padding:[120,120],maxZoom:7});
 }
 
+function addOverviewVessels(){
+  if(state.mode!=="STORY"||state.book!=="All")return;
+
+  const stories=new Map();
+  atlasData.routes
+    .filter(r=>
+      r.story &&
+      r.medium==="sea" &&
+      r.vessel &&
+      /petros lantzas/i.test(r.character||"") &&
+      hasCuratedSeaGeometry(r)
+    )
+    .sort((a,b)=>(a.sequence||0)-(b.sequence||0))
+    .forEach(r=>{
+      if(!stories.has(r.story))stories.set(r.story,r);
+    });
+
+  stories.forEach(r=>{
+    const a=(r.from||[])[0],b=(r.to||[])[0];
+    if(!a||!b)return;
+    const pa=byId.get(a.id),pb=byId.get(b.id);
+    if(!pa||!pb)return;
+    const points=routeLegPoints(r,pa,pb);
+    if(points.length<2)return;
+    const table=routeDistanceTable(points);
+    if(table.total<=0)return;
+    const pos=pointAtDistance(points,table,table.total*.48);
+    const marker=L.marker(pos,{
+      icon:routeShipIcon(r.shipVariant===2?2:1),
+      interactive:false,
+      zIndexOffset:850
+    }).addTo(vesselMarkers);
+    const el=marker.getElement();
+    if(el)el.classList.add("overview-vessel");
+  });
+}
+
 function render(){
   routeAnimationCancels.forEach(fn=>fn());routeAnimationCancels=[];
   placeMarkers.clearLayers();routeLines.clearLayers();historicalLabels.clearLayers();vesselMarkers.clearLayers();
+  addOverviewVessels();
   const q=state.search.trim().toLowerCase();
 
   const intelligencePlaceIds=new Set();
@@ -729,7 +767,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-thin-routes-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-vessels-visible-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
