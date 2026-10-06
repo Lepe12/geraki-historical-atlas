@@ -77,55 +77,62 @@ const yearHit=(obj,year)=>year==="All"||yearsFrom(obj.period).includes(year);
 const bookHit=(obj)=>state.book==="All"||(obj.books||[]).includes(state.book);
 
 function settlementClass(p){
+  if(p.atlasSymbol)return p.atlasSymbol;
   const t=(p.type||"").toLowerCase();
-  if(t.includes("fortress"))return "settlement-fortress";
-  if(t.includes("port")||t.includes("harbor"))return "settlement-port";
-  if(t.includes("village"))return "settlement-village";
-  if(t.includes("city"))return "settlement-city";
-  if(t.includes("island"))return "settlement-island";
-  if(t.includes("sea")||t.includes("strait"))return "settlement-sea";
-  if(t.includes("region"))return "settlement-region";
-  return "settlement-generic";
+  if(t.includes("fortress"))return "fortress";
+  if(t.includes("port")||t.includes("harbor"))return "port";
+  if(t.includes("village"))return "village";
+  if(t.includes("city"))return "city";
+  if(t.includes("island"))return "island-label";
+  if(t.includes("sea")||t.includes("strait"))return "sea-label";
+  if(t.includes("region"))return "region-label";
+  return "generic";
+}
+function labelOnlyPlace(p){
+  const s=settlementClass(p);
+  return s==="island-label"||s==="region-label"||s==="sea-label";
 }
 function settlementIcon(p){
-  const cls=settlementClass(p);
-  const isCapital=CAPITAL_PLACES.has(p.place)||p.place==="Venice";
-  const isMajor=MAJOR_PLACES.has(p.place);
-  const power=powerForPlace(p);
+  const symbol=settlementClass(p);
 
-  const svgByClass={
-    "settlement-village":"village.svg",
-    "settlement-city":isCapital?"capital.svg":"city.svg",
-    "settlement-port":isCapital?"capital.svg":"port.svg",
-    "settlement-fortress":"fortress.svg"
-  };
-
-  if(svgByClass[cls]){
-    const file=svgByClass[cls];
-    const scale=isCapital?" is-capital":(isMajor?" is-major":"");
-    const heraldry=power?`<span class="settlement-svg-heraldry"><span class="settlement-svg-heraldry-art" style="background-image:url('${power.image.replace(/"/g,"%22")}')"></span></span>`:"";
+  if(labelOnlyPlace(p)){
+    const kind=symbol.replace("-label","");
     return L.divIcon({
       className:"",
-      html:`<div class="settlement-svg-wrap${scale}" title="${esc(p.place)}"><img class="settlement-svg-art" src="./icons/${file}" alt="">${heraldry}</div>`,
-      iconSize:isCapital?[58,58]:[48,48],
-      iconAnchor:isCapital?[29,40]:[24,34]
+      html:`<div class="cartographic-label-only ${kind}" title="${esc(p.place)}">${esc(p.place)}</div>`,
+      iconSize:[150,24],iconAnchor:[75,12]
     });
   }
 
-  const powerClass=power?` power-${power.id}`:"";
-  const capital=isCapital?" is-capital":"";
-  const major=isMajor?" is-major":"";
-  const htmlMap={
-    "settlement-island":'<span class="island-mark"></span>',
-    "settlement-sea":'<span class="sea-mark">≈</span>',
-    "settlement-region":'<span class="region-mark">✦</span>',
-    "settlement-generic":'<span class="generic-mark">•</span>'
+  const fileBySymbol={
+    "village":"village.svg",
+    "coastal-village":"coastal-village.svg",
+    "town":"town.svg",
+    "city":"city.svg",
+    "fortified-city":"fortified-city.svg",
+    "capital":"capital.svg",
+    "port":"port.svg",
+    "fortress":"fortress.svg",
+    "generic":"town.svg"
   };
-  const heraldry=power?`<span class="settlement-heraldry"><span class="settlement-heraldry-art" style="background-image:url('${power.image.replace(/"/g,"%22")}')"></span></span>`:"";
+  const sizeBySymbol={
+    "village":[52,28],
+    "coastal-village":[62,30],
+    "town":[62,30],
+    "city":[74,34],
+    "fortified-city":[82,36],
+    "capital":[96,42],
+    "port":[82,36],
+    "fortress":[68,32],
+    "generic":[58,29]
+  };
+  const file=fileBySymbol[symbol]||"town.svg";
+  const size=sizeBySymbol[symbol]||sizeBySymbol.generic;
   return L.divIcon({
     className:"",
-    html:`<div class="settlement-icon ${cls}${capital}${major}${powerClass}" title="${esc(p.place)}">${htmlMap[cls]||htmlMap["settlement-generic"]}${heraldry}</div>`,
-    iconSize:[46,40],iconAnchor:[23,28]
+    html:`<div class="engraved-settlement ${symbol}" title="${esc(p.place)}"><img src="./icons/${file}" alt=""></div>`,
+    iconSize:size,
+    iconAnchor:[Math.round(size[0]/2),Math.round(size[1]*.72)]
   });
 }
 function markerIcon(p){
@@ -346,7 +353,7 @@ function render(){
     m.bindPopup(`<strong>${esc(p.place)}</strong><br><small>${esc(p.period||"")}</small>`);
     m.on("click",()=>showPlace(p));
     m.addTo(placeMarkers);
-    if(state.mode!=="EMPIRES" && shouldShowLabel(p,activeRouteNodeIds)){
+    if(state.mode!=="EMPIRES" && !labelOnlyPlace(p) && shouldShowLabel(p,activeRouteNodeIds)){
       L.marker([p.lat,p.lon],{icon:historicalLabelIcon(p),interactive:false}).addTo(historicalLabels);
     }
   });
