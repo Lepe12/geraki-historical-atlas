@@ -537,8 +537,19 @@ function updateModePresentation(){
     EVIDENCE:"ΤΕΚΜΗΡΙΩΣΗ",
     TIMELINE:"ΧΡΟΝΟΛΟΓΙΟ"
   };
+  const notes={
+    STORY:"Μία canonical αφήγηση κάθε φορά",
+    PEOPLE:"Τόποι που συνδέονται με χαρακτήρες",
+    VOYAGES:"Επίλεξε ένα ταξίδι για να εμφανιστεί η πορεία",
+    EMPIRES:"Πολιτικός έλεγχος και ιστορικές δυνάμεις",
+    INTELLIGENCE:"Μόνο δίκτυα πληροφοριών — χωρίς πλοία",
+    EVIDENCE:"Κατάσταση τεκμηρίωσης τόπων και συντεταγμένων",
+    TIMELINE:"Χρονική εξερεύνηση του atlas"
+  };
   const badge=document.getElementById("mapModeBadge");
+  const note=document.getElementById("modeNote");
   if(badge)badge.textContent=labels[state.mode]||state.mode;
+  if(note)note.textContent=notes[state.mode]||"";
 }
 function render(){
   updateModePresentation();
@@ -735,7 +746,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-game-map-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-game-map-2",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
