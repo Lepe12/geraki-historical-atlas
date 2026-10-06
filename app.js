@@ -77,12 +77,36 @@ const yearsFrom=s=>{
 };
 const yearHit=(obj,year)=>year==="All"||yearsFrom(obj.period).includes(year);
 const bookHit=(obj)=>state.book==="All"||(obj.books||[]).includes(state.book);
+function primaryStoryRoutes(){
+  return atlasData.routes.filter(r=>Boolean(r.story));
+}
+function defaultStoryForBook(book){
+  if(book==="All")return "All";
+  const stories=Array.from(new Set(
+    primaryStoryRoutes().filter(r=>(r.books||[]).includes(book)).map(r=>r.story)
+  ));
+  return stories.length===1?stories[0]:"All";
+}
+function routeVisibleInCurrentMode(r){
+  if(r.atlasHidden||!hasCuratedSeaGeometry(r)||!bookHit(r)||!yearHit(r,state.year))return false;
+  if(state.mode==="EMPIRES"||state.mode==="EVIDENCE")return false;
+  if(state.mode==="STORY"){
+    if(!r.story)return false;
+    if(state.routeStory!=="All"&&r.story!==state.routeStory)return false;
+    return state.routeTypes.has(r.type);
+  }
+  if(state.mode==="INTELLIGENCE")return r.type==="INTELLIGENCE / NETWORK"&&state.routeTypes.has(r.type);
+  if(state.mode==="PEOPLE"||state.mode==="VOYAGES"){
+    if(!["DEPICTED TRAVEL","STRONG RECONSTRUCTION"].includes(r.type))return false;
+    if(state.routeStory!=="All"&&routeStory(r)!==state.routeStory)return false;
+    return state.routeTypes.has(r.type);
+  }
+  if(state.routeStory!=="All"&&routeStory(r)!==state.routeStory)return false;
+  return state.routeTypes.has(r.type);
+}
 function currentRouteNodeIds(){
   const ids=new Set();
-  atlasData.routes.filter(r=>
-    bookHit(r)&&yearHit(r,state.year)&&
-    (state.routeStory==="All"||routeStory(r)===state.routeStory)
-  ).forEach(r=>{
+  atlasData.routes.filter(routeVisibleInCurrentMode).forEach(r=>{
     (r.from||[]).forEach(x=>ids.add(x.id));
     (r.to||[]).forEach(x=>ids.add(x.id));
   });
@@ -234,7 +258,7 @@ function rebuildFilters(){
   document.getElementById("bookStrip").innerHTML=books.map(b=>`<button class="book-chip ${state.book===b?"active":""}" data-book="${esc(b)}">${b==="All"?"Όλα":esc(b)}</button>`).join("");
   document.querySelectorAll("[data-book]").forEach(b=>b.onclick=()=>{
     state.book=b.dataset.book;
-    state.routeStory="All";
+    state.routeStory=defaultStoryForBook(state.book);
     state.storyStep=0;
     rebuildFilters();
     render();
@@ -245,7 +269,10 @@ function rebuildFilters(){
   const yearSelect=document.getElementById("yearFilter");
   yearSelect.innerHTML='<option value="All">Όλες οι περίοδοι</option>'+years.map(y=>`<option value="${y}" ${state.year===y?"selected":""}>${y}</option>`).join("");
 
-  const stories=["All",...Array.from(new Set(atlasData.routes.filter(r=>bookHit(r)).map(routeStory).filter(Boolean))).sort()];
+  const storyPool=state.mode==="STORY"
+    ? atlasData.routes.filter(r=>bookHit(r)&&Boolean(r.story)).map(r=>r.story)
+    : atlasData.routes.filter(r=>bookHit(r)).map(routeStory).filter(Boolean);
+  const stories=["All",...Array.from(new Set(storyPool)).sort()];
   const storySelect=document.getElementById("routeStoryFilter");
   storySelect.innerHTML=stories.map(s=>`<option value="${esc(s)}" ${state.routeStory===s?"selected":""}>${s==="All"?"Όλες οι διαδρομές":esc(s)}</option>`).join("");
 
@@ -532,15 +559,9 @@ function render(){
 
   let routeCount=0;
   if(state.showRoutes){
-    const filtered=atlasData.routes.filter(r=>{
-      if(r.atlasHidden)return false;
-      if(!hasCuratedSeaGeometry(r))return false;
-      if(state.mode==="EMPIRES"||state.mode==="EVIDENCE")return false;
-      if(state.mode==="INTELLIGENCE"&&r.type!=="INTELLIGENCE / NETWORK")return false;
-      if(state.mode==="PEOPLE"&&!["DEPICTED TRAVEL","STRONG RECONSTRUCTION"].includes(r.type))return false;
-      if(state.mode==="VOYAGES"&&!["DEPICTED TRAVEL","STRONG RECONSTRUCTION"].includes(r.type))return false;
-      return state.routeTypes.has(r.type)&&bookHit(r)&&yearHit(r,state.year)&&textHit(r,q);
-    });
+    const filtered=atlasData.routes.filter(r=>
+      routeVisibleInCurrentMode(r)&&textHit(r,q)
+    );
 
     const grouped=new Map();
     filtered.forEach(r=>{
@@ -569,7 +590,7 @@ function render(){
       if(points.length<2)return;
       const representative=items[0].r;
       const medium=representative.medium||"unknown";
-      const focused=state.routeStory==="All"?(state.book!=="All"):state.routeStory===story;
+      const focused=state.routeStory==="All"?true:state.routeStory===story;
       const under=routeUnderlayStyle(representative.type,medium,focused);
       if(under)L.polyline(points,under).addTo(routeLines);
       const line=L.polyline(points,routeStyle(representative.type,medium,focused));
@@ -656,7 +677,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-redesign-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-story-fix-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
@@ -672,7 +693,11 @@ document.querySelectorAll("[data-mode]").forEach(btn=>btn.addEventListener("clic
   if(state.mode==="INTELLIGENCE")state.routeTypes=new Set(["INTELLIGENCE / NETWORK"]);
   if(state.mode==="PEOPLE")state.routeTypes=new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"]);
   if(state.mode==="VOYAGES")state.routeTypes=new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"]);
-  if(state.mode==="STORY")state.routeTypes=new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"]);
+  if(state.mode==="STORY"){
+    state.routeTypes=new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"]);
+    state.routeStory=defaultStoryForBook(state.book);
+    state.storyStep=0;
+  }
   rebuildFilters();render();
 }));
 document.getElementById("routeStoryFilter").addEventListener("change",e=>{state.routeStory=e.target.value;state.storyStep=0;updateStoryDeck();render();if(state.routeStory!=="All")focusStoryStep(0);});
