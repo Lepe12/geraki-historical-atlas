@@ -1,4 +1,4 @@
-const state={mode:"STORY",book:"All",search:"",year:"All",routeStory:"All",verifiedOnly:false,showPlaces:true,showRoutes:true,routeTypes:new Set(["DEPICTED TRAVEL"])};
+const state={mode:"STORY",book:"All",search:"",year:"All",routeStory:"All",verifiedOnly:false,showPlaces:true,showRoutes:true,routeTypes:new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"])};
 const placeMarkers=L.layerGroup(),routeLines=L.layerGroup(),historicalLabels=L.layerGroup(),vesselMarkers=L.layerGroup();
 let routeAnimationCancels=[];
 let atlasData={places:[],routes:[]};
@@ -55,6 +55,7 @@ const powerForPlace=p=>{
 };
 const routeDashed=t=>t!=="DEPICTED TRAVEL";
 const routeStory=r=>{
+  if(r.story)return r.story;
   const n=r.name||"";
   if(n.startsWith("Acuña 1577")) return "Acuña mission 1577";
   if(n.startsWith("Cyprus intelligence")) return "Cyprus intelligence 1578";
@@ -479,8 +480,8 @@ function render(){
       if(!hasCuratedSeaGeometry(r))return false;
       if(state.mode==="EMPIRES"||state.mode==="EVIDENCE")return false;
       if(state.mode==="INTELLIGENCE"&&r.type!=="INTELLIGENCE / NETWORK")return false;
-      if(state.mode==="PEOPLE"&&r.type!=="DEPICTED TRAVEL")return false;
-      if(state.mode==="VOYAGES"&&r.type!=="DEPICTED TRAVEL")return false;
+      if(state.mode==="PEOPLE"&&!["DEPICTED TRAVEL","STRONG RECONSTRUCTION"].includes(r.type))return false;
+      if(state.mode==="VOYAGES"&&!["DEPICTED TRAVEL","STRONG RECONSTRUCTION"].includes(r.type))return false;
       return state.routeTypes.has(r.type)&&bookHit(r)&&yearHit(r,state.year)&&textHit(r,q)&&
         (state.routeStory==="All"||routeStory(r)===state.routeStory);
     });
@@ -492,7 +493,7 @@ function render(){
       const pa=byId.get(a.id),pb=byId.get(b.id);
       if(!pa||!pb||!Number.isFinite(pa.lat)||!Number.isFinite(pb.lat))return;
       if(state.verifiedOnly&&(pa.coordinateStatus!=="VERIFIED"||pb.coordinateStatus!=="VERIFIED"))return;
-      const key=routeStory(r)+"||"+r.type;
+      const key=routeStory(r)+"||"+r.type+"||"+(r.medium||"unknown");
       if(!grouped.has(key))grouped.set(key,[]);
       grouped.get(key).push({r,pa,pb});
     });
@@ -531,12 +532,39 @@ function render(){
         `);
       });
       line.addTo(routeLines);
-      const lantzasVoyage=representative.type==="DEPICTED TRAVEL"&&medium==="sea"&&items.some(x=>/petros lantzas/i.test(x.r.character||""));
-      if(lantzasVoyage){
-        const variant=representative.shipVariant===1?1:2;
-        animateVessel(points,variant);
-      }
       routeCount++;
+    });
+
+    // Animate one physical Lantzas vessel per route story, across all visible sea legs,
+    // regardless of evidence styling. This prevents duplicate ships and keeps one
+    // constant-speed movement over the actual curated maritime geometry.
+    const voyageGroups=new Map();
+    filtered.forEach(r=>{
+      if(r.medium!=="sea" || !r.vessel || !/petros lantzas/i.test(r.character||""))return;
+      if(r.type==="INTELLIGENCE / NETWORK" || r.type==="PLANNED — NOT EXECUTED")return;
+      const a=(r.from||[])[0],b=(r.to||[])[0];
+      if(!a||!b)return;
+      const pa=byId.get(a.id),pb=byId.get(b.id);
+      if(!pa||!pb||!hasCuratedSeaGeometry(r))return;
+      const key=routeStory(r);
+      if(!voyageGroups.has(key))voyageGroups.set(key,[]);
+      voyageGroups.get(key).push({r,pa,pb});
+    });
+    voyageGroups.forEach(items=>{
+      items.sort((x,y)=>(x.r.sequence||0)-(y.r.sequence||0));
+      const voyagePoints=[];
+      items.forEach((it,i)=>{
+        const leg=routeLegPoints(it.r,it.pa,it.pb);
+        if(!leg.length)return;
+        if(i>0&&voyagePoints.length){
+          const last=voyagePoints[voyagePoints.length-1],first=leg[0];
+          if(Math.abs(last[0]-first[0])<1e-6&&Math.abs(last[1]-first[1])<1e-6)leg.shift();
+        }
+        voyagePoints.push(...leg);
+      });
+      if(voyagePoints.length<2)return;
+      const variant=items[0].r.shipVariant===1?1:2;
+      animateVessel(voyagePoints,variant);
     });
   }
   const modeLabels={STORY:"Story",PEOPLE:"People",VOYAGES:"Voyages",EMPIRES:"Empires",INTELLIGENCE:"Intelligence",EVIDENCE:"Evidence",TIMELINE:"Timeline"};
@@ -563,7 +591,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json").then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-route-audit-2",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
@@ -577,9 +605,9 @@ document.querySelectorAll("[data-mode]").forEach(btn=>btn.addEventListener("clic
   state.mode=btn.dataset.mode;
   document.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("active",x===btn));
   if(state.mode==="INTELLIGENCE")state.routeTypes=new Set(["INTELLIGENCE / NETWORK"]);
-  if(state.mode==="PEOPLE")state.routeTypes=new Set(["DEPICTED TRAVEL"]);
-  if(state.mode==="VOYAGES")state.routeTypes=new Set(["DEPICTED TRAVEL"]);
-  if(state.mode==="STORY")state.routeTypes=new Set(["DEPICTED TRAVEL"]);
+  if(state.mode==="PEOPLE")state.routeTypes=new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"]);
+  if(state.mode==="VOYAGES")state.routeTypes=new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"]);
+  if(state.mode==="STORY")state.routeTypes=new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"]);
   rebuildFilters();render();
 }));
 document.getElementById("routeStoryFilter").addEventListener("change",e=>{state.routeStory=e.target.value;render();});
