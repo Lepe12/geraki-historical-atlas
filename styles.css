@@ -567,3 +567,80 @@ button{color:inherit}
   position:absolute;inset:2px;
   background-position:center;background-repeat:no-repeat;background-size:contain;
 }
+
+/* Canonical 16th–17th c. cartographic settlement system */
+.engraved-settlement{
+  position:relative;
+  width:100%;
+  height:100%;
+  pointer-events:auto;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  filter:none!important;
+  transform-origin:50% 72%;
+  transition:transform .12s ease, opacity .12s ease;
+}
+.engraved-settlement img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  filter:sepia(.18) contrast(1.08);
+  opacity:.94;
+}
+.engraved-settlement:hover{transform:scale(1.08)}
+.engraved-settlement.capital img{opacity:1}
+.engraved-settlement.village img,.engraved-settlement.coastal-village img{opacity:.88}
+.engraved-settlement.port img{filter:sepia(.16) contrast(1.08)}
+.engraved-settlement.fortress img,.engraved-settlement.fortified-city img{filter:sepia(.22) contrast(1.13)}
+
+/* Islands, regions and seas are geography, not marker symbols. */
+.cartographic-label-only{
+  width:150px;
+  text-align:center;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  color:#4c4438;
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:.06em;
+  line-height:1.05;
+  text-shadow:0 1px 0 rgba(243,234,213,.92),0 0 3px rgba(243,234,213,.75);
+  white-space:nowrap;
+  transform:translateY(2px);
+}
+.cartographic-label-only.island{
+  font-style:italic;
+  font-size:11px;
+  letter-spacing:.09em;
+}
+.cartographic-label-only.region{
+  font-size:11px;
+  font-style:italic;
+  letter-spacing:.11em;
+  opacity:.86;
+}
+.cartographic-label-only.sea{
+  font-size:12px;
+  font-style:italic;
+  letter-spacing:.16em;
+  opacity:.72;
+}
+
+/* No UI badge or sovereignty sticker is attached to settlement artwork. */
+.engraved-settlement .settlement-svg-heraldry,
+.engraved-settlement .settlement-heraldry{display:none!important}
+
+/* Remove legacy visible island/settlement constructs if stale DOM/CSS survives cache. */
+.settlement-island .island-mark,
+.settlement-svg-wrap,
+.settlement-icon.settlement-city,
+.settlement-icon.settlement-port,
+.settlement-icon.settlement-fortress,
+.settlement-icon.settlement-village{background:transparent!important;border:0!important;box-shadow:none!important}
