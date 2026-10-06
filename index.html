@@ -1,240 +1,190 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ιστορικός Άτλας της Μεσογείου</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800;900&family=GFS+Didot&family=IM+Fell+English:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family:'Plus Jakarta Sans',sans-serif; background-color:#0a0d12; color:#e5ded3; overflow:hidden; user-select:none; }
-        .font-cinzel{font-family:'Cinzel',serif}.font-didot{font-family:'GFS Didot',serif}.font-archival{font-family:'IM Fell English',serif}
-        .parchment-panel{background:#ebd8c3 url('https://www.transparenttextures.com/patterns/paper-fibers.png') repeat;color:#2b1f17;box-shadow:inset 0 0 120px rgba(70,38,12,.35),-12px 0 35px rgba(0,0,0,.8)}
-        .glass-dark{background:rgba(12,15,22,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(212,163,89,.3)}
-        .gold-glow{box-shadow:0 0 15px rgba(217,119,6,.25)}
-        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:rgba(50,35,20,.08)}::-webkit-scrollbar-thumb{background:rgba(160,110,50,.4);border-radius:4px}::-webkit-scrollbar-thumb:hover{background:rgba(190,130,60,.7)}
-        .map-cursor-grab{cursor:grab}.map-cursor-grabbing{cursor:grabbing}
-        #realMap{position:absolute;inset:0;z-index:0}
-        #mapCanvas{position:absolute;inset:0;z-index:2;pointer-events:none}
-        .leaflet-container{background:#547f86}
-        .leaflet-tile-pane{
-            filter:sepia(.28) saturate(.88) contrast(1.14) brightness(.96) hue-rotate(-8deg);
-        }
-        #realMap:after{
-            content:"";
-            position:absolute;
-            inset:0;
-            z-index:350;
-            pointer-events:none;
-            background:
-                radial-gradient(circle at 48% 42%,rgba(255,238,194,.05) 0 35%,transparent 62%),
-                linear-gradient(rgba(84,61,35,.05),rgba(35,27,20,.08));
-            mix-blend-mode:multiply;
-        }
-        .leaflet-control-attribution{background:rgba(15,17,20,.72)!important;color:#c9b795!important}
-        .leaflet-control-attribution a{color:#e1bc75!important}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Ιστορικός Άτλας της Μεσογείου</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800;900&family=GFS+Didot&family=IM+Fell+English:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+html,body{height:100%;margin:0}body{font-family:'Plus Jakarta Sans',sans-serif;background:#0a0d12;color:#e5ded3;overflow:hidden}
+.font-cinzel{font-family:'Cinzel',serif}.font-didot{font-family:'GFS Didot',serif}.font-archival{font-family:'IM Fell English',serif}
+.glass-dark{background:rgba(18,16,13,.92);backdrop-filter:blur(14px);border-color:rgba(207,163,94,.28)!important}
+.parchment-panel{background:#e9d5b7;color:#2b1f17;box-shadow:inset 0 0 100px rgba(83,51,22,.18),-14px 0 34px rgba(0,0,0,.40)}
+#realMap{position:absolute;inset:0;background:#557c82}
+.leaflet-tile-pane{filter:sepia(.28) saturate(.82) contrast(1.16) brightness(.94) hue-rotate(-8deg)}
+.leaflet-container{background:#547f86;font-family:'GFS Didot',serif}
+.leaflet-control-attribution{background:rgba(20,17,13,.74)!important;color:#c8b28d!important}
+.leaflet-control-attribution a{color:#e0bd7b!important}
+.map-wash{position:absolute;inset:0;z-index:450;pointer-events:none;background:
+radial-gradient(circle at 49% 42%,rgba(255,241,199,.06) 0 28%,transparent 58%),
+linear-gradient(rgba(77,55,32,.03),rgba(38,28,20,.10));mix-blend-mode:multiply}
+.settlement-wrap{position:relative;transform:translate(-50%,-78%);pointer-events:auto}
+.settlement-img{display:block;width:110px;height:auto;filter:drop-shadow(0 6px 6px rgba(31,21,14,.36));transition:transform .18s ease}
+.settlement-wrap:hover .settlement-img{transform:scale(1.08)}
+.settlement-wrap.village .settlement-img{width:76px}.settlement-wrap.coastal-village .settlement-img{width:82px}.settlement-wrap.town .settlement-img{width:92px}.settlement-wrap.city .settlement-img{width:108px}.settlement-wrap.capital .settlement-img{width:122px}.settlement-wrap.port .settlement-img{width:100px}
+.settlement-label{position:absolute;left:50%;top:76%;transform:translateX(-50%);white-space:nowrap;padding:2px 6px;background:rgba(232,211,171,.92);border:1px solid rgba(75,51,28,.34);color:#2e2117;font:700 12px/1.1 'GFS Didot',serif;box-shadow:0 2px 5px rgba(30,20,12,.18)}
+.label-only{white-space:nowrap;color:#3a2b20;font:700 12px/1.2 'GFS Didot',serif;text-shadow:0 1px 0 #f3dfb8,0 0 5px #f3dfb8}
+.route-hit{cursor:pointer}
+.panel-scroll::-webkit-scrollbar{width:6px}.panel-scroll::-webkit-scrollbar-thumb{background:rgba(124,83,43,.4);border-radius:5px}
+.book-btn.active,.year-btn.active{background:rgba(217,119,6,.32);border-color:rgba(245,158,11,.72);color:#fde8ba}
+#sidePanel.closed{transform:translateX(100%)}
+</style>
 </head>
-<body class="h-screen w-screen flex flex-col relative overflow-hidden bg-stone-950">
-
-<header class="h-16 z-30 glass-dark flex items-center justify-between px-4 md:px-8 border-b border-amber-900/50 shrink-0">
-    <div class="flex items-center space-x-3.5">
-        <div class="w-10 h-10 rounded-full border border-amber-500/50 bg-amber-950/60 flex items-center justify-center text-amber-400 gold-glow"><i class="fa-solid fa-compass text-xl"></i></div>
-        <div><h1 class="font-cinzel text-base md:text-lg font-bold tracking-widest text-amber-100 leading-tight">ΙΣΤΟΡΙΚΟΣ ΑΤΛΑΣ</h1><p class="text-[10px] tracking-[0.25em] text-amber-500/90 font-cinzel uppercase">ΤΗΣ ΜΕΣΟΓΕΙΟΥ</p></div>
-    </div>
-    <nav class="hidden lg:flex items-center space-x-6 text-xs font-semibold tracking-wider font-cinzel">
-        <button class="px-3 py-1.5 text-amber-300 border-b-2 border-amber-400 bg-amber-500/10 rounded-t transition">ΧΑΡΤΗΣ</button>
-        <button class="px-3 py-1.5 text-stone-400 hover:text-amber-200 transition">ΠΕΡΙΟΔΟΙ</button>
-        <button class="px-3 py-1.5 text-stone-400 hover:text-amber-200 transition">ΘΕΜΑΤΑ</button>
-        <button class="px-3 py-1.5 text-stone-400 hover:text-amber-200 transition">ΠΡΟΣΩΠΑ</button>
-        <button class="px-3 py-1.5 text-stone-400 hover:text-amber-200 transition">ΠΗΓΕΣ</button>
-    </nav>
-    <div class="flex items-center space-x-3">
-        <div class="relative w-48 sm:w-64 md:w-80">
-            <input type="text" id="searchInput" placeholder="Αναζήτηση τόπων, προσώπων, γεγονότων..." class="w-full bg-stone-900/90 text-amber-100 placeholder-stone-400 text-xs rounded-lg pl-9 pr-8 py-2 border border-amber-800/50 focus:outline-none focus:border-amber-500 transition shadow-inner" oninput="handleSearch(this.value)">
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-amber-500/70"></i>
-            <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2.5 top-2 text-xs text-stone-400 hover:text-amber-300"><i class="fa-solid fa-xmark"></i></button>
-            <div id="searchResults" class="hidden absolute left-0 right-0 top-full mt-2 bg-stone-900/95 border border-amber-600/50 rounded-lg shadow-2xl z-50 max-h-64 overflow-y-auto divide-y divide-stone-800"></div>
-        </div>
-        <button class="hidden sm:flex items-center space-x-1 border border-amber-800/50 px-2.5 py-1.5 rounded text-xs text-amber-300/80 hover:bg-amber-900/30 transition"><span>EL</span><i class="fa-solid fa-chevron-down text-[9px] text-amber-500"></i></button>
-    </div>
+<body class="h-screen w-screen flex flex-col">
+<header class="h-16 z-[1200] glass-dark flex items-center justify-between px-5 md:px-7 border-b shrink-0">
+  <div class="flex items-center gap-3">
+    <div class="w-10 h-10 rounded-full border border-amber-500/45 bg-amber-950/50 flex items-center justify-center text-amber-400"><i class="fa-solid fa-compass text-xl"></i></div>
+    <div><div class="font-cinzel text-[17px] font-bold tracking-[.14em] text-amber-100">ΙΣΤΟΡΙΚΟΣ ΑΤΛΑΣ</div><div class="font-cinzel text-[9px] tracking-[.28em] text-amber-500">ΤΗΣ ΜΕΣΟΓΕΙΟΥ</div></div>
+  </div>
+  <nav class="hidden lg:flex items-center gap-5 font-cinzel text-[11px] tracking-wider">
+    <button class="text-amber-300 border-b-2 border-amber-400 py-2">ΧΑΡΤΗΣ</button><button class="text-stone-400">ΠΕΡΙΟΔΟΙ</button><button class="text-stone-400">ΘΕΜΑΤΑ</button><button class="text-stone-400">ΠΡΟΣΩΠΑ</button><button class="text-stone-400">ΠΗΓΕΣ</button>
+  </nav>
+  <div class="relative w-52 sm:w-72 md:w-80">
+    <input id="searchInput" class="w-full bg-stone-900/85 border border-amber-800/45 text-amber-100 text-xs rounded-md py-2 pl-9 pr-8 outline-none" placeholder="Αναζήτηση τόπων, προσώπων..." oninput="searchPlaces(this.value)">
+    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-amber-500/70"></i>
+    <div id="searchResults" class="hidden absolute top-full mt-2 left-0 right-0 bg-stone-900/95 border border-amber-700/40 rounded-md shadow-2xl max-h-72 overflow-y-auto z-[1600]"></div>
+  </div>
 </header>
 
-<div class="relative flex-1 w-full h-full overflow-hidden flex">
-    <div id="mapViewport" class="relative flex-1 w-full h-full bg-[#09121d] overflow-hidden map-cursor-grab">
-        <div id="realMap"></div>
-        <canvas id="mapCanvas" class="absolute inset-0 w-full h-full block pointer-events-none"></canvas>
-        <div class="absolute top-5 left-5 z-20 flex flex-col space-y-2">
-            <div class="glass-dark p-1.5 rounded-lg flex flex-col space-y-1 shadow-2xl">
-                <button onclick="zoomMap(1.2)" title="Μεγέθυνση (+)" class="w-8 h-8 rounded hover:bg-amber-500/20 text-amber-300 flex items-center justify-center transition"><i class="fa-solid fa-plus text-sm"></i></button>
-                <button onclick="zoomMap(0.8)" title="Σμίκρυνση (-)" class="w-8 h-8 rounded hover:bg-amber-500/20 text-amber-300 flex items-center justify-center transition"><i class="fa-solid fa-minus text-sm"></i></button>
-                <button onclick="resetMapView()" title="Επαναφορά Χάρτη" class="w-8 h-8 rounded hover:bg-amber-500/20 text-amber-300 flex items-center justify-center transition"><i class="fa-solid fa-arrows-to-dot text-sm"></i></button>
-            </div>
-        </div>
-        <div class="absolute bottom-24 left-6 z-20 pointer-events-none opacity-85 hidden sm:block">
-            <div class="relative w-28 h-28 flex items-center justify-center">
-                <div id="compassRing" class="absolute inset-0 border-2 border-dashed border-amber-500/40 rounded-full flex items-center justify-center">
-                    <span class="absolute top-0.5 text-[10px] font-bold text-amber-300 font-cinzel">N</span><span class="absolute right-1 text-[10px] font-bold text-amber-300 font-cinzel">E</span><span class="absolute bottom-0.5 text-[10px] font-bold text-amber-300 font-cinzel">S</span><span class="absolute left-1 text-[10px] font-bold text-amber-300 font-cinzel">W</span>
-                </div>
-                <svg class="w-20 h-20 text-amber-400 drop-shadow-[0_0_10px_rgba(0,0,0,0.9)]" viewBox="0 0 100 100">
-                    <polygon points="50,5 58,42 95,50 58,58 50,95 42,58 5,50 42,42" fill="none" stroke="currentColor" stroke-width="1.5"/>
-                    <polygon points="50,5 50,50 58,42" fill="currentColor" opacity="0.9"/><polygon points="95,50 50,50 58,58" fill="currentColor" opacity="0.9"/><polygon points="50,95 50,50 42,58" fill="currentColor" opacity="0.9"/><polygon points="5,50 50,50 42,42" fill="currentColor" opacity="0.9"/><circle cx="50" cy="50" r="4" fill="#fef3c7"/>
-                </svg>
-            </div>
-            <div class="mt-2 text-amber-200/90 text-[11px] font-mono flex items-center space-x-2 bg-stone-950/85 px-2.5 py-1 rounded border border-amber-900/50 shadow-lg"><span>0</span><div class="w-16 h-1 bg-amber-500/70 relative"><div class="absolute left-1/2 top-0 w-0.5 h-full bg-amber-200"></div></div><span>500 χλμ.</span></div>
-        </div>
+<main class="relative flex-1 min-h-0">
+  <div id="realMap"></div><div class="map-wash"></div>
+  <div class="absolute top-5 left-5 z-[800] flex flex-col gap-1 glass-dark p-1.5 rounded-md border">
+    <button onclick="atlasMap.zoomIn()" class="w-8 h-8 text-amber-300 hover:bg-amber-500/15 rounded"><i class="fa-solid fa-plus"></i></button>
+    <button onclick="atlasMap.zoomOut()" class="w-8 h-8 text-amber-300 hover:bg-amber-500/15 rounded"><i class="fa-solid fa-minus"></i></button>
+    <button onclick="fitAll()" class="w-8 h-8 text-amber-300 hover:bg-amber-500/15 rounded"><i class="fa-solid fa-arrows-to-dot"></i></button>
+  </div>
+  <div class="absolute bottom-5 left-6 z-[800] hidden sm:block pointer-events-none">
+    <div class="w-24 h-24 rounded-full border border-dashed border-amber-500/45 flex items-center justify-center text-amber-300 relative">
+      <span class="absolute top-1 text-[10px]">N</span><span class="absolute right-1 text-[10px]">E</span><span class="absolute bottom-1 text-[10px]">S</span><span class="absolute left-1 text-[10px]">W</span><i class="fa-regular fa-compass text-5xl opacity-90"></i>
     </div>
+  </div>
 
-    <aside id="sidePanel" class="w-full sm:w-[460px] lg:w-[500px] h-full absolute sm:relative right-0 top-0 z-30 transform transition-transform duration-500 ease-in-out translate-x-0 parchment-panel border-l-2 border-amber-900/50 flex flex-col shadow-2xl">
-        <div class="p-5 border-b border-amber-900/30 flex items-start justify-between bg-amber-950/5">
-            <div><div id="panelSubtitle" class="text-xs font-cinzel font-bold uppercase tracking-widest text-amber-900/80">DUBROVNIK · RAGUSA</div><h2 id="panelTitle" class="text-3xl font-bold font-didot text-stone-900 tracking-tight mt-0.5">Ραγούσα</h2></div>
-            <div class="flex items-center space-x-1.5"><button id="bookmarkBtn" onclick="toggleBookmark()" title="Αποθήκευση" class="w-9 h-9 rounded-full hover:bg-amber-900/10 flex items-center justify-center text-amber-900 transition"><i class="fa-regular fa-bookmark text-lg"></i></button><button onclick="closeSidePanel()" title="Κλείσιμο" class="w-9 h-9 rounded-full hover:bg-amber-900/10 flex items-center justify-center text-amber-900 transition"><i class="fa-solid fa-xmark text-xl"></i></button></div>
-        </div>
-        <div class="flex-1 overflow-y-auto p-5 space-y-5">
-            <div class="relative rounded-lg overflow-hidden border border-amber-900/40 shadow-md group">
-                <img id="panelImage" src="https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1000&q=80" alt="Ραγούσα" class="w-full h-52 object-cover transition-transform duration-700 group-hover:scale-105">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent"></div>
-                <span id="panelImageCaption" class="absolute bottom-2 left-3 text-xs text-amber-100 font-archival italic drop-shadow">Η οχυρωμένη πόλη-κράτος της Ραγούσας στην Αδριατική</span>
-            </div>
-            <p id="panelDescription" class="text-stone-800 leading-relaxed font-didot text-base text-justify">Η Ραγούσα, ισχυρή ναυτική κοινότητα της Αδριατικής, εξελίχθηκε σε σημαντικό εμπορικό και διπλωματικό κέντρο μεταξύ Ανατολής και Δύσης.</p>
-            <div class="space-y-2.5">
-                <div class="p-3 rounded-lg bg-amber-950/5 border border-amber-900/20 flex items-start space-x-3.5"><div class="w-8 h-8 rounded bg-amber-900/15 flex items-center justify-center shrink-0 text-amber-900"><i class="fa-solid fa-hourglass-half text-sm"></i></div><div><span class="text-[11px] font-bold uppercase tracking-wider text-amber-900/80 font-cinzel block">Περίοδος</span><span id="panelPeriod" class="text-xs sm:text-sm font-semibold text-stone-900 font-didot"></span></div></div>
-                <div class="p-3 rounded-lg bg-amber-950/5 border border-amber-900/20 flex items-start space-x-3.5"><div class="w-8 h-8 rounded bg-amber-900/15 flex items-center justify-center shrink-0 text-amber-900"><i class="fa-solid fa-user-group text-sm"></i></div><div><span class="text-[11px] font-bold uppercase tracking-wider text-amber-900/80 font-cinzel block">Πρόσωπα</span><span id="panelPeople" class="text-xs sm:text-sm text-stone-900 font-didot"></span></div></div>
-                <div class="p-3 rounded-lg bg-amber-950/5 border border-amber-900/20 flex items-start space-x-3.5"><div class="w-8 h-8 rounded bg-amber-900/15 flex items-center justify-center shrink-0 text-amber-900"><i class="fa-solid fa-compass-drafting text-sm"></i></div><div><span class="text-[11px] font-bold uppercase tracking-wider text-amber-900/80 font-cinzel block">Ρόλος</span><span id="panelRole" class="text-xs sm:text-sm text-stone-900 font-didot"></span></div></div>
-                <div class="p-3 rounded-lg bg-amber-950/5 border border-amber-900/20 flex items-start space-x-3.5"><div class="w-8 h-8 rounded bg-amber-900/15 flex items-center justify-center shrink-0 text-amber-900"><i class="fa-solid fa-scroll text-sm"></i></div><div><span class="text-[11px] font-bold uppercase tracking-wider text-amber-900/80 font-cinzel block">Τεκμηρίωση</span><span id="panelDoc" class="text-xs sm:text-sm text-stone-900 font-didot"></span></div></div>
-            </div>
-            <div class="pt-3 border-t border-amber-900/20">
-                <div class="flex border-b border-amber-900/30 mb-3 text-xs font-bold font-cinzel uppercase tracking-wider">
-                    <button onclick="switchTab('images')" id="tabBtnImages" class="pb-2 px-3 border-b-2 border-amber-900 text-amber-950 font-bold">ΕΙΚΟΝΕΣ</button>
-                    <button onclick="switchTab('sources')" id="tabBtnSources" class="pb-2 px-3 text-stone-600 hover:text-amber-900">ΠΗΓΕΣ</button>
-                    <button onclick="switchTab('related')" id="tabBtnRelated" class="pb-2 px-3 text-stone-600 hover:text-amber-900">ΣΧΕΤΙΚΟΙ ΤΟΠΟΙ</button>
-                </div>
-                <div id="tabImages" class="grid grid-cols-4 gap-2"></div>
-                <div id="tabSources" class="hidden text-xs space-y-2 font-archival text-stone-800"></div>
-                <div id="tabRelated" class="hidden flex flex-wrap gap-2"></div>
-            </div>
-        </div>
-    </aside>
-</div>
+  <aside id="sidePanel" class="closed absolute z-[1300] right-0 top-0 bottom-0 w-full sm:w-[430px] lg:w-[470px] parchment-panel border-l border-amber-900/40 transition-transform duration-300 flex flex-col">
+    <div class="p-5 border-b border-amber-900/25 flex justify-between items-start">
+      <div><div id="panelSubtitle" class="font-cinzel text-[10px] tracking-[.16em] text-amber-900/75"></div><h2 id="panelTitle" class="font-didot text-4xl text-stone-900 leading-none mt-1"></h2></div>
+      <button onclick="closePanel()" class="w-9 h-9 rounded-full hover:bg-amber-900/10 text-amber-950"><i class="fa-solid fa-xmark text-xl"></i></button>
+    </div>
+    <div class="panel-scroll flex-1 overflow-y-auto p-5">
+      <div id="panelHero" class="h-44 rounded-md border border-amber-900/30 bg-gradient-to-br from-amber-200 to-stone-400 flex items-center justify-center text-amber-950/65 font-archival italic">Εικόνα τεκμηρίωσης μη διαθέσιμη</div>
+      <p id="panelDescription" class="font-didot text-[16px] leading-relaxed text-stone-800 mt-5"></p>
+      <div class="mt-5 space-y-2" id="panelRows"></div>
+      <div id="panelNote" class="mt-4 text-xs leading-relaxed text-stone-700 border-l-2 border-amber-800/50 pl-3"></div>
+    </div>
+  </aside>
+</main>
 
-<footer class="h-20 z-30 glass-dark border-t border-amber-900/50 px-6 flex flex-col md:flex-row items-center justify-between shrink-0 gap-3">
-    <div class="flex items-center space-x-4 w-full md:w-auto flex-1 max-w-2xl">
-        <button id="playBtn" onclick="toggleTimelinePlay()" class="w-10 h-10 rounded-full bg-amber-600/30 border border-amber-500/60 hover:bg-amber-500/40 text-amber-200 flex items-center justify-center shrink-0 transition shadow-lg"><i class="fa-solid fa-play text-xs ml-0.5"></i></button>
-        <div class="flex-1 flex flex-col justify-center space-y-1">
-            <div class="flex justify-between text-[11px] font-cinzel font-semibold text-amber-200/90 px-1">
-                <span onclick="setPeriod(0)">1000–1200</span><span onclick="setPeriod(1)">1200–1300</span><span onclick="setPeriod(2)">1300–1500</span><span onclick="setPeriod(3)">1500–1700</span><span onclick="setPeriod(4)">1700–1800</span>
-            </div>
-            <input type="range" id="timelineRange" min="0" max="4" step="1" value="1" class="w-full accent-amber-500 bg-stone-800 h-1.5 rounded-lg appearance-none cursor-pointer" oninput="onTimelineChange(this.value)">
-        </div>
-    </div>
-    <div class="flex items-center space-x-3 text-xs">
-        <div class="relative">
-            <button onclick="toggleDropdown('routesDropdown')" class="px-3 py-2 rounded bg-amber-950/40 border border-amber-800/40 text-amber-200 flex items-center space-x-2"><i class="fa-solid fa-ship text-amber-400"></i><span class="font-cinzel font-semibold uppercase tracking-wider text-[11px]">ΕΜΠΟΡΙΚΕΣ ΔΙΑΔΡΟΜΕΣ</span><i class="fa-solid fa-chevron-down text-[9px]"></i></button>
-            <div id="routesDropdown" class="hidden absolute bottom-full mb-2 right-0 w-56 bg-stone-900 border border-amber-700/50 rounded-lg p-2.5 shadow-2xl space-y-1 z-50">
-                <label class="flex items-center space-x-2 p-1.5"><input type="checkbox" id="routeVenetian" checked class="accent-amber-500"><span class="text-stone-300">Βενετικές Θαλάσσιες Οδοί</span></label>
-                <label class="flex items-center space-x-2 p-1.5"><input type="checkbox" id="routeGenoese" checked class="accent-amber-500"><span class="text-stone-300">Γενουατικές Διαδρομές</span></label>
-                <label class="flex items-center space-x-2 p-1.5"><input type="checkbox" id="routeOttoman" checked class="accent-amber-500"><span class="text-stone-300">Οθωμανικές Εμπορικές Οδοί</span></label>
-            </div>
-        </div>
-        <div class="relative">
-            <button onclick="toggleDropdown('layersDropdown')" class="px-3 py-2 rounded bg-amber-950/40 border border-amber-800/40 text-amber-200 flex items-center space-x-2"><i class="fa-solid fa-layer-group text-amber-400"></i><span class="font-cinzel font-semibold uppercase tracking-wider text-[11px]">ΣΤΡΩΜΑΤΑ</span><i class="fa-solid fa-chevron-down text-[9px]"></i></button>
-            <div id="layersDropdown" class="hidden absolute bottom-full mb-2 right-0 w-48 bg-stone-900 border border-amber-700/50 rounded-lg p-2.5 shadow-2xl space-y-1 z-50">
-                <label class="flex items-center space-x-2 p-1.5"><input type="checkbox" id="layerPorts" checked class="accent-amber-500"><span class="text-stone-300">Λιμάνια & Κάστρα</span></label>
-                <label class="flex items-center space-x-2 p-1.5"><input type="checkbox" id="layerShips" checked class="accent-amber-500"><span class="text-stone-300">Κινούμενα Πλοία</span></label>
-            </div>
-        </div>
-    </div>
+<footer class="h-20 z-[1200] glass-dark border-t shrink-0 px-5 flex items-center justify-between gap-4">
+  <div class="flex items-center gap-2 overflow-x-auto">
+    <span class="font-cinzel text-[10px] text-amber-500 mr-1">ΒΙΒΛΙΟ</span>
+    <button class="book-btn active px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-book="All">Όλα</button>
+    <button class="book-btn px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-book="Book I">Book I</button>
+    <button class="book-btn px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-book="Book II">Book II</button>
+    <button class="book-btn px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-book="Book III">Book III</button>
+  </div>
+  <div class="flex items-center gap-2 overflow-x-auto">
+    <span class="font-cinzel text-[10px] text-amber-500 mr-1">ΕΤΟΣ</span>
+    <button class="year-btn active px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-year="All">Όλα</button>
+    <button class="year-btn px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-year="1574">1574</button>
+    <button class="year-btn px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-year="1577">1577</button>
+    <button class="year-btn px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-year="1578">1578</button>
+  </div>
 </footer>
-
-<div id="lightbox" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col items-center justify-center p-4" onclick="closeLightbox()">
-    <button onclick="closeLightbox()" class="absolute top-5 right-5 text-stone-300 hover:text-white text-3xl"><i class="fa-solid fa-xmark"></i></button>
-    <img id="lightboxImg" src="" class="max-w-full max-h-[80vh] rounded shadow-2xl border border-amber-500/40 object-contain">
-    <p id="lightboxCaption" class="mt-3 text-amber-200 font-archival text-sm text-center"></p>
-</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-let realMap;
-function initRealMap(){
-  realMap=L.map("realMap",{
-    zoomControl:false,
-    preferCanvas:true,
-    zoomSnap:.5,
-    minZoom:3,
-    maxZoom:13,
-    attributionControl:true
-  }).setView([38.4,18.8],5);
+let DATA={places:[],routes:[]},state={book:"All",year:"All"},atlasMap,placeLayer,routeLayer;
+const byId=new Map();
+const symbolAsset=s=>({
+  village:"diorama-village.webp","coastal-village":"diorama-coastal.webp",
+  town:"diorama-town.webp",city:"diorama-city.webp",capital:"diorama-city.webp",
+  port:"diorama-port.webp"
+}[s]||"diorama-town.webp");
 
-  const terrain=L.tileLayer(
-    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}",
-    {
-      maxNativeZoom:13,
-      maxZoom:13,
-      attribution:"Tiles © Esri"
-    }
-  ).addTo(realMap);
-
-  const relief=L.tileLayer(
-    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}",
-    {
-      opacity:.72,
-      maxNativeZoom:13,
-      maxZoom:13,
-      attribution:"Relief © Esri"
-    }
-  ).addTo(realMap);
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function initMap(){
+  atlasMap=L.map("realMap",{zoomControl:false,minZoom:3,maxZoom:13,zoomSnap:.5,preferCanvas:true}).setView([39.0,18.5],5);
+  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}",{maxNativeZoom:13,maxZoom:13,attribution:"Relief © Esri"}).addTo(atlasMap);
+  placeLayer=L.layerGroup().addTo(atlasMap);routeLayer=L.layerGroup().addTo(atlasMap);
 }
-const locationsData=[
-{id:"ragusa",name:"Ραγούσα",foreignName:"DUBROVNIK · RAGUSA",x:.44,y:.30,periodRange:[0,4],periodText:"13ος – 15ος αιώνας",people:"Νικόλαος Γκουντούλιτς (διπλωμάτης), Μαρίνος ντέλα Ράγκουζα (έμπορος)",role:"Εμπορικός κόμβος, διπλωματικές διαμεσολαβήσεις, σύνδεση Αδριατικής – Ανατολικής Μεσογείου.",doc:"Πολύ καλά τεκμηριωμένη (αρχειακές πηγές, εμπορικά κατάστιχα, διπλωματικές αναφορές).",desc:"Η Ραγούσα, ισχυρή ναυτική κοινότητα της Αδριατικής, εξελίχθηκε σε σημαντικό εμπορικό και διπλωματικό κέντρο μεταξύ Ανατολής και Δύσης. Η στρατηγική της θέση της επέτρεψε να διατηρήσει ευρεία αυτονομία και να αναπτύξει ένα ακμάζον δίκτυο εμπορίου.",image:"https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1000&q=80",caption:"Η οχυρωμένη πόλη-κράτος της Ραγούσας στην Αδριατική",gallery:["https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=600&q=80"],sources:["• Αρχεία της Δημοκρατίας της Ραγούσας","• Χειρόγραφα ναυσιπλοΐας Αδριατικής"],related:["venice","constantinople","rhodes"]},
-{id:"venice",name:"Βενετία",foreignName:"VENEZIA · VENICE",x:.22,y:.18,periodRange:[0,4],periodText:"11ος – 18ος αιώνας",people:"Δόγης Ενρίκο Δάνδολος, Μάρκο Πόλο",role:"Βασίλισσα των Θαλασσών, θαλασσοκρατορία, εμπόριο μεταξιού και μπαχαρικών.",doc:"Πλήρως τεκμηριωμένη στο Κρατικό Αρχείο της Βενετίας.",desc:"Η Γαληνοτάτη Δημοκρατία της Βενετίας υπήρξε η κυρίαρχη ναυτική δύναμη της Μεσογείου.",image:"https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1000&q=80",caption:"Το Μεγάλο Κανάλι και το Παλάτι των Δόγηδων",gallery:["https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=600&q=80"],sources:["• Annali Veneti"],related:["ragusa","crete","rhodes"]},
-{id:"rome",name:"Ρώμη",foreignName:"ROMA · ROME",x:.20,y:.38,periodRange:[0,4],periodText:"Αιώνιο Κέντρο",people:"Πάπας Ιούλιος Β΄, Μιχαήλ Άγγελος",role:"Θρησκευτικό, πνευματικό και πολιτικό κέντρο της Δυτικής Χριστιανοσύνης.",doc:"Αρχεία Βατικανού, παπικές βούλες, διπλωματικοί χάρτες.",desc:"Η Ρώμη αποτέλεσε το πνευματικό σημείο αναφοράς της Δύσης.",image:"https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1000&q=80",caption:"Η ιστορική καρδιά της Αιώνιας Πόλης",gallery:["https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=600&q=80"],sources:["• Παπικά Αρχεία Βατικανού"],related:["palermo","malta"]},
-{id:"constantinople",name:"Κωνσταντινούπολη",foreignName:"CONSTANTINOPLE · ISTANBUL",x:.76,y:.28,periodRange:[0,4],periodText:"4ος – 18ος αιώνας",people:"Κωνσταντίνος ΙΑ΄ Παλαιολόγος, Σουλτάνος Μωάμεθ Β΄",role:"Πρωτεύουσα Βυζαντινής και Οθωμανικής Αυτοκρατορίας.",doc:"Ελληνικά, Οθωμανικά και Λατινικά χρονικά.",desc:"Η Βασιλεύουσα των πόλεων. Στο σταυροδρόμι της Μαύρης Θάλασσας και του Αιγαίου.",image:"https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?auto=format&fit=crop&w=1000&q=80",caption:"Ο Βόσπορος και τα ιστορικά τείχη",gallery:["https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?auto=format&fit=crop&w=600&q=80"],sources:["• Χρονικά Γεωργίου Σφραντζή"],related:["thessaloniki","smyrna","rhodes"]},
-{id:"crete",name:"Κρήτη",foreignName:"CANDIA · CRETE",x:.60,y:.73,periodRange:[0,4],periodText:"13ος – 17ος αιώνας",people:"Δομήνικος Θεοτοκόπουλος, Βιτσέντζος Κορνάρος",role:"Βενετικό Βασίλειο της Κάντια, στρατηγικός ναύσταθμος.",doc:"Duca di Candia αρχεία, Βενετικά έγγραφα.",desc:"Η Κρήτη αποτέλεσε το σημαντικότερο προπύργιο της Βενετίας στην Ανατολική Μεσόγειο.",image:"https://images.unsplash.com/photo-1586861635167-e5223aadc9fe?auto=format&fit=crop&w=1000&q=80",caption:"Το Ενετικό Φρούριο Κούλες",gallery:["https://images.unsplash.com/photo-1586861635167-e5223aadc9fe?auto=format&fit=crop&w=600&q=80"],sources:["• Αρχείο Δούκα της Κρήτης"],related:["venice","rhodes"]},
-{id:"rhodes",name:"Ρόδος",foreignName:"RHODES",x:.72,y:.62,periodRange:[0,4],periodText:"14ος – 16ος αιώνας",people:"Φιλίπ ντε Βιλιέ ντε λ' Ιλ-Αντάμ",role:"Έδρα του Τάγματος των Ιπποτών του Αγίου Ιωάννου.",doc:"Αρχεία Ιπποτών Ιωαννιτών.",desc:"Το νησί των Ιπποτών.",image:"https://images.unsplash.com/photo-1566375638493-322432616239?auto=format&fit=crop&w=1000&q=80",caption:"Η καστροπολιτεία της Ρόδου",gallery:["https://images.unsplash.com/photo-1566375638493-322432616239?auto=format&fit=crop&w=600&q=80"],sources:["• Χρονικά της Πολιορκίας της Ρόδου"],related:["crete","constantinople","smyrna"]},
-{id:"thessaloniki",name:"Θεσσαλονίκη",foreignName:"THESSALONIKI · SALONICA",x:.53,y:.38,periodRange:[0,4],periodText:"12ος – 18ος αιώνας",people:"Ευστάθιος Θεσσαλονίκης, Σεφαρδίτες Έμποροι",role:"Συμβασιλεύουσα πόλη, πολυπολιτισμικό εμπορικό λιμάνι Βαλκανίων.",doc:"Βυζαντινά χρονικά, Οθωμανικά φορολογικά κατάστιχα.",desc:"Δεύτερη πόλη της Βυζαντινής Αυτοκρατορίας και μετέπειτα κομβικό λιμάνι.",image:"https://images.unsplash.com/photo-1584646098378-0874589d76b1?auto=format&fit=crop&w=1000&q=80",caption:"Ο Λευκός Πύργος και η παραλία",gallery:["https://images.unsplash.com/photo-1584646098378-0874589d76b1?auto=format&fit=crop&w=600&q=80"],sources:["• Αρχεία Θεσσαλονίκης"],related:["constantinople","ragusa"]},
-{id:"smyrna",name:"Σμύρνη",foreignName:"SMYRNA · IZMIR",x:.68,y:.48,periodRange:[1,4],periodText:"14ος – 18ος αιώνας",people:"Πρόξενοι Ευρωπαϊκών Δυνάμεων",role:"Μεγάλο εξαγωγικό λιμάνι της Μικράς Ασίας.",doc:"Προξενικά αρχεία Γαλλίας, Αγγλίας και Ολλανδίας.",desc:"Η Μαργαριταρένια της Ανατολής.",image:"https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?auto=format&fit=crop&w=1000&q=80",caption:"Το ιστορικό λιμάνι της Σμύρνης",gallery:["https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?auto=format&fit=crop&w=600&q=80"],sources:["• Προξενικές εκθέσεις Levant Company"],related:["constantinople","rhodes"]},
-{id:"palermo",name:"Παλέρμο",foreignName:"PALERMO · SICILY",x:.28,y:.52,periodRange:[0,4],periodText:"12ος – 17ος αιώνας",people:"Βασιλιάς Ρογήρος Β΄",role:"Σταυροδρόμι Αραβο-Νορμανδικού πολιτισμού.",doc:"Νορμανδικά και Αραγωνικά βασιλικά αρχεία.",desc:"Πρωτεύουσα της Σικελίας.",image:"https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1000&q=80",caption:"Αρχιτεκτονική κληρονομιά στο Παλέρμο",gallery:["https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=600&q=80"],sources:["• Σικελικά Χρονικά"],related:["rome","malta","tripoli"]},
-{id:"malta",name:"Μάλτα",foreignName:"MALTA · VALLETTA",x:.32,y:.68,periodRange:[2,4],periodText:"16ος – 18ος αιώνας",people:"Jean Parisot de Valette",role:"Έδρα του Ιπποτικού Τάγματος του Αγίου Ιωάννου.",doc:"National Library of Malta Archives.",desc:"Το νησί-φρούριο της Κεντρικής Μεσογείου.",image:"https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1000&q=80",caption:"Τα οχυρά της Βαλέτας",gallery:["https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=600&q=80"],sources:["• Αρχεία Ιπποτών της Μάλτας"],related:["rhodes","palermo","tripoli"]},
-{id:"tripoli",name:"Τρίπολη",foreignName:"TRIPOLI · LIBYA",x:.38,y:.82,periodRange:[0,4],periodText:"14ος – 18ος αιώνας",people:"Turgut Reis (Dragut)",role:"Βόρειος Αφρικανικός εμπορικός σταθμός & βάση κουρσάρων.",doc:"Οθωμανικά και Ευρωπαϊκά ναυτικά ημερολόγια.",desc:"Σημαντικό λιμάνι της Βόρειας Αφρικής.",image:"https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1000&q=80",caption:"Το παραδοσιακό κάστρο της Τρίπολης",gallery:["https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=600&q=80"],sources:["• Ναυτικά Ημερολόγια Μεσογείου"],related:["malta","palermo"]}
-];
-
-const tradeRoutesData=[
-{from:"venice",to:"ragusa",type:"venetian"},{from:"ragusa",to:"crete",type:"venetian"},{from:"crete",to:"rhodes",type:"venetian"},{from:"rhodes",to:"constantinople",type:"venetian"},
-{from:"rome",to:"palermo",type:"genoese"},{from:"palermo",to:"malta",type:"genoese"},{from:"malta",to:"tripoli",type:"genoese"},
-{from:"constantinople",to:"smyrna",type:"ottoman"},{from:"smyrna",to:"rhodes",type:"ottoman"},{from:"constantinople",to:"thessaloniki",type:"ottoman"}];
-
-let canvas,ctx,selectedLocation=locationsData[0],bookmarks=new Set(),currentPeriodIndex=1,isPlaying=false,playInterval=null,mapScale=1,mapOffsetX=0,mapOffsetY=0,isDragging=false,dragStartX=0,dragStartY=0;
-let ships=[{progress:.1,routeIndex:0,speed:.0007},{progress:.5,routeIndex:2,speed:.0005},{progress:.8,routeIndex:7,speed:.0006}];
-
-window.onload=function(){initRealMap();canvas=document.getElementById('mapCanvas');ctx=canvas.getContext('2d');resizeCanvas();window.addEventListener('resize',resizeCanvas);updatePanelContent(selectedLocation);requestAnimationFrame(renderMap)};
-function resizeCanvas(){const v=document.getElementById('mapViewport');canvas.width=v.clientWidth;canvas.height=v.clientHeight}
-function renderMap(){ctx.clearRect(0,0,canvas.width,canvas.height);requestAnimationFrame(renderMap)}
-function drawMapBackground(){const w=canvas.width,h=canvas.height;const seaGrad=ctx.createRadialGradient(w*.5,h*.5,100,w*.5,h*.5,Math.max(w,h));seaGrad.addColorStop(0,"#112234");seaGrad.addColorStop(.7,"#0b1623");seaGrad.addColorStop(1,"#070e17");ctx.fillStyle=seaGrad;ctx.fillRect(0,0,w,h);ctx.fillStyle="rgba(40,32,24,.78)";ctx.strokeStyle="rgba(212,163,89,.35)";ctx.lineWidth=2;
-[[.15,.05,.22,.15,.25,.35,.35,.55,.31,.58,.22,.40,.18,.25,.12,.10],[.40,.10,.45,.25,.58,.35,.55,.65,.50,.60,.48,.40,.42,.25,.38,.15]].forEach(a=>{ctx.beginPath();ctx.moveTo(w*a[0],h*a[1]);ctx.bezierCurveTo(w*a[2],h*a[3],w*a[4],h*a[5],w*a[6],h*a[7]);ctx.lineTo(w*a[8],h*a[9]);ctx.bezierCurveTo(w*a[10],h*a[11],w*a[12],h*a[13],w*a[14],h*a[15]);ctx.closePath();ctx.fill();ctx.stroke()});
-ctx.beginPath();ctx.moveTo(w*.65,h*.25);ctx.lineTo(w*.95,h*.25);ctx.lineTo(w*.95,h*.60);ctx.lineTo(w*.70,h*.55);ctx.closePath();ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(w*.05,h*.85);ctx.bezierCurveTo(w*.30,h*.78,w*.60,h*.82,w*.95,h*.88);ctx.lineTo(w*.95,h);ctx.lineTo(w*.05,h);ctx.closePath();ctx.fill();ctx.stroke();
-ctx.strokeStyle="rgba(212,163,89,.07)";ctx.lineWidth=1;const cx=w*.5,cy=h*.5;for(let i=0;i<16;i++){const a=Math.PI*2/16*i;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(a)*1500,cy+Math.sin(a)*1500);ctx.stroke()}ctx.font="bold 20px 'Cinzel',serif";ctx.fillStyle="rgba(212,163,89,.2)";ctx.textAlign="center";ctx.fillText("Μ Ε Σ Ο Γ Ε Ι Ο Σ   Θ Α Λ Α Σ Σ Α",w*.45,h*.65)}
-function drawTradeRoutes(){const sv=document.getElementById('routeVenetian').checked,sg=document.getElementById('routeGenoese').checked,so=document.getElementById('routeOttoman').checked;tradeRoutesData.forEach(r=>{if(r.type==="venetian"&&!sv||r.type==="genoese"&&!sg||r.type==="ottoman"&&!so)return;const a=locationsData.find(l=>l.id===r.from),b=locationsData.find(l=>l.id===r.to);if(!a||!b)return;const x1=a.x*canvas.width,y1=a.y*canvas.height,x2=b.x*canvas.width,y2=b.y*canvas.height;ctx.beginPath();ctx.setLineDash([5,5]);ctx.moveTo(x1,y1);ctx.quadraticCurveTo((x1+x2)/2,(y1+y2)/2-25,x2,y2);ctx.strokeStyle=r.type==="venetian"?"rgba(234,179,8,.7)":r.type==="genoese"?"rgba(59,130,246,.7)":"rgba(239,68,68,.7)";ctx.lineWidth=2;ctx.stroke();ctx.setLineDash([])})}
-function drawLocationMarkers(){if(!document.getElementById('layerPorts').checked)return;locationsData.forEach(loc=>{if(currentPeriodIndex<loc.periodRange[0]||currentPeriodIndex>loc.periodRange[1])return;const px=loc.x*canvas.width,py=loc.y*canvas.height,sel=selectedLocation&&selectedLocation.id===loc.id;if(sel){ctx.beginPath();ctx.arc(px,py,16,0,Math.PI*2);ctx.fillStyle="rgba(234,179,8,.25)";ctx.fill();ctx.strokeStyle="rgba(245,158,11,.9)";ctx.lineWidth=2;ctx.stroke()}ctx.beginPath();ctx.arc(px,py,sel?8:6,0,Math.PI*2);ctx.fillStyle=sel?"#fef3c7":"#d97706";ctx.fill();ctx.strokeStyle="#2e1003";ctx.lineWidth=2;ctx.stroke();ctx.font=sel?"bold 15px 'GFS Didot',serif":"13px 'GFS Didot',serif";ctx.fillStyle=sel?"#fef3c7":"#e2d9cc";ctx.textAlign="center";ctx.shadowColor="rgba(0,0,0,.9)";ctx.shadowBlur=6;ctx.fillText(loc.name.toUpperCase(),px,py-14);ctx.shadowBlur=0})}
-function updateAndDrawShips(){ships.forEach(ship=>{ship.progress+=ship.speed;if(ship.progress>1)ship.progress=0;const r=tradeRoutesData[ship.routeIndex],a=locationsData.find(l=>l.id===r.from),b=locationsData.find(l=>l.id===r.to);if(!a||!b)return;const x1=a.x*canvas.width,y1=a.y*canvas.height,x2=b.x*canvas.width,y2=b.y*canvas.height,mx=(x1+x2)/2,my=(y1+y2)/2-25,t=ship.progress,sx=(1-t)*(1-t)*x1+2*(1-t)*t*mx+t*t*x2,sy=(1-t)*(1-t)*y1+2*(1-t)*t*my+t*t*y2;ctx.font="14px 'Font Awesome 6 Free'";ctx.fillStyle="#fef3c7";ctx.fillText("\uf21a",sx,sy)})}
-function setupMapInteractions(){const v=document.getElementById('mapViewport');v.addEventListener('mousedown',e=>{isDragging=true;dragStartX=e.clientX-mapOffsetX;dragStartY=e.clientY-mapOffsetY;v.classList.replace('map-cursor-grab','map-cursor-grabbing')});window.addEventListener('mousemove',e=>{if(isDragging){mapOffsetX=e.clientX-dragStartX;mapOffsetY=e.clientY-dragStartY}});window.addEventListener('mouseup',()=>{isDragging=false;v.classList.replace('map-cursor-grabbing','map-cursor-grab')});v.addEventListener('click',e=>{const rect=canvas.getBoundingClientRect(),x=(e.clientX-rect.left-mapOffsetX)/mapScale,y=(e.clientY-rect.top-mapOffsetY)/mapScale;locationsData.forEach(loc=>{if(Math.hypot(x-loc.x*canvas.width,y-loc.y*canvas.height)<22)selectLocation(loc)})});v.addEventListener('wheel',e=>{e.preventDefault();zoomMap(e.deltaY<0?1.1:.9)})}
-function zoomMap(f){if(!realMap)return;f>1?realMap.zoomIn():realMap.zoomOut()}
-function resetMapView(){if(realMap)realMap.setView([38.4,18.8],5)}
-function selectLocation(loc){selectedLocation=loc;updatePanelContent(loc);document.getElementById('sidePanel').classList.remove('translate-x-full')}
-function updatePanelContent(loc){document.getElementById('panelTitle').innerText=loc.name;document.getElementById('panelSubtitle').innerText=loc.foreignName;document.getElementById('panelDescription').innerText=loc.desc;document.getElementById('panelPeriod').innerText=loc.periodText;document.getElementById('panelPeople').innerText=loc.people;document.getElementById('panelRole').innerText=loc.role;document.getElementById('panelDoc').innerText=loc.doc;document.getElementById('panelImage').src=loc.image;document.getElementById('panelImageCaption').innerText=loc.caption;document.getElementById('bookmarkBtn').innerHTML=bookmarks.has(loc.id)?'<i class="fa-solid fa-bookmark text-lg text-amber-900"></i>':'<i class="fa-regular fa-bookmark text-lg text-amber-900"></i>';const imgs=document.getElementById('tabImages');imgs.innerHTML='';loc.gallery.forEach((u,i)=>{const im=document.createElement('img');im.src=u;im.className="w-full h-16 object-cover rounded border border-amber-900/30 cursor-pointer hover:opacity-80 transition";im.onclick=()=>openLightbox(u,loc.name+" - Εικόνα "+(i+1));imgs.appendChild(im)});document.getElementById('tabSources').innerHTML=loc.sources.map(s=>`<p>${s}</p>`).join('');const rel=document.getElementById('tabRelated');rel.innerHTML='';loc.related.forEach(id=>{const r=locationsData.find(l=>l.id===id);if(r){const b=document.createElement('button');b.className="px-2.5 py-1 bg-amber-950/10 border border-amber-900/20 rounded text-xs text-amber-950 font-bold";b.innerText=r.name;b.onclick=()=>selectLocation(r);rel.appendChild(b)}})}
-function closeSidePanel(){document.getElementById('sidePanel').classList.add('translate-x-full')}
-function toggleBookmark(){if(!selectedLocation)return;bookmarks.has(selectedLocation.id)?bookmarks.delete(selectedLocation.id):bookmarks.add(selectedLocation.id);updatePanelContent(selectedLocation)}
-function switchTab(n){['Images','Sources','Related'].forEach(x=>document.getElementById('tab'+x).classList.add('hidden'));['Images','Sources','Related'].forEach(x=>document.getElementById('tabBtn'+x).className="pb-2 px-3 text-stone-600 hover:text-amber-900");const X=n[0].toUpperCase()+n.slice(1);document.getElementById('tab'+X).classList.remove('hidden');document.getElementById('tabBtn'+X).className="pb-2 px-3 border-b-2 border-amber-900 text-amber-950 font-bold"}
-function openLightbox(u,c){document.getElementById('lightboxImg').src=u;document.getElementById('lightboxCaption').innerText=c;document.getElementById('lightbox').classList.remove('hidden')}function closeLightbox(){document.getElementById('lightbox').classList.add('hidden')}
-function setPeriod(i){currentPeriodIndex=parseInt(i);document.getElementById('timelineRange').value=currentPeriodIndex}function onTimelineChange(v){currentPeriodIndex=parseInt(v)}
-function toggleTimelinePlay(){const b=document.getElementById('playBtn');if(isPlaying){clearInterval(playInterval);isPlaying=false;b.innerHTML='<i class="fa-solid fa-play text-xs ml-0.5"></i>'}else{isPlaying=true;b.innerHTML='<i class="fa-solid fa-pause text-xs"></i>';playInterval=setInterval(()=>{currentPeriodIndex=(currentPeriodIndex+1)%5;document.getElementById('timelineRange').value=currentPeriodIndex},3000)}}
-function toggleDropdown(id){document.getElementById(id).classList.toggle('hidden')}
-function handleSearch(q){const rb=document.getElementById('searchResults'),cb=document.getElementById('clearSearchBtn');if(!q.trim()){rb.classList.add('hidden');cb.classList.add('hidden');return}cb.classList.remove('hidden');q=q.toLowerCase();const m=locationsData.filter(l=>l.name.toLowerCase().includes(q)||l.foreignName.toLowerCase().includes(q)||l.people.toLowerCase().includes(q));rb.innerHTML=m.length?m.map(l=>`<div onclick="selectFromSearch('${l.id}')" class="p-2.5 hover:bg-amber-900/30 cursor-pointer flex items-center justify-between transition"><div><div class="text-amber-200 text-xs font-bold">${l.name}</div><div class="text-stone-400 text-[10px]">${l.foreignName}</div></div><i class="fa-solid fa-chevron-right text-[10px] text-amber-500"></i></div>`).join(''):'<div class="p-3 text-xs text-stone-400 text-center">Δεν βρέθηκαν αποτελέσματα</div>';rb.classList.remove('hidden')}
-function selectFromSearch(id){const l=locationsData.find(x=>x.id===id);if(l){selectLocation(l);document.getElementById('searchResults').classList.add('hidden')}}
-function clearSearch(){document.getElementById('searchInput').value='';document.getElementById('searchResults').classList.add('hidden');document.getElementById('clearSearchBtn').classList.add('hidden')}
+function bookHit(x){return state.book==="All"||(x.books||[]).includes(state.book)}
+function yearHit(x){return state.year==="All"||(x.period||"").includes(state.year)}
+function placeVisible(p){return Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&bookHit(p)&&yearHit(p)}
+function routeVisible(r){return bookHit(r)&&yearHit(r)&&!r.atlasHidden}
+function markerFor(p){
+  const symbol=(p.atlasSymbol||p.type||"town").toLowerCase();
+  if(["sea-label","region-label","island-label"].includes(symbol)){
+    return L.marker([p.lat,p.lon],{icon:L.divIcon({className:"",html:`<div class="label-only">${esc(p.place)}</div>`,iconSize:[140,22],iconAnchor:[70,11]})});
+  }
+  const asset=symbolAsset(symbol);
+  return L.marker([p.lat,p.lon],{
+    icon:L.divIcon({className:"",html:`<div class="settlement-wrap ${esc(symbol)}"><img class="settlement-img" src="./icons/${asset}" alt=""><div class="settlement-label">${esc(p.place)}</div></div>`,iconSize:[130,110],iconAnchor:[65,80]})
+  });
+}
+function routePoints(r){
+  const a=byId.get(r.from?.[0]?.id),b=byId.get(r.to?.[0]?.id); if(!a||!b)return [];
+  const start=Array.isArray(r.displayStart)?r.displayStart:[a.lat,a.lon],end=Array.isArray(r.displayEnd)?r.displayEnd:[b.lat,b.lon];
+  const pts=[start];(r.waypoints||[]).forEach(w=>Array.isArray(w)&&pts.push(w));pts.push(end);return pts;
+}
+function routeStyle(r){
+  if(r.type==="INTELLIGENCE / NETWORK")return{color:"#8e7b63",weight:1,opacity:.38,dashArray:"2 10"};
+  if(r.type==="PLANNED — NOT EXECUTED")return{color:"#a38660",weight:1,opacity:.38,dashArray:"3 11"};
+  if(r.type==="STRONG RECONSTRUCTION")return{color:"#d8c291",weight:1.2,opacity:.64,dashArray:"4 9"};
+  if(r.medium==="land")return{color:"#6e4a32",weight:1.3,opacity:.7,dashArray:"4 8"};
+  return{color:"#f0dfb5",weight:1.6,opacity:.9,dashArray:"6 8"};
+}
+function render(){
+  placeLayer.clearLayers();routeLayer.clearLayers();
+  DATA.routes.filter(routeVisible).forEach(r=>{
+    const pts=routePoints(r); if(pts.length<2)return;
+    const line=L.polyline(pts,{...routeStyle(r),interactive:true,className:"route-hit"}).addTo(routeLayer);
+    line.on("click",()=>showRoute(r));
+  });
+  DATA.places.filter(placeVisible).forEach(p=>{
+    const m=markerFor(p).addTo(placeLayer);m.on("click",()=>showPlace(p));
+  });
+}
+function row(icon,label,val){if(!val)return"";return `<div class="p-3 rounded-md bg-amber-950/5 border border-amber-900/15 flex gap-3"><div class="w-8 h-8 rounded bg-amber-900/10 flex items-center justify-center text-amber-900"><i class="fa-solid ${icon}"></i></div><div><div class="font-cinzel text-[9px] tracking-wider text-amber-900/75 uppercase">${esc(label)}</div><div class="font-didot text-sm text-stone-900 mt-1">${esc(val)}</div></div></div>`}
+function openPanel(){document.getElementById("sidePanel").classList.remove("closed")}
+function closePanel(){document.getElementById("sidePanel").classList.add("closed")}
+function showPlace(p){
+  document.getElementById("panelTitle").textContent=p.place||"";
+  document.getElementById("panelSubtitle").textContent=p.historicalNames||p.modernName||"";
+  document.getElementById("panelDescription").textContent=p.historicalContext||p.trilogyRole||"";
+  document.getElementById("panelRows").innerHTML=row("fa-hourglass-half","Περίοδος",p.period)+row("fa-user-group","Πρόσωπα",p.characters)+row("fa-compass","Ρόλος",p.trilogyRole)+row("fa-landmark","Εξουσία / έλεγχος",p.authority)+row("fa-scroll","Τεκμηρίωση",p.sources||p.historicalStatus);
+  document.getElementById("panelNote").textContent=p.notes||"";
+  openPanel();
+}
+function showRoute(r){
+  const from=(r.from||[]).map(x=>x.name).join(", "),to=(r.to||[]).map(x=>x.name).join(", ");
+  document.getElementById("panelTitle").textContent=r.name||"Διαδρομή";
+  document.getElementById("panelSubtitle").textContent=r.character||"";
+  document.getElementById("panelDescription").textContent=r.evidence||"";
+  document.getElementById("panelRows").innerHTML=row("fa-hourglass-half","Περίοδος",r.period)+row("fa-location-dot","Από",from)+row("fa-location-dot","Προς",to)+row("fa-ship","Μέσο",r.medium)+row("fa-scroll","Τεκμηρίωση",r.status||r.type);
+  document.getElementById("panelNote").textContent=r.note||"";
+  openPanel();
+}
+function fitAll(){const pts=DATA.places.filter(placeVisible).map(p=>[p.lat,p.lon]);if(pts.length)atlasMap.fitBounds(pts,{padding:[70,70],maxZoom:6})}
+function searchPlaces(q){
+  const box=document.getElementById("searchResults");q=q.trim().toLowerCase();
+  if(!q){box.classList.add("hidden");box.innerHTML="";return}
+  const m=DATA.places.filter(p=>[p.place,p.historicalNames,p.modernName,p.characters].some(v=>String(v||"").toLowerCase().includes(q))).slice(0,12);
+  box.innerHTML=m.map(p=>`<button class="w-full text-left p-3 border-b border-stone-800 hover:bg-amber-900/20" onclick="focusPlace('${p.id}')"><div class="text-amber-200 text-xs font-bold">${esc(p.place)}</div><div class="text-stone-400 text-[10px]">${esc(p.historicalNames||p.modernName||"")}</div></button>`).join("");
+  box.classList.remove("hidden");
+}
+function focusPlace(id){const p=byId.get(id);if(!p)return;atlasMap.setView([p.lat,p.lon],7);showPlace(p);document.getElementById("searchResults").classList.add("hidden")}
+document.querySelectorAll(".book-btn").forEach(b=>b.onclick=()=>{document.querySelectorAll(".book-btn").forEach(x=>x.classList.remove("active"));b.classList.add("active");state.book=b.dataset.book;render();fitAll()});
+document.querySelectorAll(".year-btn").forEach(b=>b.onclick=()=>{document.querySelectorAll(".year-btn").forEach(x=>x.classList.remove("active"));b.classList.add("active");state.year=b.dataset.year;render();fitAll()});
+(async function(){
+  initMap();
+  DATA=await fetch("./data.json?v=20261006-real-data-ui-1").then(r=>r.json());
+  DATA.places.forEach(p=>byId.set(p.id,p));
+  render();fitAll();
+})();
 </script>
 </body>
 </html>
