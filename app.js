@@ -21,6 +21,9 @@ function styleMediterraneanBasemap(){
   const style=vectorMap.getStyle();
   if(!style||!Array.isArray(style.layers)||!style.layers.length)return;
 
+  // Lock immediately so addSource/addLayer style events cannot re-enter this pass.
+  mediterraneanBasemapStyled=true;
+
   style.layers.forEach(layer=>{
     const id=(layer.id||"").toLowerCase();
     const modernDetail=/road|highway|street|transport|rail|transit|aeroway|building|poi|housenumber|boundary|admin/.test(id);
@@ -107,7 +110,39 @@ function styleMediterraneanBasemap(){
     }
   }
 
-  mediterraneanBasemapStyled=true;
+  // Real elevation-derived relief. This changes the map architecture:
+  // the vector atlas remains interactive, while a DEM hillshade supplies physical terrain.
+  if(!vectorMap.getSource("atlas-terrain-dem")){
+    try{
+      vectorMap.addSource("atlas-terrain-dem",{
+        type:"raster-dem",
+        tiles:["https://elevation-tiles-prod.s3.amazonaws.com/terrarium/{z}/{x}/{y}.png"],
+        tileSize:256,
+        encoding:"terrarium",
+        minzoom:0,
+        maxzoom:14,
+        attribution:"Terrain data © AWS Terrain Tiles"
+      });
+    }catch(e){}
+  }
+
+  if(vectorMap.getSource("atlas-terrain-dem")&&!vectorMap.getLayer("atlas-terrain-relief")){
+    try{
+      vectorMap.addLayer({
+        id:"atlas-terrain-relief",
+        type:"hillshade",
+        source:"atlas-terrain-dem",
+        paint:{
+          "hillshade-illumination-direction":315,
+          "hillshade-illumination-anchor":"map",
+          "hillshade-exaggeration":0.82,
+          "hillshade-shadow-color":"#5a4028",
+          "hillshade-highlight-color":"#f6dfaa",
+          "hillshade-accent-color":"#8b6d46"
+        }
+      });
+    }catch(e){}
+  }
 }
 vectorMap.on("load",()=>{mediterraneanBasemapStyled=false;styleMediterraneanBasemap();});
 vectorMap.on("styledata",()=>{if(!mediterraneanBasemapStyled)styleMediterraneanBasemap();});
@@ -911,7 +946,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-major-map-pass-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-dem-relief-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
