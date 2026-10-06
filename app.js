@@ -77,6 +77,17 @@ const yearsFrom=s=>{
 };
 const yearHit=(obj,year)=>year==="All"||yearsFrom(obj.period).includes(year);
 const bookHit=(obj)=>state.book==="All"||(obj.books||[]).includes(state.book);
+function currentRouteNodeIds(){
+  const ids=new Set();
+  atlasData.routes.filter(r=>
+    bookHit(r)&&yearHit(r,state.year)&&
+    (state.routeStory==="All"||routeStory(r)===state.routeStory)
+  ).forEach(r=>{
+    (r.from||[]).forEach(x=>ids.add(x.id));
+    (r.to||[]).forEach(x=>ids.add(x.id));
+  });
+  return ids;
+}
 
 function settlementClass(p){
   if(p.atlasSymbol)return p.atlasSymbol;
@@ -414,8 +425,10 @@ function render(){
     (r.to||[]).forEach(x=>intelligencePlaceIds.add(x.id));
   });
 
+  const activeRouteNodeIds=currentRouteNodeIds();
+
   const visiblePlaces=atlasData.places.filter(p=>{
-    const base=Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&bookHit(p)&&yearHit(p,state.year)&&
+    const base=Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&(bookHit(p)||activeRouteNodeIds.has(p.id))&&yearHit(p,state.year)&&
       (!state.verifiedOnly||p.coordinateStatus==="VERIFIED")&&textHit(p,q);
     if(!base)return false;
     if(state.mode==="PEOPLE")return Boolean((p.characters||"").trim());
@@ -450,15 +463,6 @@ function render(){
       if(rep)empireRepIds.add(rep.id);
     });
   }
-
-  const activeRouteNodeIds=new Set();
-  atlasData.routes.filter(r=>
-    bookHit(r)&&yearHit(r,state.year)&&
-    (state.routeStory==="All"||routeStory(r)===state.routeStory)
-  ).forEach(r=>{
-    (r.from||[]).forEach(x=>activeRouteNodeIds.add(x.id));
-    (r.to||[]).forEach(x=>activeRouteNodeIds.add(x.id));
-  });
 
   if(state.showPlaces)visiblePlaces.forEach(p=>{
     const m=L.marker([p.lat,p.lon],{icon:markerIcon(p),title:p.place,riseOnHover:true});
@@ -572,8 +576,9 @@ function render(){
 }
 function fitVisible(){
   const q=state.search.trim().toLowerCase();
+  const activeRouteNodeIds=currentRouteNodeIds();
   const latlngs=atlasData.places.filter(p=>
-    Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&bookHit(p)&&yearHit(p,state.year)&&
+    Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&(bookHit(p)||activeRouteNodeIds.has(p.id))&&yearHit(p,state.year)&&
     (!state.verifiedOnly||p.coordinateStatus==="VERIFIED")&&textHit(p,q)
   ).map(p=>[p.lat,p.lon]);
   if(latlngs.length)map.fitBounds(latlngs,{padding:[90,90],maxZoom:7});
@@ -591,7 +596,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-route-audit-2",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-book2-otranto",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
