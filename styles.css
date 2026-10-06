@@ -538,3 +538,32 @@ button{color:inherit}
   content:"";position:absolute;left:2px;right:2px;bottom:-6px;height:5px;
   border-top:2px solid #5b6d6d!important;border-radius:50%!important;opacity:.8
 }
+
+/* SVG settlement sprites: replaces boxy CSS-built cities/villages/ports/fortresses */
+.settlement-svg-wrap{
+  position:relative;width:48px;height:48px;
+  transform-origin:50% 78%;
+  transition:transform .14s ease,filter .14s ease;
+  filter:drop-shadow(0 2px 2px rgba(44,31,20,.36));
+}
+.settlement-svg-wrap:hover{transform:scale(1.12);filter:drop-shadow(0 3px 3px rgba(44,31,20,.48))}
+.settlement-svg-wrap.is-major{transform:scale(1.10)}
+.settlement-svg-wrap.is-major:hover{transform:scale(1.18)}
+.settlement-svg-wrap.is-capital{width:58px;height:58px;transform:scale(1.04)}
+.settlement-svg-wrap.is-capital:hover{transform:scale(1.12)}
+.settlement-svg-art{
+  display:block;width:100%;height:100%;
+  object-fit:contain;
+  image-rendering:auto;
+}
+.settlement-svg-heraldry{
+  position:absolute;right:-3px;top:-4px;width:16px;height:20px;
+  background:#eee4cf;border:1px solid #3f3021;
+  clip-path:polygon(50% 0,94% 10%,91% 58%,77% 81%,50% 100%,23% 81%,9% 58%,6% 10%);
+  overflow:hidden;filter:drop-shadow(0 1px 2px rgba(0,0,0,.48));
+}
+.settlement-svg-wrap.is-capital .settlement-svg-heraldry{width:18px;height:22px;right:0;top:-2px}
+.settlement-svg-heraldry-art{
+  position:absolute;inset:2px;
+  background-position:center;background-repeat:no-repeat;background-size:contain;
+}
