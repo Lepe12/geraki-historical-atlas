@@ -1,17 +1,49 @@
 const state={mode:"STORY",book:"All",search:"",year:"All",routeStory:"All",storyStep:0,verifiedOnly:false,showPlaces:true,showRoutes:true,routeTypes:new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"])};
-const placeMarkers=L.layerGroup(),routeLines=L.layerGroup(),historicalLabels=L.layerGroup(),vesselMarkers=L.layerGroup();
+const placeMarkers=L.layerGroup(),routeLines=L.layerGroup(),historicalLabels=L.layerGroup(),vesselMarkers=L.layerGroup(),portolanLayer=L.layerGroup();
 let routeAnimationCancels=[];
 let atlasData={places:[],routes:[]};
 const byId=new Map();
 let empireRepIds=new Set();
 
-const map=L.map("map",{zoomControl:true,preferCanvas:true}).setView([39.1,18.5],5);
-L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",{
+const map=L.map("map",{zoomControl:true,preferCanvas:true,zoomSnap:.5}).setView([39.1,18.5],5);
+L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}",{
+  maxNativeZoom:13,
   maxZoom:16,
-  attribution:"Tiles &copy; Esri"
+  opacity:.72,
+  attribution:"Relief tiles &copy; Esri"
 }).addTo(map);
+portolanLayer.addTo(map);
 placeMarkers.addTo(map);routeLines.addTo(map);historicalLabels.addTo(map);vesselMarkers.addTo(map);
+
 map.zoomControl.setPosition("bottomright");
+
+function addPortolanLine(points,kind="grid"){
+  const style=kind==="rhumb"
+    ?{color:"#6e5334",weight:.72,opacity:.20,dashArray:"3 8",interactive:false}
+    :{color:"#7a6241",weight:.55,opacity:.16,dashArray:"1 6",interactive:false};
+  L.polyline(points,{...style,pane:"overlayPane"}).addTo(portolanLayer);
+}
+function buildPortolanLayer(){
+  portolanLayer.clearLayers();
+  // Geographic graticule: decorative only, not a historical route claim.
+  for(let lat=30;lat<=50;lat+=5){
+    const pts=[];
+    for(let lon=-10;lon<=40;lon+=1)pts.push([lat,lon]);
+    addPortolanLine(pts,"grid");
+  }
+  for(let lon=-10;lon<=40;lon+=5){
+    const pts=[];
+    for(let lat=28;lat<=52;lat+=1)pts.push([lat,lon]);
+    addPortolanLine(pts,"grid");
+  }
+  // Portolan-style rhumb fans anchored in open water, purely decorative.
+  const fans=[
+    {c:[37.2,18.0],ends:[[49,-8],[49,38],[29,-8],[29,38],[43,-8],[43,38],[31,-8],[31,38]]},
+    {c:[40.2,8.5],ends:[[49,-8],[49,30],[29,-8],[29,30],[45,-8],[45,30],[33,-8],[33,30]]}
+  ];
+  fans.forEach(f=>f.ends.forEach(e=>addPortolanLine([f.c,e],"rhumb")));
+}
+buildPortolanLayer();
 
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
 const textHit=(obj,q)=>!q||Object.values(obj).some(v=>{
@@ -677,7 +709,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-story-fix-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-cartography-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
