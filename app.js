@@ -367,6 +367,7 @@ function render(){
   let routeCount=0;
   if(state.showRoutes){
     const filtered=atlasData.routes.filter(r=>{
+      if(r.atlasHidden)return false;
       if(state.mode==="EMPIRES"||state.mode==="EVIDENCE")return false;
       if(state.mode==="INTELLIGENCE"&&r.type!=="INTELLIGENCE / NETWORK")return false;
       if(state.mode==="PEOPLE"&&r.type!=="DEPICTED TRAVEL")return false;
