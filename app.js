@@ -98,9 +98,10 @@ function settlementIcon(p){
   if(labelOnlyPlace(p)){
     const kind=symbol.replace("-label","");
     return L.divIcon({
-      className:"",
+      className:"cartographic-anchor",
       html:`<div class="cartographic-label-only ${kind}" title="${esc(p.place)}">${esc(p.place)}</div>`,
-      iconSize:[150,24],iconAnchor:[75,12]
+      iconSize:[1,1],
+      iconAnchor:[0,0]
     });
   }
 
@@ -115,24 +116,24 @@ function settlementIcon(p){
     "fortress":"fortress.svg",
     "generic":"town.svg"
   };
-  const sizeBySymbol={
-    "village":[52,28],
-    "coastal-village":[62,30],
-    "town":[62,30],
-    "city":[74,34],
-    "fortified-city":[82,36],
-    "capital":[96,42],
-    "port":[82,36],
-    "fortress":[68,32],
-    "generic":[58,29]
+  const widthBySymbol={
+    "village":56,
+    "coastal-village":72,
+    "town":72,
+    "city":86,
+    "fortified-city":98,
+    "capital":116,
+    "port":96,
+    "fortress":80,
+    "generic":70
   };
   const file=fileBySymbol[symbol]||"town.svg";
-  const size=sizeBySymbol[symbol]||sizeBySymbol.generic;
+  const w=widthBySymbol[symbol]||70;
   return L.divIcon({
-    className:"",
-    html:`<div class="engraved-settlement ${symbol}" title="${esc(p.place)}"><img src="./icons/${file}" alt=""></div>`,
-    iconSize:size,
-    iconAnchor:[Math.round(size[0]/2),Math.round(size[1]*.72)]
+    className:"cartographic-anchor",
+    html:`<img class="engraved-settlement-art ${symbol}" src="./icons/${file}" alt="" style="width:${w}px" title="${esc(p.place)}">`,
+    iconSize:[1,1],
+    iconAnchor:[0,0]
   });
 }
 function markerIcon(p){
