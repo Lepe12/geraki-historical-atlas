@@ -8,6 +8,7 @@ on:
       - "styles.css"
       - "app.js"
       - "data.json"
+      - "icons/**"
       - ".github/workflows/atlas-pages.yml"
   workflow_dispatch:
 
@@ -29,14 +30,67 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Stage atlas
+        run: |
+          mkdir -p _site/icons
+          rsync -a --exclude '.git' --exclude '.github' --exclude '_site' ./ _site/
+
+      - name: Install Mercator settlement drawings
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL="https://kmalexander.com/wp-content/uploads/2026/06/mercator-settlement-png-pack-1.1.zip"
+          curl -L --fail --retry 3 --retry-delay 2 "$URL" -o /tmp/mercator.zip
+          mkdir -p /tmp/mercator
+          unzip -q /tmp/mercator.zip -d /tmp/mercator
+
+          mapfile -t ALL < <(find /tmp/mercator -type f -iname '*.png' | sort)
+          if [ "${#ALL[@]}" -lt 10 ]; then
+            echo "Mercator PNG pack did not unpack as expected."
+            exit 1
+          fi
+
+          pick_group () {
+            local regex="$1"
+            local prefix="$2"
+            local count="$3"
+            mapfile -t MATCHES < <(printf '%s\n' "${ALL[@]}" | grep -Ei "$regex" || true)
+            if [ "${#MATCHES[@]}" -eq 0 ]; then
+              echo "No Mercator assets matched: $regex"
+              exit 1
+            fi
+            local i=1
+            for src in "${MATCHES[@]}"; do
+              cp "$src" "_site/icons/${prefix}-${i}.png"
+              i=$((i+1))
+              [ "$i" -gt "$count" ] && break
+            done
+            while [ "$i" -le "$count" ]; do
+              cp "${MATCHES[0]}" "_site/icons/${prefix}-${i}.png"
+              i=$((i+1))
+            done
+          }
+
+          # Folder names in the CC0 pack are used as category hints.
+          pick_group 'small[ _-]*town' 'mercator-village' 4
+          pick_group '/towns?/|[ _-]town[ _-]' 'mercator-town' 6
+          pick_group 'large[ _-]*town' 'mercator-city' 4
+          pick_group '/cities?/|[ _-]cit(y|ies)[ _-]' 'mercator-capital' 2
+          pick_group 'unique[ _-]*settlement' 'mercator-unique' 4
+
+          printf '%s\n'             'Settlement artwork source: K. M. Alexander, Mercator Settlement PNG Pack 1.1.'             'Derived from Gerardus Mercator / early Hondius material; distributed CC0.'             'https://kmalexander.com/2026/06/30/mercator-settlement-a-free-16th-century-settlement-brush-set-for-fantasy-maps/'             > _site/icons/MERCATOR-SOURCE.txt
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
           enablement: true
+
       - name: Upload Atlas
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "."
+          path: "_site"
+
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
