@@ -6,13 +6,12 @@ const byId=new Map();
 let empireRepIds=new Set();
 
 const map=L.map("map",{zoomControl:true,preferCanvas:true,zoomSnap:.5}).setView([39.1,18.5],5);
-L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}",{
-  maxNativeZoom:13,
+L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}",{
+  maxNativeZoom:8,
   maxZoom:16,
-  opacity:.72,
-  attribution:"Relief tiles &copy; Esri"
+  opacity:1,
+  attribution:"Physical map tiles &copy; Esri"
 }).addTo(map);
-portolanLayer.addTo(map);
 placeMarkers.addTo(map);routeLines.addTo(map);historicalLabels.addTo(map);vesselMarkers.addTo(map);
 
 map.zoomControl.setPosition("bottomright");
@@ -43,7 +42,7 @@ function buildPortolanLayer(){
   ];
   fans.forEach(f=>f.ends.forEach(e=>addPortolanLine([f.c,e],"rhumb")));
 }
-buildPortolanLayer();
+// Portolan line layer intentionally disabled: decorative lines obscured narrative routes.
 
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
 const textHit=(obj,q)=>!q||Object.values(obj).some(v=>{
