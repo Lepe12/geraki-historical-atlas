@@ -8,7 +8,7 @@ let empireRepIds=new Set();
 const map=L.map("map",{zoomControl:true,preferCanvas:true,zoomSnap:.5,maxZoom:18}).setView([39.1,18.5],5);
 
 const vectorBase=L.maplibreGL({
-  style:"https://tiles.openfreemap.org/styles/positron",
+  style:"https://tiles.openfreemap.org/styles/liberty",
   attribution:"&copy; OpenFreeMap &copy; OpenStreetMap contributors",
   interactive:false
 }).addTo(map);
@@ -95,8 +95,8 @@ function styleMediterraneanBasemap(){
 
   mediterraneanBasemapStyled=true;
 }
-vectorMap.on("load",styleMediterraneanBasemap);
-vectorMap.on("styledata",styleMediterraneanBasemap);
+vectorMap.on("load",()=>{mediterraneanBasemapStyled=false;styleMediterraneanBasemap();});
+vectorMap.on("styledata",()=>{if(!mediterraneanBasemapStyled)styleMediterraneanBasemap();});
 
 placeMarkers.addTo(map);routeLines.addTo(map);historicalLabels.addTo(map);vesselMarkers.addTo(map);
 
@@ -897,7 +897,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-mediterranean-map-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-liberty-map-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
