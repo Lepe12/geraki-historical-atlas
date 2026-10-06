@@ -812,3 +812,222 @@ button{color:inherit}
   background:transparent!important;
   border:0!important;
 }
+
+
+/* ===== Narrative atlas redesign — 2026-10-06 ===== */
+#map{
+  background:#cfc1a2!important;
+}
+.leaflet-tile-pane{
+  filter:sepia(.88) saturate(.46) brightness(.90) contrast(.94) hue-rotate(-4deg)!important;
+}
+#map:after{
+  background:
+    radial-gradient(circle at 48% 44%,rgba(255,248,228,.04) 0 34%,rgba(76,55,30,.10) 72%,rgba(35,25,16,.26) 100%),
+    linear-gradient(rgba(144,112,68,.05),rgba(72,51,28,.09))!important;
+  mix-blend-mode:multiply!important;
+}
+.chart-overlay{opacity:.42!important}
+.chart-overlay .rhumb line{
+  stroke:#6f5638!important;
+  stroke-width:.65!important;
+  opacity:.24!important;
+}
+.hero{
+  background:linear-gradient(180deg,rgba(17,13,9,.63),rgba(17,13,9,.25),transparent)!important;
+  box-shadow:none!important;
+}
+.hero p{color:#dbcdb4!important}
+.mode-strip{
+  background:rgba(19,15,10,.72)!important;
+  box-shadow:0 8px 24px rgba(31,22,13,.18)!important;
+}
+.book-strip{
+  background:rgba(24,18,12,.78)!important;
+  box-shadow:0 10px 28px rgba(31,22,13,.22)!important;
+}
+.book-chip.active,.mode-chip.active{
+  background:rgba(214,176,103,.18)!important;
+}
+
+/* Story deck: narrative navigation, intentionally compact. */
+.story-deck{
+  position:absolute;
+  z-index:665;
+  left:50%;
+  top:160px;
+  transform:translateX(-50%) translateY(-8px);
+  width:min(560px,calc(100% - 220px));
+  min-height:66px;
+  display:grid;
+  grid-template-columns:42px 1fr 42px;
+  align-items:center;
+  gap:10px;
+  padding:9px 10px;
+  border:1px solid rgba(120,88,48,.22);
+  border-radius:15px;
+  background:rgba(241,229,204,.88);
+  box-shadow:0 12px 34px rgba(45,31,18,.18);
+  color:#3c2c1d;
+  backdrop-filter:blur(8px);
+  opacity:0;
+  pointer-events:none;
+  transition:.24s ease;
+}
+.story-deck.active{
+  opacity:1;
+  pointer-events:auto;
+  transform:translateX(-50%) translateY(0);
+}
+.story-deck-copy{min-width:0;text-align:center}
+.story-deck-kicker{
+  font-size:8px;
+  letter-spacing:.18em;
+  font-weight:700;
+  color:#896a3d;
+}
+.story-deck-title{
+  margin-top:2px;
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-weight:700;
+  font-size:18px;
+  line-height:1.05;
+  color:#3a291b;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.story-deck-meta{
+  margin-top:3px;
+  font-size:9px;
+  color:#7b6a56;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.story-nav-btn{
+  width:34px;height:34px;
+  border-radius:50%;
+  border:1px solid rgba(105,77,42,.24);
+  background:rgba(255,250,239,.62);
+  color:#5f4429;
+  font-family:Georgia,serif;
+  font-size:25px;
+  line-height:1;
+  cursor:pointer;
+}
+.story-nav-btn:hover:not(:disabled){background:#f8efd9;border-color:rgba(105,77,42,.45)}
+.story-nav-btn:disabled{opacity:.28;cursor:default}
+
+/* Hide technical route taxonomy until explicitly requested. */
+.advanced-routes{
+  margin-top:12px;
+  border-top:1px solid var(--line);
+  padding-top:11px;
+}
+.advanced-routes summary{
+  cursor:pointer;
+  list-style:none;
+  font-size:9px;
+  letter-spacing:.08em;
+  color:#8f816c;
+}
+.advanced-routes summary::-webkit-details-marker{display:none}
+.advanced-routes summary:before{content:"+ ";color:#b99b67}
+.advanced-routes[open] summary:before{content:"− "}
+
+/* Stronger settlement hierarchy. */
+.mercator-settlement-art{
+  opacity:.90!important;
+  filter:sepia(.35) contrast(1.06) drop-shadow(0 1px 1px rgba(62,43,24,.22))!important;
+}
+.mercator-settlement-art.village,
+.mercator-settlement-art.coastal-village{opacity:.68!important}
+.mercator-settlement-art.town,.mercator-settlement-art.port{opacity:.82!important}
+.mercator-settlement-art.city,.mercator-settlement-art.fortified-city,.mercator-settlement-art.capital{opacity:.98!important}
+
+.historical-place-label{
+  color:#4a3826!important;
+  text-shadow:
+    0 1px 0 rgba(248,238,216,.92),
+    0 0 4px rgba(248,238,216,.95)!important;
+  font-size:11px!important;
+  letter-spacing:.025em!important;
+}
+.historical-place-label.major{font-size:13px!important;font-weight:700!important}
+.historical-place-label.capital{font-size:15px!important;font-weight:700!important;letter-spacing:.055em!important}
+.historical-place-label.port{font-style:italic}
+
+/* Vessels should read as cartographic engravings, not UI sprites. */
+.route-ship{
+  width:60px!important;
+  height:52px!important;
+  opacity:.92!important;
+  filter:grayscale(1) sepia(1) saturate(.64) brightness(.66) contrast(1.48) drop-shadow(0 1px 1px rgba(255,248,230,.42))!important;
+}
+.moving-vessel-anchor{
+  width:60px!important;
+  height:52px!important;
+  margin-left:-30px!important;
+  margin-top:-26px!important;
+}
+
+/* Dossier refinement */
+.detail-panel{
+  background:linear-gradient(180deg,rgba(27,21,15,.97),rgba(14,11,8,.97))!important;
+}
+.detail-panel h1{font-size:35px!important}
+.detail-panel .field .v{font-size:16px!important}
+.dossier-status{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin:14px 0 18px;
+}
+.dossier-status-item{
+  padding:9px 10px;
+  border:1px solid rgba(200,162,94,.18);
+  border-radius:10px;
+  background:rgba(255,255,255,.018);
+}
+.dossier-status-item .dk{
+  font-size:8px;
+  letter-spacing:.12em;
+  color:#8f8069;
+  text-transform:uppercase;
+}
+.dossier-status-item .dv{
+  margin-top:3px;
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:15px;
+  color:#e0d1b7;
+}
+
+/* Softer controls: content first, interface second. */
+.control-panel{
+  width:300px!important;
+  background:linear-gradient(180deg,rgba(24,19,14,.95),rgba(14,11,8,.94))!important;
+}
+.control-panel section{padding:12px 0!important}
+.legend{opacity:.78}
+.data-note{opacity:.72}
+
+/* Responsive Story Deck */
+@media(max-width:900px){
+  .story-deck{
+    top:146px;
+    width:calc(100% - 40px);
+    grid-template-columns:38px 1fr 38px;
+  }
+}
+@media(max-width:620px){
+  .story-deck{
+    top:144px;
+    left:12px;right:12px;
+    width:auto;
+    transform:translateY(-8px);
+  }
+  .story-deck.active{transform:translateY(0)}
+  .story-deck-title{font-size:16px}
+  .story-deck-meta{font-size:8px}
+}
