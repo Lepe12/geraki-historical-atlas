@@ -331,7 +331,7 @@ function densifyRoute(points,stepsPerSegment=24){
 function mercatorShipIcon(){
   return L.divIcon({
     className:"moving-vessel-anchor",
-    html:`<div class="mercator-map-ship" aria-label="Mercator-style sailing ship"></div>`,
+    html:`<div class="approved-route-ship" aria-label="historical sailing ship"></div>`,
     iconSize:[54,36],
     iconAnchor:[27,18]
   });
@@ -357,7 +357,7 @@ function animateVessel(points,duration=14000){
     marker.setLatLng([a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f]);
     const el=marker.getElement();
     if(el){
-      const g=el.querySelector(".moving-galley");
+      const g=el.querySelector(".approved-route-ship");
       if(g)g.style.transform=`rotate(${bearingDeg(a,b)}deg)`;
     }
     rafId=requestAnimationFrame(tick);
