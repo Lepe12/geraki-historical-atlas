@@ -354,40 +354,52 @@ function isLandAt(lon,lat){
 function refreshMorphology(){
   if(!atlasMap||!atlasMap.loaded()||typeof atlasMap.queryTerrainElevation!=="function")return;
   clearMorphology();
+
   const b=atlasMap.getBounds();
   const west=b.getWest(),east=b.getEast(),south=b.getSouth(),north=b.getNorth();
   const z=atlasMap.getZoom();
-  const cols=z<5?9:z<7?11:13;
-  const rows=z<5?6:z<7?8:10;
-  const dx=(east-west)/cols,dy=(north-south)/rows;
-  const probe=Math.max(.045,Math.min(.16,Math.max(dx,dy)*.22));
+
+  // IMPORTANT: fixed geographic lattice, not viewport-relative sampling.
+  // This keeps every morphology asset anchored to the same world coordinate.
+  const step=z<5?3.0:z<7?1.5:.75;
+  const probe=z<5?.16:z<7?.10:.06;
 
   document.documentElement.style.setProperty("--morph-mountain-size",z<5?"92px":z<7?"112px":"138px");
   document.documentElement.style.setProperty("--morph-rock-size",z<5?"48px":z<7?"62px":"78px");
   document.documentElement.style.setProperty("--morph-tree-size",z<5?"34px":z<7?"44px":"56px");
 
-  for(let r=0;r<rows;r++){
-    for(let c=0;c<cols;c++){
-      const baseLon=west+(c+.5)*dx,baseLat=south+(r+.5)*dy;
-      const h=morphHash(baseLat,baseLon);
-      const lon=baseLon+(h-.5)*dx*.38;
-      const lat=baseLat+(morphHash(baseLat+.17,baseLon-.23)-.5)*dy*.38;
+  const minC=Math.floor(west/step)-1;
+  const maxC=Math.ceil(east/step)+1;
+  const minR=Math.floor(south/step)-1;
+  const maxR=Math.ceil(north/step)+1;
+
+  for(let gy=minR;gy<=maxR;gy++){
+    for(let gx=minC;gx<=maxC;gx++){
+      // Stable jitter derived only from fixed cell coordinates.
+      const baseLon=(gx+.5)*step;
+      const baseLat=(gy+.5)*step;
+      const h1=morphHash(gy*17.17,gx*31.31);
+      const h2=morphHash(gy*43.43,gx*11.11);
+      const lon=baseLon+(h1-.5)*step*.34;
+      const lat=baseLat+(h2-.5)*step*.34;
+
       if(!isLandAt(lon,lat))continue;
+
       const t=localRelief(lon,lat,probe);
       if(!t||t.elev<5)continue;
 
+      const h=morphHash(gy*7.77,gx*19.19);
       let kind=null,scale=.78+h*.24;
-      // Mountains only on genuinely high / sharply broken terrain.
+
       if((t.elev>=1050 && t.relief>=220) || t.relief>=520)kind="mountain";
-      // Rocky outcrops on middle elevations or abrupt local relief.
       else if((t.elev>=180 && t.relief>=80) || t.relief>=155)kind="rock";
-      // Low-relief land receives vegetation rather than rock.
       else if(t.elev>=5 && t.relief<155 && h>.22)kind="trees";
 
       if(!kind)continue;
-      if(kind==="mountain" && morphHash(lat+.51,lon-.37)<.36)continue;
-      if(kind==="rock" && morphHash(lat-.11,lon+.27)<.28)continue;
-      if(kind==="trees" && morphHash(lat+.31,lon+.19)<.46)continue;
+      if(kind==="mountain" && morphHash(gy*3.1,gx*5.7)<.36)continue;
+      if(kind==="rock" && morphHash(gy*9.3,gx*2.9)<.28)continue;
+      if(kind==="trees" && morphHash(gy*4.7,gx*8.1)<.46)continue;
+
       addMorphMarker(kind,lon,lat,scale);
     }
   }
