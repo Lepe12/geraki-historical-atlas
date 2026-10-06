@@ -6,7 +6,7 @@
 <title>Ιστορικός Άτλας της Μεσογείου</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800;900&family=GFS+Didot&family=IM+Fell+English:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -15,11 +15,16 @@ html,body{height:100%;margin:0}body{font-family:'Plus Jakarta Sans',sans-serif;b
 .font-cinzel{font-family:'Cinzel',serif}.font-didot{font-family:'GFS Didot',serif}.font-archival{font-family:'IM Fell English',serif}
 .glass-dark{background:rgba(18,16,13,.92);backdrop-filter:blur(14px);border-color:rgba(207,163,94,.28)!important}
 .parchment-panel{background:#e9d5b7;color:#2b1f17;box-shadow:inset 0 0 100px rgba(83,51,22,.18),-14px 0 34px rgba(0,0,0,.40)}
-#realMap{position:absolute;inset:0;background:#557c82}
-.leaflet-tile-pane{filter:sepia(.28) saturate(.82) contrast(1.16) brightness(.94) hue-rotate(-8deg)}
-.leaflet-container{background:#547f86;font-family:'GFS Didot',serif}
-.leaflet-control-attribution{background:rgba(20,17,13,.74)!important;color:#c8b28d!important}
-.leaflet-control-attribution a{color:#e0bd7b!important}
+#realMap{position:absolute;inset:0;background:#4f7c82}
+.maplibregl-canvas{filter:saturate(1.06) contrast(1.08) brightness(.98)}
+.maplibregl-ctrl-attrib{background:rgba(20,17,13,.72)!important;color:#c9b48d!important;font-size:10px!important}
+.maplibregl-ctrl-attrib a{color:#e1bd78!important}
+.maplibregl-marker{will-change:transform}
+
+
+
+
+
 .map-wash{position:absolute;inset:0;z-index:450;pointer-events:none;background:
 radial-gradient(circle at 49% 42%,rgba(255,241,199,.06) 0 28%,transparent 58%),
 linear-gradient(rgba(77,55,32,.03),rgba(38,28,20,.10));mix-blend-mode:multiply}
@@ -94,96 +99,298 @@ linear-gradient(rgba(77,55,32,.03),rgba(38,28,20,.10));mix-blend-mode:multiply}
     <button class="year-btn px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-year="1578">1578</button>
   </div>
 </footer>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script>
-let DATA={places:[],routes:[]},state={book:"All",year:"All"},atlasMap,placeLayer,routeLayer;
+let DATA={places:[],routes:[]};
+let state={book:"All",year:"All"};
+let atlasMap;
 const byId=new Map();
+const placeMarkers=[];
+let routeSourceReady=false;
+
 const symbolAsset=s=>({
-  village:"diorama-village.webp","coastal-village":"diorama-coastal.webp",
-  town:"diorama-town.webp",city:"diorama-city.webp",capital:"diorama-city.webp",
+  village:"diorama-village.webp",
+  "coastal-village":"diorama-coastal.webp",
+  town:"diorama-town.webp",
+  city:"diorama-city.webp",
+  capital:"diorama-city.webp",
   port:"diorama-port.webp"
 }[s]||"diorama-town.webp");
 
-function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
-function initMap(){
-  atlasMap=L.map("realMap",{zoomControl:false,minZoom:3,maxZoom:13,zoomSnap:.5,preferCanvas:true}).setView([39.0,18.5],5);
-  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}",{maxNativeZoom:13,maxZoom:13,attribution:"Relief © Esri"}).addTo(atlasMap);
-  placeLayer=L.layerGroup().addTo(atlasMap);routeLayer=L.layerGroup().addTo(atlasMap);
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
 }
+
+function styleHistoricalBase(){
+  const style=atlasMap.getStyle();
+  if(!style||!style.layers)return;
+
+  style.layers.forEach(layer=>{
+    const id=(layer.id||"").toLowerCase();
+    try{
+      if(layer.type==="symbol" || /road|highway|street|transport|rail|transit|aeroway|building|poi|housenumber|boundary|admin/.test(id)){
+        atlasMap.setLayoutProperty(layer.id,"visibility","none");
+        return;
+      }
+      if(layer.type==="background"){
+        atlasMap.setPaintProperty(layer.id,"background-color","#c8aa70");
+      }
+      if(layer.type==="fill"){
+        if(/water|ocean|sea|lake|riverbank/.test(id)){
+          atlasMap.setPaintProperty(layer.id,"fill-color","#4f7f88");
+          atlasMap.setPaintProperty(layer.id,"fill-opacity",1);
+        }else if(/wood|forest|scrub|vegetation/.test(id)){
+          atlasMap.setPaintProperty(layer.id,"fill-color","#7f8e60");
+          atlasMap.setPaintProperty(layer.id,"fill-opacity",.72);
+        }else if(/grass|park|green|meadow/.test(id)){
+          atlasMap.setPaintProperty(layer.id,"fill-color","#9ba16f");
+          atlasMap.setPaintProperty(layer.id,"fill-opacity",.58);
+        }else if(/farmland|farm|agric|crop|orchard|vineyard/.test(id)){
+          atlasMap.setPaintProperty(layer.id,"fill-color","#b89a65");
+          atlasMap.setPaintProperty(layer.id,"fill-opacity",.58);
+        }else if(/sand|beach|dune/.test(id)){
+          atlasMap.setPaintProperty(layer.id,"fill-color","#d6bb7f");
+          atlasMap.setPaintProperty(layer.id,"fill-opacity",.86);
+        }else if(/land|earth|landcover|landuse/.test(id)){
+          atlasMap.setPaintProperty(layer.id,"fill-color","#c5a76f");
+          atlasMap.setPaintProperty(layer.id,"fill-opacity",.50);
+        }
+      }
+      if(layer.type==="line" && /coast|shore/.test(id)){
+        atlasMap.setPaintProperty(layer.id,"line-color","#355e61");
+        atlasMap.setPaintProperty(layer.id,"line-opacity",.88);
+        atlasMap.setPaintProperty(layer.id,"line-width",1.2);
+      }
+    }catch(e){}
+  });
+}
+
+function initMap(){
+  atlasMap=new maplibregl.Map({
+    container:"realMap",
+    style:"https://tiles.openfreemap.org/styles/liberty",
+    center:[18.5,39.0],
+    zoom:5,
+    pitch:48,
+    bearing:-9,
+    minZoom:3,
+    maxZoom:13,
+    attributionControl:true,
+    antialias:true
+  });
+
+  atlasMap.on("load",()=>{
+    styleHistoricalBase();
+
+    if(!atlasMap.getSource("atlas-dem")){
+      atlasMap.addSource("atlas-dem",{
+        type:"raster-dem",
+        tiles:["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],
+        tileSize:256,
+        encoding:"terrarium",
+        maxzoom:14
+      });
+    }
+    atlasMap.setTerrain({source:"atlas-dem",exaggeration:1.45});
+
+    atlasMap.addLayer({
+      id:"atlas-relief",
+      type:"hillshade",
+      source:"atlas-dem",
+      paint:{
+        "hillshade-exaggeration":.92,
+        "hillshade-shadow-color":"#4a3322",
+        "hillshade-highlight-color":"#f0d89f",
+        "hillshade-accent-color":"#846946",
+        "hillshade-illumination-direction":315
+      }
+    });
+
+    atlasMap.addSource("atlas-routes",{type:"geojson",data:{type:"FeatureCollection",features:[]}});
+    atlasMap.addLayer({
+      id:"atlas-routes",
+      type:"line",
+      source:"atlas-routes",
+      layout:{"line-cap":"round","line-join":"round"},
+      paint:{
+        "line-color":["get","color"],
+        "line-width":["get","width"],
+        "line-opacity":["get","opacity"],
+        "line-dasharray":[2,5]
+      }
+    });
+    routeSourceReady=true;
+    render();
+    fitAll();
+  });
+
+  atlasMap.on("click","atlas-routes",e=>{
+    const id=e.features?.[0]?.properties?.id;
+    const r=DATA.routes.find(x=>x.id===id);
+    if(r)showRoute(r);
+  });
+  atlasMap.on("mouseenter","atlas-routes",()=>atlasMap.getCanvas().style.cursor="pointer");
+  atlasMap.on("mouseleave","atlas-routes",()=>atlasMap.getCanvas().style.cursor="");
+}
+
 function bookHit(x){return state.book==="All"||(x.books||[]).includes(state.book)}
 function yearHit(x){return state.year==="All"||(x.period||"").includes(state.year)}
 function placeVisible(p){return Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&bookHit(p)&&yearHit(p)}
 function routeVisible(r){return bookHit(r)&&yearHit(r)&&!r.atlasHidden}
+
+function clearPlaces(){
+  while(placeMarkers.length){
+    try{placeMarkers.pop().remove()}catch(e){}
+  }
+}
+
 function markerFor(p){
   const symbol=(p.atlasSymbol||p.type||"town").toLowerCase();
+  const el=document.createElement("div");
   if(["sea-label","region-label","island-label"].includes(symbol)){
-    return L.marker([p.lat,p.lon],{icon:L.divIcon({className:"",html:`<div class="label-only">${esc(p.place)}</div>`,iconSize:[140,22],iconAnchor:[70,11]})});
+    el.className="label-only";
+    el.textContent=p.place||"";
+  }else{
+    el.className="settlement-wrap "+symbol;
+    const img=document.createElement("img");
+    img.className="settlement-img";
+    img.src="./icons/"+symbolAsset(symbol);
+    img.alt="";
+    const lab=document.createElement("div");
+    lab.className="settlement-label";
+    lab.textContent=p.place||"";
+    el.append(img,lab);
   }
-  const asset=symbolAsset(symbol);
-  return L.marker([p.lat,p.lon],{
-    icon:L.divIcon({className:"",html:`<div class="settlement-wrap ${esc(symbol)}"><img class="settlement-img" src="./icons/${asset}" alt=""><div class="settlement-label">${esc(p.place)}</div></div>`,iconSize:[130,110],iconAnchor:[65,80]})
-  });
+  el.addEventListener("click",ev=>{ev.stopPropagation();showPlace(p)});
+  return new maplibregl.Marker({
+    element:el,
+    anchor:"bottom",
+    pitchAlignment:"map",
+    rotationAlignment:"map"
+  }).setLngLat([p.lon,p.lat]);
 }
+
 function routePoints(r){
-  const a=byId.get(r.from?.[0]?.id),b=byId.get(r.to?.[0]?.id); if(!a||!b)return [];
-  const start=Array.isArray(r.displayStart)?r.displayStart:[a.lat,a.lon],end=Array.isArray(r.displayEnd)?r.displayEnd:[b.lat,b.lon];
-  const pts=[start];(r.waypoints||[]).forEach(w=>Array.isArray(w)&&pts.push(w));pts.push(end);return pts;
+  const a=byId.get(r.from?.[0]?.id),b=byId.get(r.to?.[0]?.id);
+  if(!a||!b)return [];
+  const start=Array.isArray(r.displayStart)?r.displayStart:[a.lat,a.lon];
+  const end=Array.isArray(r.displayEnd)?r.displayEnd:[b.lat,b.lon];
+  const pts=[start];
+  (r.waypoints||[]).forEach(w=>Array.isArray(w)&&pts.push(w));
+  pts.push(end);
+  return pts;
 }
-function routeStyle(r){
-  if(r.type==="INTELLIGENCE / NETWORK")return{color:"#8e7b63",weight:1,opacity:.38,dashArray:"2 10"};
-  if(r.type==="PLANNED — NOT EXECUTED")return{color:"#a38660",weight:1,opacity:.38,dashArray:"3 11"};
-  if(r.type==="STRONG RECONSTRUCTION")return{color:"#d8c291",weight:1.2,opacity:.64,dashArray:"4 9"};
-  if(r.medium==="land")return{color:"#6e4a32",weight:1.3,opacity:.7,dashArray:"4 8"};
-  return{color:"#f0dfb5",weight:1.6,opacity:.9,dashArray:"6 8"};
+
+function routePaint(r){
+  if(r.type==="INTELLIGENCE / NETWORK")return{color:"#8e7b63",width:1.0,opacity:.38};
+  if(r.type==="PLANNED — NOT EXECUTED")return{color:"#a38660",width:1.0,opacity:.38};
+  if(r.type==="STRONG RECONSTRUCTION")return{color:"#d9c59a",width:1.35,opacity:.72};
+  if(r.medium==="land")return{color:"#6d4931",width:1.4,opacity:.78};
+  return{color:"#f2e2bd",width:1.7,opacity:.92};
 }
+
 function render(){
-  placeLayer.clearLayers();routeLayer.clearLayers();
-  DATA.routes.filter(routeVisible).forEach(r=>{
-    const pts=routePoints(r); if(pts.length<2)return;
-    const line=L.polyline(pts,{...routeStyle(r),interactive:true,className:"route-hit"}).addTo(routeLayer);
-    line.on("click",()=>showRoute(r));
-  });
+  if(!atlasMap||!atlasMap.loaded())return;
+  clearPlaces();
+
   DATA.places.filter(placeVisible).forEach(p=>{
-    const m=markerFor(p).addTo(placeLayer);m.on("click",()=>showPlace(p));
+    const m=markerFor(p).addTo(atlasMap);
+    placeMarkers.push(m);
   });
+
+  if(routeSourceReady){
+    const features=DATA.routes.filter(routeVisible).map(r=>{
+      const pts=routePoints(r);
+      if(pts.length<2)return null;
+      const paint=routePaint(r);
+      return{
+        type:"Feature",
+        properties:{id:r.id,...paint},
+        geometry:{type:"LineString",coordinates:pts.map(([lat,lon])=>[lon,lat])}
+      };
+    }).filter(Boolean);
+    atlasMap.getSource("atlas-routes").setData({type:"FeatureCollection",features});
+  }
 }
-function row(icon,label,val){if(!val)return"";return `<div class="p-3 rounded-md bg-amber-950/5 border border-amber-900/15 flex gap-3"><div class="w-8 h-8 rounded bg-amber-900/10 flex items-center justify-center text-amber-900"><i class="fa-solid ${icon}"></i></div><div><div class="font-cinzel text-[9px] tracking-wider text-amber-900/75 uppercase">${esc(label)}</div><div class="font-didot text-sm text-stone-900 mt-1">${esc(val)}</div></div></div>`}
+
+function row(icon,label,val){
+  if(!val)return"";
+  return `<div class="p-3 rounded-md bg-amber-950/5 border border-amber-900/15 flex gap-3">
+    <div class="w-8 h-8 rounded bg-amber-900/10 flex items-center justify-center text-amber-900"><i class="fa-solid ${icon}"></i></div>
+    <div><div class="font-cinzel text-[9px] tracking-wider text-amber-900/75 uppercase">${esc(label)}</div>
+    <div class="font-didot text-sm text-stone-900 mt-1">${esc(val)}</div></div></div>`;
+}
 function openPanel(){document.getElementById("sidePanel").classList.remove("closed")}
 function closePanel(){document.getElementById("sidePanel").classList.add("closed")}
+
 function showPlace(p){
   document.getElementById("panelTitle").textContent=p.place||"";
   document.getElementById("panelSubtitle").textContent=p.historicalNames||p.modernName||"";
   document.getElementById("panelDescription").textContent=p.historicalContext||p.trilogyRole||"";
-  document.getElementById("panelRows").innerHTML=row("fa-hourglass-half","Περίοδος",p.period)+row("fa-user-group","Πρόσωπα",p.characters)+row("fa-compass","Ρόλος",p.trilogyRole)+row("fa-landmark","Εξουσία / έλεγχος",p.authority)+row("fa-scroll","Τεκμηρίωση",p.sources||p.historicalStatus);
+  document.getElementById("panelRows").innerHTML=
+    row("fa-hourglass-half","Περίοδος",p.period)+
+    row("fa-user-group","Πρόσωπα",p.characters)+
+    row("fa-compass","Ρόλος",p.trilogyRole)+
+    row("fa-landmark","Εξουσία / έλεγχος",p.authority)+
+    row("fa-scroll","Τεκμηρίωση",p.sources||p.historicalStatus);
   document.getElementById("panelNote").textContent=p.notes||"";
   openPanel();
 }
 function showRoute(r){
-  const from=(r.from||[]).map(x=>x.name).join(", "),to=(r.to||[]).map(x=>x.name).join(", ");
+  const from=(r.from||[]).map(x=>x.name).join(", ");
+  const to=(r.to||[]).map(x=>x.name).join(", ");
   document.getElementById("panelTitle").textContent=r.name||"Διαδρομή";
   document.getElementById("panelSubtitle").textContent=r.character||"";
   document.getElementById("panelDescription").textContent=r.evidence||"";
-  document.getElementById("panelRows").innerHTML=row("fa-hourglass-half","Περίοδος",r.period)+row("fa-location-dot","Από",from)+row("fa-location-dot","Προς",to)+row("fa-ship","Μέσο",r.medium)+row("fa-scroll","Τεκμηρίωση",r.status||r.type);
+  document.getElementById("panelRows").innerHTML=
+    row("fa-hourglass-half","Περίοδος",r.period)+
+    row("fa-location-dot","Από",from)+
+    row("fa-location-dot","Προς",to)+
+    row("fa-ship","Μέσο",r.medium)+
+    row("fa-scroll","Τεκμηρίωση",r.status||r.type);
   document.getElementById("panelNote").textContent=r.note||"";
   openPanel();
 }
-function fitAll(){const pts=DATA.places.filter(placeVisible).map(p=>[p.lat,p.lon]);if(pts.length)atlasMap.fitBounds(pts,{padding:[70,70],maxZoom:6})}
+
+function fitAll(){
+  if(!atlasMap)return;
+  const pts=DATA.places.filter(placeVisible);
+  if(!pts.length)return;
+  const bounds=new maplibregl.LngLatBounds();
+  pts.forEach(p=>bounds.extend([p.lon,p.lat]));
+  atlasMap.fitBounds(bounds,{padding:90,maxZoom:5.8,duration:900,pitch:48,bearing:-9});
+}
+
 function searchPlaces(q){
-  const box=document.getElementById("searchResults");q=q.trim().toLowerCase();
+  const box=document.getElementById("searchResults");
+  q=q.trim().toLowerCase();
   if(!q){box.classList.add("hidden");box.innerHTML="";return}
   const m=DATA.places.filter(p=>[p.place,p.historicalNames,p.modernName,p.characters].some(v=>String(v||"").toLowerCase().includes(q))).slice(0,12);
-  box.innerHTML=m.map(p=>`<button class="w-full text-left p-3 border-b border-stone-800 hover:bg-amber-900/20" onclick="focusPlace('${p.id}')"><div class="text-amber-200 text-xs font-bold">${esc(p.place)}</div><div class="text-stone-400 text-[10px]">${esc(p.historicalNames||p.modernName||"")}</div></button>`).join("");
+  box.innerHTML=m.map(p=>`<button class="w-full text-left p-3 border-b border-stone-800 hover:bg-amber-900/20" onclick="focusPlace('${p.id}')">
+    <div class="text-amber-200 text-xs font-bold">${esc(p.place)}</div>
+    <div class="text-stone-400 text-[10px]">${esc(p.historicalNames||p.modernName||"")}</div></button>`).join("");
   box.classList.remove("hidden");
 }
-function focusPlace(id){const p=byId.get(id);if(!p)return;atlasMap.setView([p.lat,p.lon],7);showPlace(p);document.getElementById("searchResults").classList.add("hidden")}
-document.querySelectorAll(".book-btn").forEach(b=>b.onclick=()=>{document.querySelectorAll(".book-btn").forEach(x=>x.classList.remove("active"));b.classList.add("active");state.book=b.dataset.book;render();fitAll()});
-document.querySelectorAll(".year-btn").forEach(b=>b.onclick=()=>{document.querySelectorAll(".year-btn").forEach(x=>x.classList.remove("active"));b.classList.add("active");state.year=b.dataset.year;render();fitAll()});
+function focusPlace(id){
+  const p=byId.get(id);if(!p)return;
+  atlasMap.flyTo({center:[p.lon,p.lat],zoom:7.5,pitch:55,bearing:-7,duration:1000});
+  showPlace(p);
+  document.getElementById("searchResults").classList.add("hidden");
+}
+
+document.querySelectorAll(".book-btn").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".book-btn").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");state.book=b.dataset.book;render();fitAll();
+});
+document.querySelectorAll(".year-btn").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".year-btn").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");state.year=b.dataset.year;render();fitAll();
+});
+
 (async function(){
-  initMap();
-  DATA=await fetch("./data.json?v=20261006-real-data-ui-1").then(r=>r.json());
+  DATA=await fetch("./data.json?v=20261006-3d-terrain-live-1").then(r=>r.json());
   DATA.places.forEach(p=>byId.set(p.id,p));
-  render();fitAll();
+  initMap();
 })();
 </script>
 </body>
