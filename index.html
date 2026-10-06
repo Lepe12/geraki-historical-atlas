@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800;900&family=GFS+Didot&family=IM+Fell+English:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -21,7 +20,21 @@
         .map-cursor-grab{cursor:grab}.map-cursor-grabbing{cursor:grabbing}
         #realMap{position:absolute;inset:0;z-index:0}
         #mapCanvas{position:absolute;inset:0;z-index:2;pointer-events:none}
-        .leaflet-container{background:#4f7c83}
+        .leaflet-container{background:#547f86}
+        .leaflet-tile-pane{
+            filter:sepia(.28) saturate(.88) contrast(1.14) brightness(.96) hue-rotate(-8deg);
+        }
+        #realMap:after{
+            content:"";
+            position:absolute;
+            inset:0;
+            z-index:350;
+            pointer-events:none;
+            background:
+                radial-gradient(circle at 48% 42%,rgba(255,238,194,.05) 0 35%,transparent 62%),
+                linear-gradient(rgba(84,61,35,.05),rgba(35,27,20,.08));
+            mix-blend-mode:multiply;
+        }
         .leaflet-control-attribution{background:rgba(15,17,20,.72)!important;color:#c9b795!important}
         .leaflet-control-attribution a{color:#e1bc75!important}
     </style>
@@ -144,17 +157,36 @@
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
-<script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.22/leaflet-maplibre-gl.js"></script>
 <script>
 let realMap;
 function initRealMap(){
-  realMap=L.map("realMap",{zoomControl:false,preferCanvas:true,zoomSnap:.5,minZoom:3,maxZoom:18}).setView([38.4,18.8],5);
-  L.maplibreGL({
-    style:"https://tiles.openfreemap.org/styles/liberty",
-    attribution:"&copy; OpenFreeMap &copy; OpenStreetMap contributors",
-    interactive:false
-  }).addTo(realMap);
+  realMap=L.map("realMap",{
+    zoomControl:false,
+    preferCanvas:true,
+    zoomSnap:.5,
+    minZoom:3,
+    maxZoom:13,
+    attributionControl:true
+  }).setView([38.4,18.8],5);
+
+  const terrain=L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}",
+    {
+      maxNativeZoom:13,
+      maxZoom:13,
+      attribution:"Tiles © Esri"
+    }
+  ).addTo(realMap);
+
+  const relief=L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}",
+    {
+      opacity:.72,
+      maxNativeZoom:13,
+      maxZoom:13,
+      attribution:"Relief © Esri"
+    }
+  ).addTo(realMap);
 }
 const locationsData=[
 {id:"ragusa",name:"Ραγούσα",foreignName:"DUBROVNIK · RAGUSA",x:.44,y:.30,periodRange:[0,4],periodText:"13ος – 15ος αιώνας",people:"Νικόλαος Γκουντούλιτς (διπλωμάτης), Μαρίνος ντέλα Ράγκουζα (έμπορος)",role:"Εμπορικός κόμβος, διπλωματικές διαμεσολαβήσεις, σύνδεση Αδριατικής – Ανατολικής Μεσογείου.",doc:"Πολύ καλά τεκμηριωμένη (αρχειακές πηγές, εμπορικά κατάστιχα, διπλωματικές αναφορές).",desc:"Η Ραγούσα, ισχυρή ναυτική κοινότητα της Αδριατικής, εξελίχθηκε σε σημαντικό εμπορικό και διπλωματικό κέντρο μεταξύ Ανατολής και Δύσης. Η στρατηγική της θέση της επέτρεψε να διατηρήσει ευρεία αυτονομία και να αναπτύξει ένα ακμάζον δίκτυο εμπορίου.",image:"https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1000&q=80",caption:"Η οχυρωμένη πόλη-κράτος της Ραγούσας στην Αδριατική",gallery:["https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=600&q=80"],sources:["• Αρχεία της Δημοκρατίας της Ραγούσας","• Χειρόγραφα ναυσιπλοΐας Αδριατικής"],related:["venice","constantinople","rhodes"]},
