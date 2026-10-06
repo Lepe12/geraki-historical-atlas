@@ -328,16 +328,30 @@ function rebuildFilters(){
 }
 
 function routeStyle(type,medium,focused=true){
-  const fade=focused?1:.22;
-  if(type==="INTELLIGENCE / NETWORK")return {weight:1.05,opacity:.34*fade,color:"#756951",lineCap:"round",lineJoin:"round",dashArray:"1 9"};
-  if(type==="PLANNED — NOT EXECUTED")return {weight:1.0,opacity:.28*fade,color:"#8b7659",lineCap:"round",lineJoin:"round",dashArray:"11 10"};
-  if(type==="STRONG RECONSTRUCTION")return {weight:focused?2.0:1.1,opacity:.62*fade,color:"#745c3d",lineCap:"round",lineJoin:"round",dashArray:"5 7"};
-  if(medium==="land")return {weight:focused?2.1:1.15,opacity:.72*fade,color:"#72583a",lineCap:"round",lineJoin:"round",dashArray:"5 4"};
-  return {weight:focused?2.35:1.2,opacity:.88*fade,color:"#4f3924",lineCap:"round",lineJoin:"round"};
+  const fade=focused?1:.55;
+  if(type==="INTELLIGENCE / NETWORK")return {
+    weight:1.0,opacity:.35*fade,color:"#6f6558",
+    lineCap:"round",lineJoin:"round",dashArray:"2 10"
+  };
+  if(type==="PLANNED — NOT EXECUTED")return {
+    weight:1.0,opacity:.34*fade,color:"#8a765d",
+    lineCap:"round",lineJoin:"round",dashArray:"3 11"
+  };
+  if(type==="STRONG RECONSTRUCTION")return {
+    weight:1.25,opacity:.55*fade,color:"#6a5844",
+    lineCap:"round",lineJoin:"round",dashArray:"4 9"
+  };
+  if(medium==="land")return {
+    weight:1.25,opacity:.62*fade,color:"#6a5844",
+    lineCap:"round",lineJoin:"round",dashArray:"4 8"
+  };
+  return {
+    weight:1.55,opacity:.82*fade,color:"#4f4336",
+    lineCap:"round",lineJoin:"round",dashArray:"6 8"
+  };
 }
 function routeUnderlayStyle(type,medium,focused=true){
-  if(type!=="DEPICTED TRAVEL"||!focused)return null;
-  return {weight:5.4,opacity:.42,color:"#efe2c4",lineCap:"round",lineJoin:"round"};
+  return null;
 }
 
 const MAJOR_PLACES=new Set(["Madrid","Lisbon","Naples","Constantinople","Corfu","Malta","Ragusa","Candia","Tunis","Otranto"]);
@@ -715,7 +729,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-routes-vessels-2",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-thin-routes-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
