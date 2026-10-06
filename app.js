@@ -289,7 +289,7 @@ function showRoute(r){
     ${field("To",(r.to||[]).map(x=>x.name).join(", ")||"Unavailable")}
     ${field("Evidence / scene",r.evidence)}
     ${field("Atlas display note",r.note)}
-    ${field("Geometry note","Schematic straight segment between Airtable nodes; not an exact historical track.")}
+    ${field("Geometry note",r.medium==="sea"?"Curated maritime corridor using stored waypoints; not an asserted exact historical track.":"Narrative/analytical leg between stored nodes; not an asserted exact historical track.")}
   `);
 }
 function field(k,v){return `<div class="field"><div class="k">${esc(k)}</div><div class="v">${esc(v||"Unavailable")}</div></div>`}
@@ -465,9 +465,9 @@ function animateVessel(points,variant=1){
   if(distanceTable.total<=0)return;
 
   // Deliberately slow atlas animation: readable rather than game-like.
-  const VISUAL_KM_PER_SECOND=10;
+  const VISUAL_KM_PER_SECOND=6;
   const rawDuration=(distanceTable.total/VISUAL_KM_PER_SECOND)*1000;
-  const duration=Math.max(24000,Math.min(120000,rawDuration));
+  const duration=Math.max(30000,Math.min(150000,rawDuration));
 
   const marker=L.marker(points[0],{icon:routeShipIcon(variant),interactive:false,zIndexOffset:900}).addTo(vesselMarkers);
   const facing=routeFacing(points);
@@ -611,95 +611,79 @@ function render(){
       routeVisibleInCurrentMode(r)&&textHit(r,q)
     );
 
-    const grouped=new Map();
-    filtered.forEach(r=>{
-      const a=(r.from||[])[0],b=(r.to||[])[0];
-      if(!a||!b||a.id===b.id)return;
-      const pa=byId.get(a.id),pb=byId.get(b.id);
-      if(!pa||!pb||!Number.isFinite(pa.lat)||!Number.isFinite(pb.lat))return;
-      if(state.verifiedOnly&&(pa.coordinateStatus!=="VERIFIED"||pb.coordinateStatus!=="VERIFIED"))return;
-      const key=routeStory(r)+"||"+r.type+"||"+(r.medium||"unknown");
-      if(!grouped.has(key))grouped.set(key,[]);
-      grouped.get(key).push({r,pa,pb});
-    });
+    // Draw every route leg independently. Never merge separate legs into one polyline.
+    filtered
+      .slice()
+      .sort((a,b)=>(a.sequence||0)-(b.sequence||0))
+      .forEach(r=>{
+        const a=(r.from||[])[0],b=(r.to||[])[0];
+        if(!a||!b||a.id===b.id)return;
+        const pa=byId.get(a.id),pb=byId.get(b.id);
+        if(!pa||!pb||!Number.isFinite(pa.lat)||!Number.isFinite(pb.lat))return;
+        if(state.verifiedOnly&&(pa.coordinateStatus!=="VERIFIED"||pb.coordinateStatus!=="VERIFIED"))return;
 
-    grouped.forEach(items=>{
-      items.sort((x,y)=>(x.r.sequence||0)-(y.r.sequence||0));
-      const story=routeStory(items[0].r);
-      const points=[];
-      items.forEach((it,i)=>{
-        const leg=routeLegPoints(it.r,it.pa,it.pb);
-        if(i>0&&points.length&&leg.length){
-          const last=points[points.length-1],first=leg[0];
-          if(last[0]===first[0]&&last[1]===first[1])leg.shift();
-        }
-        points.push(...leg);
-      });
-      if(points.length<2)return;
-      const representative=items[0].r;
-      const medium=representative.medium||"unknown";
-      const focused=state.routeStory==="All"?true:state.routeStory===story;
-      const under=routeUnderlayStyle(representative.type,medium,focused);
-      if(under)L.polyline(points,under).addTo(routeLines);
-      const line=L.polyline(points,routeStyle(representative.type,medium,focused));
-      const label=items.length>1?story:representative.name;
-      line.bindTooltip(label,{sticky:true});
-      line.on("click",()=>{
-        state.routeStory=story;
-        state.storyStep=Math.max(0,(representative.sequence||1)-1);
-        rebuildFilters();
-        updateStoryDeck();
-        render();
-        if(items.length===1)showRoute(representative);
-        else openDetail(`
-          <div class="mini-kicker">ROUTE STORY</div>
-          <h1>${esc(story)}</h1>
-          <div class="sub">${esc(representative.character||"")}</div>
-          <div class="badges"><span class="badge">${esc(representative.type)}</span><span class="badge">${items.length} legs</span></div>
-          ${field("Period",representative.period)}
-          ${field("Sequence",items.map(x=>x.r.name).join("\n→ "))}
-          ${field("Evidence",items.map(x=>x.r.evidence).filter(Boolean).join("\n\n"))}
-          ${field("Atlas note","The displayed polyline joins the stored Airtable nodes in sequence. It is a narrative/analytical route, not an asserted exact historical track.")}
-        `);
-      });
-      line.addTo(routeLines);
-      routeCount++;
-    });
+        const points=routeLegPoints(r,pa,pb);
+        if(points.length<2)return;
 
-    // Animate one physical Lantzas vessel per route story, across all visible sea legs,
-    // regardless of evidence styling. This prevents duplicate ships and keeps one
-    // constant-speed movement over the actual curated maritime geometry.
-    const voyageGroups=new Map();
+        const medium=r.medium||"unknown";
+        const under=routeUnderlayStyle(r.type,medium,true);
+        if(under)L.polyline(points,under).addTo(routeLines);
+
+        const line=L.polyline(points,routeStyle(r.type,medium,true));
+        line.bindTooltip(r.name,{sticky:true});
+        line.on("click",()=>{
+          state.routeStory=routeStory(r);
+          state.storyStep=Math.max(0,(r.sequence||1)-1);
+          rebuildFilters();
+          updateStoryDeck();
+          render();
+          showRoute(r);
+        });
+        line.addTo(routeLines);
+        routeCount++;
+      });
+
+    // Animate only vessels belonging to the active canonical story.
+    // Consecutive sea legs using the same vessel/variant form one voyage animation.
+    const vesselGroups=new Map();
     const animateActiveStory=state.mode==="STORY"&&state.book!=="All"&&state.routeStory!=="All";
-    filtered.forEach(r=>{
-      if(!animateActiveStory)return;
-      if(routeStory(r)!==state.routeStory)return;
-      if(r.medium!=="sea" || !r.vessel || !/petros lantzas/i.test(r.character||""))return;
-      if(r.type==="INTELLIGENCE / NETWORK" || r.type==="PLANNED — NOT EXECUTED")return;
-      const a=(r.from||[])[0],b=(r.to||[])[0];
-      if(!a||!b)return;
-      const pa=byId.get(a.id),pb=byId.get(b.id);
-      if(!pa||!pb||!hasCuratedSeaGeometry(r))return;
-      const key=routeStory(r);
-      if(!voyageGroups.has(key))voyageGroups.set(key,[]);
-      voyageGroups.get(key).push({r,pa,pb});
-    });
-    voyageGroups.forEach(items=>{
-      items.sort((x,y)=>(x.r.sequence||0)-(y.r.sequence||0));
-      const voyagePoints=[];
-      items.forEach((it,i)=>{
-        const leg=routeLegPoints(it.r,it.pa,it.pb);
-        if(!leg.length)return;
-        if(i>0&&voyagePoints.length){
-          const last=voyagePoints[voyagePoints.length-1],first=leg[0];
-          if(Math.abs(last[0]-first[0])<1e-6&&Math.abs(last[1]-first[1])<1e-6)leg.shift();
-        }
-        voyagePoints.push(...leg);
+    if(animateActiveStory){
+      filtered
+        .filter(r=>
+          routeStory(r)===state.routeStory &&
+          r.medium==="sea" &&
+          r.vessel &&
+          /petros lantzas/i.test(r.character||"") &&
+          r.type!=="INTELLIGENCE / NETWORK" &&
+          r.type!=="PLANNED — NOT EXECUTED"
+        )
+        .sort((a,b)=>(a.sequence||0)-(b.sequence||0))
+        .forEach(r=>{
+          const a=(r.from||[])[0],b=(r.to||[])[0];
+          if(!a||!b)return;
+          const pa=byId.get(a.id),pb=byId.get(b.id);
+          if(!pa||!pb||!hasCuratedSeaGeometry(r))return;
+          const variant=r.shipVariant===2?2:1;
+          const key=(r.vessel||"vessel")+"||"+variant;
+          if(!vesselGroups.has(key))vesselGroups.set(key,[]);
+          vesselGroups.get(key).push({r,pa,pb});
+        });
+
+      vesselGroups.forEach(items=>{
+        const voyagePoints=[];
+        items.forEach((it,i)=>{
+          const leg=routeLegPoints(it.r,it.pa,it.pb);
+          if(!leg.length)return;
+          if(i>0&&voyagePoints.length){
+            const last=voyagePoints[voyagePoints.length-1],first=leg[0];
+            if(Math.abs(last[0]-first[0])<1e-6&&Math.abs(last[1]-first[1])<1e-6)leg.shift();
+          }
+          voyagePoints.push(...leg);
+        });
+        if(voyagePoints.length<2)return;
+        animateVessel(voyagePoints,items[0].r.shipVariant===2?2:1);
       });
-      if(voyagePoints.length<2)return;
-      const variant=items[0].r.shipVariant===1?1:2;
-      animateVessel(voyagePoints,variant);
-    });
+    }
   }
   updateStoryDeck();
   const modeLabels={STORY:"Story",PEOPLE:"People",VOYAGES:"Voyages",EMPIRES:"Empires",INTELLIGENCE:"Intelligence",EVIDENCE:"Evidence",TIMELINE:"Timeline"};
@@ -731,7 +715,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-voyages-clean-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-routes-vessels-2",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
