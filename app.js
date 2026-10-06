@@ -8,7 +8,7 @@ let empireRepIds=new Set();
 const map=L.map("map",{zoomControl:true,preferCanvas:true,zoomSnap:.5}).setView([39.1,18.5],5);
 L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}",{
   maxNativeZoom:8,
-  maxZoom:16,
+  maxZoom:8,
   opacity:1,
   attribution:"Physical map tiles &copy; Esri"
 }).addTo(map);
@@ -464,8 +464,8 @@ function routeShipIcon(variant=1){
   return L.divIcon({
     className:"moving-vessel-anchor",
     html:`<div class="${cls}" aria-label="historical sailing ship"></div>`,
-    iconSize:[58,52],
-    iconAnchor:[29,26]
+    iconSize:[96,82],
+    iconAnchor:[48,41]
   });
 }
 function routeFacing(points){
@@ -767,7 +767,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-vessels-visible-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-ships-zoom-fix-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
