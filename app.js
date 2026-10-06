@@ -302,7 +302,16 @@ function curvedRoutePoints(a,b,steps=28){
 }
 
 
+function hasCuratedSeaGeometry(r){
+  return r.medium!=="sea" || (
+    r.routeGeometry==="CURATED MARITIME CORRIDOR" &&
+    Array.isArray(r.waypoints) &&
+    r.waypoints.length>0
+  );
+}
+
 function routeLegPoints(r,pa,pb){
+  if(!hasCuratedSeaGeometry(r))return [];
   const start=Array.isArray(r.displayStart)&&Number.isFinite(r.displayStart[0])&&Number.isFinite(r.displayStart[1])
     ?r.displayStart:[pa.lat,pa.lon];
   const end=Array.isArray(r.displayEnd)&&Number.isFinite(r.displayEnd[0])&&Number.isFinite(r.displayEnd[1])
@@ -467,6 +476,7 @@ function render(){
   if(state.showRoutes){
     const filtered=atlasData.routes.filter(r=>{
       if(r.atlasHidden)return false;
+      if(!hasCuratedSeaGeometry(r))return false;
       if(state.mode==="EMPIRES"||state.mode==="EVIDENCE")return false;
       if(state.mode==="INTELLIGENCE"&&r.type!=="INTELLIGENCE / NETWORK")return false;
       if(state.mode==="PEOPLE"&&r.type!=="DEPICTED TRAVEL")return false;
@@ -501,7 +511,7 @@ function render(){
       });
       if(points.length<2)return;
       const representative=items[0].r;
-      const medium=representative.medium||"sea";
+      const medium=representative.medium||"unknown";
       const under=routeUnderlayStyle(representative.type,medium);
       if(under)L.polyline(points,under).addTo(routeLines);
       const line=L.polyline(points,routeStyle(representative.type,medium));
