@@ -72,12 +72,30 @@ jobs:
             done
           }
 
-          # Folder names in the CC0 pack are used as category hints.
-          pick_group 'small[ _-]*town' 'mercator-village' 4
-          pick_group '/towns?/|[ _-]town[ _-]' 'mercator-town' 6
-          pick_group 'large[ _-]*town' 'mercator-city' 4
-          pick_group '/cities?/|[ _-]cit(y|ies)[ _-]' 'mercator-capital' 2
-          pick_group 'unique[ _-]*settlement' 'mercator-unique' 4
+          # Strict category separation: do not mix Small Town / Town / Large Town / City assets.
+          mapfile -t SMALL < <(printf '%s\n' "${ALL[@]}" | grep -Ei 'small[ _-]*town' || true)
+          mapfile -t LARGE < <(printf '%s\n' "${ALL[@]}" | grep -Ei 'large[ _-]*town' || true)
+          mapfile -t CITY < <(printf '%s\n' "${ALL[@]}" | grep -Ei '/cities?/|[ _-]cit(y|ies)([ _.-]|$)' || true)
+          mapfile -t UNIQUE < <(printf '%s\n' "${ALL[@]}" | grep -Ei 'unique[ _-]*settlement' || true)
+          mapfile -t TOWN < <(printf '%s\n' "${ALL[@]}" | grep -Ei 'town' | grep -Eiv 'small[ _-]*town|large[ _-]*town' || true)
+
+          copy_set () {
+            local arr_name="$1"; local prefix="$2"; local count="$3"
+            eval 'local vals=("${'"$arr_name"'[@]}")'
+            if [ "${#vals[@]}" -eq 0 ]; then echo "Missing Mercator category: $arr_name"; exit 1; fi
+            local i=1
+            for src in "${vals[@]}"; do
+              cp "$src" "_site/icons/${prefix}-${i}.png"
+              i=$((i+1)); [ "$i" -gt "$count" ] && break
+            done
+            while [ "$i" -le "$count" ]; do cp "${vals[0]}" "_site/icons/${prefix}-${i}.png"; i=$((i+1)); done
+          }
+
+          copy_set SMALL mercator-village 4
+          copy_set TOWN mercator-town 6
+          copy_set LARGE mercator-city 4
+          copy_set CITY mercator-capital 2
+          copy_set UNIQUE mercator-unique 4
 
           printf '%s\n'             'Settlement artwork source: K. M. Alexander, Mercator Settlement PNG Pack 1.1.'             'Derived from Gerardus Mercator / early Hondius material; distributed CC0.'             'https://kmalexander.com/2026/06/30/mercator-settlement-a-free-16th-century-settlement-brush-set-for-fantasy-maps/'             > _site/icons/MERCATOR-SOURCE.txt
 
