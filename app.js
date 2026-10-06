@@ -239,12 +239,16 @@ function rebuildFilters(){
   `).join("");
 }
 
-function routeStyle(type){
-  const base={weight:1.55,opacity:.78,color:"#5a4631",lineCap:"round",lineJoin:"round",dashArray:"7 5 1 5"};
-  if(type==="INTELLIGENCE / NETWORK")return {...base,color:"#6f5f49",dashArray:"1 7",weight:1.35,opacity:.56};
-  if(type==="PLANNED — NOT EXECUTED")return {...base,color:"#7b6850",dashArray:"11 8",weight:1.25,opacity:.46};
-  if(type==="STRONG RECONSTRUCTION")return {...base,color:"#695843",dashArray:"5 6",weight:1.3,opacity:.55};
-  return base;
+function routeStyle(type,medium){
+  if(type==="INTELLIGENCE / NETWORK")return {weight:1.15,opacity:.5,color:"#77664f",lineCap:"round",lineJoin:"round",dashArray:"1 8"};
+  if(type==="PLANNED — NOT EXECUTED")return {weight:1.1,opacity:.42,color:"#806e58",lineCap:"round",lineJoin:"round",dashArray:"10 9"};
+  if(type==="STRONG RECONSTRUCTION")return {weight:1.2,opacity:.52,color:"#6d5c46",lineCap:"round",lineJoin:"round",dashArray:"4 7"};
+  if(medium==="land")return {weight:1.35,opacity:.7,color:"#665038",lineCap:"round",lineJoin:"round",dashArray:"5 4"};
+  return {weight:1.4,opacity:.78,color:"#57442f",lineCap:"round",lineJoin:"round",dashArray:"1 6"};
+}
+function routeUnderlayStyle(type,medium){
+  if(type!=="DEPICTED TRAVEL")return null;
+  return {weight:4.2,opacity:.58,color:"#eee4cf",lineCap:"round",lineJoin:"round"};
 }
 
 const MAJOR_PLACES=new Set(["Madrid","Lisbon","Naples","Constantinople","Corfu","Malta","Ragusa","Candia","Tunis","Otranto"]);
@@ -469,7 +473,10 @@ function render(){
       });
       if(points.length<2)return;
       const representative=items[0].r;
-      const line=L.polyline(points,routeStyle(representative.type));
+      const medium=representative.medium||"sea";
+      const under=routeUnderlayStyle(representative.type,medium);
+      if(under)L.polyline(points,under).addTo(routeLines);
+      const line=L.polyline(points,routeStyle(representative.type,medium));
       const label=items.length>1?story:representative.name;
       line.bindTooltip(label,{sticky:true});
       line.on("click",()=>{
@@ -486,7 +493,7 @@ function render(){
         `);
       });
       line.addTo(routeLines);
-      const lantzasVoyage=representative.type==="DEPICTED TRAVEL"&&items.some(x=>/petros lantzas/i.test(x.r.character||""));
+      const lantzasVoyage=representative.type==="DEPICTED TRAVEL"&&medium==="sea"&&items.some(x=>/petros lantzas/i.test(x.r.character||""));
       if(lantzasVoyage)animateVessel(points,15000+Math.min(8000,points.length*700));
       routeCount++;
     });
