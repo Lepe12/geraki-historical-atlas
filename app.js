@@ -126,6 +126,12 @@ function styleMediterraneanBasemap(){
     }catch(e){}
   }
 
+  if(vectorMap.getSource("atlas-terrain-dem")){
+    try{
+      vectorMap.setTerrain({source:"atlas-terrain-dem",exaggeration:1.18});
+    }catch(e){}
+  }
+
   if(vectorMap.getSource("atlas-terrain-dem")&&!vectorMap.getLayer("atlas-terrain-relief")){
     try{
       vectorMap.addLayer({
@@ -497,23 +503,23 @@ function rebuildFilters(){
 function routeStyle(type,medium,focused=true){
   const fade=focused?1:.55;
   if(type==="INTELLIGENCE / NETWORK")return {
-    weight:1.0,opacity:.35*fade,color:"#6f6558",
+    weight:1.0,opacity:.38*fade,color:"#6b5b4c",
     lineCap:"round",lineJoin:"round",dashArray:"2 10"
   };
   if(type==="PLANNED — NOT EXECUTED")return {
-    weight:1.0,opacity:.34*fade,color:"#8a765d",
+    weight:1.0,opacity:.36*fade,color:"#8b6d49",
     lineCap:"round",lineJoin:"round",dashArray:"3 11"
   };
   if(type==="STRONG RECONSTRUCTION")return {
-    weight:1.25,opacity:.55*fade,color:"#6a5844",
+    weight:1.2,opacity:.58*fade,color:"#6c5137",
     lineCap:"round",lineJoin:"round",dashArray:"4 9"
   };
   if(medium==="land")return {
-    weight:1.25,opacity:.62*fade,color:"#6a5844",
+    weight:1.25,opacity:.68*fade,color:"#684831",
     lineCap:"round",lineJoin:"round",dashArray:"4 8"
   };
   return {
-    weight:1.55,opacity:.82*fade,color:"#4f4336",
+    weight:1.5,opacity:.86*fade,color:"#efe1bd",
     lineCap:"round",lineJoin:"round",dashArray:"6 8"
   };
 }
@@ -964,7 +970,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-dem-relief-2",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-unified-rebuild-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
