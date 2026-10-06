@@ -1,6 +1,6 @@
 const state={mode:"STORY",book:"All",search:"",year:"All",routeStory:"All",verifiedOnly:false,showPlaces:true,showRoutes:true,routeTypes:new Set(["DEPICTED TRAVEL"])};
 const placeMarkers=L.layerGroup(),routeLines=L.layerGroup(),historicalLabels=L.layerGroup(),vesselMarkers=L.layerGroup();
-let routeAnimationFrames=[];
+let routeAnimationCancels=[];
 let atlasData={places:[],routes:[]};
 const byId=new Map();
 let empireRepIds=new Set();
@@ -299,13 +299,17 @@ function curvedRoutePoints(a,b,steps=28){
 
 
 function routeLegPoints(r,pa,pb){
-  const pts=[[pa.lat,pa.lon]];
+  const start=Array.isArray(r.displayStart)&&Number.isFinite(r.displayStart[0])&&Number.isFinite(r.displayStart[1])
+    ?r.displayStart:[pa.lat,pa.lon];
+  const end=Array.isArray(r.displayEnd)&&Number.isFinite(r.displayEnd[0])&&Number.isFinite(r.displayEnd[1])
+    ?r.displayEnd:[pb.lat,pb.lon];
+  const pts=[start];
   if(Array.isArray(r.waypoints)){
     r.waypoints.forEach(w=>{
       if(Array.isArray(w)&&Number.isFinite(w[0])&&Number.isFinite(w[1]))pts.push([w[0],w[1]]);
     });
   }
-  pts.push([pb.lat,pb.lon]);
+  pts.push(end);
   return pts;
 }
 function densifyRoute(points,stepsPerSegment=24){
@@ -346,8 +350,10 @@ function animateVessel(points,duration=14000){
   const dense=densifyRoute(points,20);
   const marker=L.marker(dense[0],{icon:galleyIcon(),interactive:false,zIndexOffset:900}).addTo(vesselMarkers);
   const start=performance.now();
+  let rafId=0;
+  let stopped=false;
   function tick(now){
-    if(!map.hasLayer(vesselMarkers))return;
+    if(stopped||!map.hasLayer(vesselMarkers))return;
     const phase=((now-start)%duration)/duration;
     const pos=phase*(dense.length-1);
     const i=Math.min(dense.length-2,Math.floor(pos));
@@ -359,12 +365,13 @@ function animateVessel(points,duration=14000){
       const g=el.querySelector(".moving-galley");
       if(g)g.style.transform=`rotate(${bearingDeg(a,b)}deg)`;
     }
-    routeAnimationFrames.push(requestAnimationFrame(tick));
+    rafId=requestAnimationFrame(tick);
   }
-  routeAnimationFrames.push(requestAnimationFrame(tick));
+  rafId=requestAnimationFrame(tick);
+  routeAnimationCancels.push(()=>{stopped=true;cancelAnimationFrame(rafId);});
 }
 function render(){
-  routeAnimationFrames.forEach(cancelAnimationFrame);routeAnimationFrames=[];
+  routeAnimationCancels.forEach(fn=>fn());routeAnimationCancels=[];
   placeMarkers.clearLayers();routeLines.clearLayers();historicalLabels.clearLayers();vesselMarkers.clearLayers();
   const q=state.search.trim().toLowerCase();
 
