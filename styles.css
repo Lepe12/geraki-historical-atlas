@@ -1174,3 +1174,59 @@ button{color:inherit}
   .rose-b{display:none}
   .map-frame-line{opacity:.55}
 }
+
+
+/* ===== Clean historical sheet correction — screenshot audit ===== */
+.map-stage,
+#map,
+.leaflet-container{
+  background:#b89e72!important;
+}
+.leaflet-tile-pane{
+  filter:sepia(.96) saturate(.52) brightness(.76) contrast(1.22) hue-rotate(-8deg)!important;
+  mix-blend-mode:multiply!important;
+  opacity:.84!important;
+}
+#map:after{
+  background:
+    radial-gradient(circle at 50% 42%,rgba(248,232,197,.03) 0 32%,rgba(82,57,31,.10) 68%,rgba(42,29,18,.28) 100%),
+    linear-gradient(rgba(122,88,50,.045),rgba(72,49,28,.08))!important;
+}
+.paper-grain{opacity:.14!important}
+.portolan-rose{opacity:.34!important}
+.rose-b{opacity:.22!important}
+
+/* Settlement symbols: preserve hierarchy and avoid icon forests. */
+.mercator-settlement-art.village,
+.mercator-settlement-art.coastal-village{
+  transform:scale(.80)!important;
+  opacity:.58!important;
+}
+.mercator-settlement-art.town,
+.mercator-settlement-art.port{
+  transform:scale(.88)!important;
+}
+.mercator-settlement-art.city,
+.mercator-settlement-art.fortified-city{
+  transform:scale(.94)!important;
+}
+.mercator-settlement-art.capital{
+  transform:scale(1)!important;
+}
+
+/* Labels read like cartographic type, not UI overlays. */
+.historical-place-label{
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+  font-size:10px!important;
+  font-weight:600!important;
+  color:#392818!important;
+  text-shadow:0 1px 0 rgba(225,205,167,.72)!important;
+}
+.historical-place-label.major{font-size:12px!important}
+.historical-place-label.capital{font-size:14px!important}
+
+/* Routes should never dominate the map sheet. */
+.leaflet-overlay-pane path{
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
