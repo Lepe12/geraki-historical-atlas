@@ -263,6 +263,7 @@ function shouldShowLabel(p,routeNodeIds){
   if(z===6)return pri>=2||routeNodeIds.has(p.id);
   return pri>=3||routeNodeIds.has(p.id);
 }
+const atlasLabelFor=p=>p.atlasLabel||p.place;
 function historicalLabelIcon(p){
   const t=(p.type||"").toLowerCase();
   const port=t.includes("port")||t.includes("harbor")?" port":"";
