@@ -33,11 +33,17 @@ linear-gradient(rgba(79,56,31,.025),rgba(31,23,17,.10));mix-blend-mode:multiply}
 .ship-marker img{width:100%;height:100%;object-fit:contain;display:block}
 .ship-marker.face-left{transform:translate(-50%,-50%) scaleX(-1)}
 
-.settlement-wrap{position:relative;transform:translate(-50%,-78%);pointer-events:auto}
+.settlement-wrap{position:relative;transform:translate(-50%,-78%) scale(var(--atlas-marker-scale,1));transform-origin:50% 100%;pointer-events:auto;transition:opacity .2s ease,transform .2s ease}
+.settlement-wrap.minor{opacity:var(--atlas-minor-opacity,.15)}
+.settlement-wrap.major{opacity:1}
+.settlement-wrap.capital{opacity:1}
+
 .settlement-img{display:block;width:132px;height:auto;filter:drop-shadow(0 10px 10px rgba(31,21,14,.38));transition:transform .18s ease;transform-origin:50% 100%}
 .settlement-wrap:hover .settlement-img{transform:scale(1.08)}
 .settlement-wrap.village .settlement-img{width:92px}.settlement-wrap.coastal-village .settlement-img{width:98px}.settlement-wrap.town .settlement-img{width:112px}.settlement-wrap.city .settlement-img{width:136px}.settlement-wrap.capital .settlement-img{width:154px}.settlement-wrap.port .settlement-img{width:126px}
-.settlement-label{position:absolute;left:50%;top:76%;transform:translateX(-50%);white-space:nowrap;padding:2px 6px;background:rgba(232,211,171,.92);border:1px solid rgba(75,51,28,.34);color:#2e2117;font:700 12px/1.1 'GFS Didot',serif;box-shadow:0 2px 5px rgba(30,20,12,.18)}
+.settlement-label{position:absolute;left:50%;top:76%;transform:translateX(-50%);white-space:nowrap;padding:2px 6px;background:rgba(232,211,171,.88);border:1px solid rgba(75,51,28,.28);color:#2e2117;font:700 calc(11px * var(--atlas-label-scale,1))/1.1 'GFS Didot',serif;box-shadow:0 2px 5px rgba(30,20,12,.16);backdrop-filter:blur(2px)}
+.settlement-wrap.minor .settlement-label{opacity:var(--atlas-minor-label-opacity,0)}
+
 .label-only{white-space:nowrap;color:#3a2b20;font:700 12px/1.2 'GFS Didot',serif;text-shadow:0 1px 0 #f3dfb8,0 0 5px #f3dfb8}
 .route-hit{cursor:pointer}
 .panel-scroll::-webkit-scrollbar{width:6px}.panel-scroll::-webkit-scrollbar-thumb{background:rgba(124,83,43,.4);border-radius:5px}
@@ -183,9 +189,12 @@ function initMap(){
     minZoom:3,
     maxZoom:13,
     attributionControl:true,
-    antialias:true
+    antialias:true,
+    dragRotate:false,
+    touchPitch:false
   });
 
+  atlasMap.on("zoom",updateMarkerHierarchy);
   atlasMap.on("load",()=>{
     styleHistoricalBase();
 
@@ -227,6 +236,7 @@ function initMap(){
       }
     });
     routeSourceReady=true;
+    updateMarkerHierarchy();
     render();
     fitAll();
   });
@@ -251,6 +261,26 @@ function clearPlaces(){
   }
 }
 
+const MAJOR_PLACES=new Set(["Corfu","Naples","Otranto","Ragusa","Candia","Constantinople","Malta","Madrid","Lisbon","Tunis","Parga","Himara"]);
+function placeImportance(p){
+  const symbol=(p.atlasSymbol||p.type||"").toLowerCase();
+  if(symbol==="capital")return "capital";
+  if(MAJOR_PLACES.has(p.place)||symbol==="city"||symbol==="port")return "major";
+  return "minor";
+}
+function updateMarkerHierarchy(){
+  if(!atlasMap)return;
+  const z=atlasMap.getZoom();
+  const scale=z<5?0.78:z<6?0.9:z<7?1.0:z<8?1.12:1.24;
+  const labelScale=z<5?0.86:z<7?1:1.08;
+  const minorOpacity=z<5?.05:z<6?.18:z<7?.45:1;
+  const minorLabelOpacity=z<6?0:z<7?.25:1;
+  const root=document.documentElement;
+  root.style.setProperty("--atlas-marker-scale",scale);
+  root.style.setProperty("--atlas-label-scale",labelScale);
+  root.style.setProperty("--atlas-minor-opacity",minorOpacity);
+  root.style.setProperty("--atlas-minor-label-opacity",minorLabelOpacity);
+}
 function markerFor(p){
   const symbol=(p.atlasSymbol||p.type||"town").toLowerCase();
   const el=document.createElement("div");
@@ -258,7 +288,7 @@ function markerFor(p){
     el.className="label-only";
     el.textContent=p.place||"";
   }else{
-    el.className="settlement-wrap "+symbol;
+    el.className="settlement-wrap "+symbol+" "+placeImportance(p);
     const img=document.createElement("img");
     img.className="settlement-img";
     img.src="./icons/"+symbolAsset(symbol);
@@ -272,8 +302,8 @@ function markerFor(p){
   return new maplibregl.Marker({
     element:el,
     anchor:"bottom",
-    pitchAlignment:"viewport",
-    rotationAlignment:"viewport"
+    pitchAlignment:"map",
+    rotationAlignment:"map"
   }).setLngLat([p.lon,p.lat]);
 }
 
