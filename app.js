@@ -123,6 +123,7 @@ function routeVisibleInCurrentMode(r){
   if(r.atlasHidden||!hasCuratedSeaGeometry(r)||!bookHit(r)||!yearHit(r,state.year))return false;
   if(state.mode==="EMPIRES"||state.mode==="EVIDENCE")return false;
   if(state.mode==="STORY"){
+    if(state.book==="All")return false;
     if(!r.story)return false;
     if(state.routeStory!=="All"&&r.story!==state.routeStory)return false;
     return state.routeTypes.has(r.type);
@@ -344,7 +345,7 @@ function labelPriority(p){
 function shouldShowLabel(p,routeNodeIds){
   const z=map.getZoom();
   const pri=labelPriority(p);
-  const focused=state.routeStory!=="All"&&routeNodeIds.has(p.id);
+  const focused=routeNodeIds.has(p.id);
   if(pri>=4)return true;
   if(focused)return true;
   if(z>=9)return true;
@@ -539,9 +540,12 @@ function render(){
   const activeRouteNodeIds=currentRouteNodeIds();
 
   const visiblePlaces=atlasData.places.filter(p=>{
-    const heroOverview=state.mode==="STORY"&&state.book==="All"&&state.routeStory==="All"&&map.getZoom()<=5;
+    const heroOverview=state.mode==="STORY"&&state.book==="All";
+    const storyBookView=state.mode==="STORY"&&state.book!=="All";
+    const storyPlaceAllowed=!heroOverview||labelPriority(p)>=2;
+    const bookPlaceAllowed=!storyBookView||activeRouteNodeIds.has(p.id)||labelPriority(p)>=2;
     const base=Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&(bookHit(p)||activeRouteNodeIds.has(p.id))&&yearHit(p,state.year)&&
-      (!state.verifiedOnly||p.coordinateStatus==="VERIFIED")&&textHit(p,q)&&(!heroOverview||labelPriority(p)>=2);
+      (!state.verifiedOnly||p.coordinateStatus==="VERIFIED")&&textHit(p,q)&&storyPlaceAllowed&&bookPlaceAllowed;
     if(!base)return false;
     if(state.mode==="PEOPLE")return Boolean((p.characters||"").trim());
     if(state.mode==="VOYAGES")return true;
@@ -690,10 +694,14 @@ function render(){
 function fitVisible(){
   const q=state.search.trim().toLowerCase();
   const activeRouteNodeIds=currentRouteNodeIds();
-  const latlngs=atlasData.places.filter(p=>
-    Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&(bookHit(p)||activeRouteNodeIds.has(p.id))&&yearHit(p,state.year)&&
-    (!state.verifiedOnly||p.coordinateStatus==="VERIFIED")&&textHit(p,q)
-  ).map(p=>[p.lat,p.lon]);
+  const latlngs=atlasData.places.filter(p=>{
+    const heroOverview=state.mode==="STORY"&&state.book==="All";
+    const storyBookView=state.mode==="STORY"&&state.book!=="All";
+    return Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&(bookHit(p)||activeRouteNodeIds.has(p.id))&&yearHit(p,state.year)&&
+      (!state.verifiedOnly||p.coordinateStatus==="VERIFIED")&&textHit(p,q)&&
+      (!heroOverview||labelPriority(p)>=2)&&
+      (!storyBookView||activeRouteNodeIds.has(p.id)||labelPriority(p)>=2);
+  }).map(p=>[p.lat,p.lon]);
   if(latlngs.length)map.fitBounds(latlngs,{padding:[90,90],maxZoom:7});
 }
 function fitAll(){
@@ -709,7 +717,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-cartography-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-clean-map-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
