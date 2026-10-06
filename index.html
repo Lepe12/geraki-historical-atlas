@@ -37,9 +37,9 @@ linear-gradient(rgba(79,56,31,.025),rgba(31,23,17,.10));mix-blend-mode:multiply}
 .ship-marker.face-left{transform:translate(-50%,-50%) scaleX(-1)}
 #realMap .morph-marker{z-index:260!important;pointer-events:none!important;overflow:visible!important}
 .morph-asset{display:block;transform:translate(-50%,-82%);transform-origin:50% 100%;filter:drop-shadow(0 9px 8px rgba(35,25,16,.28));opacity:.96}
-.morph-marker.mountain .morph-asset{width:var(--morph-mountain-size,170px)}
-.morph-marker.rock .morph-asset{width:var(--morph-rock-size,100px)}
-.morph-marker.trees .morph-asset{width:var(--morph-tree-size,84px)}
+.morph-marker.mountain .morph-asset{width:var(--morph-mountain-size,118px)}
+.morph-marker.rock .morph-asset{width:var(--morph-rock-size,72px)}
+.morph-marker.trees .morph-asset{width:var(--morph-tree-size,54px)}
 
 .settlement-wrap{position:relative;transform:translate(-50%,-78%);transform-origin:50% 100%;pointer-events:auto;opacity:1!important;transition:transform .18s ease}
 
@@ -338,20 +338,33 @@ function addMorphMarker(kind,lon,lat,scale=1){
   }).setLngLat([lon,lat]).addTo(atlasMap);
   morphMarkers.push(m);
 }
+function isLandAt(lon,lat){
+  try{
+    const p=atlasMap.project([lon,lat]);
+    const fs=atlasMap.queryRenderedFeatures(p);
+    let hasLand=false;
+    for(const f of fs){
+      const id=(f.layer?.id||"").toLowerCase();
+      if(/water|ocean|sea|lake|river|reservoir/.test(id)) return false;
+      if(/land|landuse|landcover|earth|grass|wood|forest|scrub|park|farmland|farm|sand|beach/.test(id)) hasLand=true;
+    }
+    return hasLand;
+  }catch(e){return false}
+}
 function refreshMorphology(){
   if(!atlasMap||!atlasMap.loaded()||typeof atlasMap.queryTerrainElevation!=="function")return;
   clearMorphology();
   const b=atlasMap.getBounds();
   const west=b.getWest(),east=b.getEast(),south=b.getSouth(),north=b.getNorth();
   const z=atlasMap.getZoom();
-  const cols=z<5?6:z<7?7:8;
-  const rows=z<5?4:z<7?5:6;
+  const cols=z<5?9:z<7?11:13;
+  const rows=z<5?6:z<7?8:10;
   const dx=(east-west)/cols,dy=(north-south)/rows;
-  const probe=Math.max(.06,Math.min(.22,Math.max(dx,dy)*.28));
+  const probe=Math.max(.045,Math.min(.16,Math.max(dx,dy)*.22));
 
-  document.documentElement.style.setProperty("--morph-mountain-size",z<5?"145px":z<7?"165px":"190px");
-  document.documentElement.style.setProperty("--morph-rock-size",z<5?"78px":z<7?"96px":"112px");
-  document.documentElement.style.setProperty("--morph-tree-size",z<5?"62px":z<7?"78px":"92px");
+  document.documentElement.style.setProperty("--morph-mountain-size",z<5?"92px":z<7?"112px":"138px");
+  document.documentElement.style.setProperty("--morph-rock-size",z<5?"48px":z<7?"62px":"78px");
+  document.documentElement.style.setProperty("--morph-tree-size",z<5?"34px":z<7?"44px":"56px");
 
   for(let r=0;r<rows;r++){
     for(let c=0;c<cols;c++){
@@ -359,18 +372,22 @@ function refreshMorphology(){
       const h=morphHash(baseLat,baseLon);
       const lon=baseLon+(h-.5)*dx*.38;
       const lat=baseLat+(morphHash(baseLat+.17,baseLon-.23)-.5)*dy*.38;
+      if(!isLandAt(lon,lat))continue;
       const t=localRelief(lon,lat,probe);
-      if(!t||t.elev<8)continue;
+      if(!t||t.elev<5)continue;
 
-      let kind=null,scale=.86+h*.28;
-      // Actual DEM morphology decides the asset type.
-      if(t.elev>=850 || t.relief>=420)kind="mountain";
-      else if(t.elev>=180 || t.relief>=145)kind="rock";
-      else if(t.elev>=20 && h>.34)kind="trees";
+      let kind=null,scale=.78+h*.24;
+      // Mountains only on genuinely high / sharply broken terrain.
+      if((t.elev>=1050 && t.relief>=220) || t.relief>=520)kind="mountain";
+      // Rocky outcrops on middle elevations or abrupt local relief.
+      else if((t.elev>=180 && t.relief>=80) || t.relief>=155)kind="rock";
+      // Low-relief land receives vegetation rather than rock.
+      else if(t.elev>=5 && t.relief<155 && h>.22)kind="trees";
 
       if(!kind)continue;
-      // Keep overview readable: fewer tree clusters than rocky forms.
-      if(kind==="trees" && morphHash(lat+.31,lon+.19)<.58)continue;
+      if(kind==="mountain" && morphHash(lat+.51,lon-.37)<.36)continue;
+      if(kind==="rock" && morphHash(lat-.11,lon+.27)<.28)continue;
+      if(kind==="trees" && morphHash(lat+.31,lon+.19)<.46)continue;
       addMorphMarker(kind,lon,lat,scale);
     }
   }
