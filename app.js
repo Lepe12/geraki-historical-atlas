@@ -14,83 +14,6 @@ const vectorBase=L.maplibreGL({
 }).addTo(map);
 
 const vectorMap=vectorBase.getMaplibreMap();
-let seaMotionStarted=false;
-const seaTextureLayerIds=[];
-
-function installLivingSea(){
-  const style=vectorMap.getStyle();
-  if(!style||!Array.isArray(style.layers))return;
-
-  if(!vectorMap.hasImage("atlas-sea-wave")){
-    const canvas=document.createElement("canvas");
-    canvas.width=64; canvas.height=40;
-    const ctx=canvas.getContext("2d");
-    ctx.clearRect(0,0,64,40);
-    ctx.strokeStyle="rgba(55,70,66,.30)";
-    ctx.lineWidth=.75;
-    ctx.lineCap="round";
-    [[-10,9,30],[18,9,58],[46,9,86],[-24,29,16],[4,29,44],[32,29,72]].forEach(([x,y,x2])=>{
-      ctx.beginPath();
-      ctx.moveTo(x,y);
-      ctx.bezierCurveTo(x+7,y-3,x2-7,y+3,x2,y);
-      ctx.stroke();
-    });
-    vectorMap.addImage("atlas-sea-wave",ctx.getImageData(0,0,64,40),{pixelRatio:2});
-  }
-
-  const currentStyle=vectorMap.getStyle();
-  currentStyle.layers.forEach(layer=>{
-    const id=(layer.id||"").toLowerCase();
-    if(layer.type!=="fill"||!/water|ocean|sea/.test(id))return;
-
-    try{
-      vectorMap.setPaintProperty(layer.id,"fill-color","#b8c5bf");
-      vectorMap.setPaintProperty(layer.id,"fill-opacity",.94);
-    }catch(e){}
-
-    const textureId="atlas-sea-texture-"+layer.id.replace(/[^a-z0-9_-]/gi,"-");
-    if(vectorMap.getLayer(textureId))return;
-
-    const textureLayer={
-      id:textureId,
-      type:"fill",
-      source:layer.source,
-      paint:{
-        "fill-pattern":"atlas-sea-wave",
-        "fill-opacity":.11
-      }
-    };
-    if(layer["source-layer"])textureLayer["source-layer"]=layer["source-layer"];
-    if(layer.filter)textureLayer.filter=layer.filter;
-    if(layer.minzoom!==undefined)textureLayer.minzoom=layer.minzoom;
-    if(layer.maxzoom!==undefined)textureLayer.maxzoom=layer.maxzoom;
-
-    try{
-      vectorMap.addLayer(textureLayer);
-      seaTextureLayerIds.push(textureId);
-    }catch(e){}
-  });
-
-  if(!seaMotionStarted&&seaTextureLayerIds.length){
-    seaMotionStarted=true;
-    const started=performance.now();
-    let last=0;
-    function breatheSea(now){
-      if(now-last>180){
-        last=now;
-        const wave=.105+.025*Math.sin((now-started)/8500*Math.PI*2);
-        seaTextureLayerIds.forEach(id=>{
-          if(vectorMap.getLayer(id)){
-            try{vectorMap.setPaintProperty(id,"fill-opacity",wave)}catch(e){}
-          }
-        });
-      }
-      requestAnimationFrame(breatheSea);
-    }
-    requestAnimationFrame(breatheSea);
-  }
-}
-
 function simplifyVectorBasemap(){
   const style=vectorMap.getStyle();
   if(!style||!Array.isArray(style.layers))return;
@@ -101,7 +24,6 @@ function simplifyVectorBasemap(){
       try{vectorMap.setLayoutProperty(layer.id,"visibility","none")}catch(e){}
     }
   });
-  installLivingSea();
 }
 vectorMap.on("load",simplifyVectorBasemap);
 vectorMap.on("styledata",simplifyVectorBasemap);
@@ -557,7 +479,7 @@ function routeShipIcon(variant=1){
   const cls=variant===2?"route-ship route-ship-2":"route-ship route-ship-1";
   return L.divIcon({
     className:"moving-vessel-anchor",
-    html:`<div class="ship-heading"><div class="ship-motion"><span class="ship-wake" aria-hidden="true"></span><div class="${cls}" aria-label="historical sailing ship"></div></div></div>`,
+    html:`<div class="ship-motion"><span class="ship-wake" aria-hidden="true"></span><div class="${cls}" aria-label="historical sailing ship"></div></div>`,
     iconSize:[96,82],
     iconAnchor:[48,41]
   });
@@ -577,24 +499,6 @@ function routeFacingAtDistance(points,table,distanceKm){
   const dx=p2[1]-p1[1];
   if(Math.abs(dx)<1e-7)return routeFacing(points);
   return dx>=0?"right":"left";
-}
-function routeHeadingAtDistance(points,table,distanceKm){
-  if(!points||points.length<2||!table||table.total<=0)return 0;
-  const lookAhead=Math.max(1,Math.min(10,table.total*0.018));
-  const d1=Math.max(0,distanceKm-lookAhead);
-  const d2=Math.min(table.total,distanceKm+lookAhead);
-  const p1=pointAtDistance(points,table,d1);
-  const p2=pointAtDistance(points,table,d2);
-  const s1=map.latLngToLayerPoint(L.latLng(p1[0],p1[1]));
-  const s2=map.latLngToLayerPoint(L.latLng(p2[0],p2[1]));
-  const dx=s2.x-s1.x;
-  const dy=s2.y-s1.y;
-  if(Math.abs(dx)<.001&&Math.abs(dy)<.001)return 0;
-  // Artwork natively points left (180°). Rotate that left-facing bow to the local route tangent.
-  let deg=Math.atan2(dy,dx)*180/Math.PI-180;
-  while(deg>180)deg-=360;
-  while(deg<=-180)deg+=360;
-  return deg;
 }
 function animateVessel(points,variant=1){
   if(!points||points.length<2)return;
@@ -618,12 +522,19 @@ function animateVessel(points,variant=1){
     const travelled=phase*distanceTable.total;
     marker.setLatLng(pointAtDistance(points,distanceTable,travelled));
     facing=routeFacingAtDistance(points,distanceTable,travelled);
-    const heading=routeHeadingAtDistance(points,distanceTable,travelled);
 
     const el=marker.getElement();
     if(el){
-      const headingEl=el.querySelector(".ship-heading");
-      if(headingEl)headingEl.style.setProperty("--ship-heading",heading+"deg");
+      const g=el.querySelector(".route-ship");
+      const motion=el.querySelector(".ship-motion");
+      if(g){
+        g.classList.toggle("faces-right",facing==="right");
+        g.classList.toggle("faces-left",facing!=="right");
+      }
+      if(motion){
+        motion.classList.toggle("faces-right",facing==="right");
+        motion.classList.toggle("faces-left",facing!=="right");
+      }
     }
     rafId=requestAnimationFrame(tick);
   }
@@ -706,9 +617,17 @@ function addOverviewVessels(){
     const el=marker.getElement();
     if(el){
       el.classList.add("overview-vessel");
-      const heading=routeHeadingAtDistance(points,table,table.total*.48);
-      const headingEl=el.querySelector(".ship-heading");
-      if(headingEl)headingEl.style.setProperty("--ship-heading",heading+"deg");
+      const facing=routeFacingAtDistance(points,table,table.total*.48);
+      const g=el.querySelector(".route-ship");
+      const motion=el.querySelector(".ship-motion");
+      if(g){
+        g.classList.toggle("faces-right",facing==="right");
+        g.classList.toggle("faces-left",facing!=="right");
+      }
+      if(motion){
+        motion.classList.toggle("faces-right",facing==="right");
+        motion.classList.toggle("faces-left",facing!=="right");
+      }
     }
   });
 }
@@ -894,7 +813,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-living-sea-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-stability-reset-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
