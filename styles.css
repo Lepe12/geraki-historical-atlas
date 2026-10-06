@@ -1230,3 +1230,31 @@ button{color:inherit}
   stroke-linecap:round;
   stroke-linejoin:round;
 }
+
+
+/* ===== Cartography correction after live visual review ===== */
+.map-stage,
+#map,
+.leaflet-container{
+  background:#d8c9aa!important;
+}
+.leaflet-tile-pane{
+  filter:sepia(.58) saturate(.52) brightness(.98) contrast(1.05)!important;
+  mix-blend-mode:normal!important;
+  opacity:1!important;
+}
+#map:after{
+  background:
+    radial-gradient(circle at 50% 45%,transparent 0 54%,rgba(70,48,27,.08) 82%,rgba(45,31,19,.16) 100%),
+    linear-gradient(rgba(120,88,50,.015),rgba(120,88,50,.03))!important;
+}
+.paper-grain{opacity:.10!important}
+.portolan-rose{opacity:.26!important}
+.rose-b{display:none!important}
+.map-frame-line{opacity:.38!important}
+
+/* Keep the geography visually above decorative paper texture. */
+.chart-overlay{z-index:425!important}
+
+/* Overview is intentionally quiet: the book routes appear only after choosing a book. */
+.book-strip{z-index:690!important}
