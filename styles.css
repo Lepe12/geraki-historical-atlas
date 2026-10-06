@@ -644,3 +644,46 @@ button{color:inherit}
 .settlement-icon.settlement-port,
 .settlement-icon.settlement-fortress,
 .settlement-icon.settlement-village{background:transparent!important;border:0!important;box-shadow:none!important}
+
+/* True map-engraving placement: the Leaflet marker is a 1×1 anchor only. */
+.cartographic-anchor{
+  width:1px!important;
+  height:1px!important;
+  overflow:visible!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+.engraved-settlement-art{
+  position:absolute;
+  left:0;
+  bottom:0;
+  height:auto;
+  max-width:none!important;
+  transform:translate(-50%,10%);
+  transform-origin:50% 100%;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  filter:sepia(.22) contrast(1.16);
+  opacity:.94;
+  pointer-events:auto;
+}
+.engraved-settlement-art.village{transform:translate(-48%,8%) rotate(-1deg)}
+.engraved-settlement-art.coastal-village{transform:translate(-44%,7%) rotate(.5deg)}
+.engraved-settlement-art.town{transform:translate(-51%,8%) rotate(-.5deg)}
+.engraved-settlement-art.city{transform:translate(-48%,8%) rotate(.4deg)}
+.engraved-settlement-art.fortified-city{transform:translate(-50%,7%) rotate(-.4deg)}
+.engraved-settlement-art.capital{transform:translate(-49%,7%) rotate(.3deg)}
+.engraved-settlement-art.port{transform:translate(-45%,8%) rotate(-.2deg)}
+.engraved-settlement-art.fortress{transform:translate(-50%,8%) rotate(.6deg)}
+.engraved-settlement-art:hover{filter:sepia(.12) contrast(1.22);opacity:1}
+
+/* Geographic labels also sit directly on the map without an icon footprint. */
+.cartographic-label-only{
+  position:absolute!important;
+  left:0!important;
+  top:0!important;
+  transform:translate(-50%,-50%)!important;
+  pointer-events:auto!important;
+}
