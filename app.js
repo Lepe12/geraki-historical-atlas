@@ -489,6 +489,17 @@ function routeFacing(points){
   const dx=points[points.length-1][1]-points[0][1];
   return dx>=0?"right":"left";
 }
+function routeFacingAtDistance(points,table,distanceKm){
+  if(!points||points.length<2||!table||table.total<=0)return "left";
+  const lookAhead=Math.max(1,Math.min(8,table.total*0.015));
+  const d1=Math.max(0,distanceKm-lookAhead);
+  const d2=Math.min(table.total,distanceKm+lookAhead);
+  const p1=pointAtDistance(points,table,d1);
+  const p2=pointAtDistance(points,table,d2);
+  const dx=p2[1]-p1[1];
+  if(Math.abs(dx)<1e-7)return routeFacing(points);
+  return dx>=0?"right":"left";
+}
 function animateVessel(points,variant=1){
   if(!points||points.length<2)return;
   const distanceTable=routeDistanceTable(points);
@@ -500,7 +511,7 @@ function animateVessel(points,variant=1){
   const duration=Math.max(30000,Math.min(150000,rawDuration));
 
   const marker=L.marker(points[0],{icon:routeShipIcon(variant),interactive:false,zIndexOffset:900}).addTo(vesselMarkers);
-  const facing=routeFacing(points);
+  let facing=routeFacing(points);
   const start=performance.now();
   let rafId=0;
   let stopped=false;
@@ -510,6 +521,7 @@ function animateVessel(points,variant=1){
     const phase=((now-start)%duration)/duration;
     const travelled=phase*distanceTable.total;
     marker.setLatLng(pointAtDistance(points,distanceTable,travelled));
+    facing=routeFacingAtDistance(points,distanceTable,travelled);
 
     const el=marker.getElement();
     if(el){
@@ -605,7 +617,7 @@ function addOverviewVessels(){
     const el=marker.getElement();
     if(el){
       el.classList.add("overview-vessel");
-      const facing=routeFacing(points);
+      const facing=routeFacingAtDistance(points,table,table.total*.48);
       const g=el.querySelector(".route-ship");
       const motion=el.querySelector(".ship-motion");
       if(g){
@@ -801,7 +813,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-living-ships-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-local-ship-direction-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
