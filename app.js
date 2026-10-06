@@ -337,14 +337,16 @@ function routeShipIcon(variant=1){
     iconAnchor:[36,32]
   });
 }
-function bearingDeg(a,b){
-  const dy=b[0]-a[0],dx=b[1]-a[1];
-  return Math.atan2(dx,dy)*180/Math.PI;
+function routeFacing(points){
+  if(!points||points.length<2)return "left";
+  const dx=points[points.length-1][1]-points[0][1];
+  return dx>=0?"right":"left";
 }
 function animateVessel(points,duration=14000,variant=1){
   if(!points||points.length<2)return;
   const dense=densifyRoute(points,20);
   const marker=L.marker(dense[0],{icon:routeShipIcon(variant),interactive:false,zIndexOffset:900}).addTo(vesselMarkers);
+  const facing=routeFacing(points);
   const start=performance.now();
   let rafId=0;
   let stopped=false;
@@ -359,7 +361,10 @@ function animateVessel(points,duration=14000,variant=1){
     const el=marker.getElement();
     if(el){
       const g=el.querySelector(".route-ship");
-      if(g)g.style.transform=`rotate(${bearingDeg(a,b)}deg)`;
+      if(g){
+        g.classList.toggle("faces-right",facing==="right");
+        g.classList.toggle("faces-left",facing!=="right");
+      }
     }
     rafId=requestAnimationFrame(tick);
   }
@@ -496,8 +501,7 @@ function render(){
       line.addTo(routeLines);
       const lantzasVoyage=representative.type==="DEPICTED TRAVEL"&&medium==="sea"&&items.some(x=>/petros lantzas/i.test(x.r.character||""));
       if(lantzasVoyage){
-        const routeKey=String(representative.name||representative.id||"");
-        const variant=(Array.from(routeKey).reduce((n,ch)=>n+ch.charCodeAt(0),0)%2)+1;
+        const variant=representative.shipVariant===1?1:2;
         animateVessel(points,15000+Math.min(8000,points.length*700),variant);
       }
       routeCount++;
