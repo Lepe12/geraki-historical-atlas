@@ -79,7 +79,7 @@ const bookHit=(obj)=>state.book==="All"||(obj.books||[]).includes(state.book);
 function settlementClass(p){
   if(p.atlasSymbol)return p.atlasSymbol;
   const t=(p.type||"").toLowerCase();
-  if(t.includes("fortress"))return "fortress";
+  if(t.includes("fortress"))return "town";
   if(t.includes("port")||t.includes("harbor"))return "port";
   if(t.includes("village"))return "village";
   if(t.includes("city"))return "city";
@@ -110,10 +110,10 @@ function settlementIcon(p){
     "coastal-village":"mercator-village-2.png",
     "town":"mercator-town-1.png",
     "city":"mercator-city-1.png",
-    "fortified-city":"mercator-unique-1.png",
+    "fortified-city":"mercator-city-1.png",
     "capital":"mercator-capital-1.png",
     "port":"mercator-town-2.png",
-    "fortress":"mercator-unique-2.png",
+    "fortress":"mercator-town-1.png",
     "generic":"mercator-town-1.png"
   };
   const widthBySymbol={
