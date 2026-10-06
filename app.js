@@ -1,4 +1,4 @@
-const state={mode:"STORY",book:"All",search:"",year:"All",routeStory:"All",verifiedOnly:false,showPlaces:true,showRoutes:true,routeTypes:new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"])};
+const state={mode:"STORY",book:"All",search:"",year:"All",routeStory:"All",storyStep:0,verifiedOnly:false,showPlaces:true,showRoutes:true,routeTypes:new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"])};
 const placeMarkers=L.layerGroup(),routeLines=L.layerGroup(),historicalLabels=L.layerGroup(),vesselMarkers=L.layerGroup();
 let routeAnimationCancels=[];
 let atlasData={places:[],routes:[]};
@@ -130,15 +130,15 @@ function settlementIcon(p){
     "generic":"mercator-town-1.png"
   };
   const widthBySymbol={
-    "village":44,
-    "coastal-village":48,
-    "town":54,
-    "city":66,
-    "fortified-city":72,
-    "capital":84,
-    "port":58,
-    "fortress":62,
-    "generic":52
+    "village":32,
+    "coastal-village":36,
+    "town":44,
+    "city":58,
+    "fortified-city":66,
+    "capital":78,
+    "port":48,
+    "fortress":56,
+    "generic":40
   };
   const file=p.atlasAsset||assetFor[symbol]||assetFor.generic;
   const w=widthBySymbol[symbol]||52;
@@ -228,6 +228,8 @@ function rebuildFilters(){
   document.getElementById("bookStrip").innerHTML=books.map(b=>`<button class="book-chip ${state.book===b?"active":""}" data-book="${esc(b)}">${b==="All"?"Όλα":esc(b)}</button>`).join("");
   document.querySelectorAll("[data-book]").forEach(b=>b.onclick=()=>{
     state.book=b.dataset.book;
+    state.routeStory="All";
+    state.storyStep=0;
     rebuildFilters();
     render();
     setTimeout(fitVisible,0);
@@ -251,16 +253,17 @@ function rebuildFilters(){
   `).join("");
 }
 
-function routeStyle(type,medium){
-  if(type==="INTELLIGENCE / NETWORK")return {weight:1.15,opacity:.5,color:"#77664f",lineCap:"round",lineJoin:"round",dashArray:"1 8"};
-  if(type==="PLANNED — NOT EXECUTED")return {weight:1.1,opacity:.42,color:"#806e58",lineCap:"round",lineJoin:"round",dashArray:"10 9"};
-  if(type==="STRONG RECONSTRUCTION")return {weight:1.2,opacity:.52,color:"#6d5c46",lineCap:"round",lineJoin:"round",dashArray:"4 7"};
-  if(medium==="land")return {weight:1.35,opacity:.7,color:"#665038",lineCap:"round",lineJoin:"round",dashArray:"5 4"};
-  return {weight:1.4,opacity:.78,color:"#57442f",lineCap:"round",lineJoin:"round",dashArray:"1 6"};
+function routeStyle(type,medium,focused=true){
+  const fade=focused?1:.22;
+  if(type==="INTELLIGENCE / NETWORK")return {weight:1.05,opacity:.34*fade,color:"#756951",lineCap:"round",lineJoin:"round",dashArray:"1 9"};
+  if(type==="PLANNED — NOT EXECUTED")return {weight:1.0,opacity:.28*fade,color:"#8b7659",lineCap:"round",lineJoin:"round",dashArray:"11 10"};
+  if(type==="STRONG RECONSTRUCTION")return {weight:focused?2.0:1.1,opacity:.62*fade,color:"#745c3d",lineCap:"round",lineJoin:"round",dashArray:"5 7"};
+  if(medium==="land")return {weight:focused?2.1:1.15,opacity:.72*fade,color:"#72583a",lineCap:"round",lineJoin:"round",dashArray:"5 4"};
+  return {weight:focused?2.35:1.2,opacity:.88*fade,color:"#4f3924",lineCap:"round",lineJoin:"round"};
 }
-function routeUnderlayStyle(type,medium){
-  if(type!=="DEPICTED TRAVEL")return null;
-  return {weight:4.2,opacity:.58,color:"#eee4cf",lineCap:"round",lineJoin:"round"};
+function routeUnderlayStyle(type,medium,focused=true){
+  if(type!=="DEPICTED TRAVEL"||!focused)return null;
+  return {weight:5.4,opacity:.42,color:"#efe2c4",lineCap:"round",lineJoin:"round"};
 }
 
 const MAJOR_PLACES=new Set(["Madrid","Lisbon","Naples","Constantinople","Corfu","Malta","Ragusa","Candia","Tunis","Otranto"]);
@@ -276,11 +279,14 @@ function labelPriority(p){
 function shouldShowLabel(p,routeNodeIds){
   const z=map.getZoom();
   const pri=labelPriority(p);
+  const focused=state.routeStory!=="All"&&routeNodeIds.has(p.id);
   if(pri>=4)return true;
-  if(z>=8)return true;
-  if(z===7)return pri>=1||routeNodeIds.has(p.id);
-  if(z===6)return pri>=2||routeNodeIds.has(p.id);
-  return pri>=3||routeNodeIds.has(p.id);
+  if(focused)return true;
+  if(z>=9)return true;
+  if(z===8)return pri>=1;
+  if(z===7)return pri>=2;
+  if(z===6)return pri>=3;
+  return pri>=3;
 }
 const atlasLabelFor=p=>p.atlasLabel||p.place;
 function historicalLabelIcon(p){
@@ -370,8 +376,8 @@ function routeShipIcon(variant=1){
   return L.divIcon({
     className:"moving-vessel-anchor",
     html:`<div class="${cls}" aria-label="historical sailing ship"></div>`,
-    iconSize:[72,64],
-    iconAnchor:[36,32]
+    iconSize:[58,52],
+    iconAnchor:[29,26]
   });
 }
 function routeFacing(points){
@@ -414,6 +420,46 @@ function animateVessel(points,variant=1){
   rafId=requestAnimationFrame(tick);
   routeAnimationCancels.push(()=>{stopped=true;cancelAnimationFrame(rafId);});
 }
+
+function visibleStoryRoutes(story=state.routeStory){
+  if(story==="All")return [];
+  return atlasData.routes.filter(r=>
+    !r.atlasHidden&&routeStory(r)===story&&bookHit(r)&&yearHit(r,state.year)
+  ).sort((a,b)=>(a.sequence||0)-(b.sequence||0));
+}
+function updateStoryDeck(){
+  const deck=document.getElementById("storyDeck");
+  if(!deck)return;
+  const routes=visibleStoryRoutes();
+  if(state.routeStory==="All"||!routes.length){
+    deck.classList.remove("active");
+    document.getElementById("storyDeckTitle").textContent="Επίλεξε μία διαδρομή";
+    document.getElementById("storyDeckMeta").textContent="Η αφήγηση θα εμφανιστεί εδώ.";
+    return;
+  }
+  state.storyStep=Math.max(0,Math.min(state.storyStep,routes.length-1));
+  const r=routes[state.storyStep];
+  deck.classList.add("active");
+  document.getElementById("storyDeckKicker").textContent=`STORY MODE · ${state.storyStep+1}/${routes.length}`;
+  document.getElementById("storyDeckTitle").textContent=r.name||state.routeStory;
+  const from=r.from?.[0]?.name||"—",to=r.to?.[0]?.name||"—";
+  document.getElementById("storyDeckMeta").textContent=`${from} → ${to} · ${r.period||""}`;
+  document.getElementById("storyPrev").disabled=state.storyStep<=0;
+  document.getElementById("storyNext").disabled=state.storyStep>=routes.length-1;
+}
+function focusStoryStep(delta=0){
+  const routes=visibleStoryRoutes();
+  if(!routes.length)return;
+  state.storyStep=Math.max(0,Math.min(state.storyStep+delta,routes.length-1));
+  const r=routes[state.storyStep],a=r.from?.[0],b=r.to?.[0];
+  const pts=[];
+  if(a&&byId.get(a.id)){const p=byId.get(a.id);pts.push([p.lat,p.lon]);}
+  if(b&&byId.get(b.id)){const p=byId.get(b.id);pts.push([p.lat,p.lon]);}
+  updateStoryDeck();
+  render();
+  if(pts.length)map.fitBounds(pts,{padding:[120,120],maxZoom:7});
+}
+
 function render(){
   routeAnimationCancels.forEach(fn=>fn());routeAnimationCancels=[];
   placeMarkers.clearLayers();routeLines.clearLayers();historicalLabels.clearLayers();vesselMarkers.clearLayers();
@@ -428,8 +474,9 @@ function render(){
   const activeRouteNodeIds=currentRouteNodeIds();
 
   const visiblePlaces=atlasData.places.filter(p=>{
+    const heroOverview=state.mode==="STORY"&&state.book==="All"&&state.routeStory==="All"&&map.getZoom()<=5;
     const base=Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&(bookHit(p)||activeRouteNodeIds.has(p.id))&&yearHit(p,state.year)&&
-      (!state.verifiedOnly||p.coordinateStatus==="VERIFIED")&&textHit(p,q);
+      (!state.verifiedOnly||p.coordinateStatus==="VERIFIED")&&textHit(p,q)&&(!heroOverview||labelPriority(p)>=2);
     if(!base)return false;
     if(state.mode==="PEOPLE")return Boolean((p.characters||"").trim());
     if(state.mode==="VOYAGES")return true;
@@ -486,8 +533,7 @@ function render(){
       if(state.mode==="INTELLIGENCE"&&r.type!=="INTELLIGENCE / NETWORK")return false;
       if(state.mode==="PEOPLE"&&!["DEPICTED TRAVEL","STRONG RECONSTRUCTION"].includes(r.type))return false;
       if(state.mode==="VOYAGES"&&!["DEPICTED TRAVEL","STRONG RECONSTRUCTION"].includes(r.type))return false;
-      return state.routeTypes.has(r.type)&&bookHit(r)&&yearHit(r,state.year)&&textHit(r,q)&&
-        (state.routeStory==="All"||routeStory(r)===state.routeStory);
+      return state.routeTypes.has(r.type)&&bookHit(r)&&yearHit(r,state.year)&&textHit(r,q);
     });
 
     const grouped=new Map();
@@ -517,12 +563,18 @@ function render(){
       if(points.length<2)return;
       const representative=items[0].r;
       const medium=representative.medium||"unknown";
-      const under=routeUnderlayStyle(representative.type,medium);
+      const focused=state.routeStory==="All"||state.routeStory===story;
+      const under=routeUnderlayStyle(representative.type,medium,focused);
       if(under)L.polyline(points,under).addTo(routeLines);
-      const line=L.polyline(points,routeStyle(representative.type,medium));
+      const line=L.polyline(points,routeStyle(representative.type,medium,focused));
       const label=items.length>1?story:representative.name;
       line.bindTooltip(label,{sticky:true});
       line.on("click",()=>{
+        state.routeStory=story;
+        state.storyStep=Math.max(0,(representative.sequence||1)-1);
+        rebuildFilters();
+        updateStoryDeck();
+        render();
         if(items.length===1)showRoute(representative);
         else openDetail(`
           <div class="mini-kicker">ROUTE STORY</div>
@@ -544,6 +596,7 @@ function render(){
     // constant-speed movement over the actual curated maritime geometry.
     const voyageGroups=new Map();
     filtered.forEach(r=>{
+      if(state.routeStory!=="All"&&routeStory(r)!==state.routeStory)return;
       if(r.medium!=="sea" || !r.vessel || !/petros lantzas/i.test(r.character||""))return;
       if(r.type==="INTELLIGENCE / NETWORK" || r.type==="PLANNED — NOT EXECUTED")return;
       const a=(r.from||[])[0],b=(r.to||[])[0];
@@ -571,6 +624,7 @@ function render(){
       animateVessel(voyagePoints,variant);
     });
   }
+  updateStoryDeck();
   const modeLabels={STORY:"Story",PEOPLE:"People",VOYAGES:"Voyages",EMPIRES:"Empires",INTELLIGENCE:"Intelligence",EVIDENCE:"Evidence",TIMELINE:"Timeline"};
   document.getElementById("countBadge").textContent=`${modeLabels[state.mode]} · ${state.showPlaces?visiblePlaces.length:0} τόποι · ${routeCount} route stories`;
 }
@@ -596,7 +650,7 @@ function closeFilters(){
   if(!document.getElementById("detailPanel").classList.contains("open"))document.getElementById("scrim").classList.remove("on");
 }
 
-fetch("./data.json?v=20261006-book2-otranto",{cache:"no-store"}).then(r=>r.json()).then(data=>{
+fetch("./data.json?v=20261006-redesign-1",{cache:"no-store"}).then(r=>r.json()).then(data=>{
   atlasData=data;atlasData.places.forEach(p=>byId.set(p.id,p));
   rebuildFilters();render();fitAll();
 }).catch(err=>{
@@ -615,7 +669,7 @@ document.querySelectorAll("[data-mode]").forEach(btn=>btn.addEventListener("clic
   if(state.mode==="STORY")state.routeTypes=new Set(["DEPICTED TRAVEL","STRONG RECONSTRUCTION"]);
   rebuildFilters();render();
 }));
-document.getElementById("routeStoryFilter").addEventListener("change",e=>{state.routeStory=e.target.value;render();});
+document.getElementById("routeStoryFilter").addEventListener("change",e=>{state.routeStory=e.target.value;state.storyStep=0;updateStoryDeck();render();if(state.routeStory!=="All")focusStoryStep(0);});
 document.getElementById("verifiedOnly").addEventListener("change",e=>{state.verifiedOnly=e.target.checked;render();});
 document.getElementById("placesToggle").addEventListener("change",e=>{state.showPlaces=e.target.checked;e.target.checked?placeMarkers.addTo(map):map.removeLayer(placeMarkers);render();});
 document.getElementById("routesToggle").addEventListener("change",e=>{
@@ -624,6 +678,8 @@ document.getElementById("routesToggle").addEventListener("change",e=>{
   else{map.removeLayer(routeLines);map.removeLayer(vesselMarkers);}
   render();
 });
+document.getElementById("storyPrev").addEventListener("click",()=>focusStoryStep(-1));
+document.getElementById("storyNext").addEventListener("click",()=>focusStoryStep(1));
 document.getElementById("fitBtn").addEventListener("click",fitAll);
 document.getElementById("filtersBtn").addEventListener("click",openFilters);
 document.getElementById("closeFilters").addEventListener("click",closeFilters);
