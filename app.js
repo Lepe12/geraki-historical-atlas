@@ -89,15 +89,33 @@ function settlementClass(p){
 }
 function settlementIcon(p){
   const cls=settlementClass(p);
-  const capital=CAPITAL_PLACES.has(p.place)?" is-capital":"";
-  const major=MAJOR_PLACES.has(p.place)?" is-major":"";
+  const isCapital=CAPITAL_PLACES.has(p.place)||p.place==="Venice";
+  const isMajor=MAJOR_PLACES.has(p.place);
   const power=powerForPlace(p);
+
+  const svgByClass={
+    "settlement-village":"village.svg",
+    "settlement-city":isCapital?"capital.svg":"city.svg",
+    "settlement-port":isCapital?"capital.svg":"port.svg",
+    "settlement-fortress":"fortress.svg"
+  };
+
+  if(svgByClass[cls]){
+    const file=svgByClass[cls];
+    const scale=isCapital?" is-capital":(isMajor?" is-major":"");
+    const heraldry=power?`<span class="settlement-svg-heraldry"><span class="settlement-svg-heraldry-art" style="background-image:url('${power.image.replace(/"/g,"%22")}')"></span></span>`:"";
+    return L.divIcon({
+      className:"",
+      html:`<div class="settlement-svg-wrap${scale}" title="${esc(p.place)}"><img class="settlement-svg-art" src="./icons/${file}" alt="">${heraldry}</div>`,
+      iconSize:isCapital?[58,58]:[48,48],
+      iconAnchor:isCapital?[29,40]:[24,34]
+    });
+  }
+
   const powerClass=power?` power-${power.id}`:"";
+  const capital=isCapital?" is-capital":"";
+  const major=isMajor?" is-major":"";
   const htmlMap={
-    "settlement-city":'<span class="city-base"></span><span class="city-wall"></span><span class="city-tower ct1"></span><span class="city-tower ct2"></span><span class="city-roof cr1"></span><span class="city-roof cr2"></span>',
-    "settlement-port":'<span class="port-water"></span><span class="city-base"></span><span class="city-wall"></span><span class="city-tower ct1"></span><span class="port-mast"></span><span class="port-sail"></span>',
-    "settlement-fortress":'<span class="fort-base"></span><span class="fort-wall"></span><span class="fort-tower ft1"></span><span class="fort-tower ft2"></span><span class="fort-gate"></span>',
-    "settlement-village":'<span class="village-ground"></span><span class="house h1"></span><span class="house h2"></span><span class="house h3"></span>',
     "settlement-island":'<span class="island-mark"></span>',
     "settlement-sea":'<span class="sea-mark">≈</span>',
     "settlement-region":'<span class="region-mark">✦</span>',
@@ -106,8 +124,8 @@ function settlementIcon(p){
   const heraldry=power?`<span class="settlement-heraldry"><span class="settlement-heraldry-art" style="background-image:url('${power.image.replace(/"/g,"%22")}')"></span></span>`:"";
   return L.divIcon({
     className:"",
-    html:`<div class="settlement-icon ${cls}${capital}${major}${powerClass}" title="${esc(p.place)}">${htmlMap[cls]}${heraldry}</div>`,
-    iconSize:[54,46],iconAnchor:[27,31]
+    html:`<div class="settlement-icon ${cls}${capital}${major}${powerClass}" title="${esc(p.place)}">${htmlMap[cls]||htmlMap["settlement-generic"]}${heraldry}</div>`,
+    iconSize:[46,40],iconAnchor:[23,28]
   });
 }
 function markerIcon(p){
