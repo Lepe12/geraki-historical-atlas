@@ -26,12 +26,17 @@ html,body{height:100%;margin:0}body{font-family:'Plus Jakarta Sans',sans-serif;b
 
 
 .map-wash{position:absolute;inset:0;z-index:450;pointer-events:none;background:
-radial-gradient(circle at 49% 42%,rgba(255,241,199,.06) 0 28%,transparent 58%),
-linear-gradient(rgba(77,55,32,.03),rgba(38,28,20,.10));mix-blend-mode:multiply}
+radial-gradient(circle at 48% 36%,rgba(255,220,160,.10) 0 20%,transparent 50%),
+radial-gradient(circle at 50% 50%,transparent 48%,rgba(24,18,13,.16) 100%),
+linear-gradient(rgba(79,56,31,.025),rgba(31,23,17,.10));mix-blend-mode:multiply}
+.ship-marker{width:76px;height:60px;transform:translate(-50%,-50%);pointer-events:none;filter:drop-shadow(0 6px 5px rgba(20,15,10,.35))}
+.ship-marker img{width:100%;height:100%;object-fit:contain;display:block}
+.ship-marker.face-left{transform:translate(-50%,-50%) scaleX(-1)}
+
 .settlement-wrap{position:relative;transform:translate(-50%,-78%);pointer-events:auto}
-.settlement-img{display:block;width:110px;height:auto;filter:drop-shadow(0 6px 6px rgba(31,21,14,.36));transition:transform .18s ease}
+.settlement-img{display:block;width:132px;height:auto;filter:drop-shadow(0 10px 10px rgba(31,21,14,.38));transition:transform .18s ease;transform-origin:50% 100%}
 .settlement-wrap:hover .settlement-img{transform:scale(1.08)}
-.settlement-wrap.village .settlement-img{width:76px}.settlement-wrap.coastal-village .settlement-img{width:82px}.settlement-wrap.town .settlement-img{width:92px}.settlement-wrap.city .settlement-img{width:108px}.settlement-wrap.capital .settlement-img{width:122px}.settlement-wrap.port .settlement-img{width:100px}
+.settlement-wrap.village .settlement-img{width:92px}.settlement-wrap.coastal-village .settlement-img{width:98px}.settlement-wrap.town .settlement-img{width:112px}.settlement-wrap.city .settlement-img{width:136px}.settlement-wrap.capital .settlement-img{width:154px}.settlement-wrap.port .settlement-img{width:126px}
 .settlement-label{position:absolute;left:50%;top:76%;transform:translateX(-50%);white-space:nowrap;padding:2px 6px;background:rgba(232,211,171,.92);border:1px solid rgba(75,51,28,.34);color:#2e2117;font:700 12px/1.1 'GFS Didot',serif;box-shadow:0 2px 5px rgba(30,20,12,.18)}
 .label-only{white-space:nowrap;color:#3a2b20;font:700 12px/1.2 'GFS Didot',serif;text-shadow:0 1px 0 #f3dfb8,0 0 5px #f3dfb8}
 .route-hit{cursor:pointer}
@@ -265,8 +270,8 @@ function markerFor(p){
   return new maplibregl.Marker({
     element:el,
     anchor:"bottom",
-    pitchAlignment:"map",
-    rotationAlignment:"map"
+    pitchAlignment:"viewport",
+    rotationAlignment:"viewport"
   }).setLngLat([p.lon,p.lat]);
 }
 
@@ -287,6 +292,65 @@ function routePaint(r){
   if(r.type==="STRONG RECONSTRUCTION")return{color:"#d9c59a",width:1.35,opacity:.72};
   if(r.medium==="land")return{color:"#6d4931",width:1.4,opacity:.78};
   return{color:"#f2e2bd",width:1.7,opacity:.92};
+}
+
+let shipMarkers=[];
+let shipAnimFrame=0;
+
+function clearShips(){
+  shipMarkers.forEach(m=>{try{m.remove()}catch(e){}});
+  shipMarkers=[];
+  if(shipAnimFrame)cancelAnimationFrame(shipAnimFrame);
+  shipAnimFrame=0;
+}
+function haversineKm(a,b){
+  const R=6371,rad=x=>x*Math.PI/180;
+  const p1=rad(a[0]),p2=rad(b[0]),dp=p2-p1,dl=rad(b[1]-a[1]);
+  const h=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+  return 2*R*Math.asin(Math.min(1,Math.sqrt(h)));
+}
+function routeTable(points){
+  const cum=[0];let total=0;
+  for(let i=0;i<points.length-1;i++){total+=haversineKm(points[i],points[i+1]);cum.push(total)}
+  return{cum,total};
+}
+function pointAt(points,table,d){
+  if(d<=0)return points[0]; if(d>=table.total)return points[points.length-1];
+  let i=0;while(i<table.cum.length-1&&table.cum[i+1]<d)i++;
+  const a=points[i],b=points[i+1],seg=table.cum[i+1]-table.cum[i],t=seg?(d-table.cum[i])/seg:0;
+  return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];
+}
+function addShips(){
+  clearShips();
+  const sea=DATA.routes.filter(r=>routeVisible(r)&&r.medium==="sea"&&routePoints(r).length>1&&!["INTELLIGENCE / NETWORK","PLANNED — NOT EXECUTED"].includes(r.type));
+  const chosen=sea.slice(0,6);
+  const ships=chosen.map((r,i)=>{
+    const pts=routePoints(r),table=routeTable(pts);
+    const el=document.createElement("div");
+    el.className="ship-marker";
+    const img=document.createElement("img");
+    img.src="./icons/"+((r.shipVariant||1)===2?"ship-variant-2.png":"ship-variant-1.png");
+    img.alt="";
+    el.appendChild(img);
+    const marker=new maplibregl.Marker({element:el,anchor:"center",pitchAlignment:"viewport",rotationAlignment:"viewport"}).setLngLat([pts[0][1],pts[0][0]]).addTo(atlasMap);
+    shipMarkers.push(marker);
+    return{marker,el,pts,table,phase:i/Math.max(1,chosen.length)};
+  }).filter(x=>x.table.total>0);
+
+  const start=performance.now();
+  function tick(now){
+    ships.forEach((s,i)=>{
+      const period=Math.max(70000,Math.min(180000,s.table.total/4*1000));
+      const ph=((now-start)/period+s.phase)%1;
+      const d=ph*s.table.total;
+      const p=pointAt(s.pts,s.table,d);
+      s.marker.setLngLat([p[1],p[0]]);
+      const p2=pointAt(s.pts,s.table,Math.min(s.table.total,d+Math.max(1,s.table.total*.01)));
+      s.el.classList.toggle("face-left",p2[1]<p[1]);
+    });
+    shipAnimFrame=requestAnimationFrame(tick);
+  }
+  shipAnimFrame=requestAnimationFrame(tick);
 }
 
 function render(){
@@ -311,6 +375,7 @@ function render(){
     }).filter(Boolean);
     atlasMap.getSource("atlas-routes").setData({type:"FeatureCollection",features});
   }
+  addShips();
 }
 
 function row(icon,label,val){
