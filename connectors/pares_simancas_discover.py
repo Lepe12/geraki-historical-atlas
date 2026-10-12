@@ -31,7 +31,8 @@ def discover(term,limit=5,max_pages=12):
     facet=re.search(r'href="([^"]*find\\?[^\"]*idA=2[^\"]*)"',seed_html,re.I)
     if not facet: raise RuntimeError("AGS facet link idA=2 not found in seeded PARES result page")
     first=urllib.parse.urljoin(HOST,unescape(facet.group(1)))
-    html,fmeta=fetch(opener,first,True)\n    print("PARES_FILTER_RESPONSE",json.dumps({"request_url":first,**fmeta,"html_size":len(html),"record_links":len(ids(html)),"has_simancas":"Archivo General de Simancas" in html},ensure_ascii=False))
+    html,fmeta=fetch(opener,first,True)
+    print("PARES_FILTER_RESPONSE",json.dumps({"request_url":first,**fmeta,"html_size":len(html),"record_links":len(ids(html)),"has_simancas":"Archivo General de Simancas" in html},ensure_ascii=False))
     # Diagnose archive-facet controls before record verification.
     facet_context=[]
     for token in ("Archivo General de Simancas","Archivos","archivo","facet","filtro"):
