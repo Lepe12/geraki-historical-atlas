@@ -38,12 +38,12 @@ def bsb(q):
         out.append({"discovery_repository":"BSB","discovery_lane":lane,"connector_status":"EXECUTED","identifier":ident,"title":x.get("title"),"creator":x.get("creator"),"date":x.get("date") or [],"url":links[0] if links else None,"digital_url":links[0] if links else None,"iiif_manifest_candidates":x.get("iiif_manifest_candidates") or [],"bsb_digital_ids":x.get("bsb_digital_ids") or [],"raw":x})
     return out
 
-terms=[]
-for x in [plan.get("target","")]+list(plan.get("aliases",[]) or []):
-    x=str(x).strip()
-    if x and x.lower() not in [t.lower() for t in terms]:terms.append(x)
-# Bound remote load but actually test historical variants, not only the modern target.
-terms=terms[:max(1,int(os.getenv("PCT_REPOSITORY_QUERY_LIMIT","2")))] or [str(plan.get("target","")).strip()]
+# Use the auditable expanded query set produced for this lane.
+terms=list(plan.get("expanded_queries") or [])
+if not terms:
+    terms=[str(plan.get("target","")).strip()]
+limit=int(os.getenv("PCT_REPOSITORY_QUERY_LIMIT","0"))
+if limit>0: terms=terms[:limit]
 results=[];attempts=[]
 for r in plan["repositories"]:
     name=r["name"]; repo_records=[]; statuses=[]; diagnostics=[]
