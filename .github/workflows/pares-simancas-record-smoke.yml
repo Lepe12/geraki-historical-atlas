@@ -1,0 +1,21 @@
+name: PARES Simancas Record Smoke
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'connectors/pares_simancas_verify.py'
+      - '.github/workflows/pares-simancas-record-smoke.yml'
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify three official PARES descriptions
+        run: |
+          python connectors/pares_simancas_verify.py 2749750
+          python connectors/pares_simancas_verify.py 2208053
+          python connectors/pares_simancas_verify.py 2199621
