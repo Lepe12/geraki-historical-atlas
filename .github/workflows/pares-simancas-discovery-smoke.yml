@@ -1,0 +1,18 @@
+name: PARES Simancas Dynamic Discovery
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'connectors/pares_simancas_discover.py'
+      - '.github/workflows/pares-simancas-discovery-smoke.yml'
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Discover and verify Nápoles
+        run: python connectors/pares_simancas_discover.py Nápoles --limit 5
