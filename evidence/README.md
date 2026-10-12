@@ -11,3 +11,5 @@ Rules:
 
 Layout:
 evidence/<research_job_id>/<source_id>/{manifest,ocr,pages,reports}/
+
+Activation diagnostic marker: 2026-10-12 / pct workflow every-push test.
