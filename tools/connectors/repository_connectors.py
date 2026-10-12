@@ -188,39 +188,24 @@ def isam(q,lane):
 
 def searchculture(q,lane):
     key=os.getenv("SEARCHCULTURE_API_KEY","").strip()
-    if key:
-        url="https://www.searchculture.gr/aggregator/api/search.json?"+urllib.parse.urlencode({"apiKey":key,"general_term":q,"page":1,"pageSize":50})
-        d=_json(url);out=[]
-        for x in d.get("results",[]) or d.get("items",[]) or []:
-            uri=x.get("uri") or x.get("id")
-            title=x.get("dc_title") or x.get("title")
-            if isinstance(title,list): title=" ".join(str(v) for v in title)
-            out.append({"discovery_repository":"SearchCulture.gr / EKT","discovery_lane":lane,"connector_status":"EXECUTED","identifier":uri,"title":title,"date":x.get("dc_date") or x.get("date") or [],"url":uri,"raw":x})
-        return "EXECUTED",out,url
-    # Public portal fallback: useful for anonymous discovery; API remains preferred.
-    base="https://www.searchculture.gr"
-    params={"keywords[0].field":"","keywords[0].value":q,"page.page":1}
-    url=base+"/aggregator/portal/advancedSearch/search?"+urllib.parse.urlencode(params)
-    keep=lambda u,t: "/aggregator/edm/" in u and len(t)>1
-    try:
-        out=_html_search(url,"SearchCulture.gr / EKT",lane,base,keep,max_records=8)
-        enriched=[]
-        for row in out:
-            u=row.get("url")
+    if not key:
+        return "API_KEY_REQUIRED",[],"Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+    url="https://www.searchculture.gr/aggregator/api/search.json?"+urllib.parse.urlencode({"apiKey":key,"general_term":q,"page":1,"pageSize":50})
+    d=_json(url);out=[]
+    for x in d.get("results",[]) or d.get("items",[]) or []:
+        uri=x.get("uri") or x.get("id")
+        title=x.get("dc_title") or x.get("title")
+        if isinstance(title,list): title=" ".join(str(v) for v in title)
+        row={"discovery_repository":"SearchCulture.gr / EKT","discovery_lane":lane,"connector_status":"EXECUTED","identifier":uri,"title":title,"date":x.get("dc_date") or x.get("date") or [],"url":uri,"raw":x}
+        if uri:
             try:
-                jd=_json(u.rstrip("/")+"/json",timeout=6) if u else {}
-                flat=json.dumps(jd,ensure_ascii=False)
-                row["raw"]=jd
-                row["metadata_text"]=flat
-                dates=re.findall(r"\b(?:1[0-9]{3}|20[0-9]{2})\b",flat)
-                row["date"]=list(dict.fromkeys(dates))[:8]
+                jd=_json(uri.rstrip("/")+"/json",timeout=12)
+                row["raw_full"]=jd
+                row["metadata_text"]=json.dumps(jd,ensure_ascii=False)
             except Exception:
                 pass
-            enriched.append(row)
-        if enriched:return "EXECUTED",enriched,url+" ; anonymous portal fallback + public JSON-LD dereference"
-        return "API_KEY_REQUIRED",[],"SearchCulture API requires SEARCHCULTURE_API_KEY; anonymous portal returned no item links."
-    except Exception as exc:
-        return "API_KEY_REQUIRED",[],"SearchCulture API requires SEARCHCULTURE_API_KEY; portal fallback failed: "+type(exc).__name__+": "+str(exc)
+        out.append(row)
+    return "EXECUTED",out,url
 
 def ddb(q,lane):
     key=os.getenv("DDB_API_KEY","").strip()
