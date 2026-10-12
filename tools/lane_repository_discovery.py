@@ -43,7 +43,7 @@ for x in [plan.get("target","")]+list(plan.get("aliases",[]) or []):
     x=str(x).strip()
     if x and x.lower() not in [t.lower() for t in terms]:terms.append(x)
 # Bound remote load but actually test historical variants, not only the modern target.
-terms=terms[:2] or [str(plan.get("target","")).strip()]
+terms=terms[:max(1,int(os.getenv("PCT_REPOSITORY_QUERY_LIMIT","2")))] or [str(plan.get("target","")).strip()]
 results=[];attempts=[]
 for r in plan["repositories"]:
     name=r["name"]; repo_records=[]; statuses=[]; diagnostics=[]
@@ -75,6 +75,9 @@ for r in plan["repositories"]:
     elif statuses and all(s=="ERROR" for s in statuses):overall="ERROR"
     else:overall=statuses[0] if statuses else "CITATION_CHASE_WEB_OR_API_CONNECTOR_REQUIRED"
     attempts.append({"repository":name,"status":overall,"hits":len(ded),"queries":diagnostics,"base_url":r["base_url"]})
+    # Persist partial progress before the next remote repository can time out.
+    checkpoint={"schema":"pct-lane-discovery-v3","lane":lane,"request_file":plan.get("request_file"),"target":plan.get("target"),"aliases":plan.get("aliases",[]),"date_range":plan.get("date_range"),"attempts":attempts,"results":results,"partial":True,"gate":"Partial discovery metadata is not evidence."}
+    (out/f"{lane}.json").write_text(json.dumps(checkpoint,ensure_ascii=False,indent=2),encoding="utf-8")
 payload={"schema":"pct-lane-discovery-v3","lane":lane,"request_file":plan.get("request_file"),"target":plan.get("target"),"aliases":plan.get("aliases",[]),"date_range":plan.get("date_range"),"attempts":attempts,"results":results,"gate":"Discovery metadata is not historical evidence. EXECUTED means a real remote query completed; auth/key/browser targets remain explicit blockers and are never claimed as searched."}
 (out/f"{lane}.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding="utf-8")
 print("LANE DISCOVERY",lane,"executed",sum(a["status"]=="EXECUTED" for a in attempts),"blocked",sum(a["status"] in ("AUTH_OR_BROWSER_REQUIRED","API_KEY_REQUIRED") for a in attempts),"errors",sum(a["status"]=="ERROR" for a in attempts),"hits",len(results))
