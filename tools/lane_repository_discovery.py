@@ -47,7 +47,16 @@ if limit>0: terms=terms[:limit]
 results=[];attempts=[]
 for r in plan["repositories"]:
     name=r["name"]; repo_records=[]; statuses=[]; diagnostics=[]
-    for q in terms:
+    repo_terms=list(terms)
+    if name=="SearchCulture.gr / EKT":
+        greek=[q for q in repo_terms if any("\u0370"<=ch<="\u03ff" for ch in q)]
+        dated=[q for q in repo_terms if any(y in q for y in [str(x) for x in range(1200,2101)])]
+        broad=[q for q in repo_terms if q in [plan.get("target")]+plan.get("aliases",[])]
+        ordered=[]
+        for q in greek+dated+broad:
+            if q not in ordered: ordered.append(q)
+        repo_terms=ordered[:int(os.getenv("PCT_SEARCHCULTURE_QUERY_LIMIT","6"))]
+    for q in repo_terms:
         try:
             if name=="Internet Archive":
                 x=ia(q);status="EXECUTED";diag="public advanced-search API"
