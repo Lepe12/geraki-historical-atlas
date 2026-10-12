@@ -204,7 +204,20 @@ def searchculture(q,lane):
     keep=lambda u,t: "/aggregator/edm/" in u and len(t)>1
     try:
         out=_html_search(url,"SearchCulture.gr / EKT",lane,base,keep,max_records=50)
-        if out:return "EXECUTED",out,url+" ; anonymous portal fallback"
+        enriched=[]
+        for row in out:
+            u=row.get("url")
+            try:
+                jd=_json(u.rstrip("/")+"/json",timeout=20) if u else {}
+                flat=json.dumps(jd,ensure_ascii=False)
+                row["raw"]=jd
+                row["metadata_text"]=flat
+                dates=re.findall(r"\b(?:1[0-9]{3}|20[0-9]{2})\b",flat)
+                row["date"]=list(dict.fromkeys(dates))[:8]
+            except Exception:
+                pass
+            enriched.append(row)
+        if enriched:return "EXECUTED",enriched,url+" ; anonymous portal fallback + public JSON-LD dereference"
         return "API_KEY_REQUIRED",[],"SearchCulture API requires SEARCHCULTURE_API_KEY; anonymous portal returned no item links."
     except Exception as exc:
         return "API_KEY_REQUIRED",[],"SearchCulture API requires SEARCHCULTURE_API_KEY; portal fallback failed: "+type(exc).__name__+": "+str(exc)
