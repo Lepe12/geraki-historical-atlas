@@ -186,6 +186,29 @@ def isam(q,lane):
         out=_html_search(url,"İSAM AtoM",lane,base,keep)
         return "EXECUTED",out,url+" ; DSpace fallback reason="+str(first)
 
+def searchculture(q,lane):
+    key=os.getenv("SEARCHCULTURE_API_KEY","").strip()
+    if key:
+        url="https://www.searchculture.gr/aggregator/api/search.json?"+urllib.parse.urlencode({"apiKey":key,"general_term":q,"page":1,"pageSize":50})
+        d=_json(url);out=[]
+        for x in d.get("results",[]) or d.get("items",[]) or []:
+            uri=x.get("uri") or x.get("id")
+            title=x.get("dc_title") or x.get("title")
+            if isinstance(title,list): title=" ".join(str(v) for v in title)
+            out.append({"discovery_repository":"SearchCulture.gr / EKT","discovery_lane":lane,"connector_status":"EXECUTED","identifier":uri,"title":title,"date":x.get("dc_date") or x.get("date") or [],"url":uri,"raw":x})
+        return "EXECUTED",out,url
+    # Public portal fallback: useful for anonymous discovery; API remains preferred.
+    base="https://www.searchculture.gr"
+    params={"keywords[0].field":"","keywords[0].value":q,"page.page":1}
+    url=base+"/aggregator/portal/advancedSearch/search?"+urllib.parse.urlencode(params)
+    keep=lambda u,t: "/aggregator/edm/" in u and len(t)>1
+    try:
+        out=_html_search(url,"SearchCulture.gr / EKT",lane,base,keep,max_records=50)
+        if out:return "EXECUTED",out,url+" ; anonymous portal fallback"
+        return "API_KEY_REQUIRED",[],"SearchCulture API requires SEARCHCULTURE_API_KEY; anonymous portal returned no item links."
+    except Exception as exc:
+        return "API_KEY_REQUIRED",[],"SearchCulture API requires SEARCHCULTURE_API_KEY; portal fallback failed: "+type(exc).__name__+": "+str(exc)
+
 def ddb(q,lane):
     key=os.getenv("DDB_API_KEY","").strip()
     if not key:return "API_KEY_REQUIRED",[],"Set DDB_API_KEY to execute the Deutsche Digitale Bibliothek API."
@@ -271,7 +294,7 @@ def dispatch(repository,q,lane):
     if repository=="Internet Culturale": return internet_culturale(q,lane)
     if repository=="Nationaal Archief": return nationaal_archief(q,lane)
     if repository=="Delpher": return delpher_sru(q,lane)
-    if repository=="Deutsche Digitale Bibliothek": return ddb(q,lane)
+    if repository=="Deutsche Digitale Bibliothek": return ddb(q,lane)\n    if repository=="SearchCulture.gr / EKT": return searchculture(q,lane)
     if repository=="İSAM Kütüphanesi": return isam(q,lane)
     if repository=="PARES / Archivo General de Simancas":
         return pares_simancas(q,lane)
