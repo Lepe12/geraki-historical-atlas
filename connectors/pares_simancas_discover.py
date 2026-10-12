@@ -20,6 +20,11 @@ def discover(term,limit=5):
             if rid not in candidates:candidates.append(rid)
     if not candidates:
         print("PARES_SEARCH_DIAGNOSTIC",json.dumps({"html_size":len(html),"description_occurrences":html.lower().count("description"),"href_samples":re.findall(r'href="([^"]+)"',html,re.I)[-35:]},ensure_ascii=False))
+    pager_context=[]
+    for token in ("Siguiente","SearchController.do","pagina","numPag","pag="):
+        for m in list(re.finditer(re.escape(token),html,re.I))[:4]:
+            pager_context.append(re.sub(r"\\s+"," ",html[max(0,m.start()-180):m.end()+350]))
+    print("PARES_PAGER_DIAGNOSTIC",json.dumps(pager_context,ensure_ascii=False))
     records=[];errors=[]
     for rid in candidates:
         try:
