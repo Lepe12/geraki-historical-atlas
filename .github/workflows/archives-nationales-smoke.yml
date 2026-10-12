@@ -1,0 +1,33 @@
+name: Archives nationales inventory connector smoke test
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 7 * * 1'
+permissions:
+  contents: read
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Offline unit tests
+        run: python -m unittest discover -s connectors -p 'test_archives_nationales_open_data.py' -v
+      - name: Live official dataset query
+        run: |
+          python connectors/archives_nationales_open_data.py marine --limit 3 > /tmp/france_inventory.json
+          python - <<'PY'
+          import json
+          with open('/tmp/france_inventory.json', encoding='utf-8') as f:
+              result=json.load(f)
+          assert result['status']=='EXECUTED'
+          assert result['scope']=='open_data_finding_aids_only'
+          assert result['hits']>0, 'No records returned; connector not verified'
+          for record in result['records']:
+              assert record.get('fran_ir'), 'Missing archival inventory identifier'
+              assert record.get('url_slv'), 'Missing inventory permalink'
+          print('VERIFIED:',result['hits'],'inventory matches with identifiers and links')
+          PY
