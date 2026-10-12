@@ -34,7 +34,10 @@ jobs:
       - name: Build lane-specific repository plan
         env:
           PCT_RESEARCH_LANE: ${{ matrix.lane }}
-        run: python3 tools/lane_repository_plan.py
+        run: |
+          python3 tools/build_research_lanes.py
+          python3 tools/lane_repository_plan.py
+          python3 tools/lane_repository_discovery.py
       - name: Run lane discovery
         env:
           PCT_RESEARCH_LANE: ${{ matrix.lane }}
@@ -53,6 +56,7 @@ jobs:
           path: |
             research_lanes/${{ matrix.lane }}.json
             repository_plans/${{ matrix.lane }}.json
+            lane_discovery/${{ matrix.lane }}.json
             library_discovery/
             citation_chase_candidates/
             library_acquisition/
