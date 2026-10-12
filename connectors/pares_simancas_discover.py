@@ -4,9 +4,12 @@ from html import unescape
 from pares_simancas_verify import verify
 HOST="https://pares.cultura.gob.es"
 FIRST="/ParesBusquedas20/catalogo/find?"
-def fetch(opener,url):
+def fetch(opener,url,meta=False):
     req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0 (compatible; GERAKI-Research/1.0)","Accept":"text/html"})
-    with opener.open(req,timeout=35) as r:return r.read(4000000).decode("iso-8859-15","replace")
+    with opener.open(req,timeout=35) as r:
+        body=r.read(4000000).decode("iso-8859-15","replace")
+        if meta: return body,{"status":r.status,"final_url":r.geturl(),"content_type":r.headers.get("Content-Type")}
+        return body
 def ids(html):
     out=[]
     for m in re.finditer(r"/catalogo/description/(\d+)",unescape(html),re.I):
