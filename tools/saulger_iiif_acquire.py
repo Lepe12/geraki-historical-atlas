@@ -52,9 +52,11 @@ try:
     report["canvas_count"] = len(canvases)
     for idx, canvas in enumerate(canvases):
         label = text_label(canvas.get("label", ""))
-        # ONLY exact printed page labels, not scan ordinal numbers.
-        digits = re.findall(r"(?<!\d)\d{1,4}(?!\d)", label)
-        matched = sorted(TARGETS.intersection(map(int, digits)))
+        # BSB label format: "PRINTED_PAGE (SCAN_NUMBER)", e.g. "305 (0323)".
+        # Only the leading number is printed pagination.
+        page_match = re.match(r"^\\s*(\\d{1,4})(?=\\s|\\(|$)", label)
+        printed_page = int(page_match.group(1)) if page_match else None
+        matched = [printed_page] if printed_page in TARGETS else []
         if matched:
             url = image_url(canvas)
             entry = {"canvas_index_0_based": idx, "canvas_id": canvas.get("@id") or canvas.get("id"), "label": label, "printed_pages": matched, "image_url": url}
