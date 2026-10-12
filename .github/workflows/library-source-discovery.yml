@@ -21,6 +21,8 @@ jobs:
         run: python3 tools/route_library_candidates.py
       - name: Acquire routed digital originals
         run: python3 tools/acquire_library_candidate.py
+      - name: Search acquired OCR for Citation Chase targets
+        run: python3 tools/search_acquired_ocr.py
       - name: Upload catalogue candidates
         if: always()
         uses: actions/upload-artifact@v4
@@ -30,4 +32,5 @@ jobs:
             library_discovery/
             citation_chase_candidates/
             library_acquisition/
+            citation_chase_hits/
           if-no-files-found: warn
