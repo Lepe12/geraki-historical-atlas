@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+"""Normalize repository-specific lane discoveries into common Citation Chase input."""
+import json,os,pathlib,datetime
+lane=os.getenv("PCT_RESEARCH_LANE","travellers")
+src=pathlib.Path("lane_discovery")/f"{lane}.json"
+out=pathlib.Path("citation_chase_candidates");out.mkdir(exist_ok=True)
+if not src.exists(): raise SystemExit("missing "+str(src))
+d=json.loads(src.read_text(encoding="utf-8"));selected=[]
+for x in d.get("results",[]):
+    repo=x.get("discovery_repository") or x.get("repository")
+    item={
+      "identifier":x.get("identifier"),
+      "title":x.get("title"),
+      "creator":x.get("creator"),
+      "date":x.get("date"),
+      "repository":repo,
+      "discovery_repository":repo,
+      "discovery_lane":lane,
+      "connector_status":x.get("connector_status","EXECUTED"),
+      "url":x.get("url"),
+      "digital_url":x.get("digital_url"),
+      "iiif_manifest_candidates":x.get("iiif_manifest_candidates",[]),
+      "bsb_digital_ids":x.get("bsb_digital_ids",[]),
+      "acquisition_route":x.get("acquisition_route"),
+      "verification_status":"NEEDS_EVIDENCE",
+      "next_stage":"LOCATE_OR_ACQUIRE_DIGITAL_OBJECT"
+    }
+    if item["identifier"] or item["url"] or item["title"]:selected.append(item)
+payload={"schema":"pct-repository-candidates-v2","generated_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"lane":lane,"request_file":d.get("request_file"),"selected":selected,"attempts":d.get("attempts",[]),"rule":"Repository provenance is retained end-to-end. Catalogue discovery is not evidence and cannot set VERIFIED."}
+(out/"repository_candidates.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding="utf-8")
+print("repository candidates",lane,len(selected))
