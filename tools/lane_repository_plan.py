@@ -3,6 +3,7 @@
 import os,json,pathlib,sys
 sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from request_context import load_request
+from historical_query_expansion import expand_queries
 
 lane=os.getenv("PCT_RESEARCH_LANE","travellers")
 rf,req,ctx=load_request()
@@ -21,7 +22,8 @@ cfg={
 langs={"spanish_simancas":["Spanish","Latin"],"venetian":["Italian","Venetian","Latin"],"french":["French"],"british":["English"],"dutch":["Dutch"],"german":["German","Latin"],"italian_states":["Italian","Latin"],"ottoman":["Ottoman Turkish","Turkish"],"north_african":["Arabic","Ottoman Turkish","French","Spanish","Italian"],"travellers":["French","Italian","English","Dutch","German","Spanish","Latin","Greek"]}
 if lane not in cfg: raise SystemExit("Unknown PCT_RESEARCH_LANE: "+lane)
 terms=[ctx["target"]]+ctx["aliases"]
-plan={"lane":lane,"request_file":rf.name,"target":ctx["target"],"aliases":ctx["aliases"],"date_range":ctx["date_range"],"languages":langs[lane],"repositories":[],"rule":"Search repository/catalogue in its own language and historical variants; acquire digital originals where technically available; catalogue records are leads only."}
+queries=expand_queries(lane,ctx["target"],ctx["aliases"],ctx["date_range"])
+plan={"lane":lane,"request_file":rf.name,"target":ctx["target"],"aliases":ctx["aliases"],"date_range":ctx["date_range"],"languages":langs[lane],"expanded_queries":queries,"repositories":[],"rule":"Search repository/catalogue with auditable multilingual event vocabulary and user-supplied historical name variants; catalogue records are leads only."}
 for name,base in cfg[lane]:
     q=" ".join(terms+[ctx["date_range"]]).strip()
     plan["repositories"].append({"name":name,"base_url":base,"query_seed":q,"status":"DISCOVERY_TARGET"})
