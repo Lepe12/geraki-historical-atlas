@@ -25,11 +25,13 @@ for q in queries:
  time.sleep(1)
 
 # Keep Archipel/Arcipelago as valid historical terms; rank rather than discard.
-AEGEAN=("thermia","termia","kythnos","cyclad","aege","egée","egeo","archipel de la mer mediterran","middelantsche zee","naxos","paros","mycono","andros","santorini","crevel")\nNOISE=("bed curtain","bedspread","pillow","embroidery","clevelandart","legendary greece","ancient history")
+AEGEAN=("thermia","termia","kythnos","cyclad","aege","egée","egeo","archipel de la mer mediterran","middelantsche zee","naxos","paros","mycono","andros","santorini","crevel")
+NOISE=("bed curtain","bedspread","pillow","embroidery","clevelandart","legendary greece","ancient history")
 for item in items:
  textblob=json.dumps(item["metadata"],ensure_ascii=False).lower()
  item["aegean_relevance_score"]=sum(1 for t in AEGEAN if t in textblob)
- noise=any(t in textblob for t in NOISE)\n item["routing"]="REJECT_NOISE" if noise else ("CITATION_CHASE_PRIORITY" if item["aegean_relevance_score"]>=1 else "BROAD_ARCHIPEL_REVIEW")
+ noise=any(t in textblob for t in NOISE)
+ item["routing"]="REJECT_NOISE" if noise else ("CITATION_CHASE_PRIORITY" if item["aegean_relevance_score"]>=1 else "BROAD_ARCHIPEL_REVIEW")
 
 seen=set(); unique=[]
 for item in items:
