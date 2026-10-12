@@ -23,7 +23,7 @@ EVENT=[
 root=pathlib.Path("library_acquisition");out=pathlib.Path("event_first_hits");out.mkdir(exist_ok=True)
 hits=[]
 for p in root.glob("*"):
-    if not p.is_file() or p.name=="acquisition_report.json":continue
+    if not p.is_file() or p.name=="acquisition_report.json" or p.suffix.lower() not in (".txt",".xml",".html",".htm"):continue
     try:text=unicodedata.normalize("NFKC",p.read_text(encoding="utf-8",errors="ignore"))
     except Exception:continue
     pm=[m for t in terms for m in re.finditer(r"(?<!\w)"+re.escape(t)+r"(?!\w)",text,re.I)]
