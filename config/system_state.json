@@ -1,15 +1,65 @@
 {
   "system": "Piratecartography Historical Research System",
-  "version": "PCT-AGENT-TREE v2.1 PARALLEL 10-LANE MULTI-AGENT",
+  "version": "PCT-AGENT-TREE v2.1 / PIPELINE v3.0 MULTI-ARCHIVE",
   "as_of": "2026-10-12",
   "ui_is_replaceable": true,
   "canonical_engine": "GitHub",
   "structured_store": "Airtable",
-  "evidence_store": {"status":"TO_BE_PROVISIONED","transient_github_artifacts_are_canonical":false},
-  "positive_controls": {
-    "BSB": {"id":"bsb10447069","catalogue":true,"iiif_manifest":true,"reference_scan":true},
-    "TNA": {"catalogue_connector":true},
-    "Internet_Archive": {"acquisition_ocr_event_first_exact_page_demonstrated":true}
+  "evidence_store": {
+    "status": "ACTIVE_GITHUB_PILOT",
+    "durable_run_indexes": true,
+    "sha256_indexes": true,
+    "selected_original_scans": true,
+    "transient_github_artifacts_are_canonical": false
   },
-  "lanes": ["travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]
+  "airtable_backup": {
+    "schema_snapshot": true,
+    "record_backup_workflow": true,
+    "first_live_backup_run": 38243014838,
+    "first_live_backup_commit": "711076fc328d37daa59d3aa487e6056aa22a36fb"
+  },
+  "positive_controls": {
+    "BSB": {
+      "id": "bsb10447069",
+      "catalogue": true,
+      "iiif_manifest": true,
+      "reference_scan": true
+    },
+    "TNA": {
+      "catalogue_connector": true
+    },
+    "Internet_Archive": {
+      "acquisition_ocr_event_first_exact_page_demonstrated": true
+    }
+  },
+  "pipeline_stages": [
+    "REQUEST",
+    "SOURCE_DISCOVERY",
+    "CITATION_CHASE",
+    "ACQUISITION",
+    "OCR",
+    "EVENT_FIRST",
+    "EXACT_PAGE_MAPPING",
+    "ORIGINAL_INSPECTION_QUEUE",
+    "SOURCE_GENEALOGY",
+    "CORROBORATION",
+    "VERIFICATION_GATE",
+    "QA",
+    "STRUCTURED_OUTPUT",
+    "DURABLE_EVIDENCE",
+    "SYSTEM_HEALTH"
+  ],
+  "lanes": [
+    "travellers",
+    "spanish_simancas",
+    "venetian",
+    "french",
+    "british",
+    "dutch",
+    "german",
+    "italian_states",
+    "ottoman",
+    "north_african"
+  ],
+  "verification_rule": "No catalogue/OCR/acquisition signal may set VERIFIED. Exact original inspection + genealogy + >=3 independent source chains + QA are required."
 }
