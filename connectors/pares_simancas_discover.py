@@ -1,40 +1,42 @@
-"""Native PARES catalogue discovery with strict Simancas attribution.
-Catalogue metadata only; does not imply inspection of archival originals.
-"""
-import argparse,json,re,urllib.parse,urllib.request
+"""Native PARES search with pagination and strict Archivo General de Simancas verification."""
+import argparse,json,re,urllib.parse,urllib.request,http.cookiejar
 from html import unescape
 from pares_simancas_verify import verify
-
-SEARCH="https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?"
-def discover(term,limit=5):
-    if not term.strip():raise ValueError("Search term required")
-    url=SEARCH+urllib.parse.urlencode({"texto":term})
+HOST="https://pares.cultura.gob.es"
+FIRST="/ParesBusquedas20/catalogo/find?"
+def fetch(opener,url):
     req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0 (compatible; GERAKI-Research/1.0)","Accept":"text/html"})
-    with urllib.request.urlopen(req,timeout=35) as r: html=r.read(4000000).decode("iso-8859-15","replace")
-    # PARES renders catalogue result links in server-side HTML.
-    patterns=[r"/catalogo/description/(\d+)",r"/catalogo/description\?id=(\d+)",r"javascript:[^\"']*description[^\"']*?(\d{5,12})"]
-    candidates=[]
-    for pattern in patterns:
-        for match in re.finditer(pattern,unescape(html),re.I):
-            rid=match.group(1)
-            if rid not in candidates:candidates.append(rid)
-    if not candidates:
-        print("PARES_SEARCH_DIAGNOSTIC",json.dumps({"html_size":len(html),"description_occurrences":html.lower().count("description"),"href_samples":re.findall(r'href="([^"]+)"',html,re.I)[-35:]},ensure_ascii=False))
-    pager_context=[]
-    for token in ("Siguiente","SearchController.do","pagina","numPag","pag="):
-        for m in list(re.finditer(re.escape(token),html,re.I))[:4]:
-            pager_context.append(re.sub(r"\\s+"," ",html[max(0,m.start()-180):m.end()+350]))
-    print("PARES_PAGER_DIAGNOSTIC",json.dumps(pager_context,ensure_ascii=False))
-    records=[];errors=[]
-    for rid in candidates:
-        try:
-            rec=verify(rid)
-            if rec["status"]=="RECORD_VERIFIED":records.append(rec)
-            if len(records)>=limit:break
-        except Exception as exc:errors.append({"record_id":rid,"error":str(exc)})
-    return {"term":term,"search_url":url,"discovery_method":"native_PARES_catalogo_find","candidate_count":len(candidates),"candidate_ids":candidates[:50],"verified_count":len(records),"records":records,"errors":errors[:10],"native_PARES_search_implemented":True,"scope":"catalogue search and description verification only"}
+    with opener.open(req,timeout=35) as r:return r.read(4000000).decode("iso-8859-15","replace")
+def ids(html):
+    out=[]
+    for m in re.finditer(r"/catalogo/description/(\d+)",unescape(html),re.I):
+        if m.group(1) not in out:out.append(m.group(1))
+    return out
+def discover(term,limit=5,max_pages=12):
+    jar=http.cookiejar.CookieJar();opener=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
+    first=HOST+FIRST+urllib.parse.urlencode({"texto":term});html=fetch(opener,first)
+    pages=[html];pager=re.search(r'href="([^"]*SearchController\.do[^"]*d-2677838-p=2[^"]*)"',html,re.I)
+    page2=unescape(pager.group(1)) if pager else None
+    verified=[];seen=[];errors=[]
+    for page in range(1,max_pages+1):
+        if page>1:
+            if not page2:break
+            pageurl=urllib.parse.urljoin(HOST,re.sub(r'd-2677838-p=2',f'd-2677838-p={page}',page2))
+            try:html=fetch(opener,pageurl)
+            except Exception as e:errors.append({"page":page,"error":str(e)});break
+        cands=ids(html)
+        for rid in cands:
+            if rid in seen:continue
+            seen.append(rid)
+            try:
+                rec=verify(rid)
+                if rec["status"]=="RECORD_VERIFIED":
+                    rec["discovered_on_page"]=page;verified.append(rec)
+                    if len(verified)>=limit:break
+            except Exception as e:errors.append({"record_id":rid,"error":str(e)})
+        if len(verified)>=limit:break
+    return {"term":term,"search_url":first,"discovery_method":"native_PARES_catalogo_find_paginated","pages_checked":page,"candidates_checked":len(seen),"verified_count":len(verified),"records":verified,"errors":errors[:10],"native_PARES_search_implemented":True,"archive_gate":"Archivo General de Simancas + ES.47161.AGS + signatura","scope":"catalogue metadata only; originals not inspected"}
 if __name__=="__main__":
-    p=argparse.ArgumentParser();p.add_argument("term");p.add_argument("--limit",type=int,default=5)
-    a=p.parse_args();result=discover(a.term,a.limit)
-    print(json.dumps(result,ensure_ascii=False,indent=2))
-    if not result["records"]:raise SystemExit("No newly discovered Simancas records verified")
+    p=argparse.ArgumentParser();p.add_argument("term");p.add_argument("--limit",type=int,default=3);p.add_argument("--max-pages",type=int,default=12)
+    a=p.parse_args();r=discover(a.term,a.limit,a.max_pages);print(json.dumps(r,ensure_ascii=False,indent=2))
+    if not r["records"]:raise SystemExit("No Simancas records verified within page limit")
