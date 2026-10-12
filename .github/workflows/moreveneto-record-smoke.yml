@@ -1,0 +1,33 @@
+name: Moreveneto known-record live verification
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'connectors/moreveneto_record_verify.py'
+      - '.github/workflows/moreveneto-record-smoke.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check syntax
+        run: python -m py_compile connectors/moreveneto_record_verify.py
+      - name: Verify live official Venetian archival description
+        run: |
+          python connectors/moreveneto_record_verify.py 'https://asve.arianna4.cloud/patrimonio/73a0c098-e94f-49d6-a27d-d20acde2b11f/0985-fondo-luogotenente-alla-patria-del-friuli-%5Budine%5D' > /tmp/moreveneto.json
+          python - <<'PY'
+          import json
+          with open('/tmp/moreveneto.json', encoding='utf-8') as f:
+              data=json.load(f)
+          assert data['status']=='RECORD_VERIFIED'
+          assert data['scope']=='known_record_url_only'
+          assert data['custodian_confirmed'] and data['date_metadata_present']
+          print('VERIFIED RECORD:',data['record_uuid'],data['record_url'])
+          PY
