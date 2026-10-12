@@ -23,7 +23,15 @@ for q in queries:
    items.append({"query":q,"repository":"Internet Archive digital library","metadata":d,"original_inspected":False,"verified":False})
  except Exception as exc: errors.append({"query":q,"error":str(exc)})
  time.sleep(1)
-\n# Keep Archipel/Arcipelago as valid historical terms; rank rather than discard.\nAEGEAN=("thermia","termia","kythnos","cyclad","aege","egée","egeo","grec","greece","archipel de la mer mediterran","middelantsche zee","naxos","paros","mycono","andros","santorini","crevel")\nfor item in items:\n textblob=json.dumps(item["metadata"],ensure_ascii=False).lower()\n item["aegean_relevance_score"]=sum(1 for t in AEGEAN if t in textblob)\n item["routing"]="CITATION_CHASE_PRIORITY" if item["aegean_relevance_score"]>=1 else "BROAD_ARCHIPEL_REVIEW"\n\nseen=set(); unique=[]
+
+# Keep Archipel/Arcipelago as valid historical terms; rank rather than discard.
+AEGEAN=("thermia","termia","kythnos","cyclad","aege","egée","egeo","grec","greece","archipel de la mer mediterran","middelantsche zee","naxos","paros","mycono","andros","santorini","crevel")
+for item in items:
+ textblob=json.dumps(item["metadata"],ensure_ascii=False).lower()
+ item["aegean_relevance_score"]=sum(1 for t in AEGEAN if t in textblob)
+ item["routing"]="CITATION_CHASE_PRIORITY" if item["aegean_relevance_score"]>=1 else "BROAD_ARCHIPEL_REVIEW"
+
+seen=set(); unique=[]
 for item in items:
  k=item["metadata"].get("identifier")
  if k and k not in seen:seen.add(k);unique.append(item)
