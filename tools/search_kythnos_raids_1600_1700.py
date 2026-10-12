@@ -17,7 +17,7 @@ hits=[]
 for p in sorted(root.glob("*")):
  if not p.is_file() or p.name=="acquisition_report.json": continue
  text=norm(p.read_text(encoding="utf-8",errors="ignore"))
- place_matches=[m for pat in PLACE for m in re.finditer(pat,text,re.I)]
+ place_matches=[m for pat in PLACE for m in re.finditer(r"(?<!\\w)(?:"+pat+r")(?!\\w)",text,re.I)]
  event_matches=[m for pat in EVENT for m in re.finditer(pat,text,re.I)]
  for pm in place_matches:
   near=[em for em in event_matches if abs(em.start()-pm.start())<=5000]
