@@ -37,7 +37,9 @@ required_files={
  "human_review_queue":pathlib.Path("human_review/review_queue.json").exists(),
  "verification_gate":pathlib.Path("verification/verification_gate.json").exists(),
  "qa_report":pathlib.Path("qa/qa_report.json").exists(),
- "structured_output":pathlib.Path("structured_output/candidate_events.json").exists()
+ "structured_output":pathlib.Path("structured_output/candidate_events.json").exists(),
+ "research_dossier":pathlib.Path(f"research_dossier/{lane}.json").exists(),
+ "run_manifest":pathlib.Path("run_manifest/manifest.json").exists()
 }
 pipeline_complete=all(required_files.values()) and exact_page_complete
 if executed and pipeline_complete:status="OPERATIONAL_WITH_EXPLICIT_BLOCKERS" if blocked else "OPERATIONAL"
