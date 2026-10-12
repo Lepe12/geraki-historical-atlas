@@ -1,0 +1,53 @@
+name: Automatic IIIF Acquisition Queue
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'acquisition_requests/*.json'
+
+permissions:
+  contents: read
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Locate request added by triggering commit
+        id: req
+        shell: bash
+        run: |
+          FILE=$(git diff-tree --no-commit-id --name-only -r "${{ github.sha }}" | grep '^acquisition_requests/.*\.json$' | head -n 1)
+          if [ -z "$FILE" ]; then
+            echo "No acquisition request found in triggering commit" >&2
+            exit 1
+          fi
+          echo "file=$FILE" >> "$GITHUB_OUTPUT"
+      - name: Validate request and acquire pages
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, subprocess
+          p=pathlib.Path("${{ steps.req.outputs.file }}")
+          q=json.loads(p.read_text(encoding="utf-8"))
+          required=("manifest","pages")
+          missing=[k for k in required if not q.get(k)]
+          if missing: raise SystemExit("Missing required request fields: "+", ".join(missing))
+          pages=q["pages"]
+          if isinstance(pages,list): pages=",".join(str(x) for x in pages)
+          cmd=["python3","tools/iiif_acquire.py","--manifest",str(q["manifest"]),"--pages",str(pages),"--source-id",str(q.get("source_id","")),"--out","iiif_acquisition"]
+          subprocess.run(cmd,check=True)
+          PY
+      - name: Preserve request with Citation Chase package
+        if: always()
+        run: |
+          mkdir -p iiif_acquisition
+          cp "${{ steps.req.outputs.file }}" iiif_acquisition/request.json || true
+      - name: Upload Citation Chase package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: citation-chase-auto-${{ github.run_id }}
+          path: iiif_acquisition/
+          if-no-files-found: warn
