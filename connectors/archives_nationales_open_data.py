@@ -18,7 +18,13 @@ def normalize(value):
     return "".join(c for c in value if not unicodedata.combining(c)).casefold()
 
 def search_csv(csv_text, query, limit=20):
-    reader = csv.DictReader(io.StringIO(csv_text.lstrip("\ufeff")), delimiter=";")
+    sample = csv_text.lstrip("\ufeff")
+    try:
+        dialect = csv.Sniffer().sniff(sample[:8192], delimiters=",;\t")
+        delimiter = dialect.delimiter
+    except csv.Error:
+        delimiter = ","
+    reader = csv.DictReader(io.StringIO(sample), delimiter=delimiter)
     if not reader.fieldnames or "fran_ir" not in reader.fieldnames:
         raise ValueError("Unexpected inventory CSV schema: " + str(reader.fieldnames))
     terms = [normalize(term) for term in query.split() if term.strip()]
