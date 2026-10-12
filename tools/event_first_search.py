@@ -21,7 +21,7 @@ EVENT=[
  r"zeerover\w*",r"kapern\w*",r"seer[aä]uber\w*",r"ghaz\w*",r"akın\w*",r"esir\w*",r"fidye\w*"
 ]
 root=pathlib.Path("library_acquisition");out=pathlib.Path("event_first_hits");out.mkdir(exist_ok=True)
-hits=[]
+hits=[];context_leads=[]
 for p in root.glob("*"):
     if not p.is_file() or p.name=="acquisition_report.json" or p.suffix.lower() not in (".txt",".xml",".html",".htm"):continue
     try:text=unicodedata.normalize("NFKC",p.read_text(encoding="utf-8",errors="ignore"))
@@ -33,7 +33,11 @@ for p in root.glob("*"):
         if not near:continue
         a=max(0,m.start()-2500);b=min(len(text),m.end()+5000);ctx_text=text[a:b]
         ys=sorted(set(int(y) for y in re.findall(r"\b(1[0-9]{3}|20[0-9]{2})\b",ctx_text) if lo<=int(y)<=hi))
-        hits.append({"file":p.name,"place_match":m.group(0),"line":text.count("\n",0,m.start())+1,"years_in_scope":ys,"event_terms":sorted(set(e.group(0) for e in near),key=str.casefold),"context":re.sub(r"[ \t]+"," ",ctx_text)})
-report={"schema":"pct-event-first-general-v2","request_file":rf.name,"target":target,"aliases":aliases,"date_range":[lo,hi],"hits":hits,"verification_status":"NEEDS_EVIDENCE","next_stage":"EXACT_PAGE_MAPPING_AND_ORIGINAL_INSPECTION","rule":"Actor identity is not required for discovery. OCR/event proximity is a lead only."}
+        item={"file":p.name,"place_match":m.group(0),"line":text.count("\n",0,m.start())+1,"years_in_scope":ys,"event_terms":sorted(set(e.group(0) for e in near),key=str.casefold),"context":re.sub(r"[ \t]+"," ",ctx_text)}
+        if ys: hits.append(item)
+        else:
+            item["status"]="TEMPORAL_CONTEXT_UNRESOLVED"
+            context_leads.append(item)
+report={"schema":"pct-event-first-general-v2","request_file":rf.name,"target":target,"aliases":aliases,"date_range":[lo,hi],"hits":hits,"context_leads":context_leads,"verification_status":"NEEDS_EVIDENCE","next_stage":"EXACT_PAGE_MAPPING_AND_ORIGINAL_INSPECTION","rule":"Actor identity is not required for discovery. OCR/event proximity is a lead only."}
 (out/"event_hits.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
-print("GENERAL EVENT-FIRST",target,date,"hits",len(hits))
+print("GENERAL EVENT-FIRST",target,date,"anchored_hits",len(hits),"unresolved_context_leads",len(context_leads))
