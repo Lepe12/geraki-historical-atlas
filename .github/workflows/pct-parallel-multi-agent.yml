@@ -46,9 +46,11 @@ jobs:
       - name: Run lane discovery
         env:
           PCT_RESEARCH_LANE: ${{ matrix.lane }}
+          PCT_MAX_ACQUISITION_CANDIDATES: "100"
+          PCT_MAX_IA_CANDIDATES: "10"
         run: |
           python3 tools/build_research_lanes.py
-          timeout 180s bash -c '
+          timeout 600s bash -c '
             set -o pipefail
             if [ "$PCT_RESEARCH_LANE" = "travellers" ]; then
               python3 tools/library_source_discovery.py &&
@@ -127,6 +129,17 @@ jobs:
             sleep $((n*2))
           done
           exit 1
+
+      - name: Synchronize safe research state to Airtable
+        env:
+          AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+          PCT_RUN_ID: ${{ github.run_id }}
+        run: |
+          python3 tools/airtable_sync.py
+          git add "evidence/runs/${{ github.run_id }}/AIRTABLE_SYNC.json"
+          git diff --cached --quiet || git commit -m "Airtable sync report: run ${{ github.run_id }}"
+          git pull --rebase origin main
+          git push origin HEAD:main
 
       - name: Enforce ten-lane operational gate
         run: |
