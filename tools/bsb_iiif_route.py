@@ -9,7 +9,14 @@ data=json.loads(src.read_text(encoding="utf-8"))
 candidates=[];seen=set()
 for r in data.get("results",[]):
  if r.get("repository")!="BSB":continue
- for manifest in r.get("iiif_manifest_candidates",[]):
+ manifests=list(r.get("iiif_manifest_candidates",[]))
+ # Also parse any BSB IDs from every digital URL/marker. Do not fabricate identifiers.
+ import re
+ raw=" ".join(r.get("digital_links",[])+r.get("digital_markers",[]))
+ for bid in re.findall(r"bsb[0-9]{7,}",raw,re.I):
+  m="https://api.digitale-sammlungen.de/iiif/presentation/v2/"+bid+"/manifest"
+  if m not in manifests: manifests.append(m)
+ for manifest in manifests:
   if manifest in seen:continue
   seen.add(manifest)
   entry={"manifest":manifest,"source_id":manifest.split("/")[-2],"source_title":r.get("title"),"status":"UNTESTED_MANIFEST_CANDIDATE","original_inspected":False,"verification_status":"NEEDS_EVIDENCE"}
