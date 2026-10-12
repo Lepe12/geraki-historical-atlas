@@ -2,7 +2,14 @@
   "schema": "agent-piracy-historical-benchmark-v1",
   "methodology": {
     "gold_standard_rule": "Only HUMAN_REVIEWED primary-source cases may be labelled HISTORICAL_GOLD. Public catalogue or edition metadata are REFERENCE_GOLD and test retrieval/classification, not final historical truth.",
-    "metrics": ["precision","recall","false_positive_rate","date_error_rate","entity_error_rate","unsupported_claim_rate"]
+    "metrics": [
+      "precision",
+      "recall",
+      "false_positive_rate",
+      "date_error_rate",
+      "entity_error_rate",
+      "unsupported_claim_rate"
+    ]
   },
   "cases": [
     {
@@ -10,7 +17,9 @@
       "tier": "REFERENCE_GOLD",
       "label": true,
       "target": "Henry Morgan",
-      "aliases": ["Morgan"],
+      "aliases": [
+        "Morgan"
+      ],
       "date_range": "1671-1671",
       "expected_year": 1671,
       "expected_entity": "Henry Morgan",
@@ -27,7 +36,10 @@
       "tier": "REFERENCE_GOLD",
       "label": true,
       "target": "Mykonos",
-      "aliases": ["Μύκονος","Myconos"],
+      "aliases": [
+        "Μύκονος",
+        "Myconos"
+      ],
       "date_range": "1695-1695",
       "expected_year": 1695,
       "expected_entity": null,
@@ -66,6 +78,18 @@
       "label": false,
       "text_fixture": "Three later books repeat the same earlier narrative. They are not three independent source chains.",
       "expected_event_family": "DEPENDENT_SOURCES"
+    },
+    {
+      "id": "NEG-LIVE-NONEXISTENT-TARGET",
+      "tier": "LIVE_NEGATIVE_CONTROL",
+      "label": false,
+      "target": "Zerphalon Control 91827",
+      "aliases": [
+        "Zerphalon-91827"
+      ],
+      "date_range": "1670-1680",
+      "expected_event_family": "NONE",
+      "source_note": "Deliberately nonexistent benchmark target used to detect false positives; not a historical claim."
     }
   ]
 }
