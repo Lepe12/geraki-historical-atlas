@@ -39,16 +39,44 @@ The engine defines ten source-family lanes:
 
 A successful GitHub job does NOT imply the named archive was searched. Repository execution must be recorded explicitly as EXECUTED; unsupported targets remain CITATION_CHASE_WEB_OR_API_CONNECTOR_REQUIRED.
 
-## 5. Connector state — 2026-10-12
-- British/TNA Discovery: catalogue connector empirically operational.
-- German/BSB: SRU catalogue connector empirically operational. Positive control bsb10447069 validated IIIF and acquired a reference scan; non-digitized/catalogue-only BSB identifiers may correctly return 404.
-- Travellers/Internet Archive: automated discovery/acquisition/OCR/event-search/exact-page path empirically demonstrated.
-- Gallica: GitHub Actions request encountered HTTP 403; do not claim connected.
-- PARES/Simancas, ASVe/SIAS, British Library, Nationaal Archief/Delpher, DDB, Internet Culturale, BOA/İSAM and North-African specialist repositories: connector work pending unless a later run explicitly supersedes this status.
+## 5. Connector architecture — 2026-10-12
+The connector layer is now normalized through `tools/connectors/repository_connectors.py` and `tools/lane_repository_discovery.py`. Every result carries repository/lane provenance and an explicit connector status.
+
+Implemented anonymous/public execution paths:
+- BSB Alma SRU + IIIF routing.
+- The National Archives (UK) Discovery API.
+- Internet Archive search/acquisition/OCR/exact-page route.
+- BnF General Catalogue SRU as the stable BnF discovery path when direct Gallica SRU is blocked.
+- Biblioteca Nacional de España SRU / Biblioteca Digital Hispánica discovery path.
+- Archives diplomatiques public catalogue search.
+- Internet Culturale public catalogue search.
+- Nationaal Archief public search/open-data route.
+- Delpher/KB SRU.
+- Google Books public discovery.
+- İSAM public DSpace/AtoM discovery fallback.
+- Deutsche Digitale Bibliothek connector when `DDB_API_KEY` is supplied.
+
+Explicit blockers are preserved rather than faked:
+- PARES/Archivo General de Simancas: interactive/browser research target; no stable anonymous API is claimed.
+- Türkiye Devlet Arşivleri/BOA: authenticated interactive catalogue.
+- SIAS/Archivio di Stato archive-specific search: retained as a research target until a stable anonymous term-search connector is proven.
+- British Library and Archives nationales: retained as targets; no general anonymous machine-search API is claimed.
+
+A lane can be operational through a proven public counterpart/fallback while a named archive in that lane remains blocked. Never translate lane success into a false claim that every listed archive was searched.
 
 ## 6. Evidence-state model
-Suggested immutable progression:
+Immutable progression:
 DISCOVERED → LOCATED → ACQUIRED → EXACT_PAGE_MAPPED → ORIGINAL_INSPECTED → EXTRACTED → GENEALOGY_CHECKED → CORROBORATED → VERIFIED.
+
+The automated workflow now also creates explicit post-acquisition queues/reports:
+- `original_inspection/inspection_queue.json`
+- `source_genealogy/genealogy_queue.json`
+- `corroboration/corroboration_queue.json`
+- `verification/verification_gate.json`
+- `qa/qa_report.json`
+- `structured_output/candidate_events.json`
+
+These files complete the workflow stages without pretending that a machine download has been visually inspected. If original inspection/genealogy/corroboration are absent, the verification gate remains blocked.
 Failures/holds: ACCESS_BLOCKED, CITATION_DEAD_END, NEEDS_EVIDENCE, PAGINATION_UNRESOLVED.
 No acquisition action may directly set VERIFIED.
 
@@ -109,16 +137,26 @@ No irreplaceable component may exist in only one of:
 
 Canonical code/specification lives in GitHub; structured research state in Airtable plus schema snapshots; acquired evidence in durable Evidence Store plus checksums/indexes.
 
-## 11. Next hardening tasks
-1. Choose/provision the durable Evidence Store.
-2. Add automatic evidence index + SHA-256 generation.
-3. Export/version Airtable schema.
-4. Merge repository-specific discoveries into the common acquisition pipeline with provenance.
-5. Implement remaining archive connectors one by one with positive controls.
-6. Add automated system-health report covering all ten lanes.
+## 11. Hardening status
+Completed:
+1. GitHub Evidence Store pilot with SHA-256 indexes and selected durable scans.
+2. Automatic run evidence preservation for all ten lanes.
+3. Airtable schema snapshot versioned in GitHub.
+4. Automated timestamped Airtable record backup to GitHub.
+5. Repository-specific discoveries merged into the common Citation Chase/acquisition pipeline with provenance.
+6. General request-driven library/OCR/EVENT-FIRST stages; Kythnos/Crevelier are no longer hard-coded in engine logic.
+7. Post-acquisition inspection/genealogy/corroboration/verification/QA stages.
+8. Per-lane and aggregate ten-lane system-health reports.
+
+Remaining external-access work is repository-specific, not architectural: authenticated/browser-only archives and optional-key APIs stay explicit blockers until credentials or a stable legal machine interface are available.
 
 
 ## Airtable schema recovery snapshot
 
 Canonical structural backup path: `backups/airtable/schema/airtable_schema_2026-10-12.json`.
 It preserves base/table/field IDs, names, types, descriptions and link-field structure for PLACES, SOURCES, EVENTS, ROUTES and RESEARCH JOBS. This is a structural recovery snapshot; record-data export is a separate backup layer.
+
+
+## 12. Airtable durable record backup
+Workflow: `.github/workflows/airtable-durable-backup.yml`.
+The first live backup succeeded in GitHub Actions run 38243014838 and commit `711076fc328d37daa59d3aa487e6056aa22a36fb`, under `backups/airtable/records/20261012T113000Z/`. The snapshot contains PLACES, SOURCES, EVENTS, ROUTES, RESEARCH_JOBS and a manifest. Scheduled backups use the repository secret `AIRTABLE_TOKEN` and never expose the token in repository files.
