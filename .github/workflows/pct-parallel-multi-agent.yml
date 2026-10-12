@@ -39,7 +39,9 @@ jobs:
           python3 tools/build_research_lanes.py
           python3 tools/lane_repository_plan.py
           timeout 90s python3 tools/lane_repository_discovery.py || { code=$?; echo "LANE DISCOVERY bounded exit=$code"; [ "$code" -eq 124 ] && echo "LANE DISCOVERY TIMEOUT after 90s"; true; }
-          if [ "$PCT_RESEARCH_LANE" = "german" ]; then python3 tools/bsb_iiif_route.py; fi
+          python3 tools/merge_repository_candidates.py
+          if [ "$PCT_RESEARCH_LANE" = "german" ]; then PCT_BSB_POSITIVE_CONTROL=1 python3 tools/bsb_iiif_route.py; fi
+          if [ "$PCT_RESEARCH_LANE" = "travellers" ]; then python3 tools/bsb_iiif_route.py; fi
       - name: Run lane discovery
         env:
           PCT_RESEARCH_LANE: ${{ matrix.lane }}
@@ -87,4 +89,30 @@ jobs:
             citation_chase_hits/
             event_first_hits/
             exact_page_acquisition/
+            system_health/
           if-no-files-found: warn
+
+  aggregate-health:
+    needs: research-lanes
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Refresh durable lane evidence
+        run: git pull --rebase origin main
+      - name: Build ten-lane system health
+        run: python3 tools/research_system_health.py --run-id "${{ github.run_id }}"
+      - name: Commit aggregate health
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "evidence/runs/${{ github.run_id }}/SYSTEM_HEALTH.json"
+          git diff --cached --quiet && exit 0
+          git commit -m "System health: run ${{ github.run_id }}"
+          for n in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            sleep $((n*2))
+          done
+          exit 1
