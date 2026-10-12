@@ -26,7 +26,7 @@ tp=1 if expected_positive and detected else 0
 fn=1 if expected_positive and not detected else 0
 fp=1 if (not expected_positive) and detected else 0
 tn=1 if (not expected_positive) and not detected else 0
-report={
+expected_source=str(case.get("source_repository") or "")\ncoverage_blockers=[]\nfor rr in repos:\n    for b in rr.get("blocked",[]):\n        name=str(b.get("repository") or "")\n        if ("SearchCulture" in expected_source and "SearchCulture" in name) or (expected_source and expected_source.casefold() in name.casefold()):\n            coverage_blockers.append({"lane":rr["lane"],**b})\nreport={
  "schema":"agent-piracy-live-benchmark-result-v1","run_id":a.run_id,"case_id":a.case_id,
  "benchmark_tier":case.get("tier"),"expected_positive":expected_positive,"detected_any_candidate":detected,
  "candidate_count":len(events),"true_positive":tp,"false_negative":fn,"false_positive":fp,"true_negative":tn,
@@ -37,7 +37,7 @@ report={
  "date_error":bool(expected_positive and detected and year and not date_hits),
  "entity_error":bool(expected_positive and detected and entity and not entity_hits),
  "unsupported_claim_rate":0.0 if not any(e.get("verified") for e in events) else None,
- "missing_lane_outputs":missing,"repository_execution":repos,
+ "missing_lane_outputs":missing,"repository_execution":repos,"coverage_blockers":coverage_blockers,"false_negative_due_to_coverage_blocker":bool(fn and coverage_blockers),
  "interpretation":"A false negative is a measurable coverage/retrieval gap, not permission to invent a finding. REFERENCE_GOLD tests retrieval/classification only unless human_reviewed_original is true."
 }
 out=pathlib.Path("benchmarks/results");out.mkdir(parents=True,exist_ok=True)
