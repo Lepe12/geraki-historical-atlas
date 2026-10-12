@@ -10,6 +10,9 @@ def canonical_request():
     digest=hashlib.sha256(canonical.encode("utf-8")).hexdigest()
     run_id=os.getenv("GITHUB_RUN_ID","local")
     job_id=os.getenv("PCT_RESEARCH_JOB_ID","").strip() or f"agent-piracy-{run_id}-{digest[:12]}"
+    expected=os.getenv("PCT_EXPECTED_REQUEST_SHA256","").strip()
+    if expected and expected != digest:
+        raise SystemExit("REQUEST_IDENTITY_MISMATCH")
     return rf,req,ctx,payload,digest,job_id
 
 def write_identity(path="research_request_identity.json"):
