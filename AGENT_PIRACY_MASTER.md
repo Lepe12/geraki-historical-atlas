@@ -213,3 +213,36 @@ A second live request was executed after the scientific architecture changes:
 - All 10 lanes completed successfully and aggregate health completed successfully.
 
 The prior full regression used SHA-256 `31852297c6f8d37d54e2e8413bb8d52d368148e92292f2d4d31e61ee6db6f056`. The two live requests therefore remained cryptographically distinct and independently pinned through separate successful ten-lane runs.
+
+
+## Live historical benchmark — 2026-10-12
+
+Benchmark infrastructure:
+- Curated benchmark corpus: `benchmarks/historical_benchmark_v1.json`.
+- Live evaluator: `tools/evaluate_live_benchmark.py`.
+- Workflow: `.github/workflows/historical-benchmark.yml`.
+- Result summary: `benchmarks/results/SUMMARY.json`.
+
+Benchmark tiers are explicit:
+- `REFERENCE_GOLD` = public documented reference suitable for retrieval/classification testing, but not equivalent to inspected primary-source historical truth.
+- `LIVE_NEGATIVE_CONTROL` / adversarial controls = false-positive tests.
+- Only a human-reviewed original primary source may be promoted to `HISTORICAL_GOLD`.
+
+Current live benchmark set contains three evaluated runs:
+1. Henry Morgan / Panama 1671 reference case — candidate detected, entity matched, but year 1671 was not correctly recovered: **TP with date error**.
+2. Mykonos ship-capture 1695 reference case — no event candidate recovered: **false negative**.
+3. Deliberately nonexistent target `Zerphalon Control 91827` — no event candidate: **true negative**.
+
+Current curated-set metrics:
+- evaluated results: **3**
+- true positives: **1**
+- false positives: **0**
+- false negatives: **1**
+- true negatives: **1**
+- precision: **1.0**
+- recall: **0.5**
+- false-positive rate: **0.0**
+- date errors: **1**
+- entity errors: **0**
+
+These figures are benchmark-set diagnostics only, not a universal accuracy claim. The present system therefore shows good precision on this very small test set but insufficient recall and a demonstrated date-recovery weakness. Those failures are research-engine defects to improve, not reasons to infer missing historical facts.
