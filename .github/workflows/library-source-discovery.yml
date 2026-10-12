@@ -19,11 +19,12 @@ jobs:
         run: python3 tools/library_source_discovery.py
       - name: Route strong candidates to Citation Chase
         run: python3 tools/route_library_candidates.py
-
       - name: Upload catalogue candidates
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: library-source-candidates-${{ github.run_id }}
-          path: |\n            library_discovery/\n            citation_chase_candidates/
+          path: |
+            library_discovery/
+            citation_chase_candidates/
           if-no-files-found: warn
