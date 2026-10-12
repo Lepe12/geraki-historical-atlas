@@ -146,3 +146,31 @@ Three general research-engine upgrades are canonical:
 Regression run **38297211798** confirmed correct request routing. The Italian-states lane generated 24 auditable expanded queries and completed through exact-page/health as `OPERATIONAL_WITH_EXPLICIT_BLOCKERS`.
 
 These are generic Agent Piracy capabilities and must never be specialized to a benchmark place, person or event.
+
+
+## Request integrity gate — 2026-10-12
+
+Agent Piracy now pins every research run to one canonical request identity before the ten research lanes execute.
+
+Canonical controls:
+- `tools/request_identity.py` creates a deterministic SHA-256 over the normalized request.
+- Every run receives a `research_job_id`.
+- `prepare` resolves the request once and passes the same `request_file`, `request_sha256` and `research_job_id` to all ten lanes.
+- `tools/verify_request_integrity.py` fails if lane payloads disagree.
+- `tools/research_system_health.py` independently checks the durable evidence from all ten lanes and sets `request_fingerprint_ok`.
+- The aggregate GitHub gate fails if ten-lane health or request fingerprint consistency fails.
+- `.github/workflows/library-source-discovery.yml` also resolves, pins and revalidates the same request within its run.
+
+Accepted regression:
+- GitHub Actions run **38298585128** — SUCCESS.
+- Ten lane reports present: true.
+- Ten lanes operational: true.
+- `request_fingerprint_ok`: true.
+- All 10 lanes used:
+  - request file: `agent-piracy-architecture-v6-20261012.json`
+  - research job: `agent-piracy-38298585128-31852297c6f8`
+  - SHA-256: `31852297c6f8d37d54e2e8413bb8d52d368148e92292f2d4d31e61ee6db6f056`
+- The aggregate log ended with: `TEN-LANE REQUEST INTEGRITY GATE PASSED`.
+- Library workflow run **38298585150** also completed SUCCESS with the pinned-request workflow.
+
+This gate proves that all ten lanes executed from the same research request. It does not by itself verify any historical claim.
