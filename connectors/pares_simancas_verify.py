@@ -12,11 +12,11 @@ def verify(record_id):
     req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0 (compatible; GERAKI-Research/1.0)"})
     with urllib.request.urlopen(req,timeout=25) as res:
         raw=res.read(2500000).decode("utf-8","replace")
-    text=unescape(re.sub(r"<[^>]+>"," ",re.sub(r"<(script|style)\\b[^>]*>.*?</\\1>"," ",raw,flags=re.I|re.S)))
-    text=re.sub(r"\\s+"," ",text)
+    text=unescape(re.sub(r"<[^>]+>"," ",re.sub(r"<(script|style)\b[^>]*>.*?</\1>"," ",raw,flags=re.I|re.S)))
+    text=re.sub(r"\s+"," ",text)
     archive="Archivo General de Simancas" in text
-    code=re.search(r"ES\\.47161\\.AGS(?:/[^\\s<]+)?",text)
-    sign=re.search(r"Signatura\\s*:\\s*([^:]{3,110}?)(?=Fecha Creaci[oó]n|Nivel de Descripci[oó]n|C[oó]digo de Referencia|$)",text,re.I)
+    code=re.search(r"ES\.47161\.AGS(?:/[^\s<]+)?",text)
+    sign=re.search(r"Signatura\s*:\s*([^:]{3,110}?)(?=Fecha Creaci[oó]n|Nivel de Descripci[oó]n|C[oó]digo de Referencia|$)",text,re.I)
     result={"record_id":str(record_id),"url":BASE+str(record_id),"archive":"Archivo General de Simancas" if archive else None,"reference_code":code.group(0) if code else None,"signatura":sign.group(1).strip() if sign else None,"status":"RECORD_VERIFIED" if archive and code and sign else "NOT_VERIFIED","scope":"PARES archival catalogue description only; original document not inspected"}
     return result
 if __name__=="__main__":
