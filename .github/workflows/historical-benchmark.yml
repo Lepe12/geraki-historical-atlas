@@ -1,0 +1,58 @@
+name: Historical Benchmark Evaluation
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'benchmarks/evaluation_requests/*.json'
+permissions:
+  contents: write
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+      - name: Evaluate requested durable runs
+        run: |
+          for f in benchmarks/evaluation_requests/*.json; do
+            [ -f "$f" ] || continue
+            python3 - "$f" <<'PY'
+          import json,sys,subprocess
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          subprocess.check_call(["python3","tools/evaluate_live_benchmark.py","--run-id",str(d["run_id"]),"--case-id",d["case_id"]])
+          PY
+          done
+      - name: Aggregate benchmark metrics
+        run: |
+          python3 - <<'PY'
+          import json,pathlib
+          rows=[]
+          for p in pathlib.Path("benchmarks/results").glob("*.json"):
+              try: rows.append(json.loads(p.read_text(encoding="utf-8")))
+              except Exception: pass
+          tp=sum(x.get("true_positive",0) for x in rows);fp=sum(x.get("false_positive",0) for x in rows)
+          fn=sum(x.get("false_negative",0) for x in rows);tn=sum(x.get("true_negative",0) for x in rows)
+          out={
+            "schema":"agent-piracy-benchmark-summary-v1","evaluated_results":len(rows),
+            "tp":tp,"fp":fp,"fn":fn,"tn":tn,
+            "precision":tp/(tp+fp) if tp+fp else None,
+            "recall":tp/(tp+fn) if tp+fn else None,
+            "false_positive_rate":fp/(fp+tn) if fp+tn else None,
+            "date_errors":sum(bool(x.get("date_error")) for x in rows),
+            "entity_errors":sum(bool(x.get("entity_error")) for x in rows),
+            "interpretation":"Metrics describe the curated benchmark set only; they are not a universal accuracy estimate."
+          }
+          pathlib.Path("benchmarks/results/SUMMARY.json").write_text(json.dumps(out,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+          print(json.dumps(out,ensure_ascii=False,indent=2))
+          PY
+      - name: Commit benchmark results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add benchmarks/results/
+          git diff --cached --quiet && exit 0
+          git commit -m "Update historical benchmark results"
+          git pull --rebase origin main
+          git push origin HEAD:main
