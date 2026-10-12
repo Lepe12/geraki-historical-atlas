@@ -6,7 +6,7 @@ on:
     paths:
       - 'library_discovery_requests/*.json'
 permissions:
-  contents: read
+  contents: write
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -53,6 +53,24 @@ jobs:
             python3 tools/event_first_search.py &&
             python3 tools/exact_page_acquire.py
           ' || { code=$?; echo "GENERIC FALLBACK bounded exit=$code"; [ "$code" -eq 124 ] && echo "GENERIC FALLBACK TIMEOUT after 180s"; true; }
+      - name: Preserve durable evidence in GitHub
+        if: always()
+        env:
+          PCT_RESEARCH_LANE: ${{ matrix.lane }}
+          PCT_RUN_ID: ${{ github.run_id }}
+        run: |
+          python3 tools/preserve_run_evidence.py --run-id "$PCT_RUN_ID" --lane "$PCT_RESEARCH_LANE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "evidence/runs/$PCT_RUN_ID/$PCT_RESEARCH_LANE/"
+          git diff --cached --quiet && exit 0
+          git commit -m "Preserve evidence: run $PCT_RUN_ID lane $PCT_RESEARCH_LANE"
+          for n in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            sleep $((n*2))
+          done
+          echo "WARNING: durable evidence commit failed after retries; Actions artifact remains available for recovery."
+          exit 0
       - uses: actions/upload-artifact@v4
         if: always()
         with:
