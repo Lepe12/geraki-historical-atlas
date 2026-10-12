@@ -1,0 +1,22 @@
+name: Autonomous Library Source Discovery
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  library-discovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Query digitized library catalogue
+        run: python3 tools/library_source_discovery.py
+      - name: Upload catalogue candidates
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: library-source-candidates-${{ github.run_id }}
+          path: library_discovery/
+          if-no-files-found: warn
