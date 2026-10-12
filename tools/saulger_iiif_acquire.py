@@ -53,9 +53,10 @@ try:
     for idx, canvas in enumerate(canvases):
         label = text_label(canvas.get("label", ""))
         # BSB label format: "PRINTED_PAGE (SCAN_NUMBER)", e.g. "305 (0323)".
-        # Only the leading number is printed pagination.
-        page_match = re.match(r"^\\s*(\\d{1,4})(?=\\s|\\(|$)", label)
-        printed_page = int(page_match.group(1)) if page_match else None
+        # Parse only the leading token; the parenthetical number is the scan ordinal.
+        leading = label.strip().split(maxsplit=1)[0] if label.strip() else ""
+        leading = leading.split("(", 1)[0]
+        printed_page = int(leading) if leading.isdigit() else None
         matched = [printed_page] if printed_page in TARGETS else []
         if matched:
             url = image_url(canvas)
