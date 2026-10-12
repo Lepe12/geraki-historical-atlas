@@ -11,7 +11,7 @@ from html.parser import HTMLParser
 
 UA={"User-Agent":"Piratecartography-Historical-Research/3.0 (+scholarly catalogue discovery)"}
 
-def _get(url, timeout=45, accept=None):
+def _get(url, timeout=20, accept=None):
     headers=dict(UA)
     if accept: headers["Accept"]=accept
     req=urllib.request.Request(url,headers=headers)
