@@ -39,7 +39,7 @@ def checkpoint():
 checkpoint()
 for h in hits:
  fn=h.get("file",""); ident=next((k for k in byfile if k and fn.startswith(k+"_")),None)
- if not ident:continue
+ if not ident:\n  report.append({"hit":h,"identifier":None,"status":"NO_ACQUIRED_SOURCE_MAPPING","verification_status":"NEEDS_EVIDENCE"});checkpoint();continue
  try:
   files=ia_files(ident)
  except Exception as e:
