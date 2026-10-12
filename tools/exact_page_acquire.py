@@ -26,9 +26,16 @@ report=[]
 for h in hits:
  fn=h.get("file",""); ident=next((k for k in byfile if k and fn.startswith(k+"_")),None)
  if not ident:continue
- files=ia_files(ident); djvu=pick(files,"_djvu.txt"); scan=pick(files,"_scandata.xml")
+ try:
+  files=ia_files(ident)
+ except Exception as e:
+  report.append({"hit":h,"identifier":ident,"status":"METADATA_FETCH_ERROR:"+str(e)});continue
+ djvu=pick(files,"_djvu.txt"); scan=pick(files,"_scandata.xml")
  if not djvu or not scan: report.append({"hit":h,"identifier":ident,"status":"NO_PAGE_METADATA"});continue
- text=fetch("https://archive.org/download/%s/%s"%(urllib.parse.quote(ident),urllib.parse.quote(djvu))).decode("utf-8","ignore")
+ try:
+  text=fetch("https://archive.org/download/%s/%s"%(urllib.parse.quote(ident),urllib.parse.quote(djvu))).decode("utf-8","ignore")
+ except Exception as e:
+  report.append({"hit":h,"identifier":ident,"status":"OCR_FETCH_ERROR:"+str(e)});continue
  pages=text.split("\f")
  needle=re.sub(r"\s+"," ",str(h.get("context",""))).strip()
  # use central distinctive 120-char fragment, then fallback matched place near event
@@ -38,7 +45,10 @@ for h in hits:
  for i,p in enumerate(pages):
   q=p.lower(); scores.append((sum(1 for t in toks if t.lower() in q),i))
  scores.sort(reverse=True);score,pi=scores[0] if scores else (0,0)
- sd=page_map_from_scandata(fetch("https://archive.org/download/%s/%s"%(urllib.parse.quote(ident),urllib.parse.quote(scan))))
+ try:
+  sd=page_map_from_scandata(fetch("https://archive.org/download/%s/%s"%(urllib.parse.quote(ident),urllib.parse.quote(scan))))
+ except Exception as e:
+  report.append({"hit":h,"identifier":ident,"status":"SCANDATA_FETCH_ERROR:"+str(e)});continue
  meta=sd[pi] if pi<len(sd) else {"leaf":pi,"printed_page":None};leaf=meta["leaf"]
  # IA BookReaderPreview image endpoint, leaf-specific
  imgurl=f"https://archive.org/download/{urllib.parse.quote(ident)}/page/n{leaf}/mode/1up?view=theater"
