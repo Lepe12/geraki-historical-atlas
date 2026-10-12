@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Acquire searchable text/metadata for routed Internet Archive library candidates."""
-import json,pathlib,urllib.request,urllib.error,datetime,zipfile,io,re
+import json,pathlib,urllib.request,urllib.error,urllib.parse,datetime,zipfile,io,re
 src=pathlib.Path("citation_chase_candidates/routed_candidates.json")
 if not src.exists(): raise SystemExit("missing routed_candidates.json")
 d=json.loads(src.read_text(encoding="utf-8")); out=pathlib.Path("library_acquisition");out.mkdir(exist_ok=True)
