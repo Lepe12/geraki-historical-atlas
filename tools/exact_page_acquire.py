@@ -5,7 +5,8 @@ from functools import lru_cache
 hitsf=pathlib.Path("event_first_hits/event_hits.json"); acqf=pathlib.Path("library_acquisition/acquisition_report.json")
 if not hitsf.exists() or not acqf.exists(): raise SystemExit("missing event hits/acquisition report")
 all_hits=json.loads(hitsf.read_text(encoding="utf-8")).get("hits",[])
-# Process the complete durable hit set. Checkpoint after every candidate so interrupted runs retain progress.\nhits=all_hits
+# Process the complete durable hit set. Checkpoint after every candidate so interrupted runs retain progress.
+hits=all_hits
 acq=json.loads(acqf.read_text(encoding="utf-8")).get("results",[])
 out=pathlib.Path("exact_page_acquisition");out.mkdir(exist_ok=True)
 byfile={r.get("identifier"):r for r in acq if r.get("identifier") and (r.get("acquisition_route")=="INTERNET_ARCHIVE" or str(r.get("discovery_repository") or r.get("repository") or "").lower().startswith("internet archive"))}
@@ -39,7 +40,8 @@ def checkpoint():
 checkpoint()
 for h in hits:
  fn=h.get("file",""); ident=next((k for k in byfile if k and fn.startswith(k+"_")),None)
- if not ident:\n  report.append({"hit":h,"identifier":None,"status":"NO_ACQUIRED_SOURCE_MAPPING","verification_status":"NEEDS_EVIDENCE"});checkpoint();continue
+ if not ident:
+  report.append({"hit":h,"identifier":None,"status":"NO_ACQUIRED_SOURCE_MAPPING","verification_status":"NEEDS_EVIDENCE"});checkpoint();continue
  try:
   files=ia_files(ident)
  except Exception as e:
