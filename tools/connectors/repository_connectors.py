@@ -203,12 +203,12 @@ def searchculture(q,lane):
     url=base+"/aggregator/portal/advancedSearch/search?"+urllib.parse.urlencode(params)
     keep=lambda u,t: "/aggregator/edm/" in u and len(t)>1
     try:
-        out=_html_search(url,"SearchCulture.gr / EKT",lane,base,keep,max_records=50)
+        out=_html_search(url,"SearchCulture.gr / EKT",lane,base,keep,max_records=8)
         enriched=[]
         for row in out:
             u=row.get("url")
             try:
-                jd=_json(u.rstrip("/")+"/json",timeout=20) if u else {}
+                jd=_json(u.rstrip("/")+"/json",timeout=6) if u else {}
                 flat=json.dumps(jd,ensure_ascii=False)
                 row["raw"]=jd
                 row["metadata_text"]=flat
