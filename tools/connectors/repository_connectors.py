@@ -307,7 +307,8 @@ def dispatch(repository,q,lane):
     if repository=="Internet Culturale": return internet_culturale(q,lane)
     if repository=="Nationaal Archief": return nationaal_archief(q,lane)
     if repository=="Delpher": return delpher_sru(q,lane)
-    if repository=="Deutsche Digitale Bibliothek": return ddb(q,lane)\n    if repository=="SearchCulture.gr / EKT": return searchculture(q,lane)
+    if repository=="Deutsche Digitale Bibliothek": return ddb(q,lane)
+    if repository=="SearchCulture.gr / EKT": return searchculture(q,lane)
     if repository=="İSAM Kütüphanesi": return isam(q,lane)
     if repository=="PARES / Archivo General de Simancas":
         return pares_simancas(q,lane)
