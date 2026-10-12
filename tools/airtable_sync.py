@@ -48,7 +48,14 @@ for lane in [p for p in root.iterdir() if p.is_dir()]:
         notes=f"Automated research candidate. run={run_id}; lane={lane.name}; repository={repo}; connector_status={x.get('connector_status','')}; acquisition_status={x.get('status','')}. Catalogue/acquisition evidence only; not historical verification."
         rows.append({"fields":{"Source Title":title[:1000],"Author / Creator":str(creator)[:1000],"Year":str(dates)[:1000],"URL / Archive Ref":ref[:1000],"Evidence Notes":notes[:100000],"Verification Status":"Unverified"}})
         by_ref[ref]="PENDING"
-sync_error=None\nfor i in range(0,len(rows),10):\n    try:\n        request("POST",f"https://api.airtable.com/v0/{BASE}/{SOURCES}",{"records":rows[i:i+10],"typecast":True});created+=len(rows[i:i+10])\n    except Exception as e:\n        sync_error=f"{type(e).__name__}: {e}"\n        break
+sync_error=None
+for i in range(0,len(rows),10):
+    try:
+        request("POST",f"https://api.airtable.com/v0/{BASE}/{SOURCES}",{"records":rows[i:i+10],"typecast":True})
+        created+=len(rows[i:i+10])
+    except Exception as e:
+        sync_error=f"{type(e).__name__}: {e}"
+        break
 health=json.loads((root/"SYSTEM_HEALTH.json").read_text(encoding="utf-8")) if (root/"SYSTEM_HEALTH.json").exists() else {}
 summary={"run_id":run_id,"sources_created":created,"duplicates_skipped":skipped,"all_ten_operational":health.get("all_ten_operational"),"verified_events":sum(int(x.get("verified_events",0)) for x in health.get("lane_reports",[])),"sync_status":"SYNCED" if sync_error is None else "BLOCKED","sync_error":sync_error}
 out=root/"AIRTABLE_SYNC.json";out.write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
