@@ -131,3 +131,18 @@ When a new model/session resumes Agent Piracy:
 **DISCOVERED means an endpoint/dataset has been identified but not yet proven as a working connector.**
 
 This file is the canonical navigation document for Agent Piracy. Detailed evidence remains authoritative for individual connector claims.
+
+
+## Architecture v2 — 2026-10-12
+
+Three general research-engine upgrades are canonical:
+
+1. **Parameterized research command.** `.github/workflows/pct-parallel-multi-agent.yml` exposes workflow-dispatch inputs for target, aliases, date range and research purpose. `tools/request_context.py` accepts those inputs without requiring a bespoke request JSON. Push-triggered durable JSON requests remain supported.
+
+2. **Auditable multilingual/historical query expansion.** `tools/historical_query_expansion.py` creates lane-specific event-vocabulary queries while preserving researcher-supplied historical name variants. Generated queries are stored in each repository plan. The engine must not invent unsupported historical spellings.
+
+3. **Complete candidate processing by default.** Artificial first-N acquisition and exact-page caps were removed from the canonical multi-agent workflow. Exact-page processing checkpoints every candidate and records unmapped candidates explicitly. Verification gates remain unchanged: exhaustive processing does not imply verification.
+
+Regression run **38297211798** confirmed correct request routing. The Italian-states lane generated 24 auditable expanded queries and completed through exact-page/health as `OPERATIONAL_WITH_EXPLICIT_BLOCKERS`.
+
+These are generic Agent Piracy capabilities and must never be specialized to a benchmark place, person or event.
