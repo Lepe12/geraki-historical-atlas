@@ -26,7 +26,14 @@ tp=1 if expected_positive and detected else 0
 fn=1 if expected_positive and not detected else 0
 fp=1 if (not expected_positive) and detected else 0
 tn=1 if (not expected_positive) and not detected else 0
-expected_source=str(case.get("source_repository") or "")\ncoverage_blockers=[]\nfor rr in repos:\n    for b in rr.get("blocked",[]):\n        name=str(b.get("repository") or "")\n        if ("SearchCulture" in expected_source and "SearchCulture" in name) or (expected_source and expected_source.casefold() in name.casefold()):\n            coverage_blockers.append({"lane":rr["lane"],**b})\nreport={
+expected_source=str(case.get("source_repository") or "")
+coverage_blockers=[]
+for rr in repos:
+    for b in rr.get("blocked",[]):
+        name=str(b.get("repository") or "")
+        if ("SearchCulture" in expected_source and "SearchCulture" in name) or (expected_source and expected_source.casefold() in name.casefold()):
+            coverage_blockers.append({"lane":rr["lane"],**b})
+report={
  "schema":"agent-piracy-live-benchmark-result-v1","run_id":a.run_id,"case_id":a.case_id,
  "benchmark_tier":case.get("tier"),"expected_positive":expected_positive,"detected_any_candidate":detected,
  "candidate_count":len(events),"true_positive":tp,"false_negative":fn,"false_positive":fp,"true_negative":tn,
