@@ -1,0 +1,31 @@
+name: SIASVe SPARQL Smoke
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/siasve-sparql-smoke.yml'
+jobs:
+  query:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Query Italian cultural heritage SPARQL endpoints
+        run: |
+          python - <<'PY'
+          import urllib.request,urllib.parse,json
+          queries={
+            'dataset':'SELECT ?p ?o WHERE { <http://dati.beniculturali.it/resource/fonte-SIASVE> ?p ?o } LIMIT 12',
+            'archival':'SELECT ?s ?p ?o WHERE { ?s ?p ?o FILTER(CONTAINS(STR(?s), "SIASVE")) } LIMIT 8'
+          }
+          for host in ['https://dati.cultura.gov.it/sparql','https://dati.beniculturali.it/sparql']:
+            for name,q in queries.items():
+              url=host+'?'+urllib.parse.urlencode({'query':q,'format':'application/sparql-results+json'})
+              try:
+                req=urllib.request.Request(url,headers={'Accept':'application/sparql-results+json','User-Agent':'GERAKI-Research/1.0'})
+                with urllib.request.urlopen(req,timeout=18) as r:
+                  data=r.read(60000);print('HTTP',host,name,r.status,r.headers.get('content-type'),'BYTES',len(data))
+                  try:
+                    obj=json.loads(data); rows=obj.get('results',{}).get('bindings',[]);print('ROWS',len(rows),'SAMPLE',json.dumps(rows[:4],ensure_ascii=False)[:5000])
+                  except Exception as e: print('NON_JSON',repr(data[:250]))
+              except Exception as e:print('ERROR',host,name,type(e).__name__,str(e)[:250])
+          PY
