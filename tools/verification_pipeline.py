@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
-"""Complete the post-discovery verification/QA stages without inventing evidence.
+"""Post-discovery scientific verification pipeline.
 
-This stage prepares inspection, genealogy, corroboration, verification, QA and
-structured candidate outputs. It will not turn OCR/catalogue/acquisition signals
-into VERIFIED historical claims.
+Automated stages may discover, locate, acquire and prepare evidence, but cannot
+promote a claim to HUMAN_REVIEWED or VERIFIED without explicit review data.
 """
-import json,os,pathlib,datetime,hashlib,re
+import json,os,pathlib,datetime,hashlib,sys
+sys.path.insert(0,str(pathlib.Path(__file__).parent))
+from request_context import load_request
+from evidence_model import normalize_date,toponym_identity,evidence_weight,verification_assessment
 
 LANE=os.getenv("PCT_RESEARCH_LANE","travellers")
 NOW=datetime.datetime.now(datetime.timezone.utc).isoformat()
+rf,req,ctx=load_request()
 
 def read(path,default=None):
     p=pathlib.Path(path)
@@ -28,99 +31,86 @@ bsb=read("iiif_candidate_requests/bsb_iiif_candidates.json",{}).get("results",[]
 inspection=[]
 for p in pages:
     if p.get("image_file"):
-        inspection.append({
-          "lane":LANE,"source_id":p.get("identifier"),"repository":p.get("discovery_repository","Internet Archive"),
-          "printed_page":p.get("printed_page"),"leaf_or_canvas":p.get("leaf"),
-          "image_file":p.get("image_file"),"status":"NEEDS_ORIGINAL_INSPECTION",
-          "original_inspected":False
-        })
+        inspection.append({"lane":LANE,"source_id":p.get("identifier"),"repository":p.get("discovery_repository","Internet Archive"),"printed_page":p.get("printed_page"),"leaf_or_canvas":p.get("leaf"),"image_file":p.get("image_file"),"evidence_state":"ACQUIRED","status":"NEEDS_ORIGINAL_INSPECTION","original_inspected":False})
 for r in bsb:
     if r.get("reference_scan"):
-        inspection.append({
-          "lane":LANE,"source_id":r.get("source_id"),"repository":"BSB",
-          "printed_page":None,"leaf_or_canvas":r.get("reference_canvas_id"),
-          "image_file":r.get("reference_scan"),"status":"NEEDS_ORIGINAL_INSPECTION",
-          "original_inspected":False,"control":bool(r.get("control"))
-        })
-write("original_inspection/inspection_queue.json",{
- "schema":"pct-original-inspection-queue-v1","generated_utc":NOW,"lane":LANE,
- "items":inspection,"gate":"A downloaded image is not inspected merely because it exists."
-})
+        inspection.append({"lane":LANE,"source_id":r.get("source_id"),"repository":"BSB","printed_page":None,"leaf_or_canvas":r.get("reference_canvas_id"),"image_file":r.get("reference_scan"),"evidence_state":"ACQUIRED","status":"NEEDS_ORIGINAL_INSPECTION","original_inspected":False,"control":bool(r.get("control"))})
+write("original_inspection/inspection_queue.json",{"schema":"pct-original-inspection-queue-v2","generated_utc":NOW,"lane":LANE,"items":inspection,"gate":"A downloaded image is ACQUIRED, not ORIGINAL_INSPECTED."})
 
-# Conservative source genealogy: exact repository+identifier duplicates share a chain;
-# all other independence remains UNKNOWN until parent/derivative relationships are researched.
-chains={};genealogy=[]
+# Source genealogy: exact duplicate chains are deterministic; all other relationships remain unresolved.
+genealogy=[]
 for r in acq:
     repo=str(r.get("discovery_repository") or r.get("repository") or "UNKNOWN")
     ident=str(r.get("identifier") or r.get("url") or r.get("title") or "UNKNOWN")
     key=(repo.casefold()+"|"+ident.casefold()).encode("utf-8","ignore")
     chain="exact-"+hashlib.sha256(key).hexdigest()[:16]
-    chains.setdefault(chain,0);chains[chain]+=1
     genealogy.append({
       "source_id":r.get("identifier"),"repository":repo,"title":r.get("title"),
-      "provisional_chain_id":chain,"independence_status":"UNKNOWN_PENDING_SOURCE_GENEALOGY",
-      "derivative_of":None,"verification_status":"NEEDS_EVIDENCE"
+      "provisional_chain_id":chain,"relationship":"UNRESOLVED",
+      "possible_relationships":["INDEPENDENT","COPY","QUOTATION","TRANSLATION","COMMON_SOURCE","DERIVATIVE"],
+      "independence_status":"UNKNOWN_PENDING_SOURCE_GENEALOGY","derivative_of":None,
+      "genealogy_evidence":[],"verification_status":"NEEDS_EVIDENCE"
     })
-write("source_genealogy/genealogy_queue.json",{
- "schema":"pct-source-genealogy-queue-v1","generated_utc":NOW,"lane":LANE,
- "sources":genealogy,
- "rule":"Different repositories/editions are not automatically independent. Exact duplicate grouping is only a de-duplication aid."
-})
+write("source_genealogy/genealogy_queue.json",{"schema":"pct-source-genealogy-v2","generated_utc":NOW,"lane":LANE,"sources":genealogy,"rule":"Repository or edition diversity never proves independence. Genealogy relationships require evidence."})
 
-# Build candidate-event records from OCR proximity, never as verified events.
 page_by_source={}
-for p in pages:
-    page_by_source.setdefault(str(p.get("source_file","")),[]).append(p)
+for p in pages:page_by_source.setdefault(str(p.get("source_file","")),[]).append(p)
 candidates=[]
-for i,h in enumerate(events[:200],1):
-    src=h.get("file")
-    related=page_by_source.get(str(src),[])
+for i,h in enumerate(events,1):
+    src=h.get("file");related=page_by_source.get(str(src),[])
+    topo=toponym_identity(h.get("place_match"),ctx["target"],ctx["aliases"])
+    dnorm=normalize_date(" / ".join(str(y) for y in h.get("years_in_scope",[])))
+    acquired=bool(related)
     candidates.append({
       "candidate_id":f"{LANE}-event-{i:04d}","lane":LANE,"source_file":src,
-      "place_match":h.get("place_match"),"years_in_scope":h.get("years_in_scope",[]),
-      "event_terms":h.get("event_terms",[]),"exact_page_candidates":[{"identifier":p.get("identifier"),"printed_page":p.get("printed_page"),"leaf":p.get("leaf"),"image_file":p.get("image_file")} for p in related[:10]],
-      "actor":"UNKNOWN","status":"CANDIDATE_NEEDS_ORIGINAL_INSPECTION",
+      "evidence_state":"ACQUIRED" if acquired else "LOCATED",
+      "place":topo,"date":dnorm,"event_terms":h.get("event_terms",[]),
+      "event_type":"UNKNOWN","actor":"UNKNOWN",
+      "exact_page_candidates":[{"identifier":p.get("identifier"),"printed_page":p.get("printed_page"),"leaf":p.get("leaf"),"image_file":p.get("image_file")} for p in related],
+      "original_quote":None,"controlled_transcription":None,"translation":None,
+      "source_says":None,"researcher_inference":None,
+      "original_inspected":False,"extracted":False,"corroborated":False,
+      "machine_status":"NOT_ORIGINAL_VERIFIED","human_review_status":"NOT_REVIEWED",
       "verified":False
     })
-write("structured_output/candidate_events.json",{
- "schema":"pct-structured-candidates-v1","generated_utc":NOW,"lane":LANE,
- "events":candidates,"total_ocr_event_hits":len(events),"deferred_event_candidates":max(0,len(events)-len(candidates)),"rule":"Candidate output is safe for review/import but must not be represented as a Verified Airtable event."
-})
+write("structured_output/candidate_events.json",{"schema":"pct-structured-candidates-v2","generated_utc":NOW,"lane":LANE,"events":candidates,"total_ocr_event_hits":len(events),"rule":"OCR/event proximity creates a candidate only; it is not a historical fact."})
 
-write("corroboration/corroboration_queue.json",{
- "schema":"pct-corroboration-queue-v1","generated_utc":NOW,"lane":LANE,
- "candidate_events":[{"candidate_id":c["candidate_id"],"independent_supporting_chains":0,"required_independent_chains":3,"status":"NEEDS_GENEALOGY_AND_ORIGINAL_INSPECTION"} for c in candidates],
- "rule":"Corroboration counts independent source chains, not portal copies or repeated citations."
-})
+corroboration=[]
+for c in candidates:
+    corroboration.append({
+      "candidate_id":c["candidate_id"],"independent_supporting_chains":[],
+      "source_quality_assessment":[],"corroboration_status":"NOT_ASSESSED",
+      "rule":"No fixed number of sources is universally required. Weight authenticity, proximity, independence and claim scope."
+    })
+write("corroboration/corroboration_queue.json",{"schema":"pct-corroboration-queue-v2","generated_utc":NOW,"lane":LANE,"candidate_events":corroboration})
 
-if not candidates:
-    gate_status="NO_EVENT_CANDIDATES"
-elif not inspection:
-    gate_status="NEEDS_EXACT_PAGE_EVIDENCE"
-else:
-    gate_status="NEEDS_ORIGINAL_INSPECTION"
+human=[]
+for c in candidates:
+    human.append({
+      "candidate_id":c["candidate_id"],"machine_status":c["machine_status"],
+      "review_status":"NOT_REVIEWED","reviewer":None,"reviewed_utc":None,
+      "decision":None,"notes":None,"evidence_examined":[]
+    })
+write("human_review/review_queue.json",{"schema":"pct-human-review-v1","generated_utc":NOW,"lane":LANE,"items":human,"rule":"MACHINE_CHECKED and HUMAN_REVIEWED are distinct states."})
+
+gate_status="NO_EVENT_CANDIDATES" if not candidates else ("NEEDS_EXACT_PAGE_EVIDENCE" if not inspection else "NEEDS_ORIGINAL_INSPECTION")
 verification={
- "schema":"pct-verification-gate-v1","generated_utc":NOW,"lane":LANE,
- "status":gate_status,"candidate_events":len(candidates),"inspection_queue_items":len(inspection),
- "verified_events":0,"requirements":{
-   "original_page_inspected":True,"event_date_place_extracted":True,
-   "source_genealogy_checked":True,"minimum_independent_source_chains":3,
-   "qa_passed":True
+ "schema":"pct-verification-gate-v2","generated_utc":NOW,"lane":LANE,
+ "status":gate_status,"candidate_events":len(candidates),"inspection_queue_items":len(inspection),"verified_events":0,
+ "requirements":{
+   "exact_source_identification":True,"original_page_or_folio_inspected":True,
+   "event_date_place_extracted":True,"source_genealogy_assessed":True,
+   "evidence_quality_weighted":True,"human_review_required_for_verified":True
  },
- "rule":"No automated acquisition/OCR/catalogue stage can set VERIFIED."
+ "prohibited_shortcuts":["CATALOGUE_TO_VERIFIED","OCR_TO_VERIFIED","SOURCE_COUNT_ONLY_TO_VERIFIED"],
+ "rule":"Verification is evidence-weighted and claim-specific; no automated stage may set HUMAN_REVIEWED or VERIFIED."
 }
 write("verification/verification_gate.json",verification)
 write("qa/qa_report.json",{
- "schema":"pct-qa-v1","generated_utc":NOW,"lane":LANE,
+ "schema":"pct-qa-v2","generated_utc":NOW,"lane":LANE,
  "decision":"BLOCKED_PENDING_EVIDENCE" if candidates else "NO_CANDIDATE_TO_VERIFY",
  "verified_events":0,"candidate_events":len(candidates),
- "checks":{
-   "catalogue_not_treated_as_evidence":True,
-   "ocr_not_treated_as_exact_quote":True,
-   "actor_optional_unknown_allowed":True,
-   "three_independent_chains_required":True,
-   "original_inspection_required":True
- },
+ "checks":{"catalogue_not_treated_as_evidence":True,"ocr_not_treated_as_exact_quote":True,"actor_unknown_allowed":True,"fixed_three_source_rule_removed":True,"original_inspection_required":True,"human_review_separate":True},
  "verification_gate":gate_status
 })
 print("VERIFICATION PIPELINE",LANE,"candidates",len(candidates),"inspection",len(inspection),"gate",gate_status,"verified",0)
