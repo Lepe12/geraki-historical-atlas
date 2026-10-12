@@ -25,6 +25,7 @@ for x in candidates:
 max_items=max(1,int(os.getenv("PCT_MAX_ACQUISITION_CANDIDATES","8")))
 max_ia=max(1,int(os.getenv("PCT_MAX_IA_CANDIDATES","3")))
 ia=[x for x in items if x.get("acquisition_route")=="INTERNET_ARCHIVE" or str(x.get("discovery_repository") or x.get("repository") or "").lower().startswith("internet archive")]
+ia.sort(key=lambda x:(not bool(x.get("source_lead")), str(x.get("title") or "").lower().startswith(("skaitv","youtube")), -(int(str(x.get("year") or "0")[:4]) if str(x.get("year") or "")[:4].isdigit() and int(str(x.get("year") or "0")[:4])<1900 else 0)))
 other=[x for x in items if x not in ia]
 selected=ia[:max_ia]+other[:max(0,max_items-min(max_ia,len(ia)))]
 if len(selected)<max_items:selected+=(ia[max_ia:]+other[max(0,max_items-min(max_ia,len(ia))):])[:max_items-len(selected)]
@@ -36,7 +37,7 @@ items=selected
 def safe_name(s):
     return re.sub(r"[^A-Za-z0-9_.-]+","_",str(s))[:180]
 
-def fetch(url,limit=8_000_000,timeout=25):
+def fetch(url,limit=8_000_000,timeout=14):
     req=urllib.request.Request(url,headers={"User-Agent":"Piratecartography-Research/3.0"})
     with urllib.request.urlopen(req,timeout=timeout) as f:
         data=f.read(limit+1);ctype=f.headers.get("Content-Type","")
@@ -55,7 +56,7 @@ for x in items:
             names=[str(a.get("name","")) for a in meta.get("files",[])]
             preferred=[n for n in names if n.lower().endswith(("_djvu.txt","_searchtext.txt",".txt"))]
             rec["available_text_files"]=preferred[:20]
-            for n in preferred[:2]:
+            for n in preferred[:1]:
                 try:
                     url="https://archive.org/download/"+urllib.parse.quote(str(ident))+"/"+urllib.parse.quote(n)
                     data,_=fetch(url)
@@ -67,7 +68,7 @@ for x in items:
             manifests=rec.get("iiif_manifest_candidates") or []
             for i,url in enumerate(manifests[:3]):
                 try:
-                    data,ctype=fetch(url,limit=4_000_000,timeout=30)
+                    data,ctype=fetch(url,limit=4_000_000,timeout=14)
                     json.loads(data.decode("utf-8","replace"))
                     dest=OUT/(safe_name((ident or repo)+"_manifest_"+str(i+1))+".json");dest.write_bytes(data);rec["files"].append(str(dest))
                 except Exception as e:rec.setdefault("errors",[]).append(f"IIIF_MANIFEST {type(e).__name__}: {e}")
