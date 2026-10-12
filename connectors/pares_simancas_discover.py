@@ -16,6 +16,14 @@ def discover(term,limit=5,max_pages=12):
     jar=http.cookiejar.CookieJar();opener=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
     seed=HOST+FIRST+urllib.parse.urlencode({"texto":term})
     seed_html=fetch(opener,seed)
+    # Inspect server-side search state carried by forms/hidden inputs.
+    hidden=re.findall(r'<input[^>]+type=["\\']hidden["\\'][^>]*>',seed_html,re.I)
+    state=[]
+    for tag in hidden:
+        n=re.search(r'name=["\\']([^"\\']+)',tag,re.I);v=re.search(r'value=["\\']([^"\\']*)',tag,re.I)
+        if n: state.append([n.group(1),unescape(v.group(1) if v else "")])
+    forms=re.findall(r'<form[^>]+action=["\\']([^"\\']+)[^>]*>',seed_html,re.I)
+    print("PARES_STATE_DIAGNOSTIC",json.dumps({"hidden":state,"forms":forms},ensure_ascii=False))
     facet=re.search(r'href="([^"]*find\\?[^\"]*idA=2[^\"]*)"',seed_html,re.I)
     if not facet: raise RuntimeError("AGS facet link idA=2 not found in seeded PARES result page")
     first=urllib.parse.urljoin(HOST,unescape(facet.group(1)))
