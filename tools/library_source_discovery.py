@@ -11,7 +11,7 @@ for x in [ctx["target"]]+ctx["aliases"]:
     x=str(x).strip()
     if x and x.casefold() not in [t.casefold() for t in terms]:terms.append(x)
 # Bound network load while preserving modern and historical variants.
-terms=terms[:8]
+terms=terms[:4]
 years=[int(x) for x in re.findall(r"\b(?:1[0-9]{3}|20[0-9]{2})\b",ctx["date_range"])]
 lo,hi=(min(years),max(years)) if years else (0,9999)
 queries=[]
@@ -28,7 +28,7 @@ for q in queries:
         for d in data.get("response",{}).get("docs",[]):
             items.append({"query":q,"repository":"Internet Archive","discovery_repository":"Internet Archive","metadata":d,"original_inspected":False,"verified":False})
     except Exception as exc: errors.append({"query":q,"error":f"{type(exc).__name__}: {exc}"})
-    time.sleep(.4)
+    time.sleep(.2)
 
 needles=[t.casefold() for t in terms]
 for item in items:
