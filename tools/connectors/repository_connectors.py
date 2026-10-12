@@ -216,14 +216,16 @@ def pares_simancas(q,lane):
             if "Resultados" not in html and "resultados" not in html:
                 return "SEARCH_NOT_CONFIRMED",[],search_url
             ids=list(dict.fromkeys(re.findall(r'(?:/catalogo/description/|catalogo/description/)([0-9]{2,12})',html)))
-            rows=[{"discovery_repository":"PARES / Archivo General de Simancas",
-                "discovery_lane":lane,"connector_status":"EXECUTED",
-                "identifier":i,"title":"PARES candidate "+i,
-                "url":"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/description/"+i,
-                "date":[],"evidence_level":"UNFILTERED_CATALOGUE_CANDIDATE",
-                "archive_attribution":"UNCONFIRMED_REQUIRES_RECORD_CHECK"}
-                for i in ids[:20]]
-            return "EXECUTED",rows,search_url+" ; catalogue search, archive attribution unconfirmed"
+            # Search result links are not proof of archive attribution.
+            # Confirm each description page before emitting a Simancas hit.
+            rows=[]
+            for candidate_id in ids[:20]:
+                record_status,record_rows,record_detail=pares_simancas(candidate_id,lane)
+                if record_status=="EXECUTED":
+                    rows.extend(record_rows)
+            if rows:
+                return "EXECUTED",rows,search_url+" ; confirmed Simancas descriptions only"
+            return "ARCHIVE_NOT_CONFIRMED",[],search_url+" ; "+str(len(ids))+" catalogue links, none confirmed as Archivo General de Simancas"
         except Exception as exc:
             return "ACCESS_BLOCKED",[],search_url+" ; "+type(exc).__name__+": "+str(exc)
 
