@@ -12,7 +12,7 @@ queries=[
 items=[]; errors=[]
 for q in queries:
  try:
-  params=urllib.parse.urlencode({"q":q,"fl[]":["identifier","title","year","creator","date","collection"],"rows":30,"output":"json"})
+  params=urllib.parse.urlencode({"q":q,"fl[]":["identifier","title","year","creator","date","collection"],"rows":30,"output":"json"},doseq=True)
   req=urllib.request.Request("https://archive.org/advancedsearch.php?"+params,headers={"User-Agent":"Piratecartography-Research/1.0 (scholarly source discovery)"})
   with urllib.request.urlopen(req,timeout=35) as f: data=json.load(f)
   for d in data.get("response",{}).get("docs",[]):
