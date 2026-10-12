@@ -1,32 +1,39 @@
 #!/usr/bin/env python3
-"""Search acquired historical-library OCR for target names and spelling variants."""
-import json,pathlib,re,datetime,unicodedata
-root=pathlib.Path("library_acquisition"); out=pathlib.Path("citation_chase_hits");out.mkdir(exist_ok=True)
-TERMS={
- "KYTHNOS_THERMIA":[r"kythnos",r"cythnos",r"kithnos",r"thermia",r"termia",r"thermie",r"therm[iy]a"],
- "CREVELIER":[r"crevelier",r"creveliers",r"crevellier",r"crevelière",r"creveliere",r"crevel"],
- "AEGEAN_CONTEXT":[r"archipel",r"arcipelago",r"archipelago",r"archipelagus",r"cyclad",r"naxos",r"paros",r"andros",r"astypal",r"stampalia"]
-}
+"""Search acquired text for request-defined place/alias/name terms."""
+import json,pathlib,re,datetime,unicodedata,sys
+sys.path.insert(0,str(pathlib.Path(__file__).parent))
+from request_context import load_request
+rf,req,ctx=load_request()
+root=pathlib.Path("library_acquisition");out=pathlib.Path("citation_chase_hits");out.mkdir(exist_ok=True)
+
+place=[]
+for t in [ctx["target"]]+ctx["aliases"]:
+    t=str(t).strip()
+    if t and t.casefold() not in [x.casefold() for x in place]:place.append(t)
+lead_values=[]
+for key in ("actors","actor","names","leads","persons","keywords"):
+    v=req.get(key,[])
+    if isinstance(v,str):v=[x.strip() for x in v.split(",") if x.strip()]
+    if isinstance(v,list):lead_values.extend(str(x).strip() for x in v if str(x).strip())
+
 def norm(s):
- s=unicodedata.normalize("NFKC",s).replace("\x00"," ")
- return re.sub(r"[ \t]+"," ",s)
-def line_no(text,pos): return text.count("\n",0,pos)+1
+    s=unicodedata.normalize("NFKC",s).replace("\x00"," ")
+    return re.sub(r"[ \t]+"," ",s)
+def line_no(text,pos):return text.count("\n",0,pos)+1
 hits=[]
+terms=[("PLACE",t) for t in place]+[("REQUEST_LEAD",t) for t in lead_values]
 for p in sorted(root.glob("*")):
- if not p.is_file() or p.name=="acquisition_report.json": continue
- try: raw=p.read_text(encoding="utf-8",errors="ignore")
- except Exception: continue
- text=norm(raw)
- for group,pats in TERMS.items():
-  for pat in pats:
-   for m in re.finditer(pat,text,re.I):
-    a=max(0,m.start()-350);b=min(len(text),m.end()+500)
-    context=text[a:b].replace("\n"," ")
-    hits.append({"file":p.name,"group":group,"matched":m.group(0),"line":line_no(text,m.start()),"context":context})
-report={"generated_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"protocol":"PCT-OCR-CITATION-HIT-v1","terms":TERMS,"hit_count":len(hits),"hits":hits,"warning":"OCR hits are discovery leads, not verified quotations or page citations. Exact page image/original inspection remains required."}
+    if not p.is_file() or p.name=="acquisition_report.json":continue
+    try:raw=p.read_text(encoding="utf-8",errors="ignore")
+    except Exception:continue
+    text=norm(raw)
+    for group,term in terms:
+        pat=r"(?<!\w)"+re.escape(term)+r"(?!\w)"
+        for m in re.finditer(pat,text,re.I):
+            a=max(0,m.start()-350);b=min(len(text),m.end()+500)
+            hits.append({"file":p.name,"group":group,"term":term,"matched":m.group(0),"line":line_no(text,m.start()),"context":text[a:b].replace("\n"," ")})
+report={"schema":"pct-ocr-citation-hit-v2","generated_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"request_file":rf.name,"target":ctx["target"],"aliases":ctx["aliases"],"terms":terms,"hit_count":len(hits),"hits":hits,"warning":"OCR hits are discovery leads, not verified quotations or page citations. Exact-page original inspection remains required."}
 (out/"ocr_hits.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
-# Compact priority report: Kythnos/Thermia or Crevelier only
-priority=[h for h in hits if h["group"] in ("KYTHNOS_THERMIA","CREVELIER")]
-(out/"priority_hits.json").write_text(json.dumps({"count":len(priority),"hits":priority,"next_stage":"MAP_HIT_TO_PAGE_AND_INSPECT_ORIGINAL"},ensure_ascii=False,indent=2),encoding="utf-8")
-print("OCR hits",len(hits),"priority",len(priority))
-for h in priority[:30]: print(h["file"],h["group"],h["matched"],"line",h["line"],h["context"][:240])
+priority=[h for h in hits if h["group"]=="PLACE"]
+(out/"priority_hits.json").write_text(json.dumps({"count":len(priority),"hits":priority,"next_stage":"EVENT_FIRST_AND_EXACT_PAGE_MAPPING"},ensure_ascii=False,indent=2),encoding="utf-8")
+print("OCR hits",len(hits),"place priority",len(priority))
