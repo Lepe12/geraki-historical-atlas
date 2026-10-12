@@ -8,7 +8,7 @@ from historical_query_expansion import expand_queries
 lane=os.getenv("PCT_RESEARCH_LANE","travellers")
 rf,req,ctx=load_request()
 cfg={
-"travellers":[("Gallica/BnF","https://catalogue.bnf.fr"),("BSB","https://www.digitale-sammlungen.de"),("Internet Archive","https://archive.org"),("Google Books","https://books.google.com")],
+"travellers":[("SearchCulture.gr / EKT","https://www.searchculture.gr"),("Gallica/BnF","https://catalogue.bnf.fr"),("BSB","https://www.digitale-sammlungen.de"),("Internet Archive","https://archive.org"),("Google Books","https://books.google.com")],
 "spanish_simancas":[("PARES / Archivo General de Simancas","https://pares.cultura.gob.es"),("Biblioteca Digital Hispánica","https://catalogo.bne.es")],
 "venetian":[("Archivio di Stato di Venezia / SIAS","https://sias-archivi.cultura.gov.it"),("Internet Culturale","https://www.internetculturale.it"),("Internet Archive","https://archive.org")],
 "french":[("Archives nationales","https://www.archives-nationales.culture.gouv.fr"),("Archives diplomatiques","https://archivesdiplomatiques.diplomatie.gouv.fr"),("Gallica/BnF","https://catalogue.bnf.fr")],
