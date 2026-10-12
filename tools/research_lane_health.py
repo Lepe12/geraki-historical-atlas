@@ -33,7 +33,7 @@ required_files={
  "exact_page_report":pathlib.Path("exact_page_acquisition/exact_page_report.json").exists(),
  "inspection_queue":pathlib.Path("original_inspection/inspection_queue.json").exists(),
  "genealogy_queue":pathlib.Path("source_genealogy/genealogy_queue.json").exists(),
- "corroboration_queue":pathlib.Path("corroboration/corroboration_queue.json").exists(),
+ "corroboration_queue":pathlib.Path("corroboration/corroboration_queue.json").exists(),\n "human_review_queue":pathlib.Path("human_review/review_queue.json").exists(),
  "verification_gate":pathlib.Path("verification/verification_gate.json").exists(),
  "qa_report":pathlib.Path("qa/qa_report.json").exists(),
  "structured_output":pathlib.Path("structured_output/candidate_events.json").exists()
