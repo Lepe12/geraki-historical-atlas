@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Execute lane-specific repository discovery using public search endpoints where stable; preserve unsupported targets for citation chase."""
-import os,json,pathlib,urllib.parse,urllib.request,xml.etree.ElementTree as ET
+import os,json,pathlib,urllib.parse,urllib.request,xml.etree.ElementTree as ET,sys
+sys.path.insert(0,str(pathlib.Path(__file__).parent))
+from connectors.bsb_sru import search_bsb
 lane=os.getenv("PCT_RESEARCH_LANE","travellers")
 plan=json.loads(pathlib.Path(f"repository_plans/{lane}.json").read_text(encoding="utf-8"))
 out=pathlib.Path("lane_discovery");out.mkdir(exist_ok=True)
@@ -42,6 +44,8 @@ for r in plan["repositories"]:
    x=gallica(q);results+=x;attempts.append({"repository":name,"status":"EXECUTED","hits":len(x)})
   elif name=="The National Archives Discovery":
    x=tna(q);results+=x;attempts.append({"repository":name,"status":"EXECUTED","hits":len(x)})
+  elif name=="BSB":
+   x=search_bsb(q);results+=x;attempts.append({"repository":name,"status":"EXECUTED","hits":len(x)})
   else:
    attempts.append({"repository":name,"status":"CITATION_CHASE_WEB_OR_API_CONNECTOR_REQUIRED","base_url":r["base_url"],"query_seed":r["query_seed"]})
  except Exception as e:
