@@ -38,7 +38,7 @@ def discover(term,limit=5,max_pages=12):
     if sid and "/catalogo/find?" in facet_path:
         facet_path=facet_path.replace("/catalogo/find?","/catalogo/find;jsessionid="+sid.group(1)+"?")
     first=urllib.parse.urljoin(HOST,facet_path)
-    html,fmeta=fetch(opener,first,True)
+    html,fmeta=fetch(opener,seed,True)
     print("PARES_FILTER_RESPONSE",json.dumps({"request_url":first,**fmeta,"html_size":len(html),"record_links":len(ids(html)),"has_simancas":"Archivo General de Simancas" in html},ensure_ascii=False))
     # Diagnose archive-facet controls before record verification.
     facet_context=[]
@@ -66,7 +66,7 @@ def discover(term,limit=5,max_pages=12):
                     if len(verified)>=limit:break
             except Exception as e:errors.append({"record_id":rid,"error":str(e)})
         if len(verified)>=limit:break
-    return {"term":term,"search_url":first,"discovery_method":"native_PARES_catalogo_find_paginated","pages_checked":page,"candidates_checked":len(seen),"verified_count":len(verified),"records":verified,"errors":errors[:10],"native_PARES_search_implemented":True,"archive_filter":"idA=2 (Archivo General de Simancas)","archive_gate":"Archivo General de Simancas + ES.47161.AGS + signatura","scope":"catalogue metadata only; originals not inspected"}
+    return {"term":term,"search_url":first,"discovery_method":"native_PARES_result_rows_AGS_filtered","pages_checked":page,"candidates_checked":len(seen),"verified_count":len(verified),"records":verified,"errors":errors[:10],"native_PARES_search_implemented":True,"archive_filter":"result-row Archivo General de Simancas","archive_gate":"Archivo General de Simancas + ES.47161.AGS + signatura","scope":"catalogue metadata only; originals not inspected"}
 if __name__=="__main__":
     p=argparse.ArgumentParser();p.add_argument("term");p.add_argument("--limit",type=int,default=3);p.add_argument("--max-pages",type=int,default=12)
     a=p.parse_args();r=discover(a.term,a.limit,a.max_pages);print(json.dumps(r,ensure_ascii=False,indent=2))
