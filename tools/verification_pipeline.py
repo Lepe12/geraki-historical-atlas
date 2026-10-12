@@ -72,7 +72,7 @@ page_by_source={}
 for p in pages:
     page_by_source.setdefault(str(p.get("source_file","")),[]).append(p)
 candidates=[]
-for i,h in enumerate(events,1):
+for i,h in enumerate(events[:200],1):
     src=h.get("file")
     related=page_by_source.get(str(src),[])
     candidates.append({
@@ -84,7 +84,7 @@ for i,h in enumerate(events,1):
     })
 write("structured_output/candidate_events.json",{
  "schema":"pct-structured-candidates-v1","generated_utc":NOW,"lane":LANE,
- "events":candidates,"rule":"Candidate output is safe for review/import but must not be represented as a Verified Airtable event."
+ "events":candidates,"total_ocr_event_hits":len(events),"deferred_event_candidates":max(0,len(events)-len(candidates)),"rule":"Candidate output is safe for review/import but must not be represented as a Verified Airtable event."
 })
 
 write("corroboration/corroboration_queue.json",{
