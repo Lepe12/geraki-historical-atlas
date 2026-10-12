@@ -24,7 +24,7 @@ def write(path,obj):
     p.write_text(json.dumps(obj,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 
 acq=read("library_acquisition/acquisition_report.json",{}).get("results",[])
-events=read("event_first_hits/event_hits.json",{}).get("hits",[])
+event_report=read("event_first_hits/event_hits.json",{})\nevents=event_report.get("hits",[])\ncatalogue_leads=event_report.get("catalogue_leads",[])
 pages=read("exact_page_acquisition/exact_page_report.json",{}).get("results",[])
 bsb=read("iiif_candidate_requests/bsb_iiif_candidates.json",{}).get("results",[])
 
@@ -73,7 +73,27 @@ for i,h in enumerate(events,1):
       "machine_status":"NOT_ORIGINAL_VERIFIED","human_review_status":"NOT_REVIEWED",
       "verified":False
     })
-write("structured_output/candidate_events.json",{"schema":"pct-structured-candidates-v2","generated_utc":NOW,"lane":LANE,"events":candidates,"total_ocr_event_hits":len(events),"rule":"OCR/event proximity creates a candidate only; it is not a historical fact."})
+
+for j,h in enumerate(catalogue_leads,1):
+    topo=toponym_identity(h.get("place_match"),ctx["target"],ctx["aliases"])
+    dnorm=normalize_date(" / ".join(str(y) for y in h.get("years_in_scope",[])))
+    candidates.append({
+      "candidate_id":f"{LANE}-catalogue-{j:04d}","lane":LANE,
+      "source_file":None,"source_type":"CATALOGUE_METADATA",
+      "repository":h.get("repository"),"identifier":h.get("identifier"),"url":h.get("url"),"title":h.get("title"),
+      "evidence_state":"LOCATED",
+      "place":topo,"date":dnorm,"event_terms":h.get("event_terms",[]),
+      "event_type":"UNKNOWN","actor":"UNKNOWN",
+      "exact_page_candidates":[],
+      "original_quote":None,"controlled_transcription":None,"translation":None,
+      "source_says":None,"researcher_inference":None,
+      "original_inspected":False,"extracted":False,"corroborated":False,
+      "machine_status":"NOT_ORIGINAL_VERIFIED","human_review_status":"NOT_REVIEWED",
+      "verified":False,
+      "warning":"Catalogue metadata lead only; not historical evidence."
+    })
+
+write("structured_output/candidate_events.json",{"schema":"pct-structured-candidates-v2","generated_utc":NOW,"lane":LANE,"events":candidates,"total_ocr_event_hits":len(events),"total_catalogue_event_leads":len(catalogue_leads),"rule":"OCR/event proximity creates a candidate only; it is not a historical fact."})
 
 corroboration=[]
 for c in candidates:
