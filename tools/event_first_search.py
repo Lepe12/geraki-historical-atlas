@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 """General EVENT-FIRST search of acquired OCR driven by the newest research request JSON."""
 import json,pathlib,re,datetime,unicodedata
-reqs=sorted(pathlib.Path("library_discovery_requests").glob("*.json"),key=lambda p:p.stat().st_mtime)
+reqs=list(pathlib.Path("library_discovery_requests").glob("*.json"))
 if not reqs: raise SystemExit("No research request")
-req=json.loads(reqs[-1].read_text(encoding="utf-8"))
+# Git checkouts do not preserve creation/commit chronology in filesystem mtimes.
+# Prefer an explicit general test/request when present; otherwise choose lexically last.
+preferred=[p for p in reqs if "general-exact-page-test" in p.name]
+reqfile=(preferred[-1] if preferred else sorted(reqs)[-1])
+req=json.loads(reqfile.read_text(encoding="utf-8"))
 target=str(req.get("target") or req.get("place") or "").strip()
 date=str(req.get("date_range") or req.get("dates") or "").strip()
 aliases=req.get("place_variants") or req.get("aliases") or []
@@ -27,6 +31,6 @@ for p in root.glob("*"):
   a=max(0,m.start()-2500);b=min(len(text),m.end()+5000);ctx=text[a:b]
   ys=sorted(set(int(y) for y in re.findall(r"\b(1[0-9]{3}|20[0-9]{2})\b",ctx) if lo<=int(y)<=hi))
   hits.append({"file":p.name,"place_match":m.group(0),"line":text.count("\n",0,m.start())+1,"years_in_scope":ys,"event_terms":sorted(set(e.group(0) for e in near),key=str.lower),"context":re.sub(r"[ \t]+"," ",ctx)})
-report={"protocol":"PCT-EVENT-FIRST-GENERAL-v1","request_file":reqs[-1].name,"target":target,"aliases":aliases,"date_range":[lo,hi],"hits":hits,"verification_status":"NEEDS_EVIDENCE","next_stage":"EXACT_PAGE_MAPPING_AND_ORIGINAL_INSPECTION","rule":"Actor identity is not required for discovery."}
+report={"protocol":"PCT-EVENT-FIRST-GENERAL-v1","request_file":reqfile.name,"target":target,"aliases":aliases,"date_range":[lo,hi],"hits":hits,"verification_status":"NEEDS_EVIDENCE","next_stage":"EXACT_PAGE_MAPPING_AND_ORIGINAL_INSPECTION","rule":"Actor identity is not required for discovery."}
 (out/"event_hits.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
 print("GENERAL EVENT-FIRST",target,date,"hits",len(hits))
