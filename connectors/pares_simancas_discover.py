@@ -21,13 +21,13 @@ def discover(term,limit=5):
     if not candidates:
         print("PARES_SEARCH_DIAGNOSTIC",json.dumps({"html_size":len(html),"description_occurrences":html.lower().count("description"),"href_samples":re.findall(r'href="([^"]+)"',html,re.I)[-35:]},ensure_ascii=False))
     records=[];errors=[]
-    for rid in candidates[:max(limit*5,limit)]:
+    for rid in candidates:
         try:
             rec=verify(rid)
             if rec["status"]=="RECORD_VERIFIED":records.append(rec)
             if len(records)>=limit:break
         except Exception as exc:errors.append({"record_id":rid,"error":str(exc)})
-    return {"term":term,"search_url":url,"discovery_method":"native_PARES_catalogo_find","candidate_count":len(candidates),"verified_count":len(records),"records":records,"errors":errors[:10],"native_PARES_search_implemented":True,"scope":"catalogue search and description verification only"}
+    return {"term":term,"search_url":url,"discovery_method":"native_PARES_catalogo_find","candidate_count":len(candidates),"candidate_ids":candidates[:50],"verified_count":len(records),"records":records,"errors":errors[:10],"native_PARES_search_implemented":True,"scope":"catalogue search and description verification only"}
 if __name__=="__main__":
     p=argparse.ArgumentParser();p.add_argument("term");p.add_argument("--limit",type=int,default=5)
     a=p.parse_args();result=discover(a.term,a.limit)
