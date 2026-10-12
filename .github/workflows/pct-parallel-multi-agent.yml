@@ -50,13 +50,15 @@ jobs:
           python3 tools/build_research_lanes.py
           timeout 180s bash -c '
             set -o pipefail
-            python3 tools/library_source_discovery.py &&
-            python3 tools/route_library_candidates.py &&
+            if [ "$PCT_RESEARCH_LANE" = "travellers" ]; then
+              python3 tools/library_source_discovery.py &&
+              python3 tools/route_library_candidates.py || exit $?
+            fi
             python3 tools/acquire_library_candidate.py &&
             python3 tools/search_acquired_ocr.py &&
             python3 tools/event_first_search.py &&
             python3 tools/exact_page_acquire.py
-          ' || { code=$?; echo "GENERIC FALLBACK bounded exit=$code"; [ "$code" -eq 124 ] && echo "GENERIC FALLBACK TIMEOUT after 180s"; true; }
+          ' || { code=$?; echo "LANE PIPELINE bounded exit=$code"; [ "$code" -eq 124 ] && echo "LANE PIPELINE TIMEOUT after 180s"; true; }
           python3 tools/verification_pipeline.py
           python3 tools/research_lane_health.py
       - name: Preserve durable evidence in GitHub
