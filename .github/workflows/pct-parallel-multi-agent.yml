@@ -56,6 +56,7 @@ jobs:
             python3 tools/event_first_search.py &&
             python3 tools/exact_page_acquire.py
           ' || { code=$?; echo "GENERIC FALLBACK bounded exit=$code"; [ "$code" -eq 124 ] && echo "GENERIC FALLBACK TIMEOUT after 180s"; true; }
+          python3 tools/research_lane_health.py
       - name: Preserve durable evidence in GitHub
         if: always()
         env:
