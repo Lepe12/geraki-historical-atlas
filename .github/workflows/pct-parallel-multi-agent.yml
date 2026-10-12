@@ -37,6 +37,8 @@ jobs:
       matrix: ${{ steps.m.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - run: python3 tools/build_research_lanes.py
       - id: m
         run: echo 'matrix=["travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]' >> "$GITHUB_OUTPUT"
@@ -54,10 +56,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - name: Build lane-specific repository plan
         env:
           PCT_RESEARCH_LANE: ${{ matrix.lane }}
-          PCT_REPOSITORY_QUERY_LIMIT: "1"
+
         run: |
           python3 tools/build_research_lanes.py
           python3 tools/lane_repository_plan.py
@@ -68,8 +72,8 @@ jobs:
       - name: Run lane discovery
         env:
           PCT_RESEARCH_LANE: ${{ matrix.lane }}
-          PCT_MAX_ACQUISITION_CANDIDATES: "100"
-          PCT_MAX_IA_CANDIDATES: "10"
+
+
         run: |
           python3 tools/build_research_lanes.py
           timeout 1800s bash -c '
@@ -133,6 +137,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
         with:
           ref: main
       - name: Refresh durable lane evidence
