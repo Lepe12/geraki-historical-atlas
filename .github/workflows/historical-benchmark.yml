@@ -30,6 +30,8 @@ jobs:
           import json,pathlib
           rows=[]
           for p in pathlib.Path("benchmarks/results").glob("*.json"):
+              if p.name == "SUMMARY.json":
+                  continue
               try: rows.append(json.loads(p.read_text(encoding="utf-8")))
               except Exception: pass
           tp=sum(x.get("true_positive",0) for x in rows);fp=sum(x.get("false_positive",0) for x in rows)
