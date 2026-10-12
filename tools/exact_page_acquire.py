@@ -5,8 +5,7 @@ from functools import lru_cache
 hitsf=pathlib.Path("event_first_hits/event_hits.json"); acqf=pathlib.Path("library_acquisition/acquisition_report.json")
 if not hitsf.exists() or not acqf.exists(): raise SystemExit("missing event hits/acquisition report")
 all_hits=json.loads(hitsf.read_text(encoding="utf-8")).get("hits",[])
-# Bound expensive page fetches per run; unprocessed hits stay in the durable OCR/event report.
-hits=all_hits[:4]
+# Process the complete durable hit set. Checkpoint after every candidate so interrupted runs retain progress.\nhits=all_hits
 acq=json.loads(acqf.read_text(encoding="utf-8")).get("results",[])
 out=pathlib.Path("exact_page_acquisition");out.mkdir(exist_ok=True)
 byfile={r.get("identifier"):r for r in acq if r.get("identifier") and (r.get("acquisition_route")=="INTERNET_ARCHIVE" or str(r.get("discovery_repository") or r.get("repository") or "").lower().startswith("internet archive"))}
@@ -31,7 +30,7 @@ report=[]
 def checkpoint():
  (out/"exact_page_report.json").write_text(json.dumps({
   "generated_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),
-  "protocol":"PCT-EXACT-PAGE-AUTO-v2","results":report,
+  "protocol":"PCT-EXACT-PAGE-AUTO-v3","results":report,
   "total_event_hits":len(all_hits),"selected_page_hits":len(hits),
   "processed_page_hits":len(report),"completed":len(report)>=len(hits),
   "deferred_page_hits":max(0,len(all_hits)-len(hits)),
