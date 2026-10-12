@@ -1,7 +1,5 @@
 name: Autonomous Library Source Discovery
 on:
-  schedule:
-    - cron: '17 6 * * 1'
   workflow_dispatch:
     inputs:
       target:
@@ -53,6 +51,7 @@ jobs:
           print("PCT_RESEARCH_JOB_ID="+d["research_job_id"])
           PY
           python3 tools/request_identity.py
+          python3 tools/run_manifest.py
       - name: Query digitized library catalogue
         run: python3 tools/library_source_discovery.py
       - name: Route strong candidates to Citation Chase
@@ -66,7 +65,10 @@ jobs:
       - name: Map hits and acquire exact scanned pages
         run: python3 tools/exact_page_acquire.py
       - name: Revalidate pinned request after research
-        run: python3 tools/request_identity.py
+        run: |
+          python3 tools/request_identity.py
+          python3 tools/verification_pipeline.py
+          python3 tools/build_research_dossier.py
       - name: Upload catalogue candidates
         if: always()
         uses: actions/upload-artifact@v4
@@ -80,4 +82,13 @@ jobs:
             citation_chase_hits/
             event_first_hits/
             exact_page_acquisition/
+            original_inspection/
+            source_genealogy/
+            corroboration/
+            human_review/
+            verification/
+            qa/
+            structured_output/
+            research_dossier/
+            run_manifest/
           if-no-files-found: warn
