@@ -1,0 +1,14 @@
+name: PARES Simancas Facet Diagnostic
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'connectors/pares_simancas_discover.py'
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect PARES archive facet
+        run: timeout 35s python connectors/pares_simancas_discover.py Nápoles --limit 1 --max-pages 1 || true
