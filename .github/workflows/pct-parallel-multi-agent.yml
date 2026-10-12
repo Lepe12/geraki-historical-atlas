@@ -23,32 +23,56 @@ on:
       - main
     paths:
       - 'library_discovery_requests/**'
+
 permissions:
   contents: write
+
 env:
   PCT_TARGET: ${{ inputs.target }}
   PCT_ALIASES: ${{ inputs.aliases }}
   PCT_DATE_RANGE: ${{ inputs.date_range }}
   PCT_PURPOSE: ${{ inputs.purpose }}
+
 jobs:
   prepare:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.m.outputs.matrix }}
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      request_file: ${{ steps.identity.outputs.request_file }}
+      request_sha256: ${{ steps.identity.outputs.request_sha256 }}
+      research_job_id: ${{ steps.identity.outputs.research_job_id }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
-      - run: |
+      - id: identity
+        name: Resolve canonical research request once
+        run: |
           python3 tools/request_identity.py
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          d=json.load(open("research_request_identity.json",encoding="utf-8"))
+          print("request_file="+d["request_file"])
+          print("request_sha256="+d["request_sha256"])
+          print("research_job_id="+d["research_job_id"])
+          PY
+      - name: Build and validate ten lane payloads
+        env:
+          PCT_RESEARCH_JOB_ID: ${{ steps.identity.outputs.research_job_id }}
+          PCT_EXPECTED_REQUEST_SHA256: ${{ steps.identity.outputs.request_sha256 }}
+          PCT_REQUEST_FILE: ${{ steps.identity.outputs.request_file }}
+        run: |
           python3 tools/build_research_lanes.py
           python3 tools/verify_request_integrity.py
-      - id: m
+      - id: matrix
         run: echo 'matrix=["travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]' >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
-          name: pct-research-lanes-${{ github.run_id }}
-          path: research_lanes/
+          name: pct-research-request-${{ github.run_id }}
+          path: |
+            research_request_identity.json
+            research_lanes/
+
   research-lanes:
     needs: prepare
     strategy:
@@ -57,30 +81,32 @@ jobs:
         lane: ${{ fromJSON(needs.prepare.outputs.matrix) }}
       max-parallel: 10
     runs-on: ubuntu-latest
+    env:
+      PCT_REQUEST_FILE: ${{ needs.prepare.outputs.request_file }}
+      PCT_EXPECTED_REQUEST_SHA256: ${{ needs.prepare.outputs.request_sha256 }}
+      PCT_RESEARCH_JOB_ID: ${{ needs.prepare.outputs.research_job_id }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
+      - name: Validate pinned request before research
+        run: |
+          python3 tools/request_identity.py
+          python3 tools/build_research_lanes.py
+          python3 tools/verify_request_integrity.py
       - name: Build lane-specific repository plan
         env:
           PCT_RESEARCH_LANE: ${{ matrix.lane }}
-
         run: |
-          python3 tools/build_research_lanes.py
-          python3 tools/verify_request_integrity.py
           python3 tools/lane_repository_plan.py
           timeout 150s python3 tools/lane_repository_discovery.py || { code=$?; echo "LANE DISCOVERY bounded exit=$code"; [ "$code" -eq 124 ] && echo "LANE DISCOVERY TIMEOUT after 150s"; true; }
           python3 tools/merge_repository_candidates.py
           if [ "$PCT_RESEARCH_LANE" = "german" ]; then PCT_BSB_POSITIVE_CONTROL=1 python3 tools/bsb_iiif_route.py; fi
           if [ "$PCT_RESEARCH_LANE" = "travellers" ]; then python3 tools/bsb_iiif_route.py; fi
-      - name: Run lane discovery
+      - name: Run lane research pipeline
         env:
           PCT_RESEARCH_LANE: ${{ matrix.lane }}
-
-
         run: |
-          python3 tools/build_research_lanes.py
-          python3 tools/verify_request_integrity.py
           timeout 1800s bash -c '
             set -o pipefail
             if [ "$PCT_RESEARCH_LANE" = "travellers" ]; then
@@ -118,6 +144,7 @@ jobs:
           name: pct-${{ matrix.lane }}-${{ github.run_id }}
           path: |
             research_lanes/${{ matrix.lane }}.json
+            research_request_identity.json
             repository_plans/${{ matrix.lane }}.json
             lane_discovery/${{ matrix.lane }}.json
             iiif_candidate_requests/
@@ -137,9 +164,12 @@ jobs:
           if-no-files-found: warn
 
   aggregate-health:
-    needs: research-lanes
+    needs: [prepare, research-lanes]
     if: always()
     runs-on: ubuntu-latest
+    env:
+      PCT_EXPECTED_REQUEST_SHA256: ${{ needs.prepare.outputs.request_sha256 }}
+      PCT_RESEARCH_JOB_ID: ${{ needs.prepare.outputs.research_job_id }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -147,9 +177,6 @@ jobs:
           fetch-depth: 2
       - name: Refresh durable lane evidence
         run: git pull --rebase origin main
-      - name: Verify ten-lane request identity
-        run: |
-          python3 tools/verify_request_integrity.py
       - name: Build ten-lane system health
         run: python3 tools/research_system_health.py --run-id "${{ github.run_id }}"
       - name: Commit aggregate health
@@ -164,7 +191,6 @@ jobs:
             sleep $((n*2))
           done
           exit 1
-
       - name: Synchronize safe research state to Airtable
         env:
           AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
@@ -175,15 +201,19 @@ jobs:
           git diff --cached --quiet || git commit -m "Airtable sync report: run ${{ github.run_id }}"
           git pull --rebase origin main
           git push origin HEAD:main
-
-      - name: Enforce ten-lane operational gate
+      - name: Enforce ten-lane operational and request-integrity gate
         run: |
           python3 - <<'PY'
           import json, os, pathlib, sys
           p=pathlib.Path('evidence/runs')/os.environ['GITHUB_RUN_ID']/'SYSTEM_HEALTH.json'
           d=json.loads(p.read_text(encoding='utf-8'))
-          if not d.get('all_ten_pipeline_reports_present') or not d.get('all_ten_operational'):
-              print('TEN-LANE GATE FAILED', d.get('missing_lane_reports'), d.get('no_executed_repository_lanes'))
+          if not d.get('all_ten_pipeline_reports_present') or not d.get('all_ten_operational') or not d.get('request_fingerprint_ok'):
+              print('TEN-LANE GATE FAILED', d.get('missing_lane_reports'), d.get('no_executed_repository_lanes'), d.get('request_fingerprint_ok'))
               sys.exit(1)
-          print('TEN-LANE GATE PASSED')
+          expected=os.environ.get('PCT_EXPECTED_REQUEST_SHA256','')
+          seen={x.get('request_sha256') for x in d.get('request_fingerprints',[]) if x.get('request_sha256')}
+          if expected and seen != {expected}:
+              print('REQUEST FINGERPRINT GATE FAILED', expected, sorted(seen))
+              sys.exit(1)
+          print('TEN-LANE REQUEST INTEGRITY GATE PASSED')
           PY
