@@ -24,7 +24,7 @@ jobs:
               raise SystemExit("No acquisition request files found")
           newest=max(files,key=lambda p:p.stat().st_mtime)
           with open(os.environ["GITHUB_OUTPUT"],"a",encoding="utf-8") as out:
-              out.write("file="+newest.as_posix()+"\\n")
+              out.write("file="+newest.as_posix()+"\n")
       - name: Validate request and acquire pages
         shell: bash
         run: |
