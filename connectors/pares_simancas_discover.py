@@ -14,7 +14,7 @@ def ids(html):
     return out
 def discover(term,limit=5,max_pages=12):
     jar=http.cookiejar.CookieJar();opener=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
-    first=HOST+FIRST+urllib.parse.urlencode({"texto":term});html=fetch(opener,first)
+    first=HOST+FIRST+urllib.parse.urlencode({"texto":term,"idA":"2"});html=fetch(opener,first)
     # Diagnose archive-facet controls before record verification.
     facet_context=[]
     for token in ("Archivo General de Simancas","Archivos","archivo","facet","filtro"):
@@ -41,7 +41,7 @@ def discover(term,limit=5,max_pages=12):
                     if len(verified)>=limit:break
             except Exception as e:errors.append({"record_id":rid,"error":str(e)})
         if len(verified)>=limit:break
-    return {"term":term,"search_url":first,"discovery_method":"native_PARES_catalogo_find_paginated","pages_checked":page,"candidates_checked":len(seen),"verified_count":len(verified),"records":verified,"errors":errors[:10],"native_PARES_search_implemented":True,"archive_gate":"Archivo General de Simancas + ES.47161.AGS + signatura","scope":"catalogue metadata only; originals not inspected"}
+    return {"term":term,"search_url":first,"discovery_method":"native_PARES_catalogo_find_paginated","pages_checked":page,"candidates_checked":len(seen),"verified_count":len(verified),"records":verified,"errors":errors[:10],"native_PARES_search_implemented":True,"archive_filter":"idA=2 (Archivo General de Simancas)","archive_gate":"Archivo General de Simancas + ES.47161.AGS + signatura","scope":"catalogue metadata only; originals not inspected"}
 if __name__=="__main__":
     p=argparse.ArgumentParser();p.add_argument("term");p.add_argument("--limit",type=int,default=3);p.add_argument("--max-pages",type=int,default=12)
     a=p.parse_args();r=discover(a.term,a.limit,a.max_pages);print(json.dumps(r,ensure_ascii=False,indent=2))
