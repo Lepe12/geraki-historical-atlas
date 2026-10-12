@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Build ten parallel source-family lanes from one general PCT research request."""
+"""Build ten parallel source-family lanes from one canonical research request."""
 import json,pathlib,sys
 sys.path.insert(0,str(pathlib.Path(__file__).parent))
-from request_context import load_request
-rf,req,ctx=load_request()
+from request_identity import canonical_request
+
+rf,req,ctx,normalized,request_sha256,research_job_id=canonical_request()
 lanes={
 "travellers":{"label":"Mediterranean/Eastern Mediterranean travellers & contemporary literature","families":["travel accounts","itineraries","geographies","missionary","consular","gazettes","chronicles"]},
 "spanish_simancas":{"label":"Spanish Monarchy / Simancas","families":["Archivo General de Simancas","state","royal","naval","diplomatic"]},
@@ -18,6 +19,11 @@ lanes={
 }
 out=pathlib.Path("research_lanes");out.mkdir(exist_ok=True)
 for k,v in lanes.items():
-    payload={"lane":k,"label":v["label"],"source_families":v["families"],"request_file":rf.name,"research_request":req,"normalized_context":ctx,"rules":{"event_first":True,"actor_required":False,"period_adaptive":True,"historical_language_variants":True,"catalogue_is_evidence":False,"verification":"exact original page + genealogy + independent corroboration"}}
+    payload={
+      "lane":k,"label":v["label"],"source_families":v["families"],
+      "request_file":rf.name,"research_job_id":research_job_id,"request_sha256":request_sha256,
+      "research_request":req,"normalized_context":ctx,"normalized_request":normalized,
+      "rules":{"event_first":True,"actor_required":False,"period_adaptive":True,"historical_language_variants":True,"catalogue_is_evidence":False,"verification":"exact original page + genealogy + independent corroboration"}
+    }
     (out/f"{k}.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding="utf-8")
-print("research lanes",len(lanes),"request",rf.name,",".join(lanes))
+print("research lanes",len(lanes),"job",research_job_id,"request",rf.name,"sha256",request_sha256,",".join(lanes))
