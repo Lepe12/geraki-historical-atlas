@@ -128,3 +128,15 @@ jobs:
             sleep $((n*2))
           done
           exit 1
+
+      - name: Enforce ten-lane operational gate
+        run: |
+          python3 - <<'PY'
+          import json, os, pathlib, sys
+          p=pathlib.Path('evidence/runs')/os.environ['GITHUB_RUN_ID']/'SYSTEM_HEALTH.json'
+          d=json.loads(p.read_text(encoding='utf-8'))
+          if not d.get('all_ten_pipeline_reports_present') or not d.get('all_ten_operational'):
+              print('TEN-LANE GATE FAILED', d.get('missing_lane_reports'), d.get('no_executed_repository_lanes'))
+              sys.exit(1)
+          print('TEN-LANE GATE PASSED')
+          PY
