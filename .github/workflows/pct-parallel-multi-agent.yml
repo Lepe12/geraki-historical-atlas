@@ -39,7 +39,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
-      - run: python3 tools/build_research_lanes.py
+      - run: |
+          python3 tools/request_identity.py
+          python3 tools/build_research_lanes.py
+          python3 tools/verify_request_integrity.py
       - id: m
         run: echo 'matrix=["travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]' >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
@@ -64,6 +67,7 @@ jobs:
 
         run: |
           python3 tools/build_research_lanes.py
+          python3 tools/verify_request_integrity.py
           python3 tools/lane_repository_plan.py
           timeout 150s python3 tools/lane_repository_discovery.py || { code=$?; echo "LANE DISCOVERY bounded exit=$code"; [ "$code" -eq 124 ] && echo "LANE DISCOVERY TIMEOUT after 150s"; true; }
           python3 tools/merge_repository_candidates.py
@@ -76,6 +80,7 @@ jobs:
 
         run: |
           python3 tools/build_research_lanes.py
+          python3 tools/verify_request_integrity.py
           timeout 1800s bash -c '
             set -o pipefail
             if [ "$PCT_RESEARCH_LANE" = "travellers" ]; then
@@ -142,6 +147,9 @@ jobs:
           fetch-depth: 2
       - name: Refresh durable lane evidence
         run: git pull --rebase origin main
+      - name: Verify ten-lane request identity
+        run: |
+          python3 tools/verify_request_integrity.py
       - name: Build ten-lane system health
         run: python3 tools/research_system_health.py --run-id "${{ github.run_id }}"
       - name: Commit aggregate health
