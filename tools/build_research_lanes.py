@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Build parallel research lanes from one general PCT research request."""
-import json,pathlib
-reqs=list(pathlib.Path("library_discovery_requests").glob("*.json"))
-if not reqs: raise SystemExit("No research request")
-preferred=[p for p in reqs if "general-exact-page" in p.name or p.name.startswith("zz-")]
-rf=sorted(preferred or reqs)[-1]; req=json.loads(rf.read_text(encoding="utf-8"))
+"""Build ten parallel source-family lanes from one general PCT research request."""
+import json,pathlib,sys
+sys.path.insert(0,str(pathlib.Path(__file__).parent))
+from request_context import load_request
+rf,req,ctx=load_request()
 lanes={
 "travellers":{"label":"Mediterranean/Eastern Mediterranean travellers & contemporary literature","families":["travel accounts","itineraries","geographies","missionary","consular","gazettes","chronicles"]},
 "spanish_simancas":{"label":"Spanish Monarchy / Simancas","families":["Archivo General de Simancas","state","royal","naval","diplomatic"]},
@@ -19,6 +18,6 @@ lanes={
 }
 out=pathlib.Path("research_lanes");out.mkdir(exist_ok=True)
 for k,v in lanes.items():
- payload={"lane":k,"label":v["label"],"source_families":v["families"],"research_request":req,"rules":{"event_first":True,"actor_required":False,"period_adaptive":True,"historical_language_variants":True,"catalogue_is_evidence":False,"verification":"exact original page + genealogy + independent corroboration"}}
- (out/f"{k}.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding="utf-8")
-print("research lanes",len(lanes),",".join(lanes))
+    payload={"lane":k,"label":v["label"],"source_families":v["families"],"request_file":rf.name,"research_request":req,"normalized_context":ctx,"rules":{"event_first":True,"actor_required":False,"period_adaptive":True,"historical_language_variants":True,"catalogue_is_evidence":False,"verification":"exact original page + genealogy + independent corroboration"}}
+    (out/f"{k}.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding="utf-8")
+print("research lanes",len(lanes),"request",rf.name,",".join(lanes))
