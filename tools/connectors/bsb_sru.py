@@ -30,13 +30,21 @@ def search_bsb(query,maximum=20):
   if marc is None: continue
   def vals(tag):
    return [" ".join("".join(sf.itertext()).strip() for sf in field.findall("{http://www.loc.gov/MARC21/slim}subfield")) for field in marc.findall("{http://www.loc.gov/MARC21/slim}datafield") if field.get("tag")==tag]
-  ids=[el.text for el in marc.findall("{http://www.loc.gov/MARC21/slim}controlfield") if el.get("tag") in ("001","003") and el.text]
+  control_ids=[el.text.strip() for el in marc.findall("{http://www.loc.gov/MARC21/slim}controlfield") if el.get("tag")=="001" and el.text]
+  ids=control_ids[:]
+  all_subfields=[sf.text.strip() for sf in marc.findall(".//{http://www.loc.gov/MARC21/slim}subfield") if sf.text]
   links=[]
   for field in marc.findall("{http://www.loc.gov/MARC21/slim}datafield"):
    if field.get("tag")=="856":
     links += [sf.text for sf in field.findall("{http://www.loc.gov/MARC21/slim}subfield") if sf.get("code")=="u" and sf.text]
   import re
-  bsbids=list(dict.fromkeys(v for link in links for v in re.findall(r"bsb[0-9]{7,}",link,re.I)))
+  # BSB digital IDs may occur outside 856 (e.g. identifiers/notes) or be recoverable
+  # from catalogue/control identifiers. Search the complete MARC payload conservatively.
+  marc_text=" ".join(all_subfields+control_ids+links)
+  bsbids=list(dict.fromkeys(re.findall(r"bsb[0-9]{7,}",marc_text,re.I)))
+  digital_markers=[x for x in all_subfields if "digitale-sammlungen" in x.lower() or "digital" in x.lower()]
+  # Keep unresolved digital hints for citation chase; never guess a bsb ID.
+
   manifests=["https://api.digitale-sammlungen.de/iiif/presentation/v2/"+v+"/manifest" for v in bsbids]
-  out.append({"repository":"BSB","title":vals("245"),"creator":vals("100")+vals("700"),"date":vals("260")+vals("264"),"identifier":ids,"digital_links":links,"bsb_digital_ids":bsbids,"iiif_manifest_candidates":manifests,"source_api":BSB_SRU,"verification_status":"CATALOGUE_LEAD_ONLY"})
+  out.append({"repository":"BSB","title":vals("245"),"creator":vals("100")+vals("700"),"date":vals("260")+vals("264"),"identifier":ids,"digital_links":links,"digital_markers":digital_markers,"bsb_digital_ids":bsbids,"iiif_manifest_candidates":manifests,"source_api":BSB_SRU,"verification_status":"CATALOGUE_LEAD_ONLY"})
  return out
