@@ -1,0 +1,30 @@
+name: Moreveneto Network Diagnostics
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/moreveneto-network-diagnostics.yml'
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Probe official host and backend connectivity
+        run: |
+          python - <<'PY'
+          import socket,urllib.request,urllib.error,json
+          hosts=['asve.arianna4.cloud','aw-unifi-graphql.netseven.it']
+          for host in hosts:
+              try:
+                  ips=sorted({x[4][0] for x in socket.getaddrinfo(host,None)})
+                  print('DNS',host,ips)
+              except Exception as e: print('DNS_ERROR',host,type(e).__name__,str(e)[:150])
+          targets=['https://aw-unifi-graphql.netseven.it/','http://aw-unifi-graphql.netseven.it/','https://aw-unifi-graphql.netseven.it/graphql','https://asve.arianna4.cloud/graphql','https://asve.arianna4.cloud/api/graphql','https://asve.arianna4.cloud/']
+          for url in targets:
+              for method in ['GET','OPTIONS']:
+                  try:
+                      req=urllib.request.Request(url,method=method,headers={'User-Agent':'Mozilla/5.0','Origin':'https://asve.arianna4.cloud'})
+                      with urllib.request.urlopen(req,timeout=7) as res: print('HTTP',method,url,res.status,res.headers.get('content-type'),res.url)
+                  except urllib.error.HTTPError as e: print('HTTP_STATUS',method,url,e.code,e.headers.get('content-type'))
+                  except Exception as e: print('HTTP_ERROR',method,url,type(e).__name__,str(e)[:120])
+          PY
