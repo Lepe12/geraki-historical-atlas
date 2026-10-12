@@ -201,6 +201,40 @@ def ddb(q,lane):
           "url":("https://www.deutsche-digitale-bibliothek.de/item/"+ident) if ident else None})
     return "EXECUTED",out,url
 
+def pares_simancas(q,lane):
+    """Resolve a known public PARES record URL/ID; NOT a general catalogue search."""
+    value=str(q).strip()
+    match=re.search(r"(?:ParesBusquedas20/catalogo/description/)?([0-9]{2,12})(?:[/?#].*)?$",value)
+    if not match or (not value.isdigit() and "pares." not in value.lower()):
+        return "RECORD_ID_OR_BROWSER_SEARCH_REQUIRED",[],(
+            "PARES public search is interactive. Supply a PARES description URL "
+            "or numeric record ID for a direct archival-metadata lookup.")
+    record_id=match.group(1)
+    url="https://pares.cultura.gob.es/ParesBusquedas20/catalogo/description/"+record_id
+    try:
+        raw=_get(url,timeout=25).decode("utf-8","replace")
+        from html import unescape
+        plain=unescape(re.sub(r"<[^>]+>"," ",re.sub(r"(?is)<(script|style)[^>]*>.*?</\\1>"," ",raw)))
+        plain=" ".join(plain.split())
+        if not ("Signatura" in plain and ("Archivo General de Simancas" in plain)):
+            return "RECORD_NOT_CONFIRMED",[],url+" did not confirm a Simancas archival description"
+        title_match=re.search(r"(?is)<title[^>]*>(.*?)</title>",raw)
+        title=unescape(re.sub(r"<[^>]+>"," ",title_match.group(1))).strip() if title_match else "PARES record "+record_id
+        sig=re.search(r"Signatura\\s*:\\s*(.{1,180}?)(?=Fecha |Nivel de Descripci|Código de Referencia|Contexto)",plain)
+        ref=re.search(r"Código de Referencia\\s*:\\s*(.{1,180}?)(?=Contexto|Contenido y Estructura|Condiciones)",plain)
+        return "EXECUTED",[{
+            "discovery_repository":"PARES / Archivo General de Simancas",
+            "discovery_lane":lane,"connector_status":"EXECUTED",
+            "identifier":record_id,"title":title,"url":url,
+            "archive":"Archivo General de Simancas",
+            "archival_reference":ref.group(1).strip() if ref else None,
+            "shelfmark":sig.group(1).strip() if sig else None,
+            "date":[],"digital_url":None,
+            "evidence_level":"CATALOGUE_METADATA_ONLY",
+        }],url
+    except Exception as exc:
+        return "ACCESS_BLOCKED",[],url+" ; "+type(exc).__name__+": "+str(exc)
+
 def unsupported(repository, reason="No stable anonymous machine-search connector configured."):
     return "AUTH_OR_BROWSER_REQUIRED",[],reason
 
@@ -217,7 +251,7 @@ def dispatch(repository,q,lane):
     if repository=="Deutsche Digitale Bibliothek": return ddb(q,lane)
     if repository=="İSAM Kütüphanesi": return isam(q,lane)
     if repository=="PARES / Archivo General de Simancas":
-        return unsupported(repository,"PARES public research is interactive/browser based; do not claim an API search.")
+        return pares_simancas(q,lane)
     if repository in ("Türkiye Devlet Arşivleri / BOA",):
         return unsupported(repository,"BOA catalogue requires authenticated interactive research access.")
     if repository in ("Archivio di Stato di Venezia / SIAS","SIAS / Italian State Archives"):
