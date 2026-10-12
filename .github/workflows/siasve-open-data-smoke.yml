@@ -1,0 +1,31 @@
+name: SIASVe Open Data Smoke
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/siasve-open-data-smoke.yml'
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Test official Venice open data CSV distributions
+        run: |
+          python - <<'PY'
+          import urllib.request,urllib.error,hashlib,csv,io
+          names=['fonte-SIASVE','strumento-SIASVE']
+          roots=['https://dati.san.beniculturali.it/dataset/csv/','http://dati.san.beniculturali.it/dataset/csv/','https://dati.beniculturali.it/dataset/csv/']
+          for name in names:
+              for root in roots:
+                  url=root+name+'.csv'
+                  try:
+                      req=urllib.request.Request(url,headers={'User-Agent':'GERAKI-Research/1.0'})
+                      with urllib.request.urlopen(req,timeout=12) as r:
+                          data=r.read(200000)
+                          print('RESULT',name,r.status,r.url,r.headers.get('content-type'),'BYTES',len(data),'SHA256_SAMPLE',hashlib.sha256(data).hexdigest())
+                          sample=data[:250].decode('utf-8','replace')
+                          print('SAMPLE',repr(sample))
+                          if len(data)>100 and ('text/html' not in str(r.headers.get('content-type'))):
+                              print('CANDIDATE_CSV',name)
+                  except Exception as e: print('ERROR',name,url,type(e).__name__,str(e)[:160])
+          PY
