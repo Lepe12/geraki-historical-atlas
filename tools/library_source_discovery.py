@@ -11,7 +11,8 @@ for x in [ctx["target"]]+ctx["aliases"]:
     x=str(x).strip()
     if x and x.casefold() not in [t.casefold() for t in terms]:terms.append(x)
 # Bound network load while preserving modern and historical variants.
-terms=terms[:4]
+terms=([terms[0]]+[terms[i] for i in (1,3,len(terms)-1) if 0<i<len(terms)]) if terms else []
+terms=list(dict.fromkeys(terms))[:4]
 years=[int(x) for x in re.findall(r"\b(?:1[0-9]{3}|20[0-9]{2})\b",ctx["date_range"])]
 lo,hi=(min(years),max(years)) if years else (0,9999)
 queries=[]
