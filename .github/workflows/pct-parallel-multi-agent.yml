@@ -17,7 +17,9 @@ jobs:
       matrix: ${{ steps.m.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
-      - name: Compile research engine\n        run: python3 -m py_compile tools/request_context.py tools/build_research_lanes.py tools/lane_repository_plan.py tools/lane_repository_discovery.py tools/connectors/repository_connectors.py tools/merge_repository_candidates.py tools/library_source_discovery.py tools/route_library_candidates.py tools/acquire_library_candidate.py tools/search_acquired_ocr.py tools/event_first_search.py tools/exact_page_acquire.py tools/verification_pipeline.py tools/research_lane_health.py tools/research_system_health.py\n      - run: python3 tools/build_research_lanes.py
+      - name: Compile research engine
+        run: python3 -m py_compile tools/request_context.py tools/build_research_lanes.py tools/lane_repository_plan.py tools/lane_repository_discovery.py tools/connectors/repository_connectors.py tools/merge_repository_candidates.py tools/library_source_discovery.py tools/route_library_candidates.py tools/acquire_library_candidate.py tools/search_acquired_ocr.py tools/event_first_search.py tools/exact_page_acquire.py tools/verification_pipeline.py tools/research_lane_health.py tools/research_system_health.py
+      - run: python3 tools/build_research_lanes.py
       - id: m
         run: echo 'matrix=["travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]' >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
