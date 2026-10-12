@@ -14,8 +14,12 @@ def ids(html):
     return out
 def discover(term,limit=5,max_pages=12):
     jar=http.cookiejar.CookieJar();opener=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
-    seed=HOST+FIRST+urllib.parse.urlencode({"texto":term});fetch(opener,seed)
-    first=HOST+FIRST+urllib.parse.urlencode({"texto":term,"idA":"2"});html=fetch(opener,first)
+    seed=HOST+FIRST+urllib.parse.urlencode({"texto":term})
+    seed_html=fetch(opener,seed)
+    facet=re.search(r'href="([^"]*find\\?[^\"]*idA=2[^\"]*)"',seed_html,re.I)
+    if not facet: raise RuntimeError("AGS facet link idA=2 not found in seeded PARES result page")
+    first=urllib.parse.urljoin(HOST,unescape(facet.group(1)))
+    html=fetch(opener,first)
     # Diagnose archive-facet controls before record verification.
     facet_context=[]
     for token in ("Archivo General de Simancas","Archivos","archivo","facet","filtro"):
