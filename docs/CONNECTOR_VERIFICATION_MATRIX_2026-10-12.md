@@ -4,7 +4,7 @@ Source: GitHub Actions PCT run 38285556230, per-lane repository discovery logs. 
 
 | Target | Observed status | Hits | Classification |
 |---|---|---:|---|
-| PARES / Archivo General de Simancas | ARCHIVE_NOT_CONFIRMED | 0 | PARTIAL — search returned candidates but no confirmed Simancas archival description |
+| PARES / Archivo General de Simancas | EXECUTED | 3 | CONNECTED — native PARES catalogue search; AGS attribution + ES.47161.AGS reference + signatura verified |
 | Biblioteca Digital Hispánica | EXECUTED | 3 | CONNECTED — catalogue |
 | BSB | EXECUTED | 20 | CONNECTED — catalogue |
 | Deutsche Digitale Bibliothek | API_KEY_REQUIRED | 0 | BLOCKED — DDB_API_KEY missing |
@@ -23,7 +23,7 @@ Source: GitHub Actions PCT run 38285556230, per-lane repository discovery logs. 
 
 ## Work queue — concrete acceptance gates
 
-1. **PARES/Simancas:** demonstrate a record with archival attribution from the description page and a stable archival reference. A PARES result link alone does not qualify.
+1. **PARES/Simancas: COMPLETE.** Native search acceptance gate passed in Actions run 38295298857; three dynamically discovered AGS descriptions verified with stable archival references and signaturas.
 2. **SIAS/Venice and Italian state archives:** inspect official advanced-search form mechanics; test real query and record metadata before enabling a connector.
 3. **Archives nationales:** implement a separately named **open-data inventory** route using the official published inventory dataset (31,001 finding aids) and/or digitized corpus (>700 sets). Do not represent this as complete archive coverage.
 4. **British Library:** test its public interim archives/manuscripts catalogue where technically supported; the official Z39.50 MARC21 service requires registration and credentials.
