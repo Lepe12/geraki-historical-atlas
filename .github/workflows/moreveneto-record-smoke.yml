@@ -59,6 +59,22 @@ jobs:
               for item in found[:20]:
                   print('CANDIDATE:',item[:220])
           PY
+      - name: Extract high-signal API configuration from public bundle
+        if: always()
+        run: |
+          python - <<'PY'
+          import re
+          from urllib.request import Request,urlopen
+          url='https://asve.arianna4.cloud/main.b2709b386ffc0a41.js'
+          js=urlopen(Request(url,headers={'User-Agent':'GERAKI-Research/1.0'}),timeout=40).read().decode('utf-8','replace')
+          needles=['graphql','apiUrl','api_url','baseUrl','baseURL','environment','patrimonio/','/search','ricerca']
+          for needle in needles:
+              print('===',needle,'===')
+              starts=[m.start() for m in re.finditer(re.escape(needle),js,re.I)]
+              print('COUNT',len(starts))
+              for pos in starts[:12]:
+                  print(re.sub(r'\\s+',' ',js[max(0,pos-260):pos+420])[:700])
+          PY
       - name: Verify live official Venetian archival description
         run: |
           python connectors/moreveneto_record_verify.py 'https://asve.arianna4.cloud/patrimonio/73a0c098-e94f-49d6-a27d-d20acde2b11f/0985-fondo-luogotenente-alla-patria-del-friuli-%5Budine%5D' > /tmp/moreveneto.json
