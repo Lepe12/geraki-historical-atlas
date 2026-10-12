@@ -1,0 +1,39 @@
+name: IIIF Source Acquisition
+on:
+  workflow_dispatch:
+    inputs:
+      manifest:
+        description: "IIIF Presentation manifest URL"
+        required: true
+        type: string
+      pages:
+        description: "Printed Arabic pages, comma-separated (e.g. 305,310,314,317)"
+        required: true
+        type: string
+      source_id:
+        description: "Optional source/citation identifier"
+        required: false
+        default: ""
+        type: string
+permissions:
+  contents: read
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Acquire exact printed pages
+        run: |
+          python3 tools/iiif_acquire.py \
+            --manifest "${{ inputs.manifest }}" \
+            --pages "${{ inputs.pages }}" \
+            --source-id "${{ inputs.source_id }}" \
+            --out iiif_acquisition
+      - name: Upload Citation Chase package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: citation-chase-${{ github.run_id }}
+          path: iiif_acquisition/
+          if-no-files-found: warn
