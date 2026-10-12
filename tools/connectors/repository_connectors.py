@@ -49,10 +49,34 @@ def _sru_records(url, repository, lane):
     for rec in [e for e in root.iter() if _local(e.tag)=="record"]:
         rd=next((e for e in rec.iter() if _local(e.tag)=="recorddata"),None)
         if rd is None: continue
-        title=_first_local(rd,["title","245"])
-        creators=_all_local(rd,["creator","author","100","700"])
-        dates=_all_local(rd,["date","publicationdate","260","264"])
-        ids=_all_local(rd,["identifier","035","001","856"])
+        # Dublin Core / generic SRU fields.
+        title=_first_local(rd,["title"])
+        creators=_all_local(rd,["creator","author"])
+        dates=_all_local(rd,["date","publicationdate"])
+        ids=_all_local(rd,["identifier"])
+        # MARCXML fields (BNE and other Alma SRU targets).
+        marc=next((e for e in rd.iter() if _local(e.tag)=="record"),None)
+        if marc is not None:
+            def marc_values(tags,codes=None):
+                vals=[]
+                for field in marc.iter():
+                    if _local(field.tag)!="datafield" or field.get("tag") not in tags:continue
+                    parts=[]
+                    for sf in field:
+                        if _local(sf.tag)!="subfield":continue
+                        if codes is None or sf.get("code") in codes:
+                            t=_text(sf)
+                            if t:parts.append(t)
+                    if parts:vals.append(" ".join(parts))
+                return vals
+            controls=[_text(e) for e in marc.iter() if _local(e.tag)=="controlfield" and e.get("tag")=="001" and _text(e)]
+            mt=marc_values({"245"},{"a","b","c"})
+            mc=marc_values({"100","110","700"},{"a","b","c","d"})
+            md=marc_values({"260","264"},{"c"})
+            mids=marc_values({"035"},{"a"})+controls
+            murls=marc_values({"856"},{"u"})
+            title=title or (mt[0] if mt else None)
+            creators=creators+mc;dates=dates+md;ids=ids+mids+murls
         urls=[x for x in ids if x.startswith(("http://","https://"))]
         recs.append({
             "discovery_repository":repository,"discovery_lane":lane,
