@@ -11,7 +11,7 @@ UA={"User-Agent":"PCT-Historical-Research/3.0"}
 
 def getjson(url):
     req=urllib.request.Request(url,headers=UA)
-    with urllib.request.urlopen(req,timeout=45) as r:return json.load(r)
+    with urllib.request.urlopen(req,timeout=25) as r:return json.load(r)
 
 def ia(q):
     u="https://archive.org/advancedsearch.php?"+urllib.parse.urlencode({"q":q,"fl[]":["identifier","title","creator","date","year"],"rows":20,"page":1,"output":"json"},doseq=True)
@@ -43,7 +43,7 @@ for x in [plan.get("target","")]+list(plan.get("aliases",[]) or []):
     x=str(x).strip()
     if x and x.lower() not in [t.lower() for t in terms]:terms.append(x)
 # Bound remote load but actually test historical variants, not only the modern target.
-terms=terms[:3] or [str(plan.get("target","")).strip()]
+terms=terms[:2] or [str(plan.get("target","")).strip()]
 results=[];attempts=[]
 for r in plan["repositories"]:
     name=r["name"]; repo_records=[]; statuses=[]; diagnostics=[]
