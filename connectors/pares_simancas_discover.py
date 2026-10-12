@@ -24,6 +24,10 @@ def discover(term,limit=5,max_pages=12):
         if n: state.append([n.group(0),v.group(0) if v else ""])
     forms=re.findall(r"<form[^>]+action=([^ >]+)[^>]*>",seed_html,re.I)
     print("PARES_STATE_DIAGNOSTIC",json.dumps({"hidden":state,"forms":forms},ensure_ascii=False))
+    ags_context=[]
+    for m in list(re.finditer(r'idA=2',seed_html,re.I))[:8]:
+        ags_context.append(re.sub(r"\\s+"," ",seed_html[max(0,m.start()-700):m.end()+700]))
+    print("PARES_AGS_TRANSITION_DIAGNOSTIC",json.dumps(ags_context,ensure_ascii=False))
     facet=re.search(r'href="([^"]*find\\?[^\"]*idA=2[^\"]*)"',seed_html,re.I)
     if not facet: raise RuntimeError("AGS facet link idA=2 not found in seeded PARES result page")
     first=urllib.parse.urljoin(HOST,unescape(facet.group(1)))
