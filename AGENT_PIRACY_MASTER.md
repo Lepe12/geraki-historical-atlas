@@ -174,3 +174,30 @@ Accepted regression:
 - Library workflow run **38298585150** also completed SUCCESS with the pinned-request workflow.
 
 This gate proves that all ten lanes executed from the same research request. It does not by itself verify any historical claim.
+
+
+## Scientific reliability architecture — 2026-10-12
+
+The following rules are canonical:
+
+- Research request selection is fail-closed. A run requires workflow inputs, explicit `PCT_REQUEST_FILE`, or exactly one changed request JSON. Ambiguous fallback to newest/lexical files is forbidden.
+- Evidence states are: `DISCOVERED -> LOCATED -> ACQUIRED -> ORIGINAL_INSPECTED -> EXTRACTED -> CORROBORATED -> VERIFIED`.
+- Catalogue records and OCR hits cannot skip evidence states.
+- Verification is claim-specific and evidence-weighted. The former fixed rule requiring three independent source chains has been removed.
+- A single authentic, inspected primary source may strongly support a narrow claim; corroboration increases confidence but source count alone never verifies a claim.
+- Source genealogy distinguishes possible `INDEPENDENT`, `COPY`, `QUOTATION`, `TRANSLATION`, `COMMON_SOURCE`, and `DERIVATIVE` relationships. Until evidence establishes a relation, independence remains unknown.
+- Historical place matches are tied to supplied variants with explicit confidence; similar names are never automatically equated.
+- Original date text is preserved. Calendar system/conversion remains explicit and must not be silently normalized.
+- Actor identity may remain `UNKNOWN`.
+- `MACHINE_CHECKED` and `HUMAN_REVIEWED` are distinct. Automated stages cannot set `HUMAN_REVIEWED` or `VERIFIED`.
+- Every lane produces a reproducible run manifest and a self-contained Research Dossier.
+- Operational health means the technical research path executed; it never means an historical claim is verified.
+
+Core scientific benchmark `tools/scientific_benchmark.py` gates the main workflow and checks request isolation, evidence-state rules, human-review requirements, non-equivalence of unresolved toponyms, and preservation of original date text.
+
+Accepted full regression after these changes:
+- GitHub Actions run **38299681125** — SUCCESS.
+- 10/10 research lanes completed successfully.
+- aggregate health completed successfully.
+- core scientific benchmark passed.
+- request integrity remained pinned across all ten lanes.
