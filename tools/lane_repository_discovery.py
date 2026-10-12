@@ -30,7 +30,9 @@ def europeana(q):
  # Public website target retained; API requires key, so do not fake execution.
  return []
 results=[]; attempts=[]
-q=" ".join([plan.get("target",""),*json.loads(pathlib.Path(sorted(pathlib.Path("library_discovery_requests").glob("*.json"))[-1]).read_text()).get("aliases",[])])
+q=plan.get("target","").strip()
+# Search a single toponym per request; joining every alias with spaces suppresses legitimate catalogue matches.
+if not q: raise SystemExit("Missing research target")
 for r in plan["repositories"]:
  name=r["name"]
  try:
@@ -42,7 +44,10 @@ for r in plan["repositories"]:
    x=tna(q);results+=x;attempts.append({"repository":name,"status":"EXECUTED","hits":len(x)})
   else:
    attempts.append({"repository":name,"status":"CITATION_CHASE_WEB_OR_API_CONNECTOR_REQUIRED","base_url":r["base_url"],"query_seed":r["query_seed"]})
- except Exception as e:attempts.append({"repository":name,"status":"ERROR","error":str(e)})
+ except Exception as e:
+  attempts.append({"repository":name,"status":"ERROR","error":str(e)})
+  print("CONNECTOR ERROR",lane,name,repr(e))
 payload={"lane":lane,"query":q,"attempts":attempts,"results":results,"gate":"Discovery metadata is not historical evidence. Unsupported repositories remain explicit citation-chase targets; never claim searched unless EXECUTED."}
 (out/f"{lane}.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding="utf-8")
-print("LANE DISCOVERY",lane,"executed",sum(a["status"]=="EXECUTED" for a in attempts),"pending",sum(a["status"].startswith("CITATION") for a in attempts),"hits",len(results))
+print("LANE DISCOVERY",lane,"executed",sum(a["status"]=="EXECUTED" for a in attempts),"pending",sum(a["status"].startswith("CITATION") for a in attempts),"errors",sum(a["status"]=="ERROR" for a in attempts),"hits",len(results))
+for a in attempts: print("REPOSITORY RESULT",a["repository"],a["status"],a.get("hits",0),a.get("error",""))
