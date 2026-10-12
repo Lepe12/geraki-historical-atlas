@@ -3,7 +3,9 @@
 import json,pathlib,re,urllib.request,urllib.parse,xml.etree.ElementTree as ET,datetime
 hitsf=pathlib.Path("event_first_hits/event_hits.json"); acqf=pathlib.Path("library_acquisition/acquisition_report.json")
 if not hitsf.exists() or not acqf.exists(): raise SystemExit("missing event hits/acquisition report")
-hits=json.loads(hitsf.read_text(encoding="utf-8")).get("hits",[])
+all_hits=json.loads(hitsf.read_text(encoding="utf-8")).get("hits",[])
+# Bound expensive page fetches per run; unprocessed hits stay in the durable OCR/event report.
+hits=all_hits[:16]
 acq=json.loads(acqf.read_text(encoding="utf-8")).get("results",[])
 out=pathlib.Path("exact_page_acquisition");out.mkdir(exist_ok=True)
 byfile={r.get("identifier"):r for r in acq if r.get("identifier") and (r.get("acquisition_route")=="INTERNET_ARCHIVE" or str(r.get("discovery_repository") or r.get("repository") or "").lower().startswith("internet archive"))}
@@ -60,5 +62,5 @@ for h in hits:
   else: status="IMAGE_ENDPOINT_UNAVAILABLE"
  except Exception as e: status="IMAGE_DOWNLOAD_ERROR:"+str(e)
  report.append({"identifier":ident,"discovery_repository":"Internet Archive","discovery_lane":byfile.get(ident,{}).get("discovery_lane"),"source_file":fn,"hit_line":h.get("line"),"place_match":h.get("place_match"),"event_terms":h.get("event_terms"),"ocr_page_index":pi,"leaf":leaf,"printed_page":meta.get("printed_page"),"mapping_score":score,"image_url":imgurl,"image_file":str(dest) if dest.exists() else None,"status":status,"verification_status":"NEEDS_ORIGINAL_INSPECTION"})
-(pathlib.Path(out)/"exact_page_report.json").write_text(json.dumps({"generated_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"protocol":"PCT-EXACT-PAGE-AUTO-v1","results":report,"gate":"Mapped/downloaded page remains NEEDS_ORIGINAL_INSPECTION; do not auto-verify."},ensure_ascii=False,indent=2),encoding="utf-8")
+(pathlib.Path(out)/"exact_page_report.json").write_text(json.dumps({"generated_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"protocol":"PCT-EXACT-PAGE-AUTO-v1","results":report,"total_event_hits":len(all_hits),"deferred_page_hits":max(0,len(all_hits)-len(hits)),"gate":"Mapped/downloaded page remains NEEDS_ORIGINAL_INSPECTION; do not auto-verify."},ensure_ascii=False,indent=2),encoding="utf-8")
 print("exact-page mappings",len(report),"images",sum(1 for x in report if x["status"]=="PAGE_IMAGE_ACQUIRED"))
