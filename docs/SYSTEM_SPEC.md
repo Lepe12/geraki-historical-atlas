@@ -116,3 +116,9 @@ Canonical code/specification lives in GitHub; structured research state in Airta
 4. Merge repository-specific discoveries into the common acquisition pipeline with provenance.
 5. Implement remaining archive connectors one by one with positive controls.
 6. Add automated system-health report covering all ten lanes.
+
+
+## Airtable schema recovery snapshot
+
+Canonical structural backup path: `backups/airtable/schema/airtable_schema_2026-10-12.json`.
+It preserves base/table/field IDs, names, types, descriptions and link-field structure for PLACES, SOURCES, EVENTS, ROUTES and RESEARCH JOBS. This is a structural recovery snapshot; record-data export is a separate backup layer.
