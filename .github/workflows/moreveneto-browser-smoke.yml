@@ -1,0 +1,26 @@
+name: Moreveneto Browser Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/moreveneto-browser-smoke.yml'
+      - 'connectors/moreveneto_browser_search.py'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Playwright
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Run official moreveneto browser search
+        run: |
+          python connectors/moreveneto_browser_search.py Senato
