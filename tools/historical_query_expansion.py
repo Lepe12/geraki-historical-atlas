@@ -7,7 +7,7 @@ request; generic event vocabulary is controlled here and every emitted query is
 preserved in the repository plan for audit.
 """
 EVENT_TERMS={
- "travellers":["pirate","corsair","privateer","raid","captivity","ransom","pillage"],
+ "travellers":["pirate","corsair","privateer","raid","captivity","ransom","pillage","πειρατής","πειρατές","κουρσάρος","κουρσάροι","επιδρομή","αιχμαλωσία","λύτρα","λεηλασία","κατάληψη","ρεσάλτο"],
  "spanish_simancas":["pirata","corsario","incursión","saqueo","cautivo","rescate","armada"],
  "venetian":["pirata","corsaro","incursione","saccheggio","schiavo","riscatto","armata"],
  "french":["pirate","corsaire","forban","incursion","pillage","captivité","rançon"],
@@ -31,7 +31,13 @@ def expand_queries(lane,target,aliases,date_range="",max_queries=0):
         for term in terms: queries.append(f'"{n}" {term}')
     # Date is a separate variant because some archival catalogues index dates poorly.
     if date_range:
-        for n in names: queries.append(f'"{n}" {date_range}')
+        import re
+        ys=re.findall(r"\b(1[0-9]{3}|20[0-9]{2})\b",str(date_range))
+        date_terms=[str(date_range)]
+        date_terms += [y for y in ys if y not in date_terms]
+        for n in names:
+            for dt in date_terms:
+                queries.append(f'"{n}" {dt}')
     ded=[];seen=set()
     for q in queries:
         k=q.casefold()
