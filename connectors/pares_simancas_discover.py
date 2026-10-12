@@ -33,7 +33,11 @@ def discover(term,limit=5,max_pages=12):
     print("PARES_AGS_TRANSITION_DIAGNOSTIC",json.dumps(ags_context,ensure_ascii=False))
     facet=re.search(r'href="([^"]*find\\?[^\"]*idA=2[^\"]*)"',seed_html,re.I)
     if not facet: raise RuntimeError("AGS facet link idA=2 not found in seeded PARES result page")
-    first=urllib.parse.urljoin(HOST,unescape(facet.group(1)))
+    facet_path=unescape(facet.group(1))
+    sid=re.search(r"SearchController\\.do;jsessionid=([^?\"&]+)",seed_html,re.I)
+    if sid and "/catalogo/find?" in facet_path:
+        facet_path=facet_path.replace("/catalogo/find?","/catalogo/find;jsessionid="+sid.group(1)+"?")
+    first=urllib.parse.urljoin(HOST,facet_path)
     html,fmeta=fetch(opener,first,True)
     print("PARES_FILTER_RESPONSE",json.dumps({"request_url":first,**fmeta,"html_size":len(html),"record_links":len(ids(html)),"has_simancas":"Archivo General de Simancas" in html},ensure_ascii=False))
     # Diagnose archive-facet controls before record verification.
