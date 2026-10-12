@@ -1,0 +1,51 @@
+name: Evidence pilot - Saulger original page
+on:
+  push:
+    paths:
+      - '.github/workflows/evidence-saulger-pilot.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  preserve-original-page:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Acquire BSB original scan and checksum
+        run: |
+          python - <<'PY'
+          import requests,hashlib,json,pathlib,datetime
+          from urllib.parse import urlparse
+          base='https://api.digitale-sammlungen.de/iiif/presentation/v2/bsb10447069/manifest'
+          r=requests.get(base,timeout=45);r.raise_for_status();manifest=r.json()
+          canvases=manifest['sequences'][0]['canvases']
+          # Prior verified mapping: printed p. 305 = scan 323 (1-based).
+          canvas=canvases[322]
+          img=canvas['images'][0]['resource']
+          service=img.get('service',{})
+          if isinstance(service,list):service=service[0]
+          service_id=service.get('@id') or service.get('id')
+          candidates=([service_id.rstrip('/')+'/full/1200,/0/default.jpg'] if service_id else [])+[img.get('@id') or img.get('id')]
+          response=None
+          for url in filter(None,candidates):
+            try:
+              candidate=requests.get(url,timeout=75)
+              if candidate.ok and candidate.headers.get('content-type','').startswith('image/'):
+                response=candidate;break
+            except requests.RequestException:pass
+          if response is None:raise RuntimeError('Original page image unavailable; do not claim persisted')
+          out=pathlib.Path('evidence/bsb-positive-control/bsb10447069/pages');out.mkdir(parents=True,exist_ok=True)
+          image=out/'printed-p305_scan323.jpg';image.write_bytes(response.content)
+          digest=hashlib.sha256(response.content).hexdigest()
+          meta={'source_id':'bsb10447069','repository':'Bayerische Staatsbibliothek','title':'Robert Saulger, Histoire nouvelle des anciens ducs et autres souverains de l Archipel','manifest':base,'printed_page':'305','scan_number_1_based':323,'canvas_id':canvas.get('@id'),'image_url':response.url,'sha256':digest,'bytes':len(response.content),'acquired_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'original_inspected':False,'verification_status':'NEEDS_EVIDENCE','note':'Acquired scan only; historical assertions require separate inspection and corroboration.'}
+          (out/'printed-p305_scan323.metadata.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print('PERSISTED SCAN',image,len(response.content),'SHA256',digest)
+          PY
+      - name: Commit durable evidence to repository
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add evidence/bsb-positive-control/bsb10447069/pages/
+          git diff --cached --quiet && exit 0
+          git commit -m "Preserve BSB Saulger p305 original scan and checksum"
+          git push
