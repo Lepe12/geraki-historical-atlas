@@ -22,7 +22,15 @@ def load_request():
     else:
         reqs=list(ROOT.glob("*.json"))
         if not reqs: raise SystemExit("No research request")
-        p=max(reqs,key=lambda x:(_git_time(x),x.name))
+        # For a push-triggered run, use the request changed by that push.
+        # A lexically later older filename must never override the triggering request.
+        changed=[]
+        try:
+            names=subprocess.check_output(["git","diff-tree","--no-commit-id","--name-only","-r","HEAD"],text=True,stderr=subprocess.DEVNULL).splitlines()
+            changed=[pathlib.Path(n) for n in names if n.startswith(str(ROOT)+"/") and n.endswith(".json") and pathlib.Path(n).exists()]
+        except Exception:
+            pass
+        p=sorted(changed)[-1] if changed else max(reqs,key=lambda x:(_git_time(x),x.name))
     req=json.loads(p.read_text(encoding="utf-8"))
     target=str(req.get("target") or req.get("place") or "").strip()
     aliases=req.get("aliases") or req.get("place_variants") or []
