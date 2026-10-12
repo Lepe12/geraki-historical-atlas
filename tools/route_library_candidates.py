@@ -10,7 +10,8 @@ for x in d.get("records",[]):
  m=x.get("metadata",{}); title=str(m.get("title","")); year=m.get("year")
  blob=json.dumps(m,ensure_ascii=False).lower()
  if x.get("routing")!="CITATION_CHASE_PRIORITY": continue
- if not any(k in blob for k in ("middelantsche zee","description exacte des isles de l'archipel","thermia","termia","kythnos","crevel")): continue
+ if not any(k in blob for k in ("middelantsche zee","description exacte des isles de l'archipel","thermia","termia","kythnos","crevelier","creveliers")): continue
+ if any(k in blob for k in ("duplantier","tribunaux de commerce","opinion de crevellier","messidor","gironde")): continue
  selected.append({"identifier":m.get("identifier"),"title":title,"year":year,"repository":x.get("repository"),"verification_status":"NEEDS_EVIDENCE","next_stage":"LOCATE_DIGITAL_OBJECT_AND_FULLTEXT_OR_IIIF"})
 report={"generated_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"protocol":"PCT-AUTO-ROUTER-v1","selected":selected,"rule":"Catalogue metadata is not evidence; inspect digitized original before claim use."}
 (out/"routed_candidates.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
