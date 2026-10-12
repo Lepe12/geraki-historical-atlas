@@ -1,0 +1,20 @@
+name: Saulger IIIF acquisition test
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Acquire Saulger pages from IIIF
+        run: python3 tools/saulger_iiif_acquire.py
+      - name: Upload acquisition report and any page images
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: saulger-iiif-pages
+          path: saulger_acquisition/
+          if-no-files-found: warn
