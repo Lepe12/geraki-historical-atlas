@@ -78,12 +78,14 @@ for rec in payload.get("results",[]):
  for bid in re.findall(r"bsb[0-9]{7,}",raw,re.I):
   by_id.setdefault(bid.lower(),{"source_id":bid.lower(),"source_title":rec.get("title"),"catalogue_ids":rec.get("identifier",[]),"discovery_repository":"BSB","discovery_lane":"german"})
 items=list(by_id.values())
+# Positive control: known digitized Saulger volume. Proves the BSB IIIF route independently of catalogue-hit digitization.
+items.append({"source_id":"bsb10447069","source_title":"CONTROL — Robert Saulger, Histoire nouvelle des anciens ducs et autres souverains de l\'Archipel","catalogue_ids":[],"discovery_repository":"BSB","discovery_lane":"german","control":True})
 results=[]
 with ThreadPoolExecutor(max_workers=4) as pool:
  for future in as_completed([pool.submit(process,item) for item in items]):
   results.append(future.result())
 results.sort(key=lambda r:r["source_id"])
-summary={"catalogue_records":sum(x.get("repository")=="BSB" for x in payload.get("results",[])),"digital_ids":len(items),"validated_manifests":sum(r["status"] in ("IIIF_MANIFEST_VALIDATED","REFERENCE_SCAN_ACQUIRED_PENDING_INSPECTION") for r in results),"reference_scans":sum(r["status"]=="REFERENCE_SCAN_ACQUIRED_PENDING_INSPECTION" for r in results)}
+summary={"catalogue_records":sum(x.get("repository")=="BSB" for x in payload.get("results",[])),"digital_ids":len(by_id),"control_objects":1,"validated_manifests":sum(r["status"] in ("IIIF_MANIFEST_VALIDATED","REFERENCE_SCAN_ACQUIRED_PENDING_INSPECTION") for r in results),"reference_scans":sum(r["status"]=="REFERENCE_SCAN_ACQUIRED_PENDING_INSPECTION" for r in results)}
 (OUT/"bsb_iiif_candidates.json").write_text(json.dumps({"summary":summary,"results":results,"gate":"Reference scan is NOT visually inspected and NOT historical verification."},ensure_ascii=False,indent=2),encoding="utf-8")
 print("BSB IIIF",json.dumps(summary))
 for r in results:print("BSB IIIF RESULT",r["source_id"],r["status"],r.get("canvas_count",0),r.get("attempts",[]),r.get("scan_error",""))
