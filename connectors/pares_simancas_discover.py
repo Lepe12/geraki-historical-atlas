@@ -18,6 +18,8 @@ def discover(term,limit=5):
         for match in re.finditer(pattern,unescape(html),re.I):
             rid=match.group(1)
             if rid not in candidates:candidates.append(rid)
+    if not candidates:
+        print("PARES_SEARCH_DIAGNOSTIC",json.dumps({"html_size":len(html),"description_occurrences":html.lower().count("description"),"href_samples":re.findall(r'href="([^"]+)"',html,re.I)[-35:]},ensure_ascii=False))
     records=[];errors=[]
     for rid in candidates[:max(limit*5,limit)]:
         try:
