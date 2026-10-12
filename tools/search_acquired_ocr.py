@@ -23,7 +23,7 @@ def line_no(text,pos):return text.count("\n",0,pos)+1
 hits=[]
 terms=[("PLACE",t) for t in place]+[("REQUEST_LEAD",t) for t in lead_values]
 for p in sorted(root.glob("*")):
-    if not p.is_file() or p.name=="acquisition_report.json":continue
+    if not p.is_file() or p.name=="acquisition_report.json" or p.suffix.lower() not in (".txt",".xml",".html",".htm"):continue
     try:raw=p.read_text(encoding="utf-8",errors="ignore")
     except Exception:continue
     text=norm(raw)
