@@ -119,6 +119,21 @@ jobs:
           print('SEARCH_VERIFIED:',d['totalCount'],'matches;',len(d['results']),'returned')
           for x in d['results'][:3]: print('RESULT:',x)
           PY
+      - name: Trace Apollo transport and proxy configuration
+        if: always()
+        run: |
+          python - <<'PY'
+          import re
+          from urllib.request import Request,urlopen
+          js=urlopen(Request('https://asve.arianna4.cloud/main.b2709b386ffc0a41.js',headers={'User-Agent':'GERAKI-Research/1.0'}),timeout=40).read().decode('utf-8','replace')
+          needles=['aw-unifi-graphql.netseven.it','defaultProvider:"apollo"','providers','Apollo','HttpLink','createHttpLink','Authorization','headers','baseUrls']
+          for needle in needles:
+              print('%%% ',needle)
+              hits=[m.start() for m in re.finditer(re.escape(needle),js,re.I)]
+              print('COUNT',len(hits))
+              for p in hits[:15]:
+                  print(re.sub(r'\\s+',' ',js[max(0,p-1200):p+1800])[:3000])
+          PY
       - name: Verify live official Venetian archival description
         run: |
           python connectors/moreveneto_record_verify.py 'https://asve.arianna4.cloud/patrimonio/73a0c098-e94f-49d6-a27d-d20acde2b11f/0985-fondo-luogotenente-alla-patria-del-friuli-%5Budine%5D' > /tmp/moreveneto.json
