@@ -246,3 +246,36 @@ Current curated-set metrics:
 - entity errors: **0**
 
 These figures are benchmark-set diagnostics only, not a universal accuracy claim. The present system therefore shows good precision on this very small test set but insufficient recall and a demonstrated date-recovery weakness. Those failures are research-engine defects to improve, not reasons to infer missing historical facts.
+
+
+## Mykonos 1695 benchmark diagnosis — 2026-10-12
+
+The Mykonos 1695 false negative was traced to repository coverage, not to absence of the historical reference.
+
+Confirmed reference:
+- SearchCulture.gr / Academy of Athens record `https://www.searchculture.gr/aggregator/edm/kemnepp/000126-12708`
+- Catalogue description states capture of a ship by Turkish pirates and dates the testimony to 20 May 1695.
+- This remains REFERENCE_GOLD catalogue/edition metadata until the underlying original archival item is inspected.
+
+Root causes found:
+1. SearchCulture/EKT was absent from the repository plans.
+2. Greek piracy/event vocabulary was incomplete.
+3. Event detection ignored catalogue metadata and only searched acquired OCR.
+4. Date queries included weak forms such as `1695-1695`.
+5. An anonymous SearchCulture portal fallback did not reliably honor search terms and was therefore rejected.
+
+Corrections:
+- SearchCulture/EKT added to the Greek-capable travellers lane.
+- Greek event vocabulary added (piracy, corsairing, raid, captivity, ransom, pillage, capture/occupation-related forms).
+- Year-specific query variants added.
+- Catalogue metadata leads are now tracked separately from OCR and remain `LOCATED / NOT_ORIGINAL_VERIFIED`.
+- Main workflow now fails closed on discovery/pipeline execution errors.
+- SearchCulture connector now accepts only the official API path for machine search.
+- Workflow secret slot: `SEARCHCULTURE_API_KEY`.
+
+Current blocker:
+- SearchCulture official API requires a personal API key. Without it the connector reports `API_KEY_REQUIRED`, never `EXECUTED`.
+- Run **38304556676** completed successfully with SearchCulture explicitly blocked and the Mykonos case remained a false negative.
+- Benchmark result records `false_negative_due_to_coverage_blocker: true`.
+
+Thus the remaining step for this benchmark is external credential provisioning, not another search-logic workaround.
