@@ -14,7 +14,8 @@ def ids(html):
     return out
 def discover(term,limit=5,max_pages=12):
     jar=http.cookiejar.CookieJar();opener=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
-    seed=HOST+FIRST+urllib.parse.urlencode({"texto":term});fetch(opener,seed)\n    first=HOST+FIRST+urllib.parse.urlencode({"texto":term,"idA":"2"});html=fetch(opener,first)
+    seed=HOST+FIRST+urllib.parse.urlencode({"texto":term});fetch(opener,seed)
+    first=HOST+FIRST+urllib.parse.urlencode({"texto":term,"idA":"2"});html=fetch(opener,first)
     # Diagnose archive-facet controls before record verification.
     facet_context=[]
     for token in ("Archivo General de Simancas","Archivos","archivo","facet","filtro"):
