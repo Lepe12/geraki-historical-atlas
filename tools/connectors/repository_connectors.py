@@ -206,6 +206,27 @@ def pares_simancas(q,lane):
     value=str(q).strip()
     match=re.search(r"(?:ParesBusquedas20/catalogo/description/)?([0-9]{2,12})(?:[/?#].*)?$",value)
     if not match or (not value.isdigit() and "pares." not in value.lower()):
+        # PARES publishes a public HTML catalogue search. Treat matches as
+        # *discovery candidates*, not archival record verification.
+        if not value or len(value)>180:
+            return "INVALID_QUERY",[],"Expected short catalogue search text"
+        search_url="https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?"+urllib.parse.urlencode({"texto":value})
+        try:
+            html=_get(search_url,timeout=25).decode("utf-8","replace")
+            if "Resultados" not in html and "resultados" not in html:
+                return "SEARCH_NOT_CONFIRMED",[],search_url
+            ids=list(dict.fromkeys(re.findall(r'(?:/catalogo/description/|catalogo/description/)([0-9]{2,12})',html)))
+            rows=[{"discovery_repository":"PARES / Archivo General de Simancas",
+                "discovery_lane":lane,"connector_status":"EXECUTED",
+                "identifier":i,"title":"PARES candidate "+i,
+                "url":"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/description/"+i,
+                "date":[],"evidence_level":"UNFILTERED_CATALOGUE_CANDIDATE",
+                "archive_attribution":"UNCONFIRMED_REQUIRES_RECORD_CHECK"}
+                for i in ids[:20]]
+            return "EXECUTED",rows,search_url+" ; catalogue search, archive attribution unconfirmed"
+        except Exception as exc:
+            return "ACCESS_BLOCKED",[],search_url+" ; "+type(exc).__name__+": "+str(exc)
+
         return "RECORD_ID_OR_BROWSER_SEARCH_REQUIRED",[],(
             "PARES public search is interactive. Supply a PARES description URL "
             "or numeric record ID for a direct archival-metadata lookup.")
