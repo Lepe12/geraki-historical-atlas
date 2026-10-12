@@ -201,3 +201,15 @@ Accepted full regression after these changes:
 - aggregate health completed successfully.
 - core scientific benchmark passed.
 - request integrity remained pinned across all ten lanes.
+
+
+### Two-request isolation regression
+
+A second live request was executed after the scientific architecture changes:
+- Run **38299927837** — SUCCESS.
+- Request file: `request-isolation-beta-20261012.json`
+- Request SHA-256: `b079011d0434d77b2cc53a61ced36e1c1c7accb8be3f6f02805b28dd6bc93243`
+- Research job: `agent-piracy-38299927837-b079011d0434`
+- All 10 lanes completed successfully and aggregate health completed successfully.
+
+The prior full regression used SHA-256 `31852297c6f8d37d54e2e8413bb8d52d368148e92292f2d4d31e61ee6db6f056`. The two live requests therefore remained cryptographically distinct and independently pinned through separate successful ten-lane runs.
