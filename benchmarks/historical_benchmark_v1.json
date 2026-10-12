@@ -1,0 +1,71 @@
+{
+  "schema": "agent-piracy-historical-benchmark-v1",
+  "methodology": {
+    "gold_standard_rule": "Only HUMAN_REVIEWED primary-source cases may be labelled HISTORICAL_GOLD. Public catalogue or edition metadata are REFERENCE_GOLD and test retrieval/classification, not final historical truth.",
+    "metrics": ["precision","recall","false_positive_rate","date_error_rate","entity_error_rate","unsupported_claim_rate"]
+  },
+  "cases": [
+    {
+      "id": "REF-MORGAN-PANAMA-1671",
+      "tier": "REFERENCE_GOLD",
+      "label": true,
+      "target": "Henry Morgan",
+      "aliases": ["Morgan"],
+      "date_range": "1671-1671",
+      "expected_year": 1671,
+      "expected_entity": "Henry Morgan",
+      "expected_place": "Panama",
+      "expected_event_family": "ATTACK_OR_SACK",
+      "source_repository": "Library of Congress",
+      "source_title": "Bucaniers of America",
+      "source_url": "https://www.loc.gov/item/02017956/",
+      "source_note": "LoC catalogue/edition record identifies Morgan and the sack/burning of Panama; benchmark tier does not claim original-page inspection.",
+      "human_reviewed_original": false
+    },
+    {
+      "id": "REF-MYKONOS-SHIP-CAPTURE-1695",
+      "tier": "REFERENCE_GOLD",
+      "label": true,
+      "target": "Mykonos",
+      "aliases": ["Μύκονος","Myconos"],
+      "date_range": "1695-1695",
+      "expected_year": 1695,
+      "expected_entity": null,
+      "expected_place": "Mykonos",
+      "expected_event_family": "CAPTURE",
+      "source_repository": "Academy of Athens / SearchCulture aggregation",
+      "source_title": "Αθανάς",
+      "source_url": "https://www.searchculture.gr/aggregator/edm/kemnepp/000126-12708",
+      "source_note": "Catalogue description identifies a 20 May 1695 witness statement concerning capture of a ship by Turkish pirates; original archival deposition not inspected by this benchmark.",
+      "human_reviewed_original": false
+    },
+    {
+      "id": "NEG-PRESENCE-NOT-ATTACK",
+      "tier": "ADVERSARIAL_CONTROL",
+      "label": false,
+      "text_fixture": "A corsair vessel was reported offshore, but the record describes no attack, capture, pillage, boarding, ransom, or violence.",
+      "expected_event_family": "PRESENCE_ONLY"
+    },
+    {
+      "id": "NEG-NAME-COLLISION",
+      "tier": "ADVERSARIAL_CONTROL",
+      "label": false,
+      "text_fixture": "A place with a similar spelling is mentioned in a merchant itinerary; no evidence establishes identity with the requested island and no hostile event is described.",
+      "expected_event_family": "NONE"
+    },
+    {
+      "id": "NEG-OCR-NOISE",
+      "tier": "ADVERSARIAL_CONTROL",
+      "label": false,
+      "text_fixture": "piratc raicl capturc 167l appears as corrupted OCR without an identifiable source passage or stable place match.",
+      "expected_event_family": "NONE"
+    },
+    {
+      "id": "NEG-DERIVATIVE-THREE-COPIES",
+      "tier": "ADVERSARIAL_CONTROL",
+      "label": false,
+      "text_fixture": "Three later books repeat the same earlier narrative. They are not three independent source chains.",
+      "expected_event_family": "DEPENDENT_SOURCES"
+    }
+  ]
+}
