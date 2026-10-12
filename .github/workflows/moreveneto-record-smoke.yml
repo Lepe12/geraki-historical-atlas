@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'connectors/moreveneto_record_verify.py'
+      - 'connectors/moreveneto_search.py'
       - '.github/workflows/moreveneto-record-smoke.yml'
 permissions:
   contents: read
@@ -104,6 +105,19 @@ jobs:
               print('COUNT',len(hits))
               for p in hits[:20]:
                   print(re.sub(r'\\s+',' ',js[max(0,p-1000):p+1600])[:2600])
+          PY
+      - name: Live public GraphQL autocomplete
+        run: |
+          python connectors/moreveneto_search.py 'Senato' --limit 5 > /tmp/moreveneto_search.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/moreveneto_search.json',encoding='utf-8'))
+          assert d['status']=='EXECUTED'
+          assert d['scope']=='public_graphql_autocomplete'
+          assert d['totalCount'] > 0
+          assert len(d['results']) > 0
+          print('SEARCH_VERIFIED:',d['totalCount'],'matches;',len(d['results']),'returned')
+          for x in d['results'][:3]: print('RESULT:',x)
           PY
       - name: Verify live official Venetian archival description
         run: |
