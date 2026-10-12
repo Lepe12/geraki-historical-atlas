@@ -15,6 +15,12 @@ def ids(html):
 def discover(term,limit=5,max_pages=12):
     jar=http.cookiejar.CookieJar();opener=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
     first=HOST+FIRST+urllib.parse.urlencode({"texto":term});html=fetch(opener,first)
+    # Diagnose archive-facet controls before record verification.
+    facet_context=[]
+    for token in ("Archivo General de Simancas","Archivos","archivo","facet","filtro"):
+        for m in list(re.finditer(re.escape(token),html,re.I))[:8]:
+            facet_context.append(re.sub(r"\\s+"," ",html[max(0,m.start()-300):m.end()+500]))
+    print("PARES_ARCHIVE_FACET_DIAGNOSTIC",json.dumps(facet_context,ensure_ascii=False))
     pages=[html];pager=re.search(r'href="([^"]*SearchController\.do[^"]*d-2677838-p=2[^"]*)"',html,re.I)
     page2=unescape(pager.group(1)) if pager else None
     verified=[];seen=[];errors=[]
