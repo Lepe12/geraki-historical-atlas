@@ -6,7 +6,7 @@ writes SHA-256 metadata, and never changes verification state.
 """
 import argparse, hashlib, json, pathlib, shutil, datetime
 p=argparse.ArgumentParser();p.add_argument("--run-id",required=True);p.add_argument("--lane",required=True);a=p.parse_args()
-roots=["lane_discovery","iiif_candidate_requests","library_acquisition","citation_chase_hits","event_first_hits","exact_page_acquisition"]
+roots=["lane_discovery","iiif_candidate_requests","library_acquisition","citation_chase_hits","event_first_hits","exact_page_acquisition","system_health"]
 dest=pathlib.Path("evidence/runs")/a.run_id/a.lane;dest.mkdir(parents=True,exist_ok=True)
 items=[]
 for root in roots:
