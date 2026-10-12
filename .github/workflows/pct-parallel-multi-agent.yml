@@ -102,7 +102,7 @@ jobs:
           PCT_RESEARCH_LANE: ${{ matrix.lane }}
         run: |
           python3 tools/lane_repository_plan.py
-          timeout 150s python3 tools/lane_repository_discovery.py || { code=$?; echo "LANE DISCOVERY bounded exit=$code"; [ "$code" -eq 124 ] && echo "LANE DISCOVERY TIMEOUT after 150s"; true; }
+          timeout 150s python3 tools/lane_repository_discovery.py || { code=$?; echo "LANE DISCOVERY FAILED exit=$code"; exit "$code"; }
           python3 tools/merge_repository_candidates.py
           if [ "$PCT_RESEARCH_LANE" = "german" ]; then PCT_BSB_POSITIVE_CONTROL=1 python3 tools/bsb_iiif_route.py; fi
           if [ "$PCT_RESEARCH_LANE" = "travellers" ]; then python3 tools/bsb_iiif_route.py; fi
@@ -120,7 +120,7 @@ jobs:
             python3 tools/search_acquired_ocr.py &&
             python3 tools/event_first_search.py &&
             python3 tools/exact_page_acquire.py
-          ' || { code=$?; echo "LANE PIPELINE bounded exit=$code"; [ "$code" -eq 124 ] && echo "LANE PIPELINE TIMEOUT after 1800s"; true; }
+          ' || { code=$?; echo "LANE PIPELINE FAILED exit=$code"; exit "$code"; }
           python3 tools/verification_pipeline.py
           python3 tools/build_research_dossier.py
           python3 tools/research_lane_health.py
