@@ -49,13 +49,15 @@ for r in plan["repositories"]:
     name=r["name"]; repo_records=[]; statuses=[]; diagnostics=[]
     repo_terms=list(terms)
     if name=="SearchCulture.gr / EKT":
-        greek=[q for q in repo_terms if any("\u0370"<=ch<="\u03ff" for ch in q)]
-        dated=[q for q in repo_terms if any(y in q for y in [str(x) for x in range(1200,2101)])]
-        broad=[q for q in repo_terms if q in [plan.get("target")]+plan.get("aliases",[])]
-        ordered=[]
-        for q in greek+dated+broad:
-            if q not in ordered: ordered.append(q)
-        repo_terms=ordered[:int(os.getenv("PCT_SEARCHCULTURE_QUERY_LIMIT","6"))]
+        greek_names=[x for x in [plan.get("target")]+plan.get("aliases",[]) if any("\u0370"<=ch<="\u03ff" for ch in str(x))]
+        base_name=greek_names[0] if greek_names else plan.get("target")
+        ys=[x for x in str(plan.get("date_range","")).replace("-"," ").split() if x.isdigit()]
+        repo_terms=[
+          f"{base_name} πειρατές",
+          f"{base_name} κατάληψη",
+          f"{base_name} {ys[0]}" if ys else str(base_name)
+        ]
+        repo_terms=list(dict.fromkeys(repo_terms))[:int(os.getenv("PCT_SEARCHCULTURE_QUERY_LIMIT","3"))]
     for q in repo_terms:
         try:
             if name=="Internet Archive":
