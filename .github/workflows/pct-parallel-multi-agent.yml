@@ -39,6 +39,7 @@ jobs:
       - name: Build lane-specific repository plan
         env:
           PCT_RESEARCH_LANE: ${{ matrix.lane }}
+          PCT_REPOSITORY_QUERY_LIMIT: "1"
         run: |
           python3 tools/build_research_lanes.py
           python3 tools/lane_repository_plan.py
