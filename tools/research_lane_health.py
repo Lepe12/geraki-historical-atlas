@@ -17,7 +17,9 @@ blocked=[{"repository":a.get("repository"),"status":a.get("status")} for a in at
 errors=[a for a in attempts if a.get("status")=="ERROR"]
 acq=read("library_acquisition/acquisition_report.json",{}).get("results",[])
 events=read("event_first_hits/event_hits.json",{}).get("hits",[])
-pages=read("exact_page_acquisition/exact_page_report.json",{}).get("results",[])
+exact_page=read("exact_page_acquisition/exact_page_report.json",{})
+pages=exact_page.get("results",[])
+exact_page_complete=bool(exact_page.get("completed", True))
 bsb=read("iiif_candidate_requests/bsb_iiif_candidates.json",{}).get("summary",{})
 verification=read("verification/verification_gate.json",{})
 qa=read("qa/qa_report.json",{})
@@ -36,7 +38,7 @@ required_files={
  "qa_report":pathlib.Path("qa/qa_report.json").exists(),
  "structured_output":pathlib.Path("structured_output/candidate_events.json").exists()
 }
-pipeline_complete=all(required_files.values())
+pipeline_complete=all(required_files.values()) and exact_page_complete
 if executed and pipeline_complete:status="OPERATIONAL_WITH_EXPLICIT_BLOCKERS" if blocked else "OPERATIONAL"
 elif executed:status="PIPELINE_INCOMPLETE"
 else:status="NO_EXECUTED_REPOSITORY"
@@ -48,7 +50,7 @@ report={
  "acquisition_results":len(acq),"acquired_objects":sum(r.get("status") in ("TEXT_ACQUIRED","DIGITAL_METADATA_ACQUIRED") for r in acq),
  "located_citation_chase":sum(r.get("status")=="LOCATED_CITATION_CHASE" for r in acq),
  "event_first_hits":len(events),"exact_page_mappings":len(pages),
- "exact_page_images":sum(r.get("status")=="PAGE_IMAGE_ACQUIRED" for r in pages),
+ "exact_page_images":sum(r.get("status")=="PAGE_IMAGE_ACQUIRED" for r in pages),"exact_page_stage_complete":exact_page_complete,
  "bsb_iiif_summary":bsb,"verification_status":verification.get("status"),"qa_decision":qa.get("decision"),"verified_events":verification.get("verified_events",0),
  "verification_gate":"Operational means the research lane and pipeline ran through QA gates. It does NOT mean any historical claim is VERIFIED."
 }
