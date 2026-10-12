@@ -22,8 +22,8 @@ for x in candidates:
 
 # Bounded per-run acquisition with a durable deferred queue. Preserve both
 # executable Internet Archive objects and lane-specific catalogue candidates.
-max_items=max(1,int(os.getenv("PCT_MAX_ACQUISITION_CANDIDATES","8")))
-max_ia=max(1,int(os.getenv("PCT_MAX_IA_CANDIDATES","3")))
+max_items=max(1,int(os.getenv("PCT_MAX_ACQUISITION_CANDIDATES","100")))
+max_ia=max(1,int(os.getenv("PCT_MAX_IA_CANDIDATES","10")))
 ia=[x for x in items if x.get("acquisition_route")=="INTERNET_ARCHIVE" or str(x.get("discovery_repository") or x.get("repository") or "").lower().startswith("internet archive")]
 ia.sort(key=lambda x:(not bool(x.get("source_lead")), str(x.get("title") or "").lower().startswith(("skaitv","youtube")), -(int(str(x.get("year") or "0")[:4]) if str(x.get("year") or "")[:4].isdigit() and int(str(x.get("year") or "0")[:4])<1900 else 0)))
 other=[x for x in items if x not in ia]
