@@ -1,6 +1,23 @@
 name: PCT Parallel Multi-Agent Research
 on:
   workflow_dispatch:
+    inputs:
+      target:
+        description: "Research target (place, person, event, institution)"
+        required: true
+        type: string
+      aliases:
+        description: "Known/historically supported aliases separated by |"
+        required: false
+        type: string
+      date_range:
+        description: "Date range, e.g. 1600-1700"
+        required: false
+        type: string
+      purpose:
+        description: "Research question / scope"
+        required: false
+        type: string
   push:
     branches:
       - main
@@ -8,6 +25,11 @@ on:
       - 'library_discovery_requests/**'
 permissions:
   contents: write
+env:
+  PCT_TARGET: ${{ inputs.target }}
+  PCT_ALIASES: ${{ inputs.aliases }}
+  PCT_DATE_RANGE: ${{ inputs.date_range }}
+  PCT_PURPOSE: ${{ inputs.purpose }}
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -50,7 +72,7 @@ jobs:
           PCT_MAX_IA_CANDIDATES: "10"
         run: |
           python3 tools/build_research_lanes.py
-          timeout 600s bash -c '
+          timeout 1800s bash -c '
             set -o pipefail
             if [ "$PCT_RESEARCH_LANE" = "travellers" ]; then
               python3 tools/library_source_discovery.py &&
@@ -60,7 +82,7 @@ jobs:
             python3 tools/search_acquired_ocr.py &&
             python3 tools/event_first_search.py &&
             python3 tools/exact_page_acquire.py
-          ' || { code=$?; echo "LANE PIPELINE bounded exit=$code"; [ "$code" -eq 124 ] && echo "LANE PIPELINE TIMEOUT after 180s"; true; }
+          ' || { code=$?; echo "LANE PIPELINE bounded exit=$code"; [ "$code" -eq 124 ] && echo "LANE PIPELINE TIMEOUT after 1800s"; true; }
           python3 tools/verification_pipeline.py
           python3 tools/research_lane_health.py
       - name: Preserve durable evidence in GitHub
