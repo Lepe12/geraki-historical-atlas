@@ -31,6 +31,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Build lane-specific repository plan
+        env:
+          PCT_RESEARCH_LANE: ${{ matrix.lane }}
+        run: python3 tools/lane_repository_plan.py
       - name: Run lane discovery
         env:
           PCT_RESEARCH_LANE: ${{ matrix.lane }}
@@ -48,6 +52,7 @@ jobs:
           name: pct-${{ matrix.lane }}-${{ github.run_id }}
           path: |
             research_lanes/${{ matrix.lane }}.json
+            repository_plans/${{ matrix.lane }}.json
             library_discovery/
             citation_chase_candidates/
             library_acquisition/
