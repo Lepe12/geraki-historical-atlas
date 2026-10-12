@@ -55,8 +55,8 @@ def process(item):
    if img:
     try:
      data=get(img,timeout=15,limit=6_000_000)
-     if data[:3]==b"\\xff\\xd8\\xff" or data[:8]==b"\\x89PNG\\r\\n\\x1a\\n":
-      dest=OUT/"scans"/f"{bid}_canvas_0001"+".jpg"
+     if data[:3]==bytes.fromhex("ffd8ff") or data[:8]==bytes.fromhex("89504e470d0a1a0a"):
+      dest=OUT/"scans"/f"{bid}_canvas_0001.jpg"
       dest.parent.mkdir(exist_ok=True)
       dest.write_bytes(data)
       result.update(status="REFERENCE_SCAN_ACQUIRED_PENDING_INSPECTION",reference_scan=str(dest),reference_scan_bytes=len(data),reference_canvas_id=cs[0].get("id") or cs[0].get("@id"))
