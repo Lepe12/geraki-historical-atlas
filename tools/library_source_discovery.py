@@ -17,8 +17,8 @@ lo,hi=(min(years),max(years)) if years else (0,9999)
 queries=[]
 for t in terms:
     escaped=t.replace('"','')
-    yr=f" AND year:[{lo} TO {hi}]" if years else ""
-    queries.append(f'(title:("{escaped}") OR description:("{escaped}") OR subject:("{escaped}")){yr}')
+    # Event years must not filter publication dates: later source editions matter.
+    queries.append(f'(title:("{escaped}") OR description:("{escaped}") OR subject:("{escaped}"))')
 items=[];errors=[]
 for q in queries:
     try:
