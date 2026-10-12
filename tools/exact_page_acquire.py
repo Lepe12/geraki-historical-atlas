@@ -59,7 +59,10 @@ for h in hits:
  scores=[]
  for i,p in enumerate(pages):
   q=p.lower(); scores.append((sum(1 for t in toks if t.lower() in q),i))
- scores.sort(reverse=True);score,pi=scores[0] if scores else (0,0)
+ scores.sort(key=lambda x:(x[0],-x[1]),reverse=True);score,pi=scores[0] if scores else (0,0)
+ # Never guess a page from a zero/weak lexical match. This prevents false leaf/page mappings.
+ if score < 2:
+  report.append({"hit":h,"identifier":ident,"status":"PAGINATION_UNRESOLVED_LOW_CONTEXT_SCORE","mapping_score":score,"verification_status":"NEEDS_EVIDENCE"});checkpoint();continue
  try:
   sd=page_map_from_scandata(fetch("https://archive.org/download/%s/%s"%(urllib.parse.quote(ident),urllib.parse.quote(scan))))
  except Exception as e:
