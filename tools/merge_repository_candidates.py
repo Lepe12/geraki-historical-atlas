@@ -4,7 +4,11 @@ import json,os,pathlib,datetime
 lane=os.getenv("PCT_RESEARCH_LANE","travellers")
 src=pathlib.Path("lane_discovery")/f"{lane}.json"
 out=pathlib.Path("citation_chase_candidates");out.mkdir(exist_ok=True)
-if not src.exists(): raise SystemExit("missing "+str(src))
+if not src.exists():
+    payload={"schema":"pct-repository-candidates-v2","lane":lane,"selected":[],"attempts":[],"status":"LANE_DISCOVERY_OUTPUT_MISSING","rule":"Missing discovery output is a pipeline diagnostic, not evidence."}
+    (out/"repository_candidates.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding="utf-8")
+    print("repository candidates",lane,0,"discovery output missing")
+    raise SystemExit(0)
 d=json.loads(src.read_text(encoding="utf-8"));selected=[]
 for x in d.get("results",[]):
     repo=x.get("discovery_repository") or x.get("repository")
