@@ -274,3 +274,46 @@ jobs:
               sys.exit(1)
           print('TEN-LANE REQUEST INTEGRITY GATE PASSED')
           PY
+
+
+  jarvis-escalation-check:
+    needs: [prepare, research-lanes]
+    if: always() && inputs.selected_agents != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+      - name: Refresh durable lane evidence
+        run: git pull --rebase origin main
+      - name: Evaluate archive escalation
+        env:
+          PCT_RUN_ID: ${{ github.run_id }}
+        run: |
+          python3 tools/orchestrator/jarvis_escalate.py \
+            --run-id "$PCT_RUN_ID" \
+            --output "jarvis_escalation_requests/$PCT_RUN_ID.json"
+      - name: Queue escalation only when routes exist
+        env:
+          PCT_RUN_ID: ${{ github.run_id }}
+        run: |
+          count=$(python3 - <<'PY'
+          import json,os
+          p="jarvis_escalation_requests/"+os.environ["PCT_RUN_ID"]+".json"
+          print(len(json.load(open(p,encoding="utf-8")).get("routes",[])))
+          PY
+          )
+          if [ "$count" -eq 0 ]; then
+            echo "JARVIS_NO_ARCHIVE_ESCALATION_REQUIRED"
+            rm -f "jarvis_escalation_requests/$PCT_RUN_ID.json"
+            exit 0
+          fi
+          git config user.name "jarvis-orchestrator[bot]"
+          git config user.email "jarvis-orchestrator@users.noreply.github.com"
+          git add "jarvis_escalation_requests/$PCT_RUN_ID.json"
+          git commit -m "JARVIS queue archive escalation $PCT_RUN_ID"
+          git pull --rebase origin main
+          git push origin HEAD:main
