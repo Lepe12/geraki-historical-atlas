@@ -15,13 +15,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.sha }}
           fetch-depth: 2
       - name: Compile benchmark Python code
         run: python3 -m compileall -q tools
       - name: Evaluate changed benchmark request
         run: |
-          mapfile -t files < <(git diff-tree --no-commit-id --name-only -r HEAD -- 'benchmarks/evaluation_requests/*.json')
+          mapfile -t files < <(git diff-tree --no-commit-id --name-only -r "${{ github.sha }}" -- 'benchmarks/evaluation_requests/*.json')
           if [ "${#files[@]}" -ne 1 ]; then
             echo "BENCHMARK_REQUEST_SELECTION_ERROR expected exactly 1 changed evaluation request, got ${#files[@]}"
             printf '%s\\n' "${files[@]}"
