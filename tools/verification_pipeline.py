@@ -4,6 +4,7 @@ import json,os,pathlib,datetime,hashlib,sys
 sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from request_context import load_request
 from evidence_model import normalize_date,toponym_identity
+from exact_page_mapping import pages_for_hit
 
 LANE=os.getenv("PCT_RESEARCH_LANE","travellers")
 NOW=datetime.datetime.now(datetime.timezone.utc).isoformat()
@@ -71,7 +72,7 @@ for p in pages:page_by_source.setdefault(str(p.get("source_file","")),[]).append
 candidates=[]
 
 for i,h in enumerate(events,1):
-    src=h.get("file");related=page_by_source.get(str(src),[])
+    src=h.get("file");related=pages_for_hit(pages,src,i-1,h.get("line"))
     topo=toponym_identity(h.get("place_match"),ctx["target"],ctx["aliases"])
     dnorm=normalize_date(" / ".join(str(y) for y in h.get("years_in_scope",[])), h.get("date_role","UNRESOLVED"))
     candidates.append({

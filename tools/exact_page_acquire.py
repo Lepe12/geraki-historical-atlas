@@ -2,6 +2,7 @@
 """Map event OCR hits to Internet Archive leaf/page metadata and download exact scan images."""
 import json,pathlib,re,urllib.request,urllib.parse,xml.etree.ElementTree as ET,datetime
 from functools import lru_cache
+from exact_page_mapping import djvu_pages, djvu_leaf_ids, map_context
 hitsf=pathlib.Path("event_first_hits/event_hits.json"); acqf=pathlib.Path("library_acquisition/acquisition_report.json")
 if not hitsf.exists() or not acqf.exists(): raise SystemExit("missing event hits/acquisition report")
 all_hits=json.loads(hitsf.read_text(encoding="utf-8")).get("hits",[])
@@ -31,14 +32,14 @@ report=[]
 def checkpoint():
  (out/"exact_page_report.json").write_text(json.dumps({
   "generated_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),
-  "protocol":"PCT-EXACT-PAGE-AUTO-v3","results":report,
+  "protocol":"PCT-EXACT-PAGE-AUTO-v4","results":report,
   "total_event_hits":len(all_hits),"selected_page_hits":len(hits),
   "processed_page_hits":len(report),"completed":len(report)>=len(hits),
   "deferred_page_hits":max(0,len(all_hits)-len(hits)),
   "gate":"Mapped/downloaded page remains NEEDS_ORIGINAL_INSPECTION; do not auto-verify."
  },ensure_ascii=False,indent=2),encoding="utf-8")
 checkpoint()
-for h in hits:
+for hit_index,h in enumerate(hits):
  fn=h.get("file",""); ident=next((k for k in byfile if k and fn.startswith(k+"_")),None)
  if not ident:
   report.append({"hit":h,"identifier":None,"status":"NO_ACQUIRED_SOURCE_MAPPING","verification_status":"NEEDS_EVIDENCE"});checkpoint();continue
@@ -47,28 +48,28 @@ for h in hits:
  except Exception as e:
   report.append({"hit":h,"identifier":ident,"status":"METADATA_FETCH_ERROR:"+str(e)});checkpoint();continue
  djvu=pick(files,"_djvu.txt"); scan=pick(files,"_scandata.xml")
- if not djvu or not scan: report.append({"hit":h,"identifier":ident,"status":"NO_PAGE_METADATA"});checkpoint();continue
- try:
-  text=fetch("https://archive.org/download/%s/%s"%(urllib.parse.quote(ident),urllib.parse.quote(djvu))).decode("utf-8","ignore")
- except Exception as e:
-  report.append({"hit":h,"identifier":ident,"status":"OCR_FETCH_ERROR:"+str(e)});checkpoint();continue
- pages=text.split("\f")
- needle=re.sub(r"\s+"," ",str(h.get("context",""))).strip()
- # use central distinctive 120-char fragment, then fallback matched place near event
- frag=needle[max(0,len(needle)//2-80):min(len(needle),len(needle)//2+80)]
- toks=[t for t in re.findall(r"[A-Za-zÀ-ÿ]{4,}",frag) if len(t)>4][:8]
- scores=[]
- for i,p in enumerate(pages):
-  q=p.lower(); scores.append((sum(1 for t in toks if t.lower() in q),i))
- scores.sort(key=lambda x:(x[0],-x[1]),reverse=True);score,pi=scores[0] if scores else (0,0)
- # Never guess a page from a zero/weak lexical match. This prevents false leaf/page mappings.
- if score < 2:
-  report.append({"hit":h,"identifier":ident,"status":"PAGINATION_UNRESOLVED_LOW_CONTEXT_SCORE","mapping_score":score,"verification_status":"NEEDS_EVIDENCE"});checkpoint();continue
+ if not (djvu or pick(files,"_djvu.xml")) or not scan: report.append({"hit":h,"identifier":ident,"status":"NO_PAGE_METADATA"});checkpoint();continue
  try:
   sd=page_map_from_scandata(fetch("https://archive.org/download/%s/%s"%(urllib.parse.quote(ident),urllib.parse.quote(scan))))
+  xml_name=pick(files,"_djvu.xml")
+  ocr_leaves=None
+  if xml_name:
+   xml_data=fetch("https://archive.org/download/%s/%s"%(urllib.parse.quote(ident),urllib.parse.quote(xml_name)))
+   page_text=djvu_pages(xml_data)
+   ocr_leaves=djvu_leaf_ids(xml_data)
+   basis="DJVU_XML_OBJECT_ORDER"
+  else:
+   text=fetch("https://archive.org/download/%s/%s"%(urllib.parse.quote(ident),urllib.parse.quote(djvu))).decode("utf-8","replace")
+   page_text=text.split("\f")
+   if page_text and not page_text[-1].strip():page_text.pop()
+   basis="FORM_FEED_PAGE_ORDER"
+  mapping=map_context(str(h.get("context_excerpt") or h.get("context") or ""),page_text,sd,basis,ocr_leaves)
  except Exception as e:
-  report.append({"hit":h,"identifier":ident,"status":"SCANDATA_FETCH_ERROR:"+str(e)});checkpoint();continue
- meta=sd[pi] if pi<len(sd) else {"leaf":pi,"printed_page":None};leaf=meta["leaf"]
+  report.append({"hit":h,"hit_index":hit_index,"identifier":ident,"source_file":fn,"status":"PAGE_DATA_FETCH_OR_PARSE_ERROR:"+type(e).__name__,"verification_status":"NEEDS_EVIDENCE"});checkpoint();continue
+ if mapping["status"]!="EXACT_PAGE_MAPPED":
+  report.append({"hit":h,"hit_index":hit_index,"identifier":ident,"source_file":fn,**mapping,"verification_status":"NEEDS_EVIDENCE"});checkpoint();continue
+ pi=mapping["ocr_page_index"];leaf=mapping["leaf"]
+ meta={"leaf":leaf,"printed_page":mapping.get("printed_page")}
  # IA BookReaderPreview image endpoint, leaf-specific
  imgurl=f"https://archive.org/download/{urllib.parse.quote(ident)}/page/n{leaf}/mode/1up?view=theater"
  dest=out/f"{ident}_leaf_{leaf}.jpg"
@@ -78,6 +79,6 @@ for h in hits:
   if data[:2]==b"\xff\xd8" or data[:8]==b"\x89PNG\r\n\x1a\n":dest.write_bytes(data);status="PAGE_IMAGE_ACQUIRED"
   else: status="IMAGE_ENDPOINT_UNAVAILABLE"
  except Exception as e: status="IMAGE_DOWNLOAD_ERROR:"+str(e)
- report.append({"identifier":ident,"discovery_repository":"Internet Archive","discovery_lane":byfile.get(ident,{}).get("discovery_lane"),"source_file":fn,"hit_line":h.get("line"),"place_match":h.get("place_match"),"event_terms":h.get("event_terms"),"ocr_page_index":pi,"leaf":leaf,"printed_page":meta.get("printed_page"),"mapping_score":score,"image_url":imgurl,"image_file":str(dest) if dest.exists() else None,"status":status,"verification_status":"NEEDS_ORIGINAL_INSPECTION"});checkpoint()
+ report.append({"identifier":ident,"hit_index":hit_index,"mapping_basis":mapping["mapping_basis"],"context_match_method":mapping["context_match_method"],"alignment_note":mapping["alignment_note"],"discovery_repository":"Internet Archive","discovery_lane":byfile.get(ident,{}).get("discovery_lane"),"source_file":fn,"hit_line":h.get("line"),"place_match":h.get("place_match"),"event_terms":h.get("event_terms"),"ocr_page_index":pi,"leaf":leaf,"printed_page":meta.get("printed_page"),"image_url":imgurl,"image_file":str(dest) if dest.exists() else None,"status":status,"verification_status":"NEEDS_ORIGINAL_INSPECTION"});checkpoint()
 checkpoint()
 print("exact-page mappings",len(report),"images",sum(1 for x in report if x["status"]=="PAGE_IMAGE_ACQUIRED"))
