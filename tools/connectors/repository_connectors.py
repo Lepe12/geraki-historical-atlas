@@ -437,7 +437,15 @@ def searchculture(q,lane):
     key=os.getenv("SEARCHCULTURE_API_KEY","").strip()
     if not key:
         return "API_KEY_REQUIRED",[],"Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
-    url="https://www.searchculture.gr/aggregator/api/search.json?"+urllib.parse.urlencode({"apiKey":key,"general_term":q,"page":1,"pageSize":25})
+    params={"apiKey":key,"page":1,"pageSize":25}
+    if str(q).startswith("__SC_FILTER__|"):
+        for part in str(q).split("|")[1:]:
+            if "=" not in part: continue
+            k,v=part.split("=",1)
+            if k and v: params[k]=v
+    else:
+        params["general_term"]=q
+    url="https://www.searchculture.gr/aggregator/api/search.json?"+urllib.parse.urlencode(params)
     req=urllib.request.Request(url,headers={**UA,"Accept":"application/json"})
     with urllib.request.urlopen(req,timeout=30) as resp:
         d=json.loads(resp.read().decode("utf-8","replace"))
@@ -452,12 +460,13 @@ def searchculture(q,lane):
           "connector_status":"EXECUTED",
           "identifier":uri,
           "title":title,
-          "date":x.get("dc_date") or x.get("date") or [],
+          "date":x.get("ekt_chronology") or x.get("dc_date") or x.get("date") or [],
           "url":uri,
           "metadata_text":json.dumps(x,ensure_ascii=False),
           "raw":x
         })
-    safe_url="https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&"+urllib.parse.urlencode({"general_term":q,"page":1,"pageSize":25})
+    safe_params=dict(params);safe_params["apiKey"]="REDACTED"
+    safe_url="https://www.searchculture.gr/aggregator/api/search.json?"+urllib.parse.urlencode(safe_params)
     return "EXECUTED",out,safe_url
 
 def ddb(q,lane):
