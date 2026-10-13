@@ -58,6 +58,15 @@ for r in plan["repositories"]:
           f"{base_name} {ys[0]}" if ys else str(base_name)
         ]
         repo_terms=list(dict.fromkeys(repo_terms))[:int(os.getenv("PCT_SEARCHCULTURE_QUERY_LIMIT","3"))]
+    if name=="Library of Congress":
+        ys=[x for x in str(plan.get("date_range","")).replace("-"," ").split() if x.isdigit()]
+        target=str(plan.get("target") or "").strip()
+        aliases=[str(x).strip() for x in plan.get("aliases",[]) if str(x).strip()]
+        repo_terms=[target]
+        if ys: repo_terms.append(f'"{target}" {ys[0]}')
+        repo_terms.append(f'"{target}" pirate')
+        if aliases and ys: repo_terms.append(f'"{aliases[0]}" {ys[0]}')
+        repo_terms=list(dict.fromkeys(q for q in repo_terms if q))[:int(os.getenv("PCT_LOC_QUERY_LIMIT","4"))]
     for q in repo_terms:
         try:
             if name=="Internet Archive":
