@@ -3,7 +3,7 @@ from jarvis_dispatch import validate, fingerprint
 
 class JarvisDispatchTests(unittest.TestCase):
     def setUp(self):
-        self.policy={"mode":"controlled_dispatch","dispatch":{"dispatch_enabled":True,"kill_switch":False,"max_parallel":3,"allowed_agents":["travellers","venetian","french"],"require_explicit_target":True,"require_explicit_selected_agents":True}}
+        self.policy={"mode":"controlled_dispatch","dispatch":{"dispatch_enabled":True,"kill_switch":False,"max_parallel":3,"allowed_agents":["travellers","venetian","french","italian_states"],"require_explicit_target":True,"require_explicit_selected_agents":True}}
     def test_valid_bounded_dispatch(self):
         out=validate({"target":"Petros Lantzas","selected_agents":["venetian","french"]},self.policy)
         self.assertEqual(out["selected_agents"],["venetian","french"])
@@ -17,7 +17,7 @@ class JarvisDispatchTests(unittest.TestCase):
             validate({"target":"x","selected_agents":["ottoman"]},self.policy)
     def test_parallel_limit_blocks(self):
         with self.assertRaisesRegex(ValueError,"TOO_MANY_SELECTED_AGENTS"):
-            validate({"target":"x","selected_agents":["travellers","venetian","french","travellers"]},self.policy)
+            validate({"target":"x","selected_agents":["travellers","venetian","french","italian_states"]},self.policy)
 
 if __name__=="__main__":
     unittest.main()
