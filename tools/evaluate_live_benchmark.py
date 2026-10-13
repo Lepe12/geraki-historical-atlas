@@ -56,7 +56,7 @@ def family_match(e):
     if family=="ATTACK_OR_SACK":
         return any(x in b for x in ["attack","attaque","ataque","attacc","raid","sack","saccag","saque","pillage","plunder"])
     if family=="CAPTURE":
-        return any(x in b for x in ["captur","cattur","καταληψ","αιχμαλω","seiz","prison"])
+        return any(x in b for x in ["captur","cattur","καταληψ","αιχμαλω","seiz","prison","presa","prise"])
     if family=="NAVAL_BATTLE":
         return any(x in b for x in ["battle","bataill","combat","victoire","victory","naval"])
     if family=="BOMBARDMENT":
