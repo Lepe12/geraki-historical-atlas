@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Evaluate a durable Agent Piracy run against one curated benchmark case."""
-import argparse,json,pathlib,re
+import argparse,json,pathlib,re,unicodedata
 
 p=argparse.ArgumentParser()
 p.add_argument("--run-id",required=True)
@@ -33,8 +33,12 @@ entity=case.get("expected_entity")
 place=case.get("expected_place")
 family=case.get("expected_event_family")
 
+def norm_text(s):
+    s=unicodedata.normalize("NFKD",str(s))
+    return "".join(ch for ch in s if not unicodedata.combining(ch)).casefold()
+
 def blob(e):
-    return json.dumps(e,ensure_ascii=False).casefold()
+    return norm_text(json.dumps(e,ensure_ascii=False))
 
 def date_match(e):
     if not year:return True
@@ -44,7 +48,7 @@ def date_match(e):
     return bool(re.search(r"(?<!\d)"+re.escape(str(year))+r"(?!\d)",blob(e)))
 
 def term_match(e,needle):
-    return str(needle).casefold() in blob(e)
+    return norm_text(needle) in blob(e)
 
 def family_match(e):
     if not family or family in ("NONE","UNKNOWN"):return True
