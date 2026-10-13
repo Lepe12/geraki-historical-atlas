@@ -471,3 +471,86 @@ The current false negatives are diagnostically useful:
 - Jan Janszoon / Rabat 1624: alias/entity disambiguation plus place-context retrieval gap.
 
 These metrics remain diagnostics for a small curated set and are not a universal accuracy estimate.
+
+
+## Benchmark hardening phase closure — 2026-10-13
+
+This phase is considered scientifically closed on the current curated benchmark set.
+
+### Jan Janszoon / Rabat 1624
+
+Final validated run:
+- research run **38366061028** — SUCCESS;
+- 10/10 lanes successful + aggregate success;
+- benchmark case `REF-JAN-JANSZOON-RABAT-1624` — **TRUE POSITIVE**;
+- matched source: The National Archives Public Content, *The corsair state of Rabat-Salé*;
+- expected entity/date/place all matched from source-derived context;
+- date_error = false;
+- entity_error = false;
+- place_error = false;
+- unsupported_claim_rate = 0.
+
+Key corrections that enabled the result:
+- bounded travellers repository queries prevented 150-second discovery timeout;
+- benchmark entity/place matching is source-only and cannot self-confirm from pipeline canonical labels;
+- catalogue context is now centred on the actual matched entity/place rather than truncating the first 12,000 characters of a long page;
+- this eliminated the earlier false Mourad/Algiers alias collision.
+
+### Salé 1630
+
+Final tested run:
+- research run **38366930304** — SUCCESS;
+- 10/10 lanes successful + aggregate success;
+- benchmark case `REF-SALE-RANSOM-1630` remains a raw false negative;
+- however it is now classified as **coverage-blocked** with status `PUBLIC_CONTENT_INDEX_GAP`.
+
+The known reference remains:
+- The National Archives, *Tobacco — Source 4b*;
+- direct public URL is reachable;
+- letter dated September 1630, catalogue reference HCA 15/1;
+- the educational explanation identifies payment for redeemed captains as ransom in the Barbary-corsair context.
+
+Repeated live discovery attempts covered:
+- TNA Discovery API;
+- TNA public site search;
+- bounded public-content hub crawl;
+- embedded resource-path extraction;
+- rendered-card title reconstruction;
+- child-page expansion;
+- public web-index fallback.
+
+These machine-search surfaces did not reliably expose the known Source 4b page from the historical target query. The benchmark therefore records a repository/public-site **discovery-surface coverage gap**, not a retrieval/classification failure and not evidence of historical absence.
+
+No benchmark-specific source URL was hardcoded into the research retrieval pipeline to force a pass.
+
+### Final current benchmark metrics
+
+Latest curated summary:
+- evaluated results: **9**
+- metric-included results: **8**
+- TP: **5**
+- FP: **0**
+- FN: **2**
+- TN: **1**
+- precision: **1.0**
+- end-to-end recall: **0.7142857143**
+- coverage-blocked false negatives: **2**
+- unblocked false negatives: **0**
+- coverage-adjusted recall: **1.0**
+- false-positive rate: **0.0**
+- date errors: **0**
+- entity errors: **0**
+- place errors: **0**
+
+The two remaining raw false negatives are explicit coverage limitations:
+1. **Mykonos 1695** — SearchCulture `API_KEY_REQUIRED`.
+2. **Salé 1630** — TNA Public Content `PUBLIC_CONTENT_INDEX_GAP`.
+
+Therefore, on the currently reachable benchmark coverage, the system has:
+- no unblocked false negatives;
+- no false positives;
+- no date/entity/place errors;
+- precision 1.0;
+- coverage-adjusted recall 1.0.
+
+This does **not** imply universal historical accuracy. It means the present benchmark-hardening phase has met its stated regression target without hiding or fabricating inaccessible coverage.
