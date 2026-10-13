@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Piratecartography Research Command Center</title>
+  <link rel="stylesheet" href="./command-center.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">PIRATECARTOGRAPHY / JARVIS</p>
+        <h1>Research Command Center</h1>
+      </div>
+      <div class="connection">
+        <span id="connection-dot" class="dot offline"></span>
+        <span id="connection-label">OFFLINE</span>
+      </div>
+    </header>
+
+    <section class="summary-grid">
+      <article class="metric"><span>Active agents</span><strong id="metric-active">0</strong></article>
+      <article class="metric"><span>Completed</span><strong id="metric-completed">0</strong></article>
+      <article class="metric"><span>Blocked</span><strong id="metric-blocked">0</strong></article>
+      <article class="metric"><span>Warnings</span><strong id="metric-warnings">0</strong></article>
+    </section>
+
+    <nav class="tabs" aria-label="Command center sections">
+      <button class="tab active" data-tab="agents">Agents</button>
+      <button class="tab" data-tab="jobs">Research Jobs</button>
+      <button class="tab" data-tab="connectors">Connectors</button>
+      <button class="tab" data-tab="evidence">Evidence</button>
+      <button class="tab" data-tab="claims">Claims</button>
+      <button class="tab" data-tab="qa">Scientific QA</button>
+    </nav>
+
+    <main>
+      <section id="tab-agents" class="tab-panel active">
+        <div class="panel-head">
+          <div><p class="eyebrow">LIVE WORKFORCE</p><h2>Research agents</h2></div>
+          <button id="refresh-button" class="ghost">Refresh snapshot</button>
+        </div>
+        <div id="agent-grid" class="agent-grid"></div>
+      </section>
+
+      <section id="tab-jobs" class="tab-panel">
+        <div class="panel-head"><div><p class="eyebrow">QUEUE / HISTORY</p><h2>Research jobs</h2></div></div>
+        <div id="jobs-table" class="table-wrap"></div>
+      </section>
+
+      <section id="tab-connectors" class="tab-panel">
+        <div class="panel-head"><div><p class="eyebrow">ARCHIVE ACCESS</p><h2>Connector state</h2></div></div>
+        <div id="connector-grid" class="connector-grid"></div>
+      </section>
+
+      <section id="tab-evidence" class="tab-panel">
+        <div class="panel-head"><div><p class="eyebrow">PROVENANCE</p><h2>Evidence stream</h2></div></div>
+        <div id="evidence-list" class="feed empty">No evidence events yet.</div>
+      </section>
+
+      <section id="tab-claims" class="tab-panel">
+        <div class="panel-head"><div><p class="eyebrow">CLAIM MATRIX</p><h2>Claims</h2></div></div>
+        <div id="claims-list" class="feed empty">No claim events yet.</div>
+      </section>
+
+      <section id="tab-qa" class="tab-panel">
+        <div class="panel-head"><div><p class="eyebrow">SCIENTIFIC GATES</p><h2>Scientific QA</h2></div></div>
+        <div class="qa-grid">
+          <article><span>Automatic VERIFIED</span><strong>DISABLED</strong></article>
+          <article><span>Source genealogy</span><strong id="qa-genealogy">WAITING</strong></article>
+          <article><span>Contradiction search</span><strong id="qa-contradiction">WAITING</strong></article>
+          <article><span>Human review</span><strong id="qa-human">REQUIRED</strong></article>
+        </div>
+      </section>
+
+      <section class="mission-log">
+        <div class="panel-head">
+          <div><p class="eyebrow">LIVE EVENT STREAM</p><h2>Mission log</h2></div>
+          <button id="clear-log" class="ghost">Clear local view</button>
+        </div>
+        <div id="mission-log" class="log-stream" aria-live="polite"></div>
+      </section>
+    </main>
+  </div>
+  <script src="./command-center.js"></script>
+</body>
+</html>
