@@ -29,11 +29,23 @@ jobs:
           python3 - <<'PY'
           import json,pathlib
           rows=[]
+          latest={}
           for p in pathlib.Path("benchmarks/results").glob("*.json"):
               if p.name == "SUMMARY.json":
                   continue
-              try: rows.append(json.loads(p.read_text(encoding="utf-8")))
-              except Exception: pass
+              try:
+                  row=json.loads(p.read_text(encoding="utf-8"))
+              except Exception:
+                  continue
+              case_id=row.get("case_id")
+              if not case_id:
+                  continue
+              try: rid=int(row.get("run_id",0))
+              except Exception: rid=0
+              prev=latest.get(case_id)
+              if prev is None or rid>prev[0]:
+                  latest[case_id]=(rid,row)
+          rows=[v[1] for v in latest.values()]
           tp=sum(x.get("true_positive",0) for x in rows);fp=sum(x.get("false_positive",0) for x in rows)
           fn=sum(x.get("false_negative",0) for x in rows);tn=sum(x.get("true_negative",0) for x in rows)
           out={
@@ -43,7 +55,7 @@ jobs:
             "recall":tp/(tp+fn) if tp+fn else None,
             "false_positive_rate":fp/(fp+tn) if fp+tn else None,
             "date_errors":sum(bool(x.get("date_error")) for x in rows),
-            "entity_errors":sum(bool(x.get("entity_error")) for x in rows),
+            "entity_errors":sum(bool(x.get("entity_error")) for x in rows),\n            "place_errors":sum(bool(x.get("place_error")) for x in rows),
             "interpretation":"Metrics describe the curated benchmark set only; they are not a universal accuracy estimate."
           }
           pathlib.Path("benchmarks/results/SUMMARY.json").write_text(json.dumps(out,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
