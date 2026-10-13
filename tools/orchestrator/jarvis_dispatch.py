@@ -107,9 +107,16 @@ def main() -> None:
         raise ValueError("DUPLICATE_DISPATCH_REQUEST")
     matrix = json.dumps(payload["selected_agents"], separators=(",", ":"))
     if args.github_output:
+        def one_line(value):
+            return str(value).replace("\\r", " ").replace("\\n", " ").strip()
         with args.github_output.open("a", encoding="utf-8") as fh:
             fh.write("matrix=%s\n" % matrix)
             fh.write("request_fingerprint=%s\n" % audit["request_fingerprint"])
+            fh.write("target=%s\n" % one_line(payload["target"]))
+            fh.write("aliases=%s\n" % one_line("|".join(payload["aliases"])))
+            fh.write("date_range=%s\n" % one_line(payload["date_range"]))
+            fh.write("purpose=%s\n" % one_line(payload["purpose"]))
+            fh.write("selected_agents=%s\n" % one_line(",".join(payload["selected_agents"])))
     if args.write_audit:
         args.write_audit.parent.mkdir(parents=True, exist_ok=True)
         args.write_audit.write_text(json.dumps(audit, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
