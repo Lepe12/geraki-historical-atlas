@@ -75,7 +75,14 @@ detected_any=bool(events)
 case_detected=bool(matched)
 
 def source_key(e):
-    return (e.get("_lane"),e.get("repository"),e.get("identifier"),e.get("source_file") or e.get("url") or e.get("title"))
+    ident=e.get("identifier")
+    url=e.get("url")
+    src=e.get("source_file")
+    title=e.get("title")
+    if ident:return ("identifier",str(ident))
+    if url:return ("url",str(url))
+    if src:return ("source_file",str(src))
+    return ("title",str(title))
 
 matched_sources={}
 for e in matched:
