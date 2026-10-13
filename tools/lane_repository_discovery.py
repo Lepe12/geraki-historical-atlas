@@ -78,15 +78,19 @@ for r in plan["repositories"]:
     if name=="SearchCulture.gr / EKT":
         target=str(plan.get("target") or "").strip()
         aliases=[str(x).strip() for x in plan.get("aliases",[]) if str(x).strip()]
-        greek_names=[x for x in [target]+aliases if any("\u0370"<=ch<="\u03ff" for ch in x)]
         ys=[x for x in str(plan.get("date_range","")).replace("-"," ").split() if x.isdigit()]
+        year=ys[0] if ys else None
         repo_terms=[]
-        for n in [target]+aliases[:3]:
+        for n in [target]+aliases[:2]:
             if n: repo_terms.append(n)
-        if ys: repo_terms.append(ys[0])
-        repo_terms += ["πειρατές","Τούρκοι πειρατές","αιχμαλωσία","κατάληψη"]
-        if greek_names and ys:
-            repo_terms.append(f"{greek_names[0]} {ys[0]}")
+        if year:
+            repo_terms.append("__SC_FILTER__|ekt_chronology="+year)
+            if target:
+                repo_terms.append("__SC_FILTER__|dcterms_spatial="+target+"|ekt_chronology="+year)
+                repo_terms.append("__SC_FILTER__|ekt_place="+target+"|ekt_chronology="+year)
+                if any("\u0370"<=ch<="\u03ff" for ch in target) and " " not in target:
+                    repo_terms.append("__SC_FILTER__|ekt_place=Νήσος "+target+"|ekt_chronology="+year)
+        repo_terms += ["πειρατές","αιχμαλωσία"]
         repo_terms=list(dict.fromkeys(q for q in repo_terms if q))[:int(os.getenv("PCT_SEARCHCULTURE_QUERY_LIMIT","10"))]
     if name=="The National Archives Public Content":
         ys=[x for x in str(plan.get("date_range","")).replace("-"," ").split() if x.isdigit()]
