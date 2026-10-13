@@ -56,6 +56,12 @@ def family_match(e):
     b=blob(e)
     if family=="ATTACK_OR_SACK":
         return any(x in b for x in ["attack","attaque","ataque","attacc","raid","sack","saccag","saque","pillage","plunder"])
+    if family=="ATTACK_OR_CAPTURE":
+        return any(x in b for x in ["attack","attaque","ataque","attacc","captur","cattur","seiz","sack","raid"])
+    if family=="RANSOM_OR_CAPTIVITY":
+        return any(x in b for x in ["ransom","rançon","riscatt","rescat","captiv","prison","slave","enslav"])
+    if family=="CORSAIR_OPERATION":
+        return any(x in b for x in ["corsair","corsaire","corsar","reis","raïs","pirat","privateer"])
     if family=="CAPTURE":
         return any(x in b for x in ["captur","cattur","καταληψ","αιχμαλω","seiz","prison","presa","prise"])
     if family=="NAVAL_BATTLE":
@@ -68,6 +74,8 @@ def family_match(e):
         return any(x in b for x in ["presence","reported offshore","galley","galleys","galera","galeras","corsair vessel","vessel"])
     if family=="DEPENDENT_SOURCES":
         return "derivative" in b or "common_source" in b
+    if family=="STATE_NAVAL_ACTION_NOT_PIRATE":
+        return False
     return True
 
 matched=[]
