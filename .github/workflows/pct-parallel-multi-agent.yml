@@ -239,6 +239,8 @@ jobs:
         env:
           PCT_RUN_ID: ${{ github.run_id }}
         run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           python3 tools/storage/queue_mariadb_storage.py
           git add "evidence/runs/${{ github.run_id }}/MARIADB_STORAGE_INTENT.json"
           git diff --cached --quiet || git commit -m "Queue MariaDB persistence: run ${{ github.run_id }}"
