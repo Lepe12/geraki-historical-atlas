@@ -1,0 +1,118 @@
+{
+  "schema": "pct-connector-registry-v1",
+  "connectors": {
+    "pares_simancas_native": {
+      "repository": "PARES / Archivo General de Simancas",
+      "module": "connectors/pares_simancas_discover.py",
+      "access_class": "READ_ONLY",
+      "priority": 10,
+      "capabilities": {
+        "search": true,
+        "fetch_record": true,
+        "fetch_page": false,
+        "verify_record": true,
+        "fulltext": false,
+        "images": false,
+        "iiif": false,
+        "browser": false,
+        "auth_required": false
+      },
+      "fallbacks": {
+        "ARCHIVE_NOT_CONFIRMED": "pares_simancas_browser",
+        "TIMEOUT": "pares_simancas_browser",
+        "*": "pares_simancas_browser"
+      }
+    },
+    "pares_simancas_browser": {
+      "repository": "PARES / Archivo General de Simancas",
+      "module": "connectors/pares_browser_search.py",
+      "access_class": "BROWSER",
+      "priority": 20,
+      "capabilities": {
+        "search": true,
+        "fetch_record": false,
+        "fetch_page": false,
+        "verify_record": false,
+        "fulltext": false,
+        "images": true,
+        "iiif": false,
+        "browser": true,
+        "auth_required": false
+      },
+      "fallbacks": {
+        "CAPTCHA": "human_archive_review",
+        "LOGIN_REQUIRED": "human_archive_review",
+        "*": "human_archive_review"
+      }
+    },
+    "moreveneto_browser": {
+      "repository": "Archivio di Stato di Venezia / Moreveneto",
+      "module": "connectors/moreveneto_browser_search.py",
+      "access_class": "BROWSER",
+      "priority": 10,
+      "capabilities": {
+        "search": true,
+        "fetch_record": false,
+        "fetch_page": false,
+        "verify_record": false,
+        "fulltext": false,
+        "images": true,
+        "iiif": false,
+        "browser": true,
+        "auth_required": false
+      },
+      "fallbacks": {
+        "LOGIN_REQUIRED": "human_archive_review",
+        "CAPTCHA": "human_archive_review",
+        "*": "human_archive_review"
+      }
+    },
+    "sias_browser": {
+      "repository": "SIAS / Italian State Archives",
+      "module": "connectors/sias_browser_search.py",
+      "access_class": "BROWSER",
+      "priority": 20,
+      "capabilities": {
+        "search": true,
+        "fetch_record": false,
+        "fetch_page": false,
+        "verify_record": false,
+        "fulltext": false,
+        "images": true,
+        "iiif": false,
+        "browser": true,
+        "auth_required": false
+      },
+      "fallbacks": {
+        "LOGIN_REQUIRED": "human_archive_review",
+        "CAPTCHA": "human_archive_review",
+        "*": "human_archive_review"
+      }
+    },
+    "archives_nationales_open_data": {
+      "repository": "Archives nationales de France",
+      "module": "connectors/archives_nationales_open_data.py",
+      "access_class": "READ_ONLY",
+      "priority": 10,
+      "capabilities": {
+        "search": true,
+        "fetch_record": true,
+        "fetch_page": false,
+        "verify_record": false,
+        "fulltext": false,
+        "images": false,
+        "iiif": false,
+        "browser": false,
+        "auth_required": false
+      },
+      "fallbacks": {
+        "*": "human_archive_review"
+      }
+    }
+  },
+  "rules": [
+    "Connector operational success is not historical verification.",
+    "Fallbacks may change access method but never raise evidence state.",
+    "No connector may emit VERIFIED."
+  ]
+}
