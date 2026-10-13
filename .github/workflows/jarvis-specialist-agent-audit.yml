@@ -1,0 +1,48 @@
+name: JARVIS Specialist Agent Audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/orchestrator/jarvis_specialist_*.py'
+      - 'tools/orchestrator/specialist_agent_registry.json'
+      - '.github/workflows/jarvis-specialist-research.yml'
+      - '.github/workflows/jarvis-specialist-agent-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile specialist agents
+        run: python3 -m py_compile tools/orchestrator/jarvis_specialist_plan.py tools/orchestrator/jarvis_specialist_worker.py tools/orchestrator/jarvis_specialist_aggregate.py
+      - name: Dry plan pirate biography
+        run: |
+          python3 tools/orchestrator/jarvis_specialist_plan.py --target 'Test Pirate' --purpose 'biography research' --date-range '1600-1700' --target-type person --output biography_plan.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('biography_plan.json',encoding='utf-8'))
+          ids={x['agent_id'] for x in d['agents']}
+          required={'pirate_biography','identity_resolution','timeline','relationship_network','contradiction','source_genealogy'}
+          missing=required-ids
+          assert not missing, missing
+          assert d['verified_promotion_allowed'] is False
+          print('BIOGRAPHY PLAN PASS',len(ids))
+          PY
+      - name: Dry plan pirate base
+        run: |
+          python3 tools/orchestrator/jarvis_specialist_plan.py --target 'Test Harbour' --purpose 'pirate base anchorage research' --date-range '1600-1700' --target-type place --output base_plan.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('base_plan.json',encoding='utf-8'))
+          ids={x['agent_id'] for x in d['agents']}
+          required={'pirate_base','identity_resolution','timeline','relationship_network','contradiction','source_genealogy'}
+          missing=required-ids
+          assert not missing, missing
+          assert d['verified_promotion_allowed'] is False
+          print('BASE PLAN PASS',len(ids))
+          PY
