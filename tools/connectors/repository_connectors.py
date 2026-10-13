@@ -438,7 +438,10 @@ def searchculture(q,lane):
     if not key:
         return "API_KEY_REQUIRED",[],"Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
     url="https://www.searchculture.gr/aggregator/api/search.json?"+urllib.parse.urlencode({"apiKey":key,"general_term":q,"page":1,"pageSize":50})
-    d=_json(url);out=[]
+    req=urllib.request.Request(url,headers={**UA,"Accept":"application/json"})
+    with urllib.request.urlopen(req,timeout=45) as resp:
+        d=json.loads(resp.read().decode("utf-8","replace"))
+    out=[]
     for x in d.get("results",[]) or d.get("items",[]) or []:
         uri=x.get("uri") or x.get("id")
         title=x.get("dc_title") or x.get("title")
