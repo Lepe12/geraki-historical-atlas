@@ -49,6 +49,8 @@ def audit(root=Path('evidence/runs')):
                             if isinstance(identity.get(k), dict) and identity[k].get('target')), None)
             human = read(base/'human_review/review_queue.json') or {}
             human_items = {x.get('candidate_id'): x for x in human.get('items', [])}
+            claim_matrix = read(base/'claim_evidence_matrix/claims.json') or {}
+            claim_items = {x.get('candidate_id'): x for x in claim_matrix.get('claims', [])}
             inspection = read(base/'original_inspection/inspection_queue.json') or {}
             genealogy = read(base/'source_genealogy/genealogy_queue.json') or {}
             corroboration = read(base/'corroboration/corroboration_queue.json') or {}
@@ -63,6 +65,7 @@ def audit(root=Path('evidence/runs')):
                 else:
                     routing = {'decision': 'REVIEW_CONTEXT', 'reason': 'PRESERVED_REQUEST_CONTEXT_MISSING'}
                 review = human_items.get(c.get('candidate_id'), {})
+                claim = claim_items.get(c.get('candidate_id'), {})
                 checks = {
                     'bibliographic_identity': bool(c.get('identifier') or c.get('url')),
                     'exact_page_mapping': any(p.get('printed_page') is not None and
@@ -79,6 +82,10 @@ def audit(root=Path('evidence/runs')):
                         support.get(c.get('candidate_id'), {}).get('independent_supporting_chains') and c.get('corroboration_evidence')),
                     'human_review_attestation': bool(review.get('reviewer') and review.get('reviewed_utc') and
                         review.get('evidence_examined') and review.get('decision')),
+                    'claim_matrix_present': bool(claim),
+                    'contradiction_search_assessed': bool(claim and claim.get('contradiction_search_status') not in (None,'NOT_ASSESSED')),
+                    'uncertainties_recorded': bool(claim and isinstance(claim.get('uncertainties'), list)),
+                    'falsification_targets_recorded': bool(claim and claim.get('falsification_targets')),
                 }
                 key = str(c.get('identifier') or c.get('url') or c.get('source_file') or source_path+'#'+str(number))
                 row = {'run_id': base.parent.name, 'lane': lane, 'candidate_id': c.get('candidate_id'),
