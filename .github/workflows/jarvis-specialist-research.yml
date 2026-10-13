@@ -134,8 +134,11 @@ jobs:
           mkdir -p "$dest"
           cp SPECIALIST_AGGREGATE.json "$dest/"
           cp -R normalized "$dest/agents"
-          find specialist_results -path '*/command_center/*' -type f -exec sh -c 'mkdir -p "$0/command_center"; cp "$1" "$0/command_center/$(basename "$(dirname "$(dirname "$1")")")-$(basename "$1")"' "$dest" {} \;
-          find specialist_results -name task_history.jsonl -type f -exec sh -c 'cat "$1" >> "$0/TASK_HISTORY.jsonl"' "$dest" {} \;
+          cp -R specialist_results "$dest/raw_agents"
+          : > "$dest/TASK_HISTORY.jsonl"
+          find specialist_results -name task_history.jsonl -type f -print0 | while IFS= read -r -d '' f; do
+            cat "$f" >> "$dest/TASK_HISTORY.jsonl"
+          done
           git config user.name "jarvis-orchestrator[bot]"
           git config user.email "jarvis-orchestrator@users.noreply.github.com"
           git add "$dest"
