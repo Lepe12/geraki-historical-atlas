@@ -9,7 +9,7 @@ This repository is the durable research engine. ChatGPT or any other UI is only 
 
 ## 2. Durable components
 1. **GitHub repository** — code, workflows, connectors, doctrine, schemas and recovery documentation.
-2. **Airtable research database** — structured SOURCES, EVENTS, PLACES, ROUTES and RESEARCH JOBS.
+2. **Dedicated MariaDB database `piratecartography`** — host-local durable research runs, reports, source/event candidates and provenance. Existing Airtable data remains a legacy snapshot and separate Atlas consumer; it is not the default agent-results writer.
 3. **Evidence Store** — durable copies of legally/technically retrievable manifests, OCR/full text, acquisition reports and exact-page images/PDFs. GitHub Actions artifacts are transient transport/cache and MUST NOT be the sole copy.
 4. **UI/client** — ChatGPT today; replaceable. No canonical evidence or unique system state may live only in chat memory.
 
@@ -103,8 +103,12 @@ evidence/<research_job_id>/<source_id>/reports/
 
 Large binaries should NOT be committed blindly to normal Git history. Use a durable object store/library; retain manifests/checksums/indexes in the repository/database.
 
-## 8. Airtable canonical base
-Base: appML9NlhzlVMoGjb
+## 8. Structured storage — MariaDB primary, Airtable legacy
+Primary research-results database: `piratecartography` on the existing Top.Host server.
+Adapter and recovery: `docs/MARIADB_RESEARCH_STORAGE.md`, `tools/storage/pct_research_store.php`, `tools/storage/schema.sql`.
+The host-local importer preserves GitHub run reports and never promotes evidence to VERIFIED.
+
+Legacy Airtable base: appML9NlhzlVMoGjb
 Tables:
 - PLACES tbluvDJfE42j5qxMa
 - SOURCES tblVnmghyTX7B2EgD
@@ -119,7 +123,7 @@ If ChatGPT/UI disappears:
 1. Clone this repository.
 2. Read this file and docs/general-research-doctrine.md.
 3. Restore required repository secrets/connections.
-4. Confirm Airtable base/table schema from the versioned schema snapshot.
+4. Restore the dedicated MariaDB adapter and additive schema, then import the preserved GitHub run trees. Confirm the legacy Airtable schema/snapshot only when restoring migrated records or the existing Atlas consumer.
 5. Confirm Evidence Store credentials/location and checksum index.
 6. Run positive controls before research:
    - BSB: bsb10447069 must resolve to a valid manifest and retrievable scan while available upstream.
@@ -135,7 +139,7 @@ No irreplaceable component may exist in only one of:
 - a temporary runner filesystem,
 - a single external URL.
 
-Canonical code/specification lives in GitHub; structured research state in Airtable plus schema snapshots; acquired evidence in durable Evidence Store plus checksums/indexes.
+Canonical code/specification lives in GitHub; primary research-results state in the dedicated MariaDB database with versioned compressed payloads and import audit; legacy Airtable records retain schema/record snapshots; acquired evidence stays in the durable Evidence Store with checksums/indexes.
 
 ## 11. Hardening status
 Completed:
@@ -160,3 +164,10 @@ It preserves base/table/field IDs, names, types, descriptions and link-field str
 ## 12. Airtable durable record backup
 Workflow: `.github/workflows/airtable-durable-backup.yml`.
 The first live backup succeeded in GitHub Actions run 38243014838 and commit `711076fc328d37daa59d3aa487e6056aa22a36fb`, under `backups/airtable/records/20261012T113000Z/`. The snapshot contains PLACES, SOURCES, EVENTS, ROUTES, RESEARCH_JOBS and a manifest. Scheduled backups use the repository secret `AIRTABLE_TOKEN` and never expose the token in repository files.
+
+
+## 13. Host-local MariaDB results persistence
+
+The research workflow defaults to `PCT_STORAGE_BACKEND=mariadb`. Durable lane results are committed to GitHub and queued through `MARIADB_STORAGE_INTENT.json`; the hosting-local importer writes them to the dedicated database. The queue report never claims that a database write already happened. Actual import, read-back, idempotency and recurring-task evidence are in the host-local storage audit and `docs/MARIADB_RESEARCH_STORAGE.md`.
+
+No public writer API, open database port, WordPress changes, or embedded DB credentials are required. The five additive `pc_research_*` tables preserve research jobs, document versions, compressed original payloads, searchable candidates and import history. Existing `pc_mig_*` tables stay intact. Airtable synchronization is an explicit rollback mode, not a second default writer.

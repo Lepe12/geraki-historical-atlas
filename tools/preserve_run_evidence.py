@@ -2,15 +2,15 @@
 """Preserve research evidence in GitHub, including large files via deterministic chunks."""
 import argparse, hashlib, json, pathlib, shutil, datetime
 p=argparse.ArgumentParser();p.add_argument("--run-id",required=True);p.add_argument("--lane",required=True);a=p.parse_args()
-roots=["research_lanes","repository_plans","lane_discovery","iiif_candidate_requests","library_acquisition","citation_chase_hits","event_first_hits","exact_page_acquisition","original_inspection","source_genealogy","corroboration","human_review","verification","qa","structured_output","research_dossier","run_manifest","system_health"]
+roots=["research_request_identity.json","research_lanes","repository_plans","lane_discovery","library_discovery","citation_chase_candidates","iiif_candidate_requests","library_acquisition","citation_chase_hits","event_first_hits","exact_page_acquisition","original_inspection","source_genealogy","corroboration","human_review","verification","qa","structured_output","research_dossier","run_manifest","system_health"]
 dest=pathlib.Path("evidence/runs")/a.run_id/a.lane;dest.mkdir(parents=True,exist_ok=True)
 items=[];chunk_size=20*1024*1024
 for root in roots:
  src=pathlib.Path(root)
  if not src.exists(): continue
- for f in src.rglob("*"):
+ for f in ([src] if src.is_file() else src.rglob("*")):
   if not f.is_file(): continue
-  rel=pathlib.Path(root)/f.relative_to(src);size=f.stat().st_size
+  rel=pathlib.Path(root) if src.is_file() else pathlib.Path(root)/f.relative_to(src);size=f.stat().st_size
   if size<=chunk_size:
    out=dest/rel;out.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(f,out);b=out.read_bytes()
    items.append({"path":str(out.relative_to(pathlib.Path("evidence"))),"bytes":len(b),"sha256":hashlib.sha256(b).hexdigest(),"storage":"direct"})

@@ -32,6 +32,8 @@ env:
   PCT_ALIASES: ${{ inputs.aliases }}
   PCT_DATE_RANGE: ${{ inputs.date_range }}
   PCT_PURPOSE: ${{ inputs.purpose }}
+  # Host-local MariaDB is primary. Airtable is retained only as an explicit legacy option.
+  PCT_STORAGE_BACKEND: mariadb
 
 jobs:
   prepare:
@@ -205,7 +207,18 @@ jobs:
             sleep $((n*2))
           done
           exit 1
-      - name: Synchronize safe research state to Airtable
+      - name: Queue host-local MariaDB persistence
+        if: env.PCT_STORAGE_BACKEND == 'mariadb'
+        env:
+          PCT_RUN_ID: ${{ github.run_id }}
+        run: |
+          python3 tools/storage/queue_mariadb_storage.py
+          git add "evidence/runs/${{ github.run_id }}/MARIADB_STORAGE_INTENT.json"
+          git diff --cached --quiet || git commit -m "Queue MariaDB persistence: run ${{ github.run_id }}"
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Synchronize legacy research state to Airtable
+        if: env.PCT_STORAGE_BACKEND == 'airtable'
         env:
           AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
           PCT_RUN_ID: ${{ github.run_id }}

@@ -7,9 +7,12 @@ The hosting-local CLI importer reads a pinned Git commit and writes those output
 existing dedicated `piratecartography` database. This is a storage adapter for the
 existing engine, not another backend, hosted plugin, or new agent runner.
 
-Deployment status: implementation prepared; live database validation is required before
-changing the research workflow's primary backend. The installed status is recorded in
-the hosting-local audit and `piratecartography-system/pct-research-storage-last.json`.
+Live validation on 2026-10-13: schema install, real write/read/idempotency tests and
+backfill succeeded in the dedicated database. The first full backfill stored 67 runs,
+19,738 document records, 28,035 source-candidate records and 1,519 event candidates,
+with zero blocked imports and zero automatically verified items. These counts are a
+validation snapshot, not a fixed expectation for future runs. The installed status is
+recorded in the hosting-local audit and `piratecartography-system/pct-research-storage-last.json`.
 
 ## Security and scope
 
@@ -45,22 +48,25 @@ invented to conceal legacy or partial data.
 
 ## Host-local commands
 
-Run through Plesk Scheduled Tasks using the existing hosting system user:
+Run through Plesk Scheduled Tasks using the existing hosting system user and the
+verified PHP 8.4 CLI at `/opt/plesk/php/8.4/bin/php`. The default `/usr/bin/php`
+on this host is PHP 7.2 and must not be used for this adapter:
 
 ```sh
-php /var/www/vhosts/piratecartography.com/piratecartography-gateway/tools/storage/pct_research_store.php install
-php /var/www/vhosts/piratecartography.com/piratecartography-gateway/tools/storage/pct_research_store.php self-test-parser
-php /var/www/vhosts/piratecartography.com/piratecartography-gateway/tools/storage/pct_research_store.php self-test-db
-php /var/www/vhosts/piratecartography.com/piratecartography-gateway/tools/storage/pct_research_store.php sync
-php /var/www/vhosts/piratecartography.com/piratecartography-gateway/tools/storage/pct_research_store.php status
-php /var/www/vhosts/piratecartography.com/piratecartography-gateway/tools/storage/pct_research_store.php job RUN_ID
-php /var/www/vhosts/piratecartography.com/piratecartography-gateway/tools/storage/pct_research_store.php search TERM
-php /var/www/vhosts/piratecartography.com/piratecartography-gateway/tools/storage/pct_research_store.php document RUN_ID evidence/runs/RUN_ID/LANE/REPORT.json
+/opt/plesk/php/8.4/bin/php /var/www/vhosts/piratecartography.com/piratecartography-gateway/tools/storage/pct_research_store.php install
+/opt/plesk/php/8.4/bin/php /var/www/vhosts/piratecartography.com/piratecartography-gateway/tools/storage/pct_research_store.php self-test-parser
+/opt/plesk/php/8.4/bin/php /var/www/vhosts/piratecartography.com/piratecartography-gateway/tools/storage/pct_research_store.php self-test-db
+/opt/plesk/php/8.4/bin/php /var/www/vhosts/piratecartography.com/piratecartography-gateway/tools/storage/pct_research_store.php sync
+/opt/plesk/php/8.4/bin/php /var/www/vhosts/piratecartography.com/piratecartography-gateway/tools/storage/pct_research_store.php status
+/opt/plesk/php/8.4/bin/php /var/www/vhosts/piratecartography.com/piratecartography-gateway/tools/storage/pct_research_store.php job RUN_ID
+/opt/plesk/php/8.4/bin/php /var/www/vhosts/piratecartography.com/piratecartography-gateway/tools/storage/pct_research_store.php search TERM
+/opt/plesk/php/8.4/bin/php /var/www/vhosts/piratecartography.com/piratecartography-gateway/tools/storage/pct_research_store.php document RUN_ID evidence/runs/RUN_ID/LANE/REPORT.json
 ```
 
 `sync --no-fetch` uses the already fetched commit. `sync --run=RUN_ID` isolates a real
 run for a live test. `self-test-db` checks actual write/read/idempotency and rolls back
-its test transaction. `document` checks the uncompressed SHA-256 before returning bytes.
+its test transaction. `document` checks the uncompressed SHA-256 before returning original bytes.
+`verify-run RUN_ID` checks every stored text against both its SHA-256 and original Git blob identity.
 
 Only add a recurring task after schema install, a real run import and a read-back pass.
 Recommended schedule: every five minutes, no email notification, stdout/stderr redirected

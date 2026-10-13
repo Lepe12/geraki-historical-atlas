@@ -195,7 +195,18 @@ try {
     } elseif ($action==='document') {
         $row=query($db,'SELECT d.payload_sha256,p.compressed_payload FROM pc_research_documents d JOIN pc_research_payloads p ON p.sha256=d.payload_sha256 WHERE d.run_id=? AND d.source_path=? AND d.is_current=1',[$argv[2]??'',$argv[3]??''])->fetch();
         if (!$row) throw new RuntimeException('TEXT_DOCUMENT_NOT_FOUND');
-        $raw=gzdecode($row['compressed_payload']); if ($raw===false||hash('sha256',$raw)!==$row['payload_sha256']) throw new RuntimeException('PAYLOAD_CHECKSUM_FAILED'); echo $raw,PHP_EOL;
+        $raw=gzdecode($row['compressed_payload']); if ($raw===false||hash('sha256',$raw)!==$row['payload_sha256']) throw new RuntimeException('PAYLOAD_CHECKSUM_FAILED'); echo $raw;
+    } elseif ($action==='verify-run') {
+        $run=$argv[2]??'';
+        if (!query($db,'SELECT run_id FROM pc_research_runs WHERE run_id=?',[$run])->fetchColumn()) throw new RuntimeException('JOB_NOT_FOUND');
+        $rows=query($db,'SELECT d.git_blob,d.byte_count,d.payload_sha256,p.compressed_payload FROM pc_research_documents d JOIN pc_research_payloads p ON p.sha256=d.payload_sha256 WHERE d.run_id=? AND d.is_current=1',[$run]);
+        $checked=0;
+        while ($row=$rows->fetch()) {
+            $raw=gzdecode($row['compressed_payload']);
+            if ($raw===false || strlen($raw)!==(int)$row['byte_count'] || hash('sha256',$raw)!==$row['payload_sha256'] || sha1('blob '.strlen($raw).chr(0).$raw)!==$row['git_blob']) throw new RuntimeException('STORED_DOCUMENT_INTEGRITY_FAILED');
+            $checked++;
+        }
+        emit(['status'=>'PASS','run_id'=>$run,'stored_documents_verified_against_git_bytes'=>$checked,'binary_reference_bytes_checked'=>false]);
     } elseif ($action==='self-test-db') {
         $db->beginTransaction(); $raw='{"control":"storage-roundtrip","verified":false}';
         $before=(int)$db->query('SELECT COUNT(*) FROM pc_research_payloads')->fetchColumn(); $sha=payload($db,$raw); payload($db,$raw);
