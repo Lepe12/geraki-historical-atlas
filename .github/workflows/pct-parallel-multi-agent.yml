@@ -56,6 +56,8 @@ jobs:
           print("request_sha256="+d["request_sha256"])
           print("research_job_id="+d["research_job_id"])
           PY
+      - name: Compile Python research code
+        run: python3 -m compileall -q tools
       - name: Run core scientific benchmark
         run: python3 tools/scientific_benchmark.py
       - name: Build and validate ten lane payloads
