@@ -1,0 +1,123 @@
+name: JARVIS Archive Escalation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'jarvis_escalation_requests/*.json'
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      request_file: ${{ steps.req.outputs.request_file }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - id: req
+        shell: bash
+        run: |
+          mapfile -t changed < <(git diff-tree --no-commit-id --name-only -r HEAD -- 'jarvis_escalation_requests/*.json')
+          if [ "${#changed[@]}" -ne 1 ]; then echo 'Expected one escalation request' >&2; exit 1; fi
+          echo "request_file=${changed[0]}" >> "$GITHUB_OUTPUT"
+      - id: plan
+        env:
+          REQUEST_FILE: ${{ steps.req.outputs.request_file }}
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          d=json.load(open(os.environ['REQUEST_FILE'],encoding='utf-8'))
+          routes=d.get('routes',[])
+          if not routes: raise SystemExit('NO_ESCALATION_ROUTES')
+          print('matrix='+json.dumps(routes,separators=(',',':')))
+          PY
+
+  search:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        item: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+      max-parallel: 3
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Load request
+        env:
+          REQUEST_FILE: ${{ needs.prepare.outputs.request_file }}
+        run: |
+          python3 - <<'PY' >> "$GITHUB_ENV"
+          import json,os
+          d=json.load(open(os.environ['REQUEST_FILE'],encoding='utf-8'))
+          def clean(x): return str(x).replace('\n',' ').replace('\r',' ').strip()
+          print('PCT_PARENT_RUN_ID='+clean(d.get('parent_run_id','')))
+          print('PCT_TARGET='+clean(d.get('target','')))
+          print('PCT_ALIASES='+clean('|'.join(d.get('aliases',[]))))
+          PY
+      - name: Run Moreveneto browser escalation
+        if: matrix.item.route == 'moreveneto_browser'
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright
+          python -m playwright install --with-deps chromium
+          mkdir -p escalation_output
+          { python connectors/moreveneto_browser_search.py "$PCT_TARGET" || true; } > escalation_output/result.txt 2>&1
+      - name: Run PARES Simancas dynamic escalation
+        if: matrix.item.route == 'pares_simancas_dynamic'
+        run: |
+          mkdir -p escalation_output
+          { python connectors/pares_simancas_discover.py "$PCT_TARGET" --limit 5 --max-pages 8 || true; } > escalation_output/result.txt 2>&1
+      - name: Queue unresolved generic SIAS browser escalation
+        if: matrix.item.route == 'manual_browser_queue'
+        run: |
+          mkdir -p escalation_output
+          python3 - <<'PY' > escalation_output/result.txt
+          import json,os
+          print(json.dumps({
+            'status':'BROWSER_AGENT_REQUIRED',
+            'target':os.environ.get('PCT_TARGET',''),
+            'repository':'SIAS / Italian State Archives',
+            'note':'No safe generic automated SIAS browser connector is currently available. Preserve as explicit escalation; do not claim repository searched.'
+          },ensure_ascii=False,indent=2))
+          PY
+      - name: Persist escalation result
+        env:
+          ROUTE: ${{ matrix.item.route }}
+          LANE: ${{ matrix.item.lane }}
+        run: |
+          set -euo pipefail
+          dest="evidence/escalations/$PCT_PARENT_RUN_ID/$LANE-$ROUTE"
+          mkdir -p "$dest"
+          cp escalation_output/result.txt "$dest/result.txt"
+          python3 - <<'PY' > "$dest/metadata.json"
+          import json,os,datetime
+          print(json.dumps({
+            'schema':'pct-jarvis-escalation-result-v1',
+            'parent_run_id':os.environ['PCT_PARENT_RUN_ID'],
+            'lane':os.environ['LANE'],
+            'route':os.environ['ROUTE'],
+            'target':os.environ.get('PCT_TARGET',''),
+            'created_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            'verified':False,
+            'rule':'Discovery/browser escalation output is not historical verification.'
+          },indent=2))
+          PY
+          git config user.name "jarvis-escalation[bot]"
+          git config user.email "jarvis-escalation@users.noreply.github.com"
+          git add "$dest"
+          git commit -m "JARVIS archive escalation: $PCT_PARENT_RUN_ID $LANE $ROUTE"
+          for n in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            sleep $((n*2))
+          done
+          exit 1
