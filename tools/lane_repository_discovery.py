@@ -48,6 +48,17 @@ results=[];attempts=[]
 for r in plan["repositories"]:
     name=r["name"]; repo_records=[]; statuses=[]; diagnostics=[]
     repo_terms=list(terms)
+    if lane=="travellers" and name in ("Gallica/BnF","BSB","Internet Archive","Google Books"):
+        ys=[x for x in str(plan.get("date_range","")).replace("-"," ").split() if x.isdigit()]
+        names=[str(plan.get("target") or "").strip()]+[str(x).strip() for x in plan.get("aliases",[]) if str(x).strip()]
+        focused=[]
+        for n in names:
+            if not n: continue
+            focused.append(n)
+            focused.append(f'"{n}" pirate')
+            focused.append(f'"{n}" corsair')
+            if ys: focused.append(f'"{n}" {ys[0]}')
+        repo_terms=list(dict.fromkeys(focused))[:int(os.getenv("PCT_TRAVELLERS_REPO_QUERY_LIMIT","16"))]
     if name=="SearchCulture.gr / EKT":
         greek_names=[x for x in [plan.get("target")]+plan.get("aliases",[]) if any("\u0370"<=ch<="\u03ff" for ch in str(x))]
         base_name=greek_names[0] if greek_names else plan.get("target")
