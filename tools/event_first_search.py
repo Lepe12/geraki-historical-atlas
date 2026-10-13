@@ -35,6 +35,28 @@ def event_matches(text):
 def scoped_years(text):
     return sorted(set(int(y) for y in re.findall(r"\b(1[0-9]{3}|20[0-9]{2})\b",text) if lo<=int(y)<=hi))
 
+def dedupe_ocr(items):
+    merged={}
+    for x in items:
+        key=(x.get("file"),str(x.get("place_match","")).casefold(),tuple(x.get("years_in_scope") or []),tuple(sorted(str(t).casefold() for t in x.get("event_terms") or [])))
+        if key not in merged:
+            y=dict(x);y["occurrence_count"]=1;y["lines"]=[x.get("line")] if x.get("line") else [];merged[key]=y
+        else:
+            y=merged[key];y["occurrence_count"]+=1
+            if x.get("line") and x.get("line") not in y["lines"]:y["lines"].append(x.get("line"))
+    return list(merged.values())
+
+def dedupe_catalogue(items):
+    merged={}
+    for x in items:
+        key=(x.get("repository"),x.get("identifier") or x.get("url"),tuple(x.get("years_in_scope") or []),tuple(sorted(str(t).casefold() for t in x.get("event_terms") or [])),x.get("status"))
+        if key not in merged:
+            y=dict(x);y["occurrence_count"]=1;merged[key]=y
+        else:
+            merged[key]["occurrence_count"]+=1
+    return list(merged.values())
+
+
 root=pathlib.Path("library_acquisition");out=pathlib.Path("event_first_hits");out.mkdir(exist_ok=True)
 hits=[];context_leads=[];catalogue_leads=[]
 for p in root.glob("*"):
@@ -74,9 +96,9 @@ if disc_path.exists():
           "lead_type":"CATALOGUE_METADATA","context_excerpt":blob[:12000]
         })
 
-report={"schema":"pct-event-first-general-v4","request_file":rf.name,"target":target,"aliases":aliases,
+hits=dedupe_ocr(hits)\ncontext_leads=dedupe_ocr(context_leads)\ncatalogue_leads=dedupe_catalogue(catalogue_leads)\n\nreport={"schema":"pct-event-first-general-v5","request_file":rf.name,"target":target,"aliases":aliases,
  "date_range":[lo,hi],"hits":hits,"context_leads":context_leads,"catalogue_leads":catalogue_leads,
  "verification_status":"NEEDS_EVIDENCE","next_stage":"EXACT_PAGE_MAPPING_AND_ORIGINAL_INSPECTION",
- "rule":"OCR and catalogue metadata are discovery leads only. Actor identity is not required."}
+ "rule":"OCR and catalogue metadata are discovery leads only. Repeated occurrences within one source/signature are deduplicated and counted, not treated as independent findings. Actor identity is not required."}
 (out/"event_hits.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
 print("GENERAL EVENT-FIRST",target,date,"anchored_hits",len(hits),"catalogue_leads",len(catalogue_leads),"unresolved_context_leads",len(context_leads))
