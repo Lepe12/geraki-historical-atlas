@@ -8,7 +8,7 @@ preserved in the repository plan for audit.
 """
 EVENT_TERMS={
  "travellers":["pirate","corsair","privateer","raid","captivity","ransom","pillage","πειρατής","πειρατές","κουρσάρος","κουρσάροι","επιδρομή","αιχμαλωσία","λύτρα","λεηλασία","κατάληψη","ρεσάλτο"],
- "spanish_simancas":["pirata","corsario","incursión","saqueo","cautivo","rescate","armada"],
+ "spanish_simancas":["pirata","corsario","incursión","saqueo","cautivo","rescate","armada","galera","galeras","navío","navíos"],
  "venetian":["pirata","corsaro","incursione","saccheggio","schiavo","riscatto","armata"],
  "french":["pirate","corsaire","forban","incursion","pillage","captivité","rançon"],
  "british":["pirate","corsair","privateer","raid","plunder","captivity","ransom"],
@@ -16,7 +16,7 @@ EVENT_TERMS={
  "german":["Pirat","Seeräuber","Kaper","Angriff","Plünderung","Gefangene","Lösegeld"],
  "italian_states":["pirata","corsaro","incursione","saccheggio","schiavo","riscatto"],
  "ottoman":["korsan","levend","akın","esir","fidye","donanma"],
- "north_african":["corsaire","pirata","corsario","ghazwa","captif","esclave","rançon"]
+ "north_african":["corsaire","pirata","corsario","ghazwa","captif","esclave","rançon","galera","galeras","navío","navíos"]
 }
 def expand_queries(lane,target,aliases,date_range="",max_queries=0):
     names=[]
