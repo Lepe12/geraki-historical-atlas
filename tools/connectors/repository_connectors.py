@@ -156,17 +156,20 @@ def tna_public_content(q,lane):
     url=base+"/search/results/?"+urllib.parse.urlencode({"_q":q})
     def keep(u,t):
         try:
-            p=urllib.parse.urlsplit(u).path.lower()
+            parts=urllib.parse.urlsplit(u)
+            p=parts.path.lower()
         except Exception:
             return False
-        allowed=(
-          "/education/resources/" in p or
-          "/explore-the-collection/stories/" in p or
-          "/the-collection-blog/" in p or
-          "/help-with-your-research/research-guides/" in p or
-          "/help-with-your-research/discovery-help/" in p
+        if parts.query:
+            return False
+        patterns=(
+          r"^/education/resources/[^/]+/[^/]+/?$",
+          r"^/explore-the-collection/stories/[^/]+/?$",
+          r"^/the-collection-blog/[^/]+/?$",
+          r"^/help-with-your-research/research-guides/[^/]+/?$",
+          r"^/help-with-your-research/discovery-help/[^/]+/?$",
         )
-        return allowed and len(t)>3
+        return any(re.match(pat,p) for pat in patterns) and len(t)>3
     rows=_html_search(url,"The National Archives Public Content",lane,base,keep,max_records=20)
     out=[]
     for row in rows:
