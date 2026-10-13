@@ -98,12 +98,15 @@ if disc_path.exists():
         # For a dated request, metadata without an in-scope date remains a lead
         # but does not become a structured event candidate.
         status="CATALOGUE_METADATA_LEAD" if ys or not years else "TEMPORAL_CONTEXT_UNRESOLVED"
+        m0=pm[0]
+        a=max(0,m0.start()-6000);b=min(len(blob),m0.end()+10000)
+        local_blob=blob[a:b]
         catalogue_leads.append({
           "repository":rec.get("discovery_repository"),"identifier":rec.get("identifier"),
-          "url":rec.get("url"),"title":rec.get("title"),"place_match":pm[0].group(0),
+          "url":rec.get("url"),"title":rec.get("title"),"place_match":m0.group(0),
           "years_in_scope":ys,"event_terms":sorted(set(e.group(0) for e in em),key=str.casefold),
           "status":status,"verification_status":"NOT_ORIGINAL_VERIFIED",
-          "lead_type":"CATALOGUE_METADATA","context_excerpt":blob[:12000]
+          "lead_type":"CATALOGUE_METADATA","context_excerpt":local_blob
         })
 
 hits=dedupe_ocr(hits)
