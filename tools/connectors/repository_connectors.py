@@ -217,16 +217,16 @@ def tna_public_content(q,lane):
     candidates=[];seen=set()
     for hub in hub_urls:
         try:
-            for r in _html_search(hub,"The National Archives Public Content",lane,base,keep,max_records=80):
+            for r in _html_search(hub,"The National Archives Public Content",lane,base,keep,max_records=400):
                 k=r.get("url")
                 if k and k not in seen:
                     seen.add(k);candidates.append(r)
         except Exception:
             continue
     # Bound the fallback crawl and fetch concurrently.
-    candidates=candidates[:80]
+    candidates=candidates[:180]
     enriched=[]
-    with ThreadPoolExecutor(max_workers=8) as ex:
+    with ThreadPoolExecutor(max_workers=12) as ex:
         futs=[ex.submit(_tna_fetch_page,r) for r in candidates]
         for fut in as_completed(futs):
             try: enriched.append(fut.result())
