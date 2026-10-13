@@ -1,0 +1,32 @@
+name: JARVIS Command Center UI Audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'command-center/**'
+      - 'tools/orchestrator/jarvis_command_center_server.py'
+      - '.github/workflows/jarvis-command-center-ui-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate static UI files
+        run: |
+          test -s command-center/index.html
+          test -s command-center/command-center.css
+          test -s command-center/command-center.js
+          node --check command-center/command-center.js
+      - name: Compile command center backend
+        run: python3 -m py_compile tools/orchestrator/jarvis_command_center_server.py
+      - name: Assert scientific safety labels
+        run: |
+          grep -q 'Automatic VERIFIED' command-center/index.html
+          grep -q 'DISABLED' command-center/index.html
+          grep -q 'Scientific QA' command-center/index.html
