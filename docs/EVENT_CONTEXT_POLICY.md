@@ -15,14 +15,15 @@ maritime context. Cultural collisions are retained in the context review queue.
 Supplied aliases and OCR years stay provisional, with no automatic geographic
 equivalence or calendar conversion. Undated relevant leads remain reviewable.
 
-Seven regression groups include the three observed false positives and six
+Eight regression groups include the three observed false positives and six
 explicitly synthetic multilingual positive routing sentences. These sentences
 are not historical evidence. Passing the suite establishes these bounded
 behaviors; it does not establish universal historical precision or recall.
 
 The existing system-health step appends a retrospective machine review of all
 preserved candidate files readable in its checkout. Each decision includes the
-original file path and SHA-256. Missing request identities/parsing failures are
+original file path and SHA-256. Both normalized_request and older
+normalized_context/research_request envelopes are read. Missing identities/parsing failures are
 reported as NOT_REASSESSED. Original candidate records, acquired evidence,
 human review and VERIFIED flags are never overwritten. The report is preserved
 in the current run's SYSTEM_HEALTH.json and imported as a document by the

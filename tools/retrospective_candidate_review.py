@@ -16,7 +16,10 @@ def review(root=Path('evidence/runs')):
             lane=lane_root.name
             identity=lane_root/'research_lanes'/f'{lane}.json'
             if not identity.exists(): identity=lane_root/'research_request_identity.json'
-            request=json.loads(identity.read_text(encoding='utf-8'))['normalized_request']
+            identity_data=json.loads(identity.read_text(encoding='utf-8'))
+            request=next((identity_data[key] for key in ('normalized_request','normalized_context','research_request')
+                          if isinstance(identity_data.get(key),dict) and identity_data[key].get('target')),None)
+            if request is None: raise KeyError('PRESERVED_REQUEST_CONTEXT_MISSING')
             years=[int(y) for y in re.findall(r'\b(?:1[0-9]{3}|20[0-9]{2})\b',request.get('date_range',''))]
             lo,hi=(min(years),max(years)) if years else (0,9999)
             files+=1

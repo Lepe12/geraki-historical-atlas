@@ -2,11 +2,26 @@
 import json
 from pathlib import Path
 import unittest
+import tempfile
+from retrospective_candidate_review import review
 from candidate_context import assess, catalogue_assess, review_preserved
 from evidence_model import normalize_date, toponym_identity
 
 
 class ContextPolicy(unittest.TestCase):
+    def test_legacy_preserved_request_context_is_reassessed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)/'runs';lane=root/'123/travellers'
+            (lane/'structured_output').mkdir(parents=True);(lane/'research_lanes').mkdir()
+            request={'target':'Milos','aliases':['Milo'],'date_range':'1660-1680'}
+            (lane/'research_lanes/travellers.json').write_text(json.dumps({'normalized_context':request}))
+            source=lane/'structured_output/candidate_events.json'
+            source.write_text(json.dumps({'events':[{'candidate_id':'fixture','source_type':'OCR_CONTEXT','context_excerpt':'In 1677 pirates attacked the island of Milo.','verified':False}]}))
+            before=source.read_bytes();result=review(root)
+            self.assertEqual(result['candidate_records_reviewed'],1)
+            self.assertEqual(result['not_reassessed'],[])
+            self.assertEqual(source.read_bytes(),before)
+
     def test_observed_false_positives(self):
         fixture=json.loads((Path(__file__).resolve().parent.parent/'tests/fixtures/context_false_positives.json').read_text())
         req=fixture['request']
