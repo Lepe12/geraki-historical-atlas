@@ -31,7 +31,8 @@ expected_positive=bool(case.get("label"))
 year=case.get("expected_year")
 entity=case.get("expected_entity")
 place=case.get("expected_place")
-family=case.get("expected_event_family")\nrequired_terms=case.get("expected_required_terms") or []
+family=case.get("expected_event_family")
+required_terms=case.get("expected_required_terms") or []
 
 def norm_text(s):
     s=unicodedata.normalize("NFKD",str(s))
@@ -75,6 +76,7 @@ for e in events:
     if place and not term_match(e,place):continue
     if not date_match(e):continue
     if not family_match(e):continue
+    if any(not term_match(e,t) for t in required_terms):continue
     matched.append(e)
 
 detected_any=bool(events)
@@ -120,7 +122,8 @@ report={
  "false_positive_rate":(fp/(fp+tn)) if (fp+tn) else None,
  "date_error":bool(expected_positive and any(term_match(e,entity) if entity else True for e in events) and year and not any(date_match(e) for e in events)),
  "entity_error":bool(expected_positive and entity and events and not any(term_match(e,entity) for e in events)),
- "place_error":bool(expected_positive and place and events and not any(term_match(e,place) for e in events)),\n "required_terms_error":bool(expected_positive and required_terms and events and not any(all(term_match(e,t) for t in required_terms) for e in events)),
+ "place_error":bool(expected_positive and place and events and not any(term_match(e,place) for e in events)),
+ "required_terms_error":bool(expected_positive and required_terms and events and not any(all(term_match(e,t) for t in required_terms) for e in events)),
  "unsupported_claim_rate":0.0 if not any(e.get("verified") for e in events) else None,
  "missing_lane_outputs":missing,
  "repository_execution":repos,
