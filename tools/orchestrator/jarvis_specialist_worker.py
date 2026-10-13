@@ -5,7 +5,7 @@ import argparse,json,subprocess,sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parent.parent
 sys.path.insert(0,str(ROOT/"connectors"))
-from connectors.connector_registry import eligible
+from connector_registry import eligible
 
 def run_one(agent:dict, connector_limit:int=3):
     outputs=[]
