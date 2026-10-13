@@ -67,6 +67,19 @@ for r in plan["repositories"]:
         repo_terms.append(f'"{target}" pirate')
         if aliases and ys: repo_terms.append(f'"{aliases[0]}" {ys[0]}')
         repo_terms=list(dict.fromkeys(q for q in repo_terms if q))[:int(os.getenv("PCT_LOC_QUERY_LIMIT","4"))]
+    if name=="Biblioteca Digital Hispánica":
+        ys=[x for x in str(plan.get("date_range","")).replace("-"," ").split() if x.isdigit()]
+        target=str(plan.get("target") or "").strip()
+        aliases=[str(x).strip() for x in plan.get("aliases",[]) if str(x).strip()]
+        names=[target]+aliases[:2]
+        repo_terms=[]
+        for n in names:
+            if not n: continue
+            repo_terms.append(n)
+            if ys: repo_terms.append(f'"{n}" {ys[0]}')
+            repo_terms.append(f'"{n}" galeras')
+            repo_terms.append(f'"{n}" corsario')
+        repo_terms=list(dict.fromkeys(repo_terms))[:int(os.getenv("PCT_BNE_QUERY_LIMIT","8"))]
     for q in repo_terms:
         try:
             if name=="Internet Archive":
