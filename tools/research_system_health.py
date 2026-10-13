@@ -32,6 +32,11 @@ jobs={x.get("research_job_id") for x in fingerprints if x.get("research_job_id")
 hashes={x.get("request_sha256") for x in fingerprints if x.get("request_sha256")}
 files={x.get("request_file") for x in fingerprints if x.get("request_file")}
 fingerprint_ok=(len(fingerprints)==10 and not fingerprint_missing and len(jobs)==1 and len(hashes)==1 and len(files)==1)
+genealogy={}
+gp=root/"SOURCE_GENEALOGY.json"
+if gp.exists():
+    try: genealogy=json.loads(gp.read_text(encoding="utf-8"))
+    except Exception: genealogy={}
 report={
  "schema":"pct-system-health-v2",
  "run_id":a.run_id,
@@ -46,6 +51,7 @@ report={
  "request_fingerprint_ok":fingerprint_ok,
  "request_fingerprints":fingerprints,
  "request_fingerprint_missing":fingerprint_missing,
+ "source_genealogy":{"present":bool(genealogy),"source_count":genealogy.get("source_count",0),"exact_duplicate_groups":genealogy.get("exact_duplicate_groups",0),"possible_derivative_groups":genealogy.get("possible_derivative_groups",0)},
  "verification_gate":"System health validates execution paths and request consistency only; it does not verify historical claims."
 }
 root.mkdir(parents=True,exist_ok=True)
