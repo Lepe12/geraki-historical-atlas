@@ -1,0 +1,177 @@
+{
+  "schema": "pct-specialist-agent-registry-v1",
+  "agents": {
+    "pirate_base": {
+      "label": "Pirate Base / Anchorage Agent",
+      "task_kinds": [
+        "place",
+        "base",
+        "anchorage"
+      ],
+      "priority": 10,
+      "max_queries": 8,
+      "query_families": [
+        "{target} pirate base corsair base anchorage harbour refuge",
+        "{target} pirates corsairs provisioning repairs captives ransom",
+        "{target} historical harbour anchorage fort cave island piracy",
+        "{target} {date_range} pirates corsairs"
+      ],
+      "outputs": [
+        "base_classification",
+        "use_frequency",
+        "logistics",
+        "actors",
+        "date_ranges",
+        "evidence_gaps"
+      ]
+    },
+    "pirate_biography": {
+      "label": "Pirate Biography Agent",
+      "task_kinds": [
+        "person",
+        "biography"
+      ],
+      "priority": 10,
+      "max_queries": 10,
+      "query_families": [
+        "\"{target}\" pirate corsair biography",
+        "\"{target}\" aliases ships associates",
+        "\"{target}\" {date_range} archive",
+        "\"{target}\" death capture trial ransom",
+        "\"{target}\" patron commission privateer corsair"
+      ],
+      "outputs": [
+        "identity",
+        "aliases",
+        "chronology",
+        "ships",
+        "associates",
+        "bases",
+        "operations",
+        "death",
+        "uncertainties"
+      ]
+    },
+    "identity_resolution": {
+      "label": "Identity Resolution Agent",
+      "task_kinds": [
+        "person",
+        "place",
+        "all"
+      ],
+      "priority": 20,
+      "max_queries": 8,
+      "query_families": [
+        "\"{target}\" variant spelling",
+        "\"{target}\" alias OR aliases",
+        "\"{target}\" historical name",
+        "\"{target}\" transliteration"
+      ],
+      "outputs": [
+        "entity_candidates",
+        "variant_names",
+        "same_entity_assessment",
+        "collision_warnings"
+      ]
+    },
+    "timeline": {
+      "label": "Timeline Consistency Agent",
+      "task_kinds": [
+        "person",
+        "place",
+        "event",
+        "all"
+      ],
+      "priority": 20,
+      "max_queries": 8,
+      "query_families": [
+        "\"{target}\" {date_range}",
+        "\"{target}\" chronology",
+        "\"{target}\" dated letter report",
+        "\"{target}\" voyage operation"
+      ],
+      "outputs": [
+        "dated_events",
+        "chronology_conflicts",
+        "gaps",
+        "impossible_overlaps"
+      ]
+    },
+    "relationship_network": {
+      "label": "Relationship Network Agent",
+      "task_kinds": [
+        "person",
+        "place",
+        "all"
+      ],
+      "priority": 30,
+      "max_queries": 8,
+      "query_families": [
+        "\"{target}\" associates captain crew",
+        "\"{target}\" ship vessel patron",
+        "\"{target}\" port base ally enemy",
+        "\"{target}\" governor consul merchant"
+      ],
+      "outputs": [
+        "persons",
+        "ships",
+        "places",
+        "patrons",
+        "states",
+        "relationship_edges"
+      ]
+    },
+    "contradiction": {
+      "label": "Contradiction / Adversarial Agent",
+      "task_kinds": [
+        "person",
+        "place",
+        "event",
+        "all"
+      ],
+      "priority": 40,
+      "max_queries": 8,
+      "query_families": [
+        "\"{target}\" disputed",
+        "\"{target}\" contradiction",
+        "\"{target}\" alternative account",
+        "\"{target}\" myth legend false"
+      ],
+      "outputs": [
+        "contradicting_evidence",
+        "alternative_explanations",
+        "uncertainties",
+        "falsification_leads"
+      ]
+    },
+    "source_genealogy": {
+      "label": "Source Genealogy Agent",
+      "task_kinds": [
+        "person",
+        "place",
+        "event",
+        "all"
+      ],
+      "priority": 40,
+      "max_queries": 6,
+      "query_families": [
+        "\"{target}\" cited by",
+        "\"{target}\" bibliography sources",
+        "\"{target}\" edition translation",
+        "\"{target}\" chronicle manuscript"
+      ],
+      "outputs": [
+        "source_chains",
+        "derivative_sources",
+        "independence_warnings",
+        "primary_source_targets"
+      ]
+    }
+  },
+  "rules": [
+    "Specialist agents complement, not replace, the ten geographic/archive lanes.",
+    "Specialist agents run in parallel and may use the connector registry for discovery.",
+    "No specialist agent may promote a claim to VERIFIED.",
+    "Identity, chronology, relationships and contradictions remain claim-level review outputs."
+  ]
+}
