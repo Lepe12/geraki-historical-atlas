@@ -1,0 +1,119 @@
+#!/usr/bin/env python3
+"""Guarded JARVIS controlled-dispatch preflight."""
+from __future__ import annotations
+import argparse, hashlib, json
+from pathlib import Path
+from typing import Any
+
+POLICY_PATH = Path("tools/orchestrator/jarvis_policy.json")
+
+def load_json(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+def canonical_request(req: dict[str, Any]) -> dict[str, Any]:
+    target = str(req.get("target", "")).strip()
+    aliases = req.get("aliases", [])
+    if isinstance(aliases, str):
+        aliases = [x.strip() for x in aliases.split("|") if x.strip()]
+    selected = req.get("selected_agents", req.get("selected_lanes", []))
+    if isinstance(selected, str):
+        selected = [x.strip() for x in selected.split(",") if x.strip()]
+    return {
+        "target": target,
+        "aliases": [str(x).strip() for x in aliases if str(x).strip()],
+        "date_range": str(req.get("date_range", "")).strip(),
+        "purpose": str(req.get("purpose", "")).strip(),
+        "selected_agents": [str(x).strip() for x in selected if str(x).strip()],
+    }
+
+def fingerprint(payload: dict[str, Any]) -> str:
+    raw = json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+def validate(req: dict[str, Any], policy: dict[str, Any]) -> dict[str, Any]:
+    dispatch = policy.get("dispatch", {})
+    if policy.get("mode") != "controlled_dispatch":
+        raise ValueError("JARVIS_NOT_IN_CONTROLLED_DISPATCH_MODE")
+    if not dispatch.get("dispatch_enabled"):
+        raise ValueError("DISPATCH_DISABLED")
+    if dispatch.get("kill_switch"):
+        raise ValueError("KILL_SWITCH_ACTIVE")
+    payload = canonical_request(req)
+    if dispatch.get("require_explicit_target", True) and not payload["target"]:
+        raise ValueError("TARGET_REQUIRED")
+    if dispatch.get("require_explicit_selected_agents", True) and not payload["selected_agents"]:
+        raise ValueError("SELECTED_AGENTS_REQUIRED")
+    allowed = set(dispatch.get("allowed_agents", []))
+    unknown = [a for a in payload["selected_agents"] if a not in allowed]
+    if unknown:
+        raise ValueError("AGENT_NOT_ALLOWED:" + ",".join(unknown))
+    seen = set(); selected = []
+    for lane in payload["selected_agents"]:
+        if lane not in seen:
+            selected.append(lane); seen.add(lane)
+    max_parallel = int(dispatch.get("max_parallel", 3))
+    if max_parallel < 1:
+        raise ValueError("INVALID_MAX_PARALLEL")
+    if len(selected) > max_parallel:
+        raise ValueError("TOO_MANY_SELECTED_AGENTS:%d>%d" % (len(selected), max_parallel))
+    payload["selected_agents"] = selected
+    return payload
+
+def existing_fingerprints(audit_root: Path) -> dict[str, str]:
+    found = {}
+    if not audit_root.exists():
+        return found
+    for path in audit_root.glob("*.json"):
+        try:
+            data = load_json(path)
+        except Exception:
+            continue
+        fp, run_id = data.get("request_fingerprint"), data.get("run_id")
+        if isinstance(fp, str) and isinstance(run_id, str):
+            found[fp] = run_id
+    return found
+
+def build_audit(req_path: Path, payload: dict[str, Any], run_id: str) -> dict[str, Any]:
+    return {
+        "schema": "pct-jarvis-dispatch-audit-v1",
+        "run_id": run_id,
+        "request_file": req_path.as_posix(),
+        "request_fingerprint": fingerprint(payload),
+        "mode": "controlled_dispatch",
+        "selected_agents": payload["selected_agents"],
+        "target": payload["target"],
+        "date_range": payload["date_range"],
+        "purpose": payload["purpose"],
+        "decision": "DISPATCH_APPROVED",
+        "verified_promotion_allowed": False,
+        "wordpress_access": False,
+        "server_credentials_access": False
+    }
+
+def main() -> None:
+    p = argparse.ArgumentParser()
+    p.add_argument("--request", type=Path, required=True)
+    p.add_argument("--run-id", required=True)
+    p.add_argument("--audit-root", type=Path, default=Path("evidence/jarvis/dispatch_audit"))
+    p.add_argument("--github-output", type=Path)
+    p.add_argument("--write-audit", type=Path)
+    args = p.parse_args()
+    if not args.run_id.isdigit():
+        raise ValueError("INVALID_RUN_ID")
+    policy = load_json(POLICY_PATH)
+    payload = validate(load_json(args.request), policy)
+    audit = build_audit(args.request, payload, args.run_id)
+    if audit["request_fingerprint"] in existing_fingerprints(args.audit_root):
+        raise ValueError("DUPLICATE_DISPATCH_REQUEST")
+    matrix = json.dumps(payload["selected_agents"], separators=(",", ":"))
+    if args.github_output:
+        with args.github_output.open("a", encoding="utf-8") as fh:
+            fh.write("matrix=%s\n" % matrix)
+            fh.write("request_fingerprint=%s\n" % audit["request_fingerprint"])
+    if args.write_audit:
+        args.write_audit.parent.mkdir(parents=True, exist_ok=True)
+        args.write_audit.write_text(json.dumps(audit, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
+    print(json.dumps({"status":"CONTROLLED_DISPATCH_APPROVED","matrix":payload["selected_agents"],"request_fingerprint":audit["request_fingerprint"]}))
+
+if __name__ == "__main__":
+    main()
