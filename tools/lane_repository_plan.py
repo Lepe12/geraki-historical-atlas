@@ -12,7 +12,7 @@ cfg={
 "spanish_simancas":[("PARES / Archivo General de Simancas","https://pares.cultura.gob.es"),("Biblioteca Digital Hispánica","https://catalogo.bne.es")],
 "venetian":[("Archivio di Stato di Venezia / SIAS","https://sias-archivi.cultura.gov.it"),("Internet Culturale","https://www.internetculturale.it"),("Internet Archive","https://archive.org")],
 "french":[("Archives nationales","https://www.archives-nationales.culture.gouv.fr"),("Archives diplomatiques","https://archivesdiplomatiques.diplomatie.gouv.fr"),("Gallica/BnF","https://catalogue.bnf.fr")],
-"british":[("The National Archives Discovery","https://discovery.nationalarchives.gov.uk"),("British Library","https://searcharchives.bl.uk")],
+"british":[("The National Archives Discovery","https://discovery.nationalarchives.gov.uk"),("The National Archives Public Content","https://www.nationalarchives.gov.uk"),("British Library","https://searcharchives.bl.uk")],
 "dutch":[("Nationaal Archief","https://www.nationaalarchief.nl"),("Delpher","https://www.delpher.nl")],
 "german":[("BSB","https://www.digitale-sammlungen.de"),("Deutsche Digitale Bibliothek","https://www.deutsche-digitale-bibliothek.de")],
 "italian_states":[("Internet Culturale","https://www.internetculturale.it"),("SIAS / Italian State Archives","https://sias-archivi.cultura.gov.it")],
