@@ -56,9 +56,15 @@ def family_match(e):
     if family=="ATTACK_OR_SACK":
         return any(x in b for x in ["attack","attaque","ataque","attacc","raid","sack","saccag","saque","pillage","plunder"])
     if family=="CAPTURE":
-        return any(x in b for x in ["captur","cattur","κατάληψ","αιχμαλω","seiz","prison"])
+        return any(x in b for x in ["captur","cattur","καταληψ","αιχμαλω","seiz","prison"])
+    if family=="NAVAL_BATTLE":
+        return any(x in b for x in ["battle","bataill","combat","victoire","victory","naval"])
+    if family=="BOMBARDMENT":
+        return any(x in b for x in ["bombard","bombarde","bombas","attack","attaque","atac"])
+    if family=="CAPTIVITY_OR_REDEMPTION":
+        return any(x in b for x in ["captiv","cautiv","prison","redencion","redemption","redeem","rescat","rancon","ransom"])
     if family=="PRESENCE_ONLY":
-        return "presence" in b or "reported offshore" in b
+        return any(x in b for x in ["presence","reported offshore","galley","galleys","galera","galeras","corsair vessel","vessel"])
     if family=="DEPENDENT_SOURCES":
         return "derivative" in b or "common_source" in b
     return True
