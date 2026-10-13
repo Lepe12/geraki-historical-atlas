@@ -6,7 +6,8 @@ remote query completed.  Authentication/browser/key requirements are explicit
 and are never reported as successful searches.
 """
 from __future__ import annotations
-import json, os, re, time, urllib.parse, urllib.request, urllib.error, xml.etree.ElementTree as ET
+import json, os, re, time, urllib.parse, urllib.request, urllib.error, xml.etree.ElementTree as ET, unicodedata
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from html.parser import HTMLParser
 
 UA={"User-Agent":"Piratecartography-Historical-Research/3.0 (+scholarly catalogue discovery)"}
@@ -151,14 +152,36 @@ def internet_culturale(q,lane):
     keep=lambda u,t: ("/opencms/" in u or "/it/" in u) and ("search?" not in u) and len(t)>3
     return "EXECUTED",_html_search(url,"Internet Culturale",lane,base,keep),url
 
+def _norm_search_text(v):
+    s=unicodedata.normalize("NFKD",str(v or ""))
+    s="".join(ch for ch in s if not unicodedata.combining(ch)).casefold()
+    return " ".join(re.findall(r"[a-z0-9]+",s))
+
+def _query_tokens(q):
+    stop={"the","a","an","of","and","or","in","on","at","to","for","corsair","pirate"}
+    return [x for x in _norm_search_text(q).split() if len(x)>2 and x not in stop]
+
+def _tna_fetch_page(row):
+    u=row.get("url")
+    if not u:return row
+    try:
+        raw=_get(u,timeout=12).decode("utf-8","replace")
+        raw=re.sub(r"(?is)<(script|style|nav|footer)[^>]*>.*?</\\1>"," ",raw)
+        txt=re.sub(r"<[^>]+>"," ",raw)
+        txt=" ".join(txt.split())
+        row["metadata_text"]=txt[:40000]
+        years=list(dict.fromkeys(re.findall(r"\\b(?:1[0-9]{3}|20[0-9]{2})\\b",txt)))
+        row["date"]=years[:16]
+    except Exception:
+        pass
+    return row
+
 def tna_public_content(q,lane):
     base="https://www.nationalarchives.gov.uk"
     url=base+"/search/results/?"+urllib.parse.urlencode({"_q":q})
-    # Only retain content-bearing result paths; navigation/header links were a
-    # major false-positive source in the generic HTML parser.
     content_prefixes=(
       "/education/resources/",
-      "/explore-the-collection/",
+      "/explore-the-collection/stories/",
       "/help-with-your-research/",
       "/blog/",
       "/cabinetpapers/",
@@ -166,27 +189,60 @@ def tna_public_content(q,lane):
       "/museum/"
     )
     def keep(u,t):
-        try:
-            p=urllib.parse.urlsplit(u).path.casefold()
-        except Exception:
-            return False
+        try:p=urllib.parse.urlsplit(u).path.casefold()
+        except Exception:return False
         return any(p.startswith(x) for x in content_prefixes) and len(t)>3
+
     rows=_html_search(url,"The National Archives Public Content",lane,base,keep,max_records=25)
-    out=[]
-    for row in rows:
-        u=row.get("url")
+
+    # Fallback corpus crawl for public content that the site-search page misses.
+    hub_urls=[
+      base+"/education/sessions-and-resources/?time-period=early-modern",
+      base+"/explore-the-collection/stories/?page=1",
+      base+"/explore-the-collection/stories/?page=2",
+      base+"/explore-the-collection/stories/?page=3",
+      base+"/explore-the-collection/stories/?page=4",
+      base+"/explore-the-collection/stories/?page=5",
+      base+"/explore-the-collection/stories/?page=6",
+    ]
+    candidates=[];seen=set()
+    for hub in hub_urls:
         try:
-            raw=_get(u,timeout=12).decode("utf-8","replace") if u else ""
-            raw=re.sub(r"(?is)<(script|style|nav|footer)[^>]*>.*?</\\1>"," ",raw)
-            txt=re.sub(r"<[^>]+>"," ",raw)
-            txt=" ".join(txt.split())
-            row["metadata_text"]=txt[:30000]
-            years=list(dict.fromkeys(re.findall(r"\\b(?:1[0-9]{3}|20[0-9]{2})\\b",txt)))
-            row["date"]=years[:12]
+            for r in _html_search(hub,"The National Archives Public Content",lane,base,keep,max_records=80):
+                k=r.get("url")
+                if k and k not in seen:
+                    seen.add(k);candidates.append(r)
         except Exception:
-            pass
-        out.append(row)
-    return "EXECUTED",out,url
+            continue
+    # Bound the fallback crawl and fetch concurrently.
+    candidates=candidates[:80]
+    enriched=[]
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        futs=[ex.submit(_tna_fetch_page,r) for r in candidates]
+        for fut in as_completed(futs):
+            try: enriched.append(fut.result())
+            except Exception: pass
+
+    toks=_query_tokens(q)
+    for r in enriched:
+        body=_norm_search_text((r.get("title") or "")+" "+(r.get("metadata_text") or ""))
+        if toks and all(t in body for t in toks):
+            rows.append(r)
+
+    # Enrich direct site-search results too.
+    direct=[]
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        futs=[ex.submit(_tna_fetch_page,r) for r in rows[:40]]
+        for fut in as_completed(futs):
+            try: direct.append(fut.result())
+            except Exception: pass
+
+    ded=[];seen=set()
+    for r in direct:
+        k=r.get("url") or r.get("identifier")
+        if not k or k in seen:continue
+        seen.add(k);ded.append(r)
+    return "EXECUTED",ded[:40],url+" ; bounded public-content hub crawl"
 
 def nationaal_archief(q,lane):
     base="https://www.nationaalarchief.nl"
