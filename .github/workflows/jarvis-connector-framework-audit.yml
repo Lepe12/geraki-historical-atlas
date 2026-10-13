@@ -1,0 +1,29 @@
+name: JARVIS Connector Framework Audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/connectors/**'
+      - 'connectors/**'
+      - '.github/workflows/jarvis-connector-framework-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile connector framework
+        run: python3 -m compileall -q tools/connectors connectors
+      - name: Run connector framework unit tests
+        run: PYTHONPATH=tools/connectors python3 -m unittest tools/connectors/test_connector_framework.py -v
+      - name: Build capability audit
+        run: PYTHONPATH=tools/connectors python3 tools/connectors/connector_health.py --output connector_health.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: connector-framework-audit-${{ github.run_id }}
+          path: connector_health.json
