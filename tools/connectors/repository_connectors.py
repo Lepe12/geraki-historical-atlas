@@ -195,9 +195,13 @@ def library_of_congress(q,lane):
             d=_json(url,timeout=30);break
         except urllib.error.HTTPError as exc:
             last=exc
+            if exc.code==403:
+                return "REMOTE_ACCESS_BLOCKED",[],url+" ; HTTP 403 from remote service to GitHub runner"
             if exc.code not in (429,502,503,504): raise
             time.sleep(2*(attempt+1))
     else:
+        if isinstance(last,urllib.error.HTTPError) and last.code in (429,502,503,504):
+            return "REMOTE_ACCESS_BLOCKED",[],url+" ; repeated HTTP "+str(last.code)
         raise last
     out=[]
     for x in d.get("results",[]) or []:
