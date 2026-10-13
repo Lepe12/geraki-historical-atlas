@@ -19,6 +19,10 @@ jobs:
           fetch-depth: 2
       - name: Compile benchmark Python code
         run: python3 -m compileall -q tools
+      - name: Run deterministic scientific safeguards
+        run: |
+          python3 tools/scientific_benchmark.py
+          python3 tools/adversarial_scientific_benchmark.py
       - name: Evaluate changed benchmark request
         run: |
           mapfile -t files < <(git diff-tree --no-commit-id --name-only -r "${{ github.sha }}" -- 'benchmarks/evaluation_requests/*.json')
