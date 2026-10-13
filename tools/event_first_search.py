@@ -19,7 +19,7 @@ lo,hi=(min(years),max(years)) if years else (0,9999)
 EVENT=[
  r"corsair\w*",r"corsaire\w*",r"corsar\w*",r"corsaro\w*",r"pirat\w*",r"forban\w*",r"privateer\w*",r"armateur\w*",
  r"raid\w*",r"incursion\w*",r"attaque\w*",r"assaut\w*",r"attack\w*",r"aanval\w*",r"angriff\w*",r"ataque\w*",r"attacc\w*",
- r"pillage\w*",r"ravag\w*",r"saccag\w*",r"plunder\w*",r"raub\w*",r"plünder\w*",r"saque\w*",r"sacchegg\w*",r"roov\w*",
+ r"pillage\w*",r"ravag\w*",r"saccag\w*",r"sack\w*",r"plunder\w*",r"raub\w*",r"plünder\w*",r"saque\w*",r"sacchegg\w*",r"roov\w*",
  r"br[uû]l\w*",r"burn\w*",r"incendi\w*",r"brand\w*",r"captur\w*",r"prisonni\w*",r"gevangen\w*",r"gefang\w*",r"cattur\w*",r"captiv\w*",
  r"esclav\w*",r"slave\w*",r"schiav\w*",r"slav\w*",r"tribut\w*",r"contribution\w*",r"ran[cç]on\w*",r"ransom\w*",r"riscatt\w*",r"rescat\w*",
  r"zeerover\w*",r"kapern\w*",r"seer[aä]uber\w*",r"ghaz\w*",r"akın\w*",r"esir\w*",r"fidye\w*",
@@ -47,7 +47,7 @@ for p in root.glob("*"):
         if not near:continue
         a=max(0,m.start()-2500);b=min(len(text),m.end()+5000);ctx_text=text[a:b]
         ys=scoped_years(ctx_text)
-        item={"file":p.name,"place_match":m.group(0),"line":text.count("\n",0,m.start())+1,"years_in_scope":ys,"event_terms":sorted(set(e.group(0) for e in near),key=str.casefold),"context":re.sub(r"[ \t]+"," ",ctx_text),"lead_type":"OCR_CONTEXT"}
+        item={"file":p.name,"place_match":m.group(0),"line":text.count("\n",0,m.start())+1,"years_in_scope":ys,"event_terms":sorted(set(e.group(0) for e in near),key=str.casefold),"context":re.sub(r"[ \t]+"," ",ctx_text),"lead_type":"OCR_CONTEXT","context_excerpt":ctx_text}
         if ys:hits.append(item)
         else:
             item["status"]="TEMPORAL_CONTEXT_UNRESOLVED";context_leads.append(item)
@@ -71,7 +71,7 @@ if disc_path.exists():
           "url":rec.get("url"),"title":rec.get("title"),"place_match":pm[0].group(0),
           "years_in_scope":ys,"event_terms":sorted(set(e.group(0) for e in em),key=str.casefold),
           "status":status,"verification_status":"NOT_ORIGINAL_VERIFIED",
-          "lead_type":"CATALOGUE_METADATA"
+          "lead_type":"CATALOGUE_METADATA","context_excerpt":blob[:12000]
         })
 
 report={"schema":"pct-event-first-general-v4","request_file":rf.name,"target":target,"aliases":aliases,
