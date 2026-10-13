@@ -135,7 +135,7 @@ def bne_sru(q,lane):
     cql=" AND ".join('alma.all_for_ui="'+v.replace('"'," ")+'"' for v in vals)
     params={"version":"1.2","operation":"searchRetrieve",
       "query":cql,
-      "recordSchema":"marcxml","startRecord":1,"maximumRecords":50}
+      "recordSchema":"marcxml","startRecord":1,"maximumRecords":20}
     url="https://catalogo.bne.es/view/sru/34BNE_INST?"+urllib.parse.urlencode(params)
     return "EXECUTED",_sru_records(url,"Biblioteca Nacional de España SRU",lane),url
 
