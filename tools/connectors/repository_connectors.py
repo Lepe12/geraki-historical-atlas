@@ -151,6 +151,12 @@ def internet_culturale(q,lane):
     keep=lambda u,t: ("/opencms/" in u or "/it/" in u) and ("search?" not in u) and len(t)>3
     return "EXECUTED",_html_search(url,"Internet Culturale",lane,base,keep),url
 
+def tna_public_content(q,lane):
+    base="https://www.nationalarchives.gov.uk"
+    url=base+"/search/results/?"+urllib.parse.urlencode({"_q":q})
+    keep=lambda u,t: u.startswith(base+"/") and "/search/" not in u and len(t)>3
+    return "EXECUTED",_html_search(url,"The National Archives Public Content",lane,base,keep,max_records=25),url
+
 def nationaal_archief(q,lane):
     base="https://www.nationaalarchief.nl"
     url=base+"/onderzoeken/zoeken?"+urllib.parse.urlencode({"searchTerm":q})
@@ -340,6 +346,7 @@ def dispatch(repository,q,lane):
     if repository=="Archives diplomatiques France": return archives_diplomatiques(q,lane)
     if repository=="Internet Culturale": return internet_culturale(q,lane)
     if repository=="Nationaal Archief": return nationaal_archief(q,lane)
+    if repository=="The National Archives Public Content": return tna_public_content(q,lane)
     if repository=="Delpher": return delpher_sru(q,lane)
     if repository=="Deutsche Digitale Bibliothek": return ddb(q,lane)
     if repository=="SearchCulture.gr / EKT": return searchculture(q,lane)
