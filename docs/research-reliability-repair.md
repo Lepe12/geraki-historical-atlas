@@ -18,4 +18,6 @@ Evaluator v3 uses contextual prose for event dates and excludes URL/filename ide
 
 ## Validation
 
-`python3 tools/scientific_benchmark.py` includes six integration/regression tests (with multiple adversarial cases) covering place collisions, second-island generality, resumable queues, invalid review rejection, valid human-gate flow and stale claims/files, URL-date leakage, and specialist ingestion. `python3 tools/adversarial_scientific_benchmark.py` retains existing evidence-state controls. All use synthetic fixtures; they are not historical ground truth.
+`python3 tools/scientific_benchmark.py` includes seven integration/regression tests (with multiple adversarial cases) covering place collisions, second-island generality, resumable queues, invalid review rejection, valid human-gate flow and stale claims/files, URL-date leakage, and specialist ingestion. `python3 tools/adversarial_scientific_benchmark.py` retains existing evidence-state controls. All use synthetic fixtures; they are not historical ground truth.
+
+Connector adaptation also accepts diagnostic-prefixed native JSON, preserves French inventory identifiers/call numbers, and distinguishes process failures from keywords occurring in successfully returned source text. Partially completed specialist artifacts can be ingested.

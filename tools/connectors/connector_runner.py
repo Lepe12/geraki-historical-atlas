@@ -5,13 +5,15 @@ It does not execute arbitrary code. Only connectors declared in the registry
 may run, and their output is wrapped in the uniform connector contract.
 """
 from __future__ import annotations
-import argparse,json,subprocess,sys
+import argparse,json,re,subprocess,sys
 from pathlib import Path
 from connector_contract import ConnectorResult,ConnectorStatus,validate_result
 from connector_registry import connector,next_route
 
 def classify(returncode:int, stdout:str, stderr:str):
-    blob=(stdout+"\n"+stderr).lower()
+    # Source text containing author/auth/login must not classify a successful call.
+    if returncode==0: return ConnectorStatus.EXECUTED,None
+    blob=stderr.lower()
     if "captcha" in blob: return ConnectorStatus.BLOCKED,"CAPTCHA"
     if "login" in blob or "auth" in blob: return ConnectorStatus.BLOCKED,"LOGIN_REQUIRED"
     if "timeout" in blob or "timed out" in blob: return ConnectorStatus.FAILED,"TIMEOUT"
@@ -19,12 +21,33 @@ def classify(returncode:int, stdout:str, stderr:str):
     if returncode==0: return ConnectorStatus.EXECUTED,None
     return ConnectorStatus.FAILED,"EXECUTION_FAILED"
 
+def parse_output(stdout):
+    # Some native connectors emit diagnostic lines before their final JSON object.
+    for match in reversed(list(re.finditer(r'(?m)^\{',stdout))):
+        try:
+            result=json.loads(stdout[match.start():])
+            if isinstance(result,dict):return result
+        except ValueError:pass
+    return None
+
+
 def run_connector(connector_id:str, query:str, timeout:int=180):
     meta=connector(connector_id)
     module=Path(meta["module"])
     if not module.is_file(): raise SystemExit("CONNECTOR_MODULE_MISSING")
     proc=subprocess.run([sys.executable,str(module),query],capture_output=True,text=True,timeout=timeout)
     status,code=classify(proc.returncode,proc.stdout,proc.stderr)
+    parsed=parse_output(proc.stdout)
+    if isinstance(parsed,dict):
+        native=str(parsed.get('status','')).upper()
+        if native in {'BLOCKED','ACCESS_BLOCKED','LOGIN_REQUIRED','API_KEY_REQUIRED','CAPTCHA'}:
+            status,code=ConnectorStatus.BLOCKED,native
+        elif native in {'FAILED','ERROR','BROWSER_EXECUTED_NO_API_CONFIRMATION'}:
+            status,code=ConnectorStatus.FAILED,native
+        elif native=='PARTIAL':status=ConnectorStatus.PARTIAL
+    elif status==ConnectorStatus.EXECUTED:
+        status,code=ConnectorStatus.FAILED,'INVALID_CONNECTOR_OUTPUT'
+
     blockers=[]
     warnings=[]
     route=None
@@ -34,14 +57,9 @@ def run_connector(connector_id:str, query:str, timeout:int=180):
     if proc.returncode!=0:
         warnings.append("Connector process returned non-zero exit status.")
     records=[]
-    parsed=None
-    try:
-        parsed=json.loads(proc.stdout)
-        if isinstance(parsed,dict):
-            if isinstance(parsed.get("records"),list): records=parsed["records"]
-            elif isinstance(parsed.get("results"),list): records=parsed["results"]
-    except Exception:
-        parsed=None
+    if isinstance(parsed,dict):
+        if isinstance(parsed.get("records"),list):records=parsed["records"]
+        elif isinstance(parsed.get("results"),list):records=parsed["results"]
     result=ConnectorResult(
       connector_id=connector_id,
       repository=meta["repository"],

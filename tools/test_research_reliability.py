@@ -19,6 +19,14 @@ class Reliability(unittest.TestCase):
         else:self.assertNotEqual(p.returncode,0,p.stdout+p.stderr)
         return p
     def read(self,p):return json.loads((self.root/p).read_text())
+    def test_native_connector_diagnostics_are_not_source_evidence(self):
+        sys.path.insert(0,str(TOOLS/'connectors'))
+        from connector_runner import parse_output, classify
+        from connector_contract import ConnectorStatus
+        raw='PARES_STATE_DIAGNOSTIC {"status":"diagnostic"}\n'+json.dumps({'records':[{'title':'author login history'}]},indent=2)
+        self.assertEqual(len(parse_output(raw)['records']),1)
+        self.assertEqual(classify(0,raw,''),(ConnectorStatus.EXECUTED,None))
+        self.assertIsNone(parse_output('not JSON'))
     def test_place_collision_and_second_island(self):
         ident=identity(self.req,self.req)
         self.assertEqual(assess({'title':'Melos Zeitschrift für Musik'},ident)['status'],'EXCLUDE_FROM_ACQUISITION')
@@ -76,9 +84,9 @@ class Reliability(unittest.TestCase):
         r=self.read('benchmarks/results/test-case.json');self.assertEqual(r['true_positive'],1);self.assertEqual(r['unmatched_candidate_count'],99);self.assertIsNone(r['precision'])
     def test_specialist_records_feed_common_candidates(self):
         self.write('lane_discovery/travellers.json',{'results':[],'attempts':[]})
-        self.write('specialist_sources/test/result.json',{'agent_id':'test','search_runs':[{'repository':'Offline','status':'EXECUTED','records':[{'identifier':'x','title':'History of Milos island'}]}]})
+        self.write('specialist_sources/test/result.json',{'agent_id':'test','search_runs':[{'repository':'Offline','status':'EXECUTED','records':[{'fran_ir':'x','titre':'History of Milos island','cotes':'R 1','url_slv':'https://example.invalid/catalogue/x'}]}]})
         self.run_tool('merge_specialist_candidates.py');self.run_tool('merge_repository_candidates.py')
         row=self.read('citation_chase_candidates/repository_candidates.json')['selected'][0]
-        self.assertEqual(row['specialist_agent'],'test');self.assertEqual(row['relevance_assessment']['status'],'PRIORITY')
+        self.assertEqual(row['identifier'],'x');self.assertEqual(row['archival_reference'],'R 1');self.assertEqual(row['specialist_agent'],'test');self.assertEqual(row['relevance_assessment']['status'],'PRIORITY')
 
 if __name__=='__main__':unittest.main()

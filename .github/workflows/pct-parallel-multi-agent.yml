@@ -145,7 +145,8 @@ jobs:
         with:
           fetch-depth: 2
       - uses: actions/download-artifact@v4
-        if: matrix.lane == 'travellers' && needs.specialist-research.result == 'success'
+        if: matrix.lane == 'travellers' && needs.specialist-research.result != 'skipped'
+        continue-on-error: true
         with:
           name: specialist-normalized-${{ github.run_id }}
           path: specialist_sources

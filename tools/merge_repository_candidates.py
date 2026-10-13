@@ -17,7 +17,7 @@ for x in d.get("results",[]):
     item={
       "identifier":x.get("identifier"),
       "title":x.get("title"),
-      "creator":x.get("creator"),"specialist_agent":x.get("specialist_agent"),
+      "creator":x.get("creator"),"archival_reference":x.get("archival_reference"),"specialist_agent":x.get("specialist_agent"),
       "description":x.get("description"),"subject":x.get("subject"),"context_excerpt":x.get("context_excerpt"),"mediatype":x.get("mediatype"),
       "date":x.get("date"),
       "repository":repo,

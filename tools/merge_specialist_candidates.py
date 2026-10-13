@@ -15,6 +15,7 @@ for file in files:
     for run in specialist.get('search_runs',[]):
         for record in run.get('records',[]) or []:
             if not isinstance(record,dict):continue
+            record={**record,'identifier':record.get('identifier') or record.get('id') or record.get('record_id') or record.get('fran_ir'),'title':record.get('title') or record.get('titre') or record.get('intitulé'),'url':record.get('url') or record.get('record_url') or record.get('url_slv'),'date':record.get('date') or record.get('dates'),'description':record.get('description') or record.get('intitulé'),'archival_reference':record.get('archival_reference') or record.get('cotes')}
             item={**record,'discovery_repository':record.get('repository') or run.get('repository') or run.get('connector_id'),'discovery_lane':lane,'specialist_agent':specialist.get('agent_id'),'connector_status':run.get('status'),'identifier':record.get('identifier') or record.get('id'),'url':record.get('url') or record.get('record_url'),'original_inspected':False,'verified':False}
             key=(str(item['discovery_repository']),str(item.get('identifier') or item.get('url') or item.get('title')))
             if key not in seen:
