@@ -59,6 +59,22 @@ for r in plan["repositories"]:
             focused.append(f'"{n}" corsair')
             if ys: focused.append(f'"{n}" {ys[0]}')
         repo_terms=list(dict.fromkeys(focused))[:int(os.getenv("PCT_TRAVELLERS_REPO_QUERY_LIMIT","16"))]
+    if lane=="ottoman":
+        # Ottoman catalogues can be slow or browser-mediated. Bound each repository
+        # to a focused, auditable query set so one remote surface cannot consume the
+        # entire lane discovery timeout.
+        ys=[x for x in str(plan.get("date_range","")).replace("-"," ").split() if x.isdigit()]
+        target=str(plan.get("target") or "").strip()
+        aliases=[str(x).strip() for x in plan.get("aliases",[]) if str(x).strip()]
+        names=[target]+aliases[:3]
+        focused=[]
+        for n in names:
+            if not n: continue
+            focused.append(n)
+            focused.append(f'"{n}" korsan')
+            focused.append(f'"{n}" levend')
+            if ys: focused.append(f'"{n}" {ys[0]}')
+        repo_terms=list(dict.fromkeys(focused))[:int(os.getenv("PCT_OTTOMAN_REPO_QUERY_LIMIT","8"))]
     if name=="SearchCulture.gr / EKT":
         greek_names=[x for x in [plan.get("target")]+plan.get("aliases",[]) if any("\u0370"<=ch<="\u03ff" for ch in str(x))]
         base_name=greek_names[0] if greek_names else plan.get("target")
