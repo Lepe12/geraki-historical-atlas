@@ -13,7 +13,7 @@ def read(p,default=None):
 disc=read(pathlib.Path("lane_discovery")/f"{lane}.json",{})
 attempts=disc.get("attempts",[])
 executed=[a["repository"] for a in attempts if a.get("status")=="EXECUTED"]
-blocked=[{"repository":a.get("repository"),"status":a.get("status")} for a in attempts if a.get("status") in ("AUTH_OR_BROWSER_REQUIRED","API_KEY_REQUIRED","CITATION_CHASE_WEB_OR_API_CONNECTOR_REQUIRED")]
+blocked=[{"repository":a.get("repository"),"status":a.get("status")} for a in attempts if a.get("status") in ("AUTH_OR_BROWSER_REQUIRED","API_KEY_REQUIRED","CITATION_CHASE_WEB_OR_API_CONNECTOR_REQUIRED","REMOTE_ACCESS_BLOCKED")]
 errors=[a for a in attempts if a.get("status")=="ERROR"]
 acq=read("library_acquisition/acquisition_report.json",{}).get("results",[])
 events=read("event_first_hits/event_hits.json",{}).get("hits",[])
