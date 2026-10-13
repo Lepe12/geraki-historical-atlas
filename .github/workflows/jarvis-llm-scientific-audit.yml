@@ -1,0 +1,42 @@
+name: JARVIS LLM Scientific Audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/llm/**'
+      - '.github/workflows/jarvis-llm-scientific-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    env:
+      PCT_LLM_PROVIDER: disabled
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile LLM layer
+        run: python3 -m compileall -q tools/llm
+      - name: Run LLM scientific tests
+        env:
+          PYTHONPATH: tools/llm
+        run: python3 -m unittest tools/llm/test_llm_scientific.py -v
+      - name: Run scientific LLM policy audit
+        env:
+          PYTHONPATH: tools/llm
+        run: |
+          python3 tools/llm/scientific_llm_audit.py > llm_scientific_audit.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('llm_scientific_audit.json',encoding='utf-8'))
+          assert d['overall']=='PASS', d
+          assert d['verified_promotion_allowed'] is False
+          print('LLM SCIENTIFIC AUDIT PASS')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: llm-scientific-audit-${{ github.run_id }}
+          path: llm_scientific_audit.json
