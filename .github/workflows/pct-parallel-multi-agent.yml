@@ -59,7 +59,9 @@ jobs:
       - name: Compile Python research code
         run: python3 -m compileall -q tools
       - name: Run core scientific benchmark
-        run: python3 tools/scientific_benchmark.py
+        run: |
+          python3 tools/scientific_benchmark.py
+          python3 tools/adversarial_scientific_benchmark.py
       - name: Build and validate ten lane payloads
         env:
           PCT_RESEARCH_JOB_ID: ${{ steps.identity.outputs.research_job_id }}
