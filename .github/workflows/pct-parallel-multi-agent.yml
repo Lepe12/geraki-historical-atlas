@@ -18,6 +18,10 @@ on:
         description: "Research question / scope"
         required: false
         type: string
+      selected_agents:
+        description: "Optional comma-separated lane subset; blank means all ten"
+        required: false
+        type: string
   push:
     branches:
       - main
@@ -32,6 +36,7 @@ env:
   PCT_ALIASES: ${{ inputs.aliases }}
   PCT_DATE_RANGE: ${{ inputs.date_range }}
   PCT_PURPOSE: ${{ inputs.purpose }}
+  PCT_SELECTED_AGENTS: ${{ inputs.selected_agents }}
   # Host-local MariaDB is primary. Airtable is retained only as an explicit legacy option.
   PCT_STORAGE_BACKEND: mariadb
 
@@ -73,7 +78,25 @@ jobs:
           python3 tools/build_research_lanes.py
           python3 tools/verify_request_integrity.py
       - id: matrix
-        run: echo 'matrix=["travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]' >> "$GITHUB_OUTPUT"
+        name: Build bounded research lane matrix
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          allowed=["travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]
+          raw=os.environ.get("PCT_SELECTED_AGENTS","").strip()
+          if not raw:
+              selected=allowed
+          else:
+              selected=[]
+              for lane in [x.strip() for x in raw.split(",") if x.strip()]:
+                  if lane not in allowed:
+                      raise SystemExit("UNKNOWN_RESEARCH_LANE:"+lane)
+                  if lane not in selected:
+                      selected.append(lane)
+              if not selected:
+                  raise SystemExit("EMPTY_RESEARCH_LANE_SELECTION")
+          print("matrix="+json.dumps(selected,separators=(",",":")))
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: pct-research-request-${{ github.run_id }}
