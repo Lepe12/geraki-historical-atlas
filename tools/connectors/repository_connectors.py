@@ -154,23 +154,24 @@ def internet_culturale(q,lane):
 def tna_public_content(q,lane):
     base="https://www.nationalarchives.gov.uk"
     url=base+"/search/results/?"+urllib.parse.urlencode({"_q":q})
+    # Only retain content-bearing result paths; navigation/header links were a
+    # major false-positive source in the generic HTML parser.
+    content_prefixes=(
+      "/education/resources/",
+      "/explore-the-collection/",
+      "/help-with-your-research/",
+      "/blog/",
+      "/cabinetpapers/",
+      "/pathways/",
+      "/museum/"
+    )
     def keep(u,t):
         try:
-            parts=urllib.parse.urlsplit(u)
-            p=parts.path.lower()
+            p=urllib.parse.urlsplit(u).path.casefold()
         except Exception:
             return False
-        if parts.query:
-            return False
-        patterns=(
-          r"^/education/resources/[^/]+/[^/]+/?$",
-          r"^/explore-the-collection/stories/[^/]+/?$",
-          r"^/the-collection-blog/[^/]+/?$",
-          r"^/help-with-your-research/research-guides/[^/]+/?$",
-          r"^/help-with-your-research/discovery-help/[^/]+/?$",
-        )
-        return any(re.match(pat,p) for pat in patterns) and len(t)>3
-    rows=_html_search(url,"The National Archives Public Content",lane,base,keep,max_records=20)
+        return any(p.startswith(x) for x in content_prefixes) and len(t)>3
+    rows=_html_search(url,"The National Archives Public Content",lane,base,keep,max_records=25)
     out=[]
     for row in rows:
         u=row.get("url")
