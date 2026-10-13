@@ -3,8 +3,9 @@
  * Piratecartography read-only staging gateway (PHP 8.2+).
  * Deploy under HTTPS in a dedicated, isolated public endpoint.
  * Keep DB config and API secret outside httpdocs. No WordPress integration.
- * Requires environment PCT_GATEWAY_SECRET (random 32+ bytes, never commit).
- * Requires private config file path PCT_DB_CONFIG_PATH.
+ * Requires private file /var/www/vhosts/piratecartography.com/piratecartography-system/pct_gateway_secret.php
+ * returning a random 32+ character secret. Never commit this private file.
+ * Uses existing private pct_db_config.php outside httpdocs.
  *
  * Request: GET /pct-staging-gateway.php with headers:
  * X-PCT-Timestamp: Unix epoch seconds
@@ -25,9 +26,12 @@ function fail(int $status, string $reason): never {
 }
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'GET') fail(405, 'method');
 if (($_SERVER['HTTPS'] ?? '') !== 'on') fail(403, 'https_required');
-$secret = getenv('PCT_GATEWAY_SECRET');
-$configPath = getenv('PCT_DB_CONFIG_PATH');
-if (!is_string($secret) || strlen($secret) < 32 || !is_string($configPath) || $configPath === '') fail(503, 'not_configured');
+$privateDir = '/var/www/vhosts/piratecartography.com/piratecartography-system';
+$secretFile = $privateDir . '/pct_gateway_secret.php';
+$configPath = $privateDir . '/pct_db_config.php';
+if (!is_file($secretFile) || !is_readable($secretFile)) fail(503, 'not_configured');
+$secret = require $secretFile;
+if (!is_string($secret) || strlen($secret) < 32) fail(503, 'not_configured');
 $timestamp = $_SERVER['HTTP_X_PCT_TIMESTAMP'] ?? '';
 $nonce = $_SERVER['HTTP_X_PCT_NONCE'] ?? '';
 $signature = $_SERVER['HTTP_X_PCT_SIGNATURE'] ?? '';
