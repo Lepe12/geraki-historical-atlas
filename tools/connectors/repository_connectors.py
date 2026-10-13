@@ -291,6 +291,50 @@ def tna_public_content(q,lane):
         if toks and all(t in body for t in toks):
             rows.append(r)
 
+    # Public web-index fallback for TNA pages that are machine-reachable
+    # but omitted from TNA's own search/index HTML. This is discovery only.
+    try:
+        ddg_q="site:nationalarchives.gov.uk "+str(q)
+        ddg_url="https://html.duckduckgo.com/html/?"+urllib.parse.urlencode({"q":ddg_q})
+        raw=_get(ddg_url,timeout=20).decode("utf-8","replace")
+        pp=_LinkParser();pp.feed(raw)
+        web_rows=[]
+        for href,title in pp.links:
+            u=href
+            if "uddg=" in u:
+                try:
+                    qs=urllib.parse.parse_qs(urllib.parse.urlsplit(u).query)
+                    u=urllib.parse.unquote(qs.get("uddg",[u])[0])
+                except Exception:
+                    pass
+            if u.startswith("//"):u="https:"+u
+            try:
+                pu=urllib.parse.urlsplit(u)
+            except Exception:
+                continue
+            if pu.netloc.casefold().replace("www.","")!="nationalarchives.gov.uk":continue
+            if not keep(u,title):continue
+            web_rows.append({
+              "discovery_repository":"The National Archives Public Content",
+              "discovery_lane":lane,"connector_status":"EXECUTED",
+              "identifier":u,"title":title,"date":[],"url":u,
+              "discovery_route":"PUBLIC_WEB_INDEX_FALLBACK"
+            })
+            if len(web_rows)>=20:break
+        if web_rows:
+            with ThreadPoolExecutor(max_workers=8) as ex:
+                futs=[ex.submit(_tna_fetch_page,r) for r in web_rows]
+                for fut in as_completed(futs):
+                    try:
+                        rr=fut.result()
+                        body=_norm_search_text((rr.get("title") or "")+" "+(rr.get("metadata_text") or ""))
+                        if toks and all(t in body for t in toks):
+                            rows.append(rr)
+                    except Exception:
+                        pass
+    except Exception:
+        pass
+
     # Enrich direct site-search results too.
     direct=[]
     with ThreadPoolExecutor(max_workers=8) as ex:
