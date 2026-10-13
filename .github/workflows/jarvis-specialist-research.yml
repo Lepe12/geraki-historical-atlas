@@ -1,0 +1,140 @@
+name: JARVIS Specialist Historical Research
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Research target'
+        required: true
+        type: string
+      aliases:
+        description: 'Aliases separated by |'
+        required: false
+        type: string
+      date_range:
+        description: 'Date range'
+        required: false
+        type: string
+      purpose:
+        description: 'Research purpose'
+        required: false
+        type: string
+      target_type:
+        description: 'auto, person, place, event, all'
+        required: false
+        default: 'auto'
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: plan
+        env:
+          TARGET: ${{ inputs.target }}
+          ALIASES: ${{ inputs.aliases }}
+          DATE_RANGE: ${{ inputs.date_range }}
+          PURPOSE: ${{ inputs.purpose }}
+          TARGET_TYPE: ${{ inputs.target_type }}
+        run: |
+          python3 tools/orchestrator/jarvis_specialist_plan.py \
+            --target "$TARGET" \
+            --aliases "$ALIASES" \
+            --date-range "$DATE_RANGE" \
+            --purpose "$PURPOSE" \
+            --target-type "$TARGET_TYPE" \
+            --output specialist_plan.json
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          d=json.load(open('specialist_plan.json',encoding='utf-8'))
+          print('matrix='+json.dumps([x['agent_id'] for x in d['agents']],separators=(',',':')))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: specialist-plan-${{ github.run_id }}
+          path: specialist_plan.json
+
+  specialists:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      max-parallel: 7
+      matrix:
+        agent: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: specialist-plan-${{ github.run_id }}
+      - name: Install browser support for registered fallbacks
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Run specialist research agent
+        run: |
+          mkdir -p "specialist_output/${{ matrix.agent }}"
+          PYTHONPATH=tools/connectors python3 tools/orchestrator/jarvis_specialist_worker.py \
+            --plan specialist_plan.json \
+            --agent "${{ matrix.agent }}" \
+            --connector-limit 3 \
+            --output "specialist_output/${{ matrix.agent }}/result.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: specialist-${{ matrix.agent }}-${{ github.run_id }}
+          path: specialist_output/${{ matrix.agent }}/
+
+  aggregate:
+    needs: [prepare, specialists]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: specialist-*-${{ github.run_id }}
+          path: specialist_results
+          merge-multiple: false
+      - name: Normalize specialist artifacts
+        run: |
+          mkdir -p normalized
+          find specialist_results -name result.json -print0 | while IFS= read -r -d '' f; do
+            agent=$(python3 - "$f" <<'PY'
+          import json,sys
+          print(json.load(open(sys.argv[1],encoding='utf-8')).get('agent_id','unknown'))
+          PY
+          )
+            mkdir -p "normalized/$agent"
+            cp "$f" "normalized/$agent/result.json"
+          done
+      - name: Aggregate specialist outputs
+        run: |
+          python3 tools/orchestrator/jarvis_specialist_aggregate.py \
+            --root normalized \
+            --output SPECIALIST_AGGREGATE.json
+      - name: Preserve specialist run
+        env:
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          dest="evidence/specialist_runs/$RUN_ID"
+          mkdir -p "$dest"
+          cp SPECIALIST_AGGREGATE.json "$dest/"
+          cp -R normalized "$dest/agents"
+          git config user.name "jarvis-orchestrator[bot]"
+          git config user.email "jarvis-orchestrator@users.noreply.github.com"
+          git add "$dest"
+          git diff --cached --quiet && exit 0
+          git commit -m "Preserve specialist research run $RUN_ID"
+          git pull --rebase origin main
+          git push origin HEAD:main
