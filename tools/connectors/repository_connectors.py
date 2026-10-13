@@ -125,7 +125,7 @@ def bnf_sru(q,lane):
 def bne_sru(q,lane):
     # Alma SRU/CQL: multi-term requests must be boolean AND clauses, not one
     # literal phrase. Preserve quoted phrases as one token.
-    tokens=re.findall(r'"([^"]+)"|(\\S+)',str(q))
+    tokens=re.findall(r'"([^"]+)"|(\S+)',str(q))
     vals=[]
     for quoted,bare in tokens:
         v=(quoted or bare or "").strip()
