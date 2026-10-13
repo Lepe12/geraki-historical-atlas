@@ -3,85 +3,187 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Piratecartography Research Command Center</title>
+  <title>Piratecartography — Historical Intelligence Command Center</title>
   <link rel="stylesheet" href="./command-center.css">
 </head>
 <body>
+  <div class="grain"></div>
   <div class="shell">
     <header class="topbar">
       <div>
-        <p class="eyebrow">PIRATECARTOGRAPHY / JARVIS</p>
+        <p class="eyebrow">PIRATECARTOGRAPHY / HISTORICAL INTELLIGENCE SYSTEM</p>
         <h1>Research Command Center</h1>
       </div>
-      <div class="connection">
-        <span id="connection-dot" class="dot offline"></span>
-        <span id="connection-label">OFFLINE</span>
+      <div class="topbar-right">
+        <div class="run-chip">RUN <span id="run-id-label">LATEST</span></div>
+        <div class="connection"><span id="connection-dot" class="dot offline"></span><span id="connection-label">OFFLINE</span></div>
       </div>
     </header>
 
-    <section class="summary-grid">
-      <article class="metric"><span>Active agents</span><strong id="metric-active">0</strong></article>
-      <article class="metric"><span>Completed</span><strong id="metric-completed">0</strong></article>
-      <article class="metric"><span>Blocked</span><strong id="metric-blocked">0</strong></article>
-      <article class="metric"><span>Warnings</span><strong id="metric-warnings">0</strong></article>
+    <section class="ops-strip">
+      <article><span>AGENTS</span><strong>17</strong></article>
+      <article><span>ACTIVE</span><strong id="metric-active">0</strong></article>
+      <article><span>ARCHIVES</span><strong id="metric-archives">0</strong></article>
+      <article><span>CLAIMS</span><strong id="metric-claims">0</strong></article>
+      <article><span>CONTRADICTIONS</span><strong id="metric-contradictions">0</strong></article>
+      <article><span>BLOCKED</span><strong id="metric-blocked">0</strong></article>
     </section>
 
-    <nav class="tabs" aria-label="Command center sections">
+    <main class="command-grid">
+      <aside class="left-rail panel">
+        <div class="panel-kicker">ACTIVE MISSION</div>
+        <h2 id="mission-title">Historical Research Operation</h2>
+        <p id="mission-purpose" class="mission-purpose">Live multi-agent archival research, evidence control and scientific verification.</p>
+        <div class="mission-status">
+          <div class="mission-status-head"><span>Research progress</span><b id="mission-progress-label">0%</b></div>
+          <div class="mission-progress"><span id="mission-progress-bar"></span></div>
+        </div>
+        <dl class="mission-meta">
+          <div><dt>Run</dt><dd id="mission-run">latest</dd></div>
+          <div><dt>Primary phase</dt><dd id="mission-phase">Waiting</dd></div>
+          <div><dt>Current route</dt><dd id="mission-route">—</dd></div>
+          <div><dt>Human review</dt><dd class="amber">REQUIRED</dd></div>
+        </dl>
+        <div class="rail-title">Priority agents</div>
+        <div id="priority-agents" class="priority-agents"></div>
+      </aside>
+
+      <section class="theatre panel">
+        <div class="theatre-head">
+          <div>
+            <p class="panel-kicker">MEDITERRANEAN OPERATIONS THEATRE</p>
+            <h2>Archive & Agent Network</h2>
+          </div>
+          <div class="theatre-state"><span class="pulse-dot"></span><span id="core-state">SYSTEM STANDBY</span></div>
+        </div>
+
+        <div class="map-stage">
+          <svg class="med-map" viewBox="0 0 1000 560" aria-label="Mediterranean research operations map">
+            <defs>
+              <radialGradient id="coreGlow"><stop offset="0%" stop-color="#d6b66a" stop-opacity=".8"/><stop offset="100%" stop-color="#d6b66a" stop-opacity="0"/></radialGradient>
+              <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+            <path class="coast" d="M92 160 C150 125,235 115,305 128 C360 138,410 120,455 142 C520 175,556 173,610 155 C650 142,688 154,717 185 C750 219,785 228,840 214 C877 204,914 213,947 245"/>
+            <path class="coast" d="M104 365 C175 349,226 352,286 377 C350 403,428 416,507 401 C566 390,630 398,689 423 C734 442,783 447,842 433 C889 422,921 407,952 382"/>
+            <path class="island" d="M493 300c21-8 39-6 58 2c-17 7-40 8-58-2z"/>
+            <path class="island" d="M600 330c14-7 29-7 45-1c-14 8-28 9-45 1z"/>
+            <path class="island" d="M682 300c11-6 22-5 35 0c-10 7-22 8-35 0z"/>
+            <g id="route-layer"></g>
+
+            <g class="archive-node" data-agent="spanish_simancas" transform="translate(138 205)">
+              <circle r="18"/><circle class="halo" r="30"/><text x="28" y="5">SIMANCAS</text>
+            </g>
+            <g class="archive-node" data-agent="french" transform="translate(300 160)">
+              <circle r="15"/><circle class="halo" r="25"/><text x="24" y="5">FRANCE</text>
+            </g>
+            <g class="archive-node" data-agent="venetian" transform="translate(530 205)">
+              <circle r="18"/><circle class="halo" r="30"/><text x="28" y="5">VENICE</text>
+            </g>
+            <g class="archive-node" data-agent="italian_states" transform="translate(505 270)">
+              <circle r="13"/><circle class="halo" r="22"/><text x="22" y="5">ITALIAN STATES</text>
+            </g>
+            <g class="archive-node" data-agent="ottoman" transform="translate(780 220)">
+              <circle r="18"/><circle class="halo" r="30"/><text x="28" y="5">OTTOMAN</text>
+            </g>
+            <g class="archive-node" data-agent="north_african" transform="translate(650 405)">
+              <circle r="16"/><circle class="halo" r="27"/><text x="26" y="5">NORTH AFRICA</text>
+            </g>
+            <g class="archive-node" data-agent="british" transform="translate(280 70)">
+              <circle r="13"/><circle class="halo" r="22"/><text x="22" y="5">BRITAIN</text>
+            </g>
+            <g class="archive-node" data-agent="dutch" transform="translate(375 78)">
+              <circle r="12"/><circle class="halo" r="20"/><text x="21" y="5">DUTCH</text>
+            </g>
+            <g class="archive-node" data-agent="german" transform="translate(455 95)">
+              <circle r="12"/><circle class="halo" r="20"/><text x="21" y="5">GERMAN</text>
+            </g>
+
+            <g class="core" transform="translate(515 330)">
+              <circle class="core-glow" r="88" fill="url(#coreGlow)"/>
+              <circle class="core-ring outer" r="58"/>
+              <circle class="core-ring inner" r="42"/>
+              <circle class="core-center" r="18"/>
+              <text class="core-title" x="0" y="-4">JARVIS</text>
+              <text class="core-sub" x="0" y="16">RESEARCH CORE</text>
+            </g>
+          </svg>
+
+          <div id="agent-orbit" class="agent-orbit"></div>
+          <div class="scanline"></div>
+        </div>
+
+        <div class="theatre-footer">
+          <div><span class="legend-dot running"></span>Searching</div>
+          <div><span class="legend-dot completed"></span>Complete</div>
+          <div><span class="legend-dot blocked"></span>Blocked</div>
+          <div><span class="legend-dot queued"></span>Queued</div>
+          <div class="spacer"></div>
+          <div>Automatic VERIFIED: <strong>DISABLED</strong></div>
+        </div>
+      </section>
+
+      <aside class="right-rail panel">
+        <div class="panel-head compact">
+          <div><p class="panel-kicker">LIVE EVIDENCE FEED</p><h2>Intelligence Stream</h2></div>
+          <button id="clear-log" class="ghost">Clear</button>
+        </div>
+        <div id="evidence-feed" class="evidence-feed"></div>
+        <div class="rail-title">Scientific QA</div>
+        <div class="qa-stack">
+          <div><span>Source genealogy</span><b id="qa-genealogy">WAITING</b></div>
+          <div><span>Contradiction search</span><b id="qa-contradiction">WAITING</b></div>
+          <div><span>Original inspected</span><b id="qa-original">PENDING</b></div>
+          <div><span>Human review</span><b class="amber">REQUIRED</b></div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="lower-grid">
+      <div class="panel mission-log">
+        <div class="panel-head">
+          <div><p class="panel-kicker">TACTICAL EVENT STREAM</p><h2>Mission Log</h2></div>
+          <button id="refresh-button" class="ghost">Refresh</button>
+        </div>
+        <div id="mission-log" class="log-stream"></div>
+      </div>
+
+      <div class="panel claims-panel">
+        <div class="panel-head"><div><p class="panel-kicker">CLAIM CONTROL</p><h2>Research State</h2></div></div>
+        <div class="claim-stats">
+          <div><span>Candidate claims</span><strong id="claim-candidates">0</strong></div>
+          <div><span>Evidence items</span><strong id="claim-evidence">0</strong></div>
+          <div><span>Open contradictions</span><strong id="claim-conflicts">0</strong></div>
+        </div>
+        <div class="safety-card">
+          <span>SCIENTIFIC SAFETY GATE</span>
+          <strong>NO AUTOMATIC HISTORICAL VERIFICATION</strong>
+          <p>Every claim remains candidate / unresolved until provenance, original inspection, corroboration and human review pass.</p>
+        </div>
+      </div>
+    </section>
+
+    <nav class="tabs" aria-label="Command center detail sections">
       <button class="tab active" data-tab="agents">Agents</button>
-      <button class="tab" data-tab="jobs">Research Jobs</button>
+      <button class="tab" data-tab="jobs">Jobs</button>
       <button class="tab" data-tab="connectors">Connectors</button>
       <button class="tab" data-tab="evidence">Evidence</button>
-      <button class="tab" data-tab="claims">Claims</button>
       <button class="tab" data-tab="qa">Scientific QA</button>
     </nav>
 
-    <main>
-      <section id="tab-agents" class="tab-panel active">
-        <div class="panel-head">
-          <div><p class="eyebrow">LIVE WORKFORCE</p><h2>Research agents</h2></div>
-          <button id="refresh-button" class="ghost">Refresh snapshot</button>
-        </div>
-        <div id="agent-grid" class="agent-grid"></div>
-      </section>
-
-      <section id="tab-jobs" class="tab-panel">
-        <div class="panel-head"><div><p class="eyebrow">QUEUE / HISTORY</p><h2>Research jobs</h2></div></div>
-        <div id="jobs-table" class="table-wrap"></div>
-      </section>
-
-      <section id="tab-connectors" class="tab-panel">
-        <div class="panel-head"><div><p class="eyebrow">ARCHIVE ACCESS</p><h2>Connector state</h2></div></div>
-        <div id="connector-grid" class="connector-grid"></div>
-      </section>
-
-      <section id="tab-evidence" class="tab-panel">
-        <div class="panel-head"><div><p class="eyebrow">PROVENANCE</p><h2>Evidence stream</h2></div></div>
-        <div id="evidence-list" class="feed empty">No evidence events yet.</div>
-      </section>
-
-      <section id="tab-claims" class="tab-panel">
-        <div class="panel-head"><div><p class="eyebrow">CLAIM MATRIX</p><h2>Claims</h2></div></div>
-        <div id="claims-list" class="feed empty">No claim events yet.</div>
-      </section>
-
-      <section id="tab-qa" class="tab-panel">
-        <div class="panel-head"><div><p class="eyebrow">SCIENTIFIC GATES</p><h2>Scientific QA</h2></div></div>
+    <section class="detail-deck">
+      <div id="tab-agents" class="tab-panel active"><div id="agent-grid" class="agent-grid"></div></div>
+      <div id="tab-jobs" class="tab-panel"><div id="jobs-table" class="table-wrap"></div></div>
+      <div id="tab-connectors" class="tab-panel"><div id="connector-grid" class="connector-grid"></div></div>
+      <div id="tab-evidence" class="tab-panel"><div id="evidence-list" class="feed"></div></div>
+      <div id="tab-qa" class="tab-panel">
         <div class="qa-grid">
           <article><span>Automatic VERIFIED</span><strong>DISABLED</strong></article>
-          <article><span>Source genealogy</span><strong id="qa-genealogy">WAITING</strong></article>
-          <article><span>Contradiction search</span><strong id="qa-contradiction">WAITING</strong></article>
-          <article><span>Human review</span><strong id="qa-human">REQUIRED</strong></article>
+          <article><span>Source genealogy</span><strong>REQUIRED</strong></article>
+          <article><span>Contradiction search</span><strong>REQUIRED</strong></article>
+          <article><span>Human review</span><strong>REQUIRED</strong></article>
         </div>
-      </section>
-
-      <section class="mission-log">
-        <div class="panel-head">
-          <div><p class="eyebrow">LIVE EVENT STREAM</p><h2>Mission log</h2></div>
-          <button id="clear-log" class="ghost">Clear local view</button>
-        </div>
-        <div id="mission-log" class="log-stream" aria-live="polite"></div>
-      </section>
-    </main>
+      </div>
+    </section>
   </div>
   <script src="./command-center.js"></script>
 </body>
