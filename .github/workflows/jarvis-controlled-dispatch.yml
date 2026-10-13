@@ -116,3 +116,21 @@ jobs:
             -f purpose="$PURPOSE" \
             -f selected_agents="$SELECTED_AGENTS"
           echo "JARVIS_CONTROLLED_DISPATCH_SENT agents=$SELECTED_AGENTS"
+
+
+      - name: Dispatch parallel specialist historical agents
+        env:
+          GH_TOKEN: "${{ github.token }}"
+          TARGET: "${{ steps.jarvis.outputs.target }}"
+          ALIASES: "${{ steps.jarvis.outputs.aliases }}"
+          DATE_RANGE: "${{ steps.jarvis.outputs.date_range }}"
+          PURPOSE: "${{ steps.jarvis.outputs.purpose }}"
+        run: |
+          gh workflow run jarvis-specialist-research.yml \
+            --ref main \
+            -f target="$TARGET" \
+            -f aliases="$ALIASES" \
+            -f date_range="$DATE_RANGE" \
+            -f purpose="$PURPOSE" \
+            -f target_type="auto"
+          echo "JARVIS_SPECIALIST_DISPATCH_SENT"
