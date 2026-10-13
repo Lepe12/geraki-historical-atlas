@@ -5,6 +5,7 @@ sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from request_context import load_request
 from evidence_model import normalize_date,toponym_identity
 from exact_page_mapping import pages_for_hit
+from claim_evidence_matrix import build_lane as build_claim_evidence_matrix
 
 LANE=os.getenv("PCT_RESEARCH_LANE","travellers")
 NOW=datetime.datetime.now(datetime.timezone.utc).isoformat()
@@ -129,6 +130,37 @@ write("human_review/review_queue.json",{
  } for c in candidates],
  "rule":"MACHINE_CHECKED and HUMAN_REVIEWED are distinct states."
 })
+
+claim_matrix=build_claim_evidence_matrix(pathlib.Path("."),LANE)
+write("claim_evidence_matrix/claims.json",claim_matrix)
+
+source_first_lines=[
+ "# Source-first research report",
+ "",
+ "This report preserves evidence without model-assisted historical synthesis.",
+ ""
+]
+for claim in claim_matrix.get("claims",[]):
+    source_first_lines.extend([
+      "## "+str(claim.get("claim_id")),
+      "Status: **"+str(claim.get("machine_recommendation","UNRESOLVED"))+"**",
+      "",
+      "### Preserved claim/evidence text",
+      str(claim.get("claim_text") or "_No controlled claim text recorded._"),
+      "",
+      "### Uncertainties"
+    ])
+    for uncertainty in claim.get("uncertainties",[]) or ["NONE_RECORDED"]:
+        source_first_lines.append("- "+str(uncertainty))
+    source_first_lines.extend([
+      "",
+      "### Contradiction search",
+      "- "+str(claim.get("contradiction_search_status","NOT_ASSESSED")),
+      ""
+    ])
+pathlib.Path("claim_evidence_matrix/source_first_report.md").write_text(
+    "\n".join(source_first_lines)+"\n",encoding="utf-8"
+)
 
 gate_status="NO_EVENT_CANDIDATES" if not candidates else ("NEEDS_EXACT_PAGE_EVIDENCE" if not inspection else "NEEDS_ORIGINAL_INSPECTION")
 verification={
