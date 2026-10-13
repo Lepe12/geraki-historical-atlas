@@ -1,0 +1,29 @@
+name: Library Storage Credential Control
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/library-storage-control.yml']
+permissions:
+  contents: read
+jobs:
+  write-control:
+    if: github.repository == 'Lepe12/geraki-historical-atlas'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Test publishing policy
+        run: python3 -m unittest discover -s tools/storage -p test_library_write_scope.py -v
+      - name: Write nonresearch credential control
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/storage/publish_library_results.py --control

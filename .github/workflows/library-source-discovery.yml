@@ -31,12 +31,15 @@ env:
   PCT_ALIASES: ${{ inputs.aliases }}
   PCT_DATE_RANGE: ${{ inputs.date_range }}
   PCT_PURPOSE: ${{ inputs.purpose }}
-  SEARCHCULTURE_API_KEY: ${{ secrets.SEARCHCULTURE_API_KEY }}
 
 jobs:
   library-discovery:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      SEARCHCULTURE_API_KEY: ${{ secrets.SEARCHCULTURE_API_KEY }}
+    outputs:
+      bundle_ready: ${{ steps.bundle_upload.outputs.artifact-id }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -95,3 +98,39 @@ jobs:
             research_dossier/
             run_manifest/
           if-no-files-found: warn
+      - name: Prepare isolated database import bundle
+        id: prepare_bundle
+        if: always()
+        run: python3 tools/storage/prepare_library_bundle.py
+      - name: Upload normalized results for isolated writer
+        id: bundle_upload
+        if: always() && steps.prepare_bundle.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: library-import-bundle-${{ github.run_id }}
+          path: outbound_library_results/
+          if-no-files-found: error
+          retention-days: 7
+
+  persist-library-results:
+    needs: library-discovery
+    if: always() && github.repository == 'Lepe12/geraki-historical-atlas' && needs.library-discovery.outputs.bundle_ready != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: library-import-bundle-${{ github.run_id }}
+          path: ${{ runner.temp }}/library-import-bundle
+      - name: Publish only this run's library evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUNDLE_DIR: ${{ runner.temp }}/library-import-bundle
+        run: python3 tools/storage/publish_library_results.py --bundle "$BUNDLE_DIR"
