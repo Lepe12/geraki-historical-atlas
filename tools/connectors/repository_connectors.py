@@ -309,7 +309,8 @@ def unsupported(repository, reason="No stable anonymous machine-search connector
 def dispatch(repository,q,lane):
     """Dispatch exact repository labels from lane_repository_plan.py."""
     if repository=="Gallica/BnF": return bnf_sru(q,lane)  # catalogue SRU is stable public fallback
-    if repository=="Google Books": return google_books(q,lane)\n    if repository=="Library of Congress": return library_of_congress(q,lane)
+    if repository=="Google Books": return google_books(q,lane)
+    if repository=="Library of Congress": return library_of_congress(q,lane)
     if repository=="Biblioteca Digital Hispánica": return bne_sru(q,lane)
     if repository=="Archives diplomatiques": return archives_diplomatiques(q,lane)
     if repository=="Archives diplomatiques France": return archives_diplomatiques(q,lane)
