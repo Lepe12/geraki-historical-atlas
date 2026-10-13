@@ -9,6 +9,7 @@ from __future__ import annotations
 import json, os, re, time, urllib.parse, urllib.request, urllib.error, xml.etree.ElementTree as ET, unicodedata
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from html.parser import HTMLParser
+from html import unescape
 
 UA={"User-Agent":"Piratecartography-Historical-Research/3.0 (+scholarly catalogue discovery)"}
 
@@ -235,6 +236,23 @@ def tna_public_content(q,lane):
                   "identifier":au,"title":urllib.parse.unquote(pth.rstrip("/").rsplit("/",1)[-1]).replace("-"," "),
                   "date":[],"url":au
                 })
+            # Card titles can exist without ordinary hrefs. Reconstruct stable
+            # education-resource slugs from heading text, then verify by fetch.
+            if "/education/sessions-and-resources/" in hub:
+                for inner in re.findall(r'(?is)<h[2-4][^>]*>(.*?)</h[2-4]>',raw_hub):
+                    title=unescape(re.sub(r"<[^>]+>"," ",inner))
+                    title=" ".join(title.split())
+                    if not title or len(title)>120: continue
+                    slug=_norm_search_text(title).replace(" ","-")
+                    if not slug: continue
+                    au=base+"/education/resources/"+slug+"/"
+                    if au in seen: continue
+                    seen.add(au)
+                    candidates.append({
+                      "discovery_repository":"The National Archives Public Content",
+                      "discovery_lane":lane,"connector_status":"EXECUTED",
+                      "identifier":au,"title":title,"date":[],"url":au
+                    })
         except Exception:
             continue
     # Bound the fallback crawl and fetch concurrently.
