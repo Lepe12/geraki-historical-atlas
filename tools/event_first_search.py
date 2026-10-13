@@ -38,24 +38,34 @@ def scoped_years(text):
 def dedupe_ocr(items):
     merged={}
     for x in items:
-        key=(x.get("file"),str(x.get("place_match","")).casefold(),tuple(x.get("years_in_scope") or []),tuple(sorted(str(t).casefold() for t in x.get("event_terms") or [])))
+        key=(x.get("file"),str(x.get("place_match","")).casefold(),tuple(x.get("years_in_scope") or []),x.get("status"))
         if key not in merged:
-            y=dict(x);y["occurrence_count"]=1;y["lines"]=[x.get("line")] if x.get("line") else [];merged[key]=y
+            y=dict(x)
+            y["occurrence_count"]=1
+            y["lines"]=[x.get("line")] if x.get("line") else []
+            y["event_terms"]=sorted(set(x.get("event_terms") or []),key=str.casefold)
+            merged[key]=y
         else:
-            y=merged[key];y["occurrence_count"]+=1
-            if x.get("line") and x.get("line") not in y["lines"]:y["lines"].append(x.get("line"))
+            y=merged[key]
+            y["occurrence_count"]+=1
+            if x.get("line") and x.get("line") not in y["lines"]: y["lines"].append(x.get("line"))
+            y["event_terms"]=sorted(set((y.get("event_terms") or [])+(x.get("event_terms") or [])),key=str.casefold)
     return list(merged.values())
 
 def dedupe_catalogue(items):
     merged={}
     for x in items:
-        key=(x.get("repository"),x.get("identifier") or x.get("url"),tuple(x.get("years_in_scope") or []),tuple(sorted(str(t).casefold() for t in x.get("event_terms") or [])),x.get("status"))
+        key=(x.get("repository"),x.get("identifier") or x.get("url"),tuple(x.get("years_in_scope") or []),x.get("status"))
         if key not in merged:
-            y=dict(x);y["occurrence_count"]=1;merged[key]=y
+            y=dict(x)
+            y["occurrence_count"]=1
+            y["event_terms"]=sorted(set(x.get("event_terms") or []),key=str.casefold)
+            merged[key]=y
         else:
-            merged[key]["occurrence_count"]+=1
+            y=merged[key]
+            y["occurrence_count"]+=1
+            y["event_terms"]=sorted(set((y.get("event_terms") or [])+(x.get("event_terms") or [])),key=str.casefold)
     return list(merged.values())
-
 
 root=pathlib.Path("library_acquisition");out=pathlib.Path("event_first_hits");out.mkdir(exist_ok=True)
 hits=[];context_leads=[];catalogue_leads=[]
