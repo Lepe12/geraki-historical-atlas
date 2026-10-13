@@ -6,7 +6,7 @@ remote query completed.  Authentication/browser/key requirements are explicit
 and are never reported as successful searches.
 """
 from __future__ import annotations
-import json, os, re, urllib.parse, urllib.request, xml.etree.ElementTree as ET
+import json, os, re, time, urllib.parse, urllib.request, urllib.error, xml.etree.ElementTree as ET
 from html.parser import HTMLParser
 
 UA={"User-Agent":"Piratecartography-Historical-Research/3.0 (+scholarly catalogue discovery)"}
@@ -187,9 +187,19 @@ def isam(q,lane):
         return "EXECUTED",out,url+" ; DSpace fallback reason="+str(first)
 
 def library_of_congress(q,lane):
-    # Official loc.gov JSON API; public and anonymous.
-    url="https://www.loc.gov/search/?"+urllib.parse.urlencode({"q":q,"fo":"json","c":25})
-    d=_json(url);out=[]
+    # Official loc.gov JSON API; public and anonymous. Keep request volume low.
+    url="https://www.loc.gov/books/?"+urllib.parse.urlencode({"q":q,"fo":"json","c":25})
+    last=None
+    for attempt in range(3):
+        try:
+            d=_json(url,timeout=30);break
+        except urllib.error.HTTPError as exc:
+            last=exc
+            if exc.code not in (429,502,503,504): raise
+            time.sleep(2*(attempt+1))
+    else:
+        raise last
+    out=[]
     for x in d.get("results",[]) or []:
         ident=x.get("id") or x.get("url")
         title=x.get("title")
