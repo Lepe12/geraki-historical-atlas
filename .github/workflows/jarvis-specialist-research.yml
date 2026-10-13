@@ -81,10 +81,13 @@ jobs:
       - name: Run specialist research agent
         run: |
           mkdir -p "specialist_output/${{ matrix.agent }}"
-          PYTHONPATH=tools/connectors python3 tools/orchestrator/jarvis_specialist_worker.py \
+          PYTHONPATH=tools/connectors:tools/orchestrator python3 tools/orchestrator/jarvis_specialist_worker.py \
             --plan specialist_plan.json \
             --agent "${{ matrix.agent }}" \
             --connector-limit 3 \
+            --run-id "${{ github.run_id }}" \
+            --event-root "specialist_output/${{ matrix.agent }}/command_center" \
+            --history-path "specialist_output/${{ matrix.agent }}/task_history.jsonl" \
             --output "specialist_output/${{ matrix.agent }}/result.json"
       - uses: actions/upload-artifact@v4
         if: always()
@@ -131,6 +134,8 @@ jobs:
           mkdir -p "$dest"
           cp SPECIALIST_AGGREGATE.json "$dest/"
           cp -R normalized "$dest/agents"
+          find specialist_results -path '*/command_center/*' -type f -exec sh -c 'mkdir -p "$0/command_center"; cp "$1" "$0/command_center/$(basename "$(dirname "$(dirname "$1")")")-$(basename "$1")"' "$dest" {} \;
+          find specialist_results -name task_history.jsonl -type f -exec sh -c 'cat "$1" >> "$0/TASK_HISTORY.jsonl"' "$dest" {} \;
           git config user.name "jarvis-orchestrator[bot]"
           git config user.email "jarvis-orchestrator@users.noreply.github.com"
           git add "$dest"
