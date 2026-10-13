@@ -6,6 +6,9 @@ on:
       - 'benchmarks/evaluation_requests/*.json'
 permissions:
   contents: write
+concurrency:
+  group: historical-benchmark-results
+  cancel-in-progress: false
 jobs:
   evaluate:
     runs-on: ubuntu-latest
@@ -16,16 +19,21 @@ jobs:
           fetch-depth: 2
       - name: Compile benchmark Python code
         run: python3 -m compileall -q tools
-      - name: Evaluate requested durable runs
+      - name: Evaluate changed benchmark request
         run: |
-          for f in benchmarks/evaluation_requests/*.json; do
-            [ -f "$f" ] || continue
-            python3 - "$f" <<'PY'
+          mapfile -t files < <(git diff-tree --no-commit-id --name-only -r HEAD -- 'benchmarks/evaluation_requests/*.json')
+          if [ "${#files[@]}" -ne 1 ]; then
+            echo "BENCHMARK_REQUEST_SELECTION_ERROR expected exactly 1 changed evaluation request, got ${#files[@]}"
+            printf '%s
+' "${files[@]}"
+            exit 1
+          fi
+          f="${files[0]}"
+          python3 - "$f" <<'PY'
           import json,sys,subprocess
           d=json.load(open(sys.argv[1],encoding="utf-8"))
           subprocess.check_call(["python3","tools/evaluate_live_benchmark.py","--run-id",str(d["run_id"]),"--case-id",d["case_id"]])
           PY
-          done
       - name: Aggregate benchmark metrics
         run: |
           python3 - <<'PY'
