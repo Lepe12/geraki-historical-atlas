@@ -65,7 +65,7 @@ function treeDigest(array $entries): string {
 }
 /** One persistent cat-file process avoids thousands of process launches. */
 final class GitBlobs {
-    private $process; private array $pipes;
+    private $process; private array $pipes = [];
     public function __construct() {
         $this->process=proc_open(['/usr/bin/git','--git-dir='.PCT_GIT,'cat-file','--batch'],[0=>['pipe','r'],1=>['pipe','w'],2=>['file','/dev/null','w']],$this->pipes);
         if (!is_resource($this->process)) throw new RuntimeException('BLOB_READER_FAILED');
