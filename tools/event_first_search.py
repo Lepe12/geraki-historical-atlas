@@ -19,7 +19,7 @@ lo,hi=(min(years),max(years)) if years else (0,9999)
 EVENT=[
  r"corsair\w*",r"corsaire\w*",r"corsar\w*",r"corsaro\w*",r"pirat\w*",r"forban\w*",r"privateer\w*",r"armateur\w*",
  r"raid\w*",r"incursion\w*",r"attaqu\w*",r"assaut\w*",r"attack\w*",r"aanval\w*",r"angriff\w*",r"ataque\w*",r"attacc\w*",r"battle\w*",r"bataill\w*",r"combat\w*",r"bombard\w*",r"bombarde\w*",
- r"pillage\w*",r"ravag\w*",r"saccag\w*",r"sack\w*",r"plunder\w*",r"raub\w*",r"plünder\w*",r"saque\w*",r"sacchegg\w*",r"roov\w*",
+ r"pillage\w*",r"ravag\w*",r"saccag\w*",r"sack\w*",r"plunder\w*",r"presa\w*",r"vitori\w*",r"victor\w*",r"galera\w*",r"raub\w*",r"plünder\w*",r"saque\w*",r"sacchegg\w*",r"roov\w*",
  r"br[uû]l\w*",r"burn\w*",r"incendi\w*",r"brand\w*",r"captur\w*",r"prisonni\w*",r"gevangen\w*",r"gefang\w*",r"cattur\w*",r"captiv\w*",
  r"esclav\w*",r"slave\w*",r"schiav\w*",r"slav\w*",r"tribut\w*",r"contribution\w*",r"ran[cç]on\w*",r"ransom\w*",r"riscatt\w*",r"rescat\w*",r"redenci[oó]n\w*",r"redemption\w*",r"redeem\w*",
  r"zeerover\w*",r"kapern\w*",r"seer[aä]uber\w*",r"ghaz\w*",r"akın\w*",r"esir\w*",r"fidye\w*",
