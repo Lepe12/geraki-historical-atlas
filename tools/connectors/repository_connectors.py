@@ -437,24 +437,26 @@ def searchculture(q,lane):
     key=os.getenv("SEARCHCULTURE_API_KEY","").strip()
     if not key:
         return "API_KEY_REQUIRED",[],"Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
-    url="https://www.searchculture.gr/aggregator/api/search.json?"+urllib.parse.urlencode({"apiKey":key,"general_term":q,"page":1,"pageSize":50})
+    url="https://www.searchculture.gr/aggregator/api/search.json?"+urllib.parse.urlencode({"apiKey":key,"general_term":q,"page":1,"pageSize":25})
     req=urllib.request.Request(url,headers={**UA,"Accept":"application/json"})
-    with urllib.request.urlopen(req,timeout=45) as resp:
+    with urllib.request.urlopen(req,timeout=30) as resp:
         d=json.loads(resp.read().decode("utf-8","replace"))
     out=[]
     for x in d.get("results",[]) or d.get("items",[]) or []:
         uri=x.get("uri") or x.get("id")
         title=x.get("dc_title") or x.get("title")
         if isinstance(title,list): title=" ".join(str(v) for v in title)
-        row={"discovery_repository":"SearchCulture.gr / EKT","discovery_lane":lane,"connector_status":"EXECUTED","identifier":uri,"title":title,"date":x.get("dc_date") or x.get("date") or [],"url":uri,"raw":x}
-        if uri:
-            try:
-                jd=_json(uri.rstrip("/")+"/json",timeout=12)
-                row["raw_full"]=jd
-                row["metadata_text"]=json.dumps(jd,ensure_ascii=False)
-            except Exception:
-                pass
-        out.append(row)
+        out.append({
+          "discovery_repository":"SearchCulture.gr / EKT",
+          "discovery_lane":lane,
+          "connector_status":"EXECUTED",
+          "identifier":uri,
+          "title":title,
+          "date":x.get("dc_date") or x.get("date") or [],
+          "url":uri,
+          "metadata_text":json.dumps(x,ensure_ascii=False),
+          "raw":x
+        })
     return "EXECUTED",out,url
 
 def ddb(q,lane):
