@@ -26,7 +26,7 @@ ROUTES = {
     "italian_states": {
         "match": ["SIAS", "Italian State Archives"],
         "statuses": ["AUTH_OR_BROWSER_REQUIRED", "ARCHIVE_NOT_CONFIRMED"],
-        "route": "manual_browser_queue",
+        "route": "sias_browser",
         "repository": "SIAS / Italian State Archives",
     },
 }
