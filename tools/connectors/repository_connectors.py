@@ -123,9 +123,19 @@ def bnf_sru(q,lane):
     return "EXECUTED",_sru_records(url,"BnF General Catalogue",lane),url
 
 def bne_sru(q,lane):
+    # Alma SRU/CQL: multi-term requests must be boolean AND clauses, not one
+    # literal phrase. Preserve quoted phrases as one token.
+    tokens=re.findall(r'"([^"]+)"|(\\S+)',str(q))
+    vals=[]
+    for quoted,bare in tokens:
+        v=(quoted or bare or "").strip()
+        if v and v.casefold() not in {x.casefold() for x in vals}: vals.append(v)
+    if not vals:
+        vals=[str(q).strip()]
+    cql=" AND ".join('alma.all_for_ui="'+v.replace('"'," ")+'"' for v in vals)
     params={"version":"1.2","operation":"searchRetrieve",
-      "query":'alma.all_for_ui="'+q.replace('"'," ")+'"',
-      "recordSchema":"marcxml","startRecord":1,"maximumRecords":20}
+      "query":cql,
+      "recordSchema":"marcxml","startRecord":1,"maximumRecords":50}
     url="https://catalogo.bne.es/view/sru/34BNE_INST?"+urllib.parse.urlencode(params)
     return "EXECUTED",_sru_records(url,"Biblioteca Nacional de España SRU",lane),url
 
