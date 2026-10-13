@@ -1,0 +1,77 @@
+{
+  "schema": "pct-llm-routing-policy-v1",
+  "prompt_version": "2026-10-13.1",
+  "default_provider": "disabled",
+  "roles": {
+    "planner": {
+      "tier": "fast",
+      "model_env": "PCT_LLM_PLANNER_MODEL",
+      "temperature": 0.1,
+      "max_output_tokens": 1800,
+      "fallbacks": [
+        "deterministic_planner"
+      ],
+      "requires_evidence": false
+    },
+    "query_expander": {
+      "tier": "fast",
+      "model_env": "PCT_LLM_QUERY_MODEL",
+      "temperature": 0.2,
+      "max_output_tokens": 1600,
+      "fallbacks": [
+        "deterministic_query_expander"
+      ],
+      "requires_evidence": false
+    },
+    "evidence_extractor": {
+      "tier": "precise",
+      "model_env": "PCT_LLM_EXTRACTOR_MODEL",
+      "temperature": 0,
+      "max_output_tokens": 2600,
+      "fallbacks": [
+        "source_first_extractor"
+      ],
+      "requires_evidence": true
+    },
+    "synthesis": {
+      "tier": "reasoning",
+      "model_env": "PCT_LLM_SYNTHESIS_MODEL",
+      "temperature": 0.1,
+      "max_output_tokens": 4200,
+      "fallbacks": [
+        "source_first_report"
+      ],
+      "requires_evidence": true
+    },
+    "adversarial_reviewer": {
+      "tier": "reasoning",
+      "model_env": "PCT_LLM_ADVERSARIAL_MODEL",
+      "temperature": 0.1,
+      "max_output_tokens": 3200,
+      "fallbacks": [
+        "deterministic_gap_review"
+      ],
+      "requires_evidence": true
+    },
+    "replanner": {
+      "tier": "reasoning",
+      "model_env": "PCT_LLM_REPLANNER_MODEL",
+      "temperature": 0.1,
+      "max_output_tokens": 2200,
+      "fallbacks": [
+        "registered_route_replan"
+      ],
+      "requires_evidence": false
+    }
+  },
+  "hard_rules": [
+    "LLM output is analysis assistance, never historical verification.",
+    "No LLM role may emit or promote VERIFIED.",
+    "Synthesis and adversarial review must be keyed to an evidence hash.",
+    "If evidence changes, cached synthesis is stale and must not be reused.",
+    "Evidence extractor must preserve exact locators and provenance supplied to it.",
+    "Query expansion may propose aliases but may not assert identity equivalence.",
+    "Replanning may use only registered agents/connectors/routes.",
+    "Secrets are resolved only at execution boundary and never written to prompts, artifacts, logs, or cache."
+  ]
+}
