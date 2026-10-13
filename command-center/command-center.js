@@ -87,6 +87,24 @@
     if(e.event_type?.includes("contradiction")) $("qa-contradiction").textContent="ACTIVE";
     renderAgents();renderLog();renderJobs();renderConnectors();
   }
+  function loadPreviewData(){
+    if(events.length) return;
+    const now=new Date().toISOString();
+    const demo=[
+      {created_utc:now,event_type:"agent_started",agent_id:"venetian",phase:"Moreveneto catalogue search",percent:44,status:"RUNNING",connector_id:"moreveneto_browser"},
+      {created_utc:now,event_type:"agent_progress",agent_id:"spanish_simancas",phase:"PARES record discovery",percent:68,status:"RUNNING",connector_id:"pares_simancas_native"},
+      {created_utc:now,event_type:"agent_completed",agent_id:"identity_resolution",phase:"4 historical name variants reviewed",percent:100,status:"COMPLETED"},
+      {created_utc:now,event_type:"agent_progress",agent_id:"timeline",phase:"Chronology consistency check",percent:73,status:"RUNNING"},
+      {created_utc:now,event_type:"agent_progress",agent_id:"contradiction",phase:"Searching competing accounts",percent:51,status:"RUNNING"},
+      {created_utc:now,event_type:"agent_completed",agent_id:"source_genealogy",phase:"Source dependency map built",percent:100,status:"COMPLETED"}
+    ];
+    demo.forEach(ingest);
+    const note=document.createElement("div");
+    note.className="preview-banner";
+    note.textContent="PREVIEW MODE — live backend is not connected on this static deployment.";
+    document.querySelector(".shell").prepend(note);
+  }
+
   async function loadSnapshot(){
     try{
       const r=await fetch(`${apiBase}/status/${encodeURIComponent(project)}/${encodeURIComponent(runId)}`);
@@ -94,14 +112,16 @@
       const data=await r.json();
       events=[];
       for(const e of data.events||[]) ingest(e);
-    }catch(_){}
+    }catch(_){
+      loadPreviewData();
+    }
   }
   function connect(){
     clearTimeout(retryTimer); setConnection("CONNECTING");
     try{socket=new WebSocket(`${wsBase}/ws/${encodeURIComponent(project)}/${encodeURIComponent(runId)}`)}catch(_){retryTimer=setTimeout(connect,2500);return}
     socket.onopen=()=>setConnection("ONLINE");
     socket.onmessage=m=>{try{ingest(JSON.parse(m.data))}catch(_){}};
-    socket.onclose=()=>{setConnection("OFFLINE");retryTimer=setTimeout(connect,2500)};
+    socket.onclose=()=>{setConnection("OFFLINE");loadPreviewData();retryTimer=setTimeout(connect,5000)};
     socket.onerror=()=>socket.close();
   }
 
