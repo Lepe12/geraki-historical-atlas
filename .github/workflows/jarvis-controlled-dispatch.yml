@@ -43,18 +43,24 @@ jobs:
       - id: request
         name: Resolve one explicit request
         shell: bash
+        env:
+          INPUT_TARGET: ${{ inputs.target }}
+          INPUT_ALIASES: ${{ inputs.aliases }}
+          INPUT_DATE_RANGE: ${{ inputs.date_range }}
+          INPUT_PURPOSE: ${{ inputs.purpose }}
+          INPUT_SELECTED_AGENTS: ${{ inputs.selected_agents }}
         run: |
           set -euo pipefail
           mkdir -p .jarvis_runtime
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             python3 - <<'PY'
-          import json, pathlib
+          import json, os, pathlib
           req={
-            "target": """${{ inputs.target }}""".strip(),
-            "aliases": [x.strip() for x in """${{ inputs.aliases }}""".split("|") if x.strip()],
-            "date_range": """${{ inputs.date_range }}""".strip(),
-            "purpose": """${{ inputs.purpose }}""".strip(),
-            "selected_agents": [x.strip() for x in """${{ inputs.selected_agents }}""".split(",") if x.strip()]
+            "target": os.environ.get("INPUT_TARGET","").strip(),
+            "aliases": [x.strip() for x in os.environ.get("INPUT_ALIASES","").split("|") if x.strip()],
+            "date_range": os.environ.get("INPUT_DATE_RANGE","").strip(),
+            "purpose": os.environ.get("INPUT_PURPOSE","").strip(),
+            "selected_agents": [x.strip() for x in os.environ.get("INPUT_SELECTED_AGENTS","").split(",") if x.strip()]
           }
           p=pathlib.Path('.jarvis_runtime/request.json')
           p.write_text(json.dumps(req,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
