@@ -96,7 +96,11 @@ if disc_path.exists():
           "lead_type":"CATALOGUE_METADATA","context_excerpt":blob[:12000]
         })
 
-hits=dedupe_ocr(hits)\ncontext_leads=dedupe_ocr(context_leads)\ncatalogue_leads=dedupe_catalogue(catalogue_leads)\n\nreport={"schema":"pct-event-first-general-v5","request_file":rf.name,"target":target,"aliases":aliases,
+hits=dedupe_ocr(hits)
+context_leads=dedupe_ocr(context_leads)
+catalogue_leads=dedupe_catalogue(catalogue_leads)
+
+report={"schema":"pct-event-first-general-v5","request_file":rf.name,"target":target,"aliases":aliases,
  "date_range":[lo,hi],"hits":hits,"context_leads":context_leads,"catalogue_leads":catalogue_leads,
  "verification_status":"NEEDS_EVIDENCE","next_stage":"EXACT_PAGE_MAPPING_AND_ORIGINAL_INSPECTION",
  "rule":"OCR and catalogue metadata are discovery leads only. Repeated occurrences within one source/signature are deduplicated and counted, not treated as independent findings. Actor identity is not required."}
