@@ -166,10 +166,19 @@ def _tna_fetch_page(row):
     if not u:return row
     try:
         raw=_get(u,timeout=12).decode("utf-8","replace")
-        raw=re.sub(r"(?is)<(script|style|nav|footer)[^>]*>.*?</\\1>"," ",raw)
-        txt=re.sub(r"<[^>]+>"," ",raw)
+        parser=_LinkParser();parser.feed(raw)
+        child=[]
+        prefix=urllib.parse.urlsplit(u).path.rstrip("/")+"/"
+        for href,title in parser.links:
+            au=urllib.parse.urljoin(u,href)
+            p=urllib.parse.urlsplit(au).path
+            if p.startswith(prefix) and p!=prefix and au not in child:
+                child.append(au)
+        clean=re.sub(r"(?is)<(script|style|nav|footer)[^>]*>.*?</\\1>"," ",raw)
+        txt=re.sub(r"<[^>]+>"," ",clean)
         txt=" ".join(txt.split())
         row["metadata_text"]=txt[:40000]
+        row["child_urls"]=child[:20]
         years=list(dict.fromkeys(re.findall(r"\\b(?:1[0-9]{3}|20[0-9]{2})\\b",txt)))
         row["date"]=years[:16]
     except Exception:
@@ -224,7 +233,28 @@ def tna_public_content(q,lane):
             except Exception: pass
 
     toks=_query_tokens(q)
+    matched_parents=[]
     for r in enriched:
+        body=_norm_search_text((r.get("title") or "")+" "+(r.get("metadata_text") or ""))
+        if toks and all(t in body for t in toks):
+            rows.append(r);matched_parents.append(r)
+
+    # One bounded child-page expansion inside matched education resources.
+    child_rows=[];child_seen=set()
+    for parent in matched_parents:
+        for u in parent.get("child_urls") or []:
+            if "/education/resources/" not in u: continue
+            if u in child_seen: continue
+            child_seen.add(u)
+            child_rows.append({"discovery_repository":"The National Archives Public Content","discovery_lane":lane,"connector_status":"EXECUTED","identifier":u,"title":u.rstrip("/").rsplit("/",1)[-1],"date":[],"url":u})
+    child_rows=child_rows[:40]
+    child_enriched=[]
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        futs=[ex.submit(_tna_fetch_page,r) for r in child_rows]
+        for fut in as_completed(futs):
+            try: child_enriched.append(fut.result())
+            except Exception: pass
+    for r in child_enriched:
         body=_norm_search_text((r.get("title") or "")+" "+(r.get("metadata_text") or ""))
         if toks and all(t in body for t in toks):
             rows.append(r)
