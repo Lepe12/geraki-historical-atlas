@@ -14,6 +14,8 @@ jobs:
         with:
           ref: main
           fetch-depth: 2
+      - name: Compile benchmark Python code
+        run: python3 -m compileall -q tools
       - name: Evaluate requested durable runs
         run: |
           for f in benchmarks/evaluation_requests/*.json; do
@@ -55,7 +57,8 @@ jobs:
             "recall":tp/(tp+fn) if tp+fn else None,
             "false_positive_rate":fp/(fp+tn) if fp+tn else None,
             "date_errors":sum(bool(x.get("date_error")) for x in rows),
-            "entity_errors":sum(bool(x.get("entity_error")) for x in rows),\n            "place_errors":sum(bool(x.get("place_error")) for x in rows),
+            "entity_errors":sum(bool(x.get("entity_error")) for x in rows),
+            "place_errors":sum(bool(x.get("place_error")) for x in rows),
             "interpretation":"Metrics describe the curated benchmark set only; they are not a universal accuracy estimate."
           }
           pathlib.Path("benchmarks/results/SUMMARY.json").write_text(json.dumps(out,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
