@@ -76,20 +76,29 @@ jobs:
         if: matrix.item.route == 'pares_simancas_dynamic'
         run: |
           mkdir -p escalation_output
-          { python connectors/pares_simancas_discover.py "$PCT_TARGET" --limit 5 --max-pages 8 || true; } > escalation_output/result.txt 2>&1
-      - name: Queue unresolved generic SIAS browser escalation
-        if: matrix.item.route == 'manual_browser_queue'
+          set +e
+          python connectors/pares_simancas_discover.py "$PCT_TARGET" --limit 5 --max-pages 8 > escalation_output/native.txt 2>&1
+          code=$?
+          set -e
+          if [ "$code" -ne 0 ]; then
+            python -m pip install --upgrade pip
+            pip install playwright
+            python -m playwright install --with-deps chromium
+            { python connectors/pares_browser_search.py "$PCT_TARGET" || true; } > escalation_output/browser.txt 2>&1
+          fi
+          cat escalation_output/native.txt > escalation_output/result.txt
+          if [ -f escalation_output/browser.txt ]; then
+            printf '\n--- BROWSER FALLBACK ---\n' >> escalation_output/result.txt
+            cat escalation_output/browser.txt >> escalation_output/result.txt
+          fi
+      - name: Run SIAS restricted browser escalation
+        if: matrix.item.route == 'sias_browser'
         run: |
+          python -m pip install --upgrade pip
+          pip install playwright
+          python -m playwright install --with-deps chromium
           mkdir -p escalation_output
-          python3 - <<'PY' > escalation_output/result.txt
-          import json,os
-          print(json.dumps({
-            'status':'BROWSER_AGENT_REQUIRED',
-            'target':os.environ.get('PCT_TARGET',''),
-            'repository':'SIAS / Italian State Archives',
-            'note':'No safe generic automated SIAS browser connector is currently available. Preserve as explicit escalation; do not claim repository searched.'
-          },ensure_ascii=False,indent=2))
-          PY
+          { python connectors/sias_browser_search.py "$PCT_TARGET" || true; } > escalation_output/result.txt 2>&1
       - name: Persist escalation result
         env:
           ROUTE: ${{ matrix.item.route }}
@@ -114,6 +123,9 @@ jobs:
           PY
           git config user.name "jarvis-escalation[bot]"
           git config user.email "jarvis-escalation@users.noreply.github.com"
+          if [ -d "evidence/browser_sessions" ]; then
+            cp -R evidence/browser_sessions "$dest/browser_sessions"
+          fi
           git add "$dest"
           git commit -m "JARVIS archive escalation: $PCT_PARENT_RUN_ID $LANE $ROUTE"
           for n in 1 2 3 4 5; do
