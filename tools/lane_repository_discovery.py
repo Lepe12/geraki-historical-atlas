@@ -76,15 +76,18 @@ for r in plan["repositories"]:
             if ys: focused.append(f'"{n}" {ys[0]}')
         repo_terms=list(dict.fromkeys(focused))[:int(os.getenv("PCT_OTTOMAN_REPO_QUERY_LIMIT","8"))]
     if name=="SearchCulture.gr / EKT":
-        greek_names=[x for x in [plan.get("target")]+plan.get("aliases",[]) if any("\u0370"<=ch<="\u03ff" for ch in str(x))]
-        base_name=greek_names[0] if greek_names else plan.get("target")
+        target=str(plan.get("target") or "").strip()
+        aliases=[str(x).strip() for x in plan.get("aliases",[]) if str(x).strip()]
+        greek_names=[x for x in [target]+aliases if any("\u0370"<=ch<="\u03ff" for ch in x)]
         ys=[x for x in str(plan.get("date_range","")).replace("-"," ").split() if x.isdigit()]
-        repo_terms=[
-          f"{base_name} πειρατές",
-          f"{base_name} κατάληψη",
-          f"{base_name} {ys[0]}" if ys else str(base_name)
-        ]
-        repo_terms=list(dict.fromkeys(repo_terms))[:int(os.getenv("PCT_SEARCHCULTURE_QUERY_LIMIT","3"))]
+        repo_terms=[]
+        for n in [target]+aliases[:3]:
+            if n: repo_terms.append(n)
+        if ys: repo_terms.append(ys[0])
+        repo_terms += ["πειρατές","Τούρκοι πειρατές","αιχμαλωσία","κατάληψη"]
+        if greek_names and ys:
+            repo_terms.append(f"{greek_names[0]} {ys[0]}")
+        repo_terms=list(dict.fromkeys(q for q in repo_terms if q))[:int(os.getenv("PCT_SEARCHCULTURE_QUERY_LIMIT","10"))]
     if name=="The National Archives Public Content":
         ys=[x for x in str(plan.get("date_range","")).replace("-"," ").split() if x.isdigit()]
         target=str(plan.get("target") or "").strip()
