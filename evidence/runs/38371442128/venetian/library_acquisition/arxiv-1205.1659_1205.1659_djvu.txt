@@ -1,0 +1,8194 @@
+DESY 12-065, Edinburgh 2012/04, HU-EP-12/14, Liverpool LTH 919 
+
+
+
+Wilson loops to 20th order numerical stochastic perturbation theory 
+
+R. Horsley,! G. Hotzel E.-M. Ilgenfritz,^. * r. MiUo,^ H. Perlt,^ 
+
+P. E. L. Rakow,^ Y. Nakamura,'' G. Schierholz,'^ and A. Schiller^ 
+
+^School of Physics, University of Edinburgh, Edinburgh EH9 3JZ, UK 
+^Institut fiir Theoretische Physik, Universitdt Leipzig, D-04109 Leipzig, Germany 
+^Institut fiir Physik, Humboldt- Universitdt zu Berlin, D- 124-89 Berlin, Germany 
+Joint Institute for Nuclear Research, VBLHEP, 141980 Dubna, Russia 
+^Theoretical Physics Division, Department of Mathematical Sciences, 
+University of Liverpool, Liverpool L69 3BX, UK 
+^RIKEN Advanced Institute for Gomputational Science, Kobe, Hyogo 650-0047, Japan 
+^ Deutsches Elektronen- Synchrotron DESY, D-22603 Hamburg, Germany 
+
+We calculate perturbative contributions of Wilson loops of various sizes up to order 20 in SU (3) 
+pure lattice gauge theory at different lattice sizes for Wilson gauge action using the technique of 
+numerical stochastic perturbation theory. This allows us to investigate the perturbative series for 
+various Wilson loops at high orders of perturbation theory. We observe differences in the behavior 
+of those series as function of the loop order n. Up to n = 20 we do not find evidence for the factorial 
+growth of the expansion coefficients often assumed to characterize an asymptotic series. Based on the 
+actually observed behavior we sum the series in a model parametrized by hypergeometric functions. 
+For Wilson loops of moderate sizes the summed series in boosted perturbation theory reach stable 
+plateaus already for moderate orders in perturbation theory. The coefficients in the boosted series 
+become much more stable in the result of smoothing the coefficients of the original series effected 
+by the hypergeometric model. We introduce generalized ratios of Wilson loops of different sizes. 
+Together with the corresponding Wilson loops from standard Monte Carlo measurements they enable 
+us to assess their non-perturbative parts. 
+
+PACS numbers: ll.15.Ha, 12.38.Gc, 12.38.Cy,12.38.Aw 
+Keywords: Lattice gauge theory, stochastic perturbation theory 
+
+
+
+I. INTRODUCTION 
+
+Since the non-perturbative gluon condensate has 
+been introduced by Shifman, Vainshtein and Za- 
+kharov 1] there have been many attempts to ob- 
+tain reliable numerical values for this quantity. It 
+has become clear very soon that lattice gauge the- 
+ory provides a promising tool to calculate the gluon 
+condensate from first principles using Wilson loops 
+Wnm of various sizes NxM. The perturbative ex- 
+pansion of the Wilson loop ~ which does not depend 
+on an external scale - is especially simple since it 
+cannot depend on logarithms. In 0, y| the pla- 
+quette was used whereas larger Wilson loops have 
+been investigated in In all cases it turned out, 
+
+that the knowledge - as precisely as possible - of 
+the large order perturbative tail of the Wilson loops 
+is crucial. In the last decade, the application of nu- 
+merical stochastic perturbation theory (NSPT) |6| 
+has pushed the perturbative order of the plaquette 
+up to order n = 10 Q and even n = 16 [1]. 
+
+Apart from the desired evaluation of the gluon 
+
+
+
+'Present address: Institut fiir Physik, Humboldt-Univcrsitat 
+zu Berlin, D-12489 Berlin, Germany 
+
+
+
+condensate, there is a general interest in the be- 
+havior of perturbative series in QCD (for an inves- 
+tigation see 0). In perturbation theory observables 
+can be written as series of the form 
+
+0^^c„A", (1) 
+
+n 
+
+where A denotes some generic coupling, e.g. as. It 
+is generally believed that these series are asymp- 
+totic ones, and it is often assumed that for large 
+n the leading growth of the coefficients c„ can be 
+parametrized as |10|] 
+
+cn^ Ci{C2TT{n + C^) (2) 
+
+with some constants Ci,C2,C3, i.e., they show a 
+factorial behavior. 
+
+Using the technique of NSPT one can reach 
+loop orders of perturbation theory where a possible 
+set-in of this assumed behavior becomes testable. 
+In [ll| Narison and Zakharov discussed the differ- 
+ence between short and long perturbative series and 
+its impact on the determination of the gluon con- 
+densate. 
+
+In this paper we present perturbative calcula- 
+tions of Wilson loops in NSPT for the Wilson gauge 
+
+
+
+2 
+
+
+
+action (with /3 = 6/.g^) 
+
+
+
+Sw[U]^f3j2 
+
+
+
+-Tr 
+
+
+
+6 
+
+
+
+ul 
+
+
+
+(3) 
+
+
+
+up to order n — 20 for lattice sizes with L ~ 
+4,6,8,12. The computation for i = 12 were per- 
+formed on a NEC SX-9 computer of RCNP at Os- 
+aka University, all others on Linux/HP clusters at 
+Leipzig University. 
+
+The paper is organized as follows. In Section |lT] 
+we explain how the loop order expansion of Wilson 
+loops has been obtained in NSPT. In Section IIIII 
+we discuss a model which allows us to sum up com- 
+pletely the obtained Wilson loops series on finite 
+lattices. As an alternative we apply boosted per- 
+turbation theory consisting in a rearrangement of 
+the series such that already for a summation up to 
+relatively low loop number good convergence of the 
+summed series can be achieved. These results are 
+used to estimate the gluon condensate in Section 
+IVI Finally we draw our conclusions. 
+
+Some preliminary results have been presented in 
+recent lattice proceedings [l^, [l^l ■ In the present 
+work we give the computational details of the 
+Langevin calculation for the final statistics reached 
+and significantly extend the analysis part using 
+boosting and series summation as well as adding 
+new aspects to the analysis of Wilson loops of mod- 
+erate size. 
+
+
+
+II. NSPT AND WILSON LOOPS UP TO 20 
+LOOPS 
+
+A. The strategy of NSPT 
+
+Numerical stochastic perturbation theory - 
+based on stochastic quantization [l^ - allows per- 
+turbative calculations on finite lattices up to finite 
+but high loop order n, unrivalled by the standard 
+diagrammatic approach in lattice perturbation the- 
+ory. Practical limits are set only by computer time, 
+storage limitations and machine precision. For in- 
+stance, in order to calculate in the 7i-loop order 
+in the simplest realization of NSPT in the Euler 
+scheme, one has to keep simultaneously links corre- 
+sponding to roughly 2n gauge field configurations 
+for a given lattice size. If one wants to keep for 
+practical reasons also the gauge fields (vector po- 
+tentials) besides the gauge field links themselves, 
+the storage requirement is even doubled. In addi- 
+tion, the computer time of the Langevin simulation 
+scales quite severely, we found it roughly goes like 
+
+^3 
+
+
+
+The algorithm of NSPT has been introduced and 
+discussed in detail in [l^. For convenience, we 
+will here repeat the main points for pure SU (3) lat- 
+tice gauge theory. The stochastic evolution of the 
+gauge field links Ux,fj,, located at the link between 
+lattice sites x and x -\- fi, occurs in an additional 
+"Langevin time" t. This process is described by 
+the Langevin equation 
+
+
+
+d_ 
+
+dr 
+
+
+
+(4) 
+
+The so-called drift term is given by the variation 
+of the Euclidean gauge action Sw \U] : it is written 
+in terms of the left Lie derivative V^.p which keeps 
+the links in the SU{?>) group manifold. The process 
+is made stochastic by additive white noise rj^^^ir). 
+In the limit of large r the distribution of subse- 
+quent, simultaneous gauge link fields converges to 
+the Gibbs measure P[U] oc exp{—Sw[U]). 
+
+As in any numerical approach one needs to dis- 
+cretize the "Langevin time" as a sequence r — fee, 
+with running step number k. It is known that, in 
+order to extract correct equilibrium physics, one 
+needs to perform the double extrapolation fc — oo 
+and e — ?> 0, the latter in order not to violate de- 
+tailed balance. For the numerical solution of the 
+Langevin equation we adhere to a particular ver- 
+sion of the Euler scheme that guarantees all the 
+link matrices Ux,^, G SU{3) to stay in the group 
+manifold: 
+
+UxA'' + = exp{i Fx^f,[U,r]]) Ux^^{k;iq) (5) 
+
+with the force term for the update of the gauge links 
+Ux,p.{k; 1]) in the form 
+
+
+
+(6) 
+
+
+
+rj being a traceless 3x3 noise matrix. In case of the 
+Wilson gauge action that force term takes the form 
+
+
+
+Fx . n — 
+
+
+
+12 ^ 
+
+
+
+-Ul 
+
+
+
+-^Tr[Up-Up 
+
+
+
+(7) 
+
+
+
+We expand each link matrix at any time step 
+in the bare coupling constant g around the trivial 
+vacuum Ux,fj. = 1- Since jS — the expansion 
+
+reads 
+
+
+
+Ux,f,{k;r]) 
+
+
+
+1 
+
+
+
+m>l 
+
+
+
+(8) 
+
+
+
+If one rescales the time step to e = /3e, the expan- 
+sion ([5]) converts the Langevin equation (O into a 
+
+
+
+3 
+
+
+
+system of simultaneous updates in terms of the ex- 
+pansion coefficients of U^^^} [k] rf) and of similar ex- 
+pansion coefficients for the force F^;,^ in (O, but free 
+of adjustable constants. While the random noise 77 
+enters only the lowest order equation, higher orders 
+are rendered stochastic by the noise propagating 
+from lower to higher order terms. The system is 
+usually truncated according to the maximal order 
+of the perturbative gauge link fields one is inter- 
+ested in. 
+
+For NSPT it is indispensable to perform stochas- 
+tic gauge fixing by using a variant of gauge trans- 
+formations 
+
+
+
+the sense of an expansion 
+
+
+
+G 
+
+
+
+Gx Ux,ii 
+
+
+
+(9) 
+
+
+
+with Gx derived from the Landau gauge and ex- 
+panded in powers of ~ 5. A convenient so- 
+lution for the gauge transformation G comes with 
+the choice 
+
+Gx = exp |-a Y: [ — ) I , 
+
+(10) 
+
+where the series variant of the expression has to be 
+taken. Here the (antihermitean) vector potential 
+■^x+fL/2,ti is related to the link matrices Ux,^, via 
+
+
+
+Ax+fi/2,fi = ^OgUx,fj, : 
+
+
+
+(11) 
+
+
+
+and an expansion similar to (|S]) taking values in the 
+algebra sm(3) is applied for the potential. 
+
+The need for stochastic gauge fixing comes from 
+the fact that the diffusion of the longitudinal com- 
+ponent of the fields is unbounded and hence 
+their norms would diverge in the course of the 
+stochastic process. Although gauge-invariant quan- 
+tities are in principle not affected by these diver- 
+gences, the performance eventually runs into trou- 
+ble due to loss of accuracy. It turns out that one 
+step of ([U using (fTO|) alternating with the Langevin 
+step ([S]) is sufficient to keep fluctuations under con- 
+trol, if a is chosen of order a ~ e. 
+
+The influence of zero modes of the gluon field on 
+the performance of the Langevin process has been 
+critically discussed in [l^. Since zero modes (con- 
+stant modes) of the gauge fields do not contribute 
+to the discretized divergence present in pHt . they 
+would not be subtracted by performing the gauge 
+transformation. We take the simplest prescription 
+of subtracting zero modes at every order by hand. 
+This completes the specification how NSPT is used 
+in our calculations. 
+
+Let us remark that, whenever we speak about 
+contributions of some order to an observable con- 
+structed out of links, this has to be understood in 
+
+
+
+(12) 
+
+
+
+m>0 
+
+
+
+and the expansion coefficient (O'^™^) are extracted 
+out of the expanded r.h.s. of ([5]) by comparing co- 
+efficients of equal powers /3^™/2 (or 5™). In the 
+notation of (1121) even integers m correspond to gen- 
+uine loop contributions (with loop order to/2). In 
+the computer implementation of NSPT we practi- 
+cally measure observables for various small but fi- 
+nite values of e. The final result is then obtained 
+by performing the extrapolation to e — > for the 
+observables in each loop order. 
+
+
+
+B. NSPT results for Wilson loops in high 
+order perturbation theory 
+
+In lattice gauge theory the Wilson loop as a gauge 
+invariant quantity built only out of gauge field links 
+is defined as the trace of a product of link fields 
+along a closed path C 
+
+
+
+Wc[U] = ^Tv W 
+
+
+
+(13) 
+
+
+
+Having at our disposal the expansion of the links 
+(at finite Langevin step size) close to the trivial 
+
+vacuum J/i*^/! = 1 to all orders in g cx 1/ ^/Z?^ 
+
+
+
+Ux 
+
+
+
+T?l>0 
+
+
+
+(14) 
+
+
+
+we construct perturbative Wilson loops within a 
+given "Langevin configuration" (at fixed "Langevin 
+time"). Inserting the expansion (|14p for the links 
+in (|13|) we collect terms of equal power in g on the 
+right hand side and identify these with the n-th 
+loop order contribution W^"^ on the left hand side 
+
+(") „2ji _ 
+
+
+
+E ^c9 
+
+n=0, 1/2, 1,3/2,. 
+
+
+
+n [ E ^i: 
+
+
+
+(15) 
+
+
+
+The final result involves averaging over different 
+configurations obtained during the Langevin evo- 
+lution and the extrapolation to e — >■ 0. 
+
+
+
+^ From now we use as expansion parameter the gauge cou- 
+pling g, using the same notation for the coefficients U^f} . 
+
+
+
+4 
+
+
+
+Here we consider rectangular Wilson loops C of 
+size N X M, where we restrict the maximal side 
+length of the Wilson loop to half of the lattice size 
+L/2 for a lattice L*. Therefore, we identify the gen- 
+eral perturbative loop order expansion of the Wil- 
+son loop Wnm in terms of the bare lattice coupling 
+9 as 
+
+Wnm= E <"m5'" (16) 
+
+n=0, 1/2, 1,3/2,... 
+
+with the Wilson loop expansion coefficients W^lj 
+
+i^NM = "^^^ integer powers n = 1,2,... in 
+the series denote the perturbative loop orders 
+as in diagrammatic perturbation theory. 
+
+In addition, following ([T5|) we measure analogues 
+of the loop coefficients W^lj also for half-integer 
+n — 3/2, 5/2, . . . (Due to the color trace the coef- 
+ficient with n = 1/2 is identically equal to zero). 
+Averages over coefficients with those half-integers 
+- which describe non-loop contributions - should 
+vanish numerically after averaging over a sufficient 
+number of measurements and define some level of 
+"noise" for finite statistics to be compared to the 
+loop contributions. While higher loop order con- 
+tributions decrease fast with the loop number, the 
+"noise" does not decrease sufficiently fast, staying 
+near zero. Therefore, we adopt here the criterion 
+that we can take the expansion coefficients for a 
+given loop order n for granted ( "reliable" ) only if 
+they can be clearly distinguished numerically from 
+the noisy results for adjacent non-loop contribu- 
+tions of orders n — 1/2 and n + 1/2. We do not 
+rule out the possibility of an extrapolation to zero 
+Langevin step size crossing in a systematic way the 
+noise region near zero from a positive/negative co- 
+efficient at large e to a negative/positive coefficient 
+at smallest e. The coefficient extrapolated to £ = 
+might be as small as the noise of the adjacent non- 
+loop contributions. 
+
+Let us add some details of the perturbative 
+Langevin simulation: Instead of having one link 
+configuration as in usual Monte Carlo studies, we 
+have to handle 40 link configurations building our 
+"perturbative" configuration for each g order to 
+reach loop order 20 at each Langevin step. So, un- 
+avoidably, the different orders in g are correlated, 
+since we have to use a correlated system of Langevin 
+equations for each order. 
+
+Any simulation for a chosen Langevin step size 
+£ starts from a link configuration, where the ze- 
+roth order in g of the expanded links is put equal 
+to one (and remains so during all the evolution), 
+whereas all non-zero orders in g are set initially to 
+zero (a "cold" start). So any loop contribution is by 
+
+
+
+construction vanishing at the beginning. Starting 
+from here with the Langevin process including the 
+noise term, the non-zero g orders of the links iter- 
+atively obtain non-zero values at each link position 
+starting from the lowest order in g. Therefore, the 
+highest order in g needs the highest minimal num- 
+ber of Langevin steps to reach equilibrium. With 
+decreasing step size e that minimal number also in- 
+creases. 
+
+As a criterion to reach the equilibrium of the 
+Langevin process, we studied the behavior of the 
+perturbative plaquette. By monitoring the highest 
+order of the plaquette at the lowest chosen step size 
+£ = 0.01, we observed that equilibrium is reached 
+after roughly 2000 Langevin steps. To be on the 
+safe side we have discarded the first 5000 Langevin 
+steps after a "cold" start before we began mea- 
+surements of the perturbative Wilson loops. To 
+increase statistics, we also created new "parallel" 
+Langevin trajectories (keeping the same parameter 
+£) starting from a configuration already in equilib- 
+rium (given in replicas representing all orders in 17) 
+after changing the seeds for the white noise. Only in 
+these cases the strategy of averaging over indepen- 
+dent realizations of noise has been followed. Other- 
+wise, subsequent sequences of noise are considered 
+as independent. 
+
+We have observed that the autocorrelations in- 
+crease on one side with increasing loop order and 
+on the other side with increasing Wilson loop size. 
+The perturbative Wilson loops have been measured 
+after each 20*'' Langevin step to reduce autocorrela- 
+tions. The integrated autocorrelation times are in- 
+cluded in the error estimate of the measured quan- 
+tities. Typically for the 1x1 Wilson loop the esti- 
+mated autocorrelation was 0(1) at the lowest loop- 
+orders and increased up to 0(10) at the highest 
+loop orders. So the relative errors significantly in- 
+crease with the loop order. As a result, we have 
+collected the following statistics in measuring the 
+perturbative Wilson loops for the different chosen 
+finite Langevin steps sizes and lattice volumes as 
+shown in Table H] The statistics has to be under- 
+stood as follows: The thermalization is not in- 
+cluded, e.g. 21000 measurements at lattice volume 
+L'' with L — 8 and e = 0.01 in the Table cor- 
+responds to 420000 Langevin steps in equilibrium. 
+Those measurements are performed for all orders 
+in g, the reached results are shown in the Figures 
+below. 
+
+Let us first discuss the accuracy and some prob- 
+lems we have met in performing the extrapolation 
+to vanishing Langevin step size e. Having several 
+different expansion coefficients W^lj{s) for vari- 
+ous £ values at a given loop order n available, we 
+
+
+
+5 
+
+
+
+e 
+
+
+T A 
+
+
+L = b 
+
+
+r o 
+
+-L = 8 
+
+
+r 1 o 
+L — LZ 
+
+
+U.UiU 
+
+
+19022 
+
+
+i6o90 
+
+
+ZiUOO 
+
+
+001 z 
+
+
+0.015 
+
+
+12182 
+
+
+13366 
+
+
+18500 
+
+
+
+
+0.020 
+
+
+11186 
+
+
+12726 
+
+
+18750 
+
+
+5464 
+
+
+0.030 
+
+
+10120 
+
+
+10210 
+
+
+17500 
+
+
+5334 
+
+
+0.040 
+
+
+9620 
+
+
+9466 
+
+
+17500 
+
+
+5200 
+
+
+0.050 
+
+
+9500 
+
+
+8500 
+
+
+16500 
+
+
+
+
+0.070 
+
+
+9500 
+
+
+8500 
+
+
+16250 
+
+
+5476 
+
+
+
+TABLE I: Number of Wilson loops measurements up 
+to loop order 20 at various lattice volumes and 
+Langevin time steps e. 
+
+
+
+(n) 
+
+perform the extrapolation to the coefBcient Wj^lj 
+corresponding to zero step size by a linear plus 
+quadratic fit ansatz 
+
+
+
+(17) 
+
+
+
+The e behavior depends on the loop order n and 
+the Wilson loop size NxM, as well as on the lat- 
+tice volume. To illustrate the overall behavior we 
+present here results for the plaquette Wu and the 
+Wilson loop W33 for lattice size L = 12. 
+
+The measured perturbative plaquette values 
+Wii^ at all integer loop orders n > (remember 
+
+that W^Ij = 1) behave in a similar way: they are 
+all negative and tend to values different from zero 
+which can be determined with very good accuracy. 
+Except for n = 2 the zero Langevin step size limit 
+is approached from below with decreasing step size 
+£. The clearly non- vanishing fit results decrease 
+monotonically in magnitude with increasing loop 
+order. This is demonstrated in the left of Figure [1] 
+see also the Tables in the Appendix. The coeffi- 
+cients of odd powers of g should be zero, because 
+the action is unchanged under g o —g. These non- 
+loop coefHcients are shown in the right-hand panel 
+of Figure [TJ We observe that these coefficients are 
+indeed orders of magnitude smaller than the coef- 
+ficients for even powers of g. To show the quality 
+of the e — >■ extrapolation we zoom into the small 
+and large loop number behavior of the expansion 
+coefficients. This is demonstrated in Figured] For 
+better visibility, part of the expansion coefficients 
+at low loop numbers n are multiplied by factors 
+given in the Figure. 
+
+Now we consider the Wilson loop VF33. In Fig- 
+ure [3] we show how the loop and non-loop expan- 
+sion coefficients for various Langevin step sizes be- 
+have as function of n. We observe that the noise of 
+the non-loop coefficients is much larger than in the 
+plaquette case, which has to be expected for Wil- 
+
+
+
+son loops with larger areas. For the smallest half- 
+integer n the magnitude of the noise is larger than 
+the actual (integer) loop results at much larger n. 
+But still our criterion is fulfilled that a Wilson loop 
+coefficient at a given loop order n should be larger 
+than the magnitude of the noise for the adjacent 
+n — 1/2 and n + 1/2 non- loop contributions. 
+
+Contrary to the plaquette case, the loop expan- 
+sion coefficients alternate in sign for n < 3. In 
+absolute value the step-size extrapolation e 
+approaches the extrapolated value from above. For 
+loop number n = 4 the situation is different (see 
+left Figure 2]): The extrapolation of the expansion 
+coefficient to zero Langevin step starts at a posi- 
+tive value W^^\e = 0.07), crosses "zero" with de- 
+creasing s and points towards a negative value 14^33^ 
+at zero Langevin step. Remember that near zero 
+we have the "noise" , shown in that Figure as well, 
+by the adjacent non-loop contributions 3.5 and 4.5. 
+
+The magnitude of that noise is comparable to 1^33'' 
+for e = 0.03 only, and a reliable almost linear ex- 
+trapolation to zero Langevin step is possible. For 
+the next higher loop numbers n > 4 the extrapo- 
+lation to zero Langevin step becomes clearly non- 
+linear as shown in more detail in the right of Fig- 
+ure m for some loop numbers n. The extrapolated 
+zero step size results are still clearly distinguishable 
+from the adjacent non-loop expansion coefficients. 
+Therefore, according to our criterion, those extrap- 
+olations can be considered as reliable. For larger 
+loop numbers n > 10 the e dependence becomes 
+less non-linear again. For those n the expansion 
+coefficients of W33 as function of n behave similar 
+to those of the plaquette though their slope slightly 
+differs. 
+
+In Figure [S] we show some results for the loop 
+coefficients (extrapolated to e = 0) of elongated 
+
+(H^^"\ left) and square iW^%, right) Wilson loops 
+for various size N as function of loop order n for 
+a 12^ lattice and compare them to the noise. At 
+larger n, a behavior without sign changes is ob- 
+served for all considered Wilson loops that could 
+be interpreted as "asymptotic". We note that the 
+precision of the extrapolated loop coefficients for 
+the larger Wilson loops drops down and also the 
+signal to noise ratio decreases. Still, the signal for 
+the shown Wilson loops is clearly above the noise 
+for all orders. For square Wilson loops with > 4 
+(not shown) or other larger Wilson loops the statis- 
+tics was insufficient to get a clear signal out of the 
+noise for larger orders (see also Appendix). In the 
+analysis below we concentrate on the smallest Wil- 
+son loops. 
+
+In addition we have to raise the question about 
+the infinite volume limit of the series. In the per- 
+
+
+
+6 
+
+
+
+0.1 - 
+
+
+
+0.01 
+
+
+
+0.001 
+
+
+
+L = 12 
+
+
+
+£ = 0.07 
+£ = 0.03 
+
+£ = 0.01 
+
+£ = 0.00 
+
+
+
+• i ; ^ 
+
+» ! ; - 
+
+
+
+0.0001 
+
+
+
+le-0.5 
+
+
+
+le-06 - 
+
+
+
+10 
+
+n 
+
+
+
+15 
+
+
+
+20 
+
+
+
+le-07 
+
+
+
+
+FIG. 1: Plaquette expansion coefficients W^'"' at some finite e at L = 12 versus loop number n. On the left-hand 
+panel the loop expansion coefficients for integer n (signal) are shown together with their extrapolations e — 0. 
+The right-hand panel shows the non-loop coefficients for half-integer n which are purely noise, and 2 or 3 orders of 
+magnitude smaller than the integer coefficients. Open/full symbols denote positive/negative numbers. 
+
+
+
+-0.32 - 
+
+
+
+-0.33 
+
+
+
+-0.34 
+
+
+
+-0.35 
+
+
+
+-0.36 
+
+
+
+-0.37 
+
+
+
+L 
+
+
+= 12 
+
+
+
+
+
+
+
+
+£ 
+
+0.07 . 
+
+
+--A 
+
+
+
+
+
+
+
+
+
+
+
+
+0.05 - 
+
+
+
+
+
+
+A 
+
+
+
+
+
+
+
+
+0.03 
+
+
+- ■ ■ ■ 
+
+
+
+
+
+
+
+
+
+
+
+
+0.02 - 
+
+
+-G 
+
+
+
+
+
+
+• 
+
+▼ 
+
+
+
+
+
+
+0.01 
+
+
+■■ ■■ 
+
+
+
+
+W 
+
+
+
+
+
+
+
+
+
+0.00 - 
+
+
+
+
+m 
+
+
+■ 
+
+
+■ 
+
+
+• 
+
+
+
+
+• 
+
+
+
+
+
+
+
+
+
+
+
+
+• 
+
+
+
+
+1 
+
+
+o 
+
+
+Q 
+▼ 
+
+
+A 
+
+
+▼ 
+
+
+
+
+» 
+
+
+
+
+
+
+• 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+■ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+A 
+
+
+
+
+
+
+
+
+■ 
+
+
+■ 
+
+
+o 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+■ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+A 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+A 
+
+
+xl 
+
+
+xlO 
+
+
+x24 
+
+
+x46 
+
+
+x76 
+
+
+xll4 
+
+
+xl63 
+
+
+1 
+
+
+2 
+
+
+3 
+
+
+4 
+
+
+5 
+
+
+6 
+
+
+7 
+
+
+
+-0.00015 - 
+
+
+
+-0.0002 - 
+
+
+
+-0.00025 - 
+
+
+
+-0.0003 
+
+
+
+-0.00035 
+
+
+
+0.07 
+0.05 
+0.03 
+0.02 
+0.01 
+0.00 
+
+
+
+L = 12 
+
+
+
+16 
+
+
+
+17 
+
+
+
+n 
+
+
+
+18 
+
+n 
+
+
+
+19 
+
+
+
+20 
+
+
+
+FIG. 2: Zoom of left Figure[T]into small (left) and large (right) loop number region n for all finite e. The full circles 
+in red are the extrapolated e — ^ values. The coefficients in the left Figure at different orders n are multiplied by 
+factors to make them comparable in size to those at n = 1. 
+
+
+
+turbative series the leading finite-size correction is ansatz 
+expected to be proportional to l/L"*. For addi- 
+tional non-leading corrections we tried the heuristic (•„■) 1 log L 
+
+^NM,L = ^NM,oc> + ^NAI Ji + ^NM "fe" ' ^^^^ 
+
+
+
+7 
+
+
+
+1 - 
+
+
+
+* L = 12 
+
+
+
+0.1 
+
+
+
+^co 0-01 - 
+
+
+
+0.001 
+
+
+
+0.0001 - 
+
+
+
+e = 0.07 
+e = 0.03 
+e = 0.01 
+e = 0.00 
+
+
+
+; 
+
+
+
+i f 
+
+
+
+e CO 
+
+
+
+0.0001 
+
+
+
+le-05 
+
+
+
+le-06 
+
+
+
+le-07 
+
+
+
+L = 12 
+
+
+
+10 
+?7, 
+
+
+
+1.5 
+
+
+
+20 
+
+
+
+£ = 0.07 
+£ = 0.03 
+e = 0.01 
+
+
+
+
+
+
+i 1 . 
+
+
+T 
+
+
+t 
+
+
+' A 
+
+
+
+
+t 
+
+
+
+
+
+10 
+
+n 
+
+
+
+15 
+
+
+
+20 
+
+
+
+FIG. 3: Same as in Figure [T] but for the Wilson loop expansion coefficients W. 
+
+
+
+(n) 
+
+
+
+0.0008 
+
+
+
+0.0006 
+
+
+
+0.0004 
+
+
+
+0.0002 
+
+
+
+-0.0002 
+
+
+
+-0.0004 
+
+
+
+L = 12 
+
+
+
+£ = 0.07 
+£ = 0.03 
+
+£ = 0.01 
+
+£ = 0.00 
+
+
+
+S CO 
+^co 
+
+
+
+-8e-05 
+
+
+
+-0.00012 
+
+
+
+-0.00016 - 
+
+
+
+^ * ! 
+
+
+
+i 1 
+
+
+
+n. = 5 
+n — 6 
+n = 10 
+n = 20 
+
+
+
+
+-0.0002 - L = 12 
+
+
+
+4 5 6 7 
+
+
+
+9 10 11 
+
+
+
+n 
+
+
+
+0.02 0.04 
+
+
+
+0.06 
+
+
+
+FIG. 4: The extrapolation to zero Langevin step for Wilson loop expansion coefficients W33 • Left: Zoom of both 
+Figs.[3]in the region [3.5,11.5]. Right: Detailed extrapolation to e — >■ for selected loop numbers. 
+
+
+
+which describes well the L-dependence of one- and 
+two-loop coefficients of the perturbative Wilson 
+loops for various loop sizes. Those coefficients are 
+known from standard finite volume lattice pertur- 
+bation theory ([lB|: the basic formulae have been 
+given in flT'l). Note that the one- and two-loop 
+NSPT coefficients reproduce the finite volume lat- 
+
+
+
+tice perturbation theory reasonably well as shown 
+in Table In] for some examples. 
+
+For lower loop orders a simple 1/L^ dependence 
+was sufficient in the fits in agreement with 17 1. 
+
+
+
+Higher loop coefficients, however, need further cor- 
+rections which we have chosen in the form (|18p . In 
+Figure [5] we show two selected extrapolations for 
+
+
+
+8 
+
+
+
+L = 12 
+
+
+
+0.1 
+
+
+
+0.01 
+
+
+
+0.001 
+
+
+
+0.0001 - I 
+
+I 
+
+le-0.5 - 
+
+
+
+le-06 
+
+
+
+■ « 
+
+
+
+N = 2 
+N = 3 
+
+N = i 
+
+N = 5 
+
+N = 6 
+
+N — G. non-loop 
+TV — 1, non-loop 
+
+
+
+< 1 
+
+
+
+iiii.ini 
+
+
+
+0.1 
+
+
+
+0.01 
+
+
+
+10 
+
+n 
+
+
+
+15 
+
+
+
+20 
+
+
+
+0.001 
+
+
+
+0.0001 - 
+
+
+
+le-05 
+
+
+
+le-06 
+
+
+
+L = 12 
+
+
+
+N = l 
+N = 2 
+
+
+
+N = 3 
+N = 4 
+
+
+
+— 4, non-loop 
+
+— 3, non-loop 
+= 2, non-loop 
+= 1, non-loop 
+
+
+
+■ a 
+
+
+
+10 
+
+n 
+
+
+
+15 
+
+
+
+20 
+
+
+
+FIG. 5: Selected loop coefficients Wjva/ for L = 12 versus loop order n together with typical values in magnitude 
+
+of non-loop coefficients. Positive/negative signs of the coefficients are given by open/full symbols, all W^"^ < 
+
+0,1^2^' < 0. Left: elongated Wilson loops A*' x 1 with A'' = 1,...6, right: square Wilson loops NxN with 
+7V = 1,...,4. 
+
+
+
+Wnn 
+
+
+L 
+
+
+NSPT (1-loop) Bah (1-loop) 
+
+
+NSPT (2-loop) Bah (2-loop) 
+
+
+W22 
+
+
+4 
+
+
+-0.87468(13) 
+
+
+-0.87500 
+
+
+0.10404(07) 
+
+
+0.10406 
+
+
+
+
+6 
+
+
+-0.90752(12) 
+
+
+-0.90762 
+
+
+0.11830(10) 
+
+
+0.11837 
+
+
+
+
+8 
+
+
+-0.91147(03) 
+
+
+-0.91141 
+
+
+0.11998(02) 
+
+
+0.11993 
+
+
+
+
+12 
+
+
+-0.91264(02) 
+
+
+-0.91261 
+
+
+0.12043(01) 
+
+
+0.12038 
+
+
+W33 
+
+
+6 
+
+
+-1.50088(30) 
+
+
+-1.50093 
+
+
+0.60906(34) 
+
+
+0.60866 
+
+
+
+
+8 
+
+
+-1.52849(12) 
+
+
+-1.52803 
+
+
+0.63654(08) 
+
+
+0.63632 
+
+
+
+
+12 
+
+
+-1.53552(06) 
+
+
+-1.53533 
+
+
+0.64388(01) 
+
+
+0.64360 
+
+
+W44, 
+
+
+8 
+
+
+-2.14092(23) 
+
+
+-2.14016 
+
+
+1.52436(28) 
+
+
+1.52331 
+
+
+
+
+12 
+
+
+-2.17001(10) 
+
+
+-2.16922 
+
+
+1.57160(10) 
+
+
+1.57006 
+
+
+
+TABLE IL Comparison of one- and two-loop results for NSPT and finite volume standard lattice perturbation 
+theory 
+
+
+
+the one- and ten-loop expansion coefBcient. From 
+the volume dependence of all orders and sizes of the 
+Wilson loop we conclude that we can treat the lat- 
+tice volume 12* being already near to the infinite 
+volume limit. Therefore, in the subsequent analysis 
+
+
+
+we use that lattice size as a reasonable approxima- 
+tion for volume independent results of the series. 
+In the Appendix we present the expansion coeffi- 
+cients for all available lattice volumes and Wilson 
+loop sizes. 
+
+
+
+9 
+
+
+
+-0.332 
+-0.3322 
+-0.3324 
+-0.3326 
+-0.3328 
+
+-0.333 
+-0.3332 
+-0.3334 
+
+
+
+fit curve - 
+
+
+
+
+
+
+
+
+will ~ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0.001 
+
+
+
+0.002 
+
+
+
+0.003 
+
+
+
+0.004 
+
+
+
+-0.00074 
+-0.00076 
+-0.00078 
+
+-0.0008 
+-0.00082 
+-0.00084 
+-0.00086 
+-0.00088 
+
+-0.0009 
+
+
+
+fit curve 
+
+
+
+(10) 
+
+
+
+0.001 
+
+
+
+0.002 
+
+
+
+0.003 
+
+
+
+0.004 
+
+
+
+FIG. 6: Extrapolation L — >■ oo for VK^'"' for loop orders n — 1 (left) and n — 10 (right). 
+
+
+
+III. PERTURBATIVE SERIES OF WILSON 
+LOOPS AT LARGE ORDERS 
+
+
+
+perturbative result at given coupling. 
+
+
+
+There is plenty of evidence that perturbative 
+series in continuum QCD are divergent, at best 
+asymptotic. This would mean that, beginning from 
+some perturbative order n > n*, the coefficients of 
+the series should grow factorially. The situation 
+might be different for perturbative series on finite 
+lattices. Here we have both ultraviolet and infrared 
+cut-offs and the growth could be modified signifi- 
+cantly. With our computed coefficients of the loop 
+expansion up to order n — 20 we are able to check 
+this to a so far inaccessible level. 
+
+For finite lattices one could try to use the raw 
+NSPT coefficients for evaluating the corresponding 
+underlying infinite series. This requires to deduce 
+a kind of asymptotic model providing the complete 
+perturbative answer. Formally, one can use such a 
+model designed for finite lattices also in a version 
+adapted to the coefficients extrapolated to L — >■ oo. 
+Although the extrapolation seems to yield smooth 
+limits, it is certainly not allowed to sum a series 
+based on these extrapolated coefficients up to in- 
+finity. In this case there exist at least two possibili- 
+ties. The first consists in taking into account possi- 
+ble renormalon effects and estimating the truncated 
+tail of the series (cf. e.g. (H). This procedure, how- 
+ever, strongly depends on whether a clear factorial 
+growth of the coefficients in the perturbative re- 
+gion under consideration has been identified. We 
+will see that this is very difficult to justify from our 
+results. A second possibility consists in applying 
+boosting, i.e. a rearrangement of the series, result- 
+ing in a (rather) stable plateau of the truncated 
+sum as function of the maximal perturbative or- 
+der n* that is included, and to use this as the final 
+
+
+
+A. Plaquette 
+
+In 2001, when only the first 10 loops of the pla- 
+quette series as expansion in the bare coupling were 
+known from ,7], some of the present authors tried 
+plotting the data in various ways in order to find a 
+fit ansatz which could describe the known data and 
+would be able to predict the unknown higher coef- 
+ficients JJl] . A logarithmic plot of against n 
+shows a curve with decreasing slope, well described 
+by an asymptotic behavior 
+
+
+
+(19) 
+
+
+
+i.e. an exponential in n, multiplied by a power of n 
+(see Figure [Hand Tables in the Appendix). This is 
+a somewhat unexpected result, because a series of 
+this type has a finite radius of convergence, < 
+1/u, and sums to give a result with a power-law 
+singularity of the form 
+
+
+
+(20) 
+
+
+
+A more sensitive way of showing the large n be- 
+havior of a series is the Domb-Sykes plot "S]. If 
+the series has the form 
+
+
+
+(21) 
+
+
+
+we calculate r„, the ratio of neighboring coeffi- 
+cients, 
+
+(22) 
+
+
+
+Cn-l 
+
+
+
+10 
+
+
+
+and plot it as a function of 1/n. The intercept as 
+1/n — >■ (if the limit exists) gives the radius of 
+convergence. The behavior for small 1 /n (i.e. large 
+n) tells us the nature of the dominant singularity. 
+A function with the power-law singularity (|20p has 
+the expansion 
+
+
+
+(1 — ug^y = 1 — 7ug 
+
+
+
+r(n + i)r(-7) 
+
+
+
+(23) 
+
+
+
+which leads to the ratio of neighboring coefficients 
+depending on the parameters u and 7 
+
+
+
+Cn-l 
+
+
+
+u 1 
+
+
+
+1 + 7 
+
+
+
+(24) 
+
+
+
+Therefore, the Domb-Dykes plot c„ versus 1/n is a 
+straight-line graph. 
+
+The actual Domb-Sykes plot for the measured 
+perturbative plaquette showed a small curvature. 
+To allow for this we added one more parameter and 
+made a fit of the form 
+
+
+
+= It 1 - 
+
+
+
+1 + 7 
+
+
+
+(25) 
+
+
+
+This described the data for n £ [3, 10] well, with 
+the parameter values [ll| 
+
+u = 0.961(9), 7 = 0.99(7), s = 0.44(10) . (26) 
+
+We now have 10 more coefficients. How well do the 
+fit parameters ([^5]) predict the new data? In Fig- 
+ure [7] we compare the current data with the predic- 
+tion made in 2001. 
+
+The data lie very near the prediction. We have 
+doubled the maximum n value without seeing any 
+breakdown of the behavior seen at lower n. In par- 
+ticular, the series still looks like a series with a finite 
+range of convergence, < 1.04. 
+
+
+
+B. A model for summing up the Wilson loop 
+series 
+
+Now we have in addition also Wilson loops larger 
+than the plaquette at our disposal. In Figure [5] we 
+show the coefficient ratios r„ for some small size 
+Wilson loops for n > 5. We have seen that at 
+large order n the coefficients in the plaquette se- 
+ries have the asymptotic behavior of What is 
+the asymptotic behavior of the other Wilson loops? 
+Is it similar? 
+
+A sensitive way to investigate this is to look at 
+the ratio between the coefficients of the Wilson 
+
+
+
+loops series and the plaquette series. If both have 
+similar behaviors at large order n 
+
+
+
+(") 
+
+
+
+-(H-7') 
+
+
+
+{u')" 
+
+
+
+(n) 
+11 
+
+
+
+-(1+7) . 
+
+
+
+(27) 
+
+
+
+We plot the ratio ((27)) for various NM values in Fig- 
+ure [51 as a log-log plot against n. The plot shows 
+that at large n the ratio scales like a power of n, 
+suggesting that the parameter u in (jl9p is the same 
+for all Wilson loops, but the power 7 depends on 
+the size of the loop. Therefore, u' = u to a very 
+good approximation. This means that for all Wil- 
+son loops the series have the same apparent radius 
+of convergence, < \/u. However the curves for 
+different Wilson loops have different slopes at large 
+n, indicating different asymptotic powers of n, i.e. 
+different values of 7. 
+
+In Figure |8] one clearly recognizes that for larger 
+loop size the ratios deviate from the almost perfect 
+straight line behavior seen for Wn. This deviation 
+can be described rather well by a modification of 
+(PSt taking into account some curvature, especially 
+for larger loop-sizes N x M. Parametrizing these 
+effects by an additional parameter p we make the 
+ansatz 
+
+
+
+c„-i 
+
+
+
+u 1 
+
+
+
+1 + 7 
+
+
+
+P 
+
+
+
+n(n + s) 
+
+
+
+(28) 
+
+
+
+where the first term is the asymptotic form (j24| 
+without curvature. Relation (|28p can be trans 
+formed into a recursion relation. 
+
+
+
+Tn Cri-1 , if n > no , 
+c„o , if n = no. 
+
+
+
+(29) 
+
+
+
+Here c„p is the input value for some lowest mea- 
+sured perturbative coefficient W^^^ at loop order 
+n = 7io to begin the recursive reconstruction. Re- 
+lation (1291) can be solved to 
+
+
+
+_ ^ (g-^-l)n(^ + ^-l)r 
+Cu,hyp - «n„ (s + l)„n! 
+
+
+
+1 
+
+
+
+T = - v/(7 + s + l)2-4p/w. 
+
+
+
+(30) 
+
+
+
+s + 3 — 7 
+
+
+
+with (a)„ = r(a + n)/r(a) being the Pochhammer 
+symbol. The coefficient c?„o is given by 
+
+
+
+n',li((a-2 + fc)2-r2) 
+
+
+
+(31) 
+
+
+
+Accepting such a parametrization one can follow 
+different strategies: 
+
+
+
+11 
+
+
+
+
+0.05 0.1 0.15 0.3 0.25 0.3 0.35 0.05 0.06 0.07 0.08 0.09 0.1 
+
+
+
+1/n 1/n 
+
+
+
+FIG. 7: Current ratio data for the plaquette, compared with the prediction of 2001 plotted with the original 
+parameters. The prediction was based on data with n < 10, i.e. to the right of the vertical blue bar. The second 
+figure zooms in on the region of new data. 
+
+
+
+
+• Use the raw coefficients c„ and/or Cn,hyp fixed 
+by the fitted values of the parameters in the 
+loop order range 1 < n < 20 as determined 
+by the NSPT computation to investigate the 
+perturbative series. This will be done in the 
+next Section lill CI 
+
+
+
+• Assume that the coefficients Cn.hyp, found as 
+solution of ([M]) . belong to an infinite series 
+and try to sum up the series on a finite lattice. 
+This will be discussed in the following. 
+
+The infinite series we want to compute is defined 
+
+
+
+by 
+
+no oo 
+
+n—l n— no + 1 
+
+oo 
+
+^ 1 + E<M,..P5^"' (32) 
+
+n=l 
+
+where the first uq coefficients c„ = M^j^^f given 
+by the NSPT measurements and the Cn^hyp are 
+the solutions of (|29l) . For later use we have in- 
+
+(n) 
+
+troduced the general coefficients Wj^£j i^y^. The 
+matching condition for (I32p is that at no we have 
+Cna = Cno,hyp- Introducing the hypergeometric 
+
+
+
+12 
+
+
+
+function 2F1 
+
+{a, h- c-t)^Y. ^« ^" ^ E ^" '(33) 
+
+
+
+n=0 
+
+
+
+n=0 
+
+
+
+we get the closed expression 
+
+
+
+2F1 (a- — r — 1,(7 + r — 1; s + 
+
+
+
+-1 . 
+
+
+
+(34) 
+
+
+
+The result expressed in terms of 2F1 (^a,b;c;ug^^ 
+has a branch cut discontinuity at the positive g^- 
+axis for > 1/u. This means that the parameter 
+u in (pS)) (just as well as in (P5|) ) determines the 
+convergence radius: for g^ < 1/u the series can 
+be summed up to n = 00 without analytic con- 
+tinuation into the complex plane. All parameters 
+u,j,p,s depend on the corresponding underlying 
+data set. As discussed above (see also Figure [S]) we 
+will assume that the convergence radius is the same 
+for all Wilson loop sizes which implies a common 
+value for u. 
+
+We found that Wilson loops larger in size than 
+the plaquette (e.g., W2i,W3i,W22) give rise to ra- 
+tios r„ (for rt < 5) that show a pronounced oscillat- 
+ing behavior. Therefore, we restrict the fit of the 
+ratio function to the data for n > uq — A only. 
+The fit results are shown in Figure [5] as thin lines. 
+
+It should be pointed out that fitting the param- 
+eters {u, 7,p, s) in ansatz ((28| to the NSPT data is 
+non-trivial. We have determined the optimal values 
+by minimizing the function 
+
+
+
+20 
+
+E 
+
+n— np + l 
+
+
+
+rnju, 7,p, s) - r„(NSPT)]' 
+[r„(NSPT)]' 
+
+
+
+(35) 
+
+where r„ (NSPT) are the ratios computed from the 
+corresponding NSPT data. The most sensitive pa- 
+rameter in (pS)) is s. Therefore, we vary s over a 
+certain range Smin < s < Smax by a small incre- 
+ment As as so(fc) = Siiiin + k As {k - integer) and 
+minimize (5^(u, 7,p, so(A:)) with respect to {u,j,p) 
+at every so(fc) which is held fixed. The smallest of 
+all minimized 6^^^{u,j,p,so{k)) defines the start- 
+ing set (m^,7^,p*, so(A;*)) for a final minimization 
+fit - now with respect to all parameters (u,7,p, s). 
+In Figure [TO] we show one example for S^^^ for W22 
+with uq = 4. One recognizes a couple of shallow 
+local minima (besides the absolute one) where min- 
+imization procedures could have been trapped. In 
+Table Hm we give the results of our minimal fit func- 
+
+
+
+0.1 
+
+
+
+0.01 r 
+
+
+
+L = 12, W 
+
+
+
+22 
+
+
+
+0.001 
+
+
+
+0.0001 
+
+
+
+-10 
+
+
+
+FIG. 10: as function of parameter s for W22- 
+
+
+
+Wnm 
+
+
+52. 
+
+'-'min 
+
+
+u 
+
+
+7 
+
+
+P 
+
+
+s 
+
+
+Wii 
+W21 
+W31 
+W22 
+
+
+8- IQ-^ 
+1 • IQ-^ 
+2 • 10"^ 
+4- 10"^ 
+
+
+0.9694(4) 
+0.9694(5) 
+0.9694(6) 
+0.9694(9) 
+
+
+1.13(5) 
+1.02(4) 
+0.91(4) 
+0.82(4) 
+
+
+^■'^-0.6 
+1.6(5) 
+1.7(2) 
+1.9(2) 
+
+
+o.7l?:° 
+
+-1.4(8) 
+-3.3(2) 
+-3.9(1) 
+
+
+
+TABLE III: Minimal value of S^^^ and resulting fit pa- 
+rameters. The fit range in n is [5, 20]. 
+
+
+
+tion and the final fit parameters for various Wilson 
+loops. The given errors (Am, A7, Ap, As) are the 
+extreme values within the error ellipsoid obtained 
+from the relation 
+
+
+
+d^{u* + Au, 7* -I- Aj,p* + Ap, s* + As) 
+
+
+
+2S\u\^\p\s*)., 
+
+
+
+(36) 
+
+
+
+where (u*, 7*,p*, s*) are the best fit parameters. 
+For extrapolation of the perturbative series we use 
+hypergeometric fits in the interval [5,20]. Fits to 
+the coefficients in this range are excellent, with rel- 
+ative errors < 0.5%. 
+
+The hypergeometric fit still gives a fairly good 
+description of the data all the way down to n — 1. 
+For most loop sizes a fit from n = 1 to 20 describes 
+the data within ^ 5%, except for the 2x1 loop, 
+which has some errors ~ 10%. Given that the coef- 
+ficients vary through 4 orders of magnitude in this 
+interval, an error of 5 or 10% is still impressive. 
+
+All the Wilson loops show rather similar behavior 
+at large order n, see Figure[TTJ At small n they look 
+quite different from the plaquette, with a mixture 
+of positive and negative terms. It is interesting that 
+there is often a "notch" just before the asymptotic 
+
+
+
+13 
+
+
+
+
+5 10 15 ao 5 10 15 20 
+
+n n 
+
+
+
+FIG. 11: The hypergeometric fit to the coefficients Wj^lj for the four small Wilson loops. Solid symbols represent 
+positive terms, open symbols are negative terms. The blue line is an equal weight fit, including all points from 
+V^nIi to W^jvM- The agreement is remarkably good. 
+
+
+
+region begins, i.e. a particularly steep drop to a 
+small coefficient, followed by a jump back up again. 
+This is particularly dramatic in the 2x2 Wilson 
+loop, where the n — 3 coefficient is about 600 times 
+smaller than the n — 2 coefficient. The notch gives 
+rise to big changes in r„ , for example for the 2x2 
+loop we have 
+
+. . . , r2 = -0.1319, 7-3 = +0.0016, 
+
+r4 = -11.98, rs = +0.9722,... (37) 
+
+The notch corresponds to the singularity in the 
+Domb-Sykes plot. The anomalously large r„ value 
+occurs when n is close to the pole at n = — s in 
+(f28)) . This is demonstrated in Figure [12] where the 
+fit to the parameters has been extended to the range 
+n g [2,20]. Using this fit range one clearly recog- 
+nizes the corresponding pole terms. 
+
+Our analysis shows that we can reproduce our 
+NSPT data up to order n = 20 for Wilson loops 
+of moderate size (at least the elongated ones) with 
+
+
+
+this hypergeometric model sufficiently well. This 
+means that we do not find any evidence for a fac- 
+torial behavior which should result in a behavior 
+r„ ~ n. In Section IIIBI we showed that in the 
+range 4 < L < 12 the volume dependence of each 
+individual perturbative coefficient is rather smooth 
+and already very weak at sizes like L « 12. So we 
+do not expect a significant change extrapolating the 
+results to infinite lattice size. 
+
+Even beyond the apparent radius of convergence 
+{g^ — l/u,/3c ~ 5.82) the perturbative series still 
+has some information on the Wilson loops. In that 
+case the terms in the series decrease initially, before 
+reaching a minimum and then growing. Summing 
+the series up to the minimum term would give an 
+approximation to the Wilson loop. The minimum 
+term in the series can be estimated from the condi- 
+tion on the ratio of neighboring coefficients in ([2^ 
+''"min 5^ — 1- The corresponding minimal number 
+"■mill hi^ the summation is approximately (neglecting 
+
+
+
+14 
+
+
+
+
+the parameters s and p) 
+
+
+
+(1+7)1*32 _ 6u(l + 7) 
+
+
+
+12 
+
+
+
+(38) 
+
+
+
+for (3 < 6u. So, at /3 = 5.7 we would have to 
+sum about 100 terms before reaching the mini- 
+mum (assuming, of course, that the hypergeomet- 
+ric form remains applicable), and even at /? = 5.2 
+((7^ = 1.15) we would still have about 20 decreasing 
+terms before reaching the minimum term. To stay 
+on the safe side, we have not used any data beyond 
+the apparent convergence radius in our analy- 
+sis of non-perturbative Wilson loops described be- 
+low. We have restricted ourselves to /? > 5.85, i.e. 
+5^ < 1.026. 
+
+
+
+C. Boosted perturbation theory 
+
+It is well-known that the bare lattice coupling g is 
+a bad expansion parameter by virtue of lattice arte- 
+facts like tadpoles. There is hope that, by redefin- 
+ing the bare coupling g into a boosted coupling gb 
+and the corresponding rearrangement of the series, 
+a better convergence behavior can be achieved 120'] . 
+For the case of perturbative Wilson loops this idea 
+has been applied for the first time by Rakow [8]. 
+
+
+
+Let us denote the perturbative Wilson loop 
+summed up to order n* using the bare coupling 
+9 by 
+
+n* 
+
+WNM{g, n*) = l + Y^ 5'" (39) 
+
+n=l 
+
+and call in the following any series in g^ a "naive 
+series" . We define the boosted coupling as 
+
+
+
+Wii{g,n*) 
+
+
+
+(40) 
+
+
+
+The corresponding "boosted series" for an arbitrary 
+Wilson loop Wnm is then given by 
+
+n* 
+
+W^MAgt, n*) = l + Y, Wl,% gt (41) 
+
+
+
+(n) 
+
+with coefficients Wj^jIj ^ to be calculated from 
+W^^Ij and W^l^ with k,l<n. Setting 
+
+WNAiig, n*) = WNM,b{9b, n*) (42) 
+
+and inserting (|40p into the right hand side of (H^ . 
+
+we can compute the boosted coefficients W^^j ^ or- 
+der by order. 
+
+
+
+15 
+
+
+
+It should be emphasized that the prescribed pro- 
+cedure is done by solving a hierarchical set of re- 
+cursive equations. Especially for large loop orders 
+n these equations involve hundreds or thousands of 
+
+(n) 
+
+terms. Using the NSPT raw data Wj^£j with their 
+errors gives rise to significant numerical instabili- 
+ties in the boosted result for larger n. Therefore, 
+it turned out to be advantageous to use the co- 
+
+
+
+efficients W 
+
+
+
+(n) 
+
+NM,hyp 
+
+
+
+P2p as input for the recursive 
+equations. Using that form up to loop order n < 20 
+means that we are smoothing the data of the naive 
+series. In addition we are in the position to extend 
+the maximal loop order beyond n = 20. This leads 
+to a stable numerical result for the boosted coeffi- 
+cients VF^2f b hyp- additional improvement can 
+be achieved by replacing the lowest order pertur- 
+bative coefficients at L = 12 by the correspond- 
+ing coefficients of the infinite volume limit. In the 
+Appendix we give those numbers for the one- and 
+two-loop coefficients obtained in the diagrammatic 
+approach 
+
+In Figure [13] we compare the perturbative coeffi- 
+
+
+
+1 p 
+
+0.1 - 
+
+0.01 - 
+
+0.001 - 
+
+0.0001 - 
+
+le-05 - 
+
+le-06 - 
+
+le-07 - 
+
+le-08 - 
+
+le-09 - 
+le-10 
+
+
+
+naive i — •— 
+= 22 boosted i -Q ■ 
+
+boosted+hyp - - a - 
+
+
+
+■ : : : 
+
+* ♦ - ; 
+
+
+■EI - 
+
+
+t Q * i ■ 
+
+: i 
+
+
+A 
+
+A ! 
+A 
+
+
+
+
+
+
+
+10 
+
+n 
+
+
+
+15 
+
+
+
+20 
+
+
+
+FIG. 13: Comparison of perturbative coefficients for the 
+naive series [W^"^), the boosted series from NSPT raw 
+data (VF^'"'i,) and the boosted series using the hyperge- 
+
+ometric model (IF^'"], hyp)- The boosted coupling (|40} 
+is used, positive/negative signs of the coefficients are 
+given by open/fuU symbols. 
+
+
+
+cients of the plaquette for the NSPT raw data W^^^ 
+with the wl^^\ calculated from the raw data and 
+
+
+
+the W^i'i"i,,p. 
+
+via the model show a smooth decreasing behavior 
+with much smaller errors than the boosted coeffi- 
+cients based on the raw data, all the way down to 
+the highest order n — 20. The superior result con- 
+cerning the error is due to the fact that the errors 
+of the model-fitted coefficients are computed from 
+
+
+
+The boosted coefficients obtained 
+
+
+
+(001 
+
+
+
+the correlated errors of the parameters {u,j,p,s) 
+as discussed in the preceding section. The errors 
+of the boosted coefficients (when constructed from 
+the raw data) are calculated with standard error 
+propagation through the set of recurrence equations 
+involving thousands of terms. Since the perturba- 
+tive plaquette (as the non-perturbative plaquette) 
+is less than one, Wii{g,n*) < 1, it is clear from 
+lat > 5^. On the other hand, we find 
+
+11 b I ^ l^i"^l foi' n > 4 as shown in Figure fT3l 
+We remark that also the boosted coefficients are 
+characterized by oscillating signs as function of the 
+loop order n for smaller n (open vs. filled symbols). 
+
+The above mentioned numerical problems relat- 
+ing the boosted series to the naive series obtained 
+directly from NSPT would be less severe if we could 
+start from a coupling constant which was closer to 
+gi). Therefore in [8| one of us proposed a simulation 
+with a shifted "reference" coupling constant, gref- 
+Instead of simulating NSPT with the action ([3|) , we 
+could use the slightly modified action 
+
+
+
+SreflU] = 6 
+
+
+
+
+E 
+
+
+
++ fi + fa .g^e/ 
+
+
+
+1 - ^Tr [Up + Up 
+
+
+
+(43) 
+
+
+
+where now Up is expanded as a power series in gref 
+rather than g. Physically, the action is still the 
+usual plaquette action - all we have done is to re- 
+define the coupling constant. This modified action 
+leads to changes in the drift term of (|4]) . The advan- 
+tage is that the simulation now gives us a series for 
+the plaquette in terms of the coupling gref-, related 
+to the bare coupling by 
+
+
+
+1 
+
+
+
+1 
+
+
+
+9ref 
+
+
+
++ ri+r2 gref 
+
+
+
+(44) 
+
+
+
+If we choose the parameters fi and fa well, the new 
+intermediate coupling will be close to the boosted 
+coupling, so the transformation from gref gt will 
+be numerically stable and will not introduce large 
+uncertainties as in the transformation from g^ — > 
+
+In [q simulations have been performed with f i — 
+1/3, fa — 0.033911. These values were chosen such 
+that gl = gf^j + 0{gf^j:), making the transforma- 
+tion between the two couplings numerically robust. 
+The resulting boosted series is shown in Table IIVI 
+The results are compatible with those found by 
+transforming both the naive series from the NSPT 
+raw data and from the hypergeometric model, re- 
+spectively, but the error bars are now considerably 
+reduced. In particular, the change in the behavior 
+
+
+
+16 
+
+
+
+n 
+
+
+
+
+Ti/(") f.-r,™ Mt;PT raw rlafa 
+
+
+TT/(") f„„™ (tool 
+
+
+-1 
+1 
+
+
+
+
+-1/3 
+
+
+-1/3 
+
+
+Z 
+
+
+U.U / / io < (oU ) 
+
+
+A A'T'TOAAI 1 01 I Q\ 
+U.U / < /UUiiOHO J 
+
+
+U.U ( ( zUUiioHo j 
+
+
+Q 
+
+o 
+
+
+— U.UlOol / (^iUj 
+
+
+— U.Ult)oozl^4 j 
+
+
+— U.UiDf5ozi(^4J 
+
+
+A 
+
+4 
+
+
+U.UUoU4oo(iU ) 
+
+
+A AAQAfi10/'Q^ 
+
+U.UUoUt)i2(o J 
+
+
+A AAQA^^10/'Q^ 
+
+U.UUoUDiz(^o J 
+
+
+r 
+
+
+
+— U.UUUDiUi(i4j 
+
+
+A AAA*? 1 Of?'7/' A^ 
+
+— U.UUUuiOD/ ^9j 
+
+
+A AAACIOA/' 1 1 \ 
+
+— U.UUUbzU^ii J 
+
+
+D 
+
+
+A AAAA001 t ^\ 
+
+U.UUUUooH / j 
+
+
+A AAAA07/'0^ 
+
+U.UUUUo((2j 
+
+
+A AAAAA 1 1 / 1 /I \ 
+
+U.UUUU9ii(i4J 
+
+
+7 
+
+
+-0.00002209(34) 
+
+
+-0.000024(2) 
+
+
+-0.0000275(89) 
+
+
+8 
+
+
+-0.00000007(30) 
+
+
+0.0000009(28) 
+
+
+0.0000024(43) 
+
+
+9 
+
+
+-0.00000138(11) 
+
+
+-0.0000017(33) 
+
+
+-0.0000024(17) 
+
+
+10 
+
+
+-0.00000042(8) 
+
+
+-0.00000029(360) 
+
+
+-0.00000011(58) 
+
+
+11 
+
+
+-0.000000201(12) 
+
+
+-0.00000022(380) 
+
+
+-0.00000033(18) 
+
+
+12 
+
+
+-0.000000087(14) 
+
+
+0.000000012(3877) 
+
+
+-0.000000073(51) 
+
+
+
+TABLE IV: Coefficients for the plaquette in boosted perturbation theory, calculated using the modified action (|43|l 
+on a 12* lattice. They are compared to the corresponding coefficients from the NSPT raw data (second column) 
+and the hypergeometric model data (third column). The loop order n given in the table is restricted by the order 
+used in [al. 
+
+
+
+beyond n = 8, from an alternating series to a single- 
+sign series is confirmed in this calculation. So far 
+we have only applied this method to the series de- 
+scribing the plaquette, but we expect that it would 
+also be useful for the larger Wilson loops. 
+
+The successful hypergeometric model fit to the 
+NSPT raw data (as presented in the preceding sec- 
+tion) and the very smooth behavior of the boosted 
+coefficients based on the fit formula (p4)) allows us 
+to extend the accessible loop order for the coeffi- 
+cients both in the naive and boosted series far be- 
+yond n = 20 loops. In Figure [U the correspond- 
+ing coefficients for Wn, W21, W31 and W22 are 
+shown throughout the extended range of loop or- 
+ders n < 40 relying on the information contained 
+in the set of smoothed data represented by the hy- 
+pergeometric model. 
+
+In Figure [13] we compare the effect of truncating 
+the sum at order n* for the naive and boosted series, 
+both on the basis of the hypergeometric model. The 
+corresponding truncation error T^min^) is defined 
+
+by 
+
+
+
+"NM{n*) = 
+
+
+
+W] 
+
+
+
+("0) 
+
+
+
+(45) 
+
+
+
+NM,Qo 
+
+
+
+where WMM{n*) is either the naive (W^jvm(5, 
+
+or the boosted {WMM,b[gb,n*)) truncated series. 
+
+As the asymptotic value W^vmoo '^^ ^^e hy- 
+pergeometric sum (j32p with no = 4 computed at 
+the chosen = 6//3 = 1. Even though part of the 
+decrease in the boosted coefficients is "eaten" up by 
+the fact that gl{= 1.6832) > g'^{= 1), we see that 
+
+
+
+the boosted series is clearly superior. For example, 
+for Wii we have a truncation error ^ 10"'^ at 10*'' 
+order in the boosted series, but we would have to 
+go nearly to the 30*'' order in naive perturbation 
+theory to achieve the same accuracy. 
+
+Figure [15] suggests that using the naive pertur- 
+bative series for Wii^hyp{g,n*) in (j40l) to compute 
+5^ for a given g^ is a poor choice. A much better 
+convergence towards the total perturbative plaque- 
+tte is obtained by using the coefiicients W{-^)jf^y^. 
+This suggests to define the boosted coupling gl{g^) 
+by solving the implicit equation 
+
+(46) 
+
+
+
+Wii^b,hyp{gb,n*) 
+
+
+
+where 
+
+
+
+WnAhvpidb, n*)^l + J2 Ki.'bMP ■ (47) 
+
+
+
+One essential justification for choosing pS)) is the 
+behavior of the perturbative series of a Wilson loop 
+for large /? (small g^) in comparison to the non- 
+perturbative measurement: in this coupling range 
+the Wilson loop should be dominated by the pertur- 
+bative content. We introduce the relative difference 
+
+
+
+Wnm{P) - 1 
+
+
+
+Wnm,pt{I3) - WNM,Mc{fi) 
+
+
+
+NM,MC 
+
+
+
+if3) 
+
+
+
+(48) 
+
+where the index "PT" stands for the perturbative 
+value of the Wilson loop and "MC" denotes the 
+Monte Carlo result. This quantity should tend to 
+
+
+
+17 
+
+
+
+1 
+
+0.01 
+0.0001 
+le-OG 
+le-08 - 
+le-10 - 
+
+
+
+A 
+
+
+11 Myp ' — • — ' 
+
+L = 12 +Wii,b,i,yp ' - - 
+
+
+A* 
+
+
+
+
+
+
+
+
+*' it 
+
+
+
+
+
+
+
+
+'t 
+
+
+
+
+A 
+
+
+
+
+'t 
+
+
+
+
+*t 
+
+
+
+
+
+
+
+
+tt 
+
+
+
+
+i^'* 
+
+
+
+
+
+1 
+
+0.01 - 
+0.0001 - 
+le-06 - 
+le-08 - 
+le-10 - 
+le-12 - 
+le-14 - 
+
+
+
+
+10 15 
+
+
+
+20 
+
+n 
+
+
+
+L = V2 
+
+
+
+25 30 35 40 
+
+
+
+>hyp 
+
++ 'V31,b,hyp 
+
+
+
+1 
+
+0.01 
+
+0.0001 
+
+„ le-06 
+e ^ 
+
+^ le-08 
+le-10 
+le-12 
+le-14 
+
+1 
+
+0.01 
+0.0001 
+„ le-06 
+
+£ CM 
+
+^ le-08 
+le-10 
+le-12 
+le-14 
+
+
+
+L = 12 
+
+
+
+-j^21,hyp 
++ W21^b,hyp 
+— W21,b.hyp 
+
+
+
+10 15 
+
+
+
+20 
+
+n 
+
+
+
+L = 12 
+
+
+
+25 30 35 40 
+
+
+
++W22,hyp 
+-W22,hyp 
++ W22,b,hyp 
+— V/22,b,hyp 
+
+
+
+10 15 
+
+
+
+20 
+
+n 
+
+
+
+25 30 35 40 
+
+
+
+10 15 
+
+
+
+20 
+
+n 
+
+
+
+25 30 35 40 
+
+
+
+FIG. 14: Coefficients for the naive and boosted series based on the hypergeometric modei for W\\, W21 , W31 and 
+W22 as function of the loop order n. 
+
+
+
+0.1 
+
+
+
+0.01 
+
+
+
+^ 0.001 
+0.0001 
+
+
+
+le-05 
+
+
+
+naive+hyp 
+boosted+liyp 
+
+
+
+/3 = 6.0 
+
+
+
+0.1 
+0.01 
+
+^ 0.001 
+0.0001 
+
+
+
+5 10 15 20 25 30 35 40 
+
+n* 
+
+
+
+le-05 
+
+
+
+naive+hyp 1 — m- 
+boosted-Hhyp - 
+
+
+
+***** 
+
+
+
+*ttitt}},j 
+
+
+
+13 = 6.0 
+
+
+
+5 10 15 20 25 30 35 40 
+
+n* 
+
+
+
+FIG. 15: Truncation errors TMM{n*) (I45p for Wn (left) and W31 (right) at L = 12 and 13 — 6 using the naive and 
+the boosted series on the basis of the hypergeometric model. The hypergeometric model values for the total sum 
+are W^""^^^ = 0.59409(8) and W^"°^*^ = 0.25337(22). 
+
+
+
+zero for large /3. In FigurelUlwe plot Wii{P) — 1 as 
+function of /?. The /3 dependence clearly shows that 
+the boosted coupling computed from (l46l) gives the 
+best behavior for the small where the plaquette 
+
+
+
+from that perturbative series practically coincides 
+with the Monte Carlo value. Wilson loops with 
+larger loop sizes show a similar behavior. 
+
+Note that the definitions of the boosted coupling 
+
+
+
+18 
+
+
+
+1 
+
+0.1 
+0.01 
+
+0.001 
+0.0001 
+le-05 
+le-06 
+
+
+
+naive 
+boost ^■ ■ 
+improved boost >— 
+
+
+
+6.2 
+
+
+
+6.4 
+
+
+
+6.6 
+
+
+
+6.8 
+
+
+
+FIG. 
+
+
+
+16: Wii{l3) - 1 as function of /3 = for 
+n* = 20: "naive" with Wii,pt = Wii{g,20); "boost" 
+with Wii^pT = 20) and computed from 
+
+(|40)l : "improved boost" with Wii,pt = Wii,b(gi,, 20) 
+and gt computed from (|46p . (Full/open symbols denote 
+positive/negative numbers.) 
+
+
+
+using either or (HUl) are calculated from a per- 
+turbative input exclusively. Using boosting in stan- 
+dard Monte Carlo measurements, the boosted cou- 
+pling is defined by dividing the bare coupling 
+squared by the measured plaquette at given f3 
+value. Numerically, this coupling constant behaves 
+in a similar way as that obtained from (1461) . This is 
+another argument to use expression (j46p as defini- 
+tion for the boosted coupling in perturbation the- 
+ory. 
+
+
+
+IV. THE NON-PERTURBATIVE PART OF 
+WILSON LOOPS 
+
+A. Reliability of high order lattice 
+perturbation theory 
+
+There is much debate to which extent high order 
+lattice perturbation theory can be trusted and how 
+its results can be used to extract physical quanti- 
+ties. In |2j| the authors have investigated the influ- 
+ence of the finite volume on the possibility to find 
+infrared renormalons. Using the steepest descent 
+(sd) method, they deduce an upper bound on the 
+order of perturbation theory n'"^ above which pos- 
+sible infrared effects are tamed for dimension four 
+operators 
+
+
+
+n < n' 
+
+
+
+sd 
+
+
+
+4 log L -I- c , 
+
+
+
+(49) 
+
+
+
+where L is the lattice size. However, it is difficult to 
+determine the value of c - in [23] it was estimated 
+as c = 0(1). 
+
+
+
+As shown in the preceding Section llll Cl we found 
+that boosted perturbation theory using the raw 
+NSPT coefficients in the range 1 < n < 12 gives 
+already reliable results for the summed series. Fur- 
+thermore, from the discussion at the end of Section 
+IIIBI (see Figure [6]) we feel confident that the finite 
+size effects are under control - which would not be 
+the case if there are infrared effects. 
+
+On finite lattices one cannot expect renormalons 
+because of hard ultraviolet (k < l/a) and infrared 
+{k > 2-11 /La) cut-offs. However, one might expect 
+quadratic and quartic divergences. For the plaque- 
+tte Wii one could write (see, e.g. jlH) 
+
+Wii = Ci{aQ){t)+C2{aQ)a^GG), (50) 
+
+with (GG) denoting a condensate of dimension four. 
+There could be a mixing between operators 1 and 
+GG which would result in an a'*-contribution to Gi : 
+
+
+
+Ci{aQ) = C°^{aQ) + Ct{aQ){aQY 
+
+
+
+(51) 
+
+
+
+The coefficients C\ [a Q) themselves diverge at most 
+as powers of log(aQ). The existence of a quartic di- 
+vergence would spoil the determination of the con- 
+densate. This type of divergence is connected to a 
+pole in the Borel transform of the corresponding, 
+assumed divergent perturbative series with a facto- 
+rial growth of the expansion coefficients [l^. We 
+do not observe such a factorial growth up to loop 
+order n = 20. This is a fact, which we have to 
+accept and appreciate theoretically [13, . 
+
+
+
+B. Ratios of Wilson loops 
+
+A precise separation of the non-perturbative part 
+of Wilson loops from the corresponding quanti- 
+ties measured on the lattice requires a perturbative 
+computation to very high order. From the discus- 
+sion in Section llll CI it is clear that boosted pertur- 
+bation theory provides an optimal tool for that. We 
+use the version of boosting including the hypergeo- 
+metric model to smooth the NSPT bare coefficients 
+and go beyond loop order n = 20. The boosted cou- 
+pling is computed from (jl5|) with n* — 40. Addi- 
+tionally we restrict ourselves to moderate loop sizes 
+which ensures that the boosted coefficients can be 
+determined with sufficient accuracy. 
+
+Let us introduce generic ratios of powers of Wil- 
+son loops (together with their boosted perturbative 
+expansion) as 
+
+
+
+R 
+
+
+
+M) 
+
+
+
+NM,N'M' 
+
+
+
+{Wn'M'Y 
+
+
+
+NM.N'M'i yb ■ 
+
+
+
+(52) 
+
+
+
+19 
+
+
+
+In most of the following examples we restrict our- 
+selves to reference loops of size N' = M' = 1 (pla- 
+quette) and integer powers k,m> Q. A generaliza- 
+tion to larger TV', M' and also to non- integer powers 
+k and m can be easily performed. 
+
+We consider now the particular ratios i?2i^ii 
+R\'iii. They fulfill the area relation 
+
+
+
+k y. S 
+
+
+
+NM 
+
+
+
+m X S 
+
+
+
+N'M' : 
+
+
+
+(53) 
+
+
+
+where S^m is the area of the Wilson loop W^m 
+- in our case of planar rectangular loops we have 
+Snm — NxM. From considerations of naturalness 
+we would expect the convergence behavior of these 
+types of ratios to be better than other ratios that 
+are not constrained by the area relation ([53]). We 
+first compare the perturbative coefficients of these 
+ratios with the corresponding coefficients of Wilson 
+loops W^Ij. Figure [T71 shows that the coefficients 
+of the ratios behave similar to the coefficients of the 
+Wilson loops (shown for comparison as thin lines 
+without errors) themselves. 
+Now we define the quantity 
+
+
+
+— Apt — A^tc , 
+
+
+
+(54) 
+
+
+
+where is then the non-perturbative value of the 
+quantity A and the ratio 
+
+
+
+A 
+
+
+
+A 
+
+
+
+PT 
+
+
+
+Amc 
+
+
+
+(55) 
+
+
+
+In the case of Wilson loops A^ > and A^ ^ 
+Apt- Since we know the non-perturbative piece to 
+be much smaller than the perturbative one we can 
+expand A in powers of A^. To first order we have 
+
+
+
+A~l 
+
+
+
+A. 
+
+
+
+Apt 
+
+
+
+(56) 
+
+
+
+Applying this expansion taking in place of A the 
+ratios R for the R introduced in ([5^ we have 
+
+
+
+R 
+
+
+
+k.ni 
+
+NM,N'M' 
+
+
+
+1 + k 
+
+
+
+Wnm,pt 
+
+
+
+Wn' 
+
+
+
+M'PT 
+
+
+
+(57) 
+
+
+
+In Figure [18] we show an example for some ra- 
+
+
+
+tios Rff^i N'M' at /3 = 6. We have used our own 
+Monte Carlo measurements of Wilson loops gener- 
+ated at the same lattice size [l^. One recognizes 
+that for large n* the ratios tend to R 
+
+
+
+NM,N'M' 
+
+
+
+1. 
+
+
+
+For smaller powers m and k this behavior is more 
+pronounced. Additionally, one finds that the "non- 
+natural" choice (fc, m) = (3, 3) leads to a signifi- 
+cantly different behavior. Thus, Figure [T51 stronglv 
+suggests to use powers (fc, m) which obey the area 
+relation ([52 
+
+
+
+Using for A in the A definition ([55]) the quan- 
+tity N'M' (l52]) one can easily derive a formula 
+to determine the "deviation from perturbation the- 
+ory" , Awnm , for a iV X M Wilson loop as 
+
+
+
+(-S log 
+
+
+
+,{Wn'M' 
+
+
+
+(58) 
+
+
+
+y^NM,N'M' J 
+
+
+
+nm,pt ■ 
+
+
+
+where we made explicit the dependence of A^/jvAf 
+on the reference loop Wn'M'- Values of {N,M,k) 
+and {N'M',m) are related by (l53l) . Inserting the 
+boosted perturbative series for Wnm,pt and the 
+Monte Carlo measured values Wnm,mc for vari- 
+ous values of the inverse coupling /? into ([551) one 
+obtains rather easily the desired a-dependent non- 
+perturbative part Awkm{'^) of Wnm using one's 
+favorite known relation /3(a). 
+
+
+
+C. Condensate of dimension four on the 
+lattice 
+
+One special case of the non-perturbative part of 
+Wilson loops is Avkh = W^ii,pt — W^ii, mc which 
+is directly connected to the gluon condensate intro- 
+duced in [l[. There is a commonly used relation 
+between the Monte Carlo measured plaquette and 
+its perturbative counterpart 
+
+
+
+11. MC 
+
+
+
+11. PT 
+
+
+
+36 V I3ig) 
+
+
+
+i-GG) , 
+
+TT 
+
+
+
+(59) 
+
+which defines the gluon condensate {^GG) on the 
+lattice^. In contrast to ([58]) . relation ([59]) allows 
+us to determine the gluon condensate from the 
+1x1 Wilson loop only. An alternative could be 
+to find Awii from ([58| choosing a suitable refer- 
+ence Wilson loop. As discussed in Section llV Al this 
+is strictly valid only in the absence of renormalon 
+ambiguities which is assumed to be the case in the 
+following. 
+
+In ([59]) it is assumed that there is only a sin- 
+gle, non-perturbative quantity of dimension four 
+contributing to the plaquette. It has been specu- 
+lated [3^ that in the difference between the pertur- 
+bative and the lattice Monte Carlo plaquette also 
+an a^-contribution might be present. That differ- 
+ence depends on n* denoting the truncation of the 
+perturbative series as expressed by the n* depen- 
+
+
+
+^ In II59I I /3(g) denotes the standard /3-function with bo being 
+its leading coefficient. 
+
+
+
+20 
+
+
+
+
+FIG. 17: Boosted coefficients of ratios (left: [-R2i,ii]*"', right: defined in ([52}. The thin lines show the 
+
+corresponding boosted coefficients for the 1x1 and 2x1 (left) and 1x1 and 3xl(right) Wilson loops, respectively. 
+
+
+
+1.01 
+1.008 
+^ 1.006 
+
+
+
+1.004 
+
+
+
+1.002 
+
+
+
+Pl2 
+
+-"-21,11 
+
+524 
+-^21.11 
+n33 
+-^21. 11 
+
+
+
+^ • • • 4 ■ 
+
+
+
+10 
+
+
+
+15 
+
+
+
+20 
+
+
+
+n 
+
+
+
+30 
+
+
+
+35 
+
+
+
+40 
+
+
+
+FIG. 18: R: 
+as function of loop order n* 
+summed up. 
+
+
+
+for (fc,m) = (1,2), (2,4) and (3,3) 
+
+
+
+up to which the ratio is 
+
+
+
+dence of the corresponding coefficients: 
+
+^W^^{n*) = Wii^PT{n*) -WiuMC 
+
+= C2in*) + din*) . (60) 
+
+In [ll| Narison and Zakharov have presented argu- 
+ments that a non-zero value of the coefRcient C2(n*) 
+is an artefact due to the truncation - above some 
+value of n* that coefficient should vanish. 
+
+For the estimate of the gluon condensate we are 
+in the position to take the most precise perturba- 
+tive values available - in our computation these are 
+the summed series based on hypergeometric func- 
+tions (n* — ^ oo) given in (j34l) with the parameters 
+of Table IIIII So we can ask the question, whether 
+there is a significant a^-dependence for the non- 
+perturbative parts Aw^m derived from ([55)1 mak- 
+
+
+
+ing a corresponding ansatz as in (pO]) . 
+
+To find the dependence of the non-perturbative 
+part on the lattice spacing a, we consider the lat- 
+tice coupling region /^min < /? < /3max- Pmin = 5.85 
+
+is determined by the convergence radius of the per- 
+turbative series. In the analysis we have used non- 
+perturbative Wilson loops from the same lattice 
+size as the largest NSPT lattice and have chosen 
+/3max = 6.3. To relate the different lattice couplings 
+/3 to a/ro, where rg is the Sommer scale, we use [31 1. 
+
+In the left of Figure [19] we show AWii(a) as func- 
+tion of a^. One observes that there is not much 
+room for an additional a^-dependence. On the 
+other hand, we find a significant bending for larger 
+a{g^) which can be parametrized as an (a^)^ correc- 
+tion term. This might be a sign of breaking scaling 
+on the coarsest lattices, or it could be the signa- 
+ture of higher-dimensional condensates considered 
+in [s^]- That correction is relatively small for ■ 
+For larger Wilson loops we find this deviation from 
+a pure a*-dependence more pronounced as shown in 
+the right of Figure [T^ We should mention that, us- 
+ing the summed perturbative series of the hyperge- 
+ometric model, the non-perturbative parts Awna/ 
+are independent of the choice of the reference loops 
+(as indicated in ([55|) and also agree for the plaque- 
+tte case with the simple subtraction scheme ([5^ . 
+
+In Figure we plot C4{n*) for various Wilson 
+loops. One recognizes a pronounced plateau for 
+n* > 30. In Table |V] we give the values of the 
+coefficients C4 both for the boosted series summed 
+up to n* = 40 and as obtained from the infinite 
+series, respectively. On dimensional grounds one 
+would expect that C4 would be approximately pro- 
+portional to the square of the Wilson loop area [32| • 
+From Table |V] we do see an increase in C4, but it 
+
+
+
+21 
+
+
+
+
+Airn(ll'2l) 
+
+A,r,,(Vl'n) 
+
+
+
+though the error bars overlap). 
+
+Introducing the Sommer scale rg , a physical value 
+for the condensate can be extracted from the coeffi- 
+cient C4. If we approximate ~ 1 in we 
+extract from Avkh the gluon condensate as given in 
+
+
+
+Table |Vll This value is slightly lower than the value 
+
+
+
+1 \ 
+
+
+
+0.01 0.02 0.03 0.04 0.0.5 0.06 0.07 
+
+1/n* 
+
+
+
+
+
+rt{^GG) 
+
+
+(fGG) [GeV^] 
+
+
+
+
+1.16(12) 
+
+
+0.028(3) 
+
+
+
+FIG. 20: Coefficient C4 as function of tlie inverse loop 
+order 1/n* for different Wilson loops. The data points 
+at "1/n* = 0" represent the series summed to infinity 
+using the hypergeometric model. 
+
+
+
+
+
+C4 from boosting 
+(n* = 40) 
+
+
+C4 from the hypergeometric 
+model 
+
+
+
+
+0.30(3) 
+
+
+0.31(3) 
+
+
+W21 
+
+
+0.54(5) 
+
+
+0.56(5) 
+
+
+W31 
+
+
+0.47(9) 
+
+
+0.49(10) 
+
+
+W22 
+
+
+0.67(10) 
+
+
+0.70(11) 
+
+
+
+TABLE V: Coefficients C4 for the Wilson loops Wnm 
+obtained from boosted perturbation theory up to n* = 
+40 and from the series summed to infinity using the 
+hypergeometric model. 
+
+
+
+is much slower than area squared (in fact the a'^ 
+term in the 3x1 loop is smaller than the 2x1 loop, 
+
+
+
+TABLE VI: Gluon condensate at L = 12 (ro = 0.5 fm). 
+
+0.04(1) GeV* found in The main reason for the 
+difference is that in Q the boosted series was trun- 
+cated at n* = 12, while in the present work we 
+make an estimate of the contribution from higher 
+terms in the boosted series. 
+
+
+
+V. SUMMARY 
+
+In this paper we presented the result of NSPT 
+calculations for Wilson loops of various sizes using 
+the Wilson gauge action. Within the framework of 
+NSPT we were able to determine the perturbative 
+coefficients of those loops up to loop order n = 20 
+for different lattice sizes as numerically clear sig- 
+nals. 
+
+Up to that order we did not observe signs of a fac- 
+torial n-dependence as expected for an asymptotic 
+series. Assuming that this behavior is not spoiled at 
+larger n, we were able to describe the n dependence 
+
+
+
+22 
+
+
+
+of the series by a simple recursion relating subse- 
+quent orders. Solving that relation, the sum over 
+all orders has been represented by a hypergeomet- 
+ric function. Its branch cut discontinuity defines a 
+convergence radius of the series at positive . 
+
+Using the naive perturbative series of the Wil- 
+son loops in the bare coupling squared g'^ = 6//3, 
+the summed series up to n* converges only slowly 
+to some asymptotic value. This has led us to ap- 
+ply boosting - a rearrangement of the perturba- 
+tive series in terms of the so-called boosted cou- 
+pling as expansion parameter where we expect that 
+the summed series reaches a stable plateau already 
+after moderate loop orders. For moderate Wilson 
+loop sizes these plateaus have been found. 
+
+The transformation from the naive perturbative 
+series to the boosted series is numerically delicate, 
+involving large cancellations. Simply transform- 
+ing the NSPT raw expansion coefficients leads to 
+very noisy boosted coefficients beyond n « 8. To 
+get around this problem we "smoothed" the coef- 
+ficients of the naive perturbative series using the 
+presented hypergeometric model before calculat- 
+ing the boosted series. The resulting "smoothed" 
+boosted coefficients are much more stable, and this 
+strongly suggests that the observed rapid fall-off of 
+the boosted coefficients continues to large loop or- 
+ders. 
+
+We introduced ratios of powers of Wilson loops 
+which then have been treated within boosted per- 
+turbation theory. In many cases the truncation 
+errors for these ratios are much smaller than the 
+truncation errors for the Wilson loops themselves. 
+
+The results of the boosted perturbative series 
+are extremely close to the Monte Carlo values of 
+the Wilson loops, the same applies to their ratios. 
+For /3 > 6 (p^ < 1) the differences are typically 
+in the third or fourth decimal place. Looking at 
+the small deviations between Monte Carlo results 
+and boosted perturbation theory allows for a de- 
+termination of the non-perturbative parts of Wil- 
+son loops. We find that the dominant behavior of 
+the non-perturbative part scales like . 
+
+As a special case we have calculated the gluon 
+condensate {^GG) from the plaquette. The found 
+number is somewhat larger than that in the phe- 
+nomcnological SVZ sum rule approach [Ij] - at least 
+for our 12^ lattice. Our number agrees within er- 
+rors with the estimate (^GG) = 0.024(8) GeV 
+presented by Narison in j33| which is based on a 
+study of heavy quarkonia mass splittings. 
+
+We have checked the regularly reappearing claim, 
+that the Wilson loop has, in addition to its "canon- 
+ical" dependence, a significant part showing a 
+power dependence. Our results show that in 
+
+
+
+the chosen /J-region the non-perturbative parts of 
+the Wilson loops Wnm can be well described by 
+an a^-ansatz with an (a^)^ correction term. For 
+the difference between the perturbative and the lat- 
+tice Monte Carlo plaquette this correction is 
+rather small. 
+
+If infinite or large order perturbation theory was 
+to refiect the long distance properties of QCD, we 
+would expect the Wilson loops to show an area- 
+law behavior and the static potential to grow lin- 
+early with distance. As a result, the Borel trans- 
+form would exhibit a pole at l/6o = 16 7r^/ll, and 
+the coefficients of the perturbative series should 
+show a factorial growth. (Then, for comparison, 
+the gluon condensate would show up as a pole at 
+2/bo = 32 7rVll-) Instead, we find 
+
+I¥(i?,r)«| (61) 
+
+for i? = 2,3,4 and T = 5, within a few per cent, 
+and no sign of an infrared renormalon'^. This result 
+holds for all couplings within the radius of conver- 
+gence of the perturbative series, < g^ < 1.1. 
+In Figure!^ we show the potential difference AV 
+
+
+
+AV(R,g2) 
+
+
+
+
+2 
+
+
+
+FIG. 21: The perturbative potential difference AV ob- 
+tained from the perturbative Wilson loops up to loop 
+order 20 as function of the distance R and g^. 
+
+as function of R and g^ calculated from the series 
+
+
+
+We have nothing to add to |34( and to the argument of [35|l 
+that there is no physical significance to these ambiguities. 
+
+
+
+23 
+
+
+
+variant of the Creutz ratio 
+
+
+
+AV{R) 
+
+
+
+= log 
+
+
+
+V{R - 1) - V{R) 
+
+W{R,T)W{R-l,T^ 
+
+
+
+WiR,T-l)WiR-l,T) 
+
+
+
+(62) 
+
+
+
+using the perturbative Wilson loops up to loop 
+order 20. For a linearly increasing potential one 
+would expect AV to be a constant proportional to 
+the string tension. In fact, AV decreases with R for 
+all within the radius of convergence consistent 
+with the expected Coulomb behavior 1/{R{R— 1)). 
+
+A look at the /3 function suggests, furthermore, 
+that the perturbative theory is separated from the 
+strong coupling phase through a pole, similar to the 
+supersymmetric Yang-Mills theory |36j . indicating 
+that there is no direct contradiction with the strong 
+coupling expansion. A similar result to (I6ip was 
+found in Monte Carlo simulations of gauge-fixed 
+non-compact lattice QCD [13, [3, which as well 
+take into account small fluctuations of the gauge 
+fields only. 
+
+This leads us to conclude - on the basis of our 
+present results, nota bene - that the perturbative 
+series carry no information on the confining proper- 
+ties of the theory and the non-trivial features of the 
+QCD vacuum. The positive aspect of this result is 
+that the perturbative tail can be cleanly separated 
+from the Monte Carlo results for the plaquette. 
+
+
+
+(fT7|). The reported errors are the fit errors from 
+the extrapolation e — >■ 0. The presented numbers 
+for larger Wilson loops and higher loop orders are 
+collected irrespective of possible problems with the 
+signal to noise ratio at a given order n as discussed 
+in Section fll Bl and have to be taken with care. In 
+Table IA8I we give some perturbative Wilson loops 
+as result of an infinite series using the described hy- 
+pergeometric model for various (3 values at L = 12. 
+In Table IA9I we collect the values for known loop 
+order coefficients in the infinite volume limit. For 
+14^11 the first three loop order coefficients are given 
+in [22, 23,1 whereas for the larger Wilson loops only 
+the first two loop orders are known [2l[. The first 
+order coefficients can be computed to high preci- 
+sion. 
+
+
+
+Acknowledgements 
+
+This investigation has been supported partly by 
+DFG under contract SCHI 422/8-1 and by the EU 
+grant 227431 (Hadron Physics2). R.M. is supported 
+by the Research Executive Agency (REA) of the 
+European Union under Grant Agreement PITN- 
+GA-2009-238353 (ITN STRONGnet). We thank 
+the RCNP at Osaka university for providing com- 
+puter resources. 
+
+
+
+Appendix 
+
+We present in Tables [ATI - 1 A7I all considered rect- 
+angular perturbative Wilson loops of sizes N x M 
+with iV, M = 1, . . . , L/2 for different sizes L of the 
+used hypercubic lattices L"* in the form 
+
+20 
+
+Wnm = 1 + Y.WnIi9'''- (63) 
+
+n=l 
+
+(n) 
+
+The expansion coefRcients Wjym the result of 
+the extrapolation to zero Langevin step size using 
+
+
+
+24 
+
+
+
+n 
+
+
+
+
+
+
+
+
+1 
+
+
+-0.332147(22) 
+
+
+-0.567064(34) 
+
+
+-0.874683(122) 
+
+
+2 
+
+
+-0.033411(15) 
+
+
+-0.004571(25) 
+
+
+0.104041(63) 
+
+
+3 
+
+
+-0.013368(13) 
+
+
+-0.010094(28) 
+
+
+-0.000735(58) 
+
+
+4 
+
+
+-0.006983(1) 
+
+
+-0.006394(13) 
+
+
+-0.002683(12) 
+
+
+5 
+
+
+-0.004179(8) 
+
+
+-0.004167(9) 
+
+
+-0.002284(1) 
+
+
+6 
+
+
+-0.002719(6) 
+
+
+-0.002859(8) 
+
+
+-0.001777(9) 
+
+
+7 
+
+
+-0.001872(6) 
+
+
+-0.002041(8) 
+
+
+-0.001368(1) 
+
+
+8 
+
+
+-0.001342(5) 
+
+
+-0.001503(8) 
+
+
+-0.001063(9) 
+
+
+9 
+
+
+-0.000992(5) 
+
+
+-0.001134(7) 
+
+
+-0.000834(8) 
+
+
+10 
+
+
+-0.000752(4) 
+
+
+-0.000874(6) 
+
+
+-0.000663(7) 
+
+
+11 
+
+
+-0.000581(4) 
+
+
+-0.000684(5) 
+
+
+-0.000534(6) 
+
+
+12 
+
+
+-0.000456(4) 
+
+
+-0.000544(5) 
+
+
+-0.000433(6) 
+
+
+13 
+
+
+-0.000363(3) 
+
+
+-0.000437(4) 
+
+
+-0.000355(6) 
+
+
+14 
+
+
+-0.000292(3) 
+
+
+-0.000355(4) 
+
+
+-0.000293(6) 
+
+
+15 
+
+
+-0.000238(3) 
+
+
+-0.000291(4) 
+
+
+-0.000243(5) 
+
+
+16 
+
+
+-0.000195(2) 
+
+
+-0.000240(4) 
+
+
+-0.000204(5) 
+
+
+17 
+
+
+-0.000161(2) 
+
+
+-0.000200(3) 
+
+
+-0.000171(5) 
+
+
+18 
+
+
+-0.000134(2) 
+
+
+-0.000167(3) 
+
+
+-0.000145(5) 
+
+
+19 
+
+
+-0.000112(2) 
+
+
+-0.000141(3) 
+
+
+-0.000123(4) 
+
+
+20 
+
+
+-0.000094(2) 
+
+
+-0.000119(3) 
+
+
+-0.000105(4) 
+
+
+
+TABLE Al: Perturbative coefficients for L = A. 
+
+
+
+n 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1 
+
+
+-0.333112(15) 
+
+
+-0.573644(44) 
+
+
+-0.907518(112) 
+
+
+-0.798086(71) 
+
+
+-1.193307(174) 
+
+
+-1.500876(291) 
+
+
+2 
+
+
+-0.033829(6) 
+
+
+-0.003938(26) 
+
+
+0.118297(96) 
+
+
+0.075949(52) 
+
+
+0.313019(171) 
+
+
+0.609060(335) 
+
+
+3 
+
+
+-0.013641(4) 
+
+
+-0.010199(9) 
+
+
+0.000024(16) 
+
+
+-0.002820(12) 
+
+
+-0.005402(37) 
+
+
+-0.050954(108) 
+
+
+4 
+
+
+-0.007202(2) 
+
+
+-0.006571(5) 
+
+
+-0.002375(9) 
+
+
+-0.003622(3) 
+
+
+-0.000139(18) 
+
+
+-0.000273(38) 
+
+
+5 
+
+
+-0.004366(3) 
+
+
+-0.004366(6) 
+
+
+-0.002227(12) 
+
+
+-0.002878(6) 
+
+
+-0.000573(8) 
+
+
+-0.000083(34) 
+
+
+6 
+
+
+-0.002881(4) 
+
+
+-0.003047(7) 
+
+
+-0.001813(12) 
+
+
+-0.002190(8) 
+
+
+-0.000684(1) 
+
+
+-0.000138(7) 
+
+
+7 
+
+
+-0.002014(4) 
+
+
+-0.002214(7) 
+
+
+-0.001440(12) 
+
+
+-0.001675(8) 
+
+
+-0.000629(13) 
+
+
+-0.000147(12) 
+
+
+8 
+
+
+-0.001467(4) 
+
+
+-0.001661(7) 
+
+
+-0.001151(12) 
+
+
+-0.001303(8) 
+
+
+-0.000551(13) 
+
+
+-0.000156(1) 
+
+
+9 
+
+
+-0.001103(4) 
+
+
+-0.001278(6) 
+
+
+-0.000927(1) 
+
+
+-0.001028(7) 
+
+
+-0.000473(1) 
+
+
+-0.000157(8) 
+
+
+10 
+
+
+-0.000850(3) 
+
+
+-0.001004(5) 
+
+
+-0.000755(8) 
+
+
+-0.000824(6) 
+
+
+-0.000404(8) 
+
+
+-0.000150(7) 
+
+
+11 
+
+
+-0.000669(3) 
+
+
+-0.000802(4) 
+
+
+-0.000622(6) 
+
+
+-0.000670(5) 
+
+
+-0.000346(6) 
+
+
+-0.000139(6) 
+
+
+12 
+
+
+-0.000535(3) 
+
+
+-0.000650(3) 
+
+
+-0.000518(4) 
+
+
+-0.000551(4) 
+
+
+-0.000298(4) 
+
+
+-0.000126(5) 
+
+
+13 
+
+
+-0.000434(2) 
+
+
+-0.000533(3) 
+
+
+-0.000435(3) 
+
+
+-0.000458(3) 
+
+
+-0.000257(2) 
+
+
+-0.000114(5) 
+
+
+14 
+
+
+-0.000356(2) 
+
+
+-0.000442(2) 
+
+
+-0.000368(2) 
+
+
+-0.000384(2) 
+
+
+-0.000222(2) 
+
+
+-0.000102(4) 
+
+
+15 
+
+
+-0.000295(2) 
+
+
+-0.000370(2) 
+
+
+-0.000313(2) 
+
+
+-0.000324(2) 
+
+
+-0.000192(2) 
+
+
+-0.000091(4) 
+
+
+16 
+
+
+-0.000247(2) 
+
+
+-0.000312(2) 
+
+
+-0.000268(2) 
+
+
+-0.000276(2) 
+
+
+-0.000167(2) 
+
+
+-0.000080(3) 
+
+
+17 
+
+
+-0.000208(2) 
+
+
+-0.000265(2) 
+
+
+-0.000231(2) 
+
+
+-0.000236(2) 
+
+
+-0.000145(2) 
+
+
+-0.000071(3) 
+
+
+18 
+
+
+-0.000177(2) 
+
+
+-0.000227(2) 
+
+
+-0.000200(2) 
+
+
+-0.000203(2) 
+
+
+-0.000127(2) 
+
+
+-0.000063(2) 
+
+
+19 
+
+
+-0.000151(2) 
+
+
+-0.000195(2) 
+
+
+-0.000173(2) 
+
+
+-0.000175(2) 
+
+
+-0.000111(2) 
+
+
+-0.000056(2) 
+
+
+20 
+
+
+-0.000130(1) 
+
+
+-0.000169(2) 
+
+
+-0.000151(2) 
+
+
+-0.000152(2) 
+
+
+-0.000098(2) 
+
+
+-0.000050(2) 
+
+
+
+TABLE A2: Perturbative coefficients for L = 6. 
+
+
+
+25 
+
+
+
+n 
+
+
+
+
+"'21 
+
+
+
+
+
+
+
+
+1 
+
+
+—0.333236(8) 
+
+
+— 0.574473(16) 
+
+
+—0.911469(27) 
+
+
+—0.800665(29) 
+
+
+— 1.023410(49) 
+
+
+2 
+
+
+—0.033852(5) 
+
+
+—0.003818(8) 
+
+
+0.119976(19) 
+
+
+0.076987(16) 
+
+
+0.206839(26) 
+
+
+3 
+
+
+—0.013670(3) 
+
+
+—0.010214(4) 
+
+
+0.000196(7) 
+
+
+—0.002770(7) 
+
+
+—0.002536(14) 
+
+
+4 
+
+
+—0.007229(3) 
+
+
+—0.006594(4) 
+
+
+— 0.002321(9) 
+
+
+—0.003628(5) 
+
+
+—0.001501(7) 
+
+
+5 
+
+
+—0.004389(2) 
+
+
+—0.004397(4) 
+
+
+-0.002243(5) 
+
+
+—0.002892(6) 
+
+
+—0.001525(6) 
+
+
+6 
+
+
+—0.002903(2) 
+
+
+—0.003080(3) 
+
+
+—0.001845(5) 
+
+
+—0.002209(5) 
+
+
+—0.001309(6) 
+
+
+7 
+
+
+—0.002034(2) 
+
+
+—0.002246(2) 
+
+
+— 0.001478(5) 
+
+
+—0.001697(3) 
+
+
+—0.001076(4) 
+
+
+8 
+
+
+—0.001487(1) 
+
+
+—0.001693(2) 
+
+
+— 0.001194(6) 
+
+
+—0.001328(3) 
+
+
+—0.000880(3) 
+
+
+9 
+
+
+—0.001122(1) 
+
+
+—0.001310(2) 
+
+
+— 0.000973(7) 
+
+
+—0.001057(3) 
+
+
+—0.000725(3) 
+
+
+10 
+
+
+-0.000869(1) 
+
+
+-0.001035(3) 
+
+
+-0.000800(7) 
+
+
+-0.000854(3) 
+
+
+-0.000601(3) 
+
+
+11 
+
+
+—0.000687(1) 
+
+
+—0.000832(3) 
+
+
+-0.000664(6) 
+
+
+—0.000700(3) 
+
+
+—0.000502(3) 
+
+
+12 
+
+
+—0.000553(1) 
+
+
+—0.000678(3) 
+
+
+— 0.000555(6) 
+
+
+—0.000579(3) 
+
+
+—0.000423(3) 
+
+
+13 
+
+
+— U.UUU40HZ j 
+
+
+— u.uuuoou^o ) 
+
+
+— U.UUU4Do(^0 } 
+
+
+— U.UUU4o4(^o ) 
+
+
+— u.uuuoooi^o ) 
+
+
+14 
+
+
+-0.000372(2) 
+
+
+-0.000467(3) 
+
+
+-0.000398(5) 
+
+
+-0.000408(3) 
+
+
+-0.000306(3) 
+
+
+15 
+
+
+-0.000310(2) 
+
+
+-0.000393(3) 
+
+
+-0.000340(5) 
+
+
+-0.000346(3) 
+
+
+-0.000262(3) 
+
+
+16 
+
+
+-0.000261(2) 
+
+
+-0.000333(3) 
+
+
+-0.000292(5) 
+
+
+-0.000296(3) 
+
+
+-0.000226(3) 
+
+
+17 
+
+
+-0.000221(2) 
+
+
+-0.000284(3) 
+
+
+-0.000252(4) 
+
+
+-0.000254(3) 
+
+
+-0.000195(3) 
+
+
+18 
+
+
+-0.000189(1) 
+
+
+-0.000244(2) 
+
+
+-0.000219(4) 
+
+
+-0.000220(3) 
+
+
+-0.000170(3) 
+
+
+19 
+
+
+-0.000162(1) 
+
+
+-0.000211(2) 
+
+
+-0.000191(4) 
+
+
+-0.000191(3) 
+
+
+-0.000148(3) 
+
+
+20 
+
+
+-0.000140(1) 
+
+
+-0.000183(2) 
+
+
+-0.000167(3) 
+
+
+-0.000167(2) 
+
+
+-0.000130(2) 
+
+
+
+TABLE A3: Perturbative coefficients for L = 8. 
+
+
+
+n 
+
+
+
+
+
+
+
+
+
+
+
+
+1 
+
+
+-1.204201(52) 
+
+
+-1.528486(114) 
+
+
+-1.485430(97) 
+
+
+-1.830535(174) 
+
+
+-2.140917(228) 
+
+
+2 
+
+
+0.320661(27) 
+
+
+0.636544(74) 
+
+
+0.595785(62) 
+
+
+1.028662(168) 
+
+
+1.524356(276) 
+
+
+3 
+
+
+-0.005468(14) 
+
+
+-0.055098(20) 
+
+
+-0.048959(22) 
+
+
+-0.174438(58) 
+
+
+-0.396169(154) 
+
+
+4 
+
+
+-0.000135(19) 
+
+
+-0.000547(45) 
+
+
+-0.000495(31) 
+
+
+0.002744(73) 
+
+
+0.025146(116) 
+
+
+5 
+
+
+-0.000592(1) 
+
+
+-0.000131(15) 
+
+
+-0.000219(24) 
+
+
+-0.000108(45) 
+
+
+0.000200(94) 
+
+
+6 
+
+
+-0.000687(12) 
+
+
+-0.000159(28) 
+
+
+-0.000216(20) 
+
+
+-0.000068(44) 
+
+
+0.000011(96) 
+
+
+7 
+
+
+-0.000652(1) 
+
+
+-0.000208(13) 
+
+
+-0.000238(13) 
+
+
+-0.000082(17) 
+
+
+-0.000067(33) 
+
+
+8 
+
+
+-0.000588(1) 
+
+
+-0.000214(17) 
+
+
+-0.000246(11) 
+
+
+-0.000089(14) 
+
+
+-0.000057(28) 
+
+
+9 
+
+
+-0.000514(1) 
+
+
+-0.000196(16) 
+
+
+-0.000233(11) 
+
+
+-0.000077(15) 
+
+
+-0.000027(26) 
+
+
+10 
+
+
+-0.000443(9) 
+
+
+-0.000174(13) 
+
+
+-0.000209(9) 
+
+
+-0.000063(12) 
+
+
+-0.000011(14) 
+
+
+11 
+
+
+-0.000380(7) 
+
+
+-0.000153(1) 
+
+
+-0.000183(7) 
+
+
+-0.000054(8) 
+
+
+-0.000010(7) 
+
+
+12 
+
+
+-0.000326(6) 
+
+
+-0.000136(8) 
+
+
+-0.000160(6) 
+
+
+-0.000048(7) 
+
+
+-0.000013(5) 
+
+
+13 
+
+
+-0.000281(6) 
+
+
+-0.000120(7) 
+
+
+-0.000141(5) 
+
+
+-0.000043(6) 
+
+
+-0.000015(4) 
+
+
+14 
+
+
+-0.000243(5) 
+
+
+-0.000107(7) 
+
+
+-0.000124(5) 
+
+
+-0.000039(5) 
+
+
+-0.000015(4) 
+
+
+15 
+
+
+-0.000210(5) 
+
+
+-0.000095(6) 
+
+
+-0.000109(5) 
+
+
+-0.000035(5) 
+
+
+-0.000013(4) 
+
+
+16 
+
+
+-0.000183(5) 
+
+
+-0.000084(5) 
+
+
+-0.000096(5) 
+
+
+-0.000032(5) 
+
+
+-0.000011(4) 
+
+
+17 
+
+
+-0.000160(5) 
+
+
+-0.000075(5) 
+
+
+-0.000086(5) 
+
+
+-0.000029(4) 
+
+
+-0.000010(4) 
+
+
+18 
+
+
+-0.000141(4) 
+
+
+-0.000068(4) 
+
+
+-0.000076(4) 
+
+
+-0.000027(4) 
+
+
+-0.000009(3) 
+
+
+19 
+
+
+-0.000124(4) 
+
+
+-0.000061(4) 
+
+
+-0.000068(4) 
+
+
+-0.000025(3) 
+
+
+-0.000008(3) 
+
+
+20 
+
+
+-0.000110(4) 
+
+
+-0.000055(4) 
+
+
+-0.000061(4) 
+
+
+-0.000023(3) 
+
+
+-0.000007(2) 
+
+
+
+TABLE A4: Perturbative coefficients for L = 8 (continued). 
+
+
+
+26 
+
+
+
+n 
+
+
+
+
+"^21 
+
+
+"'22 
+
+
+
+
+
+
+
+
+
+
+1 
+
+
+— 0.333320(4) 
+
+
+—0.574758(4) 
+
+
+—0.912636(19) 
+
+
+—0.801260(5) 
+
+
+— 1.024718(1) 
+
+
+— 1.247323(13) 
+
+
+— 1.469522(15) 
+
+
+2 
+
+
+-0.033898(1) 
+
+
+—0.003835(2) 
+
+
+0.120423(2) 
+
+
+0.077139(9) 
+
+
+0.207624(22) 
+
+
+0.387381(18) 
+
+
+0.616194(13) 
+
+
+3 
+
+
+-0.013698(3) 
+
+
+—0.010247(5) 
+
+
+0.000136(15) 
+
+
+—0.002788(4) 
+
+
+—0.002610(3) 
+
+
+—0.020698(3) 
+
+
+—0.067876(11) 
+
+
+4 
+
+
+— 0.007251(3) 
+
+
+—0.006625(7) 
+
+
+—0 0n?337('1 3*1 
+
+
+—0 on3fi4n('8') 
+
+
+—0 Oni 503('7') 
+
+
+—0 0n0Q67('fi~l 
+
+
+—0.000342(11) 
+
+
+5 
+
+
+— 0.004410(3) 
+
+
+—0.004425(6) 
+
+
+—0.002255(11) 
+
+
+—0.002914(9) 
+
+
+—0.001539(1) 
+
+
+—0.000784(1) 
+
+
+— 0.000475(6) 
+
+
+6 
+
+
+-0.002922(3) 
+
+
+—0.003106(6) 
+
+
+—0.001861(9) 
+
+
+—0.002233(7) 
+
+
+—0.001326(1) 
+
+
+—0.000724(12) 
+
+
+—0.000406(15) 
+
+
+7 
+
+
+— 0.002052(3) 
+
+
+—0.002272(4) 
+
+
+—0.001503(7) 
+
+
+—0.001726(5) 
+
+
+—0.001101(5) 
+
+
+—0.000645(6) 
+
+
+—0.000373(8) 
+
+
+
+
+—0 nm 5n4('2'i 
+
+
+—0 nni 71 8^3"! 
+
+
+
+
+— n nm 355^3^ 
+
+— U. Kjyj l-OOOyO J 
+
+
+—0 00090^^3"! 
+— yj.KjyjKjijKj'jyo j 
+
+
+— n nnn5^7^'4^ 
+
+— yj.KjyjKjtjo 1 \^ J 
+
+
+
+
+9 
+
+
+— 0.001138(2) 
+
+
+—0.001333(2) 
+
+
+—0.000994(2) 
+
+
+—0.001082(2) 
+
+
+—0.000748(1) 
+
+
+—0.000475(2) 
+
+
+—0.000289(3) 
+
+
+10 
+
+
+-0.000884(1) 
+
+
+-0.001056(2) 
+
+
+-0.000820(2) 
+
+
+-0.000876(2) 
+
+
+-0.000621(1) 
+
+
+-0.000403(2) 
+
+
+-0.000251(3) 
+
+
+11 
+
+
+— 0.000700(1) 
+
+
+—0.000851(1) 
+
+
+— 0.000683(3) 
+
+
+—0.000719(2) 
+
+
+—0.000519(2) 
+
+
+—0.000344(2) 
+
+
+— 0.000218(3) 
+
+
+12 
+
+
+— 0.000565(1) 
+
+
+—0.000696(2) 
+
+
+— 0.000574(4) 
+
+
+—0.000597(3) 
+
+
+—0.000438(3) 
+
+
+—0.000295(4) 
+
+
+— 0.000191(4) 
+
+
+13 
+
+
+n nnfiyifto/'i 
+
+— U.UUU4DZ(^i ) 
+
+
+— U.UUUO 1 ( 
+
+
+— U.UUU4C5 1 
+
+
+— U.UUUOU^I^O ) 
+
+
+— U.UUUO ( 0(^4 ) 
+
+
+— U.UUU.^0D^4 ) 
+
+
+— U.UUUiDo(^4 } 
+
+
+14 
+
+
+-0.000383(1) 
+
+
+-0.000484(2) 
+
+
+-0.000418(4) 
+
+
+-0.000426(3) 
+
+
+-0.000321(4) 
+
+
+-0.000223(4) 
+
+
+-0.000149(3) 
+
+
+15 
+
+
+-0.000320(1) 
+
+
+-0.000409(2) 
+
+
+-0.000361(4) 
+
+
+-0.000364(3) 
+
+
+-0.000278(3) 
+
+
+-0.000196(3) 
+
+
+-0.000132(2) 
+
+
+16 
+
+
+-0.000271(1) 
+
+
+-0.000350(2) 
+
+
+-0.000314(3) 
+
+
+-0.000315(2) 
+
+
+-0.000243(2) 
+
+
+-0.000173(2) 
+
+
+-0.000117(1) 
+
+
+17 
+
+
+-0.000231(1) 
+
+
+-0.000301(2) 
+
+
+-0.000275(2) 
+
+
+-0.000274(2) 
+
+
+-0.000213(2) 
+
+
+-0.000153(2) 
+
+
+-0.000105(1) 
+
+
+18 
+
+
+-0.000199(1) 
+
+
+-0.000261(2) 
+
+
+-0.000242(2) 
+
+
+-0.000239(2) 
+
+
+-0.000188(2) 
+
+
+-0.000136(2) 
+
+
+-0.000094(2) 
+
+
+19 
+
+
+-0.000172(1) 
+
+
+-0.000228(1) 
+
+
+-0.000213(3) 
+
+
+-0.000210(2) 
+
+
+-0.000166(2) 
+
+
+-0.000122(3) 
+
+
+-0.000085(2) 
+
+
+20 
+
+
+-0.000150(1) 
+
+
+-0.000200(1) 
+
+
+-0.000189(3) 
+
+
+-0.000185(2) 
+
+
+-0.000147(3) 
+
+
+-0.000109(3) 
+
+
+-0.000077(2) 
+
+
+
+TABLE A5: Perturbative coefficients for L = 12. 
+
+
+
+n 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1 
+
+
+-1.207005(31) 
+
+
+-1.535522(52) 
+
+
+-1.491384(41) 
+
+
+-1.845142(72) 
+
+
+-2.170005(100) 
+
+
+-2.148586(117) 
+
+
+-0.000077(2) 
+
+
+2 
+
+
+0.322694(4) 
+
+
+0.643882(9) 
+
+
+0.601963(23) 
+
+
+1.048051(37) 
+
+
+1.571598(94) 
+
+
+1.538376(110) 
+
+
+-0.000077(2) 
+
+
+3 
+
+
+-0.005740(18) 
+
+
+-0.056823(24) 
+
+
+-0.050320(9) 
+
+
+-0.181032(13) 
+
+
+-0.418636(81) 
+
+
+-0.404144(11) 
+
+
+-0.000077(2) 
+
+
+4 
+
+
+-0.000112(19) 
+
+
+-0.000446(44) 
+
+
+-0.000514(12) 
+
+
+0.003334(36) 
+
+
+0.028597(70) 
+
+
+0.027039(50) 
+
+
+-0.000077(2) 
+
+
+5 
+
+
+-0.000592(11) 
+
+
+-0.000136(15) 
+
+
+-0.000182(2) 
+
+
+-0.000224(12) 
+
+
+-0.000196(13) 
+
+
+-0.000207(18) 
+
+
+-0.000077(2) 
+
+
+6 
+
+
+-0.000685(9) 
+
+
+-0.000113(15) 
+
+
+-0.000197(8) 
+
+
+-0.000059(18) 
+
+
+-0.000019(16) 
+
+
+0.000003(30) 
+
+
+-0.000077(2) 
+
+
+7 
+
+
+-0.000663(7) 
+
+
+-0.000178(12) 
+
+
+-0.000241(6) 
+
+
+-0.000074(13) 
+
+
+-0.000064(18) 
+
+
+-0.000054(20) 
+
+
+-0.000077(2) 
+
+
+8 
+
+
+-0.000598(4) 
+
+
+-0.000196(5) 
+
+
+-0.000248(4) 
+
+
+-0.000074(11) 
+
+
+-0.000031(14) 
+
+
+-0.000043(20) 
+
+
+-0.000077(2) 
+
+
+9 
+
+
+-0.000523(2) 
+
+
+-0.000192(5) 
+
+
+-0.000234(5) 
+
+
+-0.000067(9) 
+
+
+-0.000024(4) 
+
+
+-0.000027(11) 
+
+
+-0.000077(2) 
+
+
+10 
+
+
+-0.000453(3) 
+
+
+-0.000177(3) 
+
+
+-0.000210(3) 
+
+
+-0.000059(1) 
+
+
+-0.000013(8) 
+
+
+-0.000015(8) 
+
+
+-0.000077(2) 
+
+
+11 
+
+
+-0.000391(5) 
+
+
+-0.000161(7) 
+
+
+-0.000188(6) 
+
+
+-0.000056(8) 
+
+
+-0.000015(11) 
+
+
+-0.000018(14) 
+
+
+-0.000077(2) 
+
+
+12 
+
+
+-0.000339(6) 
+
+
+-0.000148(9) 
+
+
+-0.000170(7) 
+
+
+-0.000058(11) 
+
+
+-0.000023(7) 
+
+
+-0.000025(12) 
+
+
+-0.000077(2) 
+
+
+13 
+
+
+-0.000297(6) 
+
+
+-0.000137(9) 
+
+
+-0.000155(7) 
+
+
+-0.000059(8) 
+
+
+-0.000029(5) 
+
+
+-0.000028(7) 
+
+
+-0.000077(2) 
+
+
+14 
+
+
+-0.000261(5) 
+
+
+-0.000126(7) 
+
+
+-0.000141(5) 
+
+
+-0.000058(5) 
+
+
+-0.000030(5) 
+
+
+-0.000029(4) 
+
+
+-0.000077(2) 
+
+
+15 
+
+
+-0.000230(4) 
+
+
+-0.000116(5) 
+
+
+-0.000128(3) 
+
+
+-0.000055(4) 
+
+
+-0.000026(8) 
+
+
+-0.000026(6) 
+
+
+-0.000077(2) 
+
+
+16 
+
+
+-0.000204(3) 
+
+
+-0.000106(5) 
+
+
+-0.000116(3) 
+
+
+-0.000051(6) 
+
+
+-0.000023(11) 
+
+
+-0.000023(8) 
+
+
+-0.000077(2) 
+
+
+17 
+
+
+-0.000182(3) 
+
+
+-0.000096(7) 
+
+
+-0.000105(4) 
+
+
+-0.000047(8) 
+
+
+-0.000020(12) 
+
+
+-0.000021(9) 
+
+
+-0.000077(2) 
+
+
+18 
+
+
+-0.000162(4) 
+
+
+-0.000087(8) 
+
+
+-0.000095(5) 
+
+
+-0.000043(9) 
+
+
+-0.000018(11) 
+
+
+-0.000020(9) 
+
+
+-0.000077(2) 
+
+
+19 
+
+
+-0.000145(5) 
+
+
+-0.000078(9) 
+
+
+-0.000086(6) 
+
+
+-0.000040(9) 
+
+
+-0.000017(9) 
+
+
+-0.000020(8) 
+
+
+-0.000077(2) 
+
+
+20 
+
+
+-0.000130(5) 
+
+
+-0.000071(9) 
+
+
+-0.000077(6) 
+
+
+-0.000037(8) 
+
+
+-0.000016(6) 
+
+
+-0.000018(6) 
+
+
+-0.000077(2) 
+
+
+
+TABLE A6: Perturbative coefficients for L = 12 (continued). 
+
+
+
+27 
+
+
+
+n 
+
+
+
+
+wis"' 
+
+
+
+
+
+
+
+
+
+
+
+
+1 
+
+
+-2.484945(156) 
+
+
+-2.807271(225) 
+
+
+-2.052506(78) 
+
+
+-2.448879(142) 
+
+
+-2.794661(184) 
+
+
+-3.121967(258) 
+
+
+-3.438947(291) 
+
+
+2 
+
+
+2.181680(181) 
+
+
+2.906812(327) 
+
+
+1.391688(52) 
+
+
+2.114904(186) 
+
+
+2.879504(270) 
+
+
+3.716609(450) 
+
+
+4.631615(573) 
+
+
+3 
+
+
+-0.790329(77) 
+
+
+-1.342663(185) 
+
+
+-0.341621(19) 
+
+
+-0.751605(84) 
+
+
+-1.322744(141) 
+
+
+-2.086833(280) 
+
+
+-3.069039(366) 
+
+
+4 
+
+
+0.101235(36) 
+
+
+0.260769(172) 
+
+
+0.020658(33) 
+
+
+0.093854(31) 
+
+
+0.255213(42) 
+
+
+0.548424(285) 
+
+
+1.025063(600) 
+
+
+5 
+
+
+-0.002457(18) 
+
+
+-0.015589(148) 
+
+
+-0.000052(25) 
+
+
+-0.002038(23) 
+
+
+-0.015007(49) 
+
+
+-0.056854(283) 
+
+
+-0.156497(515) 
+
+
+6 
+
+
+0.000160(35) 
+
+
+0.000420(19) 
+
+
+-0.000080(18) 
+
+
+0.000078(14) 
+
+
+0.000253(48) 
+
+
+0.001978(79) 
+
+
+0.008403(118) 
+
+
+7 
+
+
+-0.000078(29) 
+
+
+-0.000175(44) 
+
+
+-0.000076(11) 
+
+
+-0.000051(12) 
+
+
+-0.000048(49) 
+
+
+-0.000388(108) 
+
+
+-0.000301(267) 
+
+
+8 
+
+
+-0.000020(16) 
+
+
+-0.000011(8) 
+
+
+-0.000059(11) 
+
+
+-0.000045(23) 
+
+
+-0.000034(33) 
+
+
+0.000034(26) 
+
+
+-0.000051(119) 
+
+
+9 
+
+
+-0.000008(6) 
+
+
+0.000015(11) 
+
+
+-0.000049(9) 
+
+
+-0.000022(1) 
+
+
+-0.000009(25) 
+
+
+-0.000004(50) 
+
+
+0.000008(124) 
+
+
+10 
+
+
+0.000007(12) 
+
+
+0.000030(16) 
+
+
+-0.000037(4) 
+
+
+0.000003(1) 
+
+
+0.000015(17) 
+
+
+0.000056(16) 
+
+
+0.000093(31) 
+
+
+11 
+
+
+-0.000005(12) 
+
+
+0.000008(1) 
+
+
+-0.000035(3) 
+
+
+0.000002(17) 
+
+
+-0.000004(1) 
+
+
+-0.000014(7) 
+
+
+-0.000066(26) 
+
+
+12 
+
+
+-0.000016(6) 
+
+
+-0.000002(2) 
+
+
+-0.000037(5) 
+
+
+-0.000005(11) 
+
+
+-0.000011(4) 
+
+
+-0.000022(9) 
+
+
+-0.000049(5) 
+
+
+13 
+
+
+-0.000020(4) 
+
+
+-0.000006(1) 
+
+
+-0.000038(3) 
+
+
+-0.000012(5) 
+
+
+-0.000013(11) 
+
+
+-0.000010(9) 
+
+
+-0.000026(17) 
+
+
+14 
+
+
+-0.000019(6) 
+
+
+-0.000008(3) 
+
+
+-0.000038(1) 
+
+
+-0.000016(5) 
+
+
+-0.000009(11) 
+
+
+-0.000004(8) 
+
+
+0.000002(22) 
+
+
+15 
+
+
+-0.000015(8) 
+
+
+-0.000007(6) 
+
+
+-0.000036(2) 
+
+
+-0.000016(5) 
+
+
+-0.000004(9) 
+
+
+-0.000001(7) 
+
+
+0.000012(11) 
+
+
+16 
+
+
+-0.000010(1) 
+
+
+-0.000005(8) 
+
+
+-0.000033(3) 
+
+
+-0.000015(6) 
+
+
+-0.000002(7) 
+
+
+0.000000(6) 
+
+
+0.000014(3) 
+
+
+17 
+
+
+-0.000008(1) 
+
+
+-0.000004(9) 
+
+
+-0.000030(5) 
+
+
+-0.000013(7) 
+
+
+-0.000001(6) 
+
+
+0.000000(5) 
+
+
+0.000009(5) 
+
+
+18 
+
+
+-0.000007(8) 
+
+
+-0.000003(7) 
+
+
+-0.000028(5) 
+
+
+-0.000012(6) 
+
+
+0.000000(5) 
+
+
+-0.000001(4) 
+
+
+0.000002(4) 
+
+
+19 
+
+
+-0.000007(6) 
+
+
+-0.000003(5) 
+
+
+-0.000025(5) 
+
+
+-0.000011(5) 
+
+
+0.000000(3) 
+
+
+-0.000002(3) 
+
+
+-0.000002(3) 
+
+
+20 
+
+
+-0.000006(4) 
+
+
+-0.000002(3) 
+
+
+-0.000023(4) 
+
+
+-0.000010(4) 
+
+
+0.000000(2) 
+
+
+-0.000002(2) 
+
+
+-0.000004(5) 
+
+
+
+TABLE A7: Perturbative coefEcients for L = 12 (continued). 
+
+
+
+p 
+
+
+
+
+
+
+
+
+Wis 
+
+
+5.85 
+
+
+0.57595(14) 
+
+
+0.36021(22) 
+
+
+0.22936(28) 
+
+
+0.16659(41) 
+
+
+5.9 
+
+
+0.58254(11) 
+
+
+0.36901(16) 
+
+
+0.23814(21) 
+
+
+0.17557(29) 
+
+
+5.95 
+
+
+0.588518(92) 
+
+
+0.37692(13) 
+
+
+0.24602(17) 
+
+
+0.18354(24) 
+
+
+6 
+
+
+0.594092(80) 
+
+
+0.38429(11) 
+
+
+0.25337(14) 
+
+
+0.19095(20) 
+
+
+6.05 
+
+
+0.599358(71) 
+
+
+0.39125(10) 
+
+
+0.26034(12) 
+
+
+0.19797(17) 
+
+
+6.1 
+
+
+0.604372(63) 
+
+
+0.397894(90) 
+
+
+0.26702(11) 
+
+
+0.20469(15) 
+
+
+6.15 
+
+
+0.609172(57) 
+
+
+0.404260(81) 
+
+
+0.273454(99) 
+
+
+0.21118(14) 
+
+
+6.2 
+
+
+0.613784(52) 
+
+
+0.410391(75) 
+
+
+0.279676(89) 
+
+
+0.21745(12) 
+
+
+6.25 
+
+
+0.618228(48) 
+
+
+0.416313(67) 
+
+
+0.285714(81) 
+
+
+0.22355(11) 
+
+
+6.3 
+
+
+0.622521(44) 
+
+
+0.422047(62) 
+
+
+0.291587(74) 
+
+
+0.22949(10) 
+
+
+6.35 
+
+
+0.626675(41) 
+
+
+0.427612(57) 
+
+
+0.297310(68) 
+
+
+0.235295(94) 
+
+
+6.4 
+
+
+0.630703(38) 
+
+
+0.433020(53) 
+
+
+0.302895(63) 
+
+
+0.240961(87) 
+
+
+6.45 
+
+
+0.634612(35) 
+
+
+0.438283(49) 
+
+
+0.308354(58) 
+
+
+0.246508(80) 
+
+
+6.5 
+
+
+0.638412(33) 
+
+
+0.443412(45) 
+
+
+0.313694(54) 
+
+
+0.251941(75) 
+
+
+6.55 
+
+
+0.642108(31) 
+
+
+0.448415(44) 
+
+
+0.318922(50) 
+
+
+0.257270(70) 
+
+
+6.6 
+
+
+0.645708(29) 
+
+
+0.453299(40) 
+
+
+0.324046(47) 
+
+
+0.262499(65) 
+
+
+6.65 
+
+
+0.649216(27) 
+
+
+0.458071(37) 
+
+
+0.329071(44) 
+
+
+0.267634(61) 
+
+
+6.7 
+
+
+0.652637(25) 
+
+
+0.462737(35) 
+
+
+0.334001(41) 
+
+
+0.272680(57) 
+
+
+6.75 
+
+
+0.655977(23) 
+
+
+0.467302(33) 
+
+
+0.338842(39) 
+
+
+0.277641(54) 
+
+
+6.8 
+
+
+0.659239(22) 
+
+
+0.471771(31) 
+
+
+0.343596(36) 
+
+
+0.282521(50) 
+
+
+
+TABLE A8: Summed series of perturbative Wilson loops at L = 12 using the described hypergeometric model as 
+function of f3. 
+
+
+
+28 
+
+
+
+
+
+
+
+
+
+
+
+Wu [22,^ 
+11^21 [21J 
+Wsi [21J 
+
+^^22 [21J 
+
+
+-1/3 
+-0.57483367 
+-0.80146372 
+-0.91287436 
+
+
+-0.0339109931(3) 
+-0.003857(17) 
+0.07717(5) 
+0.12040(7) 
+
+
+-0.0137063(2) 
+
+
+
+TABLE A9: CoefBcients of lowest loop orders in the 
+infinite volume limit. 
+
+
+
+29 
+
+
+
+M. A. Shifman, A. I. Vainshtein and V. I. Za- 
+
+kharov, Nucl. Phys. B 147 (1979) 385. 
+
+T. Banks, R. Horsley, H. R. Rubinstein and 
+
+U. Wolff, Nucl. Phys. B 190 (1981) 692. 
+
+A. Di Giacomo and G. C. Rossi, Phys. Lett B 100 
+
+(1981) 481. 
+
+J. Kripfganz, Phys. Lett. B 101 (1981) 169; 
+R. Kirschner, J. Kripfganz, J. Ranft and 
+A. Schiller, Nucl. Phys. B 210 (1982) 567. 
+
+E. -M. Ilgenfritz and M. Miiller-Preussker, Phys. 
+Lett. B 119 (1982) 395. 
+
+R. Alfieri, F. Di Renzo, E. Onofri and 
+L. Scorzato, Nucl. Phys. B 578 (2000) 383 
+arXiv:hep-lat/0002018 . 
+
+F. Di Renzo and L. Scorzato, JHEP 0110 (2001) 
+038 arXiv:hep-lat/0011067 . 
+
+P. E. L. Rakow, PoS LAT2005 (2006) 284 
+arXiv:hep-lat/0510046 . 
+
+Y. Meurice, Phys. Rev. D 74 (2006) 096005 
+_arXi v:hep-lat /0609005 . 
+
+J. C. LeGuillou and J. Zinn- Justin, Large-Order 
+Behavior of Perturbation Theory, North-Holland, 
+Amsterdam, 1990. 
+
+S. Narison and V. I. Zakharov, Phys. Lett. B 679 
+(2009) 355 arXiv:0906.4312 [hep-ph] . 
+
+E. -M. Ilgenfritz, Y. Nakamura, H. Perh, 
+P. E. L. Rakow, G. Schierholz and A. Schiller, PoS 
+LAT 2009 (2009) 236 [arXiv:0910.2795 [hep-lat]]. 
+R. Horsley, G. Hotzel, E.-M. Ilgenfritz, Y. Naka- 
+mura, H. Perlt, P. E. L. Rakow, G. Schierholz 
+and A. Schiller, PoS LATTICE 2010 (2010) 264 
+[arXiv: 1010.4674 [hep-lat]]. 
+
+G. Parisi and Y. -s. Wu, Set. Sm. 24 (1981) 483. 
+
+F. Di Renzo and L. Scorzat o, JHEP 0410 (2004) 
+073 [arXiv:hep-lat/0410010| . 
+
+G. Bali, private communication. 
+
+U. M. Heller and F. Karsch, Nucl. Phys. B 251 
+(1985) 254. 
+
+R. Horsley, P. E. L. Rakow and G. Schier- 
+h olz, Nucl. Phys. Proc . Suppl. 106 (2002) 870 
+arXiv:hep-lat/0110210l. 
+
+C. Domb and M. F. Sykes, Proc. R. Soc. A 240 
+(1957) 214. 
+
+
+
+[2o; 
+
+[21 
+[22; 
+
+[23; 
+
+[24 
+[25; 
+
+[26; 
+
+[27 
+
+[28; 
+
+[29" 
+
+[3o; 
+
+[31 
+
+[32" 
+[33; 
+
+[34 
+[35; 
+
+[36; 
+
+[37 
+[38; 
+
+
+
+G. P. Lepage and P. B. Mackenzie, Phys. Rev. D 
+48 (1993) 2250 arXiv:hep-lat/9209022 . 
+R. Wohlert, P. Weisz and W. Wetzel, Nucl. Phys. 
+B 259 (1985) 85. 
+
+B. AUes, A. Feo and H. Panagopoulos, Phys. Lett. 
+B 426 (1998) 361 [Erratum-ihid. B 553 (2003) 
+337] arXiv:hep-lat/9801003 . 
+
+A. Athenodorou, H. Panagopoulos and A. Tsapalis, 
+Nucl. P hys. Proc. Suppl. 140 (2005) 794 
+arXiv:hep-lat/0409T27' . 
+
+F. Di Renzo, G. Marchesini and E. Onofri, Nucl. 
+Phys. B 497 (1997) 435 arXiv:hep-lat/9612016 . 
+
+G. Martinelli and C. T. Sachrajda, Nucl. Phys. B 
+478 (1996) 660 arXiv:hep-ph/9605336 . 
+
+See, e.g., M . Beneke, Phys. Rept. 317 (1999) 1 
+[arXiv:hep-ph /9807443] . 
+
+I. M. Suslov, Zh. Eksp. Teor. Fiz. 127 (2005) 
+1350 [J. Exp. Theor. Phys. 100 (2005) 1188] 
+arXiv:hep-ph/0510142 . 
+
+V. Zakharov, Nucl. Phys. Proc. Suppl. 207-208 
+(2010) 306 arXiv: 1010.4482 [hep-ph] . 
+E.-M. Ilgenfritz, H. Perlt, A. Schiller, unpublished. 
+G. Burgio, F. Di Renzo, G. Marchesini and 
+E. Onofri, Phys. Lett. B 422 (1998) 219 
+arXiv:hep-ph/9706209 . 
+
+S. Necco and R. Sommer, Nucl. Phys. B 622 
+(2002) 328 arXiv:hep-lat/0108008 . 
+M. A. Shifman, Nucl. Phys. B 173 (1980) 13. 
+S. Narison, Phys. Lett. B 387 (1996) 162 
+arXiv:hep-ph/9512348 . 
+
+C. Bauer, G. S. Bali and A. Pineda, 
+P hys. Rev. Lett. 108 (2012) 242002 
+|arXiv:1111.3946 [hep-ph]| . 
+
+M. E. Luke, A. V. Manohar and M. J. Sav- 
+age, Phys. Rev. D 51 (1995) 4924 
+;arXiv:hep-ph/9407407; . 
+
+I. I. Kogan and M. A. Shifman, Phys. Rev. Lett. 
+
+75 (1995) 2085 arXiv:hep-th/9504141 . 
+
+A. Patrascioiu, E. Seller and I. O. Stamatescu, 
+
+Phys. Lett. B 107 (1981) 364. 
+
+E. Seller, I. O. Stamatescu and D. Zwanziger, 
+
+Nucl. Phys. B 239 (1984) 177. 
+
+
+
