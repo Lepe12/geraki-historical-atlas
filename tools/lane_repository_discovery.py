@@ -58,6 +58,19 @@ for r in plan["repositories"]:
           f"{base_name} {ys[0]}" if ys else str(base_name)
         ]
         repo_terms=list(dict.fromkeys(repo_terms))[:int(os.getenv("PCT_SEARCHCULTURE_QUERY_LIMIT","3"))]
+    if name=="The National Archives Public Content":
+        ys=[x for x in str(plan.get("date_range","")).replace("-"," ").split() if x.isdigit()]
+        target=str(plan.get("target") or "").strip()
+        aliases=[str(x).strip() for x in plan.get("aliases",[]) if str(x).strip()]
+        names=[target]+aliases[:2]
+        repo_terms=[]
+        for n in names:
+            if not n: continue
+            repo_terms.append(n)
+            repo_terms.append(f'"{n}" ransom')
+            repo_terms.append(f'"{n}" corsair')
+            if ys: repo_terms.append(f'"{n}" {ys[0]}')
+        repo_terms=list(dict.fromkeys(repo_terms))[:int(os.getenv("PCT_TNA_PUBLIC_QUERY_LIMIT","6"))]
     if name=="Library of Congress":
         ys=[x for x in str(plan.get("date_range","")).replace("-"," ").split() if x.isdigit()]
         target=str(plan.get("target") or "").strip()
