@@ -207,6 +207,7 @@ jobs:
     env:
       PCT_EXPECTED_REQUEST_SHA256: ${{ needs.prepare.outputs.request_sha256 }}
       PCT_RESEARCH_JOB_ID: ${{ needs.prepare.outputs.research_job_id }}
+      PCT_SELECTED_AGENTS: ${{ inputs.selected_agents }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -215,10 +216,13 @@ jobs:
       - name: Refresh durable lane evidence
         run: git pull --rebase origin main
       - name: Build cross-lane source genealogy
+        if: env.PCT_SELECTED_AGENTS == ''
         run: python3 tools/aggregate_source_genealogy.py --run-id "${{ github.run_id }}"
       - name: Build ten-lane system health
+        if: env.PCT_SELECTED_AGENTS == ''
         run: python3 tools/research_system_health.py --run-id "${{ github.run_id }}"
       - name: Commit aggregate health
+        if: env.PCT_SELECTED_AGENTS == ''
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -252,6 +256,7 @@ jobs:
           git pull --rebase origin main
           git push origin HEAD:main
       - name: Enforce ten-lane operational and request-integrity gate
+        if: env.PCT_SELECTED_AGENTS == ''
         run: |
           python3 - <<'PY'
           import json, os, pathlib, sys
