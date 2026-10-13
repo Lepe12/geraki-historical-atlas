@@ -72,7 +72,7 @@ for e in events:
     matched.append(e)
 
 detected_any=bool(events)
-case_detected=bool(matched)
+case_detected=bool(matched)\n\ndef source_key(e):\n    return (e.get("_lane"),e.get("repository"),e.get("identifier"),e.get("source_file") or e.get("url") or e.get("title"))\nmatched_sources={}\nfor e in matched:\n    matched_sources.setdefault(source_key(e),e)
 
 tp=1 if expected_positive and case_detected else 0
 fn=1 if expected_positive and not case_detected else 0
@@ -93,7 +93,7 @@ report={
  "expected_positive":expected_positive,
  "detected_any_candidate":detected_any,
  "matched_case_candidate":case_detected,
- "candidate_count":len(events),"matched_candidate_count":len(matched),
+ "candidate_count":len(events),"matched_candidate_count":len(matched),"matched_unique_source_count":len(matched_sources),
  "true_positive":tp,"false_negative":fn,"false_positive":fp,"true_negative":tn,
  "precision":(tp/(tp+fp)) if (tp+fp) else None,
  "recall":(tp/(tp+fn)) if (tp+fn) else None,
@@ -106,7 +106,7 @@ report={
  "repository_execution":repos,
  "coverage_blockers":coverage_blockers,
  "false_negative_due_to_coverage_blocker":bool(fn and coverage_blockers),
- "matched_candidates":[{"lane":e.get("_lane"),"candidate_id":e.get("candidate_id"),"source_type":e.get("source_type"),"date":e.get("date")} for e in matched],
+ "matched_candidates":[{"lane":e.get("_lane"),"candidate_id":e.get("candidate_id"),"source_type":e.get("source_type"),"date":e.get("date")} for e in matched[:50]],\n "matched_sources":[{"lane":e.get("_lane"),"repository":e.get("repository"),"identifier":e.get("identifier"),"source_file":e.get("source_file"),"url":e.get("url"),"title":e.get("title")} for e in matched_sources.values()],
  "interpretation":"A positive benchmark requires the case-specific entity/place/date/event signature, not merely any candidate. REFERENCE_GOLD tests retrieval/classification only unless human_reviewed_original is true."
 }
 out=pathlib.Path("benchmarks/results");out.mkdir(parents=True,exist_ok=True)
