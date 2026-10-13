@@ -391,3 +391,83 @@ Only this separate gate may set `verified=true`.
 
 Canonical principle remains:
 **workflow success is not historical verification.**
+
+
+## Expanded benchmark campaign — 2026-10-13
+
+The curated historical benchmark corpus was expanded beyond the initial Morgan/Mykonos controls with additional Atlantic and Mediterranean cases, including:
+- Henry Morgan / Maracaibo 1669;
+- Henry Morgan / Porto Bello 1668;
+- Salé / captivity-ransom context 1630;
+- Jan Janszoon / Rabat 1624;
+- a state-naval-action negative classification control.
+
+Public catalogue/curated web references remain REFERENCE_GOLD unless an original primary source has been human inspected.
+
+### TNA public-content coverage
+
+The British lane now has two distinct National Archives surfaces:
+1. The National Archives Discovery catalogue API.
+2. The National Archives Public Content website surface.
+
+A generic public-content connector was added for education resources, collection stories and research content. Search-result navigation links are filtered out and selected content pages are enriched with page text as discovery metadata only.
+
+Salé 1630 demonstrated that Discovery and public-content search are materially different surfaces:
+- Discovery returned 0 catalogue hits for the benchmark query.
+- Public-content search returned pages, but the exact Tobacco Source 4b reference was not reliably recovered by the site search route.
+- The benchmark therefore remains an **unblocked false negative**, not a credential blocker and not historical evidence of absence.
+
+The known TNA educational reference for the benchmark is:
+`https://www.nationalarchives.gov.uk/education/resources/tobacco/tobacco-source-4b/`
+It identifies a September 1630 letter (HCA 15/1) mentioning Salé and explains payment for redeemed captains as ransom in the Barbary-corsair context. This remains REFERENCE_GOLD, not HISTORICAL_GOLD.
+
+### Alias-collision hardening
+
+The Jan Janszoon 1624 benchmark exposed a real alias collision:
+- supplied alias `Mourad` matched an unrelated Mourad, pasha of Algiers, in an OCR source;
+- the previous evaluator could see the canonical label `Jan Janszoon` that the pipeline itself had assigned and therefore risked self-confirmation.
+
+The evaluator now matches expected entity/place only against source-derived fields:
+- source context excerpt;
+- title;
+- URL;
+- source file;
+- original quote/transcription/source_says when available.
+
+Pipeline-assigned canonical labels can no longer satisfy benchmark entity/place requirements.
+
+After re-evaluation:
+- Jan Janszoon / Rabat 1624 remains FN;
+- `entity_error=true`;
+- `place_error=true`;
+- this is now correctly diagnosed as a retrieval/disambiguation failure, not a valid Janszoon hit.
+
+### Benchmark workflow race-condition fix
+
+Historical benchmark evaluation is now pinned to the exact triggering commit SHA instead of current branch HEAD. This prevents concurrent research/evidence commits from causing evaluation request selection to return zero or the wrong request.
+
+### Current curated metrics
+
+Latest benchmark summary:
+- evaluated results: **9**
+- metric-included results: **8**
+- TP: **4**
+- FP: **0**
+- FN: **3**
+- TN: **1**
+- precision: **1.0**
+- recall: **0.5714**
+- coverage-blocked false negatives: **1**
+- unblocked false negatives: **2**
+- coverage-adjusted recall: **0.6667**
+- false-positive rate: **0.0**
+- date errors: **0**
+- entity errors: **1**
+- place errors: **1**
+
+The current false negatives are diagnostically useful:
+- Mykonos 1695: coverage-blocked by SearchCulture API key;
+- Salé 1630: public-content discovery/retrieval gap;
+- Jan Janszoon / Rabat 1624: alias/entity disambiguation plus place-context retrieval gap.
+
+These metrics remain diagnostics for a small curated set and are not a universal accuracy estimate.
