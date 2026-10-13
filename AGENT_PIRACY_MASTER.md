@@ -279,3 +279,115 @@ Current blocker:
 - Benchmark result records `false_negative_due_to_coverage_blocker: true`.
 
 Thus the remaining step for this benchmark is external credential provisioning, not another search-logic workaround.
+
+
+## Reliability hardening — benchmark, dedup, genealogy, human verification — 2026-10-13
+
+### Benchmark corrections
+
+The live benchmark evaluator now requires a case-specific signature rather than "any candidate":
+- expected entity, when defined;
+- expected place, when defined;
+- expected year;
+- expected event family.
+Text comparison is Unicode/diacritic normalized, so e.g. `Panamá` and `Panama` can match without inventing entity equivalence.
+
+Repeated hits are no longer treated as independent findings:
+- event-first OCR leads are deduplicated by source + target/place + year;
+- catalogue leads are deduplicated by repository object + year;
+- event terms and occurrence counts are merged;
+- benchmark output reports `matched_unique_source_count` separately from raw candidate count;
+- cross-lane benchmark source identity ignores lane duplication.
+
+Morgan / Panama 1671 final validated research run:
+- run **38349742892** — SUCCESS;
+- 10/10 lanes successful + aggregate success;
+- benchmark case `REF-MORGAN-PANAMA-1671`: TP;
+- date_error = false;
+- entity_error = false;
+- place_error = false;
+- unsupported_claim_rate = 0;
+- 9 total structured candidates, 7 case-matching candidates, 4 unique matching source objects.
+
+The earlier apparent Morgan date error was a benchmark-evaluator defect, not evidence of a date-extraction defect: the old evaluator had counted unrelated "Morgan" hits as a positive case.
+
+### Benchmark metrics
+
+Latest curated benchmark summary:
+- evaluated cases: 3
+- TP: 1
+- FP: 0
+- FN: 1
+- TN: 1
+- precision: 1.0
+- end-to-end recall: 0.5
+- false-positive rate: 0.0
+- date errors: 0
+- entity errors: 0
+- place errors: 0
+- coverage-blocked false negatives: 1
+- unblocked false negatives: 0
+- coverage-adjusted recall: 1.0
+
+These are diagnostics for the current tiny curated set only, not a universal accuracy estimate.
+
+The remaining positive false negative is Mykonos 1695 and is explicitly classified as coverage-blocked because SearchCulture requires `SEARCHCULTURE_API_KEY`.
+
+### Connector honesty
+
+SearchCulture:
+- official machine-search path only;
+- missing credential => `API_KEY_REQUIRED`;
+- anonymous portal HTML is not accepted as a reliable substitute.
+
+Library of Congress:
+- official loc.gov JSON API connector exists;
+- GitHub Actions runner currently receives HTTP 403;
+- status is therefore `REMOTE_ACCESS_BLOCKED`, not `EXECUTED` and not a historical-search failure.
+
+Python code is compiled before research runs using `python3 -m compileall -q tools`; syntax errors now fail in prepare before the ten research lanes start.
+Discovery/pipeline execution errors are fail-closed.
+
+### Cross-lane Source Genealogy Engine
+
+`tools/aggregate_source_genealogy.py` now builds:
+`evidence/runs/<run_id>/SOURCE_GENEALOGY.json`
+
+Automatic rules are deliberately conservative:
+- exact shared identifier or canonical URL => `SAME_DIGITAL_OBJECT`, `NOT_INDEPENDENT`;
+- normalized title/creator similarity => `POSSIBLE_SAME_EDITION_OR_DERIVATIVE`, independence remains unknown;
+- no source is automatically labelled `INDEPENDENT`.
+
+Validated run **38350420057**:
+- 10/10 lanes operational;
+- request fingerprint OK;
+- source records: **1289**;
+- exact duplicate groups: **259**;
+- possible derivative groups: **29**.
+
+System health now includes the cross-lane genealogy summary.
+
+### Human scientific oversight
+
+Protocol: `docs/HUMAN_REVIEW_VERIFICATION_PROTOCOL.md`
+
+`tools/apply_human_review.py`:
+- requires named reviewer;
+- evidence examined;
+- original inspected;
+- exact locator;
+- explicit `source_says`;
+- source quality score.
+An ACCEPT decision may set `HUMAN_REVIEWED` and `verification_eligible=true`, but always leaves `verified=false`.
+
+`tools/finalize_verification.py` is a separate explicit final gate.
+VERIFY additionally requires:
+- prior accepted human review;
+- explicit claim text and scope;
+- source genealogy assessment;
+- corroboration assessment;
+- limitations.
+Only this separate gate may set `verified=true`.
+
+Canonical principle remains:
+**workflow success is not historical verification.**
