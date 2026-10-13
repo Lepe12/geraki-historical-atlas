@@ -186,6 +186,30 @@ def isam(q,lane):
         out=_html_search(url,"İSAM AtoM",lane,base,keep)
         return "EXECUTED",out,url+" ; DSpace fallback reason="+str(first)
 
+def library_of_congress(q,lane):
+    # Official loc.gov JSON API; public and anonymous.
+    url="https://www.loc.gov/search/?"+urllib.parse.urlencode({"q":q,"fo":"json","c":25})
+    d=_json(url);out=[]
+    for x in d.get("results",[]) or []:
+        ident=x.get("id") or x.get("url")
+        title=x.get("title")
+        dates=[]
+        for v in [x.get("date"),x.get("created_published_date"),x.get("other_date")]:
+            if isinstance(v,list): dates.extend(str(z) for z in v if z)
+            elif v: dates.append(str(v))
+        out.append({
+          "discovery_repository":"Library of Congress","discovery_lane":lane,
+          "connector_status":"EXECUTED","identifier":ident,"title":title,
+          "creator":x.get("contributor") or x.get("contributor_names") or [],
+          "date":dates[:8],"url":x.get("id") or x.get("url"),
+          "description":x.get("description") or [],
+          "subject":x.get("subject") or [],
+          "location":x.get("location") or [],
+          "partof":x.get("partof") or [],
+          "raw":x
+        })
+    return "EXECUTED",out,url
+
 def searchculture(q,lane):
     key=os.getenv("SEARCHCULTURE_API_KEY","").strip()
     if not key:
@@ -285,7 +309,7 @@ def unsupported(repository, reason="No stable anonymous machine-search connector
 def dispatch(repository,q,lane):
     """Dispatch exact repository labels from lane_repository_plan.py."""
     if repository=="Gallica/BnF": return bnf_sru(q,lane)  # catalogue SRU is stable public fallback
-    if repository=="Google Books": return google_books(q,lane)
+    if repository=="Google Books": return google_books(q,lane)\n    if repository=="Library of Congress": return library_of_congress(q,lane)
     if repository=="Biblioteca Digital Hispánica": return bne_sru(q,lane)
     if repository=="Archives diplomatiques": return archives_diplomatiques(q,lane)
     if repository=="Archives diplomatiques France": return archives_diplomatiques(q,lane)
