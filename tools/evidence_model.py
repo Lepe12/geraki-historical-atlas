@@ -18,17 +18,18 @@ def state_rank(state):
 def can_advance(current,target):
     return state_rank(target)==state_rank(current)+1
 
-def normalize_date(raw):
+def normalize_date(raw, role="UNDETERMINED"):
     raw=str(raw or "").strip()
     years=[int(x) for x in re.findall(r"\b(1[0-9]{3}|20[0-9]{2})\b",raw)]
     return {
       "original_date_text":raw,
+      "date_role":role,
       "normalized_year":years[0] if len(years)==1 else None,
       "normalized_range":[min(years),max(years)] if len(years)>=2 else None,
       "calendar":"UNDETERMINED",
       "conversion_applied":False,
       "conversion_reason":None,
-      "certainty":"EXACT_YEAR" if len(years)==1 else ("RANGE" if len(years)>=2 else "UNRESOLVED")
+      "certainty":("CONTEXT_YEAR_UNVERIFIED" if role=="POSSIBLE_EVENT_CONTEXT" else "EXACT_YEAR") if len(years)==1 else ("RANGE" if len(years)>=2 else "UNRESOLVED")
     }
 
 def toponym_identity(observed,canonical,aliases):
@@ -38,9 +39,10 @@ def toponym_identity(observed,canonical,aliases):
     return {
       "observed_name":obs,
       "canonical_name":canonical,
-      "match_basis":"EXACT_SUPPLIED_VARIANT" if matches else "UNRESOLVED",
-      "confidence":1.0 if matches else 0.0,
-      "auto_equivalence":bool(matches)
+      "match_basis":"SUPPLIED_VARIANT_PROVISIONAL" if matches else "UNRESOLVED",
+      "confidence":0.5 if matches else 0.0,
+      "auto_equivalence":False,
+      "identity_status":"REQUIRES_CONTEXT_AND_ORIGINAL_REVIEW"
     }
 
 def evidence_weight(source_kind="UNKNOWN",original_inspected=False,proximity="UNKNOWN",independence="UNKNOWN"):

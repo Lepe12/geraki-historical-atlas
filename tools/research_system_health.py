@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Aggregate durable health reports for the ten-lane PCT research system."""
 import argparse,json,pathlib,datetime
+from retrospective_candidate_review import review
 p=argparse.ArgumentParser();p.add_argument("--run-id",required=True);a=p.parse_args()
 lanes=["travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]
 root=pathlib.Path("evidence/runs")/a.run_id
@@ -52,6 +53,7 @@ report={
  "request_fingerprints":fingerprints,
  "request_fingerprint_missing":fingerprint_missing,
  "source_genealogy":{"present":bool(genealogy),"source_count":genealogy.get("source_count",0),"exact_duplicate_groups":genealogy.get("exact_duplicate_groups",0),"possible_derivative_groups":genealogy.get("possible_derivative_groups",0)},
+ "retrospective_candidate_review":review(),
  "verification_gate":"System health validates execution paths and request consistency only; it does not verify historical claims."
 }
 root.mkdir(parents=True,exist_ok=True)

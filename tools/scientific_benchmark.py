@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Deterministic architecture/scientific benchmark for Agent Piracy core rules."""
 import hashlib,json,sys
+import unittest
+from test_candidate_context import ContextPolicy
 from evidence_model import EVIDENCE_STATES,can_advance,evidence_weight,verification_assessment,toponym_identity,normalize_date
 
 def digest(payload):
@@ -11,6 +13,7 @@ a={"target":"Alpha Test","aliases":["A"],"date_range":"1600-1610","purpose":"ben
 b={"target":"Beta Test","aliases":["B"],"date_range":"1700-1710","purpose":"benchmark B"}
 ha,hb=digest(a),digest(b)
 checks={
+ "observed_context_regressions_and_synthetic_controls":unittest.TextTestRunner(verbosity=0).run(unittest.defaultTestLoader.loadTestsFromTestCase(ContextPolicy)).wasSuccessful(),
  "two_requests_have_distinct_hashes":ha!=hb,
  "request_a_does_not_contain_b":b["target"] not in json.dumps(a),
  "request_b_does_not_contain_a":a["target"] not in json.dumps(b),

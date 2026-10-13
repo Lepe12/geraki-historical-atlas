@@ -34,7 +34,7 @@ checks["derivative_source_scores_lower_than_independent"] = der < ind
 checks["similar_toponym_not_auto_equivalent"] = not toponym_identity(
     "Melo","Milos",["Melos","Milo","Millo"]
 )["auto_equivalence"]
-checks["explicit_alias_is_equivalent"] = toponym_identity(
+checks["explicit_alias_is_provisional_not_proven"] = not toponym_identity(
     "Melos","Milos",["Melos","Milo","Millo"]
 )["auto_equivalence"]
 

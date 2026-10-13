@@ -1,0 +1,37 @@
+"""Append machine reassessment; never rewrite preserved research or human review."""
+import hashlib
+import json
+from pathlib import Path
+import re
+from collections import Counter
+from candidate_context import review_preserved, POLICY
+
+
+def review(root=Path('evidence/runs')):
+    decisions=[]; failures=[]; files=0
+    for path in sorted(root.glob('*/*/structured_output/candidate_events.json')):
+        try:
+            raw=path.read_bytes();data=json.loads(raw)
+            lane_root=path.parent.parent
+            lane=lane_root.name
+            identity=lane_root/'research_lanes'/f'{lane}.json'
+            if not identity.exists(): identity=lane_root/'research_request_identity.json'
+            request=json.loads(identity.read_text(encoding='utf-8'))['normalized_request']
+            years=[int(y) for y in re.findall(r'\b(?:1[0-9]{3}|20[0-9]{2})\b',request.get('date_range',''))]
+            lo,hi=(min(years),max(years)) if years else (0,9999)
+            files+=1
+            for candidate in data.get('events',[]):
+                decision=review_preserved(candidate,request['target'],request.get('aliases',[]),lo,hi)
+                decisions.append({**decision,'run_id':lane_root.parent.name,'lane':lane,
+                                  'candidate_id':candidate.get('candidate_id'),
+                                  'preserved_source_path':path.as_posix(),
+                                  'preserved_source_sha256':hashlib.sha256(raw).hexdigest(),
+                                  'original_verified_flag':candidate.get('verified',False)})
+        except (ValueError,KeyError,OSError,TypeError) as error:
+            failures.append({'path':path.as_posix(),'status':'NOT_REASSESSED','reason':type(error).__name__})
+    return {'schema':'pct-retrospective-context-review-v1','policy':POLICY,
+            'review_type':'MACHINE_ROUTING_REASSESSMENT_NOT_HUMAN_VERIFICATION',
+            'candidate_files_reviewed':files,'candidate_records_reviewed':len(decisions),
+            'decision_counts':dict(Counter(d['decision'] for d in decisions)),
+            'review_decisions':decisions,'not_reassessed':failures,
+            'originals_modified':False,'rule':'Original records and human decisions remain authoritative. This append-only machine routing review neither deletes nor verifies historical evidence.'}

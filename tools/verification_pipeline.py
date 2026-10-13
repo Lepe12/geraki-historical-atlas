@@ -73,7 +73,7 @@ candidates=[]
 for i,h in enumerate(events,1):
     src=h.get("file");related=page_by_source.get(str(src),[])
     topo=toponym_identity(h.get("place_match"),ctx["target"],ctx["aliases"])
-    dnorm=normalize_date(" / ".join(str(y) for y in h.get("years_in_scope",[])))
+    dnorm=normalize_date(" / ".join(str(y) for y in h.get("years_in_scope",[])), h.get("date_role","UNRESOLVED"))
     candidates.append({
       "candidate_id":f"{LANE}-event-{i:04d}","lane":LANE,"source_file":src,
       "source_type":"OCR_CONTEXT","evidence_state":"ACQUIRED" if related else "LOCATED",
@@ -89,7 +89,7 @@ for i,h in enumerate(events,1):
 for j,h in enumerate(catalogue_leads,1):
     if h.get("status")!="CATALOGUE_METADATA_LEAD":continue
     topo=toponym_identity(h.get("place_match"),ctx["target"],ctx["aliases"])
-    dnorm=normalize_date(" / ".join(str(y) for y in h.get("years_in_scope",[])))
+    dnorm=normalize_date(" / ".join(str(y) for y in h.get("years_in_scope",[])), h.get("date_role","UNRESOLVED"))
     candidates.append({
       "candidate_id":f"{LANE}-catalogue-{j:04d}","lane":LANE,
       "source_file":None,"source_type":"CATALOGUE_METADATA",
