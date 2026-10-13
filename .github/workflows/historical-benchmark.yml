@@ -55,12 +55,15 @@ jobs:
               if prev is None or rid>prev[0]:
                   latest[case_id]=(rid,row)
           rows=[v[1] for v in latest.values()]
-          tp=sum(x.get("true_positive",0) for x in rows);fp=sum(x.get("false_positive",0) for x in rows)
-          fn=sum(x.get("false_negative",0) for x in rows);tn=sum(x.get("true_negative",0) for x in rows)
-          blocked_fn=sum(1 for x in rows if x.get("false_negative") and x.get("false_negative_due_to_coverage_blocker"))
+          bench=json.loads(pathlib.Path("benchmarks/historical_benchmark_v1.json").read_text(encoding="utf-8"))
+          excluded={x.get("id") for x in bench.get("cases",[]) if x.get("metric_included") is False}
+          metric_rows=[x for x in rows if x.get("case_id") not in excluded and x.get("metric_included",True) is not False]
+          tp=sum(x.get("true_positive",0) for x in metric_rows);fp=sum(x.get("false_positive",0) for x in metric_rows)
+          fn=sum(x.get("false_negative",0) for x in metric_rows);tn=sum(x.get("true_negative",0) for x in metric_rows)
+          blocked_fn=sum(1 for x in metric_rows if x.get("false_negative") and x.get("false_negative_due_to_coverage_blocker"))
           unblocked_fn=fn-blocked_fn
           out={
-            "schema":"agent-piracy-benchmark-summary-v1","evaluated_results":len(rows),
+            "schema":"agent-piracy-benchmark-summary-v2","evaluated_results":len(rows),"metric_included_results":len(metric_rows),"excluded_case_ids":sorted(excluded),
             "tp":tp,"fp":fp,"fn":fn,"tn":tn,
             "precision":tp/(tp+fp) if tp+fp else None,
             "recall":tp/(tp+fn) if tp+fn else None,
@@ -68,9 +71,9 @@ jobs:
             "unblocked_false_negatives":unblocked_fn,
             "coverage_adjusted_recall":tp/(tp+unblocked_fn) if tp+unblocked_fn else None,
             "false_positive_rate":fp/(fp+tn) if fp+tn else None,
-            "date_errors":sum(bool(x.get("date_error")) for x in rows),
-            "entity_errors":sum(bool(x.get("entity_error")) for x in rows),
-            "place_errors":sum(bool(x.get("place_error")) for x in rows),
+            "date_errors":sum(bool(x.get("date_error")) for x in metric_rows),
+            "entity_errors":sum(bool(x.get("entity_error")) for x in metric_rows),
+            "place_errors":sum(bool(x.get("place_error")) for x in metric_rows),
             "interpretation":"Metrics describe the curated benchmark set only; they are not a universal accuracy estimate."
           }
           pathlib.Path("benchmarks/results/SUMMARY.json").write_text(json.dumps(out,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
