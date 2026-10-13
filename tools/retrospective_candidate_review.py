@@ -8,7 +8,7 @@ from candidate_context import review_preserved, POLICY
 
 
 def review(root=Path('evidence/runs')):
-    decisions=[]; failures=[]; files=0
+    decisions=[]; failures=[]; files=0; retained_sources={}
     for path in sorted(root.glob('*/*/structured_output/candidate_events.json')):
         try:
             raw=path.read_bytes();data=json.loads(raw)
@@ -30,6 +30,19 @@ def review(root=Path('evidence/runs')):
                                   'preserved_source_path':path.as_posix(),
                                   'preserved_source_sha256':hashlib.sha256(raw).hexdigest(),
                                   'original_verified_flag':candidate.get('verified',False)})
+                if decision['decision']=='RETAIN_CANDIDATE':
+                    source=candidate.get('identifier') or candidate.get('url') or candidate.get('source_file')
+                    key=str(source or path.as_posix())
+                    if key not in retained_sources:
+                        retained_sources[key]={'source_key':key,'title':candidate.get('title'),
+                            'url':candidate.get('url'),'source_file':candidate.get('source_file'),
+                            'grouping_basis':'CATALOGUE_ID_OR_FILENAME_NOT_PROOF_OF_INDEPENDENCE',
+                            'context_sample':(candidate.get('context_excerpt') or '')[:1800],
+                            'exact_page_candidates':candidate.get('exact_page_candidates',[]),
+                            'request_context':request,'candidate_references':[]}
+                    retained_sources[key]['candidate_references'].append({
+                        'run_id':lane_root.parent.name,'lane':lane,'candidate_id':candidate.get('candidate_id'),
+                        'preserved_source_path':path.as_posix()})
         except (ValueError,KeyError,OSError,TypeError) as error:
             failures.append({'path':path.as_posix(),'status':'NOT_REASSESSED','reason':type(error).__name__})
     return {'schema':'pct-retrospective-context-review-v1','policy':POLICY,
@@ -37,4 +50,5 @@ def review(root=Path('evidence/runs')):
             'candidate_files_reviewed':files,'candidate_records_reviewed':len(decisions),
             'decision_counts':dict(Counter(d['decision'] for d in decisions)),
             'review_decisions':decisions,'not_reassessed':failures,
+            'retained_source_groups':list(retained_sources.values()),
             'originals_modified':False,'rule':'Original records and human decisions remain authoritative. This append-only machine routing review neither deletes nor verifies historical evidence.'}
