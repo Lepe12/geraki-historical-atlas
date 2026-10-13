@@ -155,7 +155,22 @@ def tna_public_content(q,lane):
     base="https://www.nationalarchives.gov.uk"
     url=base+"/search/results/?"+urllib.parse.urlencode({"_q":q})
     keep=lambda u,t: u.startswith(base+"/") and "/search/" not in u and len(t)>3
-    return "EXECUTED",_html_search(url,"The National Archives Public Content",lane,base,keep,max_records=25),url
+    rows=_html_search(url,"The National Archives Public Content",lane,base,keep,max_records=10)
+    out=[]
+    for row in rows:
+        u=row.get("url")
+        try:
+            raw=_get(u,timeout=12).decode("utf-8","replace") if u else ""
+            raw=re.sub(r"(?is)<(script|style|nav|footer)[^>]*>.*?</\\1>"," ",raw)
+            txt=re.sub(r"<[^>]+>"," ",raw)
+            txt=" ".join(txt.split())
+            row["metadata_text"]=txt[:20000]
+            years=list(dict.fromkeys(re.findall(r"\\b(?:1[0-9]{3}|20[0-9]{2})\\b",txt)))
+            row["date"]=years[:12]
+        except Exception:
+            pass
+        out.append(row)
+    return "EXECUTED",out,url
 
 def nationaal_archief(q,lane):
     base="https://www.nationaalarchief.nl"
