@@ -137,6 +137,9 @@ for rr in repos:
         name=str(b.get("repository") or "")
         if ("SearchCulture" in expected_source and "SearchCulture" in name) or (expected_source and expected_source.casefold() in name.casefold()):
             coverage_blockers.append({"lane":rr["lane"],**b})
+surface_gap=case.get("known_discovery_surface_gap")
+if fn and surface_gap:
+    coverage_blockers.append({"lane":"benchmark_case","repository":surface_gap.get("repository"),"status":surface_gap.get("status"),"detail":surface_gap.get("basis")})
 
 report={
  "schema":"agent-piracy-live-benchmark-result-v2",
