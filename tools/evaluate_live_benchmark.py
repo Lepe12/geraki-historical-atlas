@@ -41,6 +41,18 @@ def norm_text(s):
 def blob(e):
     return norm_text(json.dumps(e,ensure_ascii=False))
 
+def evidence_blob(e):
+    fields=[
+      e.get("context_excerpt"),
+      e.get("title"),
+      e.get("url"),
+      e.get("source_file"),
+      e.get("original_quote"),
+      e.get("controlled_transcription"),
+      e.get("source_says")
+    ]
+    return norm_text(" ".join(str(x) for x in fields if x))
+
 def date_match(e):
     if not year:return True
     d=e.get("date",{})
@@ -49,11 +61,13 @@ def date_match(e):
     return bool(re.search(r"(?<!\d)"+re.escape(str(year))+r"(?!\d)",blob(e)))
 
 def term_match(e,needle):
-    return norm_text(needle) in blob(e)
+    # Match only source-derived/context fields, never canonical labels that the
+    # pipeline itself assigned from request aliases.
+    return norm_text(needle) in evidence_blob(e)
 
 def family_match(e):
     if not family or family in ("NONE","UNKNOWN"):return True
-    b=blob(e)
+    b=evidence_blob(e)
     if family=="ATTACK_OR_SACK":
         return any(x in b for x in ["attack","attaque","ataque","attacc","raid","sack","saccag","saque","pillage","plunder"])
     if family=="ATTACK_OR_CAPTURE":
