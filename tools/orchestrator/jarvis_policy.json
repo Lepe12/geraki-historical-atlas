@@ -1,0 +1,38 @@
+{
+  "name": "JARVIS",
+  "system": "Piratecartography Historical Research",
+  "mode": "observer",
+  "agents_expected": 10,
+  "dispatch": {
+    "prevent_duplicate_work": true,
+    "max_retries_same_agent": 1,
+    "allow_reassignment": true,
+    "allow_task_splitting": true
+  },
+  "quality_gate": {
+    "default_result_state": "CANDIDATE",
+    "allowed_states": [
+      "CANDIDATE",
+      "NEEDS_REVIEW",
+      "VERIFIED",
+      "REJECTED",
+      "DUPLICATE",
+      "UNRESOLVED"
+    ],
+    "automatic_verified_promotion": false,
+    "require_provenance": true
+  },
+  "provenance_required_fields": [
+    "agent_id",
+    "job_id",
+    "source_name",
+    "retrieved_at"
+  ],
+  "safety": {
+    "wordpress_access": false,
+    "wordpress_database_access": false,
+    "github_secrets_access": false,
+    "plesk_credentials_access": false,
+    "public_mariadb_exposure": false
+  }
+}
