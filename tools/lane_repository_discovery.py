@@ -4,6 +4,7 @@ import os,json,pathlib,urllib.parse,urllib.request,sys
 sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from connectors.bsb_sru import search_bsb
 from connectors.repository_connectors import dispatch
+from research_relevance import discovery_queries
 lane=os.getenv("PCT_RESEARCH_LANE","travellers")
 plan=json.loads(pathlib.Path(f"repository_plans/{lane}.json").read_text(encoding="utf-8"))
 out=pathlib.Path("lane_discovery");out.mkdir(exist_ok=True)
@@ -14,11 +15,11 @@ def getjson(url):
     with urllib.request.urlopen(req,timeout=25) as r:return json.load(r)
 
 def ia(q):
-    u="https://archive.org/advancedsearch.php?"+urllib.parse.urlencode({"q":q,"fl[]":["identifier","title","creator","date","year"],"rows":20,"page":1,"output":"json"},doseq=True)
+    u="https://archive.org/advancedsearch.php?"+urllib.parse.urlencode({"q":"mediatype:texts AND ("+q+")","fl[]":["identifier","title","creator","date","year","description","subject","mediatype"],"rows":20,"page":1,"output":"json"},doseq=True)
     d=getjson(u);out=[]
     for x in d.get("response",{}).get("docs",[]):
         ident=x.get("identifier")
-        out.append({"discovery_repository":"Internet Archive","discovery_lane":lane,"connector_status":"EXECUTED","identifier":ident,"title":x.get("title"),"creator":x.get("creator"),"date":[x.get("date") or x.get("year")] if (x.get("date") or x.get("year")) else [],"url":("https://archive.org/details/"+ident) if ident else None,"acquisition_route":"INTERNET_ARCHIVE"})
+        out.append({"discovery_repository":"Internet Archive","discovery_lane":lane,"connector_status":"EXECUTED","identifier":ident,"title":x.get("title"),"description":x.get("description"),"subject":x.get("subject"),"mediatype":x.get("mediatype"),"creator":x.get("creator"),"date":[x.get("date") or x.get("year")] if (x.get("date") or x.get("year")) else [],"url":("https://archive.org/details/"+ident) if ident else None,"acquisition_route":"INTERNET_ARCHIVE"})
     return out
 
 def tna(q):
@@ -127,6 +128,14 @@ for r in plan["repositories"]:
             repo_terms.append(f'"{n}" galeras')
             repo_terms.append(f'"{n}" corsario')
         repo_terms=list(dict.fromkeys(repo_terms))[:int(os.getenv("PCT_BNE_QUERY_LIMIT","8"))]
+    focused=discovery_queries(plan.get("target_identity", {"target":plan["target"],"aliases":plan.get("aliases",[])}))
+    if name != "SearchCulture.gr / EKT":
+        specialist_queries=[a["queries"][0] for a in plan.get("specialist_plan",{}).get("agents",[]) if a.get("queries")]
+        from itertools import zip_longest
+        # Preserve archive-specific vocabulary and existing per-surface limits.
+        cap=len(repo_terms)
+        interleaved=[q for group in zip_longest(repo_terms,focused,specialist_queries) for q in group if q]
+        repo_terms=list(dict.fromkeys(interleaved))[:cap]
     for q in repo_terms:
         try:
             if name=="Internet Archive":

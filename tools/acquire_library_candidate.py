@@ -4,7 +4,11 @@
 Repository provenance is retained.  Unsupported/non-direct digital objects remain
 LOCATED rather than being misreported as acquired or verified.
 """
-import json,pathlib,urllib.request,urllib.parse,datetime,re,os
+import json,pathlib,urllib.request,urllib.parse,datetime,re,os,time
+from request_context import load_request
+from research_relevance import identity, rank, request_digest
+rf,req,ctx=load_request()
+request_sha=request_digest(req,ctx)
 
 ROOT=pathlib.Path("citation_chase_candidates")
 OUT=pathlib.Path("library_acquisition");OUT.mkdir(exist_ok=True)
@@ -20,18 +24,31 @@ for x in candidates:
     if k in seen:continue
     seen.add(k);items.append(x)
 
-# Bounded per-run acquisition with a durable deferred queue. Preserve both
-# executable Internet Archive objects and lane-specific catalogue candidates.
-max_items=max(1,int(os.getenv("PCT_MAX_ACQUISITION_CANDIDATES","100")))
-max_ia=max(1,int(os.getenv("PCT_MAX_IA_CANDIDATES","10")))
-ia=[x for x in items if x.get("acquisition_route")=="INTERNET_ARCHIVE" or str(x.get("discovery_repository") or x.get("repository") or "").lower().startswith("internet archive")]
-ia.sort(key=lambda x:(not bool(x.get("source_lead")), str(x.get("title") or "").lower().startswith(("skaitv","youtube")), -(int(str(x.get("year") or "0")[:4]) if str(x.get("year") or "")[:4].isdigit() and int(str(x.get("year") or "0")[:4])<1900 else 0)))
-other=[x for x in items if x not in ia]
-selected=ia[:max_ia]+other[:max(0,max_items-min(max_ia,len(ia)))]
-if len(selected)<max_items:selected+=(ia[max_ia:]+other[max(0,max_items-min(max_ia,len(ia))):])[:max_items-len(selected)]
-selected_ids={id(x) for x in selected}
-deferred=[x for x in items if id(x) not in selected_ids]
-(OUT/"acquisition_backlog.json").write_text(json.dumps({"total_candidates":len(items),"selected":len(selected),"deferred_count":len(deferred),"deferred":deferred,"rule":"Deferred leads remain eligible for later bounded batches."},ensure_ascii=False,indent=2),encoding="utf-8")
+# Assess before acquisition, retain every rejected/uncertain item in the backlog.
+ranked=rank(items,identity(req,ctx))
+held=[x for x in ranked if x['relevance_assessment']['status']!='PRIORITY' and not x.get('source_lead')]
+items=[x for x in ranked if x['relevance_assessment']['status']=='PRIORITY' or x.get('source_lead')]
+report_path=OUT/'acquisition_report.json'
+previous=json.loads(report_path.read_text()) if report_path.exists() else {}
+if previous and previous.get('request_sha256')!=request_sha:
+    raise SystemExit('ACQUISITION_REQUEST_MISMATCH')
+results=previous.get('results',[])
+def key(x):
+    return (str(x.get('discovery_repository') or x.get('repository')),str(x.get('identifier') or x.get('url') or x.get('title')))
+completed={key(x) for x in results if x.get('status') not in ('ACQUISITION_ERROR',)}
+pending=[x for x in items if key(x) not in completed]
+max_items=max(1,int(os.getenv('PCT_MAX_ACQUISITION_CANDIDATES','100')))
+max_batches=max(1,int(os.getenv('PCT_ACQUISITION_BATCHES','3')))
+selected=pending[:max_items*max_batches]
+deferred=pending[len(selected):]
+started=time.monotonic()
+budget=max(1,int(os.getenv('PCT_ACQUISITION_BUDGET_SECONDS','360')))
+
+def checkpoint(remaining):
+    (OUT/'acquisition_backlog.json').write_text(json.dumps({'request_sha256':request_sha,'total_candidates':len(ranked),'completed':len(results),'deferred_count':len(remaining),'deferred':remaining,'review_required':held,'resume_command':'python3 tools/acquire_library_candidate.py','rule':'Rerun in the same request workspace to continue; completed objects are skipped. Held records are not silently discarded.'},ensure_ascii=False,indent=2))
+    report={'schema':'pct-library-acquire-v3','generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'request_sha256':request_sha,'results':results,'deferred_count':len(remaining),'held_count':len(held),'total_candidates':len(ranked),'verification_status':'NEEDS_EVIDENCE','gate':'Acquisition is not inspection or verification.'}
+    report_path.write_text(json.dumps(report,ensure_ascii=False,indent=2))
+checkpoint(pending)
 items=selected
 
 def safe_name(s):
@@ -44,8 +61,10 @@ def fetch(url,limit=8_000_000,timeout=14):
     if len(data)>limit:raise ValueError("object exceeds acquisition size limit")
     return data,ctype
 
-results=[]
-for x in items:
+for position,x in enumerate(items):
+    if time.monotonic()-started>=budget:
+        deferred=items[position:]+deferred
+        break
     rec=dict(x);rec["files"]=[];rec["original_inspected"]=False;rec["verification_status"]="NEEDS_EVIDENCE"
     repo=str(rec.get("discovery_repository") or rec.get("repository") or "")
     ident=rec.get("identifier")
@@ -82,7 +101,8 @@ for x in items:
             rec["status"]="DIGITAL_METADATA_ACQUIRED" if rec["files"] else "LOCATED_CITATION_CHASE"
     except Exception as e:
         rec["status"]="ACQUISITION_ERROR";rec["error"]=f"{type(e).__name__}: {e}"
+    results[:]=[old for old in results if key(old)!=key(rec)]
     results.append(rec)
-report={"schema":"pct-library-acquire-v2","generated_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"results":results,"deferred_count":len(deferred),"total_candidates":len(selected)+len(deferred),"verification_status":"NEEDS_EVIDENCE","gate":"Acquisition or location never implies original inspection or verification."}
-(OUT/"acquisition_report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
-print("acquisition",len(results),"text",sum(r.get("status")=="TEXT_ACQUIRED" for r in results),"digital",sum(r.get("status")=="DIGITAL_METADATA_ACQUIRED" for r in results),"located",sum(r.get("status")=="LOCATED_CITATION_CHASE" for r in results),"errors",sum(r.get("status")=="ACQUISITION_ERROR" for r in results))
+    checkpoint(items[position+1:]+deferred)
+checkpoint(deferred)
+print("ACQUISITION",len(results),"acquired",sum(x.get('status') in ('TEXT_ACQUIRED','DIGITAL_METADATA_ACQUIRED') for x in results),"deferred",len(deferred),"held",len(held))

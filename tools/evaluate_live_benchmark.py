@@ -45,20 +45,18 @@ def evidence_blob(e):
     fields=[
       e.get("context_excerpt"),
       e.get("title"),
-      e.get("url"),
-      e.get("source_file"),
       e.get("original_quote"),
       e.get("controlled_transcription"),
       e.get("source_says")
     ]
-    return norm_text(" ".join(str(x) for x in fields if x))
+    return norm_text(re.sub(r"https?://\S+", "", " ".join(str(x) for x in fields if x)))
 
 def date_match(e):
     if not year:return True
-    d=e.get("date",{})
-    if d.get("normalized_year")==year:return True
-    if year in (d.get("normalized_range") or []):return True
-    return bool(re.search(r"(?<!\d)"+re.escape(str(year))+r"(?!\d)",blob(e)))
+    # Only contextual source prose. URLs, filenames and assigned dates cannot match.
+    context=" ".join(str(e.get(k) or "") for k in ("context_excerpt","original_quote","controlled_transcription","source_says"))
+    context=re.sub(r"https?://\S+", "", context)
+    return bool(re.search(r"(?<!\d)"+re.escape(str(year))+r"(?!\d)", context))
 
 def term_match(e,needle):
     # Match only source-derived/context fields, never canonical labels that the
@@ -142,14 +140,18 @@ if fn and surface_gap:
     coverage_blockers.append({"lane":"benchmark_case","repository":surface_gap.get("repository"),"status":surface_gap.get("status"),"detail":surface_gap.get("basis")})
 
 report={
- "schema":"agent-piracy-live-benchmark-result-v2",
+ "schema":"agent-piracy-live-benchmark-result-v3",
  "run_id":a.run_id,"case_id":a.case_id,"benchmark_tier":case.get("tier"),
  "expected_positive":expected_positive,
  "detected_any_candidate":detected_any,
  "matched_case_candidate":case_detected,
  "candidate_count":len(events),"matched_candidate_count":len(matched),"matched_unique_source_count":len(matched_sources),
  "true_positive":tp,"false_negative":fn,"false_positive":fp,"true_negative":tn,
- "precision":(tp/(tp+fp)) if (tp+fp) else None,
+ "case_detection_precision":(tp/(tp+fp)) if (tp+fp) else None,
+ "precision":None,
+ "precision_status":"UNMEASURED_REQUIRES_CANDIDATE_LEVEL_HUMAN_LABELS",
+ "unmatched_candidate_count":len(events)-len(matched),
+ "coverage_complete":not missing,
  "recall":(tp/(tp+fn)) if (tp+fn) else None,
  "false_positive_rate":(fp/(fp+tn)) if (fp+tn) else None,
  "date_error":bool(expected_positive and any(term_match(e,entity) if entity else True for e in events) and year and not any(date_match(e) for e in events)),
@@ -157,7 +159,8 @@ report={
  "place_error":bool(expected_positive and place and events and not any(term_match(e,place) for e in events)),
  "classification_error":bool((not expected_positive) and family=="STATE_NAVAL_ACTION_NOT_PIRATE" and fp),
  "required_terms_error":bool(expected_positive and required_terms and events and not any(all(term_match(e,t) for t in required_terms) for e in events)),
- "unsupported_claim_rate":0.0 if not any(e.get("verified") for e in events) else None,
+ "unsupported_claim_rate":None,
+ "unsupported_claim_rate_status":"UNMEASURED",
  "missing_lane_outputs":missing,
  "repository_execution":repos,
  "coverage_blockers":coverage_blockers,

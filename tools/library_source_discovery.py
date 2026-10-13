@@ -1,46 +1,45 @@
 #!/usr/bin/env python3
-"""General library-first source discovery driven entirely by the active research request."""
-import json,urllib.parse,urllib.request,datetime,pathlib,time,re,sys
-sys.path.insert(0,str(pathlib.Path(__file__).parent))
+"""Bounded text-source discovery, with contextual ranking and auditable recovery."""
+import concurrent.futures, datetime, json, os, pathlib, re, urllib.parse, urllib.request
 from request_context import load_request
+from research_relevance import identity, discovery_queries, assess
 
 rf,req,ctx=load_request()
-OUT=pathlib.Path("library_discovery");OUT.mkdir(exist_ok=True)
-terms=[]
-for x in [ctx["target"]]+ctx["aliases"]:
-    x=str(x).strip()
-    if x and x.casefold() not in [t.casefold() for t in terms]:terms.append(x)
-# Bound network load while preserving modern and historical variants.
-terms=([terms[0]]+[terms[i] for i in (1,3,len(terms)-1) if 0<i<len(terms)]) if terms else []
-terms=list(dict.fromkeys(terms))[:4]
-years=[int(x) for x in re.findall(r"\b(?:1[0-9]{3}|20[0-9]{2})\b",ctx["date_range"])]
-lo,hi=(min(years),max(years)) if years else (0,9999)
-queries=[]
-for t in terms:
-    escaped=t.replace('"','')
-    # Event years must not filter publication dates: later source editions matter.
-    queries.append(f'(title:("{escaped}") OR description:("{escaped}") OR subject:("{escaped}"))')
-items=[];errors=[]
-for q in queries:
-    try:
-        params=urllib.parse.urlencode({"q":q,"fl[]":["identifier","title","year","creator","date","collection","description","language","subject"],"rows":30,"output":"json"},doseq=True)
-        request=urllib.request.Request("https://archive.org/advancedsearch.php?"+params,headers={"User-Agent":"Piratecartography-Research/3.0 (scholarly source discovery)"})
-        with urllib.request.urlopen(request,timeout=35) as f:data=json.load(f)
-        for d in data.get("response",{}).get("docs",[]):
-            items.append({"query":q,"repository":"Internet Archive","discovery_repository":"Internet Archive","metadata":d,"original_inspected":False,"verified":False})
-    except Exception as exc: errors.append({"query":q,"error":f"{type(exc).__name__}: {exc}"})
-    time.sleep(.2)
+ident=identity(req,ctx)
+recovery=os.getenv('PCT_RECOVERY_WAVE')=='1'
+base_queries=discovery_queries(ident,recovery)[:16]
+# Retrieve period editions before ranking; retain unbounded queries for later editions.
+years=[int(y) for y in re.findall(r'\b(?:1\d{3}|20\d{2})\b',ctx.get('date_range',''))]
+period_queries=[f'({q}) AND year:[{min(years)-100} TO {max(years)+100}]' for q in base_queries[:8]] if years else []
+queries=period_queries+base_queries
+out=pathlib.Path('library_discovery');out.mkdir(exist_ok=True)
 
-needles=[t.casefold() for t in terms]
-for item in items:
-    blob=json.dumps(item["metadata"],ensure_ascii=False).casefold()
-    score=sum(1 for t in needles if t and t in blob)
-    item["target_relevance_score"]=score
-    item["routing"]="CITATION_CHASE_PRIORITY" if score else "BROAD_CONTEXT_REVIEW"
-seen=set();unique=[]
-for item in items:
-    k=item["metadata"].get("identifier")
-    if k and k not in seen:seen.add(k);unique.append(item)
-report={"schema":"pct-library-discovery-v2","generated_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"request_file":rf.name,"target":ctx["target"],"aliases":ctx["aliases"],"date_range":ctx["date_range"],"purpose":ctx["purpose"],"status":"METADATA_LEADS_ONLY","records":unique,"errors":errors,"next_action":"Citation Chase: locate/acquire the digitized original, map exact pages, inspect originals, then test source genealogy and corroboration.","verification_status":"NEEDS_EVIDENCE"}
-(OUT/"catalogue_candidates.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
-print("GENERAL LIBRARY DISCOVERY",ctx["target"],"queries",len(queries),"candidates",len(unique),"errors",len(errors))
+def search(q):
+    params=urllib.parse.urlencode({'q':f'mediatype:texts AND ({q})','fl[]':['identifier','title','year','creator','date','description','language','subject','mediatype'],'rows':30,'output':'json'},doseq=True)
+    request=urllib.request.Request('https://archive.org/advancedsearch.php?'+params,headers={'User-Agent':'Piratecartography-Research/4.0'})
+    with urllib.request.urlopen(request,timeout=25) as f: data=json.load(f)
+    return data.get('response',{}).get('docs',[])
+
+items=[];errors=[]
+with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
+    pending={pool.submit(search,q):q for q in queries}
+    for future in concurrent.futures.as_completed(pending):
+        q=pending[future]
+        try:
+            for d in future.result():
+                assessment=assess(d,ident)
+                items.append({'query':q,'repository':'Internet Archive','discovery_repository':'Internet Archive','metadata':d,'relevance_assessment':assessment,'target_relevance_score':assessment['score'],'routing':'CITATION_CHASE_PRIORITY' if assessment['status']=='PRIORITY' else 'BROAD_CONTEXT_REVIEW','original_inspected':False,'verified':False})
+        except Exception as exc: errors.append({'query':q,'error':type(exc).__name__+': '+str(exc)})
+# Keep first-wave leads and query provenance during recovery.
+dest=out/'catalogue_candidates.json'
+previous=json.loads(dest.read_text()) if recovery and dest.exists() else {}
+unique={}
+for item in previous.get('records',[])+items:
+    key=item['metadata'].get('identifier')
+    if key:
+        if key not in unique: unique[key]=item
+        unique[key].setdefault('discovery_queries',[])
+        if item['query'] not in unique[key]['discovery_queries']: unique[key]['discovery_queries'].append(item['query'])
+report={'schema':'pct-library-discovery-v3','generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'request_file':rf.name,**ctx,'target_identity':ident,'status':'METADATA_LEADS_ONLY','queries':previous.get('queries',[])+queries,'recovery_wave':recovery,'records':list(unique.values()),'errors':previous.get('errors',[])+errors,'verification_status':'NEEDS_EVIDENCE'}
+dest.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+print('LIBRARY DISCOVERY',ctx['target'],'queries',len(queries),'records',len(unique),'priority',sum(x['routing']=='CITATION_CHASE_PRIORITY' for x in unique.values()),'errors',len(errors))

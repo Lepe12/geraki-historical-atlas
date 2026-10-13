@@ -6,6 +6,7 @@ may only mark it HUMAN_REVIEWED and verification_eligible.
 """
 from __future__ import annotations
 import argparse,datetime,json,pathlib,sys
+from review_validation import validate_review
 
 ap=argparse.ArgumentParser()
 ap.add_argument("--lane",required=True)
@@ -29,7 +30,7 @@ candidate=next((x for x in data.get("events",[]) if x.get("candidate_id")==cid),
 if candidate is None:raise SystemExit("CANDIDATE_NOT_FOUND")
 if candidate.get("lane")!=args.lane:raise SystemExit("LANE_MISMATCH")
 
-inspected=bool(review.get("original_inspected"))
+inspected=review.get("original_inspected") is True
 examined=review.get("evidence_examined") or []
 locator=review.get("exact_locator") or {}
 source_says=str(review.get("source_says") or "").strip()
@@ -47,12 +48,14 @@ requirements={
  "quality_score_present":quality is not None
 }
 if decision=="ACCEPT":
+    validate_review(review,candidate)
     missing=[k for k,v in requirements.items() if not v]
     if missing:raise SystemExit("ACCEPT_REVIEW_MISSING_REQUIREMENTS: "+",".join(missing))
     eligible=True
 
 record={
- "schema":"agent-piracy-human-review-decision-v1",
+ "schema":"agent-piracy-human-review-decision-v2",
+ "candidate_evidence_sha256":review.get("candidate_evidence_sha256"),
  "candidate_id":cid,
  "lane":args.lane,
  "reviewer":reviewer,
@@ -78,8 +81,7 @@ out=pathlib.Path("human_review");out.mkdir(exist_ok=True)
 dp=out/"decisions.json"
 existing={"schema":"agent-piracy-human-review-decisions-v1","items":[]}
 if dp.exists():
-    try:existing=json.loads(dp.read_text(encoding="utf-8"))
-    except Exception:pass
+    existing=json.loads(dp.read_text(encoding="utf-8"))
 items=[x for x in existing.get("items",[]) if x.get("candidate_id")!=cid]
 items.append(record)
 existing["items"]=items

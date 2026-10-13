@@ -45,6 +45,11 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
+      target: ${{ steps.identity.outputs.target }}
+      aliases: ${{ steps.identity.outputs.aliases }}
+      date_range: ${{ steps.identity.outputs.date_range }}
+      purpose: ${{ steps.identity.outputs.purpose }}
+      target_type: ${{ steps.identity.outputs.target_type }}
       request_file: ${{ steps.identity.outputs.request_file }}
       request_sha256: ${{ steps.identity.outputs.request_sha256 }}
       research_job_id: ${{ steps.identity.outputs.research_job_id }}
@@ -62,6 +67,13 @@ jobs:
           print("request_file="+d["request_file"])
           print("request_sha256="+d["request_sha256"])
           print("research_job_id="+d["research_job_id"])
+          import uuid
+          payload=d["normalized_request"]
+          for key,value in {"target":payload["target"],"aliases":"|".join(payload.get("aliases",[])),"date_range":payload.get("date_range",""),"purpose":payload.get("purpose",""),"target_type":payload.get("target_context",{}).get("type","auto")}.items():
+              marker=uuid.uuid4().hex
+              print(key+"<<"+marker)
+              print(value)
+              print(marker)
           PY
       - name: Compile Python research code
         run: python3 -m compileall -q tools
@@ -104,8 +116,19 @@ jobs:
             research_request_identity.json
             research_lanes/
 
-  research-lanes:
+  specialist-research:
     needs: prepare
+    uses: ./.github/workflows/jarvis-specialist-research.yml
+    with:
+      target: ${{ needs.prepare.outputs.target }}
+      aliases: ${{ needs.prepare.outputs.aliases }}
+      date_range: ${{ needs.prepare.outputs.date_range }}
+      purpose: ${{ needs.prepare.outputs.purpose }}
+      target_type: ${{ needs.prepare.outputs.target_type }}
+
+  research-lanes:
+    needs: [prepare, specialist-research]
+    if: always() && needs.prepare.result == 'success'
     strategy:
       fail-fast: false
       matrix:
@@ -121,6 +144,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
+      - uses: actions/download-artifact@v4
+        if: matrix.lane == 'travellers' && needs.specialist-research.result == 'success'
+        with:
+          name: specialist-normalized-${{ github.run_id }}
+          path: specialist_sources
       - name: Validate pinned request before research
         run: |
           python3 tools/request_identity.py
@@ -132,7 +160,8 @@ jobs:
           PCT_RESEARCH_LANE: ${{ matrix.lane }}
         run: |
           python3 tools/lane_repository_plan.py
-          timeout 150s python3 tools/lane_repository_discovery.py || { code=$?; echo "LANE DISCOVERY FAILED exit=$code"; exit "$code"; }
+          timeout 300s python3 tools/lane_repository_discovery.py || { code=$?; echo "LANE DISCOVERY FAILED exit=$code"; exit "$code"; }
+          python3 tools/merge_specialist_candidates.py
           python3 tools/merge_repository_candidates.py
           if [ "$PCT_RESEARCH_LANE" = "german" ]; then PCT_BSB_POSITIVE_CONTROL=1 python3 tools/bsb_iiif_route.py; fi
           if [ "$PCT_RESEARCH_LANE" = "travellers" ]; then python3 tools/bsb_iiif_route.py; fi
@@ -149,6 +178,7 @@ jobs:
             python3 tools/acquire_library_candidate.py &&
             python3 tools/search_acquired_ocr.py &&
             python3 tools/event_first_search.py &&
+            python3 tools/research_recovery.py &&
             python3 tools/exact_page_acquire.py
           ' || { code=$?; echo "LANE PIPELINE FAILED exit=$code"; exit "$code"; }
           python3 tools/verification_pipeline.py
@@ -171,7 +201,7 @@ jobs:
             sleep $((n*2))
           done
           echo "WARNING: durable evidence commit failed after retries; Actions artifact remains available for recovery."
-          exit 0
+          exit 1
       - uses: actions/upload-artifact@v4
         if: always()
         with:

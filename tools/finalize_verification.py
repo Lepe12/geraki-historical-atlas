@@ -6,6 +6,7 @@ record. No automated stage invokes this tool.
 """
 from __future__ import annotations
 import argparse,datetime,json,pathlib
+from review_validation import validate_final
 
 ap=argparse.ArgumentParser()
 ap.add_argument("--lane",required=True)
@@ -56,11 +57,13 @@ requirements={
  "claim_matrix_human_assessed":bool(claim.get("assessment_reviewer") and claim.get("assessment_utc"))
 }
 if decision=="VERIFY":
+    validate_final(v,candidate,review,claim)
     missing=[k for k,val in requirements.items() if not val]
     if missing:raise SystemExit("VERIFY_MISSING_REQUIREMENTS: "+",".join(missing))
 
 record={
- "schema":"agent-piracy-final-verification-v1",
+ "schema":"agent-piracy-final-verification-v2",
+ "claim_matrix_sha256":v.get("claim_matrix_sha256"),
  "candidate_id":cid,
  "lane":args.lane,
  "verifier":verifier,
@@ -89,8 +92,7 @@ out=pathlib.Path("verification");out.mkdir(exist_ok=True)
 fp=out/"final_verifications.json"
 existing={"schema":"agent-piracy-final-verifications-v1","items":[]}
 if fp.exists():
-    try:existing=json.loads(fp.read_text(encoding="utf-8"))
-    except Exception:pass
+    existing=json.loads(fp.read_text(encoding="utf-8"))
 items=[x for x in existing.get("items",[]) if x.get("candidate_id")!=cid]
 items.append(record);existing["items"]=items
 fp.write_text(json.dumps(existing,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")

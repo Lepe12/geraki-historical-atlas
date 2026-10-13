@@ -3,6 +3,7 @@
 import json,pathlib,datetime,re,sys
 sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from request_context import load_request
+from research_relevance import identity, rank
 rf,req,ctx=load_request()
 years=[int(y) for y in re.findall(r'\b(?:1[0-9]{3}|20[0-9]{2})\b',ctx['date_range'])]
 hi=max(years) if years else 1900
@@ -27,6 +28,7 @@ for x in d.get("records",[]):
     m=x.get("metadata",{})
     selected.append({
       "identifier":m.get("identifier"),"title":m.get("title"),"year":m.get("year") or m.get("date"),
+      "description":m.get("description"),"subject":m.get("subject"),"mediatype":m.get("mediatype"),
       "creator":m.get("creator"),"repository":x.get("repository","Internet Archive"),
       "discovery_repository":x.get("discovery_repository",x.get("repository","Internet Archive")),
       "discovery_lane":"generic_library_fallback","connector_status":"EXECUTED",
@@ -41,7 +43,7 @@ for lead in req.get("source_leads",[]):
     repo=str(lead.get("repository") or "Internet Archive")
     if not ident:continue
     selected.append({"identifier":ident,"title":lead.get("title"),"repository":repo,"discovery_repository":repo,"discovery_lane":"request_source_lead","connector_status":"REQUESTED_SOURCE_LEAD_NOT_YET_VALIDATED","url":lead.get("url") or ("https://archive.org/details/"+str(ident) if repo=="Internet Archive" else None),"acquisition_route":"INTERNET_ARCHIVE" if repo=="Internet Archive" else None,"source_lead":True,"verification_status":"NEEDS_EVIDENCE","next_stage":"ACQUIRE_AND_CHECK_ORIGINAL"})
-selected.sort(key=score,reverse=True)
+selected=rank(selected,identity(req,ctx))
 report={"schema":"pct-auto-router-v2","generated_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"request_file":d.get("request_file"),"selected":selected,"rule":"Selection is request-driven. Catalogue metadata is not evidence; inspect digitized original before claim use."}
 (out/"routed_candidates.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
 print("generic routed",len(selected))

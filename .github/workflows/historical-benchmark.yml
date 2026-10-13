@@ -61,7 +61,7 @@ jobs:
           rows=[v[1] for v in latest.values()]
           bench=json.loads(pathlib.Path("benchmarks/historical_benchmark_v1.json").read_text(encoding="utf-8"))
           excluded={x.get("id") for x in bench.get("cases",[]) if x.get("metric_included") is False}
-          metric_rows=[x for x in rows if x.get("case_id") not in excluded and x.get("metric_included",True) is not False]
+          metric_rows=[x for x in rows if x.get("schema")=="agent-piracy-live-benchmark-result-v3" and x.get("case_id") not in excluded and x.get("metric_included",True) is not False]
           tp=sum(x.get("true_positive",0) for x in metric_rows);fp=sum(x.get("false_positive",0) for x in metric_rows)
           fn=sum(x.get("false_negative",0) for x in metric_rows);tn=sum(x.get("true_negative",0) for x in metric_rows)
           blocked_fn=sum(1 for x in metric_rows if x.get("false_negative") and x.get("false_negative_due_to_coverage_blocker"))
@@ -69,7 +69,9 @@ jobs:
           out={
             "schema":"agent-piracy-benchmark-summary-v2","evaluated_results":len(rows),"metric_included_results":len(metric_rows),"excluded_case_ids":sorted(excluded),
             "tp":tp,"fp":fp,"fn":fn,"tn":tn,
-            "precision":tp/(tp+fp) if tp+fp else None,
+            "case_detection_precision":tp/(tp+fp) if tp+fp else None,
+            "precision":None,
+            "precision_status":"UNMEASURED_REQUIRES_CANDIDATE_LEVEL_LABELS",
             "recall":tp/(tp+fn) if tp+fn else None,
             "coverage_blocked_false_negatives":blocked_fn,
             "unblocked_false_negatives":unblocked_fn,

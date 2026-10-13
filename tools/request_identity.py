@@ -6,6 +6,8 @@ from request_context import load_request
 def canonical_request():
     rf,req,ctx=load_request()
     payload={"target":ctx["target"],"aliases":ctx["aliases"],"date_range":ctx["date_range"],"purpose":ctx["purpose"]}
+    if req.get("target_context"):
+        payload["target_context"]=req["target_context"]
     canonical=json.dumps(payload,ensure_ascii=False,sort_keys=True,separators=(",",":"))
     digest=hashlib.sha256(canonical.encode("utf-8")).hexdigest()
     run_id=os.getenv("GITHUB_RUN_ID","local")

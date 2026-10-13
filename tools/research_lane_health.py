@@ -13,7 +13,7 @@ def read(p,default=None):
 disc=read(pathlib.Path("lane_discovery")/f"{lane}.json",{})
 attempts=disc.get("attempts",[])
 executed=[a["repository"] for a in attempts if a.get("status")=="EXECUTED"]
-blocked=[{"repository":a.get("repository"),"status":a.get("status")} for a in attempts if a.get("status") in ("AUTH_OR_BROWSER_REQUIRED","API_KEY_REQUIRED","CITATION_CHASE_WEB_OR_API_CONNECTOR_REQUIRED","REMOTE_ACCESS_BLOCKED")]
+blocked=[{"repository":a.get("repository"),"status":a.get("status")} for a in attempts if a.get("status") not in ("EXECUTED", "ERROR")]
 errors=[a for a in attempts if a.get("status")=="ERROR"]
 acq=read("library_acquisition/acquisition_report.json",{}).get("results",[])
 events=read("event_first_hits/event_hits.json",{}).get("hits",[])
@@ -42,7 +42,7 @@ required_files={
  "run_manifest":pathlib.Path("run_manifest/manifest.json").exists()
 }
 pipeline_complete=all(required_files.values()) and exact_page_complete
-if executed and pipeline_complete:status="OPERATIONAL_WITH_EXPLICIT_BLOCKERS" if blocked else "OPERATIONAL"
+if executed and pipeline_complete:status="OPERATIONAL_WITH_EXPLICIT_BLOCKERS" if blocked or errors else "OPERATIONAL"
 elif executed:status="PIPELINE_INCOMPLETE"
 else:status="NO_EXECUTED_REPOSITORY"
 report={

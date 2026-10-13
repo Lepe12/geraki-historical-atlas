@@ -3,6 +3,7 @@
 import hashlib,json,sys
 import unittest
 from test_candidate_context import ContextPolicy
+from test_research_reliability import Reliability
 from evidence_model import EVIDENCE_STATES,can_advance,evidence_weight,verification_assessment,toponym_identity,normalize_date
 
 def digest(payload):
@@ -13,6 +14,7 @@ a={"target":"Alpha Test","aliases":["A"],"date_range":"1600-1610","purpose":"ben
 b={"target":"Beta Test","aliases":["B"],"date_range":"1700-1710","purpose":"benchmark B"}
 ha,hb=digest(a),digest(b)
 checks={
+ "retrieval_queue_and_verification_regressions":unittest.TextTestRunner(verbosity=0).run(unittest.defaultTestLoader.loadTestsFromTestCase(Reliability)).wasSuccessful(),
  "observed_context_regressions_and_synthetic_controls":unittest.TextTestRunner(verbosity=0).run(unittest.defaultTestLoader.loadTestsFromTestCase(ContextPolicy)).wasSuccessful(),
  "two_requests_have_distinct_hashes":ha!=hb,
  "request_a_does_not_contain_b":b["target"] not in json.dumps(a),

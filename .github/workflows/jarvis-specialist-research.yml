@@ -1,6 +1,23 @@
 name: JARVIS Specialist Historical Research
 
 on:
+  workflow_call:
+    inputs:
+      target:
+        required: true
+        type: string
+      aliases:
+        default: ""
+        type: string
+      date_range:
+        default: ""
+        type: string
+      purpose:
+        default: ""
+        type: string
+      target_type:
+        default: auto
+        type: string
   workflow_dispatch:
     inputs:
       target:
@@ -61,6 +78,7 @@ jobs:
           path: specialist_plan.json
 
   specialists:
+    timeout-minutes: 12
     needs: prepare
     strategy:
       fail-fast: false
@@ -126,6 +144,11 @@ jobs:
           python3 tools/orchestrator/jarvis_specialist_aggregate.py \
             --root normalized \
             --output SPECIALIST_AGGREGATE.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: specialist-normalized-${{ github.run_id }}
+          path: normalized/
+          if-no-files-found: warn
       - name: Preserve specialist run
         env:
           RUN_ID: ${{ github.run_id }}
