@@ -87,3 +87,14 @@ Recovery: deploy the versioned adapter/schema, restore the existing private conf
 install the additive tables and import the preserved GitHub run trees. The original
 Airtable migration snapshot remains available in `pc_mig_records` and GitHub backups.
 Disable only the new storage cron task to pause imports; do not delete research data.
+
+
+## Verified deployment record — 2026-10-13
+
+- Plesk task ID 348 is enabled with schedule `*/5 * * * *` and no email notifications.
+- Its saved command uses the explicit PHP 8.4 CLI and the private cron log path.
+- Running the saved task completed successfully on the hosting server.
+- Re-importing all 67 unchanged run trees returned PASS, zero new imports and zero blocked runs.
+- `verify-run 38374191697` retrieved 324 compressed documents from MariaDB and confirmed both SHA-256 and original Git blob byte identity. Binary-reference bytes were not rehashed by this test.
+- `.htaccess`, `wp-config.php` and WordPress `index.php` matched the pre-deployment checksums.
+- The public read-only gateway still has its separate `open_basedir` blocker. The host-local storage/import path does not use it and does not weaken that restriction.
