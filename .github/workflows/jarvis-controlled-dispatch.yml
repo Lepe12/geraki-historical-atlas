@@ -1,0 +1,112 @@
+name: JARVIS Controlled Dispatch
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Research target"
+        required: true
+        type: string
+      aliases:
+        description: "Aliases separated by |"
+        required: false
+        type: string
+      date_range:
+        description: "Date range"
+        required: false
+        type: string
+      purpose:
+        description: "Research question / scope"
+        required: true
+        type: string
+      selected_agents:
+        description: "Comma-separated agent lanes, max 3"
+        required: true
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - 'jarvis_dispatch_requests/*.json'
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - id: request
+        name: Resolve one explicit request
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .jarvis_runtime
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            python3 - <<'PY'
+          import json, pathlib
+          req={
+            "target": """${{ inputs.target }}""".strip(),
+            "aliases": [x.strip() for x in """${{ inputs.aliases }}""".split("|") if x.strip()],
+            "date_range": """${{ inputs.date_range }}""".strip(),
+            "purpose": """${{ inputs.purpose }}""".strip(),
+            "selected_agents": [x.strip() for x in """${{ inputs.selected_agents }}""".split(",") if x.strip()]
+          }
+          p=pathlib.Path('.jarvis_runtime/request.json')
+          p.write_text(json.dumps(req,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+            echo "request_file=.jarvis_runtime/request.json" >> "$GITHUB_OUTPUT"
+          else
+            mapfile -t changed < <(git diff-tree --no-commit-id --name-only -r HEAD -- 'jarvis_dispatch_requests/*.json')
+            if [ "${#changed[@]}" -ne 1 ]; then echo "Expected exactly one changed JARVIS request" >&2; exit 1; fi
+            echo "request_file=${changed[0]}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - id: jarvis
+        name: Validate policy, kill switch, allowlist and duplicate guard
+        run: |
+          python3 tools/orchestrator/jarvis_dispatch.py \
+            --request "${{ steps.request.outputs.request_file }}" \
+            --run-id "${{ github.run_id }}" \
+            --github-output "$GITHUB_OUTPUT" \
+            --write-audit ".jarvis_runtime/dispatch_audit.json"
+
+      - name: Test control plane
+        run: |
+          python3 -m compileall -q tools/orchestrator
+          PYTHONPATH=tools/orchestrator python3 -m unittest tools/orchestrator/test_jarvis_dispatch.py -v
+
+      - name: Commit append-only dispatch audit
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/jarvis/dispatch_audit
+          test ! -e "evidence/jarvis/dispatch_audit/${{ github.run_id }}.json"
+          cp .jarvis_runtime/dispatch_audit.json "evidence/jarvis/dispatch_audit/${{ github.run_id }}.json"
+          git config user.name "jarvis-orchestrator[bot]"
+          git config user.email "jarvis-orchestrator@users.noreply.github.com"
+          git add "evidence/jarvis/dispatch_audit/${{ github.run_id }}.json"
+          git commit -m "JARVIS approve controlled dispatch ${{ github.run_id }}"
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Dispatch bounded subset to existing ten-agent workflow
+        env:
+          GH_TOKEN: "${{ github.token }}"
+          TARGET: "${{ steps.jarvis.outputs.target }}"
+          ALIASES: "${{ steps.jarvis.outputs.aliases }}"
+          DATE_RANGE: "${{ steps.jarvis.outputs.date_range }}"
+          PURPOSE: "${{ steps.jarvis.outputs.purpose }}"
+          SELECTED_AGENTS: "${{ steps.jarvis.outputs.selected_agents }}"
+        run: |
+          gh workflow run pct-parallel-multi-agent.yml \
+            --ref main \
+            -f target="$TARGET" \
+            -f aliases="$ALIASES" \
+            -f date_range="$DATE_RANGE" \
+            -f purpose="$PURPOSE" \
+            -f selected_agents="$SELECTED_AGENTS"
+          echo "JARVIS_CONTROLLED_DISPATCH_SENT agents=$SELECTED_AGENTS"
