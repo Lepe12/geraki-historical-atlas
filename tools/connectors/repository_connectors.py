@@ -221,6 +221,20 @@ def tna_public_content(q,lane):
                 k=r.get("url")
                 if k and k not in seen:
                     seen.add(k);candidates.append(r)
+            # Some TNA resource cards are serialized in page data rather than
+            # exposed as ordinary anchor elements. Extract stable content paths
+            # directly from the server-rendered HTML/embedded JSON as a fallback.
+            raw_hub=_get(hub,timeout=15).decode("utf-8","replace")
+            for pth in re.findall(r'/(?:education/resources|explore-the-collection/stories)/[A-Za-z0-9_%\\-]+/',raw_hub,re.I):
+                au=urllib.parse.urljoin(base,pth)
+                if au in seen: continue
+                seen.add(au)
+                candidates.append({
+                  "discovery_repository":"The National Archives Public Content",
+                  "discovery_lane":lane,"connector_status":"EXECUTED",
+                  "identifier":au,"title":urllib.parse.unquote(pth.rstrip("/").rsplit("/",1)[-1]).replace("-"," "),
+                  "date":[],"url":au
+                })
         except Exception:
             continue
     # Bound the fallback crawl and fetch concurrently.
