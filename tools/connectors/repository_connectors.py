@@ -154,8 +154,20 @@ def internet_culturale(q,lane):
 def tna_public_content(q,lane):
     base="https://www.nationalarchives.gov.uk"
     url=base+"/search/results/?"+urllib.parse.urlencode({"_q":q})
-    keep=lambda u,t: u.startswith(base+"/") and "/search/" not in u and len(t)>3
-    rows=_html_search(url,"The National Archives Public Content",lane,base,keep,max_records=10)
+    def keep(u,t):
+        try:
+            p=urllib.parse.urlsplit(u).path.lower()
+        except Exception:
+            return False
+        allowed=(
+          "/education/resources/" in p or
+          "/explore-the-collection/stories/" in p or
+          "/the-collection-blog/" in p or
+          "/help-with-your-research/research-guides/" in p or
+          "/help-with-your-research/discovery-help/" in p
+        )
+        return allowed and len(t)>3
+    rows=_html_search(url,"The National Archives Public Content",lane,base,keep,max_records=20)
     out=[]
     for row in rows:
         u=row.get("url")
@@ -164,7 +176,7 @@ def tna_public_content(q,lane):
             raw=re.sub(r"(?is)<(script|style|nav|footer)[^>]*>.*?</\\1>"," ",raw)
             txt=re.sub(r"<[^>]+>"," ",raw)
             txt=" ".join(txt.split())
-            row["metadata_text"]=txt[:20000]
+            row["metadata_text"]=txt[:30000]
             years=list(dict.fromkeys(re.findall(r"\\b(?:1[0-9]{3}|20[0-9]{2})\\b",txt)))
             row["date"]=years[:12]
         except Exception:
