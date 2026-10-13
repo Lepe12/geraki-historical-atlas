@@ -1,13 +1,32 @@
 {
   "name": "JARVIS",
   "system": "Piratecartography Historical Research",
-  "mode": "observer",
+  "mode": "controlled_dispatch",
   "agents_expected": 10,
   "dispatch": {
     "prevent_duplicate_work": true,
     "max_retries_same_agent": 1,
     "allow_reassignment": true,
-    "allow_task_splitting": true
+    "allow_task_splitting": true,
+    "dispatch_enabled": true,
+    "kill_switch": false,
+    "max_parallel": 3,
+    "allowed_agents": [
+      "travellers",
+      "spanish_simancas",
+      "venetian",
+      "french",
+      "british",
+      "dutch",
+      "german",
+      "italian_states",
+      "ottoman",
+      "north_african"
+    ],
+    "require_explicit_target": true,
+    "require_explicit_selected_agents": true,
+    "audit_required": true,
+    "auto_retry_failed_agents": false
   },
   "quality_gate": {
     "default_result_state": "CANDIDATE",
