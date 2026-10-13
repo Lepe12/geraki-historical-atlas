@@ -24,8 +24,7 @@ jobs:
           mapfile -t files < <(git diff-tree --no-commit-id --name-only -r HEAD -- 'benchmarks/evaluation_requests/*.json')
           if [ "${#files[@]}" -ne 1 ]; then
             echo "BENCHMARK_REQUEST_SELECTION_ERROR expected exactly 1 changed evaluation request, got ${#files[@]}"
-            printf '%s
-' "${files[@]}"
+            printf '%s\\n' "${files[@]}"
             exit 1
           fi
           f="${files[0]}"
