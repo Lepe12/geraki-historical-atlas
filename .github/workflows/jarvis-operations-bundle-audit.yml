@@ -1,0 +1,63 @@
+name: JARVIS Operations Bundle Audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/orchestrator/jarvis_event_bus.py'
+      - 'tools/orchestrator/jarvis_task_history.py'
+      - 'tools/orchestrator/jarvis_command_center_server.py'
+      - 'tools/orchestrator/project_scope.py'
+      - 'tools/orchestrator/secret_refs.py'
+      - 'tools/orchestrator/encrypted_secret_store.py'
+      - 'tools/orchestrator/test_jarvis_resilience_bundle.py'
+      - 'tools/orchestrator/test_jarvis_safety_bundle.py'
+      - 'tools/connectors/connector_limits.json'
+      - 'tools/connectors/connector_rate_limit.py'
+      - 'tools/connectors/lazy_connector.py'
+      - 'tools/connectors/connector_batch.py'
+      - 'tools/connectors/connector_repair_proposal.py'
+      - 'tools/orchestrator/jarvis_specialist_worker.py'
+      - '.github/workflows/jarvis-operations-bundle-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile operational bundle
+        run: |
+          python3 -m py_compile \
+            tools/orchestrator/jarvis_event_bus.py \
+            tools/orchestrator/jarvis_task_history.py \
+            tools/orchestrator/project_scope.py \
+            tools/orchestrator/secret_refs.py \
+            tools/orchestrator/encrypted_secret_store.py \
+            tools/connectors/connector_rate_limit.py \
+            tools/connectors/lazy_connector.py \
+            tools/connectors/connector_batch.py \
+            tools/connectors/connector_repair_proposal.py \
+            tools/orchestrator/jarvis_specialist_worker.py
+      - name: Run resilience tests
+        env:
+          PYTHONPATH: tools/orchestrator:tools/connectors
+        run: |
+          python3 -m unittest \
+            tools/orchestrator/test_jarvis_resilience_bundle.py \
+            tools/orchestrator/test_jarvis_safety_bundle.py -v
+      - name: Validate connector limit coverage
+        env:
+          PYTHONPATH: tools/connectors
+        run: |
+          python3 - <<'PY'
+          import json
+          reg=json.load(open('tools/connectors/connector_registry.json',encoding='utf-8'))['connectors']
+          limits=json.load(open('tools/connectors/connector_limits.json',encoding='utf-8'))['connectors']
+          missing=sorted(set(reg)-set(limits))
+          assert not missing, f'MISSING_CONNECTOR_LIMITS:{missing}'
+          print('CONNECTOR LIMIT COVERAGE PASS',len(reg))
+          PY
