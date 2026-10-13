@@ -457,7 +457,8 @@ def searchculture(q,lane):
           "metadata_text":json.dumps(x,ensure_ascii=False),
           "raw":x
         })
-    return "EXECUTED",out,url
+    safe_url="https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&"+urllib.parse.urlencode({"general_term":q,"page":1,"pageSize":25})
+    return "EXECUTED",out,safe_url
 
 def ddb(q,lane):
     key=os.getenv("DDB_API_KEY","").strip()
