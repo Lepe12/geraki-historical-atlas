@@ -106,8 +106,15 @@ for e in matched:
 
 tp=1 if expected_positive and case_detected else 0
 fn=1 if expected_positive and not case_detected else 0
-fp=1 if (not expected_positive) and detected_any else 0
-tn=1 if (not expected_positive) and not detected_any else 0
+if not expected_positive and family=="STATE_NAVAL_ACTION_NOT_PIRATE":
+    prohibited=[e for e in events if str(e.get("event_type") or "").upper()=="PIRATE_ATTACK"]
+    fp=1 if prohibited else 0
+    tn=0 if prohibited else 1
+elif not expected_positive:
+    fp=1 if detected_any else 0
+    tn=1 if not detected_any else 0
+else:
+    fp=0;tn=0
 
 expected_source=str(case.get("source_repository") or "")
 coverage_blockers=[]
@@ -131,6 +138,7 @@ report={
  "date_error":bool(expected_positive and any(term_match(e,entity) if entity else True for e in events) and year and not any(date_match(e) for e in events)),
  "entity_error":bool(expected_positive and entity and events and not any(term_match(e,entity) for e in events)),
  "place_error":bool(expected_positive and place and events and not any(term_match(e,place) for e in events)),
+ "classification_error":bool((not expected_positive) and family=="STATE_NAVAL_ACTION_NOT_PIRATE" and fp),
  "required_terms_error":bool(expected_positive and required_terms and events and not any(all(term_match(e,t) for t in required_terms) for e in events)),
  "unsupported_claim_rate":0.0 if not any(e.get("verified") for e in events) else None,
  "missing_lane_outputs":missing,
