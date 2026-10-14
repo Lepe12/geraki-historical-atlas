@@ -13,6 +13,7 @@ import unicodedata
 from typing import Any
 
 ALL_AGENTS = [
+    "greek",
     "travellers",
     "spanish_simancas",
     "venetian",
@@ -55,8 +56,8 @@ PROFILE_RULES: dict[str, dict[str, Any]] = {
             r"\bmelos\b", r"\bmani\b", r"\bmorea\b",
         ],
         "weights": {
-            "venetian": 34, "ottoman": 30, "travellers": 24,
-            "italian_states": 18, "spanish_simancas": 8,
+            "greek": 48, "venetian": 32, "ottoman": 28, "travellers": 22,
+            "italian_states": 16, "spanish_simancas": 8,
         },
     },
     "iberian_habsburg": {
@@ -168,6 +169,7 @@ PROFILE_RULES: dict[str, dict[str, Any]] = {
 }
 
 BASE_SCORES = {
+    "greek": 9,
     "travellers": 8,
     "venetian": 5,
     "ottoman": 5,
