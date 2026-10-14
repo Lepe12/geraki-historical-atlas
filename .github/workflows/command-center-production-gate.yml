@@ -49,7 +49,15 @@ jobs:
         id: probe
         continue-on-error: true
         run: |
-          curl --fail --silent --show-error --max-time 10             https://piratecartography.com/pct-api/live/health             -o /tmp/pct-command-center-health.json
+          curl --fail --silent --show-error --max-time 10 \
+            -D /tmp/pct-command-center-health.headers \
+            https://piratecartography.com/pct-api/live/health \
+            -o /tmp/pct-command-center-health.json
+          echo '--- RESPONSE HEADERS ---'
+          cat /tmp/pct-command-center-health.headers
+          echo '--- RESPONSE BODY (first 1200 bytes) ---'
+          head -c 1200 /tmp/pct-command-center-health.json || true
+          echo
           python3 - <<'PY'
           import json
           d=json.load(open('/tmp/pct-command-center-health.json'))
