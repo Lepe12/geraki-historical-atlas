@@ -1,5 +1,4 @@
-name: Deploy Research Command Center
-
+name: Audit Research Command Center (Atlas owns Pages deployment)
 on:
   workflow_dispatch:
   push:
@@ -10,35 +9,18 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
 
 jobs:
-  build:
+  audit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Prepare static site
+      - name: Verify Command Center files
         run: |
-          rm -rf _site
-          mkdir -p _site
-          cp -R command-center/. _site/
-          touch _site/.nojekyll
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          test -s command-center/index.html
+          test -s command-center/command-center.css
+          test -s command-center/command-center.js
+          node --check command-center/command-center.js
+          grep -q 'id="map"' command-center/index.html
+          grep -q 'maplibregl.Map' command-center/command-center.js
+          ! grep -q 'loadPreviewData' command-center/command-center.js
