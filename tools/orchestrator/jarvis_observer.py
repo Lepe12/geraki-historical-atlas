@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """JARVIS observer adapter for the live Piratecartography evidence stream.
 
-Reads the real 10-lane run artifacts already written under evidence/runs/.
+Reads the real 11-lane run artifacts already written under evidence/runs/.
 It performs NO network calls, NO database writes, NO agent dispatch and NO
 VERIFIED promotion. Output is a deterministic observer report.
 """
@@ -18,6 +18,7 @@ from jarvis import AgentStatus, JarvisOrchestrator, ResearchTask
 
 
 EXPECTED_LANES = [
+    "greek",
     "travellers",
     "spanish_simancas",
     "venetian",
