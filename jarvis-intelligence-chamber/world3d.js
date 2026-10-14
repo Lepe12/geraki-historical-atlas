@@ -12,7 +12,7 @@ const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:"h
 renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.65));
 renderer.outputColorSpace=THREE.SRGBColorSpace;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.35;
+renderer.toneMappingExposure=1.75;
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x03080e);
 scene.fog=new THREE.FogExp2(0x03080e,0.00024);
@@ -83,17 +83,17 @@ for(let r=0;r<regions.length-1;r++){
 for(const n of agentNodes)edge(n.index,nexus.index,false);
 const points=new Float32Array(nodes.length*3);
 const pointColors=new Float32Array(nodes.length*3);
-const cyan=new THREE.Color(CYAN),gold=new THREE.Color(GOLD);
+const cyan=new THREE.Color(0x4af9f2),gold=new THREE.Color(GOLD);
 nodes.forEach((n,i)=>{
  n.position.toArray(points,i*3);
  const color=n.major?gold:n.regionIndex===4||n.regionIndex===5?new THREE.Color(0x6da3a0):cyan;
- const strength=n.major?1:(.38+rand()*.54);
+ const strength=n.major?1:(.72+rand()*.28);
  pointColors[i*3]=color.r*strength;pointColors[i*3+1]=color.g*strength;pointColors[i*3+2]=color.b*strength;
 });
 const nodeGeometry=new THREE.BufferGeometry();
 nodeGeometry.setAttribute("position",new THREE.BufferAttribute(points,3));
 nodeGeometry.setAttribute("color",new THREE.BufferAttribute(pointColors,3));
-const starNodes=new THREE.Points(nodeGeometry,new THREE.PointsMaterial({size:4.2,vertexColors:true,transparent:true,opacity:.92,sizeAttenuation:true,depthWrite:false,blending:THREE.AdditiveBlending}));
+const starNodes=new THREE.Points(nodeGeometry,new THREE.PointsMaterial({size:7.5,vertexColors:true,transparent:true,opacity:.92,sizeAttenuation:true,depthWrite:false,blending:THREE.AdditiveBlending}));
 world.add(starNodes);
 function makeLines(selected,opacity,color){
  const data=[];
@@ -105,8 +105,8 @@ function makeLines(selected,opacity,color){
  const lines=new THREE.LineSegments(geo,new THREE.LineBasicMaterial({color,transparent:true,opacity,depthWrite:false,blending:THREE.AdditiveBlending}));
  world.add(lines);return lines;
 }
-const faintLines=makeLines(false,.19,0x64a0a4);
-const routeLines=makeLines(true,.74,0x37f1e9);
+const faintLines=makeLines(false,.38,0x64d4d4);
+const routeLines=makeLines(true,.95,0x55fff2);
 const backgroundGeometry=new THREE.BufferGeometry();
 const bg=[];for(let i=0;i<2100;i++)bg.push((rand()-.5)*6500,(rand()-.5)*4200,(rand()-.5)*3500);
 backgroundGeometry.setAttribute("position",new THREE.Float32BufferAttribute(bg,3));
@@ -126,8 +126,8 @@ function hub(node,scale=1){
  const center=new THREE.Mesh(new THREE.SphereGeometry(5*scale,16,12),material);
  const selectable=new THREE.Mesh(new THREE.SphereGeometry(22*scale,12,8),new THREE.MeshBasicMaterial({visible:false}));
  selectable.userData.node=node;group.add(center,selectable);
- const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:node.name==="JARVIS"?GOLD:CYAN,transparent:true,opacity:node.name==="JARVIS"?.63:.35,depthWrite:false,blending:THREE.AdditiveBlending}));
- sprite.scale.setScalar((node.name==="JARVIS"?125:55)*scale);group.add(sprite);
+ const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:node.name==="JARVIS"?GOLD:0x3cefe5,transparent:true,opacity:node.name==="JARVIS"?.92:.62,depthWrite:false,blending:THREE.AdditiveBlending}));
+ sprite.scale.setScalar((node.name==="JARVIS"?240:85)*scale);group.add(sprite);
  if(node.name==="JARVIS"){
   const ring=new THREE.Mesh(new THREE.TorusGeometry(54,1.55,5,110),new THREE.MeshBasicMaterial({color:GOLD,transparent:true,opacity:.85,depthWrite:false}));
   ring.rotation.x=.3;group.add(ring);
@@ -189,7 +189,7 @@ function frame(){
  if(w&&h&&(canvas.width!==Math.round(w*renderer.getPixelRatio())||canvas.height!==Math.round(h*renderer.getPixelRatio()))){
   camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false);
  }
- if(!reduced){for(const n of agentNodes.concat(nexus)){if(n.group)n.sprite.material.opacity=.3+.10*Math.sin(time*.5+n.index)}}
+ if(!reduced){for(const n of agentNodes.concat(nexus)){if(n.group)n.sprite.material.opacity=(n===nexus?.75:.52)+.09*Math.sin(time*.5+n.index)}}
  for(const item of allLabels){
   const p=item.position.clone().project(camera),visible=p.z>-1&&p.z<1&&Math.abs(p.x)<.91&&Math.abs(p.y)<.85;
   item.el.style.left=((p.x+1)*w/2)+"px";item.el.style.top=((1-p.y)*h/2)+"px";
