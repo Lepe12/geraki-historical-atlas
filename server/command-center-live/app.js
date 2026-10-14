@@ -141,8 +141,13 @@ server.on("upgrade",(req,socket)=>{
     statusFor(run).then(s=>socket.write(frameText(JSON.stringify({schema:"pct-command-center-bootstrap-v1",...s})))).catch(()=>{});
   }catch(_){socket.destroy();}
 });
-if(require.main===module){
+if(require.main===module || typeof PhusionPassenger !== "undefined"){
   server.listen(PORT,"127.0.0.1",()=>console.log("PCT Command Center live service listening",PORT,PREFIX));
   setInterval(()=>refreshBaseline(true),15000).unref();
+  if(typeof PhusionPassenger !== "undefined"){
+    const loopback=require("net").createServer(socket=>server.emit("connection",socket));
+    loopback.on("error",e=>console.error("PCT loopback listener",e.code));
+    loopback.listen(PORT,"127.0.0.1");
+  }
 }
 module.exports={normalizePath,frameText,statusFor,verifyGithubOidc,server};
