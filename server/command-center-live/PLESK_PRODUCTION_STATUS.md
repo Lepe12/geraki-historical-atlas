@@ -31,3 +31,20 @@ Status: HTTP health restored; public WebSocket and current Pages UI are NOT pass
 - Generated Nginx configuration is not readable by the subscription user (EACCES); custom Nginx directives are not exposed in this account.
 - The public Pages chamber was observed as an older VISUAL SIMULATION build. The existing atlas-pages.yml push paths omit jarvis-intelligence-chamber/**.
 - Adding that path to automatic Pages deployment was rejected by automatic approval review as a CI/CD change requiring specific user authorization; it was NOT applied. Do not bypass that rejection.
+
+
+## Superseding update — 2026-10-14 18:29 UTC
+- User explicitly approved public HTTPS transport on existing pct-live subdomain and accepted Let's Encrypt terms.
+- Let's Encrypt certificate installed for pct-live.piratecartography.com, expiry 2027-01-12.
+- Proxy mode disabled ONLY on site 751: nginx-only Passenger. Main WordPress settings unchanged.
+- Actual external HTTPS health on https://pct-live.piratecartography.com/pct-api/live/health returned 200 with baseline 38533094395; original www health also rechecked 200.
+- Actual WSS client on the server connected to wss://pct-live.piratecartography.com/pct-api/live/ws/piratecartography/latest and received pct-command-center-bootstrap-v1 with 10 agents.
+- Added masked control-frame handling for close and ping to app.js in commit bae80a0a6da5bb6d4091fa50bb015fd1a4b47a19. Exact deployed SHA256 f8b7a8e21f64709526a2c4036a3073e64128fad9a63b835f464fdd3b324d2482. Backup app.js.before-ws-control retained outside document root. Restart requested via Plesk.
+- Post-deployment self-test PASS and actual public WSS close code 1000, wasClean=true.
+- Existing task 349 changed to HTTPS health on pct-live, every minute, no notifications; Plesk confirmed saved.
+- Chamber bridge, production smoke and hostname assertion changed to approved pct-live endpoint. No UI redesign.
+- Workflow jarvis-v5-live.yml run 38614811956: transport-tests SUCCESS and production-live-smoke SUCCESS, verified through GitHub jobs API.
+- Original www WSS route has NOT been proven repaired; the approved subdomain is the working transport.
+- Baseline is existing recorded control run 38533094395 with zero verified historical events. Transport PASS does not assert historical accuracy.
+- Pages path-trigger edit remains NOT applied after automatic approval review rejection even following specific approval. No indirect bypass performed.
+- Chromium public-site verification was blocked by cloud credential protection; 3D live display remains UNVERIFIED. No end-to-end UI success claimed.
