@@ -1,26 +1,9 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#02060d"><title>JARVIS — Intelligence Universe</title><link rel="stylesheet" href="./chamber.css"><style>/* Research usability sidebar: overlay only; 3D rendering and center untouched. */
-.research-sidebar{position:absolute;z-index:7;left:20px;top:88px;bottom:70px;width:min(292px,calc(100vw - 40px));overflow-y:auto;overscroll-behavior:contain;padding:18px 17px 20px;background:linear-gradient(110deg,rgba(5,15,30,.91),rgba(5,20,34,.69));border:1px solid rgba(108,195,218,.20);border-radius:5px;box-shadow:0 16px 56px rgba(0,0,0,.28);backdrop-filter:blur(12px);color:#dcecf0;scrollbar-color:#376679 transparent;scrollbar-width:thin}
-.research-overline{font:9px var(--mono);letter-spacing:.22em;color:#e8bd77}
-.research-sidebar h1{font:400 26px var(--display);letter-spacing:.12em;margin:11px 0 22px}
-.research-sidebar form{display:flex;flex-direction:column;gap:10px}
-.research-sidebar label{font:9px var(--mono);letter-spacing:.12em;color:#9bbac7}
-.research-sidebar textarea{display:block;width:100%;min-height:110px;resize:vertical;background:rgba(1,8,20,.76);border:1px solid rgba(111,194,217,.34);border-radius:3px;color:#edfaff;padding:12px;font:12px/1.55 Inter,Arial,sans-serif;outline:none}
-.research-sidebar textarea:focus{border-color:#68dce8;box-shadow:0 0 0 1px #68dce838}
-.research-sidebar textarea::placeholder{color:#7894a3}
-.research-primary{display:flex;align-items:center;justify-content:space-between;text-align:left;gap:8px;cursor:pointer;background:rgba(37,125,143,.28);border:1px solid rgba(93,216,225,.6);color:#d9faff;padding:12px 10px;font:10px var(--mono);letter-spacing:.11em}
-.research-primary:hover{background:rgba(54,153,174,.38)}.research-primary:focus-visible,.research-links a:focus-visible{outline:1px solid #82e6eb;outline-offset:3px}
-.research-feedback{font:10px/1.6 Inter,Arial,sans-serif;color:#9ab5c2;margin:11px 0 20px}
-.research-links{display:flex;flex-direction:column;border-top:1px solid rgba(111,194,217,.2)}
-.research-links a{display:flex;justify-content:space-between;padding:15px 2px;border-bottom:1px solid rgba(111,194,217,.16);font:10px var(--mono);letter-spacing:.075em;color:#b8d6e0;text-decoration:none}
-.research-links a:hover{color:#65e6ed}
-@media(max-width:720px){.research-sidebar{top:58px;left:10px;bottom:92px;width:min(236px,calc(100vw - 20px));padding:13px}.research-sidebar h1{font-size:21px;margin:7px 0 13px}.research-sidebar textarea{min-height:85px}.research-links a{padding:12px 0}}
-</style></head>
-<body>
-<div id="app">
-<canvas id="universe" aria-label="Interactive three-dimensional research intelligence network"></canvas>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#02060d"><title>JARVIS · Intelligence Universe</title><link rel="stylesheet" href="./chamber.css"><link rel="stylesheet" href="./immersive.css"></head>
+<body><main id="app">
+<canvas id="universe" aria-label="Explore the three-dimensional JARVIS intelligence network"></canvas>
 <div class="grain" aria-hidden="true"></div><div class="vignette" aria-hidden="true"></div>
-<header class="masthead"><div class="brand"><div class="sigil"><span>✦</span></div><div class="brand-label"><b>PIRATECARTOGRAPHY</b><span>HISTORICAL INTELLIGENCE DIVISION</span></div></div><div class="center-title"><span class="overline">JARVIS / SPATIAL INTELLIGENCE ENGINE</span><strong>THE RESEARCH UNIVERSE</strong><div class="coordinates" id="coordinates">X +024.77 / Y -018.56 / Z +004.31</div></div><div class="right-head"><span class="system-dot"></span><span>VISUAL SIMULATION</span><span class="vertical-rule"></span><span id="clock">--:--:-- UTC</span></div></header>
+<div id="nodeLabels" aria-hidden="true"></div>
 <aside class="research-sidebar" aria-label="Research command">
  <div class="research-overline">RESEARCH / COMMAND</div>
  <h1>NEW RESEARCH</h1>
@@ -36,13 +19,16 @@
   <a href="../command-center/" target="_blank" rel="noopener">EVIDENCE &amp; RESULTS <span>↗</span></a>
  </nav>
 </aside>
-<div class="central-hud" id="centralHud"><div class="eyebrow">COMMAND INTELLIGENCE CORE</div><div class="core-word">JARVIS</div><span class="core-status"><i></i> READY TO EXPLORE</span></div>
-<div id="nodeLabels" aria-hidden="true"></div>
-<aside class="detail-panel" id="detailPanel"><div class="detail-head"><span id="detail-number">SECTOR / 00</span><button id="closeDetail" aria-label="Close details">×</button></div><div class="detail-type" id="detailType">SELECT A RESEARCH SECTOR</div><h2 id="detailTitle">Intelligence network</h2><div class="detail-rule"></div><p id="detailDescription">Orbit, zoom and explore the network. Select a luminous node to inspect its function.</p><div class="detail-meta"><div><span>NETWORK ROLE</span><strong id="detailRole">NAVIGATION</strong></div><div><span>DATA STATE</span><strong id="detailState">VISUAL ONLY</strong></div></div><button class="detail-action" id="focusButton">FOCUS THIS SECTOR <span>↗</span></button></aside>
-<div class="map-scale"><span class="scale-label">NETWORK DEPTH</span><div class="scale-tracks"><span></span><span></span><span></span><span></span><span></span></div><span id="zoomLevel">01 / CLUSTER</span></div>
-<div class="nav-tools"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button><button id="resetView" aria-label="Reset camera">⌖</button></div>
-<footer class="bottom-hud"><div class="bottom-caption"><div class="crosshair">⌖</div><div><b>SPATIAL COMMAND MODE</b><span>DRAG TO ORBIT <i>·</i> SCROLL TO ZOOM <i>·</i> SELECT A SECTOR</span></div></div><div class="system-readout"><div class="readout"><span>SECTORS</span><strong>16</strong></div><div class="readout"><span>LINKS</span><strong id="linkCount">24</strong></div><div class="readout"><span>FRAME</span><strong id="fps">—</strong></div></div><div class="attribution">INSPIRED BY APEX × EVE MAP<br>INDEPENDENT VISUAL PROTOTYPE</div></footer>
-<div class="mobile-hint">DRAG · ZOOM · SELECT</div>
-</div><script src="./chamber.js" defer></script><script src="./gpu-field.js" defer></script><script>
+<div class="central-hud" id="centralHud" aria-hidden="true"><div class="core-word">JARVIS</div><div class="core-status"><i></i> INTELLIGENCE CORE</div></div>
+<div class="gesture-hint">DRAG TO EXPLORE <span>·</span> SCROLL TO ZOOM <span>·</span> SELECT A NODE</div>
+<aside class="detail-panel hidden" id="detailPanel" aria-label="Selected node">
+ <div class="detail-head"><span id="detail-number">SECTOR / 00</span><button id="closeDetail" aria-label="Close details">×</button></div>
+ <div class="detail-type" id="detailType"></div><h2 id="detailTitle"></h2><div class="detail-rule"></div><p id="detailDescription"></p>
+ <div class="detail-meta"><div><span>NETWORK ROLE</span><strong id="detailRole"></strong></div><div><span>DATA STATE</span><strong id="detailState"></strong></div></div>
+ <button class="detail-action" id="focusButton">FOCUS ON NODE <span>↗</span></button>
+</aside>
+<div class="hover-controls"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button><button id="resetView" aria-label="Reset view">⌖</button></div>
+<div class="machine-telemetry" aria-hidden="true"><span id="coordinates"></span><span id="zoomLevel"></span><span id="fps">—</span><span id="clock"></span><span id="linkCount"></span></div>
+</main><script>
 (()=>{const form=document.getElementById("researchForm"),field=document.getElementById("researchPrompt"),feedback=document.getElementById("researchFeedback");form.addEventListener("submit",async e=>{e.preventDefault();const target=field.value.trim();if(!target){feedback.textContent="Enter a research question.";field.focus();return;}const request={target,aliases:[],date_range:"",purpose:"Historical evidence research",source:"jarvis_intelligence_chamber_prepared_request"};const json=JSON.stringify(request,null,2);try{await navigator.clipboard.writeText(json);feedback.textContent="Request copied. Open Command Center to review it. No research has started.";}catch(_){feedback.textContent="Clipboard unavailable. Your question is preserved here; no research has started.";}});})();
-</script></body></html>
+</script><script type="importmap">{"imports":{"three":"https://esm.sh/three@0.184.0"}}</script><script type="module" src="./world3d.js"></script></body></html>
