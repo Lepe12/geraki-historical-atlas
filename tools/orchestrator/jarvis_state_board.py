@@ -5,7 +5,7 @@ import argparse, json
 from pathlib import Path
 from datetime import datetime, timezone
 
-LANES=["travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]
+LANES=["greek","travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]
 
 def read(p):
     return json.loads(p.read_text(encoding="utf-8"))
