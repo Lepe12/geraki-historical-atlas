@@ -246,6 +246,8 @@ def plan_agents(payload: dict[str, Any], policy: dict[str, Any]) -> dict[str, An
         # One context profile is usually focused; multiple geopolitical profiles
         # justify wider archival coverage.
         desired = min_agents + max(0, len(profiles) - 1)
+        if "greek_aegean" in profiles:
+            desired = max(desired, 4)
         if "caribbean_atlantic" in profiles:
             desired = max(desired, 5)
         desired = min(max_agents, desired)
