@@ -1,0 +1,744 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "source_genealogy",
+  "label": "Source Genealogy Agent",
+  "assignment_id": "source_genealogy:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "source_chains",
+    "derivative_sources",
+    "independence_warnings",
+    "primary_source_targets"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "8b7e2506d683c37ecc313d317e255697fc323ca579489266c1a062efd399abab",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "source_genealogy",
+    "assignment_id": "source_genealogy:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:Gallica/BnF",
+      "repo:Biblioteca Digital Hispánica",
+      "repo:The National Archives Public Content",
+      "repo:Internet Culturale"
+    ],
+    "queries": [
+      "\"Jan Janszoon\" cited by",
+      "\"Jan Janszoon\" bibliography sources",
+      "\"Jan Janszoon\" edition translation",
+      "\"Jan Janszoon\" chronicle manuscript",
+      "\"Murad Reis\" 1624-1624"
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 122,
+        "reason": [
+          "agent_profile",
+          "context:north_african"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:Delpher",
+        "route_type": "repository_dispatch",
+        "repository": "Delpher",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Deutsche Digitale Bibliothek",
+        "route_type": "repository_dispatch",
+        "repository": "Deutsche Digitale Bibliothek",
+        "connector_id": null,
+        "score": 80,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 76,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Archives diplomatiques France",
+        "route_type": "repository_dispatch",
+        "repository": "Archives diplomatiques France",
+        "connector_id": null,
+        "score": 75,
+        "reason": [
+          "context:north_african"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Murad Reis\" 1624-1624",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Murad+Reis++1624-1624%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jan Janszoon\" chronicle manuscript",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jan+Janszoon++chronicle+manuscript%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jan Janszoon\" edition translation",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jan+Janszoon++edition+translation%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jan Janszoon\" bibliography sources",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jan+Janszoon++bibliography+sources%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jan Janszoon\" cited by",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jan+Janszoon++cited+by%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jan Janszoon\" cited by",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Jan+Janszoon%22+AND+alma.all_for_ui%3D%22cited%22+AND+alma.all_for_ui%3D%22by%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Murad Reis\" 1624-1624",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Murad+Reis%22+AND+alma.all_for_ui%3D%221624-1624%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jan Janszoon\" edition translation",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Jan+Janszoon%22+AND+alma.all_for_ui%3D%22edition%22+AND+alma.all_for_ui%3D%22translation%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jan Janszoon\" chronicle manuscript",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Jan+Janszoon%22+AND+alma.all_for_ui%3D%22chronicle%22+AND+alma.all_for_ui%3D%22manuscript%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jan Janszoon\" bibliography sources",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Jan+Janszoon%22+AND+alma.all_for_ui%3D%22bibliography%22+AND+alma.all_for_ui%3D%22sources%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jan Janszoon\" cited by",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Jan+Janszoon%22+cited+by&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jan Janszoon\" bibliography sources",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Jan+Janszoon%22+bibliography+sources&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jan Janszoon\" edition translation",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Jan+Janszoon%22+edition+translation&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jan Janszoon\" chronicle manuscript",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Jan+Janszoon%22+chronicle+manuscript&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "\"Murad Reis\" 1624-1624",
+      "records": [],
+      "diagnostic": "HTTPError: HTTP Error 403: Forbidden",
+      "blockers": [
+        {
+          "code": "EXECUTION_FAILED",
+          "detail": "HTTPError: HTTP Error 403: Forbidden"
+        }
+      ],
+      "warnings": [
+        "Repository connector raised an exception."
+      ],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jan Janszoon\" chronicle manuscript",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "research guide",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Jan+Janszoon%22+chronicle+manuscript ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jan Janszoon\" cited by",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Jan+Janszoon%22+cited+by ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Murad Reis\" 1624-1624",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "research guide",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Murad+Reis%22+1624-1624 ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jan Janszoon\" edition translation",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "research guide",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Jan+Janszoon%22+edition+translation ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jan Janszoon\" bibliography sources",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Jan+Janszoon%22+bibliography+sources ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "result_count": 20,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
