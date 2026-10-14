@@ -13,6 +13,7 @@ export default function App(){
  const [entry,setEntry]=useState(null),[loadError,setLoadError]=useState("");
  const [tab,setTab]=useState("NETWORK"),[selected,setSelected]=useState(null),[replayIndex,setReplayIndex]=useState(0),[isPlaying,setPlaying]=useState(false);
  const [draftOpen,setDraftOpen]=useState(false),[draft,setDraft]=useState({target:"Μήλος",period:"1660–1680",objective:""});
+ const [directoryOpen,setDirectoryOpen]=useState(false);
  const [draftJson,setDraftJson]=useState(""),[evidenceFilter,setEvidenceFilter]=useState("blockers"),[search,setSearch]=useState("");
  const [filterAgent,setFilterAgent]=useState(""),[orbSupported,setOrbSupported]=useState(false),[notice,setNotice]=useState("");
  const tickRef=useRef(null),selectedRef=useRef(null),networkRef=useRef(null);
@@ -41,7 +42,7 @@ export default function App(){
  function rewind(){setPlaying(false);setReplayIndex(0);setFrame(x=>x+1)}
  function next(){setPlaying(false);setReplayIndex(i=>Math.min(Math.max(0,events.length-1),i+1));setFrame(x=>x+1)}
  function seek(i){setPlaying(false);setReplayIndex(Number(i));setFrame(x=>x+1)}
- function showAgent(node){const id=typeof node==="string"?node:node?.key;if(!id)return;setSelected(id);setTab("NETWORK");selectedRef.current=id;}
+ function showAgent(node){const id=typeof node==="string"?node:node?.key;if(!id)return;setSelected(id);setDirectoryOpen(false);setTab("NETWORK");selectedRef.current=id;}
  function reviewEvidence(record){setEvidenceItem(record)}
  function openEvidenceForAgent(id){setSelected(id);setEvidenceFilter("blockers");setSearch("");setTab("ARCHIVES")}
  function showHistoryForAgent(id){setSelected(id);setFilterAgent(id);setTab("RUN HISTORY")}
@@ -75,6 +76,8 @@ export default function App(){
      </div>
      <div className="orbital-subtitle">ARCHIVE INTELLIGENCE <span>✦</span> VERIFIED PROVENANCE GATE</div>
    </div>
+   <div className="mobile-agent-access"><button onClick={()=>setDirectoryOpen(true)}>✧ AGENT DIRECTORY <span>{agents.length} RESEARCH AGENTS ↗</span></button></div>
+   {directoryOpen&&<div className="mobile-agent-sheet" aria-label="Agent directory"><div className="sheet-top"><strong>THE RESEARCH NETWORK</strong><button onClick={()=>setDirectoryOpen(false)} aria-label="Close agent directory">×</button></div><p>Επίλεξε έναν agent για να δεις πραγματικά συμβάντα και εμπόδια.</p><div className="agent-options">{agents.map(a=><button key={a.id} onClick={()=>showAgent(a.id)}><b>{a.label}</b><span>{a.status||"NOT REPORTED"}</span></button>)}</div></div>}
    <div className="operational-insight"><span className="eyebrow">JARVIS / SELECTED RESEARCH ACTION</span><strong id="now-agent">{labelAgent(active?.agent_id)}</strong><p id="now-event">{active?shortEvent(active):"Τα πραγματικά ερευνητικά συμβάντα εμφανίζονται εδώ. Ο πυρήνας δεν προσομοιώνει εκτελέσεις."}</p><div><span>{timeLabel(active?.created_utc)}</span><span>{show(active?.event_type)}</span></div></div>
    {selected&&chosen&&<aside className="agent-dossier" aria-label="Research agent dossier">
     <div className="dossier-top"><span className="eyebrow">AGENT INTELLIGENCE / ACTUAL LOGS</span><button onClick={()=>setSelected(null)} aria-label="Close agent dossier">×</button></div>
