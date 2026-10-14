@@ -8,7 +8,7 @@ class AgentPlannerTests(unittest.TestCase):
         return {
             "dispatch":{
                 "allowed_agents":[
-                    "travellers","spanish_simancas","venetian","french","british",
+                    "greek","travellers","spanish_simancas","venetian","french","british",
                     "dutch","german","italian_states","ottoman","north_african"
                 ],
                 "auto_select_min_agents":3,
@@ -25,7 +25,7 @@ class AgentPlannerTests(unittest.TestCase):
         },self.policy())
         self.assertEqual(plan["authority"],"JARVIS")
         self.assertEqual(plan["strategy"],"context_ranked")
-        self.assertEqual(plan["selected_agents"][:3],["venetian","ottoman","travellers"])
+        self.assertEqual(plan["selected_agents"][:3],["greek","venetian","ottoman"])
 
     def test_caribbean_focus_is_cross_archive(self):
         plan=plan_agents({
@@ -43,7 +43,7 @@ class AgentPlannerTests(unittest.TestCase):
             "purpose":"Find archival sources",
         },self.policy())
         self.assertEqual(plan["strategy"],"uncertain_context_broad_coverage")
-        self.assertEqual(len(plan["selected_agents"]),10)
+        self.assertEqual(len(plan["selected_agents"]),11)
         self.assertEqual(plan["confidence"],"LOW")
 
     def test_explicit_comprehensive_request_expands_to_all_agents(self):
