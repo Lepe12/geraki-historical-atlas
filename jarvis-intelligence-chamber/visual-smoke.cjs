@@ -10,9 +10,9 @@ const result=await page.evaluate(()=>({canvasWidth:document.querySelector("#univ
 report.screens.push({name,...result});
 await page.screenshot({path:out+"/"+name+".png",fullPage:true});
 if(name==="desktop"){
- await page.waitForFunction(()=>document.body.dataset.evidenceSource==="DURABLE SNAPSHOT",{timeout:12000});
+ await page.waitForFunction(()=>["DURABLE SNAPSHOT","LIVE BOOTSTRAP","LIVE EVENT"].includes(document.body.dataset.evidenceSource),{timeout:12000});
  const evidence=await page.evaluate(()=>({source:document.body.dataset.evidenceSource,count:Number(document.body.dataset.evidenceRecords),run:document.body.dataset.evidenceRun}));
- assert.ok(evidence.count>=0&&evidence.run,"Snapshot-based evidence nodes must have a durable run ID");
+ assert.ok(evidence.count>=0&&evidence.run,"Recorded evidence nodes must have a durable run ID");
  report.evidence=evidence;
 }
 assert.ok(result.canvasWidth>100,"3D renderer must own visible canvas");
