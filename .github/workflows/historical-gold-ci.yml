@@ -1,0 +1,48 @@
+name: HISTORICAL_GOLD Gate CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'benchmarks/historical_gold/**'
+      - 'tools/historical_gold_case.py'
+      - 'tools/review_validation.py'
+      - 'docs/HISTORICAL_GOLD_CASES.md'
+      - '.github/workflows/historical-gold-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  gold-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile gold gate
+        run: python3 -m compileall -q tools/historical_gold_case.py tools/review_validation.py
+      - name: Prepare first real gold candidate
+        run: |
+          python3 tools/historical_gold_case.py \
+            --case-dir benchmarks/historical_gold/HG-EXQUEMELIN-PANAMA-1678 \
+            --mode prepare
+      - name: Confirm machine cannot self-promote candidate
+        run: |
+          test -f benchmarks/historical_gold/HG-EXQUEMELIN-PANAMA-1678/STATE.json
+          test ! -f benchmarks/historical_gold/HG-EXQUEMELIN-PANAMA-1678/HISTORICAL_GOLD.json
+          python3 - <<'PY'
+          import json,pathlib
+          root=pathlib.Path('benchmarks/historical_gold/HG-EXQUEMELIN-PANAMA-1678')
+          state=json.loads((root/'STATE.json').read_text())
+          assert state['status']=='READY_FOR_HUMAN_REVIEW'
+          assert state['historical_gold'] is False
+          assert state['automatic_promotion_allowed'] is False
+          case=json.loads((root/'case.json').read_text())
+          assert case['tier']=='HISTORICAL_GOLD_CANDIDATE'
+          assert case['human_gate']['required'] is True
+          print('HISTORICAL_GOLD FAIL-CLOSED GATE PASS')
+          PY
+      - name: Validate pending state
+        run: |
+          python3 tools/historical_gold_case.py \
+            --case-dir benchmarks/historical_gold/HG-EXQUEMELIN-PANAMA-1678 \
+            --mode validate
