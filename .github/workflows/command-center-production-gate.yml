@@ -49,27 +49,37 @@ jobs:
         id: probe
         continue-on-error: true
         run: |
-          curl --fail --silent --show-error --max-time 10 \
+          set -euo pipefail
+          http_code=$(curl --silent --show-error --max-time 10 \
             -D /tmp/pct-command-center-health.headers \
-            https://www.piratecartography.com/pct-api/live/health \
-            -o /tmp/pct-command-center-health.json
+            -o /tmp/pct-command-center-health.json \
+            -w '%{http_code}' \
+            https://www.piratecartography.com/pct-api/live/health || true)
+          echo "HTTP_STATUS=$http_code"
           echo '--- RESPONSE HEADERS ---'
-          cat /tmp/pct-command-center-health.headers
+          cat /tmp/pct-command-center-health.headers 2>/dev/null || true
           echo '--- RESPONSE BODY (first 1200 bytes) ---'
-          head -c 1200 /tmp/pct-command-center-health.json || true
+          head -c 1200 /tmp/pct-command-center-health.json 2>/dev/null || true
           echo
+          if [ "$http_code" != "200" ]; then
+            echo "::error title=Command Center public route unavailable::Expected HTTP 200 from /pct-api/live/health, got $http_code. Check the Plesk Node application mount/reverse proxy before testing OIDC."
+            exit 1
+          fi
           python3 - <<'PY'
           import json
           d=json.load(open('/tmp/pct-command-center-health.json'))
-          assert d.get('status')=='PASS'
-          assert d.get('websocket') is True
+          assert d.get('status')=='PASS',d
+          assert d.get('websocket') is True,d
           print('PLESK LIVE BACKEND PASS',d)
           PY
 
       - name: Verify GitHub OIDC event ingestion end to end
+        id: oidc
+        if: steps.probe.outcome == 'success'
         run: |
+          set -euo pipefail
           probe_run="gate-$GITHUB_RUN_ID"
-          python3 tools/orchestrator/jarvis_event_bus.py             --root /tmp/pct-command-center-probe             --run-id "$probe_run"             --event-type production_probe             --agent-id command_center             --phase "production gate"             --percent 100             --status COMPLETED             --detail "OIDC live transport verification"
+          python3 tools/orchestrator/jarvis_event_bus.py             --root /tmp/pct-command-center-probe             --run-id "$probe_run"             --event-type production_probe             --agent-id command_center             --phase "production gate"             --percent 100             --status COMPLETED             --detail "OIDC live transport verification"             --require-remote
           curl --fail --silent --show-error --max-time 10             "https://www.piratecartography.com/pct-api/live/status/piratecartography/$probe_run"             -o /tmp/pct-command-center-status.json
           python3 - "$probe_run" <<'PY'
           import json,sys
@@ -80,6 +90,8 @@ jobs:
           PY
 
       - name: Verify production WebSocket handshake and bootstrap
+        id: websocket
+        if: steps.probe.outcome == 'success' && steps.oidc.outcome == 'success'
         run: |
           node - <<'NODE'
           const tls=require('tls'),crypto=require('crypto');
@@ -112,10 +124,24 @@ jobs:
           NODE
 
       - name: Report production transport state
+        if: always()
         run: |
-          if [ "${{ steps.probe.outcome }}" = "success" ]; then
-            echo "COMMAND_CENTER_PRODUCTION_LIVE=PASS"
-          else
-            echo "COMMAND_CENTER_PRODUCTION_LIVE=PLESK_NODE_ACTIVATION_REQUIRED"
-            echo "Static durable snapshot remains real-data and operational; WebSocket transport is not yet externally reachable."
+          echo "HEALTH_PROBE=${{ steps.probe.outcome }}"
+          echo "OIDC_INGESTION=${{ steps.oidc.outcome }}"
+          echo "WEBSOCKET=${{ steps.websocket.outcome }}"
+          if [ "${{ steps.probe.outcome }}" != "success" ]; then
+            echo "COMMAND_CENTER_PRODUCTION_LIVE=PLESK_ROUTE_REQUIRED"
+            echo "::error::Production gate failed before OIDC: the public Plesk live route is not healthy."
+            exit 1
           fi
+          if [ "${{ steps.oidc.outcome }}" != "success" ]; then
+            echo "COMMAND_CENTER_PRODUCTION_LIVE=OIDC_INGESTION_FAILED"
+            echo "::error::Production gate failed at GitHub OIDC event ingestion."
+            exit 1
+          fi
+          if [ "${{ steps.websocket.outcome }}" != "success" ]; then
+            echo "COMMAND_CENTER_PRODUCTION_LIVE=WEBSOCKET_FAILED"
+            echo "::error::Production gate failed at WebSocket handshake/bootstrap."
+            exit 1
+          fi
+          echo "COMMAND_CENTER_PRODUCTION_LIVE=PASS"
