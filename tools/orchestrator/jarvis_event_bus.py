@@ -44,12 +44,16 @@ def _oidc_token()->str|None:
     _OIDC_CACHE["token"]=token;_OIDC_CACHE["exp"]=_jwt_exp(token)
     return token
 
-def _publish_remote(event:dict)->None:
+def _publish_remote(event:dict,*,require_remote:bool=False)->None:
     base=os.environ.get("PCT_COMMAND_CENTER_URL","").strip().rstrip("/")
-    if not base:return
+    if not base:
+        if require_remote: raise RuntimeError("REMOTE_EVENT_URL_MISSING")
+        return
     try:
         token=_oidc_token()
-        if not token:return
+        if not token:
+            if require_remote: raise RuntimeError("GITHUB_OIDC_TOKEN_UNAVAILABLE")
+            return
         raw=json.dumps(event,ensure_ascii=False,separators=(",",":")).encode("utf-8")
         req=Request(base+"/events",data=raw,method="POST",headers={
           "Authorization":"Bearer "+token,
@@ -60,10 +64,14 @@ def _publish_remote(event:dict)->None:
             if int(getattr(r,"status",500)) not in (200,202,204):
                 raise RuntimeError("REMOTE_EVENT_HTTP_"+str(getattr(r,"status","?")))
     except Exception as exc:
-        # Live transport is auxiliary. Durable JSONL remains authoritative.
-        print("COMMAND_CENTER_REMOTE_DELIVERY_WARNING",type(exc).__name__,file=os.sys.stderr)
+        # Live transport is auxiliary during research runs, but production gates
+        # may explicitly require delivery so routing/auth failures are observable.
+        code=getattr(exc,"code",None)
+        suffix=(" HTTP_"+str(code)) if code is not None else ""
+        print("COMMAND_CENTER_REMOTE_DELIVERY_WARNING",type(exc).__name__+suffix,file=os.sys.stderr)
+        if require_remote: raise
 
-def emit(root:Path,project:str,run_id:str,event_type:str,*,agent_id:str="",phase:str="",percent:int|None=None,status:str="",artifacts=None,warnings=None,detail:str="")->dict:
+def emit(root:Path,project:str,run_id:str,event_type:str,*,agent_id:str="",phase:str="",percent:int|None=None,status:str="",artifacts=None,warnings=None,detail:str="",require_remote:bool=False)->dict:
     project=_safe(project,"project");run_id=_safe(run_id,"run_id");event_type=_safe(event_type,"event_type")
     if agent_id:_safe(agent_id,"agent_id")
     event={
@@ -78,11 +86,12 @@ def emit(root:Path,project:str,run_id:str,event_type:str,*,agent_id:str="",phase
     }
     path=root/project/run_id/"events.jsonl";path.parent.mkdir(parents=True,exist_ok=True)
     with path.open("a",encoding="utf-8") as fh:fh.write(json.dumps(event,ensure_ascii=False)+"\n")
-    _publish_remote(event)
+    _publish_remote(event,require_remote=require_remote)
     return event
 
 if __name__=="__main__":
     p=argparse.ArgumentParser();p.add_argument("--root",type=Path,default=Path("evidence/command_center"))
     p.add_argument("--project",default="piratecartography");p.add_argument("--run-id",required=True);p.add_argument("--event-type",required=True)
     p.add_argument("--agent-id",default="");p.add_argument("--phase",default="");p.add_argument("--percent",type=int);p.add_argument("--status",default="");p.add_argument("--detail",default="")
-    a=p.parse_args();print(json.dumps(emit(a.root,a.project,a.run_id,a.event_type,agent_id=a.agent_id,phase=a.phase,percent=a.percent,status=a.status,detail=a.detail),ensure_ascii=False))
+    p.add_argument("--require-remote",action="store_true",help="Fail if GitHub OIDC live delivery does not succeed.")
+    a=p.parse_args();print(json.dumps(emit(a.root,a.project,a.run_id,a.event_type,agent_id=a.agent_id,phase=a.phase,percent=a.percent,status=a.status,detail=a.detail,require_remote=a.require_remote),ensure_ascii=False))
