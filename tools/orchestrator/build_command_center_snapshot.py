@@ -5,7 +5,7 @@ import argparse,datetime,json
 from pathlib import Path
 
 LANE_LABELS={
- "travellers":"Travellers","spanish_simancas":"Simancas","venetian":"Venetian","french":"French",
+ "greek":"Greek","travellers":"Travellers","spanish_simancas":"Simancas","venetian":"Venetian","french":"French",
  "british":"British","dutch":"Dutch","german":"German","italian_states":"Italian States",
  "ottoman":"Ottoman","north_african":"North African"
 }
