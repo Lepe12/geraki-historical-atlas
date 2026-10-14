@@ -3,7 +3,7 @@
 const $=id=>document.getElementById(id);
 const query=new URLSearchParams(location.search);
 let mode="operations",feedMode="evidence",map,mapLoaded=false,terrainOn=true,socket=null,poller=null;
-let api=(query.get("api")||"https://piratecartography.com/pct-api/live").replace(/\/$/,"");
+let api=(query.get("api")||"https://www.piratecartography.com/pct-api/live").replace(/\/$/,"");
 let currentRun=query.get("run")||"latest",project=query.get("project")||"piratecartography",selected=null;
 let events=[],claims=[],blockers=[],snapshotMeta=null,liveConnected=false;
 
