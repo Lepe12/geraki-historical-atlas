@@ -1,0 +1,1107 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "source_genealogy",
+  "label": "Source Genealogy Agent",
+  "assignment_id": "source_genealogy:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "source_chains",
+    "derivative_sources",
+    "independence_warnings",
+    "primary_source_targets"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "f1f85a076fe447727b0bec2e3c5d09a751a92273713f9b7fede5017934dd41ec",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "source_genealogy",
+    "assignment_id": "source_genealogy:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:Gallica/BnF",
+      "repo:Biblioteca Digital Hispánica",
+      "repo:The National Archives Public Content",
+      "repo:Internet Culturale"
+    ],
+    "queries": [
+      "\"Salé\" cited by",
+      "\"Salé\" bibliography sources",
+      "\"Salé\" edition translation",
+      "\"Salé\" chronicle manuscript",
+      "\"Sallee\" 1630-1630"
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 122,
+        "reason": [
+          "agent_profile",
+          "context:north_african"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:Delpher",
+        "route_type": "repository_dispatch",
+        "repository": "Delpher",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Deutsche Digitale Bibliothek",
+        "route_type": "repository_dispatch",
+        "repository": "Deutsche Digitale Bibliothek",
+        "connector_id": null,
+        "score": 80,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 76,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Archives diplomatiques France",
+        "route_type": "repository_dispatch",
+        "repository": "Archives diplomatiques France",
+        "connector_id": null,
+        "score": 75,
+        "reason": [
+          "context:north_african"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Sallee\" 1630-1630",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Sallee++1630-1630%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Salé\" chronicle manuscript",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Sal%C3%A9++chronicle+manuscript%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Salé\" bibliography sources",
+      "records": [
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb43404695q",
+          "title": "The Publishing archive of Lothar Meggendorfer : original drawings, hand-colored lithographs, and production files for his children's book illustrations : offered for sale by Justin G. Schiller, ltd. ... New York ... / with an appreciation by Maurice Sendak.",
+          "creator": [
+            "Sendak, Maurice (1928-2012). Auteur du texte"
+          ],
+          "date": [
+            "1975"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb43404695q",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb43404695q",
+            "ISBN 76355751"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb47280410v",
+          "title": "Il martirio di Santa Teodosia di Alessandro Scarlatti : analisi storico-filologica di un oratorio / Irene Pasqua",
+          "creator": [
+            "Pasqua, Irene. Auteur du texte"
+          ],
+          "date": [
+            "2023"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb47280410v",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb47280410v",
+            "ISBN 9788832908541"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb45517615m",
+          "title": "UN convention on Contracts for the International Sale of Goods (CISG) : a commentary (2nd ed.) edited by Stefan Kröll, Loukas Mistelis, Pilar Perales Viscasillas",
+          "creator": [],
+          "date": [
+            "2018"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb45517615m",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb45517615m",
+            "ISBN 9783848745913"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb42795062k",
+          "title": "Medieval market morality : life, law and ethics in the English marketplace, 1200-1500 / James Davis",
+          "creator": [
+            "Davis, James (19..-.... ; historien). Auteur du texte"
+          ],
+          "date": [
+            "2012"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb42795062k",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb42795062k",
+            "ISBN 9781107003439"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb46993488s",
+          "title": "Anonymous art at auction : the reception of early Flemish paintings in the Western art market (1946-2015) / by Anne-Sophie V. Radermecker",
+          "creator": [
+            "Radermecker, Anne-Sophie (1989-....). Auteur du texte"
+          ],
+          "date": [
+            "2021"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb46993488s",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb46993488s",
+            "ISBN 9789004460201"
+          ]
+        }
+      ],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Sal%C3%A9++bibliography+sources%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Salé\" cited by",
+      "records": [
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb45517615m",
+          "title": "UN convention on Contracts for the International Sale of Goods (CISG) : a commentary (2nd ed.) edited by Stefan Kröll, Loukas Mistelis, Pilar Perales Viscasillas",
+          "creator": [],
+          "date": [
+            "2018"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb45517615m",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb45517615m",
+            "ISBN 9783848745913"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb472754147",
+          "title": "Haunted property : slavery and the gothic / Sarah Gilbreath Ford",
+          "creator": [
+            "Ford, Sarah Gilbreath (1968-....). Auteur du texte"
+          ],
+          "date": [
+            "2020"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb472754147",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb472754147",
+            "ISBN 9781496829696"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb470774491",
+          "title": "The law of contract damages (3rd ed.) Adam Kramer",
+          "creator": [
+            "Kramer, Adam. Auteur du texte"
+          ],
+          "date": [
+            "2022"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb470774491",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb470774491",
+            "ISBN 9781509951253"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb45067473d",
+          "title": "The East German economy, 1945-2010 : falling behind or catching up? / edited by Hartmut Berghoff, Uta A. Balbier",
+          "creator": [],
+          "date": [
+            "2014"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb45067473d",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb45067473d",
+            "ISBN 9781107030138"
+          ]
+        }
+      ],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Sal%C3%A9++cited+by%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Salé\" edition translation",
+      "records": [
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30070334z",
+          "title": "A General Dictionary, historical and critical, in which a new... translation of that of the celebrated M. Bayle, with the corrections and observations printed in the late edition at Paris, is included, and interspersed with... lives never before published... by the Reverend Mr. John Peter Bernard, the Reverend Mr. Thomas Birch, Mr. John Lockman and other hands, and the articles relating to oriental history by George Sale,...",
+          "creator": [
+            "Bayle, Pierre (1647-1706). Auteur du texte",
+            "Sale, George. Auteur du texte"
+          ],
+          "date": [
+            "1734-1741"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30070334z",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30070334z"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb45606937g",
+          "title": "Tractatus de herbis : [fac similé du manuscrit British Library. Ms. Sloane 4016, accompagné d'un volume de commentaire] / auteur du commentaire Alain Touwaide",
+          "creator": [],
+          "date": [
+            "2011-2013"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb45606937g",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb45606937g",
+            "ISBN 9788496400740"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb47567789r",
+          "title": "Selling rights (9th ed.) Lynette Owen",
+          "creator": [
+            "Owen, Lynette (1947-....). Auteur du texte"
+          ],
+          "date": [
+            "2025"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb47567789r",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb47567789r",
+            "ISBN 9781032495927"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb42535680k",
+          "title": "Martirologio de Usuardo : [Full-color facsimile edition of manuscript in the Museu Diocesà de Girona, Inv. MD 273 and commentary volume] / Usuard ; Museo diocesano de Girona",
+          "creator": [
+            "Usuard (08..-0877). Auteur du texte"
+          ],
+          "date": [
+            "1997-1998"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb42535680k",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb42535680k",
+            "ISBN 8488526342"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb44656120f",
+          "title": "Accounting for derivatives : advanced hedging under ifrs 9 (2nd edition) Juan Ramirez",
+          "creator": [
+            "Ramirez, Juan (1961-....). Auteur du texte"
+          ],
+          "date": [
+            "2015"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb44656120f",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb44656120f",
+            "ISBN 9781119065876"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb472791956",
+          "title": "Beato de Tábara : [fac similé et volume de commentaire du manuscrit Cod. L.1097 B conservé aux Archives historiques nationales d'Espagne, à Madrid] / estudios por Vicente Garciá Lobo, John Williams",
+          "creator": [
+            "Béat (07..-0798 ; saint). Auteur du texte"
+          ],
+          "date": [
+            "2003-2005"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb472791956",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb472791956",
+            "ISBN 8495767430"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb45756645g",
+          "title": "Cancoes sobre textos em Alemao : (voz aguda) / Jose Vianna da Motta ; edição critica, João Paulo Santos",
+          "creator": [
+            "Mota, José Viana da (1868-1948). Compositeur"
+          ],
+          "date": [
+            "2018"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb45756645g",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb45756645g",
+            "ISBN 9789722725781"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb45658197n",
+          "title": "Cancoes sobre textos em Alemao : (voz grave) / Jose Vianna da Motta ; edição critica, João Paulo Santos",
+          "creator": [
+            "Mota, José Viana da (1868-1948). Compositeur"
+          ],
+          "date": [
+            "2018"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb45658197n",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb45658197n",
+            "ISBN 9789722725798"
+          ]
+        }
+      ],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Sal%C3%A9++edition+translation%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Salé\" chronicle manuscript",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Sal%C3%A9%22+AND+alma.all_for_ui%3D%22chronicle%22+AND+alma.all_for_ui%3D%22manuscript%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Salé\" cited by",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Sal%C3%A9%22+AND+alma.all_for_ui%3D%22cited%22+AND+alma.all_for_ui%3D%22by%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Salé\" bibliography sources",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Sal%C3%A9%22+AND+alma.all_for_ui%3D%22bibliography%22+AND+alma.all_for_ui%3D%22sources%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Sallee\" 1630-1630",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Sallee%22+AND+alma.all_for_ui%3D%221630-1630%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Salé\" edition translation",
+      "records": [
+        {
+          "discovery_repository": "Biblioteca Nacional de España SRU",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "(SpMaBN)a7054564",
+          "title": "La fàbrica pintada d'Arranz-Bravo i Bartolozzi : la pintura surt al carrer, fins al cel, a Paret del Vallès = La fábrica pintada de Arranz Bravo y Bartolozzi : la pintura sale a la calle, hasta el cielo, en Parets del Vallès = The painted factory of Arranz Bravo and Bartolozzi : the painting goes out to the street, up to the sky, in Parets del Vallès Carles Toribio Gómez ; traducció al castellà = traducción al castellano = Spanish translation, Sergi Cercós Casademunt",
+          "creator": [
+            "Toribio Gómez, Carles 1986-",
+            "Toribio Gómez, Carles 1986-",
+            "Toribio Gómez, Carles 1986-",
+            "Cercós Casademunt, Sergi"
+          ],
+          "date": [
+            "[2021]"
+          ],
+          "url": null,
+          "identifiers": [
+            "(SpMaBN)a7054564",
+            "991040766819708606"
+          ]
+        },
+        {
+          "discovery_repository": "Biblioteca Nacional de España SRU",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "(OCoLC)1121508190",
+          "title": "Mahou San Miguel, valores para hacer historia = Mahou San Miguel, values to make history texto e imágenes = text and images, Mahou San Miguel ; traducción al inglés = english translation, Mother Tongue S.L.",
+          "creator": [],
+          "date": [
+            "[2015]",
+            "©2015"
+          ],
+          "url": null,
+          "identifiers": [
+            "(OCoLC)1121508190",
+            "(SpMaBN)a6358640",
+            "991016570829708606"
+          ]
+        }
+      ],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Sal%C3%A9%22+AND+alma.all_for_ui%3D%22edition%22+AND+alma.all_for_ui%3D%22translation%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Salé\" cited by",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Sal%C3%A9%22+cited+by&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Salé\" bibliography sources",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Sal%C3%A9%22+bibliography+sources&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Salé\" edition translation",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Sal%C3%A9%22+edition+translation&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Salé\" chronicle manuscript",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Sal%C3%A9%22+chronicle+manuscript&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "\"Sallee\" 1630-1630",
+      "records": [],
+      "diagnostic": "HTTPError: HTTP Error 403: Forbidden",
+      "blockers": [
+        {
+          "code": "EXECUTION_FAILED",
+          "detail": "HTTPError: HTTP Error 403: Forbidden"
+        }
+      ],
+      "warnings": [
+        "Repository connector raised an exception."
+      ],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Salé\" cited by",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/environmental-pollution-damage/",
+          "title": "Environmental pollution and damage - The National Archives",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/environmental-pollution-damage/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Sal%C3%A9%22+cited+by ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Salé\" chronicle manuscript",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/garden-history-records-held-by-other-archives/",
+          "title": "Garden history records held by other archives - The National Archives",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/garden-history-records-held-by-other-archives/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Sal%C3%A9%22+chronicle+manuscript ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Sallee\" 1630-1630",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "research guide",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Sallee%22+1630-1630 ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Salé\" bibliography sources",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Sal%C3%A9%22+bibliography+sources ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Salé\" edition translation",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Sal%C3%A9%22+edition+translation ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "result_count": 41,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
