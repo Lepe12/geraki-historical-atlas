@@ -17,11 +17,11 @@ only to the push subprocess, never saved by checkout or placed in the remote URL
 
 The read job produces a normalized artifact. The existing `travellers` lane is
 used as an import envelope, explicitly marked `standalone-library-agent`; this
-does not claim the ten-agent workflow executed. A pinned request identity is
+does not claim the eleven-agent workflow executed. A pinned request identity is
 included under research_lanes for the unchanged database importer. Failures
 remain failures; storing results never makes them VERIFIED.
 
-The ten-agent workflow and the hosting-local every-five-minute importer are
+The eleven-agent workflow and the hosting-local every-five-minute importer are
 unchanged. No WordPress, .htaccess, WordPress database or hosting settings change.
 
 Library Storage Credential Control writes only
