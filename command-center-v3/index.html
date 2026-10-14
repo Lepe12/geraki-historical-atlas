@@ -10,8 +10,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <link rel="stylesheet" href="./v3.css">
+<link rel="stylesheet" href="./theater.css">
 <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script defer src="./v3.js"></script>
+<script defer src="./theater.js"></script>
 </head>
 <body>
 <div class="world" id="world">
@@ -34,10 +36,10 @@
  </header>
  <main id="stage" class="stage">
    <section class="scene" id="view-world" aria-label="Κεντρικός κόσμος έρευνας">
-     <div class="scene-title"><span class="eyebrow"><i></i> THE MEDITERRANEAN · HISTORICAL INTELLIGENCE</span><h1>Κάθε πηγή κρύβει<br><em>έναν ολόκληρο κόσμο.</em></h1><p>Ερεύνησε τη Μεσόγειο μέσα από πραγματική γεωγραφία, αρχεία και τεκμηριωμένες μαρτυρίες.</p>
+     <div class="scene-title"><span class="eyebrow"><i></i> THEATER OF RESEARCH · DATA-DRIVEN OPERATIONS</span><h1 id="theater-headline">Η Μεσόγειος<br><em>ως ζωντανό αρχείο.</em></h1><p id="theater-subhead">Ο JARVIS οργανώνει καταγεγραμμένες έρευνες. Τα ίχνη των agents εμφανίζονται στον γεωγραφικό χώρο ως ερευνητική δραστηριότητα, όχι ως ιστορικά γεγονότα.</p>
        <div class="scene-actions"><button id="start-mission" class="action-gold">✧ ΝΕΑ ΕΡΕΥΝΑ <span>↗</span></button><button id="show-evidence" class="action-glass">ΕΞΕΡΕΥΝΗΣΗ ΑΡΧΕΙΩΝ <span>→</span></button></div>
      </div>
-     <div class="core-module" id="core-module"><div class="core-orbit outer"></div><div class="core-orbit inner"></div><div class="core-heart">✧</div><div class="core-caption"><b>JARVIS</b><span id="core-message">RESEARCH CORE · STANDBY</span></div></div>
+     <div class="core-module" id="core-module"><div class="core-orbit outer"></div><div class="core-orbit inner"></div><div class="core-heart">✧</div><div class="core-caption"><b>JARVIS</b><span id="core-message">RESEARCH CORE · STANDBY</span><span id="theater-core-phase" class="theater-core-phase">NO ACTIVE OPERATION</span></div></div>
      <section id="mission-dock" class="floating-dock mission-dock" aria-label="Αποστολή και κατάσταση" hidden>
        <div class="dock-top"><span class="eyebrow">RESEARCH MISSION / 01</span><button class="x" id="close-mission" aria-label="Κλείσιμο">×</button></div>
        <h2>Νέα αποστολή</h2><p class="minor">Ο ερευνητικός στόχος είναι δικός σου. Ο JARVIS δεν κατασκευάζει πηγές.</p>
@@ -54,16 +56,28 @@
      </section>
      <div class="map-tools"><button id="reset" aria-label="Επαναφορά χάρτη" title="Επαναφορά Μεσογείου">⌖</button><button id="relief" aria-label="Εναλλαγή αναγλύφου" title="Ανάγλυφο" aria-pressed="true">◈</button><button id="archives" aria-label="Εμφάνιση αρχειακών κόμβων" title="Αρχειακοί κόμβοι" aria-pressed="true">⋄</button></div>
      <div class="sea-label">MARE MEDITERRANEUM <small>GEOGRAPHY · EVIDENCE · EXPLORATION</small></div>
+     <section id="theater-insight" class="theater-insight" aria-label="Δραστηριότητα ερευνητών" aria-live="polite">
+        <div class="insight-heading"><span>JARVIS / RESEARCH TELEMETRY</span><span id="theater-phase">STANDBY</span></div>
+        <strong id="theater-agent">Επιστημονική έρευνα</strong>
+        <p id="theater-event">Επιλέξτε αναπαραγωγή για να παρακολουθήσετε πραγματικά καταγεγραμμένη δραστηριότητα.</p>
+        <button id="theater-inspect" class="inspect-link" type="button" disabled>ΕΠΙΘΕΩΡΗΣΗ ΑΡΧΕΙΟΥ <span>↗</span></button>
+      </section>
+      <section id="theater-replay" class="theater-replay" aria-label="Αναπαραγωγή πραγματικής ερευνητικής δραστηριότητας">
+        <div class="replay-main"><div class="replay-id"><span class="replay-kicker">RECORDED RESEARCH ACTIVITY</span><strong id="theater-run-label">RUN —</strong><small id="theater-replay-warning">Αναπαραγωγή ιστορικού εργασιών · όχι ζωντανή εκτέλεση</small></div>
+        <div class="replay-controls"><button id="theater-rewind" type="button" title="Αρχή" aria-label="Επαναφορά αρχής">↶</button><button id="theater-play" type="button" class="play-control" aria-label="Αναπαραγωγή">▶</button><button id="theater-next" type="button" title="Επόμενο συμβάν" aria-label="Επόμενο συμβάν">↦</button></div></div>
+        <input id="theater-seek" type="range" min="0" max="1" value="0" step="1" aria-label="Μετάβαση σε καταγεγραμμένο συμβάν">
+        <div class="replay-footer"><span id="theater-step">0 / 0 EVENTS</span><span id="theater-time">—</span><span>OPERATIONS / NOT HISTORICAL VOYAGES</span><button id="theater-open-trace" type="button">ΑΝΟΙΓΜΑ ΧΡΟΝΟΛΟΓΙΟΥ ↗</button></div>
+      </section>
      <div class="bottom-rail"><div class="legend"><span class="pin-dot"></span> Πόλεις αναφοράς αρχείων <span class="divider-pip">/</span> <b>Όχι ιστορικά γεγονότα</b></div><div class="rail-right"><span id="mission-indicator">ΑΠΟΣΤΟΛΗ: —</span><span id="run-indicator">RUN —</span><button id="open-operations">JARVIS OPERATIONS <span>↗</span></button></div></div>
    </section>
    <section class="workspace hidden" id="view-evidence" aria-label="Αρχειακά τεκμήρια">
      <div class="workspace-head"><span class="eyebrow">THE ARCHIVE / EVIDENCE LAB</span><h2>Πίσω από κάθε ισχυρισμό,<br><em>η πηγή του.</em></h2><p>Πραγματικά καταγεγραμμένα ερευνητικά στοιχεία. Η εμφάνιση σε κατάλογο δεν σημαίνει αυτοψία ή ιστορική επιβεβαίωση.</p></div>
-     <div class="evidence-layout"><section class="paper-stack"><div class="dock-top"><b>Ερευνητικά ευρήματα</b><span id="evidence-count">—</span></div><div class="search-box"><input type="search" id="evidence-search" placeholder="Αναζήτηση στα καταγεγραμμένα…"></div><div id="evidence-list" class="scroll-list"></div></section>
+     <div class="evidence-layout"><section class="paper-stack"><div class="dock-top"><b>Ερευνητικά ευρήματα</b><span id="evidence-count">—</span></div><div class="evidence-switch" role="group" aria-label="Φίλτρο αρχειακών δεδομένων"><button type="button" class="selected" data-evidence-kind="claims">Claims</button><button type="button" data-evidence-kind="blockers">Access blockers</button><button type="button" data-evidence-kind="events">Research events</button></div><div class="search-box"><input type="search" id="evidence-search" placeholder="Αναζήτηση στα καταγεγραμμένα…"></div><div id="evidence-list" class="scroll-list"></div></section>
      <section class="reading-desk"><div class="desk-upper"><span>ARCHIVAL READING ROOM</span><span>⌁ &nbsp;ORIGINAL / CATALOGUE / INFERENCE</span></div><div id="document-view" class="document-view"><div class="manuscript-mark">✧</div><h3>Η τεκμηρίωση προηγείται.</h3><p>Επίλεξε εγγραφή για να δεις όσα έχουν καταχωριστεί πραγματικά. Χωρίς τεκμήριο δεν εμφανίζεται επινοημένο χειρόγραφο.</p></div><div id="citation-strip" class="citation-strip">Η αυτοψία πρωτογενούς πηγής απαιτεί ιδιαίτερο έλεγχο.</div></section></div>
    </section>
    <section class="workspace hidden" id="view-timeline" aria-label="Χρονολογία">
      <div class="workspace-head"><span class="eyebrow">TIME & ASSOCIATIONS</span><h2>Ο χρόνος είναι μέρος<br><em>της απόδειξης.</em></h2><p>Δεν μετατρέπουμε τις ώρες των εργασιών του συστήματος σε ιστορικά γεγονότα.</p></div>
-     <div class="timeline-layout"><section class="paper-stack"><div class="dock-top"><b>Ερευνητική δραστηριότητα</b><span id="event-count">—</span></div><div id="event-list" class="scroll-list"></div></section><div class="reading-desk timeline-desk"><div class="timeline-art">◌<span>CHRONOLOGY</span></div><h3>Ιστορική χρονογραμμή</h3><p>Η ιστορική αλληλουχία θα τοποθετηθεί εδώ μόνο όταν υπάρχουν τεκμηριωμένα, χρονολογημένα γεγονότα. Προς το παρόν εμφανίζονται χωριστά τα πραγματικά συμβάντα του JARVIS.</p><button id="timeline-to-map" class="action-glass">ΕΠΙΣΤΡΟΦΗ ΣΤΟΝ ΧΑΡΤΗ →</button></div></div>
+     <div class="timeline-layout"><section class="paper-stack"><div class="dock-top"><b>Ερευνητική δραστηριότητα</b><span id="event-count">—</span></div><label for="timeline-agent-filter" class="timeline-filter-label">Agent / ειδικότητα</label><select id="timeline-agent-filter"><option value="">Όλοι οι agents</option></select><div id="event-list" class="scroll-list"></div></section><div class="reading-desk timeline-desk"><div class="timeline-art">◌<span>CHRONOLOGY</span></div><h3>Ιστορική χρονογραμμή</h3><p>Η ιστορική αλληλουχία θα τοποθετηθεί εδώ μόνο όταν υπάρχουν τεκμηριωμένα, χρονολογημένα γεγονότα. Προς το παρόν εμφανίζονται χωριστά τα πραγματικά συμβάντα του JARVIS.</p><button id="timeline-to-map" class="action-glass">ΕΠΙΣΤΡΟΦΗ ΣΤΟΝ ΧΑΡΤΗ →</button></div></div>
    </section>
    <section class="workspace hidden" id="view-review" aria-label="Επιστημονικός έλεγχος">
      <div class="workspace-head"><span class="eyebrow">HUMAN REVIEW · THE DECISION CHAMBER</span><h2>Καμία βεβαιότητα<br><em>χωρίς απόδειξη.</em></h2><p>Η επιστημονική αξιοπιστία δεν είναι οπτικό εφέ. Είναι ελέγξιμη διαδικασία.</p></div>
@@ -71,7 +85,7 @@
      <section class="review-depth"><div class="review-insignia">◇</div><div><span class="eyebrow">SCIENTIFIC SAFETY GATE</span><h3 id="review-title">Δεν υπάρχει διαθέσιμη απόφαση προς έγκριση.</h3><p id="review-message">Οι ενέργειες έγκρισης παραμένουν απενεργοποιημένες χωρίς ελεγμένη πηγή, αξιολόγηση αντιφάσεων και διαπιστευμένο backend ανθρώπινης απόφασης.</p></div><div class="review-actions"><button disabled>ΕΓΚΡΙΣΗ</button><button disabled>ΑΠΟΡΡΙΨΗ</button><small>READ ONLY · NO UNAUTHENTICATED WRITES</small></div></section>
    </section>
  </main>
- <section class="arrival" id="arrival" aria-label="Είσοδος στον ερευνητικό κόσμο"><div class="arrival-vignette"></div><div class="arrival-content"><div class="arrival-line"></div><p class="eyebrow">PIRATECARTOGRAPHY · A NEW AGE OF HISTORICAL RESEARCH</p><div class="arrival-sigil">✧</div><h2>Enter the<br><em>Archive Chamber.</em></h2><p>Η Μεσόγειος. Οι χαμένες μαρτυρίες. Τα αρχεία των αυτοκρατοριών.<br>Ένας κόσμος έρευνας περιμένει να εξερευνηθεί.</p><button id="enter" class="enter-btn"><span>ΕΙΣΟΔΟΣ ΣΤΟΝ ΚΟΣΜΟ</span><span>↗</span></button><small>REAL GEOGRAPHY. REAL SOURCES. NO INVENTED CONCLUSIONS.</small></div><button id="skip" class="skip">ΠΑΡΑΛΕΙΨΗ ΕΙΣΑΓΩΓΗΣ →</button></section>
+ <section class="arrival closed" id="arrival" hidden aria-label="Είσοδος στον ερευνητικό κόσμο"><div class="arrival-vignette"></div><div class="arrival-content"><div class="arrival-line"></div><p class="eyebrow">PIRATECARTOGRAPHY · A NEW AGE OF HISTORICAL RESEARCH</p><div class="arrival-sigil">✧</div><h2>Enter the<br><em>Archive Chamber.</em></h2><p>Η Μεσόγειος. Οι χαμένες μαρτυρίες. Τα αρχεία των αυτοκρατοριών.<br>Ένας κόσμος έρευνας περιμένει να εξερευνηθεί.</p><button id="enter" class="enter-btn"><span>ΕΙΣΟΔΟΣ ΣΤΟΝ ΚΟΣΜΟ</span><span>↗</span></button><small>REAL GEOGRAPHY. REAL SOURCES. NO INVENTED CONCLUSIONS.</small></div><button id="skip" class="skip">ΠΑΡΑΛΕΙΨΗ ΕΙΣΑΓΩΓΗΣ →</button></section>
  <dialog id="draft-dialog"><div class="dock-top"><span class="eyebrow">MISSION DRAFT / NOT DISPATCHED</span><button class="x" id="close-draft" aria-label="Κλείσιμο">×</button></div><h2>Ερευνητικό αίτημα</h2><p>Το παρακάτω είναι προσχέδιο. Δεν έχει γίνει πραγματική ανάθεση στον JARVIS.</p><textarea id="draft-json" rows="11" readonly></textarea><button id="copy-draft" class="action-gold full">ΑΝΤΙΓΡΑΦΗ ΑΙΤΗΜΑΤΟΣ <span>↗</span></button><p id="copy-result" class="mini"></p></dialog>
  <dialog id="info-dialog"><div class="dock-top"><span class="eyebrow">V3 PREVIEW · EXPERIMENTAL</span><button id="close-info" class="x" aria-label="Κλείσιμο">×</button></div><h2>Η νέα ερευνητική αίθουσα</h2><p>Η γεωγραφία προέρχεται από OpenFreeMap / OpenStreetMap και DEM όπου είναι διαθέσιμο. Τα αποτελέσματα εμφανίζονται αποκλειστικά από πραγματικό JARVIS snapshot/API και διακρίνονται από τεκμηριωμένα ιστορικά γεγονότα.</p><p>Αυτή η προεπισκόπηση δεν επιτρέπει έγκριση ιστορικών συμπερασμάτων ή αποστολή ερευνητικών εντολών. Το υπάρχον Command Center παραμένει ανέπαφο.</p></dialog>
 </div></body></html>
