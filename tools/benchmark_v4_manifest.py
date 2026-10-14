@@ -38,12 +38,7 @@ def build(repo):
         root=repo/"evidence/runs"/str(rid) if rid else None
         present=bool(root and root.is_dir())
         commits=run_engine_commit(root) if present else []
-        eligible=bool(
-            present and not b.get("baseline_only",True) and
-            b.get("blind_execution_attested") is True and
-            len(commits)==1 and case.get("metric_included",True)
-        )
-        if eligible: eligible_engine_commits.update(commits)
+        eligible=False
         row={
           "case_id":cid,"case_type":case.get("case_type"),
           "metric_included":case.get("metric_included",True) is not False,
@@ -94,6 +89,26 @@ def build(repo):
                           "verified":bool(c.get("verified"))
                         })
                         row["claim_count"]+=1
+        health={}
+        hp=root/"SYSTEM_HEALTH.json" if present else None
+        if hp and hp.exists():
+            try:health=read(hp)
+            except Exception:health={}
+        complete=(
+            not row["missing_lanes"] and
+            health.get("all_lanes_pipeline_reports_present") is True and
+            health.get("all_lanes_operational") is True and
+            health.get("request_fingerprint_ok") is True
+        )
+        eligible=bool(
+            present and complete and not b.get("baseline_only",True) and
+            b.get("blind_execution_attested") is True and
+            len(commits)==1 and case.get("metric_included",True)
+        )
+        row["system_health_present"]=bool(health)
+        row["fresh_run_complete"]=complete
+        row["eligible_for_official_metrics"]=eligible
+        if eligible: eligible_engine_commits.update(commits)
         rows.append(row)
     same_engine=(len(eligible_engine_commits)<=1)
     if not same_engine:
