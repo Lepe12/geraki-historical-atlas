@@ -84,7 +84,9 @@ jobs:
       - name: Test control plane
         run: |
           python3 -m compileall -q tools/orchestrator
-          PYTHONPATH=tools/orchestrator python3 -m unittest tools/orchestrator/test_jarvis_dispatch.py -v
+          PYTHONPATH=tools/orchestrator python3 -m unittest \
+            tools/orchestrator/test_jarvis_agent_planner.py \
+            tools/orchestrator/test_jarvis_dispatch.py -v
 
       - name: Commit append-only dispatch audit
         run: |
@@ -99,7 +101,7 @@ jobs:
           git pull --rebase origin main
           git push origin HEAD:main
 
-      - name: Dispatch bounded subset to existing ten-agent workflow
+      - name: Dispatch JARVIS-planned unified research run
         env:
           GH_TOKEN: "${{ github.token }}"
           TARGET: "${{ steps.jarvis.outputs.target }}"
