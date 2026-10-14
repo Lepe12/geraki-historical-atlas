@@ -54,13 +54,19 @@ Implemented anonymous/public execution paths:
 - Nationaal Archief public search/open-data route.
 - Delpher/KB SRU.
 - Google Books public discovery.
+- SearchCulture.gr / EKT official API route when `SEARCHCULTURE_API_KEY` is configured.
+- OpenArchives.gr / EKT public discovery.
+- National Library of Greece Digital Collections public discovery.
+- Anemi / University of Crete public discovery.
+- OpenAlex and Crossref structured scholarly-metadata discovery.
+- Academia.edu public web discovery (secondary-discovery only).
 - İSAM public DSpace/AtoM discovery fallback.
 - Deutsche Digitale Bibliothek connector when `DDB_API_KEY` is supplied.
 
 Explicit blockers are preserved rather than faked:
-- PARES/Archivo General de Simancas: interactive/browser research target; no stable anonymous API is claimed.
+- PARES/Archivo General de Simancas: native public catalogue search is implemented and has returned AGS descriptions with stable archival references/signaturas. Record-level access and digitization still vary.
 - Türkiye Devlet Arşivleri/BOA: authenticated interactive catalogue.
-- SIAS/Archivio di Stato archive-specific search: retained as a research target until a stable anonymous term-search connector is proven.
+- SIAS/Archivio di Stato archive-specific search: retained as a browser/manual research target until a stable anonymous term-search connector is proven.
 - British Library and Archives nationales: retained as targets; no general anonymous machine-search API is claimed.
 
 A lane can be operational through a proven public counterpart/fallback while a named archive in that lane remains blocked. Never translate lane success into a false claim that every listed archive was searched.
@@ -153,7 +159,7 @@ Completed:
 7. Post-acquisition inspection/genealogy/corroboration/verification/QA stages.
 8. Per-lane and aggregate eleven-lane system-health reports.
 
-Remaining external-access work is repository-specific, not architectural: authenticated/browser-only archives and optional-key APIs stay explicit blockers until credentials or a stable legal machine interface are available.
+Remaining external-access work is repository-specific, not architectural: SIAS/individual state-archive interfaces, BOA authentication, British Library access constraints, Archives nationales partial coverage and optional-key services remain explicit blockers until credentials or a stable legal machine interface are available.
 
 
 ## Airtable schema recovery snapshot
