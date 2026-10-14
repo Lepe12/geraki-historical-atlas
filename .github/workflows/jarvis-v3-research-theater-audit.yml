@@ -25,6 +25,23 @@ jobs:
           node --check command-center-v3/theater-smoke.mjs
       - name: Real recorded-run interaction test
         run: node command-center-v3/theater-smoke.mjs
+      - name: Install browser automation
+        run: |
+          npm install --prefix command-center-v3 --no-save --no-audit --no-fund playwright@1.56.1
+          if ! command -v google-chrome >/dev/null 2>&1 && ! command -v chromium >/dev/null 2>&1; then
+            npx --prefix command-center-v3 playwright install chromium
+          fi
+      - name: Real Chromium interaction and visual smoke
+        run: node command-center-v3/browser-smoke.mjs
+      - name: Upload browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jarvis-v3-browser-screens
+          path: |
+            /tmp/piratecartography-v3-desktop.png
+            /tmp/piratecartography-v3-mobile.png
+          if-no-files-found: ignore
       - name: Scientific UI invariants
         run: |
           grep -q 'RESEARCH_WORKFLOW_NOT_HISTORICAL_ROUTE' command-center-v3/theater.js
