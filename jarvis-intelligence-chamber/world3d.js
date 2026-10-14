@@ -119,6 +119,19 @@ function glowTexture(){
  x.fillStyle=g;x.fillRect(0,0,128,128);return new THREE.CanvasTexture(c);
 }
 const glow=glowTexture();
+// Atmospheric depth: low-opacity cyan nebula behind the constellations.
+for(let i=0;i<9;i++){
+ const c=regions[i%regions.length].center;
+ const veil=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:i%3===0?0x356fa0:0x126a74,opacity:.065,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));
+ veil.position.set(c[0]+(rand()-.5)*420,c[1]+(rand()-.5)*280,c[2]-350-rand()*400);
+ veil.scale.set(1100+rand()*400,580+rand()*360,1);scene.add(veil);
+}
+// Bright moving signals travel along major research routes.
+const routeEdges=edges.filter(e=>e.major);
+const pulseGeometry=new THREE.BufferGeometry();
+pulseGeometry.setAttribute("position",new THREE.BufferAttribute(new Float32Array(routeEdges.length*3),3));
+const pulsePoints=new THREE.Points(pulseGeometry,new THREE.PointsMaterial({map:glow,size:34,sizeAttenuation:true,color:0x65fff2,transparent:true,opacity:.82,depthWrite:false,blending:THREE.AdditiveBlending}));
+world.add(pulsePoints);
 const hubMeshes=[],selectables=[];
 function hub(node,scale=1){
  const group=new THREE.Group();group.position.copy(node.position);
@@ -131,6 +144,13 @@ function hub(node,scale=1){
  if(node.name==="JARVIS"){
   const ring=new THREE.Mesh(new THREE.TorusGeometry(54,1.55,5,110),new THREE.MeshBasicMaterial({color:GOLD,transparent:true,opacity:.85,depthWrite:false}));
   ring.rotation.x=.3;group.add(ring);
+  const inner=new THREE.Mesh(new THREE.TorusGeometry(42,1.15,5,100),new THREE.MeshBasicMaterial({color:0x48f2ee,transparent:true,opacity:.82,depthWrite:false,blending:THREE.AdditiveBlending}));
+  inner.rotation.set(.4,.4,-.15);group.add(inner);
+  const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:0xf5af29,transparent:true,opacity:.31,depthWrite:false,blending:THREE.AdditiveBlending}));
+  halo.scale.set(155,155,1);group.add(halo);
+  const energy=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:0x0bb8df,transparent:true,opacity:.62,depthWrite:false,blending:THREE.AdditiveBlending}));
+  energy.scale.set(110,110,1);group.add(energy);
+  node.rings=[ring,inner];node.energy=energy;
  }
  world.add(group);node.group=group;node.sprite=sprite;
  hubMeshes.push(group);selectables.push(selectable);
@@ -144,7 +164,7 @@ const allLabels=[];
 regions.forEach((r,i)=>allLabels.push({position:new THREE.Vector3(...r.center),el:label(null,r.name,true),region:true}));
 agentNodes.forEach(n=>allLabels.push({position:n.position,el:label(n,n.name,false),region:false}));
 const focus=new THREE.Vector3(),goal=new THREE.Vector3();
-let targetDistance=2000,distance=2000,panX=0,panY=0,yaw=.05,pitch=.22,targetYaw=yaw,targetPitch=pitch;
+let targetDistance=1640,distance=1640,panX=0,panY=0,yaw=.05,pitch=.22,targetYaw=yaw,targetPitch=pitch;
 let selected=null,dragging=false,dragged=false,lastX=0,lastY=0;
 const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();
 function projectToMouse(e){const b=canvas.getBoundingClientRect();pointer.set((e.clientX-b.left)/b.width*2-1,-(e.clientY-b.top)/b.height*2+1)}
@@ -159,7 +179,7 @@ function select(n){
  write("detailRole",n.name==="JARVIS"?"ORCHESTRATION":"RESEARCH");
  write("detailState","VISUAL ONLY");
 }
-function reset(){goal.set(0,0,0);targetDistance=2000;targetYaw=.05;targetPitch=.22;selected=null;$("detailPanel")?.classList.add("hidden")}
+function reset(){goal.set(0,0,0);targetDistance=1640;targetYaw=.05;targetPitch=.22;selected=null;$("detailPanel")?.classList.add("hidden")}
 function pick(e){projectToMouse(e);ray.setFromCamera(pointer,camera);return ray.intersectObjects(selectables,false)[0]?.object.userData.node||null}
 canvas.addEventListener("pointerdown",e=>{dragging=true;dragged=false;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId)});
 canvas.addEventListener("pointermove",e=>{
@@ -189,12 +209,22 @@ function frame(){
  if(w&&h&&(canvas.width!==Math.round(w*renderer.getPixelRatio())||canvas.height!==Math.round(h*renderer.getPixelRatio()))){
   camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false);
  }
- if(!reduced){for(const n of agentNodes.concat(nexus)){if(n.group)n.sprite.material.opacity=(n===nexus?.75:.52)+.09*Math.sin(time*.5+n.index)}}
+ if(!reduced){
+  for(const n of agentNodes.concat(nexus)){if(n.group)n.sprite.material.opacity=(n===nexus?.75:.52)+.09*Math.sin(time*.5+n.index)}
+  nexus.rings[0].rotation.y=time*.06;nexus.rings[1].rotation.z=-time*.12;
+  nexus.energy.material.opacity=.56+.12*Math.sin(time*1.25);
+  const positions=pulseGeometry.attributes.position;
+  for(let i=0;i<routeEdges.length;i++){
+    const e=routeEdges[i],a=nodes[e.a].position,b=nodes[e.b].position,t=(time*.09+i*.337)%1;
+    positions.setXYZ(i,a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t,a.z+(b.z-a.z)*t);
+  }
+  positions.needsUpdate=true;
+ }
  for(const item of allLabels){
   const p=item.position.clone().project(camera),visible=p.z>-1&&p.z<1&&Math.abs(p.x)<.91&&Math.abs(p.y)<.85;
   item.el.style.left=((p.x+1)*w/2)+"px";item.el.style.top=((1-p.y)*h/2)+"px";
   const show=visible&&(item.region?distance>550:distance<1700);
-  item.el.style.opacity=show?(item.region?".46":".82"):"0";
+  item.el.style.opacity=show?(item.region?".73":".82"):"0";
   item.el.style.fontSize=item.region?"11px":"9px";item.el.style.letterSpacing=item.region?".27em":".07em";
  }
  if($("zoomLevel"))$("zoomLevel").textContent=distance>1450?"01 / REGIONS":distance>550?"02 / CONSTELLATIONS":"03 / SYSTEMS";

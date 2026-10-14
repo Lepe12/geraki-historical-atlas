@@ -11,7 +11,7 @@ report.screens.push({name,...result});
 await page.screenshot({path:out+"/"+name+".png",fullPage:true});
 assert.ok(result.canvasWidth>100,"3D renderer must own visible canvas");
 assert.match(result.fps,/^[0-9]+ FPS$/,"3D frame loop must advance");
-assert.equal(result.labels,16,"16 agent labels must exist");
+assert.equal(result.labels,23,"7 regions and 16 agents must exist");
 assert.ok(result.bodyWidth<=result.viewport+4,"No horizontal overflow");
 assert.ok(!report.errors.length,"No browser console/page errors");
 if(name==="desktop"){await page.locator("#zoomIn").click();await page.locator("#resetView").click();assert.equal(await page.locator(".left-panel").count(),0,"No sidebar dashboard");assert.equal(await page.locator(".masthead").count(),0,"No top dashboard");assert.equal(await page.getByText("PIRATECARTOGRAPHY").count(),0,"No unsolicited branding");await page.screenshot({path:out+"/desktop-focused.png"});}
