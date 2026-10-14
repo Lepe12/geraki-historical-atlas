@@ -1,3 +1,5 @@
+> **HISTORICAL SNAPSHOT — NOT CURRENT CANONICAL STATUS.** This document is retained for audit chronology. For current architecture/status use `docs/CANONICAL_DOCUMENTATION.md` and `docs/SYSTEM_SPEC.md`.
+
 # Archive connection audit (12 October 2026)
 
 **Verified execution:** GitHub Actions run 38282522266 completed all 10 research lanes and synchronized 165 *unverified* source candidates to Airtable. Lane success is not proof of access to every named archive.
