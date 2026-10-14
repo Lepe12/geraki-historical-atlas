@@ -1,9 +1,11 @@
 # Research Command Center deployment
 
-This directory is published to the GitHub Pages site root by `.github/workflows/deploy-command-center-pages.yml`.
+The canonical production architecture and endpoints are documented in:
 
-UI entrypoint: `index.html`. Static assets: `command-center.css`, `command-center.js`.
+`docs/COMMAND_CENTER_PRODUCTION.md`
 
-The live research event API is a separate service and is not provided by GitHub Pages; a deployed static interface may display OFFLINE until configured with a reachable API.
+This directory contains the production static Command Center client published by `.github/workflows/deploy-command-center-pages.yml`.
 
-Deployment check triggered 2026-10-13.
+The static client consumes real durable snapshots and, when available, the production live backend/WebSocket. UI transport success or failure never changes historical evidence state.
+
+Do not use this file as the authoritative backend-status document; production behavior is enforced by `.github/workflows/command-center-production-gate.yml`.
