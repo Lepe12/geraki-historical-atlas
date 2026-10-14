@@ -220,75 +220,29 @@ function label(node,text,major){
 // must originate in an actual durable run record. No synthetic "claims" are made.
 const evidenceLayer=new THREE.Group();world.add(evidenceLayer);
 const evidenceClickables=[];
+let researchSnapshot=null;
 let evidenceCount=0, evidenceSource="UNAVAILABLE",evidenceRun="";
 const evidenceAgentMap=new Map(agentNodes.map(n=>[n.agentId,n]));
 function verifiedRecord(record,kind,index){
  const id=String(record?.id||record?.claim_id||"").slice(0,120);
  const agentId=String(record?.agent_id||"");
- const agent=evidenceAgentMap.get(agentId);
- if(!agent||!["claim","blocker"].includes(kind))return;
+ const agent=evidenceAgentMap.get(agentId)||(kind==="claim"?nexus:null);
+ if(!agent||!["claim","blocker","contradiction"].includes(kind))return;
  const status=String(record?.status||"UNVERIFIED").slice(0,70);
- const label=String(record?.repository||record?.description||record?.claim||id||kind).slice(0,200);
+ const label=String(record?.repository||record?.description||record?.claim||record?.note||id||kind).slice(0,200);
  const angle=(index+1)*2.3999632,rad=38+(index%8)*11;
  const pos=agent.position.clone().add(new THREE.Vector3(Math.cos(angle)*rad,Math.sin(angle)*rad*.7,(index%7-3)*9));
  const node={position:pos,regionIndex:agent.regionIndex,major:true,name:label,index:-1};
  node.evidence={kind,status,agent_id:agentId,id,label};
- const hue=kind==="blocker"?0xd88a4e:0x54dfb8;
+ const hue=kind==="blocker"?0xd88a4e:kind==="contradiction"?0xe0b253:0x54dfb8;
  const spot=new THREE.Mesh(new THREE.SphereGeometry(3.8,9,6),new THREE.MeshBasicMaterial({color:hue,transparent:true,opacity:.94}));
  spot.position.copy(pos);spot.visible=false;evidenceLayer.add(spot);
  const hit=new THREE.Mesh(new THREE.SphereGeometry(13,8,6),new THREE.MeshBasicMaterial({visible:false}));
  hit.position.copy(pos);hit.userData.node=node;hit.visible=false;evidenceLayer.add(hit);
- node.evidenceMeshes=[spot,hit];evidenceClickables.push(hit);selectables.push(hit);evidenceCount++;
-}
-const researchState={snapshot:null,events:[],tab:"agents"};
-const researchRoot=$("researchExplorer"),researchBody=$("researchBody");
-$("toggleResearch")?.addEventListener("click",()=>{
- const isOpen=researchBody.hidden;
- researchBody.hidden=!isOpen;
- $("toggleResearch").setAttribute("aria-expanded",String(isOpen));
- $("toggleResearch").textContent=isOpen?"CLOSE ▴":"EXPLORE ▾";
-});
-document.querySelectorAll("[data-research-tab]").forEach(button=>button.addEventListener("click",()=>{
- researchState.tab=button.dataset.researchTab;
- document.querySelectorAll("[data-research-tab]").forEach(b=>b.setAttribute("aria-pressed",String(b===button)));
- renderResearch();
-}));
-function researchItem(title,subtitle,description){
- const el=document.createElement("article");el.className="research-item";
- const strong=document.createElement("strong");strong.textContent=String(title||"Unnamed record");el.appendChild(strong);
- if(subtitle){const small=document.createElement("small");small.textContent=String(subtitle);el.appendChild(small)}
- if(description){const p=document.createElement("p");p.textContent=String(description);el.appendChild(p)}
- return el;
-}
-function renderResearch(){
- const data=researchState.snapshot,root=$("researchRecords");if(!root)return;
- const put=(id,value)=>{const el=$(id);if(el)el.textContent=value};
- put("researchConnection",connectionMode);
- put("researchRun",currentRun?"RUN "+currentRun:"RUN —");
- const agents=Array.isArray(data?.agents)?data.agents:[];
- const blockers=Array.isArray(data?.blockers)?data.blockers:[];
- const claims=Array.isArray(data?.claims)?data.claims:[];
- put("researchAgents","AGENTS "+agents.length);
- put("researchBlockers","BLOCKERS "+blockers.length);
- put("researchClaims","CLAIMS "+claims.length);
- root.replaceChildren();
- let items=[];
- if(researchState.tab==="agents")items=agents.map(a=>researchItem(a.label||a.id,a.status||"UNKNOWN",String(a.phase||"")+" · blockers "+String(a.blocker_count??"—")));
- if(researchState.tab==="events")items=researchState.events.slice().reverse().map(e=>researchItem(e.event_type||"Event",String(e.agent_id||"JARVIS")+" · "+String(e.status||e.phase||"EVENT"),String(e.detail||e.created_utc||"Recorded run event")));
- if(researchState.tab==="sources")items=blockers.map((b,i)=>researchItem(b.repository||"Unidentified repository",b.status||"UNKNOWN",String(b.agent_id||"Unknown agent")+" · operational obstacle "+(i+1)));
- if(researchState.tab==="claims")items=claims.map(c=>researchItem(c.claim||c.description||c.claim_id||c.id||"Candidate claim",c.status||"UNVERIFIED",c.source_reference||c.source||"Source reference unavailable"));
- if(researchState.tab==="contradictions"){
-  const c=data?.contradictions;
-  items=c?[researchItem("Contradiction search",c.status||"NOT ADJUDICATED",String(c.note||"")+" · search records "+String(c.search_records??"—"))]:[];
- }
- if(researchState.tab==="review"){
-  const review=data?.safety;
-  items=[researchItem("Scientific verification",review?.automatic_verified===false?"AUTOMATIC VERIFIED DISABLED":"NOT CONFIRMED",review?.human_review_required?"Human review required":"Review state not supplied")];
- }
- const visible=items.slice(0,250);
- if(!visible.length){const p=document.createElement("p");p.className="research-empty";p.textContent="No recorded "+researchState.tab+" in the current run. This does not imply historical absence.";root.appendChild(p)}
- else root.append(...visible);
- if(items.length>visible.length){const p=document.createElement("p");p.className="research-empty";p.textContent="Showing "+visible.length+" of "+items.length+" records";root.appendChild(p)}
+ const lineGeometry=new THREE.BufferGeometry().setFromPoints([agent.position,pos]);
+ const link=new THREE.Line(lineGeometry,new THREE.LineBasicMaterial({color:hue,transparent:true,opacity:.38,depthWrite:false}));
+ link.visible=false;evidenceLayer.add(link);
+ node.evidenceMeshes=[spot,hit,link];evidenceClickables.push(hit);selectables.push(hit);evidenceCount++;
 }
 let currentRun="",connectionMode="OFFLINE";
 const recentEventIds=new Set();
@@ -302,7 +256,6 @@ function setConnection(mode,detail){
  document.body.dataset.feedDetail=detail||"";
  const el=$("linkCount");
  if(el)el.textContent=mode+" · "+(currentRun?"RUN "+currentRun:"NO RUN");
- renderResearch();
 }
 function receiveSnapshot(data,origin){
  if(data.schema!=="pct-command-center-live-v1"||!Array.isArray(data.agents)||!Array.isArray(data.blockers)||!Array.isArray(data.claims))return;
@@ -311,16 +264,16 @@ function receiveSnapshot(data,origin){
  if(connectionMode==="LIVE"&&origin==="LIVE"&&evidenceSource==="LIVE EVENT")return;
  clearEvidence();recentEventIds.clear();
  currentRun=String(data.run_id||"");evidenceRun=currentRun;
- researchState.snapshot=data;researchState.events=Array.isArray(data.events)?data.events.slice(-200):[];
+ researchSnapshot=data;
  evidenceSource=origin==="LIVE"?"LIVE BOOTSTRAP":"DURABLE SNAPSHOT";
  const laneState=new Map(data.agents.map(a=>[a.id,a]));
  for(const n of agentNodes)n.liveState=laneState.get(n.agentId)||null;
  data.claims.forEach((r,i)=>verifiedRecord(r,"claim",i));
  data.blockers.forEach((r,i)=>verifiedRecord(r,"blocker",i));
+ if(Array.isArray(data.contradictions?.records))data.contradictions.records.forEach((r,i)=>verifiedRecord(r,"contradiction",i));
  document.body.dataset.evidenceSource=evidenceSource;
  document.body.dataset.evidenceRecords=String(evidenceCount);
  document.body.dataset.evidenceRun=evidenceRun;
- renderResearch();
 }
 function receiveEvent(event){
  if(event.schema!=="pct-jarvis-event-v1"||!event.run_id)return;
@@ -329,15 +282,14 @@ function receiveEvent(event){
  if(id){recentEventIds.add(id);if(recentEventIds.size>1000)recentEventIds.delete(recentEventIds.values().next().value);}
  const run=String(event.run_id);
  if(run!==currentRun){
-  currentRun=run;evidenceRun=run;clearEvidence();researchState.snapshot=null;researchState.events=[];
+  currentRun=run;evidenceRun=run;researchSnapshot=null;clearEvidence();
   for(const n of agentNodes)n.liveState=null;
   document.body.dataset.evidenceRecords="0";
   document.body.dataset.evidenceRun=run;
  }
- researchState.events.push(event);if(researchState.events.length>200)researchState.events.shift();
  const n=evidenceAgentMap.get(String(event.agent_id||""));
  if(n)n.liveState={...(n.liveState||{}),status:String(event.status||event.event_type||"EVENT"),phase:String(event.phase||""),percent:event.percent};
- if(researchState.snapshot?.agents&&n){const a=researchState.snapshot.agents.find(a=>a.id===n.agentId);if(a){a.status=n.liveState.status;a.phase=n.liveState.phase;a.percent=event.percent}}
+ if(n&&selected===n)select(n);
  evidenceSource="LIVE EVENT";
  document.body.dataset.evidenceSource=evidenceSource;
  document.body.dataset.lastEvent=String(event.event_type||"");
@@ -387,7 +339,14 @@ function select(n){
  write("detail-number",n.evidence?"RECORDED "+n.evidence.kind.toUpperCase():(n.name==="JARVIS"?"NEXUS":"RESEARCH NODE"));
  write("detailType",n.evidence?"DURABLE RUN "+evidenceRun:"SPATIAL RESEARCH TOPOLOGY");
  write("detailTitle",n.name);
- write("detailDescription",n.evidence?"Recorded "+n.evidence.kind+" for "+n.evidence.agent_id+". "+n.evidence.label+". This is a run record, not independently verified historical evidence.":n.liveState?"Actual lane status: "+String(n.liveState.status||"UNKNOWN")+"; phase "+String(n.liveState.phase||"UNKNOWN")+". Network positions and connections remain illustrative.":"Research sector in an illustrative network. Connections do not represent verified historical relationships.");
+ const data=researchSnapshot;
+ const agentBlockers=n.agentId?(data?.blockers||[]).filter(r=>r.agent_id===n.agentId).length:0;
+ const agentClaims=n.agentId?(data?.claims||[]).filter(r=>r.agent_id===n.agentId).length:0;
+ const stats=n.agentId?" · "+agentBlockers+" access obstacles; "+agentClaims+" candidate claims.":"";
+ write("detailDescription",n.evidence?
+  "Recorded "+n.evidence.kind+" · "+n.evidence.label+" · "+n.evidence.status+". Not independently verified historical evidence.":
+  n.liveState?"Run "+(evidenceRun||"unknown")+" · "+String(n.liveState.status||"UNKNOWN")+" · phase "+String(n.liveState.phase||"UNKNOWN")+stats+" Nearby colored points represent recorded items, not historical routes.":
+  "Schematic research sector; no verified historical relationship is asserted.");
  write("detailRole",n.name==="JARVIS"?"ORCHESTRATION":"RESEARCH");
  write("detailState",n.evidence?n.evidence.status:n.liveState?String(n.liveState.status):"VISUAL ONLY");
 }
