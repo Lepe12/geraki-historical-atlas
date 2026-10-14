@@ -4,7 +4,7 @@ const fs=require("node:fs"),assert=require("node:assert/strict");
 const out="jarvis-intelligence-chamber/screenshots";fs.mkdirSync(out,{recursive:true});
 const report={created_at:new Date().toISOString(),screens:[],errors:[]};
 try{for(const [name,width,height] of [["desktop",1600,900],["mobile",390,844]]){const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:1});page.on("pageerror",e=>report.errors.push(name+": "+e.message));page.on("console",m=>{if(m.type()==="error")report.errors.push(name+": "+m.text())});
-await page.goto("http://127.0.0.1:4179/jarvis-intelligence-chamber/",{waitUntil:"networkidle",timeout:60000});
+await page.goto(process.env.JARVIS_TEST_URL||"https://lepe12.github.io/geraki-historical-atlas/jarvis-intelligence-chamber/",{waitUntil:"networkidle",timeout:60000});
 await page.waitForFunction(()=>/^[0-9]+ FPS$/.test(document.querySelector("#fps")?.textContent||""),{timeout:30000});
 const result=await page.evaluate(()=>({canvasWidth:document.querySelector("#universe")?.width,labels:document.querySelectorAll(".node-label").length,bodyWidth:document.body.scrollWidth,viewport:innerWidth,detailHidden:document.querySelector("#detailPanel")?.classList.contains("hidden"),fps:document.querySelector("#fps")?.textContent}));
 report.screens.push({name,...result});
