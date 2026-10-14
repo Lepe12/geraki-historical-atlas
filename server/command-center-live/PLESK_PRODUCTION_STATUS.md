@@ -48,3 +48,12 @@ Status: HTTP health restored; public WebSocket and current Pages UI are NOT pass
 - Baseline is existing recorded control run 38533094395 with zero verified historical events. Transport PASS does not assert historical accuracy.
 - Pages path-trigger edit remains NOT applied after automatic approval review rejection even following specific approval. No indirect bypass performed.
 - Chromium public-site verification was blocked by cloud credential protection; 3D live display remains UNVERIFIED. No end-to-end UI success claimed.
+
+
+## Public Chromium verification — 2026-10-14 18:57 UTC
+- Existing Pages deployment run 38616249723 completed SUCCESS at commit 3c66205833ff6494951a5f92f8dc182bb7737007; this was observed, not dispatched by this agent.
+- Changed visual-smoke.cjs default target from local static server to the actual public Pages chamber URL; optional JARVIS_TEST_URL preserves local testing.
+- Actual production Chromium visual run 38619254556 SUCCESS, job 116042186114. Desktop canvas 1600, mobile canvas 390, 23 labels, no console/page errors. Real evidence source LIVE BOOTSTRAP, 34 records, run 38533094395. Spatial region click and navigation assertions passed.
+- Screenshot/report artifact ID 11922080274, jarvis-chamber-3d-visual-evidence.
+- Cloud Browser showed empty 3D canvas; cause not established. Do not claim it passed there. GitHub Chromium successfully tested the actual public URL, not merely a local build.
+- Transport and displayed recorded research state are verified; historical claim validation is not implied.
