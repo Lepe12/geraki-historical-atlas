@@ -1,5 +1,5 @@
 // JARVIS V5 read-only production transport. Never infers historical verification.
-export function connectResearchFeed({onSnapshot,onEvent,onState,WebSocketImpl=globalThis.WebSocket,fetchImpl=globalThis.fetch,endpoint="https://www.piratecartography.com/pct-api/live",retryMs=12000}){
+export function connectResearchFeed({onSnapshot,onEvent,onState,WebSocketImpl=globalThis.WebSocket,fetchImpl=globalThis.fetch,endpoint="https://pct-live.piratecartography.com/pct-api/live",retryMs=12000}){
  let closed=false,socket=null,retry=null,connected=false;
  const status=(mode,detail="")=>onState?.(mode,detail);
  const isSnapshot=d=>d?.schema==="pct-command-center-live-v1"&&Array.isArray(d.agents)&&Array.isArray(d.blockers)&&Array.isArray(d.claims)&&d.safety?.automatic_verified===false;
