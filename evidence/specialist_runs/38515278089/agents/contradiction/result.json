@@ -1,0 +1,1234 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "contradiction",
+  "label": "Contradiction / Adversarial Agent",
+  "assignment_id": "contradiction:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "contradicting_evidence",
+    "alternative_explanations",
+    "uncertainties",
+    "falsification_leads"
+  ],
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 108,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:PARES / Archivo General de Simancas",
+        "route_type": "repository_dispatch",
+        "repository": "PARES / Archivo General de Simancas",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:İSAM Kütüphanesi",
+        "route_type": "repository_dispatch",
+        "repository": "İSAM Kütüphanesi",
+        "connector_id": null,
+        "score": 90,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:Archives diplomatiques France",
+        "route_type": "repository_dispatch",
+        "repository": "Archives diplomatiques France",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 79,
+        "reason": [
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "registry:moreveneto_browser",
+        "route_type": "registered_connector",
+        "repository": null,
+        "connector_id": "moreveneto_browser",
+        "score": 75,
+        "reason": [
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milo\" 1660-1680",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Milo++1660-1680%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" disputed",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Milos++disputed%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" alternative account",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Milos++alternative+account%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" contradiction",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Milos++contradiction%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" myth legend false",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Milos++myth+legend+false%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"Milos\" disputed",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milos%22+disputed ; TimeoutError: The read operation timed out",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milos%22+disputed ; TimeoutError: The read operation timed out"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" alternative account",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Milos%22+alternative+account ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milo\" 1660-1680",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "research guide",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Milo%22+1660-1680 ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"Milos\" contradiction",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milos%22+contradiction ; TimeoutError: The read operation timed out",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milos%22+contradiction ; TimeoutError: The read operation timed out"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" disputed",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Milos%22+disputed ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" contradiction",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "research guide",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Milos%22+contradiction ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" myth legend false",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "research guide",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Milos%22+myth+legend+false ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" disputed",
+      "records": [
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "536546a4-6bf1-4398-b955-67c2fc053bfc",
+          "title": "Empire in the Turmoil - The Ottoman Empire and the Balkans (1828-1833)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/536546a4-6bf1-4398-b955-67c2fc053bfc"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "d4c016bd-4615-4c44-88d3-204eace85e98",
+          "title": "Modern Serbian, Montenegrin and Croatian Historiography on the Ottoman Empire",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/d4c016bd-4615-4c44-88d3-204eace85e98"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "d3d968aa-01d9-4777-9491-e0d9cdd05585",
+          "title": "Modern Serbian, Montenegrin and Croatian Historiography on the Ottoman Empire",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/d3d968aa-01d9-4777-9491-e0d9cdd05585"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "99e2714c-396a-4e19-9eb5-abe85c509551",
+          "title": "A Critical Evaluation of the 1915 Armenian Rebellion in Van as the Background to Erroneous Claims of Genocide",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/99e2714c-396a-4e19-9eb5-abe85c509551"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "fddaf2af-1da4-4ec6-9057-4d471a4bda93",
+          "title": "Ottaman Heritage in the Balkans: The Ottoman Empire in Serbia, Serbia İn the Ottoman Empire",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/fddaf2af-1da4-4ec6-9057-4d471a4bda93"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "f9f7ab62-563b-4b2b-86fe-e82b1ba0f46d",
+          "title": "Church Architecture and Politics in the Last Century of Ottoman Rule: The Case of the Diocese of Raska and Prizren",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/f9f7ab62-563b-4b2b-86fe-e82b1ba0f46d"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "8714887b-dae0-42f0-a548-74e240eea621",
+          "title": "The Chronicle of the First World War and Its Impact on the Balkans",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/8714887b-dae0-42f0-a548-74e240eea621"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "94a4bad5-306c-4423-aaca-0e215e222bfc",
+          "title": "The Bridge Between Old and New: The Serbian Society in The First Century of The Ottoman Rule",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/94a4bad5-306c-4423-aaca-0e215e222bfc"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "376ab487-4e87-45c5-b0e1-afba67274686",
+          "title": "The Contribution of Egyptian Troops in the Middle of the 19th Century to the Ottoman Struggle in the Balkans",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/376ab487-4e87-45c5-b0e1-afba67274686"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "30c8bda2-741a-497a-8860-ab12bde14f5c",
+          "title": "Being an Ottoman Vlach: On Vlach Identity (Ies), Role and Status in Western Parts of the Ottoman Balkans (15th-18th Centuries)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/30c8bda2-741a-497a-8860-ab12bde14f5c"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "c3edc7fc-f101-42ab-8e89-5b5cfc9ebdbe",
+          "title": "A Byzantine Source on the Battles of Bileca (?) and Kosovo Polje: Kydones' Letters 396 and 398 Reconsidered",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/c3edc7fc-f101-42ab-8e89-5b5cfc9ebdbe"
+        }
+      ],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=%22Milos%22+disputed&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" contradiction",
+      "records": [
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "63ab3421-f342-4685-9bbb-15ad5eecb922",
+          "title": "Tito Sonrası Dönemde Eski Yugoslavya Bölgesindeki Türkler ve Müslümanlar",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/63ab3421-f342-4685-9bbb-15ad5eecb922"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "8f6725d0-4ba8-4a53-8b9e-e7971c3ae4ff",
+          "title": "Grekçe Anonim Osmanlı Tarihinin Kaynakları (1374-1421)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/8f6725d0-4ba8-4a53-8b9e-e7971c3ae4ff"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "e28a4599-0fc1-44ef-9698-858ec683a598",
+          "title": "Kosovo: From the Ottoman Empire through Yugoslavia to Independence",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/e28a4599-0fc1-44ef-9698-858ec683a598"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "8714887b-dae0-42f0-a548-74e240eea621",
+          "title": "The Chronicle of the First World War and Its Impact on the Balkans",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/8714887b-dae0-42f0-a548-74e240eea621"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "e1b83245-a9c4-4102-aa80-c30e3fce5497",
+          "title": "New Islamic Trends, Movements and Actors in Albanosphere in the Last 25 Transitional Years: A Sociological Approach",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/e1b83245-a9c4-4102-aa80-c30e3fce5497"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "239d185f-a254-4fec-b3f5-da090e0ad3d7",
+          "title": "Geç Antikçağ’dan Erken Ortaçağ’a Merdailer: BizansMüslüman İlişkilerinde Bir Sınır Topluluğu",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/239d185f-a254-4fec-b3f5-da090e0ad3d7"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "28a4c4b2-550a-4c93-8aa8-74931f502aab",
+          "title": "Simulation Theory in the Ontic and Epistemic Grounds of Kalam",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/28a4c4b2-550a-4c93-8aa8-74931f502aab"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "bb9d4bf7-e26c-4f01-b136-c89e9f785763",
+          "title": "Religio-Centric Migrant Policies of Eastern Europe",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/bb9d4bf7-e26c-4f01-b136-c89e9f785763"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "c3edc7fc-f101-42ab-8e89-5b5cfc9ebdbe",
+          "title": "A Byzantine Source on the Battles of Bileca (?) and Kosovo Polje: Kydones' Letters 396 and 398 Reconsidered",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/c3edc7fc-f101-42ab-8e89-5b5cfc9ebdbe"
+        }
+      ],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=%22Milos%22+contradiction&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milo\" 1660-1680",
+      "records": [
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "fbc5605f-93aa-49c0-b4b1-5a17e66b5f64",
+          "title": "Ceneviz Konsolos Mektuplarına Göre 1660-1680 Arasında Hollandalı Tüccarların Osmanlı Limanlarındaki Faaliyetleri",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/fbc5605f-93aa-49c0-b4b1-5a17e66b5f64"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "3d2c4558-4455-45c7-866d-36f4075594e3",
+          "title": "Cenevzi Arşiv Belgelerine Göre Garp Ocaklarının Akdenizdeki Korsanlık Faaliyetleri (1665-1690)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/3d2c4558-4455-45c7-866d-36f4075594e3"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "b8241773-0331-4968-9900-3cef11eaa940",
+          "title": "Osmanlı Temeşvar’ında Suç ve Suçlular (1652-1653)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/b8241773-0331-4968-9900-3cef11eaa940"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "cc4204d8-4985-4876-864e-079e1226480d",
+          "title": "Boşnakların Tarih İçinde Uğradığı Mezalim",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/cc4204d8-4985-4876-864e-079e1226480d"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "caead82f-97a7-4128-a62f-63dbdc1c1714",
+          "title": "Vrhovne Bosanske Kadije (Mulle) u Drugoj Polovini 17. Stoljeca",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/caead82f-97a7-4128-a62f-63dbdc1c1714"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "1973a15e-d1de-49a0-a79a-cfa7d8d59b63",
+          "title": "Tihomir Coceviç'in \"Birkaç Türbe ile Haklarında Anlatılan Bazı Efsaneler\" Başlıklı Derlemesi",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/1973a15e-d1de-49a0-a79a-cfa7d8d59b63"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "20ac3bc6-a19d-4c62-91f9-f294e4671c55",
+          "title": "Çerkasski Prensleri veya Çerkes Mirzaları: Rusya Boyar Eliti İçinde Kabardeyler (1560-1700)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/20ac3bc6-a19d-4c62-91f9-f294e4671c55"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "7e154116-99b2-4bee-927a-855e5d15dcbe",
+          "title": "XV. Yüzyılın İkinci Yarısında Balkanlarda Osmanlı Serhad Organizasyonunun Oluşumu: Kaleler Ağı, Askeri Personel, Finansman ve Mali Külfet",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/7e154116-99b2-4bee-927a-855e5d15dcbe"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "14846372-40b6-4519-ab05-6dafea2103c8",
+          "title": "Onyedinci Asırda Osmanlı-Hollanda Münâsebetlerine Bir Bakış",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/14846372-40b6-4519-ab05-6dafea2103c8"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "791e4686-5f72-40b5-b921-fed9404254ca",
+          "title": "Veba Salgınlarına Karşı Osmanlı Toplumundaki Davranışlar ve Tepkiler (17 ve 18. yy.)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/791e4686-5f72-40b5-b921-fed9404254ca"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "6365659d-9edb-48bb-8f26-a04a207a790d",
+          "title": "All for Love?: Luca Della Rocca and the Betrayal of Grabusa (1691) (Documents From the British Library Nâme-i Hümayûn Defteri)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/6365659d-9edb-48bb-8f26-a04a207a790d"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "3659c14f-c4f7-4427-874f-859da72693e7",
+          "title": "İslâm Siyaset Düşüncesinde Adalet, Emanet Ve Liyakat: Ampirik Dış Politika Analizi İçin Normatif Bir Model",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/3659c14f-c4f7-4427-874f-859da72693e7"
+        }
+      ],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=%22Milo%22+1660-1680&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" alternative account",
+      "records": [
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "9d908a67-ac80-40d8-a4b8-27ff06f4bb87",
+          "title": "Reassessing The Mosque-on-Monastery Hypothesis: The Case of Sultan Murad Mosque in Skopje, North Macedonia",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/9d908a67-ac80-40d8-a4b8-27ff06f4bb87"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "916ad6ec-1d65-4ded-a870-f845e01d498a",
+          "title": "Testing the Mediating and Moderating Factors of the Link Between Religiosity and Vaccine Hesitancy: A Quantitative Study of Turkish Muslims",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/916ad6ec-1d65-4ded-a870-f845e01d498a"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "9581a74c-b34a-4dfd-ba1c-0ee6ba705790",
+          "title": "The Bosnian Identity and Islam: A Brief Analysis About the Role of Islam in the Formation of Bosnian Identity and Yugoslavian Break-up Process",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/9581a74c-b34a-4dfd-ba1c-0ee6ba705790"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "1b48a5f0-ff70-4ba3-8606-b968a8f44e5f",
+          "title": "‘Justice’ or an Orchestrated Trial? The Lifeworld of Ferhad Bey Draga, the Lawsuit against Him, and the Local Communities in Mitrovica in the late 1920s",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/1b48a5f0-ff70-4ba3-8606-b968a8f44e5f"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "4fc96e67-3275-4b4a-90ad-da314e5bf446",
+          "title": "Interest of the English in Turkey as Reflected English Literature of the Renaissance -II- Thomas Goffe",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/4fc96e67-3275-4b4a-90ad-da314e5bf446"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "89fbb27e-c464-4c67-b12c-cd035c76314e",
+          "title": "The Autonomy of Sandzak: Historical and Political Context",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/89fbb27e-c464-4c67-b12c-cd035c76314e"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "abf192a5-e0a6-4d18-91fa-284a9e78751e",
+          "title": "Was There Antiquities Law and Regulations Before the Âsâr-ı Atîka Nizâmnâme of 1869?",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/abf192a5-e0a6-4d18-91fa-284a9e78751e"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "30c8bda2-741a-497a-8860-ab12bde14f5c",
+          "title": "Being an Ottoman Vlach: On Vlach Identity (Ies), Role and Status in Western Parts of the Ottoman Balkans (15th-18th Centuries)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/30c8bda2-741a-497a-8860-ab12bde14f5c"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "5f80889f-f371-4abf-9e45-1f7adc8ef442",
+          "title": "Jacobus Palaeologus in Constantinople, 1554-5 and 1573",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/5f80889f-f371-4abf-9e45-1f7adc8ef442"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "c3edc7fc-f101-42ab-8e89-5b5cfc9ebdbe",
+          "title": "A Byzantine Source on the Battles of Bileca (?) and Kosovo Polje: Kydones' Letters 396 and 398 Reconsidered",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/c3edc7fc-f101-42ab-8e89-5b5cfc9ebdbe"
+        }
+      ],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=%22Milos%22+alternative+account&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" myth legend false",
+      "records": [
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "dc8591b2-1fd5-4101-8f3c-b7a9f6335700",
+          "title": "Realiteden Mite: Kosova Savaşı (1389) ve Efsanesi",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/dc8591b2-1fd5-4101-8f3c-b7a9f6335700"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "eb0c04a9-b2da-4ec7-961c-07c83831815e",
+          "title": "Kosova Before and During the Ottoman Period of XVth and XVIth Centuries",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/eb0c04a9-b2da-4ec7-961c-07c83831815e"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "5cddc8b9-cad0-454a-a600-475aab85fad6",
+          "title": "Hezimetten Doğan Kahramanlık Destanları: I. Kosova (Kosovo Polje) 1389 ve Mitleştirme 141",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/5cddc8b9-cad0-454a-a600-475aab85fad6"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "88081aea-efeb-472d-b9dd-d9a0cd808590",
+          "title": "Kosova Efsanesi",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/88081aea-efeb-472d-b9dd-d9a0cd808590"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "7fcac001-73c7-4759-a3a2-687d72a9695a",
+          "title": "Images of the Ottomans in History Textbooks in Bosnia and Herzegovina",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/7fcac001-73c7-4759-a3a2-687d72a9695a"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "6c682cad-9116-4e5e-a273-4febfc108db2",
+          "title": "Images of the Ottomans in History Textbooks in Bosnia and Herzegovina",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/6c682cad-9116-4e5e-a273-4febfc108db2"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "0369f582-1099-4ba6-94db-e9051ad2697c",
+          "title": "Serbian Folk Narratives Concerning Fate and Their Turkish Parallels",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/0369f582-1099-4ba6-94db-e9051ad2697c"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "59a17823-9578-4c7f-affa-91b1d1f667dc",
+          "title": "Memoirs of a Janissary as a Source for Serbian History of the XIV Century",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/59a17823-9578-4c7f-affa-91b1d1f667dc"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "99700440-9ff5-412a-b714-ac1c103fc506",
+          "title": "Balkan Ulus Mitlerinde Osmanlı Etkisi Üzerine Bir Değerlendirme: Kosova’dan Krbaya’ya",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/99700440-9ff5-412a-b714-ac1c103fc506"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "c8a207a4-198a-4bf5-b732-f3d2c8d03c5a",
+          "title": "Halk Destanı",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/c8a207a4-198a-4bf5-b732-f3d2c8d03c5a"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "9d908a67-ac80-40d8-a4b8-27ff06f4bb87",
+          "title": "Reassessing The Mosque-on-Monastery Hypothesis: The Case of Sultan Murad Mosque in Skopje, North Macedonia",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/9d908a67-ac80-40d8-a4b8-27ff06f4bb87"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "016244fc-6e62-4a98-9ca2-9e8fee749f8d",
+          "title": "Sözlü Geleneğin (Folklorun) Dört İşlevi",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/016244fc-6e62-4a98-9ca2-9e8fee749f8d"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "9581a74c-b34a-4dfd-ba1c-0ee6ba705790",
+          "title": "The Bosnian Identity and Islam: A Brief Analysis About the Role of Islam in the Formation of Bosnian Identity and Yugoslavian Break-up Process",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/9581a74c-b34a-4dfd-ba1c-0ee6ba705790"
+        }
+      ],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=%22Milos%22+myth+legend+false&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"Milos\" myth legend false",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milos%22+myth+legend+false ; TimeoutError: The read operation timed out",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milos%22+myth+legend+false ; TimeoutError: The read operation timed out"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"Milos\" alternative account",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milos%22+alternative+account ; TimeoutError: The read operation timed out",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milos%22+alternative+account ; TimeoutError: The read operation timed out"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"Milo\" 1660-1680",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milo%22+1660-1680 ; TimeoutError: The read operation timed out",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milo%22+1660-1680 ; TimeoutError: The read operation timed out"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "result_count": 75,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}

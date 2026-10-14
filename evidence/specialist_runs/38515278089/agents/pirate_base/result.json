@@ -1,0 +1,662 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "pirate_base",
+  "label": "Pirate Base / Anchorage Agent",
+  "assignment_id": "pirate_base:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "base_classification",
+    "use_frequency",
+    "logistics",
+    "actors",
+    "date_ranges",
+    "evidence_gaps"
+  ],
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "registry:moreveneto_browser",
+        "route_type": "registered_connector",
+        "repository": null,
+        "connector_id": "moreveneto_browser",
+        "score": 120,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 120,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 108,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:İSAM Kütüphanesi",
+        "route_type": "repository_dispatch",
+        "repository": "İSAM Kütüphanesi",
+        "connector_id": null,
+        "score": 98,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:PARES / Archivo General de Simancas",
+        "route_type": "repository_dispatch",
+        "repository": "PARES / Archivo General de Simancas",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "moreveneto_browser",
+      "repository": "Archivio di Stato di Venezia / Moreveneto",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "Milos pirate base corsair base anchorage harbour refuge",
+      "records": [],
+      "provenance": {
+        "module": "connectors/moreveneto_browser_search.py",
+        "returncode": 2,
+        "stdout_excerpt": "{\n  \"status\": \"BROWSER_EXECUTED_NO_API_CONFIRMATION\",\n  \"source\": \"Archivio di Stato di Venezia / moreveneto\",\n  \"query\": \"Milos pirate base corsair base anchorage harbour refuge\",\n  \"graphql_responses\": [],\n  \"term_visible\": false,\n  \"body_excerpt\": \"Home\\nPatrimonio\\nGalleria\\nRicerca\\nCerca nel patrimonio\\n Cerca in tutti i campi delle schede\\nAggregazione logica\\n0\\nFamiglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n",
+        "stderr_excerpt": ""
+      },
+      "blockers": [
+        {
+          "code": "BROWSER_EXECUTED_NO_API_CONFIRMATION",
+          "detail": "miglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n"
+        }
+      ],
+      "warnings": [
+        "Connector process returned non-zero exit status."
+      ],
+      "next_best_route": "human_archive_review",
+      "evidence_level": "DISCOVERY_ONLY",
+      "retrieved_utc": "2026-10-14T05:12:58.505092+00:00",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "moreveneto_browser",
+      "repository": "Archivio di Stato di Venezia / Moreveneto",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "Milos pirates corsairs provisioning repairs captives ransom",
+      "records": [],
+      "provenance": {
+        "module": "connectors/moreveneto_browser_search.py",
+        "returncode": 2,
+        "stdout_excerpt": "{\n  \"status\": \"BROWSER_EXECUTED_NO_API_CONFIRMATION\",\n  \"source\": \"Archivio di Stato di Venezia / moreveneto\",\n  \"query\": \"Milos pirates corsairs provisioning repairs captives ransom\",\n  \"graphql_responses\": [],\n  \"term_visible\": false,\n  \"body_excerpt\": \"Home\\nPatrimonio\\nGalleria\\nRicerca\\nCerca nel patrimonio\\n Cerca in tutti i campi delle schede\\nAggregazione logica\\n0\\nFamiglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n",
+        "stderr_excerpt": ""
+      },
+      "blockers": [
+        {
+          "code": "BROWSER_EXECUTED_NO_API_CONFIRMATION",
+          "detail": "miglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n"
+        }
+      ],
+      "warnings": [
+        "Connector process returned non-zero exit status."
+      ],
+      "next_best_route": "human_archive_review",
+      "evidence_level": "DISCOVERY_ONLY",
+      "retrieved_utc": "2026-10-14T05:13:09.534111+00:00",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "moreveneto_browser",
+      "repository": "Archivio di Stato di Venezia / Moreveneto",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "Milos historical harbour anchorage fort cave island piracy",
+      "records": [],
+      "provenance": {
+        "module": "connectors/moreveneto_browser_search.py",
+        "returncode": 2,
+        "stdout_excerpt": "{\n  \"status\": \"BROWSER_EXECUTED_NO_API_CONFIRMATION\",\n  \"source\": \"Archivio di Stato di Venezia / moreveneto\",\n  \"query\": \"Milos historical harbour anchorage fort cave island piracy\",\n  \"graphql_responses\": [],\n  \"term_visible\": false,\n  \"body_excerpt\": \"Home\\nPatrimonio\\nGalleria\\nRicerca\\nCerca nel patrimonio\\n Cerca in tutti i campi delle schede\\nAggregazione logica\\n0\\nFamiglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n",
+        "stderr_excerpt": ""
+      },
+      "blockers": [
+        {
+          "code": "BROWSER_EXECUTED_NO_API_CONFIRMATION",
+          "detail": "miglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n"
+        }
+      ],
+      "warnings": [
+        "Connector process returned non-zero exit status."
+      ],
+      "next_best_route": "human_archive_review",
+      "evidence_level": "DISCOVERY_ONLY",
+      "retrieved_utc": "2026-10-14T05:13:20.546247+00:00",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "moreveneto_browser",
+      "repository": "Archivio di Stato di Venezia / Moreveneto",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "Milos 1660-1680 pirates corsairs",
+      "records": [],
+      "provenance": {
+        "module": "connectors/moreveneto_browser_search.py",
+        "returncode": 2,
+        "stdout_excerpt": "{\n  \"status\": \"BROWSER_EXECUTED_NO_API_CONFIRMATION\",\n  \"source\": \"Archivio di Stato di Venezia / moreveneto\",\n  \"query\": \"Milos 1660-1680 pirates corsairs\",\n  \"graphql_responses\": [],\n  \"term_visible\": false,\n  \"body_excerpt\": \"Home\\nPatrimonio\\nGalleria\\nRicerca\\nCerca nel patrimonio\\n Cerca in tutti i campi delle schede\\nAggregazione logica\\n0\\nFamiglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n",
+        "stderr_excerpt": ""
+      },
+      "blockers": [
+        {
+          "code": "BROWSER_EXECUTED_NO_API_CONFIRMATION",
+          "detail": "miglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n"
+        }
+      ],
+      "warnings": [
+        "Connector process returned non-zero exit status."
+      ],
+      "next_best_route": "human_archive_review",
+      "evidence_level": "DISCOVERY_ONLY",
+      "retrieved_utc": "2026-10-14T05:13:31.542992+00:00",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "moreveneto_browser",
+      "repository": "Archivio di Stato di Venezia / Moreveneto",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "\"Milo\" 1660-1680",
+      "records": [],
+      "provenance": {
+        "module": "connectors/moreveneto_browser_search.py",
+        "returncode": 2,
+        "stdout_excerpt": "{\n  \"status\": \"BROWSER_EXECUTED_NO_API_CONFIRMATION\",\n  \"source\": \"Archivio di Stato di Venezia / moreveneto\",\n  \"query\": \"\\\"Milo\\\" 1660-1680\",\n  \"graphql_responses\": [],\n  \"term_visible\": false,\n  \"body_excerpt\": \"Home\\nPatrimonio\\nGalleria\\nRicerca\\nCerca nel patrimonio\\n Cerca in tutti i campi delle schede\\nAggregazione logica\\n0\\nFamiglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n",
+        "stderr_excerpt": ""
+      },
+      "blockers": [
+        {
+          "code": "BROWSER_EXECUTED_NO_API_CONFIRMATION",
+          "detail": "miglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n"
+        }
+      ],
+      "warnings": [
+        "Connector process returned non-zero exit status."
+      ],
+      "next_best_route": "human_archive_review",
+      "evidence_level": "DISCOVERY_ONLY",
+      "retrieved_utc": "2026-10-14T05:13:42.547111+00:00",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "Milos historical harbour anchorage fort cave island piracy",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "Milos 1660-1680 pirates corsairs",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "Milos pirates corsairs provisioning repairs captives ransom",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "Milos pirate base corsair base anchorage harbour refuge",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "\"Milo\" 1660-1680",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milo\" 1660-1680",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Milo%22+1660-1680&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "Milos pirate base corsair base anchorage harbour refuge",
+      "records": [],
+      "diagnostic": "HTTPError: HTTP Error 403: Forbidden",
+      "blockers": [
+        {
+          "code": "EXECUTION_FAILED",
+          "detail": "HTTPError: HTTP Error 403: Forbidden"
+        }
+      ],
+      "warnings": [
+        "Repository connector raised an exception."
+      ],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Milos pirates corsairs provisioning repairs captives ransom",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=Milos+pirates+corsairs+provisioning+repairs+captives+ransom&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Milos 1660-1680 pirates corsairs",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=Milos+1660-1680+pirates+corsairs&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Milos historical harbour anchorage fort cave island piracy",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=Milos+historical+harbour+anchorage+fort+cave+island+piracy&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Milos 1660-1680 pirates corsairs",
+      "records": [],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=Milos+1660-1680+pirates+corsairs&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milo\" 1660-1680",
+      "records": [
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:pirate_base",
+          "connector_status": "EXECUTED",
+          "identifier": "fbc5605f-93aa-49c0-b4b1-5a17e66b5f64",
+          "title": "Ceneviz Konsolos Mektuplarına Göre 1660-1680 Arasında Hollandalı Tüccarların Osmanlı Limanlarındaki Faaliyetleri",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/fbc5605f-93aa-49c0-b4b1-5a17e66b5f64"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:pirate_base",
+          "connector_status": "EXECUTED",
+          "identifier": "3d2c4558-4455-45c7-866d-36f4075594e3",
+          "title": "Cenevzi Arşiv Belgelerine Göre Garp Ocaklarının Akdenizdeki Korsanlık Faaliyetleri (1665-1690)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/3d2c4558-4455-45c7-866d-36f4075594e3"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:pirate_base",
+          "connector_status": "EXECUTED",
+          "identifier": "b8241773-0331-4968-9900-3cef11eaa940",
+          "title": "Osmanlı Temeşvar’ında Suç ve Suçlular (1652-1653)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/b8241773-0331-4968-9900-3cef11eaa940"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:pirate_base",
+          "connector_status": "EXECUTED",
+          "identifier": "cc4204d8-4985-4876-864e-079e1226480d",
+          "title": "Boşnakların Tarih İçinde Uğradığı Mezalim",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/cc4204d8-4985-4876-864e-079e1226480d"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:pirate_base",
+          "connector_status": "EXECUTED",
+          "identifier": "caead82f-97a7-4128-a62f-63dbdc1c1714",
+          "title": "Vrhovne Bosanske Kadije (Mulle) u Drugoj Polovini 17. Stoljeca",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/caead82f-97a7-4128-a62f-63dbdc1c1714"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:pirate_base",
+          "connector_status": "EXECUTED",
+          "identifier": "1973a15e-d1de-49a0-a79a-cfa7d8d59b63",
+          "title": "Tihomir Coceviç'in \"Birkaç Türbe ile Haklarında Anlatılan Bazı Efsaneler\" Başlıklı Derlemesi",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/1973a15e-d1de-49a0-a79a-cfa7d8d59b63"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:pirate_base",
+          "connector_status": "EXECUTED",
+          "identifier": "20ac3bc6-a19d-4c62-91f9-f294e4671c55",
+          "title": "Çerkasski Prensleri veya Çerkes Mirzaları: Rusya Boyar Eliti İçinde Kabardeyler (1560-1700)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/20ac3bc6-a19d-4c62-91f9-f294e4671c55"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:pirate_base",
+          "connector_status": "EXECUTED",
+          "identifier": "7e154116-99b2-4bee-927a-855e5d15dcbe",
+          "title": "XV. Yüzyılın İkinci Yarısında Balkanlarda Osmanlı Serhad Organizasyonunun Oluşumu: Kaleler Ağı, Askeri Personel, Finansman ve Mali Külfet",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/7e154116-99b2-4bee-927a-855e5d15dcbe"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:pirate_base",
+          "connector_status": "EXECUTED",
+          "identifier": "14846372-40b6-4519-ab05-6dafea2103c8",
+          "title": "Onyedinci Asırda Osmanlı-Hollanda Münâsebetlerine Bir Bakış",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/14846372-40b6-4519-ab05-6dafea2103c8"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:pirate_base",
+          "connector_status": "EXECUTED",
+          "identifier": "791e4686-5f72-40b5-b921-fed9404254ca",
+          "title": "Veba Salgınlarına Karşı Osmanlı Toplumundaki Davranışlar ve Tepkiler (17 ve 18. yy.)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/791e4686-5f72-40b5-b921-fed9404254ca"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:pirate_base",
+          "connector_status": "EXECUTED",
+          "identifier": "6365659d-9edb-48bb-8f26-a04a207a790d",
+          "title": "All for Love?: Luca Della Rocca and the Betrayal of Grabusa (1691) (Documents From the British Library Nâme-i Hümayûn Defteri)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/6365659d-9edb-48bb-8f26-a04a207a790d"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:pirate_base",
+          "connector_status": "EXECUTED",
+          "identifier": "3659c14f-c4f7-4427-874f-859da72693e7",
+          "title": "İslâm Siyaset Düşüncesinde Adalet, Emanet Ve Liyakat: Ampirik Dış Politika Analizi İçin Normatif Bir Model",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/3659c14f-c4f7-4427-874f-859da72693e7"
+        }
+      ],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=%22Milo%22+1660-1680&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Milos pirates corsairs provisioning repairs captives ransom",
+      "records": [],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=Milos+pirates+corsairs+provisioning+repairs+captives+ransom&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Milos pirate base corsair base anchorage harbour refuge",
+      "records": [],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=Milos+pirate+base+corsair+base+anchorage+harbour+refuge&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Milos historical harbour anchorage fort cave island piracy",
+      "records": [],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=Milos+historical+harbour+anchorage+fort+cave+island+piracy&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "result_count": 12,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
