@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Automatic research-lane selection for JARVIS general command.
 
-JARVIS owns the decision about which of the ten geographic/archive lanes run.
+JARVIS owns the decision about which geographic/archive lanes run.
 The planner is deterministic and auditable. When context is weak or the user
 asks for exhaustive coverage, it deliberately widens coverage instead of
 pretending confidence.
