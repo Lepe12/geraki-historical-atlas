@@ -1,10 +1,15 @@
 import * as THREE from "https://esm.sh/three@0.184.0";
+import { EffectComposer } from "https://esm.sh/three@0.184.0/examples/jsm/postprocessing/EffectComposer.js?external=three";
+import { RenderPass } from "https://esm.sh/three@0.184.0/examples/jsm/postprocessing/RenderPass.js?external=three";
+import { UnrealBloomPass } from "https://esm.sh/three@0.184.0/examples/jsm/postprocessing/UnrealBloomPass.js?external=three";
+import { OutputPass } from "https://esm.sh/three@0.184.0/examples/jsm/postprocessing/OutputPass.js?external=three";
 
 /**
  * JARVIS / EVE-inspired spatial intelligence map.
  * Schematic research topology, NOT geographic coordinates or historical assertions.
  * Independent world renderer: no V5 dependencies, menus or fixed radial solar-system layout.
  */
+// Import-map aliases keep Three's postprocessing modules on the same Three instance.
 const canvas=document.getElementById("universe");
 const labels=document.getElementById("nodeLabels");
 const $=id=>document.getElementById(id);
@@ -12,14 +17,19 @@ const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:"h
 renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.65));
 renderer.outputColorSpace=THREE.SRGBColorSpace;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.75;
+renderer.toneMappingExposure=1.28;
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x03080e);
 scene.fog=new THREE.FogExp2(0x03080e,0.00024);
 const camera=new THREE.PerspectiveCamera(53,1,2,12000);
 const clock=new THREE.Clock();
+const composer=new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene,camera));
+const bloom=new UnrealBloomPass(new THREE.Vector2(1,1),1.45,.56,.17);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
 const world=new THREE.Group();scene.add(world);
-const GOLD=0xdcb96c,CYAN=0x35c6cb,DIM=0x3b737c;
+const GOLD=0xf5b83d,CYAN=0x35c6cb,DIM=0x3b737c;
 const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 let seed=19102026;function rand(){seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296}
 function randomNormal(){return (rand()+rand()+rand()+rand()-2)*1.73}
@@ -93,7 +103,7 @@ nodes.forEach((n,i)=>{
 const nodeGeometry=new THREE.BufferGeometry();
 nodeGeometry.setAttribute("position",new THREE.BufferAttribute(points,3));
 nodeGeometry.setAttribute("color",new THREE.BufferAttribute(pointColors,3));
-const starNodes=new THREE.Points(nodeGeometry,new THREE.PointsMaterial({size:7.5,vertexColors:true,transparent:true,opacity:.92,sizeAttenuation:true,depthWrite:false,blending:THREE.AdditiveBlending}));
+const starNodes=new THREE.Points(nodeGeometry,new THREE.PointsMaterial({size:9.4,vertexColors:true,transparent:true,opacity:.92,sizeAttenuation:true,depthWrite:false,blending:THREE.AdditiveBlending}));
 world.add(starNodes);
 function makeLines(selected,opacity,color){
  const data=[];
@@ -105,8 +115,8 @@ function makeLines(selected,opacity,color){
  const lines=new THREE.LineSegments(geo,new THREE.LineBasicMaterial({color,transparent:true,opacity,depthWrite:false,blending:THREE.AdditiveBlending}));
  world.add(lines);return lines;
 }
-const faintLines=makeLines(false,.38,0x64d4d4);
-const routeLines=makeLines(true,.95,0x55fff2);
+const faintLines=makeLines(false,.22,0x55aab7);
+const routeLines=makeLines(true,1,0x62ffe9);
 const backgroundGeometry=new THREE.BufferGeometry();
 const bg=[];for(let i=0;i<2100;i++)bg.push((rand()-.5)*6500,(rand()-.5)*4200,(rand()-.5)*3500);
 backgroundGeometry.setAttribute("position",new THREE.Float32BufferAttribute(bg,3));
@@ -119,6 +129,31 @@ function glowTexture(){
  x.fillStyle=g;x.fillRect(0,0,128,128);return new THREE.CanvasTexture(c);
 }
 const glow=glowTexture();
+// Rich reactor atmosphere while keeping the cartographic constellations spatially dominant.
+const reactor=new THREE.Group();
+reactor.position.copy(nexus.position);world.add(reactor);
+const reactorCore=new THREE.Mesh(new THREE.IcosahedronGeometry(24,3),new THREE.MeshBasicMaterial({color:0x19e6ff,toneMapped:false}));
+reactor.add(reactorCore);
+const plasma=new THREE.Mesh(new THREE.SphereGeometry(39,32,24),new THREE.ShaderMaterial({
+ transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+ uniforms:{uTime:{value:0}},
+ vertexShader:`varying vec3 vP;varying vec3 vN;void main(){vP=position;vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+ fragmentShader:`uniform float uTime;varying vec3 vP;varying vec3 vN;void main(){float noise=sin(vP.y*.42+uTime*1.4)*sin(vP.x*.31-uTime*.8)*sin(vP.z*.4+uTime*.6);float fresnel=pow(1.-abs(vN.z),1.6);float a=(.13+.22*noise+.43*fresnel);gl_FragColor=vec4(.03,.68,1.,clamp(a,0.,.75));}`
+}));reactor.add(plasma);
+const haloLayers=[
+ {size:510,color:0x006eaa,opacity:.16},
+ {size:340,color:0x0ac4e8,opacity:.26},
+ {size:225,color:0x42f8f3,opacity:.35},
+ {size:390,color:0xf4a626,opacity:.13}
+];
+for(const h of haloLayers){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:h.color,transparent:true,opacity:h.opacity,depthWrite:false,blending:THREE.AdditiveBlending}));sp.scale.set(h.size,h.size,1);reactor.add(sp)}
+const energyBands=[];
+for(let i=0;i<4;i++){
+ const radius=57+i*16;
+ const band=new THREE.Mesh(new THREE.TorusGeometry(radius,i===1?2.1:.85,6,168),new THREE.MeshBasicMaterial({color:i%2?0xf4b63c:0x20e7ff,toneMapped:false,transparent:true,opacity:i===1?.92:.62,depthWrite:false,blending:THREE.AdditiveBlending}));
+ band.rotation.set(.27+i*.42,.16+i*.53,i*.38);reactor.add(band);energyBands.push(band);
+}
+const bloomTestMarker="JARVIS_BLOOM_ACTIVE";
 // Atmospheric depth: low-opacity cyan nebula behind the constellations.
 for(let i=0;i<9;i++){
  const c=regions[i%regions.length].center;
@@ -207,9 +242,12 @@ function frame(){
  camera.lookAt(focus);
  const w=canvas.clientWidth,h=canvas.clientHeight;
  if(w&&h&&(canvas.width!==Math.round(w*renderer.getPixelRatio())||canvas.height!==Math.round(h*renderer.getPixelRatio()))){
-  camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false);
+  camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false);composer.setSize(w,h);
  }
  if(!reduced){
+  plasma.material.uniforms.uTime.value=time;
+  reactorCore.rotation.y=time*.11;
+  for(let i=0;i<energyBands.length;i++){energyBands[i].rotation.y+=dt*(i%2?.15:-.11);energyBands[i].rotation.z+=dt*(i%2?-.09:.07)}
   for(const n of agentNodes.concat(nexus)){if(n.group)n.sprite.material.opacity=(n===nexus?.75:.52)+.09*Math.sin(time*.5+n.index)}
   nexus.rings[0].rotation.y=time*.06;nexus.rings[1].rotation.z=-time*.12;
   nexus.energy.material.opacity=.56+.12*Math.sin(time*1.25);
@@ -231,7 +269,7 @@ function frame(){
  if($("coordinates"))$("coordinates").textContent="X "+focus.x.toFixed(0)+" / Y "+focus.y.toFixed(0);
  if($("fps")&&Math.floor(time*2)%2===0)$("fps").textContent=Math.round(1/Math.max(.001,dt))+" FPS";
  if($("clock"))$("clock").textContent=new Date().toISOString().slice(11,19)+" UTC";
- renderer.render(scene,camera);
+ composer.render();
 }
 $("detailPanel")?.classList.add("hidden");
 frame();
