@@ -26,19 +26,58 @@ function changeView(v){selectedView=v;for(const x of ["world","evidence","timeli
 function showMission(){changeView("world");$("mission-dock").hidden=false;$("target").focus();}
 function showContext(a,id){focusAgent=id;changeView("world");$("context-name").textContent=a.label;$("context-place").textContent=a.place;$("context-note").textContent="Πραγματική θέση πόλης αναφοράς ενός αρχειακού ή ερευνητικού πεδίου. Δεν αποτελεί τεκμήριο ότι συνέβη εδώ πειρατική επιδρομή.";$("context-agent").textContent="Agent: "+id+" · "+agentStatus(id);$("context-dock").hidden=false;if(map&&a.p)map.flyTo({center:a.p,zoom:6.1,pitch:44,bearing:-8,duration:matchMedia("(prefers-reduced-motion: reduce)").matches?0:1000});}
 function agentStatus(id){const d=(snapshot?.agents||[]).find(a=>a.id===id);return d?String(d.status||"NOT REPORTED"):"NO DATA";}
-function createMap(){if(!window.maplibregl){$("map-error").hidden=false;return;}
-try{map=new maplibregl.Map({container:"map",style:"https://tiles.openfreemap.org/styles/liberty",center:[16.5,38.8],zoom:4.35,pitch:45,bearing:-12,antialias:true,maxPitch:65,attributionControl:true});
-map.on("load",()=>{loaded=true;styleMap();addMarkers();$("map-error").hidden=true;window.dispatchEvent(new CustomEvent("pct:map-ready",{detail:{map}}));});
-map.on("error",err=>{console.warn("MapLibre:",err.error||err);if(!loaded)$("map-error").hidden=false;});
-} catch(e){$("map-error").hidden=false;console.error(e)}}
+let flatMap=null;
+function useFlatMap(reason){
+ console.warn("3D terrain not available; activating real OSM/Leaflet map:",reason);
+ if(!window.L){$("map-error").hidden=false;return;}
+ try{if(map?.remove){try{map.remove()}catch(_){}}$("map").replaceChildren();
+ flatMap=L.map("map",{zoomControl:false,preferCanvas:true}).setView([38.8,16.5],5);
+ L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{minZoom:2,maxZoom:18,attribution:"© OpenStreetMap contributors"}).addTo(flatMap);
+ L.control.zoom({position:"bottomright"}).addTo(flatMap);
+ map={isStyleLoaded:()=>false,getSource:()=>null,getLayer:()=>false,resize:()=>flatMap.invalidateSize(),flyTo:({center,zoom})=>flatMap.flyTo([center[1],center[0]],zoom||5),easeTo:({center,zoom})=>flatMap.flyTo([center[1],center[0]],zoom||5)};
+ loaded=true;document.body.classList.add("flat-map-mode");$("map-error").hidden=true;
+ addMarkers();window.dispatchEvent(new CustomEvent("pct:map-ready",{detail:{map}}));
+ }catch(e){console.error("Geographic fallback failed",e);$("map-error").hidden=false;}
+}
+function createMap(){
+ if(!window.maplibregl){useFlatMap("MapLibre unavailable");return;}
+ try{map=new maplibregl.Map({container:"map",style:"https://tiles.openfreemap.org/styles/liberty",center:[16.5,38.8],zoom:4.35,pitch:45,bearing:-12,antialias:true,maxPitch:65,attributionControl:true});
+ map.on("load",()=>{loaded=true;styleMap();addMarkers();$("map-error").hidden=true;window.dispatchEvent(new CustomEvent("pct:map-ready",{detail:{map}}));});
+ map.on("error",err=>{console.warn("MapLibre:",err.error||err);if(!loaded)useFlatMap(err.error?.message||"Map style unavailable");});
+ }catch(e){useFlatMap(e.message||"WebGL unavailable")}
+}
 function styleMap(){const style=map.getStyle();for(const l of (style.layers||[])){const id=l.id.toLowerCase();try{
 if(l.type==="symbol"&&/road|highway|street|poi|housenumber|transit|railway|aeroway/.test(id)){map.setLayoutProperty(l.id,"visibility","none");continue;}
 if(l.type==="background"){map.setPaintProperty(l.id,"background-color","#0d202a");continue;}
 if(l.type==="fill"){if(/water|ocean|sea|lake/.test(id))map.setPaintProperty(l.id,"fill-color","#092b38");else if(/land|landcover|earth/.test(id))map.setPaintProperty(l.id,"fill-color","#354946");else if(/forest|wood|grass|park/.test(id))map.setPaintProperty(l.id,"fill-color","#496653");}
 if(l.type==="line"){if(/coast|shore/.test(id))map.setPaintProperty(l.id,"line-color","#d0b77e");else if(/river|water/.test(id))map.setPaintProperty(l.id,"line-color","#1d6677");}
 }catch(_){}}try{map.addSource("real-relief",{type:"raster-dem",tiles:["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],tileSize:256,maxzoom:14,encoding:"terrarium",attribution:"Terrain: AWS Terrain Tiles"});map.addLayer({id:"real-hillshade",type:"hillshade",source:"real-relief",paint:{"hillshade-shadow-color":"#082026","hillshade-highlight-color":"#dbc995","hillshade-accent-color":"#234742","hillshade-exaggeration":0.65}});map.setTerrain({source:"real-relief",exaggeration:1.18});}catch(e){console.warn("Relief unavailable:",e)}}
-function addMarkers(){markers.forEach(x=>x.marker.remove());markers=[];for(const [id,a] of Object.entries(coords)){const node=document.createElement("button");node.type="button";node.className="archive-node";node.title=a.label+" — "+a.place;node.setAttribute("aria-label",a.label+" — "+a.place);node.addEventListener("click",()=>showContext(a,id));const popup=new maplibregl.Popup({offset:17,closeButton:false}).setHTML("<b>"+esc(a.label)+"</b><br>"+esc(a.place)+"<br><small>Πόλη αναφοράς αρχείου — όχι ιστορικό συμβάν</small>");node.addEventListener("mouseenter",()=>popup.setLngLat(a.p).addTo(map));node.addEventListener("mouseleave",()=>popup.remove());let marker=new maplibregl.Marker({element:node,anchor:"center"}).setLngLat(a.p).addTo(map);markers.push({id,marker});}updateMarkerStatus();}
-function updateMarkerStatus(){for(const {id,marker} of markers){const st=agentStatus(id).toUpperCase();marker.getElement().classList.toggle("active",realApiConnected&&st==="RUNNING");marker.getElement().hidden=!archivesVisible;}}
+function addMarkers(){
+ markers.forEach(x=>{try{x.marker.remove()}catch(_){}});markers=[];
+ for(const [id,a] of Object.entries(coords)){
+  if(flatMap){
+   const node='<button type="button" class="archive-node" aria-label="'+esc(a.label)+" "+esc(a.place)+'"></button>';
+   const icon=L.divIcon({className:"pct-leaflet-node",html:node,iconSize:[21,21],iconAnchor:[10,10]});
+   const marker=L.marker([a.p[1],a.p[0]],{icon,keyboard:true}).addTo(flatMap);
+   marker.on("click",()=>showContext(a,id));
+   marker.bindTooltip(esc(a.label)+" · "+esc(a.place)+" (πόλη αναφοράς)",{direction:"top"});
+   markers.push({id,marker});continue;
+  }
+  const node=document.createElement("button");node.type="button";node.className="archive-node";
+  node.title=a.label+" — "+a.place;node.setAttribute("aria-label",a.label+" — "+a.place);node.addEventListener("click",()=>showContext(a,id));
+  const popup=new maplibregl.Popup({offset:17,closeButton:false}).setHTML("<b>"+esc(a.label)+"</b><br>"+esc(a.place)+"<br><small>Πόλη αναφοράς αρχείου — όχι ιστορικό συμβάν</small>");
+  node.addEventListener("mouseenter",()=>popup.setLngLat(a.p).addTo(map));
+  node.addEventListener("mouseleave",()=>popup.remove());
+  let marker=new maplibregl.Marker({element:node,anchor:"center"}).setLngLat(a.p).addTo(map);markers.push({id,marker});
+ }updateMarkerStatus();
+}
+function updateMarkerStatus(){
+ for(const {id,marker} of markers){
+  const root=marker.getElement(),node=root?.querySelector(".archive-node")||root;
+  if(!node)continue;
+  const st=agentStatus(id).toUpperCase();node.classList.toggle("active",realApiConnected&&st==="RUNNING");root.hidden=!archivesVisible;
+ }
+}
 function renderMetrics(){const m=dataObject(snapshot?.metrics);const num=(k,fallback)=>Number.isFinite(Number(m[k]))?String(m[k]):fallback;
 $("claim-count").textContent=num("candidate_claims",claims.length?String(claims.length):"—");
 $("verified-count").textContent=num("verified_events","—");
