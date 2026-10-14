@@ -1,0 +1,46 @@
+{
+  "schema": "pct-benchmark-v3-config-v1",
+  "version": "3.0",
+  "purpose": "Measure retrieval performance and candidate relevance without conflating metadata discovery with historical truth.",
+  "lanes": [
+    "travellers",
+    "spanish_simancas",
+    "venetian",
+    "french",
+    "british",
+    "dutch",
+    "german",
+    "italian_states",
+    "ottoman",
+    "north_african"
+  ],
+  "official_label_requirements": {
+    "reviewer_type": "HUMAN",
+    "review_status": "FINAL",
+    "bind_to_candidate_evidence_sha256": true
+  },
+  "relevance_labels": {
+    "RELEVANT": "Returned candidate materially supports the requested benchmark episode/entity/place/date as a research lead.",
+    "OFF_TARGET": "Returned candidate concerns another event/entity/place/date and is not relevant to the requested benchmark case.",
+    "INSUFFICIENT_CONTEXT": "Returned candidate cannot establish relevance from the preserved context."
+  },
+  "evidence_quality_labels": {
+    "PRIMARY_ORIGINAL": "Original primary document inspected.",
+    "PRIMARY_FACSIMILE": "Authoritative facsimile/digital image of primary source inspected.",
+    "PRIMARY_DERIVATIVE": "Translation/copy/edition derived from a primary source.",
+    "SECONDARY": "Secondary scholarly/editorial source.",
+    "METADATA_ONLY": "Catalogue/index metadata only.",
+    "UNKNOWN": "Documentary quality unresolved."
+  },
+  "precision_rule": "Strict candidate precision = RELEVANT / all FINAL human-labelled returned candidates. OFF_TARGET and INSUFFICIENT_CONTEXT count as non-relevant.",
+  "recall_rule": "Reference-case recall = benchmark positive cases detected by at least one case-matched candidate / evaluated positive cases. This is retrieval recall, not historical-truth recall.",
+  "truth_rule": "Historical truth accuracy remains null until HISTORICAL_GOLD cases exist with explicit human ACCEPT and final VERIFY.",
+  "excluded_tiers": [
+    "HISTORICAL_GOLD_CANDIDATE"
+  ],
+  "notes": [
+    "URLs, filenames, assigned request fields and normalized dates cannot by themselves satisfy case matching.",
+    "Candidate relevance and evidence quality are separate dimensions.",
+    "Derivative witnesses must not be counted as independent corroboration."
+  ]
+}
