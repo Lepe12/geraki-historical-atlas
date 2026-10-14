@@ -6,7 +6,7 @@ const root="http://127.0.0.1:4179";
 const endpoint=root+"/geraki-historical-atlas/command-center-v5/";
 const snapshot=JSON.parse(await readFile("../command-center/live/latest.json","utf8"));
 assert.equal(snapshot.schema,"pct-command-center-live-v1");
-const server=spawn("npx",["vite","preview","--host","127.0.0.1","--port","4179","--strictPort"],{stdio:"pipe"});
+const server=spawn(process.execPath,["./node_modules/vite/bin/vite.js","preview","--host","127.0.0.1","--port","4179","--strictPort"],{stdio:"pipe"});
 let browser;
 try{
  let ready=false;for(let i=0;i<70;i++){try{const r=await fetch(endpoint);if(r.ok){ready=true;break}}catch(_){}await new Promise(r=>setTimeout(r,300))}
@@ -25,7 +25,7 @@ try{
  assert.equal(await page.locator(".live-tag").innerText(),"DURABLE SNAPSHOT");
  assert.equal(await page.locator('.network-world svg[aria-label="JARVIS research agent network"]').count(),1);
  assert.ok((await page.locator('.network-world svg[aria-label="JARVIS research agent network"] text').allTextContents()).length>=16,"All actual JARVIS agents should appear");
- assert.equal((await page.locator(".deck-data").innerText()).includes("/ 142 EVENTS"),true,"Replay uses true event count");
+ assert.match((await page.locator(".deck-data").innerText()).replace(/\s+/g," "),/\/ 142 EVENTS/,"Replay uses true event count");
  await page.locator(".play-controls .play").click();await page.waitForTimeout(1100);
  assert.ok(await page.locator(".chamber.replaying").count()===1,"Actual recorded playback must activate");
  await page.locator(".play-controls .play").click();
