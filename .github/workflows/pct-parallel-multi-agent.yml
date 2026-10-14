@@ -96,7 +96,7 @@ jobs:
         run: |
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
           import json, os
-          allowed=["travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]
+          allowed=["greek","travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]
           raw=os.environ.get("PCT_SELECTED_AGENTS","").strip()
           if not raw:
               selected=allowed
@@ -263,7 +263,7 @@ jobs:
       - name: Build cross-lane source genealogy
         if: env.PCT_SELECTED_AGENTS == ''
         run: python3 tools/aggregate_source_genealogy.py --run-id "${{ github.run_id }}"
-      - name: Build ten-lane system health
+      - name: Build all-lane system health
         if: env.PCT_SELECTED_AGENTS == ''
         run: python3 tools/research_system_health.py --run-id "${{ github.run_id }}"
       - name: Commit aggregate health
@@ -302,22 +302,22 @@ jobs:
           git diff --cached --quiet || git commit -m "Airtable sync report: run ${{ github.run_id }}"
           git pull --rebase origin main
           git push origin HEAD:main
-      - name: Enforce ten-lane operational and request-integrity gate
+      - name: Enforce all-lane operational and request-integrity gate
         if: env.PCT_SELECTED_AGENTS == ''
         run: |
           python3 - <<'PY'
           import json, os, pathlib, sys
           p=pathlib.Path('evidence/runs')/os.environ['GITHUB_RUN_ID']/'SYSTEM_HEALTH.json'
           d=json.loads(p.read_text(encoding='utf-8'))
-          if not d.get('all_ten_pipeline_reports_present') or not d.get('all_ten_operational') or not d.get('request_fingerprint_ok'):
-              print('TEN-LANE GATE FAILED', d.get('missing_lane_reports'), d.get('no_executed_repository_lanes'), d.get('request_fingerprint_ok'))
+          if not d.get('all_lanes_pipeline_reports_present') or not d.get('all_lanes_operational') or not d.get('request_fingerprint_ok'):
+              print('ALL-LANE GATE FAILED', d.get('missing_lane_reports'), d.get('no_executed_repository_lanes'), d.get('request_fingerprint_ok'))
               sys.exit(1)
           expected=os.environ.get('PCT_EXPECTED_REQUEST_SHA256','')
           seen={x.get('request_sha256') for x in d.get('request_fingerprints',[]) if x.get('request_sha256')}
           if expected and seen != {expected}:
               print('REQUEST FINGERPRINT GATE FAILED', expected, sorted(seen))
               sys.exit(1)
-          print('TEN-LANE REQUEST INTEGRITY GATE PASSED')
+          print('ALL-LANE REQUEST INTEGRITY GATE PASSED')
           PY
 
 
