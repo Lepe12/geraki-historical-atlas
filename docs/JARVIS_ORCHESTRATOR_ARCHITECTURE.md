@@ -1,124 +1,69 @@
 # JARVIS — Piratecartography Multi-Agent Orchestrator
 
-## Purpose
+## Current role
 
-JARVIS is the supervisory layer above the existing 10 research agents.
+JARVIS is the supervisory layer above the **11 geographic/source-family research lanes** and the specialist-agent layer.
 
-It does **not** replace them and it does **not** perform historical research by itself.
-Its job is to coordinate work, prevent duplicate effort, enforce provenance/quality gates,
-and decide what should be promoted into the Piratecartography research corpus.
+It coordinates research; it does not turn automated discovery into historical truth.
 
-## High-level architecture
+## Current architecture
 
 ```
-JARVIS Manager
-   |
-   +-- Planner / Dispatcher
-   |      +-- Agent 1
-   |      +-- Agent 2
-   |      +-- ...
-   |      +-- Agent 10
-   |
-   +-- Deduplication Gate
-   +-- Provenance / Quality Gate
-   +-- Retry / Reassignment Engine
-   +-- Audit Log
-   |
-   +-- Piratecartography MariaDB
-   +-- GitHub evidence/artifact storage
+Research objective
+      |
+      v
+JARVIS planner / policy / audit
+      |
+      +-- automatic lane selection (or explicit human override)
+      |
+      +-- 11 research lanes
+      |     Greek / Travellers / Spanish-Simancas / Venetian / French
+      |     British / Dutch / German / Italian States / Ottoman / North African
+      |
+      +-- specialist agents
+      |     identity / timeline / contradiction / genealogy / network / biography ...
+      |
+      v
+Discovery + acquisition + event-first extraction
+      |
+      v
+Exact locator -> original inspection -> controlled extraction
+      -> source genealogy -> corroboration -> contradiction review
+      -> human review -> final verification
+      |
+      +-- GitHub durable evidence/audit
+      +-- MariaDB structured research state
+      +-- Command Center read-only operational view
 ```
+
+## Operating mode
+
+Current executable policy: `tools/orchestrator/jarvis_policy.json`.
+
+The live policy is `controlled_dispatch` with deterministic/auditable automatic lane selection. Observer mode remains as a diagnostic adapter only.
+
+JARVIS widens coverage when context is weak rather than pretending routing certainty.
 
 ## Responsibilities
 
-### 1. Planning and dispatch
-JARVIS receives a research objective, splits it into bounded tasks, assigns each task to
-the most suitable research agent, and records the assignment before execution.
-
-### 2. Duplicate-work prevention
-Before creating a new task, JARVIS checks whether an equivalent or near-equivalent task
-already exists, is running, or has already produced usable evidence.
-
-### 3. Provenance enforcement
-Every accepted result must preserve:
-- originating agent
-- source/archive/library
-- stable source identifier or URL when available
-- retrieval timestamp
-- research job/task identifier
-- evidence status
-- confidence/quality state
-- links to stored artifacts where applicable
-
-JARVIS must never convert a candidate source or candidate event into a verified historical
-claim merely because an automated process completed successfully.
-
-### 4. Quality gates
-Results are classified into states such as:
-- CANDIDATE
-- NEEDS_REVIEW
-- VERIFIED
-- REJECTED
-- DUPLICATE
-- UNRESOLVED
-
-Promotion to VERIFIED must require explicit evidence rules and should remain reversible.
-
-### 5. Retry and reassignment
-If an agent fails, returns weak evidence, or times out, JARVIS may:
-- retry the same agent once
-- reassign to a second agent
-- split the task into narrower subtasks
-- escalate to human review
-
-### 6. Auditability
-Every orchestration decision must be written to an append-only audit record:
-- who/what initiated the task
-- which agent received it
-- why it was assigned
-- result status
-- quality-gate decision
-- retry/reassignment history
-- final disposition
-
-## Safety boundaries
+JARVIS may plan/dispatch bounded research, prevent duplicate work, preserve assignment provenance, route to registered connectors, aggregate specialist work, expose blockers and prepare evidence for downstream review.
 
 JARVIS must not:
-- expose MariaDB directly to the public internet
-- store credentials in GitHub
-- access WordPress files or the WordPress database
-- modify GitHub Actions/secrets without explicit authorization
-- give research agents broad server permissions
-- silently rewrite or discard provenance
-- treat technical success as historical verification
+- promote discovery automatically to VERIFIED;
+- erase weak/off-target discoveries merely because they fail acquisition priority;
+- expose MariaDB publicly;
+- access WordPress or unrelated databases;
+- inject secrets into assignments;
+- execute arbitrary shell/code through research-agent instructions.
 
-## Rollout plan
+## Evidence boundary
 
-### Phase 1 — Observer mode
-JARVIS reads task/result metadata and emits decisions without changing live agent behavior.
+Routing confidence, Research Value and Evidence Confidence are separate concepts. None is a probability that a historical claim is true.
 
-### Phase 2 — Advisory mode
-JARVIS proposes assignments, deduplication decisions, and review flags.
+The canonical evidence and verification rules are in `docs/SYSTEM_SPEC.md`, `docs/general-research-doctrine.md` and `docs/HUMAN_REVIEW_VERIFICATION_PROTOCOL.md`.
 
-### Phase 3 — Controlled dispatch
-JARVIS creates/reassigns research tasks, while result promotion remains gated.
+## Current maturity
 
-### Phase 4 — Full orchestration
-JARVIS coordinates all 10 agents with automatic retry, deduplication, audit logging, and
-quality-gated storage.
+Observer/advisory phases are retained as historical rollout stages. Controlled dispatch and automatic lane selection are implemented. Automatic retry/reassignment remains policy-bounded and is not a reason to weaken evidence gates.
 
-## Initial acceptance criteria
-
-JARVIS is ready for live use only when all of the following are true:
-1. Existing 10-agent storage continues unchanged.
-2. A duplicate research request is detected before a second agent is dispatched.
-3. Every dispatch creates an audit record.
-4. A failed agent can be reassigned without losing the original provenance.
-5. Candidate evidence cannot be silently promoted to VERIFIED.
-6. JARVIS can be disabled without disrupting the 10 agents.
-7. No WordPress, Plesk credentials, secrets, or unrelated repositories are required.
-
-## Recommended first live mode
-
-Start with **Observer Mode** for several cycles. Compare JARVIS decisions with the current
-10-agent workflow. Only after the audit log shows stable, sensible assignments and no data
-loss should controlled dispatch be enabled.
+The scientific-validation layer is Historical Benchmark v4; production validation results must come from frozen blind runs and independent human review, not from JARVIS itself.
