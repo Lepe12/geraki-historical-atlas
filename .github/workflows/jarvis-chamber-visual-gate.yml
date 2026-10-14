@@ -24,9 +24,11 @@ jobs:
           node-version: '22'
       - name: Validate syntax and references
         run: |
-          node --check jarvis-intelligence-chamber/world3d.js
-          grep -q 'type="module" src="./world3d.js"' jarvis-intelligence-chamber/index.html
-          ! grep -q '<script src="./chamber.js"' jarvis-intelligence-chamber/index.html
+          node --check jarvis-intelligence-chamber/chamber.js
+          node --check jarvis-intelligence-chamber/gpu-field.js
+          grep -q 'src="./chamber.js' jarvis-intelligence-chamber/index.html
+          grep -q 'src="./gpu-field.js' jarvis-intelligence-chamber/index.html
+          ! grep -q 'src="./world3d.js"' jarvis-intelligence-chamber/index.html
       - name: Install browser
         run: |
           npm install --no-save playwright@1.56.1
