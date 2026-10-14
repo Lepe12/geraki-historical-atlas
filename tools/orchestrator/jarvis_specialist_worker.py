@@ -12,6 +12,7 @@ from connector_batch import run_batch
 from repository_connectors import dispatch as repository_dispatch
 from jarvis_event_bus import emit
 from jarvis_task_history import record
+from jarvis_runtime_guard import validate_specialist_assignment
 
 def _repository_call(repository:str,query:str,agent_id:str)->dict:
     try:
@@ -45,22 +46,16 @@ def _run_repository_batch(items:list[dict],max_workers:int=6)->list[dict]:
                 out.append({"status":"FAILED","records":[],"error":str(exc),"evidence_level":"DISCOVERY_ONLY"})
     return out
 
-def _assignment(agent:dict):
+def _assignment(agent:dict, plan:dict):
+    permit=validate_specialist_assignment(plan,agent)
     routes=agent.get("assigned_sources")
     queries=agent.get("assigned_queries")
-    if not isinstance(routes,list) or not routes:
-        raise RuntimeError("JARVIS_ASSIGNMENT_REQUIRED_NO_ASSIGNED_SOURCES")
-    if not isinstance(queries,list) or not queries:
-        raise RuntimeError("JARVIS_ASSIGNMENT_REQUIRED_NO_ASSIGNED_QUERIES")
-    for route in routes:
-        if route.get("route_type") not in {"registered_connector","repository_dispatch"}:
-            raise RuntimeError("INVALID_JARVIS_ASSIGNED_ROUTE")
-    return routes,queries
+    return routes,queries,permit
 
 def run_one(agent:dict, plan:dict, run_id:str="local", event_root:Path|None=None, history_path:Path|None=None):
     if plan.get("routing_authority")!="JARVIS_PLANNER":
         raise RuntimeError("JARVIS_PLANNER_AUTHORITY_REQUIRED")
-    routes,queries=_assignment(agent)
+    routes,queries,permit=_assignment(agent,plan)
     registry_items=[];repository_items=[]
     for route in routes:
         for query in queries:
@@ -100,6 +95,7 @@ def run_one(agent:dict, plan:dict, run_id:str="local", event_root:Path|None=None
           "agent_id":agent["agent_id"],"label":agent.get("label"),
           "assignment_id":agent.get("assignment_id"),"assignment_wave":agent.get("assignment_wave",1),
           "requested_outputs":agent.get("outputs",[]),
+          "runtime_permit":permit,
           "routing":{
             "authority":"JARVIS_PLANNER",
             "strategy":agent.get("routing_decision",{}).get("strategy","preassigned"),
@@ -117,7 +113,7 @@ def run_one(agent:dict, plan:dict, run_id:str="local", event_root:Path|None=None
         }
         emit(event_root,"piratecartography",run_id,"agent_completed",agent_id=agent["agent_id"],
              phase="assignment_complete",percent=100,status="COMPLETED",
-             detail=f"{result['result_count']} discovery records from JARVIS assignment {agent.get('assignment_id')}")
+             detail=f"{result['result_count']} discovery records; permit {permit['permit_id'][:12]}")
         record(history_path,task_id,"piratecartography","specialist_research","COMPLETED",
                agent_id=agent["agent_id"],run_id=run_id,goal=agent.get("label",""))
         return result
