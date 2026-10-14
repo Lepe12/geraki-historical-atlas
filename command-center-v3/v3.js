@@ -6,6 +6,7 @@ const api=(params.get("api")||"https://www.piratecartography.com/pct-api/live").
 const project=params.get("project")||"piratecartography";
 const run=params.get("run")||"latest";
 const coords={
+greek:{label:"Greek Research",place:"Αθήνα · Ελλάδα (πόλη αναφοράς)",p:[23.7275,37.9838]},
 spanish_simancas:{label:"Simancas",place:"Simancas · Ισπανία",p:[-4.828,41.590]},
 venetian:{label:"Venice",place:"Βενετία · Ιταλία",p:[12.3155,45.4408]},
 french:{label:"French Archives",place:"Παρίσι · Γαλλία",p:[2.3522,48.8566]},

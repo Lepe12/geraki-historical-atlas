@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Build ten parallel source-family lanes from one canonical research request."""
+"""Build parallel source-family lanes from one canonical research request."""
 import json,pathlib,sys
 sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from request_identity import canonical_request
 
 rf,req,ctx,normalized,request_sha256,research_job_id=canonical_request()
 lanes={
+"greek":{"label":"Greek / Hellenic repositories & scholarship","families":["SearchCulture/EKT","OpenArchives","National Library of Greece","Anemi","Greek academic repositories","Academia.edu secondary scholarship"]},
 "travellers":{"label":"Mediterranean/Eastern Mediterranean travellers & contemporary literature","families":["travel accounts","itineraries","geographies","missionary","consular","gazettes","chronicles"]},
 "spanish_simancas":{"label":"Spanish Monarchy / Simancas","families":["Archivo General de Simancas","state","royal","naval","diplomatic"]},
 "venetian":{"label":"Venetian","families":["Archivio di Stato di Venezia","Senato","bailo","provveditori","maritime","colonial","diplomatic"]},

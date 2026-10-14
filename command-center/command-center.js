@@ -8,6 +8,7 @@ let currentRun=query.get("run")||"latest",project=query.get("project")||"piratec
 let events=[],claims=[],blockers=[],snapshotMeta=null,liveConnected=false;
 
 const catalog={
+ greek:{label:"Greek Research",city:"Athens, Greece (reference city)",p:[23.7275,37.9838]},
  spanish_simancas:{label:"Simancas",city:"Simancas, Spain",p:[-4.828,41.590]},
  venetian:{label:"Venice",city:"Venice, Italy",p:[12.3155,45.4408]},
  french:{label:"French",city:"Paris, France",p:[2.3522,48.8566]},

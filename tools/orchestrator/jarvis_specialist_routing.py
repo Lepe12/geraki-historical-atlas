@@ -14,9 +14,12 @@ CONTEXT_BOOSTS={
   "greek_aegean":{
     "patterns":[r"[\u0370-\u03ff]",r"\baegean\b",r"\bcyclad",r"\bgreece\b",r"\bgreek\b"],
     "routes":{
-      "repo:SearchCulture.gr / EKT":24,
-      "registry:moreveneto_browser":20,
-      "repo:Internet Culturale":16,
+      "repo:SearchCulture.gr / EKT":30,
+      "repo:OpenArchives.gr / EKT":26,
+      "repo:Academia.edu Public Research":20,
+      "repo:Anemi / University of Crete":18,
+      "registry:moreveneto_browser":16,
+      "repo:Internet Culturale":12,
       "repo:İSAM Kütüphanesi":10,
       "repo:Gallica/BnF":8,
     },

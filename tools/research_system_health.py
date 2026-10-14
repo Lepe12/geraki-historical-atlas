@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Aggregate durable health reports for the ten-lane PCT research system."""
+"""Aggregate durable health reports for the PCT research system."""
 import argparse,json,pathlib,datetime
 from retrospective_candidate_review import review
 from scientific_evidence_audit import audit
 p=argparse.ArgumentParser();p.add_argument("--run-id",required=True);a=p.parse_args()
-lanes=["travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]
+lanes=["greek","travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]
 root=pathlib.Path("evidence/runs")/a.run_id
 rows=[];missing=[];fingerprints=[];fingerprint_missing=[]
 for lane in lanes:
@@ -33,7 +33,7 @@ blocked_only=[r["lane"] for r in rows if r.get("status")=="NO_EXECUTED_REPOSITOR
 jobs={x.get("research_job_id") for x in fingerprints if x.get("research_job_id")}
 hashes={x.get("request_sha256") for x in fingerprints if x.get("request_sha256")}
 files={x.get("request_file") for x in fingerprints if x.get("request_file")}
-fingerprint_ok=(len(fingerprints)==10 and not fingerprint_missing and len(jobs)==1 and len(hashes)==1 and len(files)==1)
+fingerprint_ok=(len(fingerprints)==len(lanes) and not fingerprint_missing and len(jobs)==1 and len(hashes)==1 and len(files)==1)
 genealogy={}
 gp=root/"SOURCE_GENEALOGY.json"
 if gp.exists():
@@ -48,8 +48,10 @@ report={
  "missing_lane_reports":missing,
  "operational_lanes":operational,
  "no_executed_repository_lanes":blocked_only,
- "all_ten_pipeline_reports_present":len(rows)==10 and not missing,
- "all_ten_operational":len(operational)==10 and not missing,
+ "all_lanes_pipeline_reports_present":len(rows)==len(lanes) and not missing,
+ "all_ten_pipeline_reports_present":len(rows)==len(lanes) and not missing,
+ "all_lanes_operational":len(operational)==len(lanes) and not missing,
+ "all_ten_operational":len(operational)==len(lanes) and not missing,
  "request_fingerprint_ok":fingerprint_ok,
  "request_fingerprints":fingerprints,
  "request_fingerprint_missing":fingerprint_missing,

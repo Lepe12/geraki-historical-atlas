@@ -7,6 +7,7 @@ request; generic event vocabulary is controlled here and every emitted query is
 preserved in the repository plan for audit.
 """
 EVENT_TERMS={
+ "greek":["πειρατεία","πειρατής","πειρατές","κουρσάρος","κουρσάροι","επιδρομή","λεηλασία","αιχμαλωσία","λύτρα","ρεσάλτο","πειρατικό","corsair","piracy","pirate","Aegean","Αιγαίο","Αρχιπέλαγος"],
  "travellers":["pirate","corsair","privateer","raid","captivity","ransom","pillage","πειρατής","πειρατές","κουρσάρος","κουρσάροι","επιδρομή","αιχμαλωσία","λύτρα","λεηλασία","κατάληψη","ρεσάλτο"],
  "spanish_simancas":["pirata","corsario","incursión","saqueo","cautivo","rescate","armada","galera","galeras","navío","navíos"],
  "venetian":["pirata","corsaro","incursione","saccheggio","schiavo","riscatto","armata"],

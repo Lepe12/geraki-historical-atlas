@@ -541,6 +541,68 @@ def pares_simancas(q,lane):
     except Exception as exc:
         return "ACCESS_BLOCKED",[],url+" ; "+type(exc).__name__+": "+str(exc)
 
+def _public_site_index(q,lane,repository,domain,max_records=20):
+    """Bounded public-web discovery for repositories without a stable anonymous API.
+
+    This discovers public landing pages only. It does not bypass login, paywalls,
+    download controls, robots restrictions, or prove the historical claim.
+    """
+    query=("site:"+domain+" "+str(q)).strip()
+    url="https://html.duckduckgo.com/html/?"+urllib.parse.urlencode({"q":query})
+    try:
+        raw=_get(url,timeout=20).decode("utf-8","replace")
+    except Exception as exc:
+        return "REMOTE_ACCESS_BLOCKED",[],url+" ; "+type(exc).__name__+": "+str(exc)
+    parser=_LinkParser(); parser.feed(raw)
+    rows=[]; seen=set()
+    for href,title in parser.links:
+        u=href
+        if "uddg=" in u:
+            try:
+                qs=urllib.parse.parse_qs(urllib.parse.urlsplit(u).query)
+                u=urllib.parse.unquote(qs.get("uddg",[u])[0])
+            except Exception:
+                pass
+        if u.startswith("//"): u="https:"+u
+        try:
+            host=urllib.parse.urlsplit(u).netloc.casefold()
+        except Exception:
+            continue
+        if not host or not (host==domain.casefold() or host.endswith("."+domain.casefold())):
+            continue
+        if not title or len(title.strip())<4:
+            continue
+        key=u.split("#",1)[0]
+        if key in seen: continue
+        seen.add(key)
+        rows.append({
+          "discovery_repository":repository,
+          "discovery_lane":lane,
+          "connector_status":"EXECUTED",
+          "identifier":key,
+          "title":" ".join(title.split()),
+          "date":[],
+          "url":key,
+          "evidence_level":"SECONDARY_DISCOVERY_ONLY" if "Academia.edu" in repository else "PUBLIC_REPOSITORY_DISCOVERY_ONLY",
+          "verification_status":"UNVERIFIED_DISCOVERY",
+          "acquisition_policy":"PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "discovery_route":"PUBLIC_WEB_INDEX",
+        })
+        if len(rows)>=max_records: break
+    return "EXECUTED",rows,url
+
+def academia_public(q,lane):
+    return _public_site_index(q,lane,"Academia.edu Public Research","academia.edu",20)
+
+def openarchives_public(q,lane):
+    return _public_site_index(q,lane,"OpenArchives.gr / EKT","openarchives.gr",25)
+
+def nlg_public(q,lane):
+    return _public_site_index(q,lane,"National Library of Greece Digital Collections","digitalcollections.nlg.gr",25)
+
+def anemi_public(q,lane):
+    return _public_site_index(q,lane,"Anemi / University of Crete","anemi.lib.uoc.gr",25)
+
 def unsupported(repository, reason="No stable anonymous machine-search connector configured."):
     return "AUTH_OR_BROWSER_REQUIRED",[],reason
 
@@ -558,6 +620,10 @@ def dispatch(repository,q,lane):
     if repository=="Delpher": return delpher_sru(q,lane)
     if repository=="Deutsche Digitale Bibliothek": return ddb(q,lane)
     if repository=="SearchCulture.gr / EKT": return searchculture(q,lane)
+    if repository=="OpenArchives.gr / EKT": return openarchives_public(q,lane)
+    if repository=="National Library of Greece Digital Collections": return nlg_public(q,lane)
+    if repository=="Anemi / University of Crete": return anemi_public(q,lane)
+    if repository=="Academia.edu Public Research": return academia_public(q,lane)
     if repository=="İSAM Kütüphanesi": return isam(q,lane)
     if repository=="PARES / Archivo General de Simancas":
         return pares_simancas(q,lane)

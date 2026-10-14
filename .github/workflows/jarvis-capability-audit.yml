@@ -8,6 +8,7 @@ on:
       - 'tools/orchestrator/**'
       - '.github/workflows/jarvis-*.yml'
       - 'connectors/**'
+      - 'tools/connectors/**'
       - 'tools/storage/**'
 
 permissions:
@@ -43,6 +44,12 @@ jobs:
           grep -q 'workflow_selected_agents' .github/workflows/jarvis-controlled-dispatch.yml
           grep -q '"require_explicit_selected_agents": false' tools/orchestrator/jarvis_policy.json
           grep -q '"auto_select_agents": true' tools/orchestrator/jarvis_policy.json
+      - name: Test Greek and Academia discovery connector
+        env:
+          PYTHONPATH: tools/connectors
+        run: |
+          python3 -m py_compile tools/connectors/repository_connectors.py
+          python3 -m unittest tools/connectors/test_academia_public.py -v
       - name: Static capability self-test
         run: python3 tools/orchestrator/jarvis_self_test.py --output jarvis_self_test.json
       - uses: actions/upload-artifact@v4

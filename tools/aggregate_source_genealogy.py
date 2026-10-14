@@ -7,7 +7,7 @@ Title/creator similarity creates a review lead, never an independence claim.
 from __future__ import annotations
 import argparse,hashlib,json,pathlib,re,urllib.parse,unicodedata,datetime
 
-LANES=["travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]
+LANES=["greek","travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]
 
 def norm_text(v):
     s=unicodedata.normalize("NFKD",str(v or ""))
