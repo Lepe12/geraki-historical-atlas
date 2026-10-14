@@ -138,6 +138,27 @@ server.on("upgrade",(req,socket)=>{
     socket.write("HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: "+accept+"\r\n\r\n");
     const run=m[2];if(!sockets.has(run))sockets.set(run,new Set());sockets.get(run).add(socket);
     socket.on("close",()=>sockets.get(run)?.delete(socket));socket.on("error",()=>sockets.get(run)?.delete(socket));
+    // Consume masked client frames and complete RFC 6455 control exchanges.
+    let incoming=Buffer.alloc(0);
+    socket.on("data",chunk=>{
+      incoming=Buffer.concat([incoming,chunk]);
+      if(incoming.length>65536)return socket.destroy();
+      while(incoming.length>=2){
+        const opcode=incoming[0]&15,masked=Boolean(incoming[1]&128);
+        let size=incoming[1]&127,offset=2;
+        if(!masked)return socket.destroy();
+        if(size===126){if(incoming.length<4)return;size=incoming.readUInt16BE(2);offset=4;}
+        else if(size===127)return socket.destroy();
+        if(opcode>=8&&(size>125||!(incoming[0]&128)))return socket.destroy();
+        if(incoming.length<offset+4+size)return;
+        const mask=incoming.subarray(offset,offset+4);offset+=4;
+        const payload=Buffer.from(incoming.subarray(offset,offset+size));
+        for(let i=0;i<payload.length;i++)payload[i]^=mask[i%4];
+        incoming=incoming.subarray(offset+size);
+        if(opcode===8){sockets.get(run)?.delete(socket);return socket.end(Buffer.concat([Buffer.from([0x88,size]),payload]));}
+        if(opcode===9)socket.write(Buffer.concat([Buffer.from([0x8a,size]),payload]));
+      }
+    });
     statusFor(run).then(s=>socket.write(frameText(JSON.stringify({schema:"pct-command-center-bootstrap-v1",...s})))).catch(()=>{});
   }catch(_){socket.destroy();}
 });
