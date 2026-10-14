@@ -5,10 +5,10 @@ const $=id=>document.getElementById(id);
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x020610);scene.fog=new THREE.FogExp2(0x020610,.00055);
 const camera=new THREE.PerspectiveCamera(48,1,1,6500);
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:"high-performance"});
-renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.7;
+renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.95;
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
 const world=new THREE.Group();scene.add(world);
-const coreGroup=new THREE.Group();world.add(coreGroup);
+const coreGroup=new THREE.Group();world.add(coreGroup);coreGroup.scale.setScalar(1.48);
 const cyan=new THREE.Color(0x60edfa),gold=new THREE.Color(0xe3b979);
 const sectors=[
 ["Spanish / Simancas","archive",-310,115,-150,"Spanish state records and administrative correspondence."],
@@ -35,10 +35,10 @@ function starCloud(count,extent,size,inner){const v=new Float32Array(count*3),co
 const distant=starCloud(2600,4700,2.2,650),dust=starCloud(3600,940,1.5,115);
 const coreParticles=(()=>{const count=5200,pos=new Float32Array(count*3),c=new Float32Array(count*3),rnd=seeded(1277);
 for(let i=0;i<count;i++){const theta=i*2.39996,zz=1-2*(i+.5)/count,rr=Math.sqrt(1-zz*zz),radius=57+(rnd()-.5)*19;pos.set([Math.cos(theta)*rr*radius,zz*radius,Math.sin(theta)*rr*radius],i*3);c.set([.27+rnd()*.2,.7+rnd()*.26,.91+rnd()*.09],i*3)}
-const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(pos,3));g.setAttribute("color",new THREE.BufferAttribute(c,3));const p=new THREE.Points(g,new THREE.PointsMaterial({size:2.15,vertexColors:true,transparent:true,opacity:.87,depthWrite:false,blending:THREE.AdditiveBlending}));coreGroup.add(p);return p})();
+const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(pos,3));g.setAttribute("color",new THREE.BufferAttribute(c,3));const p=new THREE.Points(g,new THREE.PointsMaterial({size:2.8,vertexColors:true,transparent:true,opacity:.87,depthWrite:false,blending:THREE.AdditiveBlending}));coreGroup.add(p);return p})();
 // One shared physical lighting language: cyan reactor volume, amber calibration rims.
 const reactor=new THREE.Mesh(new THREE.SphereGeometry(44,64,48),new THREE.MeshBasicMaterial({color:0x42e9f7,transparent:true,opacity:.082,depthWrite:false,blending:THREE.AdditiveBlending}));coreGroup.add(reactor);
-const reactorInner=new THREE.Mesh(new THREE.SphereGeometry(19,48,32),new THREE.MeshBasicMaterial({color:0xa4fbff,transparent:true,opacity:.45,depthWrite:false,blending:THREE.AdditiveBlending}));coreGroup.add(reactorInner);
+const reactorInner=new THREE.Mesh(new THREE.SphereGeometry(24,48,32),new THREE.MeshBasicMaterial({color:0xa4fbff,transparent:true,opacity:.62,depthWrite:false,blending:THREE.AdditiveBlending}));coreGroup.add(reactorInner);
 const reactorLight=new THREE.PointLight(0x4beeff,6000,480);coreGroup.add(reactorLight);
 const haloMaterial=new THREE.ShaderMaterial({transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,uniforms:{time:{value:0},tint:{value:new THREE.Color(0x238cae)}},vertexShader:`varying vec3 vPos;void main(){vPos=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:`varying vec3 vPos;uniform float time;uniform vec3 tint;void main(){float r=length(vPos.xy);float wave=sin(atan(vPos.y,vPos.x)*9.+r*.2-time*.3);float a=exp(-r*r/12500.)*(.09+.055*wave);gl_FragColor=vec4(tint,a);}`});
 const halo=new THREE.Mesh(new THREE.PlaneGeometry(300,300),haloMaterial);coreGroup.add(halo);
@@ -57,12 +57,12 @@ const el=document.createElement("div");el.className="node-label "+s.kind;el.text
 let texture;
 function glowTexture(){if(texture)return texture;const c=document.createElement("canvas");c.width=c.height=128;const x=c.getContext("2d"),gr=x.createRadialGradient(64,64,0,64,64,64);gr.addColorStop(0,"rgba(255,255,255,1)");gr.addColorStop(.11,"rgba(255,255,255,.9)");gr.addColorStop(.38,"rgba(255,255,255,.20)");gr.addColorStop(1,"rgba(255,255,255,0)");x.fillStyle=gr;x.fillRect(0,0,128,128);texture=new THREE.CanvasTexture(c);return texture}
 sectors.forEach(node);
-const hubGlow=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTexture(),color:0x23c4e7,transparent:true,opacity:.21,blending:THREE.AdditiveBlending,depthWrite:false}));hubGlow.scale.set(440,440,1);coreGroup.add(hubGlow);
+const hubGlow=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTexture(),color:0x23c4e7,transparent:true,opacity:.38,blending:THREE.AdditiveBlending,depthWrite:false}));hubGlow.scale.set(470,470,1);coreGroup.add(hubGlow);
 scene.add(new THREE.AmbientLight(0x44677f,.5));const lamp=new THREE.PointLight(0x48dfff,12000,600);lamp.position.set(30,30,30);scene.add(lamp);
-let yaw=-.22,pitch=.22,targetYaw=yaw,targetPitch=pitch,radius=840,targetRadius=840,focus=new THREE.Vector3(),targetFocus=new THREE.Vector3(),selected=-1,hover=-1,held=false,moved=false,mx=0,my=0;const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let yaw=-.22,pitch=.22,targetYaw=yaw,targetPitch=pitch,radius=740,targetRadius=740,focus=new THREE.Vector3(),targetFocus=new THREE.Vector3(),selected=-1,hover=-1,held=false,moved=false,mx=0,my=0;const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const clock=new THREE.Clock(),raycaster=new THREE.Raycaster(),mouse=new THREE.Vector2(),point=new THREE.Vector3();let frame=0;
 function select(i){selected=i;const p=$("detailPanel");p.classList.remove("hidden");if(i<0){$("detail-number").textContent="COMMAND / 00";$("detailType").textContent="CENTRAL INTELLIGENCE";$("detailTitle").textContent="JARVIS";$("detailDescription").textContent="Central intelligence concept. This scene is a visual simulation, not a live connection.";$("detailRole").textContent="ORCHESTRATOR";$("detailState").textContent="VISUAL ONLY";return}let s=sectors[i];$("detail-number").textContent="SECTOR / "+String(i+1).padStart(2,"0");$("detailType").textContent=s.kind==="archive"?"ARCHIVAL INTELLIGENCE":"SCIENTIFIC INTELLIGENCE";$("detailTitle").textContent=s.name;$("detailDescription").textContent=s.desc;$("detailRole").textContent=s.kind.toUpperCase();$("detailState").textContent="VISUAL ONLY"}
-function reset(){targetFocus.set(0,0,0);targetRadius=840;targetYaw=-.22;targetPitch=.22;selected=-1;$("detailPanel").classList.add("hidden")}
+function reset(){targetFocus.set(0,0,0);targetRadius=740;targetYaw=-.22;targetPitch=.22;selected=-1;$("detailPanel").classList.add("hidden")}
 function aim(i){targetFocus.copy(i<0?new THREE.Vector3():sectors[i].position);targetRadius=340}
 function pointer(e){const r=canvas.getBoundingClientRect();mouse.set(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1);raycaster.setFromCamera(mouse,camera);const hits=raycaster.intersectObjects(nodeMeshes,false);hover=hits.length?hits[0].object.userData.sector:-1;canvas.style.cursor=held?"grabbing":hover>=0?"pointer":"grab"}
 canvas.addEventListener("pointerdown",e=>{held=true;moved=false;mx=e.clientX;my=e.clientY;canvas.setPointerCapture(e.pointerId)});
@@ -78,7 +78,7 @@ yaw+=(targetYaw-yaw)*damping;pitch+=(targetPitch-pitch)*damping;radius+=(targetR
 camera.position.set(focus.x+radius*Math.sin(yaw)*Math.cos(pitch),focus.y+radius*Math.sin(pitch),focus.z+radius*Math.cos(yaw)*Math.cos(pitch));camera.lookAt(focus);
 const w=canvas.clientWidth,h=canvas.clientHeight;if(w&&h&&(canvas.width!==Math.round(w*renderer.getPixelRatio())||canvas.height!==Math.round(h*renderer.getPixelRatio()))){camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false)}
 if(!reduced){coreParticles.rotation.y+=dt*.05;coreParticles.rotation.x+=dt*.018;rings[0].rotation.z+=dt*.055;rings[1].rotation.y+=dt*.033;dust.rotation.y+=dt*.001;for(const a of connections){const t=(time*a.speed+a.offset)%1;a.dot.position.copy(a.curve.getPoint(t))}haloMaterial.uniforms.time.value=time;}
-for(const s of sectors){s.mesh.quaternion.copy(camera.quaternion);s.orbit.rotation.z+=reduced?0:dt*.11;const active=s.id===selected||s.id===hover;s.mesh.scale.lerp(new THREE.Vector3().setScalar(active?1.38:1),damping);s.aura.material.opacity=active?.5:.23;point.copy(s.position).project(camera);const visible=point.z<1&&point.z>-1&&point.x>-1.1&&point.x<.8&&point.y>-.84&&point.y<.85;const el=s.label;el.style.opacity=visible?(active?"1":".78"):"0";el.style.left=(point.x*.5+.5)*w+17+"px";el.style.top=(-point.y*.5+.5)*h+"px"}
+for(const s of sectors){s.mesh.quaternion.copy(camera.quaternion);s.orbit.rotation.z+=reduced?0:dt*.11;const active=s.id===selected||s.id===hover;s.mesh.scale.lerp(new THREE.Vector3().setScalar(active?1.38:1),damping);s.aura.material.opacity=active?.5:.23;point.copy(s.position).project(camera);const visible=point.z<1&&point.z>-1&&point.x>-1.1&&point.x<.8&&point.y>-.84&&point.y<.85;const el=s.label;el.style.opacity=visible?(active?"1":(radius<560?".74":".64")):"0";el.style.left=(point.x*.5+.5)*w+17+"px";el.style.top=(-point.y*.5+.5)*h+"px"}
 $("coordinates").textContent="X "+yaw.toFixed(2)+" / Y "+pitch.toFixed(2)+" / DEPTH "+Math.round(radius);$("zoomLevel").textContent=radius<400?"03 / DOSSIER":radius<700?"02 / CONSTELLATION":"01 / CLUSTER";frame++;if(frame%35===0){$("fps").textContent=Math.round(1/Math.max(dt,.001))+" FPS";$("clock").textContent=new Date().toISOString().slice(11,19)+" UTC"}
 coreGroup.quaternion.copy(camera.quaternion);renderer.render(scene,camera)}
 $("detailPanel").classList.add("hidden");draw();
