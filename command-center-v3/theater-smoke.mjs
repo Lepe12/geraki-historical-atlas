@@ -18,7 +18,7 @@ assert.ok(theater.includes("RESEARCH_WORKFLOW_NOT_HISTORICAL_ROUTE"),"Dispatch c
 assert.ok(theater.includes("No demo events")||theater.includes("No demo events".toLowerCase())||theater.includes("No demo events or fabricated evidence"),"No mock data");
 let callbacks={};const els=new Map();
 function mock(id){if(!els.has(id)){const e={id,innerHTML:"",textContent:"",value:"",max:"1",hidden:false,disabled:false,classList:{add(){},remove(){},toggle(){}},listeners:{},addEventListener(name,fn){this.listeners[name]=fn;},setAttribute(k,v){this[k]=v;}};els.set(id,e);}return els.get(id);}
-const document={getElementById:mock,querySelectorAll(){return []}};
+const document={getElementById:mock,querySelectorAll(){return []},body:{classList:{add(){},remove(){},toggle(){}}}};
 const pct={getCoords:()=>({spanish_simancas:{label:"Simancas",p:[-4.828,41.59]},venetian:{label:"Venice",p:[12.3155,45.4408]}}),getMap:()=>null,getSnapshot:()=>null,renderEvidence(){return true;},changeView(){},focusAgent(){}};
 const window={PCT_V3:pct,matchMedia:()=>({matches:false}),addEventListener(name,fn){callbacks[name]=fn;},dispatchEvent(){}};
 const context={window,document,console,matchMedia:window.matchMedia,setInterval:()=>1,clearInterval:()=>{}};
