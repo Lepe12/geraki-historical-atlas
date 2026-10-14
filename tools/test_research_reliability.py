@@ -27,6 +27,14 @@ class Reliability(unittest.TestCase):
         self.assertEqual(len(parse_output(raw)['records']),1)
         self.assertEqual(classify(0,raw,''),(ConnectorStatus.EXECUTED,None))
         self.assertIsNone(parse_output('not JSON'))
+        self.assertEqual(classify(1,'','with open(url, timeout=35):\nurllib.error.HTTPError: HTTP Error 503: Service Unavailable'),(ConnectorStatus.FAILED,'REMOTE_SERVICE_UNAVAILABLE'))
+    def test_observed_metadata_collisions(self):
+        ident=identity(self.req,self.req)
+        for title,description in [('Perlite toxicology and epidemiology - a review.','Respiratory health on the island of Milos Greece'),('CIA Reading Room: YUGOSLAV NAVY','History of Milos island'),('Milo B. Morse','Congressional history'),('Logbook of Milo (Ship)','A voyage across the Pacific'),('Butterflies and burnet moths from Milos Island, Greece','History')]:
+            self.assertNotEqual(assess({'title':title,'description':description},ident)['status'],'PRIORITY',title)
+        early=assess({'title':'Voyage through the Archipelago','year':1703},ident)
+        late=assess({'title':'History of Milos island','year':2000},ident)
+        self.assertGreater(early['score'],late['score'])
     def test_place_collision_and_second_island(self):
         ident=identity(self.req,self.req)
         self.assertEqual(assess({'title':'Melos Zeitschrift für Musik'},ident)['status'],'EXCLUDE_FROM_ACQUISITION')

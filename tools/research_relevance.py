@@ -28,8 +28,9 @@ def identity(req, ctx):
             'rule': 'User-supplied geographic context is a search constraint, not source evidence.'}
 
 
-HISTORY = re.compile(r'voyag|travel|travell|reise|viaggio|relation|itinerar|archipel|geograph|histor|histoire|storia|chronicle|memoir|περιηγ|ιστορι|ναυτι|navigation|diplomat|consul|pirat|corsair|corsar|ransom|captiv|portolan')
+HISTORY = re.compile(r'(?<!\w)(?:voyag|travel|reise|viaggio|relation\b|itinerar|geograph|histor|histoire|storia|chronicle|memoir|περιηγ|ιστορι|ναυτι|navigation|diplomat|consul|pirat|corsair|corsar|ransom|captiv|portolan)')
 GEO = re.compile(r'\bisland\b|\bisle\b|\bisola\b|\binsel\b|νησ|cyclad|aegean|egee|archipel|greece|grece|grecia|ελλα|harbour|harbor')
+OFF_TOPIC = re.compile(r'(?<!\w)(?:respirat|toxicolog|epidemiolog|mortality|morbidity|hadronic|butterflies|moths|soundtrack|milkshake schedule|cia reading room|proceedings of.*physics)')
 NOISE = re.compile(r'quintet|symphon|zeitschrift.{0,12}musik|musical|coleoptera|scolytinae|favorites$|\bpodcast\b|\blivestream\b|\btv\b|\byoutube\b')
 
 
@@ -51,13 +52,15 @@ def assess(record, ident):
     publication_years = [int(x) for x in re.findall(r'\b(1\d{3}|20\d{2})\b', date_text)]
     requested = [int(x) for x in re.findall(r'\b(1\d{3}|20\d{2})\b', ident.get('date_range',''))]
     if publication_years and requested and min(requested)-100 <= min(publication_years) <= max(requested)+100:
-        score += 3; reasons.append('NEAR_PERIOD_PUBLICATION_NOT_EVENT_DATE')
-    if NOISE.search(title) and not (geographic and history):
+        score += 20; reasons.append('NEAR_PERIOD_PUBLICATION_NOT_EVENT_DATE')
+    if OFF_TOPIC.search(title):
+        status = 'REVIEW_REQUIRED'; reasons.append('EXPLICIT_OTHER_DISCIPLINE_OR_MODERN_CORPUS')
+    elif NOISE.search(title) and not (geographic and history):
         status = 'EXCLUDE_FROM_ACQUISITION'; reasons.append('EXPLICIT_TOPIC_COLLISION')
     elif record.get('mediatype') and record['mediatype'] not in ('texts',):
         status = 'REVIEW_REQUIRED'; reasons.append('NON_TEXT_OBJECT')
     elif ident.get('type') == 'place':
-        if (name_match and (geographic or history)) or (regional and history): status = 'PRIORITY'
+        if (name_match or regional) and geographic and history: status = 'PRIORITY'
         else: status = 'REVIEW_REQUIRED'; reasons.append('PLACE_IDENTITY_UNRESOLVED')
     elif name_match and history: status = 'PRIORITY'
     else: status = 'REVIEW_REQUIRED'; reasons.append('CONTEXT_UNRESOLVED')

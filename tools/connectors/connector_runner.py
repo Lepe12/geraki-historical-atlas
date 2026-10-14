@@ -13,7 +13,13 @@ from connector_registry import connector,next_route
 def classify(returncode:int, stdout:str, stderr:str):
     # Source text containing author/auth/login must not classify a successful call.
     if returncode==0: return ConnectorStatus.EXECUTED,None
-    blob=stderr.lower()
+    blob=stderr.strip().splitlines()[-1].lower() if stderr.strip() else ""
+    http=re.search(r"http error (\d{3})",blob)
+    if http:
+        code=int(http.group(1))
+        if code==429:return ConnectorStatus.BLOCKED,"RATE_LIMITED"
+        if code in (401,403):return ConnectorStatus.BLOCKED,"ACCESS_DENIED"
+        if code>=500:return ConnectorStatus.FAILED,"REMOTE_SERVICE_UNAVAILABLE"
     if "captcha" in blob: return ConnectorStatus.BLOCKED,"CAPTCHA"
     if "login" in blob or "auth" in blob: return ConnectorStatus.BLOCKED,"LOGIN_REQUIRED"
     if "timeout" in blob or "timed out" in blob: return ConnectorStatus.FAILED,"TIMEOUT"
