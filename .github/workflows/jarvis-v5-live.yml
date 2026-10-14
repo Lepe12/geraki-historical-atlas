@@ -27,5 +27,16 @@ jobs:
           node --check jarvis-intelligence-chamber/world3d.js
           node --check jarvis-intelligence-chamber/visual-smoke.cjs
           node --check jarvis-intelligence-chamber/live-bridge.test.cjs
+          node --check jarvis-intelligence-chamber/production-smoke.cjs
       - name: Read-only live bridge tests
         run: node --test jarvis-intelligence-chamber/live-bridge.test.cjs
+  production-live-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify production HTTPS and actual WebSocket bootstrap
+        run: node jarvis-intelligence-chamber/production-smoke.cjs
