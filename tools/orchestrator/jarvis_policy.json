@@ -53,5 +53,43 @@
     "github_secrets_access": false,
     "plesk_credentials_access": false,
     "public_mariadb_exposure": false
+  },
+  "runtime_guard": {
+    "version": 1,
+    "enabled": true,
+    "allow_arbitrary_code": false,
+    "allow_shell": false,
+    "allow_subprocess": false,
+    "allow_direct_secret_values": false,
+    "require_planner_authority": true,
+    "audit_required": true,
+    "allowed_operations": [
+      "search"
+    ],
+    "allowed_route_types": [
+      "registered_connector",
+      "repository_dispatch"
+    ],
+    "max_sources_per_assignment": 8,
+    "max_queries_per_assignment": 12,
+    "max_search_budget": 48,
+    "forbidden_assignment_keys": [
+      "command",
+      "commands",
+      "shell",
+      "script",
+      "code",
+      "python",
+      "system_command",
+      "subprocess",
+      "env",
+      "environment",
+      "secret",
+      "secrets",
+      "credentials",
+      "token",
+      "api_key",
+      "api_token"
+    ]
   }
 }
