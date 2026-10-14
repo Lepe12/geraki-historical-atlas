@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """JARVIS orchestration core for Piratecartography.
 
-Safe scaffold only:
+Side-effect-free orchestration primitives:
 - no database credentials
 - no network calls
-- no agent writes
-- observer mode by default
+- no direct agent writes
 
-The live storage adapter and agent transport must be supplied separately.
+The live system mode is defined by jarvis_policy.json; this module remains a deterministic core that can also be used by the retained observer diagnostic.
 """
 
 from __future__ import annotations
@@ -141,4 +140,4 @@ class JarvisOrchestrator:
 
 
 if __name__ == "__main__":
-    print("JARVIS scaffold loaded in observer mode; no live actions performed.")
+    print("JARVIS deterministic orchestration core loaded; no live actions performed by this module.")
