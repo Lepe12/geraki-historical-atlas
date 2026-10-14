@@ -26,7 +26,15 @@ jobs:
             tools/orchestrator/test_jarvis_dispatch.py \
             tools/orchestrator/test_jarvis_escalate.py \
             tools/orchestrator/test_jarvis_observer.py \
-            tools/orchestrator/test_jarvis_recovery.py -v
+            tools/orchestrator/test_jarvis_recovery.py \
+            tools/orchestrator/test_jarvis_runtime_guard.py -v
+      - name: Fail if specialist worker gains arbitrary execution primitives
+        run: |
+          ! grep -En 'subprocess|os\.system|shell=True|\beval\(|\bexec\(' tools/orchestrator/jarvis_specialist_worker.py
+          grep -q 'validate_specialist_assignment' tools/orchestrator/jarvis_specialist_worker.py
+          grep -q '"allow_arbitrary_code": false' tools/orchestrator/jarvis_policy.json
+          grep -q '"allow_shell": false' tools/orchestrator/jarvis_policy.json
+          grep -q '"allow_subprocess": false' tools/orchestrator/jarvis_policy.json
       - name: Static capability self-test
         run: python3 tools/orchestrator/jarvis_self_test.py --output jarvis_self_test.json
       - uses: actions/upload-artifact@v4
