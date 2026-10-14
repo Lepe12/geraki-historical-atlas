@@ -8,6 +8,8 @@ on:
       - 'tools/benchmark_v4_manifest.py'
       - 'tools/benchmark_v4_score.py'
       - 'tools/test_benchmark_v4.py'
+      - 'tools/benchmark_v4_review_packet.py'
+      - 'tools/test_benchmark_v4_review_packet.py'
       - '.github/workflows/historical-benchmark-v4.yml'
   workflow_dispatch:
 
@@ -32,17 +34,26 @@ jobs:
           python3 -m py_compile \
             tools/benchmark_v4_manifest.py \
             tools/benchmark_v4_score.py \
-            tools/test_benchmark_v4.py
+            tools/test_benchmark_v4.py \
+            tools/benchmark_v4_review_packet.py \
+            tools/test_benchmark_v4_review_packet.py
 
       - name: Run Benchmark v4 regression tests
         env:
           PYTHONPATH: tools
-        run: python3 tools/test_benchmark_v4.py
+        run: |
+          python3 tools/test_benchmark_v4.py
+          python3 tools/test_benchmark_v4_review_packet.py
 
       - name: Freeze bound baseline evidence
         env:
           PYTHONPATH: tools
         run: python3 tools/benchmark_v4_manifest.py
+
+      - name: Build blinded review packets
+        env:
+          PYTHONPATH: tools
+        run: python3 tools/benchmark_v4_review_packet.py
 
       - name: Score fail-closed
         env:
@@ -66,7 +77,7 @@ jobs:
         run: |
           git config user.name "benchmark-v4[bot]"
           git config user.email "benchmark-v4@users.noreply.github.com"
-          git add benchmarks/v4/CURRENT_MANIFEST.json benchmarks/v4/results/SUMMARY.json
+          git add benchmarks/v4/CURRENT_MANIFEST.json benchmarks/v4/results/SUMMARY.json benchmarks/v4/review_packets/
           git diff --cached --quiet && exit 0
           git commit -m "Update Historical Benchmark v4 frozen baseline"
           git pull --rebase origin main
