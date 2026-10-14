@@ -14,6 +14,10 @@ const OIDC_ISSUER="https://token.actions.githubusercontent.com";
 const OIDC_AUD="piratecartography-command-center";
 const MAX_BODY=65536;
 const RUN_EVENTS_LIMIT=1000;
+const OPERATOR_TOKEN=String(process.env.PCT_OPERATOR_TOKEN||"");
+const GITHUB_DISPATCH_TOKEN=String(process.env.PCT_GITHUB_DISPATCH_TOKEN||"");
+const CONTROLLED_WORKFLOW="jarvis-controlled-dispatch.yml";
+let lastDispatchAt=0;
 
 let baseline=null;
 let baselineFetchedAt=0;
@@ -37,6 +41,33 @@ function getJson(url){
       r.on("data",c=>{b+=c;if(b.length>2_000_000){r.destroy();reject(new Error("response_too_large"));}});
       r.on("end",()=>{if((r.statusCode||500)>=400)return reject(new Error("http_"+r.statusCode));try{resolve(JSON.parse(b))}catch(e){reject(e)}});
     }).on("error",reject);
+  });
+}
+function safeEqual(a,b){
+  const x=Buffer.from(String(a||"")),y=Buffer.from(String(b||""));
+  return x.length===y.length&&x.length>0&&crypto.timingSafeEqual(x,y);
+}
+function githubWorkflowDispatch(inputs){
+  return new Promise((resolve,reject)=>{
+    if(!GITHUB_DISPATCH_TOKEN)return reject(new Error("github_dispatch_not_configured"));
+    const body=JSON.stringify({ref:"main",inputs});
+    const req=https.request({
+      hostname:"api.github.com",
+      path:"/repos/"+REPO+"/actions/workflows/"+CONTROLLED_WORKFLOW+"/dispatches",
+      method:"POST",
+      headers:{
+        "user-agent":"piratecartography-command-center-live/1",
+        "accept":"application/vnd.github+json",
+        "authorization":"Bearer "+GITHUB_DISPATCH_TOKEN,
+        "x-github-api-version":"2022-11-28",
+        "content-type":"application/json",
+        "content-length":Buffer.byteLength(body)
+      }
+    },r=>{
+      let b="";r.setEncoding("utf8");r.on("data",c=>b+=c);
+      r.on("end",()=>{if(r.statusCode===204)return resolve();reject(new Error("github_dispatch_http_"+r.statusCode+(b?":"+b.slice(0,300):"")));});
+    });
+    req.on("error",reject);req.end(body);
   });
 }
 async function refreshBaseline(force=false){
@@ -116,9 +147,28 @@ const server=http.createServer(async(req,res)=>{
   try{
     const u=new URL(req.url,"http://localhost");const p=normalizePath(u.pathname);
     if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":"https://lepe12.github.io","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type"});return res.end();}
-    if(req.method==="GET"&&p==="/health"){const b=await refreshBaseline();return json(res,200,{status:"PASS",service:"piratecartography-command-center-live",websocket:true,baseline_run_id:b?.run_id||null});}
+    if(req.method==="GET"&&p==="/health"){const b=await refreshBaseline();return json(res,200,{status:"PASS",service:"piratecartography-command-center-live",websocket:true,dispatch_configured:Boolean(OPERATOR_TOKEN&&GITHUB_DISPATCH_TOKEN),baseline_run_id:b?.run_id||null});}
     const sm=p.match(/^\/status\/([^/]+)\/([^/]+)$/);
     if(req.method==="GET"&&sm){if(sm[1]!=="piratecartography")return json(res,404,{error:"project"});return json(res,200,await statusFor(sm[2]));}
+    if(req.method==="POST"&&p==="/dispatch"){
+      if(!OPERATOR_TOKEN||!GITHUB_DISPATCH_TOKEN)return json(res,503,{error:"dispatch_not_configured"});
+      const auth=String(req.headers.authorization||"");
+      if(!auth.startsWith("Bearer ")||!safeEqual(auth.slice(7),OPERATOR_TOKEN))return json(res,401,{error:"invalid_operator_key"});
+      if(Date.now()-lastDispatchAt<8000)return json(res,429,{error:"dispatch_rate_limited"});
+      const body=JSON.parse(await readBody(req));
+      const query=String(body?.query||"").trim();
+      if(query.length<3||query.length>500)return json(res,400,{error:"invalid_query"});
+      const requestId="ui-"+Date.now().toString(36)+"-"+crypto.randomBytes(4).toString("hex");
+      await githubWorkflowDispatch({
+        target:query,
+        aliases:"",
+        date_range:"",
+        purpose:query,
+        selected_agents:""
+      });
+      lastDispatchAt=Date.now();
+      return json(res,202,{status:"DISPATCHED",request_id:requestId,workflow:CONTROLLED_WORKFLOW});
+    }
     if(req.method==="POST"&&p==="/events"){
       const auth=String(req.headers.authorization||"");if(!auth.startsWith("Bearer "))return json(res,401,{error:"missing_oidc"});
       await verifyGithubOidc(auth.slice(7));
@@ -171,4 +221,4 @@ if(require.main===module || typeof PhusionPassenger !== "undefined"){
     loopback.listen(PORT,"127.0.0.1");
   }
 }
-module.exports={normalizePath,frameText,statusFor,verifyGithubOidc,server};
+module.exports={normalizePath,frameText,statusFor,verifyGithubOidc,safeEqual,server};
