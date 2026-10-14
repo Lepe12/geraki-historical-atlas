@@ -30,5 +30,5 @@ in the current run's SYSTEM_HEALTH.json and imported as a document by the
 unchanged MariaDB importer. It is a routing review, not human verification and
 not an in-place repair of old candidate rows.
 
-No workflow permissions, ten-lane scheduling, hosting, WordPress, .htaccess,
+No workflow permissions, eleven-lane scheduling, hosting, WordPress, .htaccess,
 database credentials or five-minute importer settings change.
