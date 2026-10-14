@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Fail if the ten lane payloads do not share one exact research request identity."""
 import json,pathlib,sys
-LANES=["travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]
+LANES=["greek","travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]
 rows=[];missing=[]
 for lane in LANES:
     p=pathlib.Path("research_lanes")/f"{lane}.json"
