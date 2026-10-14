@@ -1,3 +1,5 @@
+> **ENGINEERING HISTORY / RETAINED AUDIT RECORD.** This file records earlier reliability repair work and observed runs. It is not the current system specification. See `docs/SYSTEM_SPEC.md`, `docs/general-research-doctrine.md` and `benchmarks/v4/README.md`.
+
 # Research reliability repair
 
 The discovery layer now ranks source metadata against request identity, while retaining ambiguous and excluded leads. Publication dates affect priority only; they never establish event dates. Generic place controls cover both Milos and Naxos; no source identifiers or presumed events are injected. Optional `target_context` accepts `type` and explicit `region_terms`; these are search constraints, not evidence.
