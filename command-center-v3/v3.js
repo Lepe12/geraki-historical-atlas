@@ -41,7 +41,7 @@ function useFlatMap(reason){
 }
 function createMap(){
  if(!window.maplibregl){useFlatMap("MapLibre unavailable");return;}
- try{map=new maplibregl.Map({container:"map",style:"https://tiles.openfreemap.org/styles/liberty",center:[16.5,38.8],zoom:4.35,pitch:45,bearing:-12,antialias:true,maxPitch:65,attributionControl:true});
+ try{map=new maplibregl.Map({container:"map",style:"https://tiles.openfreemap.org/styles/fiord",center:[16.5,38.8],zoom:4.35,pitch:45,bearing:-12,antialias:true,maxPitch:65,attributionControl:true});
  map.on("load",()=>{loaded=true;styleMap();addMarkers();$("map-error").hidden=true;window.dispatchEvent(new CustomEvent("pct:map-ready",{detail:{map}}));});
  map.on("error",err=>{console.warn("MapLibre:",err.error||err);if(!loaded)useFlatMap(err.error?.message||"Map style unavailable");});
  }catch(e){useFlatMap(e.message||"WebGL unavailable")}
