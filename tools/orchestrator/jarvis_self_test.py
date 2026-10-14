@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 
 CHECKS=[
  ("controlled_dispatch",".github/workflows/jarvis-controlled-dispatch.yml"),
+ ("automatic_agent_planner","tools/orchestrator/jarvis_agent_planner.py"),
  ("archive_escalation",".github/workflows/jarvis-archive-escalation.yml"),
  ("multi_agent_workflow",".github/workflows/pct-parallel-multi-agent.yml"),
  ("moreveneto_browser","connectors/moreveneto_browser_search.py"),
@@ -28,6 +29,7 @@ def audit(root:Path):
         d=json.loads(policy.read_text(encoding="utf-8"))
         caps.append({"capability":"kill_switch","status":"AVAILABLE","enabled":bool(d.get("dispatch",{}).get("kill_switch"))})
         caps.append({"capability":"dispatch_mode","status":str(d.get("mode","UNKNOWN"))})
+        caps.append({"capability":"automatic_agent_selection","status":"ENABLED" if d.get("dispatch",{}).get("auto_select_agents") else "DISABLED","manual_override_allowed":bool(d.get("dispatch",{}).get("manual_override_allowed"))})
     return {
       "schema":"pct-jarvis-self-test-v1",
       "generated_utc":datetime.now(timezone.utc).isoformat(),
