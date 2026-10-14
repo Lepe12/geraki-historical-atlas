@@ -29,6 +29,14 @@ try{
  await page.locator(".play-controls .play").click();await page.waitForTimeout(1100);
  assert.ok(await page.locator(".chamber.replaying").count()===1,"Actual recorded playback must activate");
  await page.locator(".play-controls .play").click();
+ const clickTargets=page.locator('svg[aria-label="JARVIS research agent network"] circle[style*="pointer-events"]');
+ assert.ok(await clickTargets.count()>=16,"All agent nodes have selectable targets");
+ await clickTargets.first().click();
+ assert.equal(await page.locator(".agent-dossier").isVisible(),true,"Selecting a graph agent opens real research dossier.");
+ await page.locator(".dossier-actions button").first().click();
+ assert.equal(await page.getByRole("button",{name:"ARCHIVES",exact:true}).getAttribute("class"),"active");
+ await page.getByRole("button",{name:"NETWORK",exact:true}).click();
+ await page.locator(".dossier-top button").click();
  await page.screenshot({path:"/tmp/jarvis-v5-network-desktop.png",fullPage:true});
  await page.getByRole("button",{name:"ARCHIVES",exact:true}).click();
  await page.locator(".records-scroll .record").first().click();
@@ -44,6 +52,12 @@ try{
  assert.deepEqual(errors,[],"Browser JS errors");
  const mobile=await preparePage({width:390,height:844});
  await mobile.page.screenshot({path:"/tmp/jarvis-v5-network-mobile.png",fullPage:true});
+ await mobile.page.locator(".mobile-agent-access button").click();
+ assert.equal(await mobile.page.locator(".mobile-agent-sheet").isVisible(),true);
+ assert.equal(await mobile.page.locator(".agent-options button").count(),16);
+ await mobile.page.locator(".agent-options button").first().click();
+ assert.equal(await mobile.page.locator(".agent-dossier").isVisible(),true,"Mobile agent directory opens real dossier.");
+
  assert.equal(await mobile.page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+4),false,"Mobile should not overflow");
  assert.deepEqual(mobile.errors,[]);
  console.log("PASS: APEX original SVG network, 16 JARVIS agent nodes, 142 real replay events, evidence, scientific review, mission draft, mobile.");
