@@ -1,0 +1,39 @@
+name: JARVIS APEX Research Network — Build and Browser Audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - "command-center-v5/**"
+      - ".github/workflows/jarvis-apex-network-audit.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  research-network:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install research network dependencies
+        working-directory: command-center-v5
+        run: npm install --no-audit --no-fund
+      - name: Compile real APEX SVG and WebGL components
+        working-directory: command-center-v5
+        run: npm run build
+      - name: Install Chromium
+        working-directory: command-center-v5
+        run: npx playwright install chromium
+      - name: Browser test with real Milos research snapshot
+        working-directory: command-center-v5
+        run: node browser-smoke.mjs
+      - name: Preserve actual rendered desktop/mobile screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jarvis-apex-network-browser-screens
+          path: |
+            /tmp/jarvis-v5-network-desktop.png
+            /tmp/jarvis-v5-network-mobile.png
+          if-no-files-found: ignore
