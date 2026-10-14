@@ -14,6 +14,7 @@ CHECKS=[
  ("mariadb_queue","tools/storage/queue_mariadb_storage.py"),
  ("observer","tools/orchestrator/jarvis_observer.py"),
  ("recovery_engine","tools/orchestrator/jarvis_recovery.py"),
+ ("runtime_guard","tools/orchestrator/jarvis_runtime_guard.py"),
  ("state_board","tools/orchestrator/jarvis_state_board.py"),
 ]
 
