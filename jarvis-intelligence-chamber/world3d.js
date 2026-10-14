@@ -105,6 +105,24 @@ nodeGeometry.setAttribute("position",new THREE.BufferAttribute(points,3));
 nodeGeometry.setAttribute("color",new THREE.BufferAttribute(pointColors,3));
 const starNodes=new THREE.Points(nodeGeometry,new THREE.PointsMaterial({size:9.4,vertexColors:true,transparent:true,opacity:.92,sizeAttenuation:true,depthWrite:false,blending:THREE.AdditiveBlending}));
 world.add(starNodes);
+// Second-resolution constellation geometry, only unveiled upon approach.
+// Procedural points are navigation scaffolding, not historical evidence.
+const detailedRegions=regions.map((region,ri)=>{
+ const positions=[],connections=[];
+ const center=new THREE.Vector3(...region.center);
+ const local=[];
+ for(let i=0;i<region.count*3;i++){
+  const base=nodes.filter(n=>n.regionIndex===ri)[i%region.count].position;
+  const p=base.clone().add(new THREE.Vector3((rand()-.5)*62,(rand()-.5)*62,(rand()-.5)*38));
+  local.push(p);positions.push(p.x,p.y,p.z);
+  if(i%3!==0){connections.push(...p.toArray(),...base.toArray())}
+ }
+ const geometry=new THREE.BufferGeometry();geometry.setAttribute("position",new THREE.Float32BufferAttribute(positions,3));
+ const dots=new THREE.Points(geometry,new THREE.PointsMaterial({color:ri===6?0xe5b05c:0x25b4dc,size:4.7,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending}));
+ const linesGeometry=new THREE.BufferGeometry();linesGeometry.setAttribute("position",new THREE.Float32BufferAttribute(connections,3));
+ const strands=new THREE.LineSegments(linesGeometry,new THREE.LineBasicMaterial({color:0x3d9eac,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending}));
+ world.add(dots,strands);return {dots,strands,alpha:0,center};
+});
 function makeLines(selected,opacity,color){
  const data=[];
  for(const e of edges){if(Boolean(e.major)!==selected)continue;
@@ -289,6 +307,18 @@ function frame(){
  yaw=THREE.MathUtils.lerp(yaw,targetYaw,k);pitch=THREE.MathUtils.lerp(pitch,targetPitch,k);focus.lerp(goal,k);
  camera.position.set(focus.x+distance*Math.sin(yaw)*Math.cos(pitch),focus.y+distance*Math.sin(pitch),focus.z+distance*Math.cos(yaw)*Math.cos(pitch));
  camera.lookAt(focus);
+ // Geometric level of detail is physically unveiled at close range, never on overview.
+ for(let ri=0;ri<detailedRegions.length;ri++){
+   const detail=detailedRegions[ri];
+   const proximity=focus.distanceTo(detail.center);
+   const visible=(activeRegion===ri||proximity<260)&&distance<930;
+   const target=visible?THREE.MathUtils.smoothstep(930-distance,0,610):0;
+   detail.alpha=THREE.MathUtils.lerp(detail.alpha,target,Math.min(1,dt*3.5));
+   detail.dots.material.opacity=detail.alpha*.70;
+   detail.strands.material.opacity=detail.alpha*.23;
+   detail.dots.visible=detail.alpha>.008;
+   detail.strands.visible=detail.alpha>.008;
+ }
  const w=canvas.clientWidth,h=canvas.clientHeight;
  if(w&&h&&(canvas.width!==Math.round(w*renderer.getPixelRatio())||canvas.height!==Math.round(h*renderer.getPixelRatio()))){
   camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false);composer.setSize(w,h);
