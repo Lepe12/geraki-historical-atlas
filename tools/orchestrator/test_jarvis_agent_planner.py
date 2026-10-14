@@ -52,7 +52,7 @@ class AgentPlannerTests(unittest.TestCase):
             "purpose":"Comprehensive research across all archives and all sources",
         },self.policy())
         self.assertEqual(plan["strategy"],"explicit_broad_coverage")
-        self.assertEqual(len(plan["selected_agents"]),10)
+        self.assertEqual(len(plan["selected_agents"]),11)
         self.assertEqual(plan["confidence"],"HIGH")
 
 
