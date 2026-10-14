@@ -1,46 +1,27 @@
-# JARVIS live observer adapter
+# JARVIS live observer adapter — legacy diagnostic
 
-JARVIS is now wired to the **real Piratecartography run artifacts** already
-produced by the ten research lanes.
+**Status: retained diagnostic component, not the current JARVIS operating mode.**
 
-The adapter reads:
+The current JARVIS policy is `controlled_dispatch`; see `docs/JARVIS_CONTROLLED_DISPATCH.md` and `tools/orchestrator/jarvis_policy.json`.
+
+The observer adapter remains useful because it performs a read-only interpretation of durable Piratecartography run artifacts without dispatching agents or changing evidence.
+
+It reads:
 
 - `evidence/runs/<run_id>/SYSTEM_HEALTH.json`
 - `evidence/runs/<run_id>/MARIADB_STORAGE_INTENT.json`
 
-These are the same artifacts used to describe lane health and queue host-local
-MariaDB persistence.
-
-## Current mode: observer
+It understands the current **11 research lanes** and reports lane status, blockers, repository errors, candidate counts, verified-event counts and MariaDB persistence intent.
 
 Run:
 
 ```bash
 python3 tools/orchestrator/jarvis_observer.py
+python3 tools/orchestrator/jarvis_observer.py --run-id RUN_ID
 ```
 
-or pin a specific run:
+## Safety boundary
 
-```bash
-python3 tools/orchestrator/jarvis_observer.py --run-id 38436190001
-```
+The observer does **not** dispatch/cancel research agents, write to MariaDB, change the importer, promote evidence to VERIFIED, or modify WordPress/Plesk/secrets/GitHub settings.
 
-The generated report contains per-lane status, blockers, repository errors,
-candidate counts, verified-event counts, MariaDB persistence intent and JARVIS
-readiness recommendations.
-
-### Deliberate safety boundary
-
-This adapter does **not**:
-
-- dispatch or cancel any research agent
-- write to MariaDB
-- change the five-minute importer
-- promote any evidence to VERIFIED
-- modify WordPress, Plesk, secrets or GitHub Actions settings
-
-This is the first real integration step: JARVIS sees the actual ten-agent
-pipeline and its MariaDB storage state without becoming a new failure point.
-
-The next rollout gate is controlled dispatch, after observer output is checked
-against several real runs.
+This file is retained for recovery and regression diagnostics. It must not be used to infer that JARVIS is still observer-only.
