@@ -1,3 +1,5 @@
+> **HISTORICAL SNAPSHOT — NOT CURRENT CANONICAL STATUS.** This document is retained for audit chronology. For current architecture/status use `docs/CANONICAL_DOCUMENTATION.md` and `docs/SYSTEM_SPEC.md`.
+
 # Connector verification matrix — 2026-10-12
 
 Source: GitHub Actions PCT run 38285556230, per-lane repository discovery logs. Status applies to **catalogue search execution**, not archival completeness or historical verification.
