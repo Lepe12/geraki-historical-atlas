@@ -1,0 +1,64 @@
+name: Command Center Production Gate
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'server/command-center-live/**'
+      - 'tools/gateway/deploy_command_center_live.sh'
+      - 'tools/orchestrator/jarvis_event_bus.py'
+      - 'command-center/**'
+      - '.github/workflows/command-center-production-gate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  production-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate production code
+        run: |
+          node --check server/command-center-live/app.js
+          node server/command-center-live/self-test.js
+          node --check command-center/command-center.js
+          python3 -m py_compile tools/orchestrator/jarvis_event_bus.py tools/orchestrator/build_command_center_snapshot.py
+          python3 tools/test_command_center_snapshot.py
+
+      - name: Validate durable live snapshot
+        run: |
+          test -s command-center/live/latest.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('command-center/live/latest.json',encoding='utf-8'))
+          assert d['schema']=='pct-command-center-live-v1'
+          assert d['source']=='DURABLE_GITHUB_EVIDENCE'
+          assert d['safety']['automatic_verified'] is False
+          assert isinstance(d['agents'],list) and len(d['agents'])>0
+          print('SNAPSHOT PASS',d['run_id'],'agents',len(d['agents']),'claims',len(d.get('claims',[])))
+          PY
+
+      - name: Probe Plesk production WebSocket backend
+        id: probe
+        continue-on-error: true
+        run: |
+          curl --fail --silent --show-error --max-time 10             https://piratecartography.com/pct-api/live/health             -o /tmp/pct-command-center-health.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/pct-command-center-health.json'))
+          assert d.get('status')=='PASS'
+          assert d.get('websocket') is True
+          print('PLESK LIVE BACKEND PASS',d)
+          PY
+
+      - name: Report production transport state
+        run: |
+          if [ "${{ steps.probe.outcome }}" = "success" ]; then
+            echo "COMMAND_CENTER_PRODUCTION_LIVE=PASS"
+          else
+            echo "COMMAND_CENTER_PRODUCTION_LIVE=PLESK_NODE_ACTIVATION_REQUIRED"
+            echo "Static durable snapshot remains real-data and operational; WebSocket transport is not yet externally reachable."
+          fi
