@@ -18,15 +18,15 @@ The durable fallback is real research data and contains no preview/demo records.
 
 Default backend:
 
-`https://piratecartography.com/pct-api/live`
+`https://www.piratecartography.com/pct-api/live`
 
 Health endpoint:
 
-`https://piratecartography.com/pct-api/live/health`
+`https://www.piratecartography.com/pct-api/live/health`
 
 WebSocket:
 
-`wss://piratecartography.com/pct-api/live/ws/piratecartography/latest`
+`wss://www.piratecartography.com/pct-api/live/ws/piratecartography/latest`
 
 ## Plesk Node application
 
