@@ -240,6 +240,55 @@ function verifiedRecord(record,kind,index){
  hit.position.copy(pos);hit.userData.node=node;hit.visible=false;evidenceLayer.add(hit);
  node.evidenceMeshes=[spot,hit];evidenceClickables.push(hit);selectables.push(hit);evidenceCount++;
 }
+const researchState={snapshot:null,events:[],tab:"agents"};
+const researchRoot=$("researchExplorer"),researchBody=$("researchBody");
+$("toggleResearch")?.addEventListener("click",()=>{
+ const isOpen=researchBody.hidden;
+ researchBody.hidden=!isOpen;
+ $("toggleResearch").setAttribute("aria-expanded",String(isOpen));
+ $("toggleResearch").textContent=isOpen?"CLOSE ▴":"EXPLORE ▾";
+});
+document.querySelectorAll("[data-research-tab]").forEach(button=>button.addEventListener("click",()=>{
+ researchState.tab=button.dataset.researchTab;
+ document.querySelectorAll("[data-research-tab]").forEach(b=>b.setAttribute("aria-pressed",String(b===button)));
+ renderResearch();
+}));
+function researchItem(title,subtitle,description){
+ const el=document.createElement("article");el.className="research-item";
+ const strong=document.createElement("strong");strong.textContent=String(title||"Unnamed record");el.appendChild(strong);
+ if(subtitle){const small=document.createElement("small");small.textContent=String(subtitle);el.appendChild(small)}
+ if(description){const p=document.createElement("p");p.textContent=String(description);el.appendChild(p)}
+ return el;
+}
+function renderResearch(){
+ const data=researchState.snapshot,root=$("researchRecords");if(!root)return;
+ const put=(id,value)=>{const el=$(id);if(el)el.textContent=value};
+ put("researchConnection",connectionMode);
+ put("researchRun",currentRun?"RUN "+currentRun:"RUN —");
+ const agents=Array.isArray(data?.agents)?data.agents:[];
+ const blockers=Array.isArray(data?.blockers)?data.blockers:[];
+ const claims=Array.isArray(data?.claims)?data.claims:[];
+ put("researchAgents","AGENTS "+agents.length);
+ put("researchBlockers","BLOCKERS "+blockers.length);
+ put("researchClaims","CLAIMS "+claims.length);
+ root.replaceChildren();
+ let items=[];
+ if(researchState.tab==="agents")items=agents.map(a=>researchItem(a.label||a.id,a.status||"UNKNOWN",String(a.phase||"")+" · blockers "+String(a.blocker_count??"—")));
+ if(researchState.tab==="sources")items=blockers.map((b,i)=>researchItem(b.repository||"Unidentified repository",b.status||"UNKNOWN",String(b.agent_id||"Unknown agent")+" · operational obstacle "+(i+1)));
+ if(researchState.tab==="claims")items=claims.map(c=>researchItem(c.claim||c.description||c.claim_id||c.id||"Candidate claim",c.status||"UNVERIFIED",c.source_reference||c.source||"Source reference unavailable"));
+ if(researchState.tab==="contradictions"){
+  const c=data?.contradictions;
+  items=c?[researchItem("Contradiction search",c.status||"NOT ADJUDICATED",String(c.note||"")+" · search records "+String(c.search_records??"—"))]:[];
+ }
+ if(researchState.tab==="review"){
+  const review=data?.safety;
+  items=[researchItem("Scientific verification",review?.automatic_verified===false?"AUTOMATIC VERIFIED DISABLED":"NOT CONFIRMED",review?.human_review_required?"Human review required":"Review state not supplied")];
+ }
+ const visible=items.slice(0,250);
+ if(!visible.length){const p=document.createElement("p");p.className="research-empty";p.textContent="No recorded "+researchState.tab+" in the current run. This does not imply historical absence.";root.appendChild(p)}
+ else root.append(...visible);
+ if(items.length>visible.length){const p=document.createElement("p");p.className="research-empty";p.textContent="Showing "+visible.length+" of "+items.length+" records";root.appendChild(p)}
+}
 let currentRun="",connectionMode="OFFLINE";
 const recentEventIds=new Set();
 function clearEvidence(){
@@ -252,6 +301,7 @@ function setConnection(mode,detail){
  document.body.dataset.feedDetail=detail||"";
  const el=$("linkCount");
  if(el)el.textContent=mode+" · "+(currentRun?"RUN "+currentRun:"NO RUN");
+ renderResearch();
 }
 function receiveSnapshot(data,origin){
  if(data.schema!=="pct-command-center-live-v1"||!Array.isArray(data.agents)||!Array.isArray(data.blockers)||!Array.isArray(data.claims))return;
@@ -260,6 +310,7 @@ function receiveSnapshot(data,origin){
  if(connectionMode==="LIVE"&&origin==="LIVE"&&evidenceSource==="LIVE EVENT")return;
  clearEvidence();recentEventIds.clear();
  currentRun=String(data.run_id||"");evidenceRun=currentRun;
+ researchState.snapshot=data;researchState.events=[];
  evidenceSource=origin==="LIVE"?"LIVE BOOTSTRAP":"DURABLE SNAPSHOT";
  const laneState=new Map(data.agents.map(a=>[a.id,a]));
  for(const n of agentNodes)n.liveState=laneState.get(n.agentId)||null;
@@ -268,6 +319,7 @@ function receiveSnapshot(data,origin){
  document.body.dataset.evidenceSource=evidenceSource;
  document.body.dataset.evidenceRecords=String(evidenceCount);
  document.body.dataset.evidenceRun=evidenceRun;
+ renderResearch();
 }
 function receiveEvent(event){
  if(event.schema!=="pct-jarvis-event-v1"||!event.run_id)return;
@@ -276,13 +328,15 @@ function receiveEvent(event){
  if(id){recentEventIds.add(id);if(recentEventIds.size>1000)recentEventIds.delete(recentEventIds.values().next().value);}
  const run=String(event.run_id);
  if(run!==currentRun){
-  currentRun=run;evidenceRun=run;clearEvidence();
+  currentRun=run;evidenceRun=run;clearEvidence();researchState.snapshot=null;researchState.events=[];
   for(const n of agentNodes)n.liveState=null;
   document.body.dataset.evidenceRecords="0";
   document.body.dataset.evidenceRun=run;
  }
+ researchState.events.push(event);if(researchState.events.length>200)researchState.events.shift();
  const n=evidenceAgentMap.get(String(event.agent_id||""));
  if(n)n.liveState={...(n.liveState||{}),status:String(event.status||event.event_type||"EVENT"),phase:String(event.phase||""),percent:event.percent};
+ if(researchState.snapshot?.agents&&n){const a=researchState.snapshot.agents.find(a=>a.id===n.agentId);if(a){a.status=n.liveState.status;a.phase=n.liveState.phase;a.percent=event.percent}}
  evidenceSource="LIVE EVENT";
  document.body.dataset.evidenceSource=evidenceSource;
  document.body.dataset.lastEvent=String(event.event_type||"");
