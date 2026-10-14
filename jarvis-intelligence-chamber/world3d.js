@@ -201,6 +201,32 @@ agentNodes.forEach(n=>allLabels.push({position:n.position,el:label(n,n.name,fals
 const focus=new THREE.Vector3(),goal=new THREE.Vector3();
 let targetDistance=1640,distance=1640,panX=0,panY=0,yaw=.05,pitch=.22,targetYaw=yaw,targetPitch=pitch;
 let selected=null,dragging=false,dragged=false,lastX=0,lastY=0;
+let activeRegion=-1;
+const navigationHistory=[];
+function flyTo(position,zoom=510,region=-1){
+ navigationHistory.push({target:goal.clone(),zoom:targetDistance,region:activeRegion});
+ if(navigationHistory.length>20)navigationHistory.shift();
+ goal.copy(position);targetDistance=zoom;activeRegion=region;
+ document.body.dataset.activeRegion=region>=0?regions[region].name:"NODE";
+}
+function goBack(){
+ const previous=navigationHistory.pop();
+ if(previous){goal.copy(previous.target);targetDistance=previous.zoom;activeRegion=previous.region}
+ else reset();
+ document.body.dataset.activeRegion=activeRegion>=0?regions[activeRegion].name:"OVERVIEW";
+}
+function regionHit(event){
+ const rect=canvas.getBoundingClientRect(),mx=event.clientX-rect.left,my=event.clientY-rect.top;
+ let best=null,bestD=75;
+ for(let i=0;i<regions.length;i++){
+  const p=new THREE.Vector3(...regions[i].center).project(camera);
+  if(p.z<-1||p.z>1)continue;
+  const sx=(p.x+1)*rect.width*.5,sy=(1-p.y)*rect.height*.5;
+  const d=Math.hypot(sx-mx,sy-my);
+  if(d<bestD){bestD=d;best=i}
+ }
+ return best;
+}
 const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();
 function projectToMouse(e){const b=canvas.getBoundingClientRect();pointer.set((e.clientX-b.left)/b.width*2-1,-(e.clientY-b.top)/b.height*2+1)}
 function select(n){
@@ -214,7 +240,11 @@ function select(n){
  write("detailRole",n.name==="JARVIS"?"ORCHESTRATION":"RESEARCH");
  write("detailState","VISUAL ONLY");
 }
-function reset(){goal.set(0,0,0);targetDistance=1640;targetYaw=.05;targetPitch=.22;selected=null;$("detailPanel")?.classList.add("hidden")}
+function reset(){
+ goal.set(0,0,0);targetDistance=1640;targetYaw=.05;targetPitch=.22;selected=null;activeRegion=-1;
+ navigationHistory.length=0;document.body.dataset.activeRegion="OVERVIEW";
+ $("detailPanel")?.classList.add("hidden");
+}
 function pick(e){projectToMouse(e);ray.setFromCamera(pointer,camera);return ray.intersectObjects(selectables,false)[0]?.object.userData.node||null}
 canvas.addEventListener("pointerdown",e=>{dragging=true;dragged=false;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId)});
 canvas.addEventListener("pointermove",e=>{
@@ -225,14 +255,30 @@ canvas.addEventListener("pointermove",e=>{
  lastX=e.clientX;lastY=e.clientY;
 });
 canvas.addEventListener("contextmenu",e=>e.preventDefault());
-canvas.addEventListener("pointerup",e=>{if(!dragged){const node=pick(e);if(node)select(node)}dragging=false});
+canvas.addEventListener("pointerup",e=>{
+ if(!dragged){
+  const node=pick(e);
+  if(node){select(node);flyTo(node.position,350,node.regionIndex)}
+  else{const region=regionHit(e);if(region!==null){flyTo(new THREE.Vector3(...regions[region].center),460,region)}}
+ }
+ dragging=false;
+});
 canvas.addEventListener("pointercancel",()=>dragging=false);
 canvas.addEventListener("wheel",e=>{e.preventDefault();targetDistance=THREE.MathUtils.clamp(targetDistance*Math.exp(e.deltaY*.001),95,4500)},{passive:false});
 $("zoomIn")?.addEventListener("click",()=>targetDistance=Math.max(95,targetDistance*.78));
 $("zoomOut")?.addEventListener("click",()=>targetDistance=Math.min(4500,targetDistance*1.27));
 $("resetView")?.addEventListener("click",reset);
 $("closeDetail")?.addEventListener("click",()=>{$("detailPanel")?.classList.add("hidden");selected=null});
-$("focusButton")?.addEventListener("click",()=>{if(selected){goal.copy(selected.position);targetDistance=360}});
+$("focusButton")?.addEventListener("click",()=>{if(selected)flyTo(selected.position,280,selected.regionIndex)});
+window.addEventListener("keydown",e=>{
+ if(e.key==="Escape"||e.key==="Backspace"){if(["INPUT","TEXTAREA"].includes(document.activeElement?.tagName))return;e.preventDefault();goBack()}
+ if(e.key==="Home")reset();
+});
+canvas.addEventListener("dblclick",e=>{
+ const region=regionHit(e);
+ if(region!==null)flyTo(new THREE.Vector3(...regions[region].center),330,region);
+});
+document.body.dataset.activeRegion="OVERVIEW";
 function frame(){
  requestAnimationFrame(frame);
  const dt=Math.min(clock.getDelta(),.05),time=clock.elapsedTime,k=Math.min(dt*4,1);
@@ -271,7 +317,8 @@ function frame(){
   item.el.style.left=x+"px";item.el.style.top=y+"px";
   const onScreen=p.z>-1&&p.z<1&&x>65&&x<w-65&&y>35&&y<h-45;
   const focused=selected&&selected.position.distanceTo(item.position)<260;
-  const allow=item.region?distance>420:(distance<1100||focused);
+  const inside=activeRegion>=0&&item.position.distanceTo(new THREE.Vector3(...regions[activeRegion].center))<380;
+  const allow=item.region?distance>420:(distance<1100||focused||inside);
   const fade=THREE.MathUtils.clamp(1-depth/4600,.25,1);
   const halfWidth=item.region?98:72;
   const overlaps=occupied.some(box=>Math.abs(box.x-x)<box.r+halfWidth+12&&Math.abs(box.y-y)<30);
