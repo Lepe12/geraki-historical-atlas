@@ -52,6 +52,8 @@ jobs:
       matrix: ${{ steps.plan.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
+      - name: Validate specialist routing logic
+        run: python3 tools/test_specialist_routing.py
       - id: plan
         env:
           TARGET: ${{ inputs.target }}
