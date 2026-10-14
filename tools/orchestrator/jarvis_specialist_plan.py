@@ -59,7 +59,8 @@ def build(target,purpose,date_range="",aliases=None,target_type="auto"):
          "agent_id":aid,
          "label":load_registry()["agents"][aid]["label"],
          "queries":render_queries(aid,target,date_range,aliases or []),
-         "outputs":load_registry()["agents"][aid].get("outputs",[])
+         "outputs":load_registry()["agents"][aid].get("outputs",[]),
+         "source_routes":load_registry()["agents"][aid].get("source_routes",[])
       } for aid in agents],
       "parallel_agent_count":len(agents),
       "verified_promotion_allowed":False
