@@ -1,0 +1,877 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "identity_resolution",
+  "label": "Identity Resolution Agent",
+  "assignment_id": "identity_resolution:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "entity_candidates",
+    "variant_names",
+    "same_entity_assessment",
+    "collision_warnings"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "193954b455df3e479be3c76e810492f143fc7f42a1a9a44e7d56cd3e1a284ced",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "identity_resolution",
+    "assignment_id": "identity_resolution:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:SearchCulture.gr / EKT",
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:Biblioteca Digital Hispánica"
+    ],
+    "queries": [
+      "\"Jean Bart\" variant spelling",
+      "\"Jean Bart\" alias OR aliases",
+      "\"Jean Bart\" historical name",
+      "\"Jean Bart\" transliteration",
+      "\"Bart\" 1694-1694"
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 100,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Delpher",
+        "route_type": "repository_dispatch",
+        "repository": "Delpher",
+        "connector_id": null,
+        "score": 80,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 76,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 72,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "\"Bart\" 1694-1694",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "\"Jean Bart\" transliteration",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "\"Jean Bart\" variant spelling",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "\"Jean Bart\" historical name",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "\"Jean Bart\" alias OR aliases",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Bart\" variant spelling",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Jean+Bart%22+variant+spelling&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Bart\" alias OR aliases",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jean+Bart++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Bart\" variant spelling",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jean+Bart++variant+spelling%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Bart\" historical name",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jean+Bart++historical+name%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Bart\" transliteration",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jean+Bart++transliteration%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Bart\" transliteration",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Jean+Bart%22+transliteration&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Bart\" historical name",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Jean+Bart%22+historical+name&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Bart\" alias OR aliases",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Jean+Bart%22+alias+OR+aliases&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "\"Bart\" 1694-1694",
+      "records": [],
+      "diagnostic": "HTTPError: HTTP Error 403: Forbidden",
+      "blockers": [
+        {
+          "code": "EXECUTION_FAILED",
+          "detail": "HTTPError: HTTP Error 403: Forbidden"
+        }
+      ],
+      "warnings": [
+        "Repository connector raised an exception."
+      ],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Bart\" 1694-1694",
+      "records": [
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb37386769v",
+          "title": "Prose scelte / di Daniello Bartoli e Paolo Segnari ; a cura di Mario Scotti",
+          "creator": [
+            "Bartoli, Daniello. Auteur du texte",
+            "Segneri, Paolo. Auteur du texte"
+          ],
+          "date": [
+            "1980"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb37386769v",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb37386769v",
+            "ISBN 880201924X"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb352243327",
+          "title": "Romans et contes / Voltaire ; préface de Roland Barthes ; notes de José Lupin",
+          "creator": [
+            "Voltaire (1694-1778). Auteur du texte"
+          ],
+          "date": [
+            "1972"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb352243327",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb352243327"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb346986383",
+          "title": "Romans et contes / Voltaire ; préface de Roland Barthes ; notes de José Lupin",
+          "creator": [
+            "Voltaire (1694-1778). Auteur du texte"
+          ],
+          "date": [
+            "1976"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb346986383",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb346986383",
+            "ISBN 2070368769"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb397653301",
+          "title": "Oeuvres choisies... / François Marie Arouet Voltaire",
+          "creator": [
+            "Voltaire (1694-1778). Auteur du texte"
+          ],
+          "date": [
+            "1957"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb397653301",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb397653301"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb47478521v",
+          "title": "Romans et contes. II / Voltaire ; édition complète présentée, établie et annotée par Frédéric Deloffre ; avec la collaboration de Jacques Van den Heuvel et Jacqueline Hellegouarc'h ; postface de Roland Barthes",
+          "creator": [
+            "Voltaire (1694-1778). Auteur du texte"
+          ],
+          "date": [
+            "2023"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb47478521v",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb47478521v",
+            "ISBN 9782073048547"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb35512832f",
+          "title": "Candide et autres contes / Voltaire : éd. complète présentée, établie et annotée / par Frédéric Deloffre, avec la collab. de Jacques Van Den Heuvel ; postf. de Roland Barthes",
+          "creator": [
+            "Voltaire (1694-1778). Auteur du texte"
+          ],
+          "date": [
+            "1992"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb35512832f",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb35512832f",
+            "ISBN 2070384829"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb33218515p",
+          "title": "Oeuvres choisies...",
+          "creator": [
+            "Voltaire (1694-1778). Auteur du texte"
+          ],
+          "date": [],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb33218515p",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb33218515p"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb316040653",
+          "title": "Romans et Contes de Voltaire",
+          "creator": [
+            "Voltaire (1694-1778). Auteur du texte"
+          ],
+          "date": [
+            "1958"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb316040653",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb316040653"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb41887804x",
+          "title": "Jean-Bart à Versailles : fait historique en 1 acte / par Maréchalle et Durin",
+          "creator": [
+            "Maréchalle, Alexandre Marie (1786-1871). Auteur du texte",
+            "Durin. Auteur du texte"
+          ],
+          "date": [],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb41887804x",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb41887804x"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb381973857",
+          "title": "Virtuose Bläsermusik / Finger, Albinoni, Pezel... [et al.], comp. ; Wolfgang Basch, trp ; Han de Vries, Bart Schneemann, htb ; Maarten Dekkers, cor anglais... [et al.] ; Bob van Asperen, clav., org., dir.",
+          "creator": [
+            "Basch, Wolfgang (1947-....). Trompette",
+            "Finger, Gottfried (1660?-1730). Compositeur",
+            "Albinoni, Tomaso (1671-175.). Compositeur",
+            "Pezel, Johann Christoph (1639-1694). Compositeur"
+          ],
+          "date": [
+            "1991"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb381973857",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb381973857"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb38396547b",
+          "title": "Chamber music for trumpet and winds / Finger, Albinoni, Pezel... [et al.], comp. ; Wolfgang Basch, trp ; Han de Vries, Bart Schneemann, htb ; Maarten Dekkers, cor anglais... [et al.] ; Bob van Asperen, clav., org., dir.",
+          "creator": [
+            "Basch, Wolfgang (1947-....). Trompette",
+            "Finger, Gottfried (1660?-1730). Compositeur",
+            "Albinoni, Tomaso (1671-175.). Compositeur",
+            "Pezel, Johann Christoph (1639-1694). Compositeur"
+          ],
+          "date": [
+            "1997"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb38396547b",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb38396547b"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb45599814z",
+          "title": "Le 3 Juillet 1694 Jean-Bart rentre dans le Port de Dunkerque avec la Flotte ... : [estampe] / [d'après Pierre Ozanne] ; Gravé par Y. Le Gouaz",
+          "creator": [
+            "Le Gouaz, Yves-Marie (1742-1816). Graveur",
+            "Ozanne, Pierre (1737-1813). Dessinateur du modèle"
+          ],
+          "date": [
+            "1806"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb45599814z",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb45599814z"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb455954157",
+          "title": "Texel : Jean Bart / dessin & scénario, Jean-Yves Delitte,... ; couleurs, Douchka Delitte",
+          "creator": [
+            "Delitte, Jean-Yves. Auteur du texte"
+          ],
+          "date": [
+            "2018"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb455954157",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb455954157",
+            "ISBN 9782344026472"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb45599798j",
+          "title": "Le 29 Juin 1694 Jean-Bart rencontre la Flote chargée de grains pour la France ... : [estampe] / [d'après Pierre Ozanne] ; Gravé par Y. Le Gouaz",
+          "creator": [
+            "Le Gouaz, Yves-Marie (1742-1816). Graveur",
+            "Ozanne, Pierre (1737-1813). Dessinateur du modèle"
+          ],
+          "date": [
+            "1806"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb45599798j",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb45599798j"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb40274957p",
+          "title": "L'arrivée subite de Monseigneur le Dauphin avec l'armée du Roy a Espierre, le XXIV aoust [sic] 1694 ... : [estampe] / [non identifié]",
+          "creator": [],
+          "date": [
+            "1695"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb40274957p",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb40274957p"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb40488848z",
+          "title": "L'ARRIVÉE SUBITE DE MONSEIGNEUR LE DAUPHIN, AVEC L'ARMÉE DU ROY A ESPIERRE, LE XXIV. A AOUST 1694 : [estampe]",
+          "creator": [],
+          "date": [
+            "1695"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb40488848z",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb40488848z"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb43889939m",
+          "title": "[Recueil. Travaux des élèves du Laboratoire d'expérimentations graphiques. Année 2007-2008] / École Estienne",
+          "creator": [
+            "Barthes, Roland (1915-1980). Auteur du texte",
+            "Cheng, François (1929-....). Auteur du texte",
+            "Chiyo-ni (1703-1775). Auteur du texte",
+            "Colin, Fabrice (1972-.... ; romancier). Auteur du texte"
+          ],
+          "date": [
+            "2008"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb43889939m",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb43889939m"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb40102037g",
+          "title": "Le chevalier Jean Bart : 1694-1695 / Philippe de Courcillon, marquis de Dangeau ; texte établi par MM. Soulié, Dussieux, de Chennevières... [et al.] ; revu par Laurent Sortais",
+          "creator": [
+            "Dangeau, Philippe de Courcillon (1638-1720 ; marquis de). Auteur du texte"
+          ],
+          "date": [
+            "2005"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb40102037g",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb40102037g",
+            "ISBN 2849091227"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb40488432g",
+          "title": "LA CATALOGN¦E¦ - SOUMISE AU ROY - PAR LES LES VICTOIRES - DE MONSIEUR - LE MARECHAL -DVC - DE NOAILLES : [estampe]",
+          "creator": [],
+          "date": [
+            "1695"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb40488432g",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb40488432g"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb460746967",
+          "title": "Almanach Pour L'An de Grâce M.DC.XCV. L'Arrivée Subite De Monseigneur Le Dauphin Avec L'Armée Du Roy A Espierre Le XXIV Aoust 1694 : [estampe] / [Nicolas I Langlois]",
+          "creator": [
+            "Langlois, Nicolas (1640-1703). Graveur"
+          ],
+          "date": [
+            "1695"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb460746967",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb460746967"
+          ]
+        }
+      ],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Bart++1694-1694%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Bart\" 1694-1694",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Bart%22+AND+alma.all_for_ui%3D%221694-1694%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Bart\" transliteration",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Jean+Bart%22+AND+alma.all_for_ui%3D%22transliteration%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Bart\" alias OR aliases",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Jean+Bart%22+AND+alma.all_for_ui%3D%22alias%22+AND+alma.all_for_ui%3D%22OR%22+AND+alma.all_for_ui%3D%22aliases%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Bart\" variant spelling",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Jean+Bart%22+AND+alma.all_for_ui%3D%22variant%22+AND+alma.all_for_ui%3D%22spelling%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Bart\" historical name",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Jean+Bart%22+AND+alma.all_for_ui%3D%22historical%22+AND+alma.all_for_ui%3D%22name%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "result_count": 20,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
