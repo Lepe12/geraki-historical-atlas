@@ -1,0 +1,31 @@
+name: JARVIS V5 live bridge
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'jarvis-intelligence-chamber/**'
+      - '.github/workflows/jarvis-v5-live.yml'
+  pull_request:
+    paths:
+      - 'jarvis-intelligence-chamber/**'
+      - '.github/workflows/jarvis-v5-live.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  transport-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax
+        run: |
+          node --check jarvis-intelligence-chamber/live-bridge.js
+          node --check jarvis-intelligence-chamber/world3d.js
+          node --check jarvis-intelligence-chamber/visual-smoke.cjs
+          node --check jarvis-intelligence-chamber/live-bridge.test.cjs
+      - name: Read-only live bridge tests
+        run: node --test jarvis-intelligence-chamber/live-bridge.test.cjs
