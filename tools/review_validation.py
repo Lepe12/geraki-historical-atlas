@@ -35,7 +35,8 @@ def locator_valid(locator):
     page=locator.get('printed_page',locator.get('folio'))
     scan=locator.get('leaf',locator.get('scan_index'))
     canvas=locator.get('canvas_id')
-    return (text(page) or type(page) is int and page>=0) and (type(scan) is int and scan>=0 or text(canvas)) and (text(locator.get('source_id')) or text(locator.get('identifier')) or text(locator.get('url')))
+    image=locator.get('image_url') or locator.get('image_id')
+    return (text(page) or type(page) is int and page>=0) and (type(scan) is int and scan>=0 or text(canvas) or text(image)) and (text(locator.get('source_id')) or text(locator.get('identifier')) or text(locator.get('url')))
 
 
 def checked_evidence(items):
