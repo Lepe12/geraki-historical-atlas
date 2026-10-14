@@ -42,6 +42,8 @@ const regions=[
   {name:"HISTORICAL RELATIONSHIPS",kind:"science",center:[970,-390,-90],spread:[275,170,125],count:105},
   {name:"JARVIS INTELLIGENCE",kind:"core",center:[50,90,-20],spread:[170,140,90],count:65}
 ];
+// Agent identifiers map to actual command-center snapshot lanes.
+const agentIds=["spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african","travellers","source_genealogy","identity_resolution","contradiction","relationship_network","timeline","pirate_base"];
 const agents=[
 ["Spanish / Simancas",0],["Venetian Archives",1],["French Archives",0],
 ["British Archives",2],["Dutch Archives",2],["German Archives",2],
@@ -68,7 +70,7 @@ agents.forEach(([name,region],i)=>{
  const origin=regions[region].center;
  const a=(i+1)*2.39996,radius=52+(i%5)*22;
  const p=new THREE.Vector3(origin[0]+Math.cos(a)*radius,origin[1]+Math.sin(a)*radius*.7,origin[2]+((i%4)-1.5)*19);
- const node=addNode(p,region,true,name);agentNodes.push(node);
+ const node=addNode(p,region,true,name);node.agentId=agentIds[i];agentNodes.push(node);
 });
 function edge(a,b,major=false){
  if(a===b)return;
@@ -213,6 +215,52 @@ function label(node,text,major){
  const element=document.createElement("div");element.className="node-label "+(major?"science":"archive");
  element.textContent=text;element.style.pointerEvents="none";labels.appendChild(element);return element;
 }
+// Read-only evidence overlay: unlike procedural map scaffolding, each evidence point
+// must originate in an actual durable run record. No synthetic "claims" are made.
+const evidenceLayer=new THREE.Group();world.add(evidenceLayer);
+const evidenceClickables=[];
+let evidenceCount=0, evidenceSource="UNAVAILABLE",evidenceRun="";
+const evidenceAgentMap=new Map(agentNodes.map(n=>[n.agentId,n]));
+function verifiedRecord(record,kind,index){
+ const id=String(record?.id||record?.claim_id||"").slice(0,120);
+ const agentId=String(record?.agent_id||"");
+ const agent=evidenceAgentMap.get(agentId);
+ if(!agent||!["claim","blocker"].includes(kind))return;
+ const status=String(record?.status||"UNVERIFIED").slice(0,70);
+ const label=String(record?.repository||record?.description||record?.claim||id||kind).slice(0,200);
+ const angle=(index+1)*2.3999632,rad=38+(index%8)*11;
+ const pos=agent.position.clone().add(new THREE.Vector3(Math.cos(angle)*rad,Math.sin(angle)*rad*.7,(index%7-3)*9));
+ const node=addNode(pos,agent.regionIndex,true,label);
+ node.evidence={kind,status,agent_id:agentId,id,label};
+ const hue=kind==="blocker"?0xd88a4e:0x54dfb8;
+ const spot=new THREE.Mesh(new THREE.SphereGeometry(3.8,9,6),new THREE.MeshBasicMaterial({color:hue,transparent:true,opacity:.94}));
+ spot.position.copy(pos);spot.visible=false;evidenceLayer.add(spot);
+ const hit=new THREE.Mesh(new THREE.SphereGeometry(13,8,6),new THREE.MeshBasicMaterial({visible:false}));
+ hit.position.copy(pos);hit.userData.node=node;hit.visible=false;evidenceLayer.add(hit);
+ node.evidenceMeshes=[spot,hit];evidenceClickables.push(hit);selectables.push(hit);evidenceCount++;
+}
+async function loadEvidence(){
+ try{
+  // The canonical snapshot is durable GitHub evidence, NOT a fabricated live websocket.
+  const res=await fetch("../command-center/live/latest.json",{cache:"no-store"});
+  if(!res.ok)throw Error("Snapshot HTTP "+res.status);
+  const data=await res.json();
+  if(data.schema!=="pct-command-center-live-v1"||!Array.isArray(data.agents)||!Array.isArray(data.blockers)||!Array.isArray(data.claims))throw Error("Unexpected evidence schema");
+  evidenceRun=String(data.run_id||"");evidenceSource="DURABLE SNAPSHOT";
+  const laneState=new Map(data.agents.map(a=>[a.id,a]));
+  for(const n of agentNodes)n.liveState=laneState.get(n.agentId)||null;
+  for(let i=0;i<data.claims.length;i++)verifiedRecord(data.claims[i],"claim",i);
+  // Show individual recorded blockers, not imagined archival results.
+  for(let i=0;i<data.blockers.length;i++)verifiedRecord(data.blockers[i],"blocker",i);
+  document.body.dataset.evidenceSource=evidenceSource;
+  document.body.dataset.evidenceRecords=String(evidenceCount);
+  document.body.dataset.evidenceRun=evidenceRun;
+ }catch(e){
+  document.body.dataset.evidenceSource="UNAVAILABLE";
+  document.body.dataset.evidenceRecords="0";
+  console.warn("JARVIS evidence overlay unavailable:",e.message);
+ }
+}
 const allLabels=[];
 regions.forEach((r,i)=>allLabels.push({position:new THREE.Vector3(...r.center),el:label(null,r.name,true),region:true}));
 agentNodes.forEach(n=>allLabels.push({position:n.position,el:label(n,n.name,false),region:false}));
@@ -251,12 +299,12 @@ function select(n){
  selected=n;
  const panel=$("detailPanel");if(panel)panel.classList.remove("hidden");
  const write=(id,text)=>{if($(id))$(id).textContent=text};
- write("detail-number",n.name==="JARVIS"?"NEXUS":"RESEARCH NODE");
- write("detailType","SPATIAL RESEARCH TOPOLOGY");
+ write("detail-number",n.evidence?"RECORDED "+n.evidence.kind.toUpperCase():(n.name==="JARVIS"?"NEXUS":"RESEARCH NODE"));
+ write("detailType",n.evidence?"DURABLE RUN "+evidenceRun:"SPATIAL RESEARCH TOPOLOGY");
  write("detailTitle",n.name);
- write("detailDescription","Research sector in an illustrative network. Connections do not represent verified historical relationships.");
+ write("detailDescription",n.evidence?"Recorded "+n.evidence.kind+" for "+n.evidence.agent_id+". "+n.evidence.label+". This is a run record, not independently verified historical evidence.":n.liveState?"Actual lane status: "+String(n.liveState.status||"UNKNOWN")+"; phase "+String(n.liveState.phase||"UNKNOWN")+". Network positions and connections remain illustrative.":"Research sector in an illustrative network. Connections do not represent verified historical relationships.");
  write("detailRole",n.name==="JARVIS"?"ORCHESTRATION":"RESEARCH");
- write("detailState","VISUAL ONLY");
+ write("detailState",n.evidence?n.evidence.status:n.liveState?String(n.liveState.status):"VISUAL ONLY");
 }
 function reset(){
  goal.set(0,0,0);targetDistance=1640;targetYaw=.05;targetPitch=.22;selected=null;activeRegion=-1;
@@ -319,6 +367,12 @@ function frame(){
    detail.dots.visible=detail.alpha>.008;
    detail.strands.visible=detail.alpha>.008;
  }
+ const closeRange=distance<850;
+ for(const hit of evidenceClickables){
+  const n=hit.userData.node;
+  const shown=closeRange&&(activeRegion===n.regionIndex||focus.distanceTo(n.position)<290);
+  for(const mesh of n.evidenceMeshes)mesh.visible=shown;
+ }
  const w=canvas.clientWidth,h=canvas.clientHeight;
  if(w&&h&&(canvas.width!==Math.round(w*renderer.getPixelRatio())||canvas.height!==Math.round(h*renderer.getPixelRatio()))){
   camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false);composer.setSize(w,h);
@@ -365,4 +419,5 @@ function frame(){
  composer.render();
 }
 $("detailPanel")?.classList.add("hidden");
+loadEvidence();
 frame();

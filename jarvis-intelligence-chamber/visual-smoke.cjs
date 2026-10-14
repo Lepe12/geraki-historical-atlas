@@ -9,6 +9,12 @@ await page.waitForFunction(()=>/^[0-9]+ FPS$/.test(document.querySelector("#fps"
 const result=await page.evaluate(()=>({canvasWidth:document.querySelector("#universe")?.width,labels:document.querySelectorAll(".node-label").length,bodyWidth:document.body.scrollWidth,viewport:innerWidth,detailHidden:document.querySelector("#detailPanel")?.classList.contains("hidden"),fps:document.querySelector("#fps")?.textContent}));
 report.screens.push({name,...result});
 await page.screenshot({path:out+"/"+name+".png",fullPage:true});
+if(name==="desktop"){
+ await page.waitForFunction(()=>document.body.dataset.evidenceSource==="DURABLE SNAPSHOT",{timeout:12000});
+ const evidence=await page.evaluate(()=>({source:document.body.dataset.evidenceSource,count:Number(document.body.dataset.evidenceRecords),run:document.body.dataset.evidenceRun}));
+ assert.ok(evidence.count>=0&&evidence.run,"Snapshot-based evidence nodes must have a durable run ID");
+ report.evidence=evidence;
+}
 assert.ok(result.canvasWidth>100,"3D renderer must own visible canvas");
 assert.match(result.fps,/^[0-9]+ FPS$/,"3D frame loop must advance");
 assert.equal(result.labels,23,"7 regions and 16 agents must exist");
