@@ -30,6 +30,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write
 
 env:
   PCT_TARGET: ${{ inputs.target }}
@@ -39,6 +40,7 @@ env:
   PCT_SELECTED_AGENTS: ${{ inputs.selected_agents }}
   # Host-local MariaDB is primary. Airtable is retained only as an explicit legacy option.
   PCT_STORAGE_BACKEND: mariadb
+  PCT_COMMAND_CENTER_URL: https://piratecartography.com/pct-api/live
 
 jobs:
   prepare:
@@ -139,6 +141,7 @@ jobs:
       PCT_REQUEST_FILE: ${{ needs.prepare.outputs.request_file }}
       PCT_EXPECTED_REQUEST_SHA256: ${{ needs.prepare.outputs.request_sha256 }}
       PCT_RESEARCH_JOB_ID: ${{ needs.prepare.outputs.research_job_id }}
+      PCT_RESEARCH_LANE: ${{ matrix.lane }}
       SEARCHCULTURE_API_KEY: ${{ secrets.SEARCHCULTURE_API_KEY }}
     steps:
       - uses: actions/checkout@v4
@@ -156,14 +159,16 @@ jobs:
           python3 tools/run_manifest.py
           python3 tools/build_research_lanes.py
           python3 tools/verify_request_integrity.py
+      - name: Announce lane start to Command Center
+        run: |
+          python3 tools/orchestrator/jarvis_event_bus.py --run-id "$GITHUB_RUN_ID" --event-type agent_started --agent-id "$PCT_RESEARCH_LANE" --phase "repository discovery" --percent 5 --status RUNNING --detail "JARVIS lane execution started"
       - name: Build lane-specific repository plan
-        env:
-          PCT_RESEARCH_LANE: ${{ matrix.lane }}
         run: |
           python3 tools/lane_repository_plan.py
           timeout 300s python3 tools/lane_repository_discovery.py || { code=$?; echo "LANE DISCOVERY FAILED exit=$code"; exit "$code"; }
           python3 tools/merge_specialist_candidates.py
           python3 tools/merge_repository_candidates.py
+          python3 tools/orchestrator/jarvis_event_bus.py --run-id "$GITHUB_RUN_ID" --event-type agent_progress --agent-id "$PCT_RESEARCH_LANE" --phase "repository discovery complete" --percent 35 --status RUNNING --detail "Repository discovery and candidate merge complete"
           if [ "$PCT_RESEARCH_LANE" = "german" ]; then PCT_BSB_POSITIVE_CONTROL=1 python3 tools/bsb_iiif_route.py; fi
           if [ "$PCT_RESEARCH_LANE" = "travellers" ]; then python3 tools/bsb_iiif_route.py; fi
       - name: Run lane research pipeline
@@ -185,6 +190,7 @@ jobs:
           python3 tools/verification_pipeline.py
           python3 tools/build_research_dossier.py
           python3 tools/research_lane_health.py
+          python3 tools/orchestrator/jarvis_event_bus.py --run-id "$GITHUB_RUN_ID" --event-type agent_progress --agent-id "$PCT_RESEARCH_LANE" --phase "evidence pipeline complete" --percent 90 --status RUNNING --detail "Acquisition, extraction, verification checks and dossier complete"
       - name: Preserve durable evidence in GitHub
         if: always()
         env:
@@ -203,6 +209,14 @@ jobs:
           done
           echo "WARNING: durable evidence commit failed after retries; Actions artifact remains available for recovery."
           exit 1
+      - name: Announce lane completion to Command Center
+        if: success()
+        run: |
+          python3 tools/orchestrator/jarvis_event_bus.py --run-id "$GITHUB_RUN_ID" --event-type agent_completed --agent-id "$PCT_RESEARCH_LANE" --phase "complete" --percent 100 --status COMPLETED --detail "Lane research completed and durable evidence preserved"
+      - name: Announce lane failure to Command Center
+        if: failure()
+        run: |
+          python3 tools/orchestrator/jarvis_event_bus.py --run-id "$GITHUB_RUN_ID" --event-type agent_failed --agent-id "$PCT_RESEARCH_LANE" --phase "failed" --percent 100 --status FAILED --detail "Lane research failed; inspect workflow artifacts and blockers"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
