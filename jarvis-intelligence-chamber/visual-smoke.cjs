@@ -24,6 +24,8 @@ await page.mouse.click(regionXY.x,regionXY.y);
 await page.waitForTimeout(400);
 const region=await page.evaluate(()=>document.body.dataset.activeRegion);
 assert.ok(region&&region!=="OVERVIEW","Clicking the Western region must initiate 3D navigation");
+await page.waitForTimeout(1450);
+await page.screenshot({path:out+"/desktop-region-exploration.png"});
 await page.keyboard.press("Escape");
 await page.waitForFunction(()=>document.body.dataset.activeRegion==="OVERVIEW");
 await page.screenshot({path:out+"/desktop-focused.png"});}
