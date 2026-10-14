@@ -5,6 +5,8 @@ import argparse, hashlib, json
 from pathlib import Path
 from typing import Any
 
+from jarvis_runtime_guard import validate_runtime_policy
+
 POLICY_PATH = Path("tools/orchestrator/jarvis_policy.json")
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -34,6 +36,10 @@ def validate(req: dict[str, Any], policy: dict[str, Any]) -> dict[str, Any]:
     dispatch = policy.get("dispatch", {})
     if policy.get("mode") != "controlled_dispatch":
         raise ValueError("JARVIS_NOT_IN_CONTROLLED_DISPATCH_MODE")
+    try:
+        validate_runtime_policy(policy)
+    except RuntimeError as exc:
+        raise ValueError("RUNTIME_POLICY_REJECTED:" + str(exc)) from exc
     if not dispatch.get("dispatch_enabled"):
         raise ValueError("DISPATCH_DISABLED")
     if dispatch.get("kill_switch"):
