@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="el"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#02070f"><meta name="description" content="JARVIS V4 — immersive historical research theater with an interactive 3D Mediterranean globe.">
+<title>PIRATECARTOGRAPHY — THE ARCHIVE UNIVERSE / JARVIS V4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="./universe.css">
+<script defer src="https://unpkg.com/globe.gl@2.45.0/dist/globe.gl.min.js"></script>
+<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script defer src="./universe.js"></script>
+</head><body>
+<div id="app" class="app" data-mode="universe" data-data="loading">
+  <div class="sky" aria-hidden="true"><div class="sky-stars s1"></div><div class="sky-stars s2"></div><div class="sky-fog"></div></div>
+  <div class="planetarium" id="planetarium" aria-label="Διαδραστική τρισδιάστατη υδρόγειος με κέντρο τη Μεσόγειο">
+    <div id="globe" class="globe"></div>
+    <div id="map2d" class="map2d" hidden></div>
+    <div class="orbital-ring r1" aria-hidden="true"></div><div class="orbital-ring r2" aria-hidden="true"></div>
+    <div class="longitude-left" aria-hidden="true">16° E <span>THE MEDITERRANEAN</span></div>
+    <div id="world-legend" class="world-legend"><span class="legend-node"></span> ARCHIVE REFERENCE LOCATIONS <span>·</span> NOT HISTORICAL VOYAGES</div>
+  </div>
+  <header class="topbar">
+    <a class="brand" href="../command-center/" title="JARVIS production command center">
+      <span class="brand-icon"><span>✥</span></span><span class="brand-type">PIRATECARTOGRAPHY<small>THE ARCHIVE UNIVERSE</small></span>
+    </a>
+    <nav class="top-nav" aria-label="Βασικοί χώροι έρευνας">
+      <button data-mode="universe" class="selected">THE UNIVERSE</button>
+      <button data-mode="sources">THE ARCHIVES</button>
+      <button data-mode="investigate">INVESTIGATION</button>
+      <button data-mode="review">HUMAN REVIEW</button>
+    </nav>
+    <div class="top-status"><span class="v4-chip">V4 PREVIEW</span><span id="source-status" class="source-status loading"><i></i>ΑΝΑΚΤΗΣΗ</span></div>
+  </header>
+  <main>
+    <section class="explore" id="view-universe">
+      <div class="hero-content"><div class="supertitle"><span class="thinline"></span> JARVIS HISTORICAL INTELLIGENCE NETWORK</div>
+        <h1>History is not<br>behind us.<br><em>It surrounds us.</em></h1>
+        <p>Η Μεσόγειος δεν είναι απλώς ένας χάρτης. Είναι ένας κόσμος από αρχεία, ανθρώπους, συγκρούσεις και μαρτυρίες. Ανακάλυψε τι κατέγραψαν πραγματικά οι ερευνητικοί agents.</p>
+        <div class="hero-actions"><button id="journey" class="btn-main"><span>✦</span> ΕΞΕΡΕΥΝΗΣΗ ΕΡΕΥΝΑΣ <span class="arrow">↗</span></button><button id="focus-milos" class="btn-outline">ΕΣΤΙΑΣΗ ΣΤΗ ΜΗΛΟ ↗</button></div>
+        <div class="current-mission"><span class="micro">CURRENT RESEARCH EXPEDITION</span><strong id="mission-name">—</strong><span id="mission-period">—</span><div class="mission-line"><i></i><span id="mission-state">Σύνδεση με το ερευνητικό αρχείο...</span></div></div>
+      </div>
+      <div class="orbital-caption"><span class="orbit-index">01 / 04</span><span class="orbit-name">THE MEDITERRANEAN<br>INTELLIGENCE THEATER</span><div class="orbit-compass">✣</div></div>
+      <div class="right-dossier" id="agent-dossier" hidden>
+        <div class="dossier-top"><span>ARCHIVE NODE / FIELD REPORT</span><button id="close-dossier" aria-label="Κλείσιμο φακέλου">×</button></div>
+        <div class="dossier-seal">✥</div><h2 id="dossier-title">—</h2><p id="dossier-region">—</p>
+        <div class="dossier-rule"></div>
+        <div class="dossier-grid"><span>AGENT STATE</span><strong id="dossier-status">—</strong><span>RECORDED BLOCKERS</span><strong id="dossier-blockers">—</strong><span>RESEARCH LOG ENTRIES</span><strong id="dossier-events">—</strong></div>
+        <div class="dossier-source"><div class="micro">LATEST TRACE</div><p id="dossier-trace">—</p></div><button id="inspect-agent" class="dossier-cta">OPEN RESEARCH DOSSIER <span>↗</span></button>
+        <small>Archive nodes are modern reference locations, not historical event coordinates.</small>
+      </div>
+      <section class="event-hud" aria-label="Ενεργό συμβάν αρχείου"><div class="event-hud-top"><span>◉ RESEARCH ENGINE / ARCHIVED TRACE</span><span id="trace-phase">—</span></div><div class="event-hud-body"><span class="event-signal">✧</span><div><strong id="trace-agent">JARVIS RESEARCH NETWORK</strong><p id="trace-detail">Επίλεξε έναν αρχειακό κόμβο ή ξεκίνησε την αναπαραγωγή.</p></div></div><div class="hud-bottom"><span id="trace-time">—</span><span id="trace-type">NO EVENT SELECTED</span></div></section>
+    </section>
+    <section id="view-sources" class="workstation hidden">
+      <div class="section-intro"><div class="supertitle"><span class="thinline"></span> 02 / THE EVIDENCE OBSERVATORY</div><h2>Enter the<br><em>archives.</em></h2><p>Η πηγή προηγείται της αφήγησης. Τα blockers και τα logs είναι πραγματικά στοιχεία της ερευνητικής διαδικασίας, όχι ιστορικά τεκμήρια.</p></div>
+      <div class="archive-workspace"><section class="archive-index"><div class="index-head"><b>THE COLLECTION</b><span id="archive-total">—</span></div><div class="facet-row"><button class="facet selected" data-facet="blockers">ACCESS BLOCKERS</button><button class="facet" data-facet="events">AGENT TRACES</button><button class="facet" data-facet="claims">CLAIMS</button></div><input id="archive-search" class="archive-search" type="search" placeholder="Αναζήτηση σε πραγματικές εγγραφές…"><div id="archive-records" class="archive-records"></div></section>
+      <article class="archive-reader" id="archive-reader"><div class="reader-head"><span>THE ORIGINAL RECORD / RESEARCH LENS</span><span>READING DESK · 01</span></div><div id="reader-content" class="reader-content"><div class="reader-ornament">❧</div><h3>Η έρευνα ανοίγει<br>τις πόρτες των αρχείων.</h3><p>Επίλεξε ένα πραγματικό στοιχείο από τη συλλογή. Δεν εμφανίζονται ανύπαρκτα χειρόγραφα, πλαστές υπογραφές ή ανεπιβεβαίωτα αποσπάσματα.</p></div><div class="reader-footer" id="reader-footer">CATALOGUE RECORD ≠ ORIGINAL EXAMINATION ≠ VERIFIED HISTORICAL CLAIM</div></article></div>
+    </section>
+    <section id="view-investigate" class="workstation hidden">
+      <div class="section-intro"><div class="supertitle"><span class="thinline"></span> 03 / INVESTIGATION CONTROL</div><h2>Follow the<br><em>evidence trail.</em></h2><p>Μπορείς να αναπαράγεις πραγματικές καταγεγραμμένες ενέργειες, να τις φιλτράρεις και να ανοίγεις τα σχετικά ερευνητικά dossiers.</p></div>
+      <div class="investigate-grid"><div class="run-chronology"><div class="index-head"><b>CHRONOLOGY OF RESEARCH ACTIONS</b><span id="action-count">—</span></div><select id="agent-filter" aria-label="Φίλτρο agent"><option value="">Όλοι οι agents</option></select><div id="action-records" class="action-records"></div></div><div class="investigation-console"><div class="console-head"><span>JARVIS / LIVE HISTORICAL TRACE VIEWER</span><span class="text-amber">READ-ONLY</span></div><div class="signal-geometry" aria-hidden="true"><div class="geometry-ring g1"></div><div class="geometry-ring g2"></div><div class="geometry-center">✧</div></div><span class="micro">SELECTED RESEARCH OPERATION</span><h3 id="investigate-agent">JARVIS</h3><p id="investigate-detail">Επίλεξε μία καταγεγραμμένη ενέργεια για πλήρη επιθεώρηση.</p><div class="record-meta" id="investigate-meta"></div><button id="investigate-globe" class="btn-outline">ΕΠΙΣΤΡΟΦΗ ΣΤΟΝ ΚΟΣΜΟ ↗</button></div></div>
+    </section>
+    <section id="view-review" class="workstation hidden">
+      <div class="section-intro"><div class="supertitle"><span class="thinline"></span> 04 / THE SCIENTIFIC GATE</div><h2>Truth demands<br><em>evidence.</em></h2><p>Ο JARVIS δεν εγκρίνει ιστορικές υποθέσεις μόνος του. Ο ερευνητής έχει τον τελικό λόγο.</p></div><div class="review-constellation"><div class="review-metric"><span>DISCOVERY RECORDS</span><strong id="metric-discoveries">—</strong><small>Ερευνητικές εγγραφές, όχι αποδεδειγμένα γεγονότα</small></div><div class="review-metric"><span>REVIEW CANDIDATES</span><strong id="metric-claims">—</strong><small>Υποψήφιοι ισχυρισμοί</small></div><div class="review-metric"><span>VERIFIED EVENTS</span><strong id="metric-verified">—</strong><small>Μόνο καταγεγραμμένες εγκρίσεις</small></div><div class="review-metric"><span>ACCESS BLOCKERS</span><strong id="metric-blockers">—</strong><small>Εμπόδια προς διευθέτηση</small></div></div><div class="review-guardian"><div class="guardian-emblem">◇</div><div class="guardian-text"><span class="micro">SCIENTIFIC QUALITY GATE / HUMAN AUTHORITY</span><h3>Nothing is verified<br>without examination.</h3><p id="review-message">Δεν υπάρχει ακόμη διαθέσιμο ερευνητικό dossier προς έγκριση.</p><p class="guardian-note">Το παρόν V4 είναι αναγνωστική προεπισκόπηση. Δεν επιτρέπει αποστολές ή έγκριση χωρίς authenticated audit API.</p></div><div class="guardian-actions"><button disabled>APPROVE CLAIM</button><button disabled>REJECT CLAIM</button><small>NO AUTHORIZED REVIEW SESSION</small></div></div></section>
+  </main>
+  <div class="status-deck"><div class="deck-left"><span class="deck-kicker">JARVIS OPERATIONAL PLAYBACK</span><span id="playback-n" class="deck-frames">— / —</span><span class="deck-note">RECORDED · NOT A LIVE RUN</span></div><div class="deck-play"><button id="rewind" title="Στην αρχή" aria-label="Στην αρχή">⟲</button><button id="play" title="Αναπαραγωγή / Παύση" aria-label="Αναπαραγωγή">▶</button><button id="forward" title="Επόμενο συμβάν" aria-label="Επόμενο συμβάν">↦</button></div><input type="range" min="0" max="0" step="1" value="0" id="scrub" aria-label="Θέση αναπαραγωγής καταγεγραμμένων εργασιών"><div class="deck-right"><span id="deck-date">—</span><button id="go-dossier">OPEN TRACE ↗</button></div></div>
+  <div class="mission-note">ALL GEOGRAPHIC LOCATIONS ARE REFERENCE-ONLY · NO HISTORIC RAID OR ROUTE IS IMPLIED</div>
+  <dialog id="mission-editor"><div class="modal-header"><span class="micro">JARVIS MISSION COMPOSER</span><button id="close-editor" aria-label="Κλείσιμο">×</button></div><h2>Begin an investigation.</h2><label for="mission-target">ΤΟΠΟΣ Ή ΘΕΜΑ</label><input id="mission-target" value="Μήλος"><label for="mission-dates">ΧΡΟΝΟΛΟΓΙΕΣ</label><input id="mission-dates" value="1660–1680"><label for="mission-purpose">ΕΡΕΥΝΗΤΙΚΟΣ ΣΤΟΧΟΣ</label><textarea rows="3" id="mission-purpose" placeholder="Τι θέλουμε να ερευνήσουμε;"></textarea><button id="prepare" class="btn-main">ΠΡΟΕΤΟΙΜΑΣΙΑ ΕΝΤΟΛΗΣ ↗</button><pre id="prepared-request" hidden></pre><button id="copy-request" hidden>ΑΝΤΙΓΡΑΦΗ JSON</button><small>Προσχέδιο μόνο. Δεν πραγματοποιείται αποστολή εργασίας.</small></dialog>
+  <div id="notice" class="notice" role="status" aria-live="polite"></div>
+</div>
+</body></html>
