@@ -1,0 +1,63 @@
+name: Publish Command Center Live Snapshot
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'evidence/runs/*/JARVIS_STATE_BOARD.json'
+      - 'tools/orchestrator/build_command_center_snapshot.py'
+      - 'tools/test_command_center_snapshot.py'
+      - '.github/workflows/command-center-live-snapshot.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: command-center-live-snapshot
+  cancel-in-progress: true
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+
+      - name: Validate snapshot contract
+        run: |
+          python3 -m compileall -q tools/orchestrator/build_command_center_snapshot.py tools/test_command_center_snapshot.py
+          python3 tools/test_command_center_snapshot.py
+
+      - id: run
+        name: Resolve latest durable JARVIS run
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          from pathlib import Path
+          runs=[]
+          for p in Path('evidence/runs').glob('*/JARVIS_STATE_BOARD.json'):
+              try:r=int(p.parent.name)
+              except ValueError:continue
+              runs.append((r,p.parent.name))
+          if not runs: raise SystemExit('NO_JARVIS_STATE_BOARD')
+          print('run_id='+max(runs)[1])
+          PY
+
+      - name: Build real-data live snapshot
+        run: |
+          python3 tools/orchestrator/build_command_center_snapshot.py             --run-id "${{ steps.run.outputs.run_id }}"             --output "command-center/live/runs/${{ steps.run.outputs.run_id }}.json"             --latest "command-center/live/latest.json"
+
+      - name: Preserve live snapshot
+        run: |
+          git config user.name "jarvis-command-center[bot]"
+          git config user.email "jarvis-command-center@users.noreply.github.com"
+          git add command-center/live/
+          git diff --cached --quiet && exit 0
+          git commit -m "Publish Command Center live snapshot ${{ steps.run.outputs.run_id }}"
+          for n in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            sleep $((n*2))
+          done
+          exit 1
