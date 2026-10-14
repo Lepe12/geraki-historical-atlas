@@ -274,6 +274,7 @@ function renderResearch(){
  root.replaceChildren();
  let items=[];
  if(researchState.tab==="agents")items=agents.map(a=>researchItem(a.label||a.id,a.status||"UNKNOWN",String(a.phase||"")+" · blockers "+String(a.blocker_count??"—")));
+ if(researchState.tab==="events")items=researchState.events.slice().reverse().map(e=>researchItem(e.event_type||"Event",String(e.agent_id||"JARVIS")+" · "+String(e.status||e.phase||"EVENT"),String(e.detail||e.created_utc||"Recorded run event")));
  if(researchState.tab==="sources")items=blockers.map((b,i)=>researchItem(b.repository||"Unidentified repository",b.status||"UNKNOWN",String(b.agent_id||"Unknown agent")+" · operational obstacle "+(i+1)));
  if(researchState.tab==="claims")items=claims.map(c=>researchItem(c.claim||c.description||c.claim_id||c.id||"Candidate claim",c.status||"UNVERIFIED",c.source_reference||c.source||"Source reference unavailable"));
  if(researchState.tab==="contradictions"){
@@ -310,7 +311,7 @@ function receiveSnapshot(data,origin){
  if(connectionMode==="LIVE"&&origin==="LIVE"&&evidenceSource==="LIVE EVENT")return;
  clearEvidence();recentEventIds.clear();
  currentRun=String(data.run_id||"");evidenceRun=currentRun;
- researchState.snapshot=data;researchState.events=[];
+ researchState.snapshot=data;researchState.events=Array.isArray(data.events)?data.events.slice(-200):[];
  evidenceSource=origin==="LIVE"?"LIVE BOOTSTRAP":"DURABLE SNAPSHOT";
  const laneState=new Map(data.agents.map(a=>[a.id,a]));
  for(const n of agentNodes)n.liveState=laneState.get(n.agentId)||null;
