@@ -23,10 +23,12 @@ exact_page_complete=bool(exact_page.get("completed", True))
 bsb=read("iiif_candidate_requests/bsb_iiif_candidates.json",{}).get("summary",{})
 verification=read("verification/verification_gate.json",{})
 qa=read("qa/qa_report.json",{})
+research_discovery=read("research_discovery/all_findings.json",{})
 required_files={
  "repository_plan":pathlib.Path(f"repository_plans/{lane}.json").exists(),
  "lane_discovery":pathlib.Path(f"lane_discovery/{lane}.json").exists(),
  "repository_candidates":pathlib.Path("citation_chase_candidates/repository_candidates.json").exists(),
+ "research_discovery_inventory":pathlib.Path("research_discovery/all_findings.json").exists(),
  "acquisition_report":pathlib.Path("library_acquisition/acquisition_report.json").exists(),
  "ocr_hits":pathlib.Path("citation_chase_hits/ocr_hits.json").exists(),
  "event_hits":pathlib.Path("event_first_hits/event_hits.json").exists(),
@@ -50,6 +52,8 @@ report={
  "lane":lane,"request_file":disc.get("request_file"),"status":status,
  "repositories_executed":executed,"repository_blockers":blocked,"repository_errors":errors,
  "pipeline_files":required_files,"repository_candidates":len(disc.get("results",[])),
+ "retained_research_discoveries":research_discovery.get("retained_count",0),
+ "research_discovery_triage_counts":research_discovery.get("triage_counts",{}),
  "acquisition_results":len(acq),"acquired_objects":sum(r.get("status") in ("TEXT_ACQUIRED","DIGITAL_METADATA_ACQUIRED") for r in acq),
  "located_citation_chase":sum(r.get("status")=="LOCATED_CITATION_CHASE" for r in acq),
  "event_first_hits":len(events),"exact_page_mappings":len(pages),

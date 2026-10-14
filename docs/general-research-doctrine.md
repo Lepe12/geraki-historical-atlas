@@ -27,3 +27,13 @@ Repositories and source families are not a fixed checklist. The agent expands/we
 ## Acquisition and verification
 Catalogue hit -> locate digital object -> automatically acquire available OCR/full text/IIIF/page derivatives -> EVENT-FIRST search -> exact-page mapping -> download exact scan -> original inspection -> event/date/place extraction -> source genealogy -> independent corroboration -> Verification -> QA.
 Catalogue metadata, OCR, later quotations, or acquisition success alone never establish an event.
+
+
+## Discovery retention and dual-score rule
+Scientific filtering controls automation and claim strength; it does not erase research material. Every discovered source, OCR context, unresolved lead, contradiction and off-target candidate remains recoverable in Research Discovery with its triage reason.
+
+Every usable discovery exposes two independent non-probabilistic assessments:
+- **Research Value (0–100):** how worthwhile the lead is to inspect, chase or compare.
+- **Evidence Confidence (0–100):** how mature, traceable and claim-ready the evidence is.
+
+A lead may therefore have high Research Value and low Evidence Confidence. `EXCLUDE_FROM_ACQUISITION` means only that the system will not automatically spend acquisition resources on it; the record remains visible and preserved. Only an explicit legal/privacy/user removal policy may delete a retained discovery.

@@ -25,17 +25,18 @@ Rules:
 - Preserve historical aliases such as Archipel/Arcipelago/Archipelago/Archipelagus.
 
 ## 4. Parallel research lanes
-The engine defines ten source-family lanes:
-1. travellers
-2. spanish_simancas
-3. venetian
-4. french
-5. british
-6. dutch
-7. german
-8. italian_states
-9. ottoman
-10. north_african
+The engine defines eleven source-family lanes:
+1. greek
+2. travellers
+3. spanish_simancas
+4. venetian
+5. french
+6. british
+7. dutch
+8. german
+9. italian_states
+10. ottoman
+11. north_african
 
 A successful GitHub job does NOT imply the named archive was searched. Repository execution must be recorded explicitly as EXECUTED; unsupported targets remain CITATION_CHASE_WEB_OR_API_CONNECTOR_REQUIRED.
 
@@ -144,13 +145,13 @@ Canonical code/specification lives in GitHub; primary research-results state in 
 ## 11. Hardening status
 Completed:
 1. GitHub Evidence Store pilot with SHA-256 indexes and selected durable scans.
-2. Automatic run evidence preservation for all ten lanes.
+2. Automatic run evidence preservation for all eleven lanes.
 3. Airtable schema snapshot versioned in GitHub.
 4. Automated timestamped Airtable record backup to GitHub.
 5. Repository-specific discoveries merged into the common Citation Chase/acquisition pipeline with provenance.
 6. General request-driven library/OCR/EVENT-FIRST stages; Kythnos/Crevelier are no longer hard-coded in engine logic.
 7. Post-acquisition inspection/genealogy/corroboration/verification/QA stages.
-8. Per-lane and aggregate ten-lane system-health reports.
+8. Per-lane and aggregate eleven-lane system-health reports.
 
 Remaining external-access work is repository-specific, not architectural: authenticated/browser-only archives and optional-key APIs stay explicit blockers until credentials or a stable legal machine interface are available.
 
@@ -171,3 +172,15 @@ The first live backup succeeded in GitHub Actions run 38243014838 and commit `71
 The research workflow defaults to `PCT_STORAGE_BACKEND=mariadb`. Durable lane results are committed to GitHub and queued through `MARIADB_STORAGE_INTENT.json`; the hosting-local importer writes them to the dedicated database. The queue report never claims that a database write already happened. Actual import, read-back, idempotency and recurring-task evidence are in the host-local storage audit and `docs/MARIADB_RESEARCH_STORAGE.md`.
 
 No public writer API, open database port, WordPress changes, or embedded DB credentials are required. The five additive `pc_research_*` tables preserve research jobs, document versions, compressed original payloads, searchable candidates and import history. Existing `pc_mig_*` tables stay intact. Airtable synchronization is an explicit rollback mode, not a second default writer.
+
+
+## 14. Research Discovery retention contract
+Research Discovery and Scientific Claims are separate views over the same durable evidence trail.
+
+- No weak, unresolved, contradictory or off-target discovery is silently deleted.
+- `PRIORITY`, `REVIEW_REQUIRED` and `EXCLUDE_FROM_ACQUISITION` are automation dispositions, not visibility/deletion states.
+- Every retained lead carries **Research Value** and **Evidence Confidence** as separate 0–100, non-probabilistic scores.
+- Research Value measures whether a lead is worth pursuing.
+- Evidence Confidence measures evidence maturity/traceability for claim use.
+- A low Evidence Confidence score blocks overclaiming but never hides the research lead.
+- Claim records expose an auditable trail from discovery through exact locator, original inspection, extraction, genealogy, corroboration, contradiction search, human review and final verification.
