@@ -9,9 +9,9 @@ class JarvisDispatchTests(unittest.TestCase):
             "dispatch":{
                 "dispatch_enabled":True,
                 "kill_switch":False,
-                "max_parallel":10,
+                "max_parallel":11,
                 "allowed_agents":[
-                    "travellers","spanish_simancas","venetian","french","british",
+                    "greek","travellers","spanish_simancas","venetian","french","british",
                     "dutch","german","italian_states","ottoman","north_african"
                 ],
                 "require_explicit_target":True,
@@ -44,15 +44,16 @@ class JarvisDispatchTests(unittest.TestCase):
             "purpose":"Piracy and corsair activity in the Aegean",
         },self.policy)
         self.assertEqual(out["agent_selection"]["authority"],"JARVIS")
+        self.assertIn("greek",out["selected_agents"])
         self.assertIn("venetian",out["selected_agents"])
         self.assertIn("ottoman",out["selected_agents"])
         self.assertIn("travellers",out["selected_agents"])
         self.assertGreaterEqual(len(out["selected_agents"]),3)
 
-    def test_weak_context_widens_to_all_ten(self):
+    def test_weak_context_widens_to_all_lanes(self):
         out=validate({"target":"Petros Lantzas","purpose":"Find archival sources"},self.policy)
         self.assertEqual(out["agent_selection"]["strategy"],"uncertain_context_broad_coverage")
-        self.assertEqual(len(out["selected_agents"]),10)
+        self.assertEqual(len(out["selected_agents"]),11)
         self.assertEqual(out["workflow_selected_agents"],"")
 
     def test_kill_switch_blocks(self):
