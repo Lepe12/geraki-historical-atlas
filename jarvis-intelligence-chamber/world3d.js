@@ -20,7 +20,7 @@ renderer.toneMapping=THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure=1.28;
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x03080e);
-scene.fog=new THREE.FogExp2(0x03080e,0.00024);
+scene.fog=new THREE.FogExp2(0x03080e,0.00037);
 const camera=new THREE.PerspectiveCamera(53,1,2,12000);
 const clock=new THREE.Clock();
 const composer=new EffectComposer(renderer);
@@ -236,6 +236,9 @@ $("focusButton")?.addEventListener("click",()=>{if(selected){goal.copy(selected.
 function frame(){
  requestAnimationFrame(frame);
  const dt=Math.min(clock.getDelta(),.05),time=clock.elapsedTime,k=Math.min(dt*4,1);
+ // Ease closer to the active sector when a node is deliberately focused.
+ const parallax=.015*Math.sin(time*.14);
+ backgroundStars.rotation.y=reduced?0:parallax;
  distance=THREE.MathUtils.lerp(distance,targetDistance,k);
  yaw=THREE.MathUtils.lerp(yaw,targetYaw,k);pitch=THREE.MathUtils.lerp(pitch,targetPitch,k);focus.lerp(goal,k);
  camera.position.set(focus.x+distance*Math.sin(yaw)*Math.cos(pitch),focus.y+distance*Math.sin(pitch),focus.z+distance*Math.cos(yaw)*Math.cos(pitch));
@@ -258,12 +261,25 @@ function frame(){
   }
   positions.needsUpdate=true;
  }
- for(const item of allLabels){
-  const p=item.position.clone().project(camera),visible=p.z>-1&&p.z<1&&Math.abs(p.x)<.91&&Math.abs(p.y)<.85;
-  item.el.style.left=((p.x+1)*w/2)+"px";item.el.style.top=((1-p.y)*h/2)+"px";
-  const show=visible&&(item.region?distance>550:distance<1700);
-  item.el.style.opacity=show?(item.region?".73":".82"):"0";
-  item.el.style.fontSize=item.region?"11px":"9px";item.el.style.letterSpacing=item.region?".27em":".07em";
+ // Depth-based labels with collision avoidance and region-to-agent focus transitions.
+ const occupied=[];
+ const labelsByPriority=allLabels.slice().sort((a,b)=>Number(b.region)-Number(a.region));
+ for(const item of labelsByPriority){
+  const p=item.position.clone().project(camera);
+  const depth=item.position.distanceTo(camera.position);
+  const x=(p.x+1)*w/2,y=(1-p.y)*h/2;
+  item.el.style.left=x+"px";item.el.style.top=y+"px";
+  const onScreen=p.z>-1&&p.z<1&&x>65&&x<w-65&&y>35&&y<h-45;
+  const focused=selected&&selected.position.distanceTo(item.position)<260;
+  const allow=item.region?distance>420:(distance<1100||focused);
+  const fade=THREE.MathUtils.clamp(1-depth/4600,.25,1);
+  const halfWidth=item.region?98:72;
+  const overlaps=occupied.some(box=>Math.abs(box.x-x)<box.r+halfWidth+12&&Math.abs(box.y-y)<30);
+  const visible=onScreen&&allow&&!overlaps;
+  item.el.style.opacity=visible?String((item.region?.73:.82)*fade):"0";
+  item.el.style.fontSize=item.region?"11px":"9px";
+  item.el.style.letterSpacing=item.region?".27em":".07em";
+  if(visible)occupied.push({x,y,r:halfWidth});
  }
  if($("zoomLevel"))$("zoomLevel").textContent=distance>1450?"01 / REGIONS":distance>550?"02 / CONSTELLATIONS":"03 / SYSTEMS";
  if($("coordinates"))$("coordinates").textContent="X "+focus.x.toFixed(0)+" / Y "+focus.y.toFixed(0);
