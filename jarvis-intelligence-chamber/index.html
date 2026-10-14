@@ -1,34 +1,16 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#02060d"><title>JARVIS · Intelligence Universe</title><link rel="stylesheet" href="./chamber.css"><link rel="stylesheet" href="./immersive.css"></head>
-<body><main id="app">
-<canvas id="universe" aria-label="Explore the three-dimensional JARVIS intelligence network"></canvas>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#02060d"><title>JARVIS — Intelligence Universe</title><link rel="stylesheet" href="./chamber.css"></head>
+<body>
+<div id="app">
+<canvas id="universe" aria-label="Interactive three-dimensional research intelligence network"></canvas>
 <div class="grain" aria-hidden="true"></div><div class="vignette" aria-hidden="true"></div>
+<header class="masthead"><div class="brand"><div class="sigil"><span>✦</span></div><div class="brand-label"><b>PIRATECARTOGRAPHY</b><span>HISTORICAL INTELLIGENCE DIVISION</span></div></div><div class="center-title"><span class="overline">JARVIS / SPATIAL INTELLIGENCE ENGINE</span><strong>THE RESEARCH UNIVERSE</strong><div class="coordinates" id="coordinates">X +024.77 / Y -018.56 / Z +004.31</div></div><div class="right-head"><span class="system-dot"></span><span>VISUAL SIMULATION</span><span class="vertical-rule"></span><span id="clock">--:--:-- UTC</span></div></header>
+<aside class="left-panel"><div class="panel-number">01 / COMMAND</div><div class="eyebrow">CENTRAL INTELLIGENCE</div><h1>JARVIS<span class="small-cross">✦</span></h1><p class="panel-description">One intelligence. A constellation of historical researchers. A universe of evidence.</p><div class="separator"></div><div class="label">NAVIGATE THE NETWORK</div><div class="nav-sections"><button class="section-btn active" data-view="universe"><span class="glyph">◈</span><span>Universe overview</span><span class="index">01</span></button><button class="section-btn" data-view="archives"><span class="glyph">⌘</span><span>Archival constellation</span><span class="index">02</span></button><button class="section-btn" data-view="analysis"><span class="glyph">⌬</span><span>Scientific intelligence</span><span class="index">03</span></button><button class="section-btn" data-view="sources"><span class="glyph">⊞</span><span>Source universe</span><span class="index">04</span></button></div><div class="separator"></div><div class="label">NETWORK SIGNALS</div><div class="signal-row"><span><i class="led cyan"></i> Archive research</span><em>10 sectors</em></div><div class="signal-row"><span><i class="led amber"></i> Scientific analysis</span><em>6 sectors</em></div><div class="signal-row"><span><i class="led dim"></i> Connection topology</span><em>Spatial model</em></div><div class="bottom-panel-note">VISUAL CONCEPT · NO RESEARCH JOBS STARTED<br>SCIENTIFIC RESULTS ARE NOT SIMULATED</div></aside>
+<div class="central-hud" id="centralHud"><div class="eyebrow">COMMAND INTELLIGENCE CORE</div><div class="core-word">JARVIS</div><span class="core-status"><i></i> READY TO EXPLORE</span></div>
 <div id="nodeLabels" aria-hidden="true"></div>
-<aside class="research-sidebar" aria-label="Research command">
- <div class="research-overline">RESEARCH / COMMAND</div>
- <h1>NEW RESEARCH</h1>
- <form id="researchForm">
-  <label for="researchPrompt">HISTORICAL QUESTION</label>
-  <textarea id="researchPrompt" rows="4" maxlength="4000" placeholder="What would you like to investigate?" required></textarea>
-  <button type="submit" class="research-primary">PREPARE RESEARCH <span aria-hidden="true">↗</span></button>
- </form>
- <p class="research-feedback" id="researchFeedback" role="status" aria-live="polite">Creates a research request; does not launch a server run.</p>
- <nav class="research-links" aria-label="Research workspace">
-  <a href="../command-center/" target="_blank" rel="noopener">COMMAND CENTER <span>↗</span></a>
-  <a href="../command-center-v5/" target="_blank" rel="noopener">ACTIVE RESEARCH <span>↗</span></a>
-  <a href="../command-center/" target="_blank" rel="noopener">EVIDENCE &amp; RESULTS <span>↗</span></a>
- </nav>
-</aside>
-<div class="central-hud" id="centralHud" aria-hidden="true"><div class="core-word">JARVIS</div><div class="core-status"><i></i> INTELLIGENCE CORE</div></div>
-<div class="gesture-hint">DRAG TO EXPLORE <span>·</span> SCROLL TO ZOOM <span>·</span> SELECT A NODE</div>
-<aside class="detail-panel hidden" id="detailPanel" aria-label="Selected node">
- <div class="detail-head"><span id="detail-number">SECTOR / 00</span><button id="closeDetail" aria-label="Close details">×</button></div>
- <div class="detail-type" id="detailType"></div><h2 id="detailTitle"></h2><div class="detail-rule"></div><p id="detailDescription"></p>
- <div class="detail-meta"><div><span>NETWORK ROLE</span><strong id="detailRole"></strong></div><div><span>DATA STATE</span><strong id="detailState"></strong></div></div>
- <button class="detail-action" id="focusButton">FOCUS ON NODE <span>↗</span></button>
-</aside>
-<div class="hover-controls"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button><button id="resetView" aria-label="Reset view">⌖</button></div>
-<div class="machine-telemetry" aria-hidden="true"><span id="coordinates"></span><span id="zoomLevel"></span><span id="fps">—</span><span id="clock"></span><span id="linkCount"></span></div>
-</main><script>
-(()=>{const form=document.getElementById("researchForm"),field=document.getElementById("researchPrompt"),feedback=document.getElementById("researchFeedback");form.addEventListener("submit",async e=>{e.preventDefault();const target=field.value.trim();if(!target){feedback.textContent="Enter a research question.";field.focus();return;}const request={target,aliases:[],date_range:"",purpose:"Historical evidence research",source:"jarvis_intelligence_chamber_prepared_request"};const json=JSON.stringify(request,null,2);try{await navigator.clipboard.writeText(json);feedback.textContent="Request copied. Open Command Center to review it. No research has started.";}catch(_){feedback.textContent="Clipboard unavailable. Your question is preserved here; no research has started.";}});})();
-</script><script type="importmap">{"imports":{"three":"https://esm.sh/three@0.184.0"}}</script><script type="module" src="./world3d.js"></script></body></html>
+<aside class="detail-panel" id="detailPanel"><div class="detail-head"><span id="detail-number">SECTOR / 00</span><button id="closeDetail" aria-label="Close details">×</button></div><div class="detail-type" id="detailType">SELECT A RESEARCH SECTOR</div><h2 id="detailTitle">Intelligence network</h2><div class="detail-rule"></div><p id="detailDescription">Orbit, zoom and explore the network. Select a luminous node to inspect its function.</p><div class="detail-meta"><div><span>NETWORK ROLE</span><strong id="detailRole">NAVIGATION</strong></div><div><span>DATA STATE</span><strong id="detailState">VISUAL ONLY</strong></div></div><button class="detail-action" id="focusButton">FOCUS THIS SECTOR <span>↗</span></button></aside>
+<div class="map-scale"><span class="scale-label">NETWORK DEPTH</span><div class="scale-tracks"><span></span><span></span><span></span><span></span><span></span></div><span id="zoomLevel">01 / CLUSTER</span></div>
+<div class="nav-tools"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button><button id="resetView" aria-label="Reset camera">⌖</button></div>
+<footer class="bottom-hud"><div class="bottom-caption"><div class="crosshair">⌖</div><div><b>SPATIAL COMMAND MODE</b><span>DRAG TO ORBIT <i>·</i> SCROLL TO ZOOM <i>·</i> SELECT A SECTOR</span></div></div><div class="system-readout"><div class="readout"><span>SECTORS</span><strong>16</strong></div><div class="readout"><span>LINKS</span><strong id="linkCount">24</strong></div><div class="readout"><span>FRAME</span><strong id="fps">—</strong></div></div><div class="attribution">INSPIRED BY APEX × EVE MAP<br>INDEPENDENT VISUAL PROTOTYPE</div></footer>
+<div class="mobile-hint">DRAG · ZOOM · SELECT</div>
+</div><script src="./chamber.js" defer></script><script src="./gpu-field.js" defer></script></body></html>
