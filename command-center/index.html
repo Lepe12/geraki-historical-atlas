@@ -1,190 +1,74 @@
 <!doctype html>
-<html lang="en">
+<html lang="el">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Piratecartography — Historical Intelligence Command Center</title>
-  <link rel="stylesheet" href="./command-center.css">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JARVIS • Piratecartography Research Command Center</title>
+<meta name="theme-color" content="#071318">
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<link href="./command-center.css" rel="stylesheet">
+<script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script defer src="./command-center.js"></script>
 </head>
 <body>
-  <div class="grain"></div>
-  <div class="shell">
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">PIRATECARTOGRAPHY / HISTORICAL INTELLIGENCE SYSTEM</p>
-        <h1>Research Command Center</h1>
-      </div>
-      <div class="topbar-right">
-        <div class="run-chip">RUN <span id="run-id-label">LATEST</span></div>
-        <div class="connection"><span id="connection-dot" class="dot offline"></span><span id="connection-label">OFFLINE</span></div>
-      </div>
-    </header>
-
-    <section class="ops-strip">
-      <article><span>AGENTS</span><strong>17</strong></article>
-      <article><span>ACTIVE</span><strong id="metric-active">0</strong></article>
-      <article><span>ARCHIVES</span><strong id="metric-archives">0</strong></article>
-      <article><span>CLAIMS</span><strong id="metric-claims">0</strong></article>
-      <article><span>CONTRADICTIONS</span><strong id="metric-contradictions">0</strong></article>
-      <article><span>BLOCKED</span><strong id="metric-blocked">0</strong></article>
-    </section>
-
-    <main class="command-grid">
-      <aside class="left-rail panel">
-        <div class="panel-kicker">ACTIVE MISSION</div>
-        <h2 id="mission-title">Historical Research Operation</h2>
-        <p id="mission-purpose" class="mission-purpose">Live multi-agent archival research, evidence control and scientific verification.</p>
-        <div class="mission-status">
-          <div class="mission-status-head"><span>Research progress</span><b id="mission-progress-label">0%</b></div>
-          <div class="mission-progress"><span id="mission-progress-bar"></span></div>
-        </div>
-        <dl class="mission-meta">
-          <div><dt>Run</dt><dd id="mission-run">latest</dd></div>
-          <div><dt>Primary phase</dt><dd id="mission-phase">Waiting</dd></div>
-          <div><dt>Current route</dt><dd id="mission-route">—</dd></div>
-          <div><dt>Human review</dt><dd class="amber">REQUIRED</dd></div>
-        </dl>
-        <div class="rail-title">Priority agents</div>
-        <div id="priority-agents" class="priority-agents"></div>
-      </aside>
-
-      <section class="theatre panel">
-        <div class="theatre-head">
-          <div>
-            <p class="panel-kicker">MEDITERRANEAN OPERATIONS THEATRE</p>
-            <h2>Archive & Agent Network</h2>
-          </div>
-          <div class="theatre-state"><span class="pulse-dot"></span><span id="core-state">SYSTEM STANDBY</span></div>
-        </div>
-
-        <div class="map-stage">
-          <svg class="med-map" viewBox="0 0 1000 560" aria-label="Mediterranean research operations map">
-            <defs>
-              <radialGradient id="coreGlow"><stop offset="0%" stop-color="#d6b66a" stop-opacity=".8"/><stop offset="100%" stop-color="#d6b66a" stop-opacity="0"/></radialGradient>
-              <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-            </defs>
-            <path class="coast" d="M92 160 C150 125,235 115,305 128 C360 138,410 120,455 142 C520 175,556 173,610 155 C650 142,688 154,717 185 C750 219,785 228,840 214 C877 204,914 213,947 245"/>
-            <path class="coast" d="M104 365 C175 349,226 352,286 377 C350 403,428 416,507 401 C566 390,630 398,689 423 C734 442,783 447,842 433 C889 422,921 407,952 382"/>
-            <path class="island" d="M493 300c21-8 39-6 58 2c-17 7-40 8-58-2z"/>
-            <path class="island" d="M600 330c14-7 29-7 45-1c-14 8-28 9-45 1z"/>
-            <path class="island" d="M682 300c11-6 22-5 35 0c-10 7-22 8-35 0z"/>
-            <g id="route-layer"></g>
-
-            <g class="archive-node" data-agent="spanish_simancas" transform="translate(138 205)">
-              <circle r="18"/><circle class="halo" r="30"/><text x="28" y="5">SIMANCAS</text>
-            </g>
-            <g class="archive-node" data-agent="french" transform="translate(300 160)">
-              <circle r="15"/><circle class="halo" r="25"/><text x="24" y="5">FRANCE</text>
-            </g>
-            <g class="archive-node" data-agent="venetian" transform="translate(530 205)">
-              <circle r="18"/><circle class="halo" r="30"/><text x="28" y="5">VENICE</text>
-            </g>
-            <g class="archive-node" data-agent="italian_states" transform="translate(505 270)">
-              <circle r="13"/><circle class="halo" r="22"/><text x="22" y="5">ITALIAN STATES</text>
-            </g>
-            <g class="archive-node" data-agent="ottoman" transform="translate(780 220)">
-              <circle r="18"/><circle class="halo" r="30"/><text x="28" y="5">OTTOMAN</text>
-            </g>
-            <g class="archive-node" data-agent="north_african" transform="translate(650 405)">
-              <circle r="16"/><circle class="halo" r="27"/><text x="26" y="5">NORTH AFRICA</text>
-            </g>
-            <g class="archive-node" data-agent="british" transform="translate(280 70)">
-              <circle r="13"/><circle class="halo" r="22"/><text x="22" y="5">BRITAIN</text>
-            </g>
-            <g class="archive-node" data-agent="dutch" transform="translate(375 78)">
-              <circle r="12"/><circle class="halo" r="20"/><text x="21" y="5">DUTCH</text>
-            </g>
-            <g class="archive-node" data-agent="german" transform="translate(455 95)">
-              <circle r="12"/><circle class="halo" r="20"/><text x="21" y="5">GERMAN</text>
-            </g>
-
-            <g class="core" transform="translate(515 330)">
-              <circle class="core-glow" r="88" fill="url(#coreGlow)"/>
-              <circle class="core-ring outer" r="58"/>
-              <circle class="core-ring inner" r="42"/>
-              <circle class="core-center" r="18"/>
-              <text class="core-title" x="0" y="-4">JARVIS</text>
-              <text class="core-sub" x="0" y="16">RESEARCH CORE</text>
-            </g>
-          </svg>
-
-          <div id="agent-orbit" class="agent-orbit"></div>
-          <div class="scanline"></div>
-        </div>
-
-        <div class="theatre-footer">
-          <div><span class="legend-dot running"></span>Searching</div>
-          <div><span class="legend-dot completed"></span>Complete</div>
-          <div><span class="legend-dot blocked"></span>Blocked</div>
-          <div><span class="legend-dot queued"></span>Queued</div>
-          <div class="spacer"></div>
-          <div>Automatic VERIFIED: <strong>DISABLED</strong></div>
-        </div>
+<div class="shell">
+  <header class="topbar">
+    <a class="identity" href="../" aria-label="Piratecartography Historical Atlas"><span class="crest">✧</span><span><strong>PIRATECARTOGRAPHY</strong><small>JARVIS · HISTORICAL INTELLIGENCE</small></span></a>
+    <nav class="modes" aria-label="Research modes"><button class="mode active" data-mode="operations">◉ <span>OPERATIONS</span></button><button class="mode" data-mode="evidence">▤ <span>EVIDENCE</span></button><button class="mode" data-mode="decisions">◇ <span>DECISIONS</span></button></nav>
+    <div class="head-actions"><a class="atlas-link" href="../">Ιστορικός Άτλας ↗</a><span class="status offline" id="connection-status">● ΔΕΝ ΕΧΕΙ ΣΥΝΔΕΘΕΙ</span></div>
+  </header>
+  <div class="statusbar"><span>RESEARCH OPERATIONS · MEDITERRANEAN</span><span id="run-label">RUN —</span><span id="data-integrity">Χωρίς ζωντανά δεδομένα · κανένα αποτέλεσμα δεν προσομοιώνεται</span></div>
+  <main class="layout">
+    <aside class="left-panel panel">
+      <section class="rail-section"><div class="section-heading"><span>01 / ΕΝΕΡΓΗ ΑΠΟΣΤΟΛΗ</span><span class="line"></span></div>
+        <h1>Historical Research<br><em>Command Center</em></h1>
+        <p class="secondary">Θέσε έναν ερευνητικό στόχο. Το αίτημα προετοιμάζεται σε ελέγξιμη μορφή· η εκτέλεση απαιτεί συνδεδεμένο orchestrator.</p>
+        <label for="research-target">Αντικείμενο έρευνας</label><input id="research-target" placeholder="π.χ. Μήλος, πειρατεία" autocomplete="off">
+        <label for="research-period">Χρονολογική περίοδος</label><input id="research-period" placeholder="π.χ. 1660–1680" autocomplete="off">
+        <label for="research-purpose">Ερευνητικό ερώτημα</label><textarea id="research-purpose" rows="3" placeholder="Πηγές, μαρτυρίες, πρωτογενής τεκμηρίωση..."></textarea>
+        <button id="prepare-request" class="primary-btn">✧ Προετοιμασία αιτήματος <span>↗</span></button>
+        <p id="request-feedback" class="field-help">Η προετοιμασία δεν εκτελεί έρευνα ούτε δημιουργεί ιστορικούς ισχυρισμούς.</p>
       </section>
-
-      <aside class="right-rail panel">
-        <div class="panel-head compact">
-          <div><p class="panel-kicker">LIVE EVIDENCE FEED</p><h2>Intelligence Stream</h2></div>
-          <button id="clear-log" class="ghost">Clear</button>
-        </div>
-        <div id="evidence-feed" class="evidence-feed"></div>
-        <div class="rail-title">Scientific QA</div>
-        <div class="qa-stack">
-          <div><span>Source genealogy</span><b id="qa-genealogy">WAITING</b></div>
-          <div><span>Contradiction search</span><b id="qa-contradiction">WAITING</b></div>
-          <div><span>Original inspected</span><b id="qa-original">PENDING</b></div>
-          <div><span>Human review</span><b class="amber">REQUIRED</b></div>
-        </div>
-      </aside>
-    </main>
-
-    <section class="lower-grid">
-      <div class="panel mission-log">
-        <div class="panel-head">
-          <div><p class="panel-kicker">TACTICAL EVENT STREAM</p><h2>Mission Log</h2></div>
-          <button id="refresh-button" class="ghost">Refresh</button>
-        </div>
-        <div id="mission-log" class="log-stream"></div>
+      <section class="rail-section agents-section"><div class="section-heading"><span>02 / ΕΡΕΥΝΗΤΙΚΟΙ AGENTS</span><span class="line"></span></div>
+        <div class="stat-pair"><span>Ενεργοί agents</span><strong id="active-count">—</strong></div>
+        <div id="agents-list" class="agents-list"></div>
+        <p class="tiny">Οι γεωγραφικές θέσεις στον χάρτη είναι θέσεις πόλεων αναφοράς αρχείων, όχι τεκμηριωμένα ιστορικά γεγονότα.</p>
+      </section>
+    </aside>
+    <section class="main-column">
+      <div class="map-shell panel">
+        <div id="map" class="map" role="application" aria-label="Πραγματικός γεωγραφικός χάρτης της Μεσογείου"></div>
+        <div class="map-overlay" aria-hidden="true"></div>
+        <div id="map-unavailable" class="map-unavailable" hidden>Δεν φορτώθηκε η πραγματική γεωγραφική βάση. Έλεγξε τη σύνδεση με τα χαρτογραφικά tiles.</div>
+        <div class="map-title"><small>ACTUAL GEOGRAPHY / OPERATIONAL ARCHIVE LOCATIONS</small><strong>THE MEDITERRANEAN</strong><span>Αληθινά γεωγραφικά δεδομένα · όχι εικαστικός χάρτης</span></div>
+        <div class="map-top-right"><button id="reset-map" title="Επαναφορά Μεσογείου">⌖ Επαναφορά</button><button id="toggle-terrain" title="Εμφάνιση αναγλύφου" aria-pressed="true">◈ Ανάγλυφο</button></div>
+        <div class="core-status" aria-live="polite"><span class="core-symbol">✧</span><span><strong>JARVIS</strong><small id="core-state">RESEARCH CORE · STANDBY</small></span></div>
+        <div class="map-bottom"><span class="dot-teal"></span> REAL WORLD MAP <span class="sep">/</span> <span id="map-mode-text">Archive reference cities</span><span class="sep">/</span> <span id="map-focus-label">Mediterranean basin</span></div>
       </div>
-
-      <div class="panel claims-panel">
-        <div class="panel-head"><div><p class="panel-kicker">CLAIM CONTROL</p><h2>Research State</h2></div></div>
-        <div class="claim-stats">
-          <div><span>Candidate claims</span><strong id="claim-candidates">0</strong></div>
-          <div><span>Evidence items</span><strong id="claim-evidence">0</strong></div>
-          <div><span>Open contradictions</span><strong id="claim-conflicts">0</strong></div>
-        </div>
-        <div class="safety-card">
-          <span>SCIENTIFIC SAFETY GATE</span>
-          <strong>NO AUTOMATIC HISTORICAL VERIFICATION</strong>
-          <p>Every claim remains candidate / unresolved until provenance, original inspection, corroboration and human review pass.</p>
-        </div>
+      <div class="lower panel">
+        <div class="panel-header"><div><small>03 / RESEARCH OUTPUT</small><h2 id="results-heading">Evidence & Mission Log</h2></div><button class="outline-btn" id="refresh">↻ Ανανέωση</button></div>
+        <div class="lower-tabs"><button data-feed="evidence" class="feed-tab active">Τεκμήρια</button><button data-feed="events" class="feed-tab">Συμβάντα</button></div>
+        <div id="feed" class="feed" aria-live="polite"><p class="empty">Δεν υπάρχουν ζωντανά δεδομένα.</p></div>
       </div>
     </section>
-
-    <nav class="tabs" aria-label="Command center detail sections">
-      <button class="tab active" data-tab="agents">Agents</button>
-      <button class="tab" data-tab="jobs">Jobs</button>
-      <button class="tab" data-tab="connectors">Connectors</button>
-      <button class="tab" data-tab="evidence">Evidence</button>
-      <button class="tab" data-tab="qa">Scientific QA</button>
-    </nav>
-
-    <section class="detail-deck">
-      <div id="tab-agents" class="tab-panel active"><div id="agent-grid" class="agent-grid"></div></div>
-      <div id="tab-jobs" class="tab-panel"><div id="jobs-table" class="table-wrap"></div></div>
-      <div id="tab-connectors" class="tab-panel"><div id="connector-grid" class="connector-grid"></div></div>
-      <div id="tab-evidence" class="tab-panel"><div id="evidence-list" class="feed"></div></div>
-      <div id="tab-qa" class="tab-panel">
-        <div class="qa-grid">
-          <article><span>Automatic VERIFIED</span><strong>DISABLED</strong></article>
-          <article><span>Source genealogy</span><strong>REQUIRED</strong></article>
-          <article><span>Contradiction search</span><strong>REQUIRED</strong></article>
-          <article><span>Human review</span><strong>REQUIRED</strong></article>
-        </div>
-      </div>
-    </section>
-  </div>
-  <script src="./command-center.js"></script>
-</body>
-</html>
+    <aside class="right-panel panel">
+      <section class="rail-section"><div class="section-heading"><span>04 / SCIENTIFIC QA</span><span class="line"></span></div><h2>Evidence before<br><em>conclusions.</em></h2>
+        <p class="secondary">Η τεχνική επιτυχία δεν ισοδυναμεί με ιστορική επαλήθευση.</p>
+        <div class="qa-row"><span>Πρωτογενής πηγή</span><b id="qa-original">ΔΕΝ ΕΧΕΙ ΕΛΕΓΧΘΕΙ</b></div>
+        <div class="qa-row"><span>Γενεαλογία πηγών</span><b id="qa-genealogy">ΕΚΚΡΕΜΕΙ</b></div>
+        <div class="qa-row"><span>Αντιφάσεις</span><b id="qa-contradictions">ΕΚΚΡΕΜΕΙ</b></div>
+        <div class="qa-row"><span>Ανθρώπινη αξιολόγηση</span><b>ΑΠΑΙΤΕΙΤΑΙ</b></div>
+        <div class="safety"><span>SCIENTIFIC SAFETY GATE</span><strong>Automatic VERIFIED: DISABLED</strong><p>Καμία πηγή ή ιστορικός ισχυρισμός δεν γίνεται αυτόματα «επαληθευμένος».</p></div>
+      </section>
+      <section class="rail-section connection-section"><div class="section-heading"><span>05 / DATA CONNECTION</span><span class="line"></span></div><h3>Ζωντανός JARVIS</h3>
+        <p class="secondary">Σύνδεση μόνο με πραγματικό backend συμβάντων. Το GitHub Pages από μόνο του δεν εκτελεί έρευνες.</p>
+        <label for="api-url">Διεύθυνση API</label><input id="api-url" type="url" placeholder="https://your-api.example" autocomplete="url">
+        <button id="connect-api" class="outline-btn full">Σύνδεση με backend ↗</button>
+        <p id="connection-detail" class="field-help">Δεν έχει διαμορφωθεί backend. Ο χάρτης λειτουργεί ανεξάρτητα.</p>
+      </section>
+      <section class="rail-section review-section"><div class="section-heading"><span>06 / HUMAN REVIEW</span><span class="line"></span></div><h3>Αποφάσεις & έλεγχοι</h3><p id="review-summary" class="secondary">Δεν υπάρχει ενεργή, επαληθευμένη αξίωση προς έγκριση.</p><button id="view-decisions" class="outline-btn full">Άνοιγμα αποφάσεων →</button></section>
+    </aside>
+  </main>
+  <footer>© PIRATECARTOGRAPHY <span>ARCHIVE-FIRST RESEARCH · REAL GEOGRAPHY · AUDITABLE EVIDENCE</span><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">Map attribution ↗</a></footer>
+</div>
+<dialog id="request-dialog"><div class="dialog-head"><h2>Ερευνητικό αίτημα</h2><button id="close-dialog" aria-label="Κλείσιμο">✕</button></div><p>Αυτό το JSON είναι έτοιμο για ελεγχόμενη αποστολή στο workflow. Δεν έχει εκτελεστεί.</p><textarea id="request-json" rows="12" readonly></textarea><button id="copy-request" class="primary-btn">Αντιγραφή JSON</button><p id="copy-feedback" class="field-help"></p></dialog>
+</body></html>
