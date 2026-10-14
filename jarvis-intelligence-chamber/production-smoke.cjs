@@ -1,7 +1,7 @@
 "use strict";
 const assert=require("node:assert/strict");
-const BASE="https://www.piratecartography.com/pct-api/live";
-const WS="wss://www.piratecartography.com/pct-api/live/ws/piratecartography/latest";
+const BASE="https://pct-live.piratecartography.com/pct-api/live";
+const WS="wss://pct-live.piratecartography.com/pct-api/live/ws/piratecartography/latest";
 const timeout=AbortSignal.timeout(15000);
 (async()=>{
  const health=await fetch(BASE+"/health",{signal:timeout,headers:{"accept":"application/json"}});
