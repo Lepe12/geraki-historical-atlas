@@ -25,7 +25,7 @@ const camera=new THREE.PerspectiveCamera(53,1,2,12000);
 const clock=new THREE.Clock();
 const composer=new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene,camera));
-const bloom=new UnrealBloomPass(new THREE.Vector2(1,1),1.45,.56,.17);
+const bloom=new UnrealBloomPass(new THREE.Vector2(1,1),0.92,.43,.42);
 composer.addPass(bloom);
 composer.addPass(new OutputPass());
 const world=new THREE.Group();scene.add(world);
@@ -132,19 +132,19 @@ const glow=glowTexture();
 // Rich reactor atmosphere while keeping the cartographic constellations spatially dominant.
 const reactor=new THREE.Group();
 reactor.position.copy(nexus.position);world.add(reactor);
-const reactorCore=new THREE.Mesh(new THREE.IcosahedronGeometry(24,3),new THREE.MeshBasicMaterial({color:0x19e6ff,toneMapped:false}));
+const reactorCore=new THREE.Mesh(new THREE.IcosahedronGeometry(24,3),new THREE.MeshBasicMaterial({color:0x067dc8,toneMapped:true}));
 reactor.add(reactorCore);
 const plasma=new THREE.Mesh(new THREE.SphereGeometry(39,32,24),new THREE.ShaderMaterial({
  transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
  uniforms:{uTime:{value:0}},
  vertexShader:`varying vec3 vP;varying vec3 vN;void main(){vP=position;vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
- fragmentShader:`uniform float uTime;varying vec3 vP;varying vec3 vN;void main(){float noise=sin(vP.y*.42+uTime*1.4)*sin(vP.x*.31-uTime*.8)*sin(vP.z*.4+uTime*.6);float fresnel=pow(1.-abs(vN.z),1.6);float a=(.13+.22*noise+.43*fresnel);gl_FragColor=vec4(.03,.68,1.,clamp(a,0.,.75));}`
+ fragmentShader:`uniform float uTime;varying vec3 vP;varying vec3 vN;void main(){float noise=sin(vP.y*.42+uTime*1.4)*sin(vP.x*.31-uTime*.8)*sin(vP.z*.4+uTime*.6);float fresnel=pow(1.-abs(vN.z),1.6);float a=(.13+.22*noise+.43*fresnel);gl_FragColor=vec4(.005,.31,.82,clamp(a*.55,0.,.43));}`
 }));reactor.add(plasma);
 const haloLayers=[
- {size:510,color:0x006eaa,opacity:.16},
- {size:340,color:0x0ac4e8,opacity:.26},
- {size:225,color:0x42f8f3,opacity:.35},
- {size:390,color:0xf4a626,opacity:.13}
+ {size:510,color:0x024477,opacity:.12},
+ {size:340,color:0x087db8,opacity:.16},
+ {size:225,color:0x12b8e9,opacity:.18},
+ {size:390,color:0xd08318,opacity:.055}
 ];
 for(const h of haloLayers){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:h.color,transparent:true,opacity:h.opacity,depthWrite:false,blending:THREE.AdditiveBlending}));sp.scale.set(h.size,h.size,1);reactor.add(sp)}
 const energyBands=[];
@@ -170,12 +170,12 @@ world.add(pulsePoints);
 const hubMeshes=[],selectables=[];
 function hub(node,scale=1){
  const group=new THREE.Group();group.position.copy(node.position);
- const material=new THREE.MeshBasicMaterial({color:node.name==="JARVIS"?GOLD:CYAN,transparent:true,opacity:.94});
+ const material=new THREE.MeshBasicMaterial({color:node.name==="JARVIS"?0x168ec9:CYAN,transparent:true,opacity:.94});
  const center=new THREE.Mesh(new THREE.SphereGeometry(5*scale,16,12),material);
  const selectable=new THREE.Mesh(new THREE.SphereGeometry(22*scale,12,8),new THREE.MeshBasicMaterial({visible:false}));
  selectable.userData.node=node;group.add(center,selectable);
- const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:node.name==="JARVIS"?GOLD:0x3cefe5,transparent:true,opacity:node.name==="JARVIS"?.92:.62,depthWrite:false,blending:THREE.AdditiveBlending}));
- sprite.scale.setScalar((node.name==="JARVIS"?240:85)*scale);group.add(sprite);
+ const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:node.name==="JARVIS"?0x086dae:0x3cefe5,transparent:true,opacity:node.name==="JARVIS"?.32:.62,depthWrite:false,blending:THREE.AdditiveBlending}));
+ sprite.scale.setScalar((node.name==="JARVIS"?180:85)*scale);group.add(sprite);
  if(node.name==="JARVIS"){
   const ring=new THREE.Mesh(new THREE.TorusGeometry(54,1.55,5,110),new THREE.MeshBasicMaterial({color:GOLD,transparent:true,opacity:.85,depthWrite:false}));
   ring.rotation.x=.3;group.add(ring);
@@ -183,7 +183,7 @@ function hub(node,scale=1){
   inner.rotation.set(.4,.4,-.15);group.add(inner);
   const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:0xf5af29,transparent:true,opacity:.31,depthWrite:false,blending:THREE.AdditiveBlending}));
   halo.scale.set(155,155,1);group.add(halo);
-  const energy=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:0x0bb8df,transparent:true,opacity:.62,depthWrite:false,blending:THREE.AdditiveBlending}));
+  const energy=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:0x056cba,transparent:true,opacity:.27,depthWrite:false,blending:THREE.AdditiveBlending}));
   energy.scale.set(110,110,1);group.add(energy);
   node.rings=[ring,inner];node.energy=energy;
  }
@@ -248,9 +248,9 @@ function frame(){
   plasma.material.uniforms.uTime.value=time;
   reactorCore.rotation.y=time*.11;
   for(let i=0;i<energyBands.length;i++){energyBands[i].rotation.y+=dt*(i%2?.15:-.11);energyBands[i].rotation.z+=dt*(i%2?-.09:.07)}
-  for(const n of agentNodes.concat(nexus)){if(n.group)n.sprite.material.opacity=(n===nexus?.75:.52)+.09*Math.sin(time*.5+n.index)}
+  for(const n of agentNodes.concat(nexus)){if(n.group)n.sprite.material.opacity=(n===nexus?.25:.52)+.09*Math.sin(time*.5+n.index)}
   nexus.rings[0].rotation.y=time*.06;nexus.rings[1].rotation.z=-time*.12;
-  nexus.energy.material.opacity=.56+.12*Math.sin(time*1.25);
+  nexus.energy.material.opacity=.25+.06*Math.sin(time*1.25);
   const positions=pulseGeometry.attributes.position;
   for(let i=0;i<routeEdges.length;i++){
     const e=routeEdges[i],a=nodes[e.a].position,b=nodes[e.b].position,t=(time*.09+i*.337)%1;
