@@ -20,8 +20,8 @@ on:
         required: true
         type: string
       selected_agents:
-        description: "Comma-separated agent lanes, max 3"
-        required: true
+        description: "Optional manual override. Leave blank for JARVIS automatic selection."
+        required: false
         type: string
   push:
     branches: [main]
@@ -73,7 +73,7 @@ jobs:
           fi
 
       - id: jarvis
-        name: Validate policy, kill switch, allowlist and duplicate guard
+        name: JARVIS plans agents and validates guarded dispatch
         run: |
           python3 tools/orchestrator/jarvis_dispatch.py \
             --request "${{ steps.request.outputs.request_file }}" \
@@ -106,7 +106,8 @@ jobs:
           ALIASES: "${{ steps.jarvis.outputs.aliases }}"
           DATE_RANGE: "${{ steps.jarvis.outputs.date_range }}"
           PURPOSE: "${{ steps.jarvis.outputs.purpose }}"
-          SELECTED_AGENTS: "${{ steps.jarvis.outputs.selected_agents }}"
+          SELECTED_AGENTS: "${{ steps.jarvis.outputs.workflow_selected_agents }}"
+          JARVIS_SELECTED_AGENTS: "${{ steps.jarvis.outputs.selected_agents }}"
         run: |
           gh workflow run pct-parallel-multi-agent.yml \
             --ref main \
@@ -115,22 +116,5 @@ jobs:
             -f date_range="$DATE_RANGE" \
             -f purpose="$PURPOSE" \
             -f selected_agents="$SELECTED_AGENTS"
-          echo "JARVIS_CONTROLLED_DISPATCH_SENT agents=$SELECTED_AGENTS"
-
-
-      - name: Dispatch parallel specialist historical agents
-        env:
-          GH_TOKEN: "${{ github.token }}"
-          TARGET: "${{ steps.jarvis.outputs.target }}"
-          ALIASES: "${{ steps.jarvis.outputs.aliases }}"
-          DATE_RANGE: "${{ steps.jarvis.outputs.date_range }}"
-          PURPOSE: "${{ steps.jarvis.outputs.purpose }}"
-        run: |
-          gh workflow run jarvis-specialist-research.yml \
-            --ref main \
-            -f target="$TARGET" \
-            -f aliases="$ALIASES" \
-            -f date_range="$DATE_RANGE" \
-            -f purpose="$PURPOSE" \
-            -f target_type="auto"
-          echo "JARVIS_SPECIALIST_DISPATCH_SENT"
+          echo "JARVIS_CONTROLLED_DISPATCH_SENT planned_agents=$JARVIS_SELECTED_AGENTS workflow_filter=$SELECTED_AGENTS"
+          echo "Specialist agents are launched once inside pct-parallel-multi-agent.yml."
