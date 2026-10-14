@@ -1,0 +1,42 @@
+name: JARVIS Chamber 3D Visual Gate
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'jarvis-intelligence-chamber/**'
+      - '.github/workflows/jarvis-chamber-visual-gate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser-3d:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate syntax and references
+        run: |
+          node --check jarvis-intelligence-chamber/world3d.js
+          grep -q 'type="module" src="./world3d.js"' jarvis-intelligence-chamber/index.html
+          ! grep -q '<script src="./chamber.js"' jarvis-intelligence-chamber/index.html
+      - name: Install browser
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Start static server
+        run: |
+          python3 -m http.server 4179 --bind 127.0.0.1 > /tmp/jarvis-server.log 2>&1 &
+      - name: Browser visual verification
+        run: node jarvis-intelligence-chamber/visual-smoke.cjs
+      - name: Upload visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jarvis-chamber-3d-visual-evidence
+          path: |
+            jarvis-intelligence-chamber/screenshots/*.png
+            jarvis-intelligence-chamber/screenshots/*.json
+          if-no-files-found: warn
