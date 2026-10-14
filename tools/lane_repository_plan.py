@@ -11,7 +11,7 @@ from jarvis_specialist_plan import build as specialist_plan
 lane=os.getenv("PCT_RESEARCH_LANE","travellers")
 rf,req,ctx=load_request()
 cfg={
-"greek":[("SearchCulture.gr / EKT","https://www.searchculture.gr"),("OpenArchives.gr / EKT","https://www.openarchives.gr"),("National Library of Greece Digital Collections","https://digitalcollections.nlg.gr"),("Anemi / University of Crete","https://anemi.lib.uoc.gr"),("Academia.edu Public Research","https://www.academia.edu"),("Google Books","https://books.google.com")],
+"greek":[("SearchCulture.gr / EKT","https://www.searchculture.gr"),("OpenArchives.gr / EKT","https://www.openarchives.gr"),("National Library of Greece Digital Collections","https://digitalcollections.nlg.gr"),("Anemi / University of Crete","https://anemi.lib.uoc.gr"),("OpenAlex Scholarly Works","https://openalex.org"),("Crossref Scholarly Metadata","https://www.crossref.org"),("Academia.edu Public Research","https://www.academia.edu"),("Google Books","https://books.google.com")],
 "travellers":[("SearchCulture.gr / EKT","https://www.searchculture.gr"),("Library of Congress","https://www.loc.gov"),("Gallica/BnF","https://catalogue.bnf.fr"),("BSB","https://www.digitale-sammlungen.de"),("Internet Archive","https://archive.org"),("Google Books","https://books.google.com")],
 "spanish_simancas":[("PARES / Archivo General de Simancas","https://pares.cultura.gob.es"),("Biblioteca Digital Hispánica","https://catalogo.bne.es")],
 "venetian":[("Archivio di Stato di Venezia / SIAS","https://sias-archivi.cultura.gov.it"),("Internet Culturale","https://www.internetculturale.it"),("Internet Archive","https://archive.org")],

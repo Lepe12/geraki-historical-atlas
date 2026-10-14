@@ -591,6 +591,93 @@ def _public_site_index(q,lane,repository,domain,max_records=20):
         if len(rows)>=max_records: break
     return "EXECUTED",rows,url
 
+def openalex_works(q,lane):
+    """Search scholarly works metadata via the public OpenAlex API.
+
+    Results are discovery leads only. They must not be treated as historical
+    verification until the underlying work and its cited primary sources are inspected.
+    """
+    params={"search":str(q),"per_page":20}
+    key=os.getenv("OPENALEX_API_KEY","").strip()
+    if key:
+        params["api_key"]=key
+    url="https://api.openalex.org/works?"+urllib.parse.urlencode(params)
+    d=_json(url,timeout=30)
+    out=[]
+    for x in d.get("results",[]) or []:
+        authors=[]
+        for a in x.get("authorships",[]) or []:
+            name=((a or {}).get("author") or {}).get("display_name")
+            if name and name not in authors:
+                authors.append(name)
+        loc=x.get("primary_location") or {}
+        landing=loc.get("landing_page_url") or x.get("doi") or x.get("id")
+        out.append({
+          "discovery_repository":"OpenAlex Scholarly Works",
+          "discovery_lane":lane,
+          "connector_status":"EXECUTED",
+          "identifier":x.get("id") or x.get("doi"),
+          "title":x.get("title") or x.get("display_name"),
+          "creator":authors[:8],
+          "date":[x.get("publication_date") or x.get("publication_year")] if (x.get("publication_date") or x.get("publication_year")) else [],
+          "url":landing,
+          "doi":x.get("doi"),
+          "type":x.get("type"),
+          "cited_by_count":x.get("cited_by_count"),
+          "evidence_level":"SECONDARY_DISCOVERY_ONLY",
+          "verification_status":"UNVERIFIED_DISCOVERY",
+          "acquisition_policy":"METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route":"OPENALEX_API"
+        })
+    safe_url=url if not key else url.replace(urllib.parse.quote_plus(key),"REDACTED")
+    return "EXECUTED",out,safe_url
+
+def crossref_works(q,lane):
+    """Search Crossref bibliographic metadata for scholarly discovery."""
+    params={"query.bibliographic":str(q),"rows":20}
+    mailto=os.getenv("CROSSREF_MAILTO","").strip()
+    if mailto:
+        params["mailto"]=mailto
+    url="https://api.crossref.org/works?"+urllib.parse.urlencode(params)
+    d=_json(url,timeout=30)
+    out=[]
+    for x in (d.get("message") or {}).get("items",[]) or []:
+        title=x.get("title") or []
+        if isinstance(title,list):
+            title=" ".join(str(v) for v in title if v)
+        authors=[]
+        for a in x.get("author",[]) or []:
+            name=" ".join(str(v).strip() for v in [a.get("given"),a.get("family")] if v)
+            if name and name not in authors:
+                authors.append(name)
+        date=[]
+        for key_name in ("published-print","published-online","issued","created"):
+            parts=((x.get(key_name) or {}).get("date-parts") or [])
+            if parts and isinstance(parts[0],list):
+                date=["-".join(str(v) for v in parts[0])]
+                break
+        doi=x.get("DOI")
+        url_value=x.get("URL") or (("https://doi.org/"+doi) if doi else None)
+        out.append({
+          "discovery_repository":"Crossref Scholarly Metadata",
+          "discovery_lane":lane,
+          "connector_status":"EXECUTED",
+          "identifier":doi or url_value,
+          "title":title,
+          "creator":authors[:8],
+          "date":date,
+          "url":url_value,
+          "doi":doi,
+          "type":x.get("type"),
+          "publisher":x.get("publisher"),
+          "container_title":x.get("container-title") or [],
+          "evidence_level":"SECONDARY_DISCOVERY_ONLY",
+          "verification_status":"UNVERIFIED_DISCOVERY",
+          "acquisition_policy":"METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route":"CROSSREF_REST_API"
+        })
+    return "EXECUTED",out,url
+
 def academia_public(q,lane):
     return _public_site_index(q,lane,"Academia.edu Public Research","academia.edu",20)
 
@@ -623,6 +710,8 @@ def dispatch(repository,q,lane):
     if repository=="OpenArchives.gr / EKT": return openarchives_public(q,lane)
     if repository=="National Library of Greece Digital Collections": return nlg_public(q,lane)
     if repository=="Anemi / University of Crete": return anemi_public(q,lane)
+    if repository=="OpenAlex Scholarly Works": return openalex_works(q,lane)
+    if repository=="Crossref Scholarly Metadata": return crossref_works(q,lane)
     if repository=="Academia.edu Public Research": return academia_public(q,lane)
     if repository=="İSAM Kütüphanesi": return isam(q,lane)
     if repository=="PARES / Archivo General de Simancas":

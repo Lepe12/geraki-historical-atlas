@@ -19,7 +19,7 @@ on:
         required: false
         type: string
       selected_agents:
-        description: "Optional comma-separated lane subset; blank means all ten"
+        description: "Optional comma-separated lane subset; blank means all eleven"
         required: false
         type: string
   push:
@@ -83,7 +83,7 @@ jobs:
         run: |
           python3 tools/scientific_benchmark.py
           python3 tools/adversarial_scientific_benchmark.py
-      - name: Build and validate ten lane payloads
+      - name: Build and validate eleven lane payloads
         env:
           PCT_RESEARCH_JOB_ID: ${{ steps.identity.outputs.research_job_id }}
           PCT_EXPECTED_REQUEST_SHA256: ${{ steps.identity.outputs.request_sha256 }}
@@ -135,7 +135,7 @@ jobs:
       fail-fast: false
       matrix:
         lane: ${{ fromJSON(needs.prepare.outputs.matrix) }}
-      max-parallel: 10
+      max-parallel: 11
     runs-on: ubuntu-latest
     env:
       PCT_REQUEST_FILE: ${{ needs.prepare.outputs.request_file }}

@@ -6,7 +6,7 @@ from request_identity import canonical_request
 
 rf,req,ctx,normalized,request_sha256,research_job_id=canonical_request()
 lanes={
-"greek":{"label":"Greek / Hellenic repositories & scholarship","families":["SearchCulture/EKT","OpenArchives","National Library of Greece","Anemi","Greek academic repositories","Academia.edu secondary scholarship"]},
+"greek":{"label":"Greek / Hellenic repositories & scholarship","families":["SearchCulture/EKT","OpenArchives","National Library of Greece","Anemi","Greek academic repositories","OpenAlex scholarly metadata","Crossref scholarly metadata","Academia.edu secondary scholarship"]},
 "travellers":{"label":"Mediterranean/Eastern Mediterranean travellers & contemporary literature","families":["travel accounts","itineraries","geographies","missionary","consular","gazettes","chronicles"]},
 "spanish_simancas":{"label":"Spanish Monarchy / Simancas","families":["Archivo General de Simancas","state","royal","naval","diplomatic"]},
 "venetian":{"label":"Venetian","families":["Archivio di Stato di Venezia","Senato","bailo","provveditori","maritime","colonial","diplomatic"]},

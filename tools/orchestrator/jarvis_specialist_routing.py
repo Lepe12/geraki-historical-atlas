@@ -17,6 +17,8 @@ CONTEXT_BOOSTS={
       "repo:SearchCulture.gr / EKT":30,
       "repo:OpenArchives.gr / EKT":26,
       "repo:Academia.edu Public Research":20,
+      "repo:OpenAlex Scholarly Works":20,
+      "repo:Crossref Scholarly Metadata":18,
       "repo:Anemi / University of Crete":18,
       "registry:moreveneto_browser":16,
       "repo:Internet Culturale":12,
