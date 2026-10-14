@@ -1,3 +1,4 @@
+import { connectResearchFeed } from "./live-bridge.js";
 import * as THREE from "https://esm.sh/three@0.184.0";
 import { EffectComposer } from "https://esm.sh/three@0.184.0/examples/jsm/postprocessing/EffectComposer.js?external=three";
 import { RenderPass } from "https://esm.sh/three@0.184.0/examples/jsm/postprocessing/RenderPass.js?external=three";
@@ -239,28 +240,56 @@ function verifiedRecord(record,kind,index){
  hit.position.copy(pos);hit.userData.node=node;hit.visible=false;evidenceLayer.add(hit);
  node.evidenceMeshes=[spot,hit];evidenceClickables.push(hit);selectables.push(hit);evidenceCount++;
 }
-async function loadEvidence(){
- try{
-  // The canonical snapshot is durable GitHub evidence, NOT a fabricated live websocket.
-  const res=await fetch("../command-center/live/latest.json",{cache:"no-store"});
-  if(!res.ok)throw Error("Snapshot HTTP "+res.status);
-  const data=await res.json();
-  if(data.schema!=="pct-command-center-live-v1"||!Array.isArray(data.agents)||!Array.isArray(data.blockers)||!Array.isArray(data.claims))throw Error("Unexpected evidence schema");
-  evidenceRun=String(data.run_id||"");evidenceSource="DURABLE SNAPSHOT";
-  const laneState=new Map(data.agents.map(a=>[a.id,a]));
-  for(const n of agentNodes)n.liveState=laneState.get(n.agentId)||null;
-  for(let i=0;i<data.claims.length;i++)verifiedRecord(data.claims[i],"claim",i);
-  // Show individual recorded blockers, not imagined archival results.
-  for(let i=0;i<data.blockers.length;i++)verifiedRecord(data.blockers[i],"blocker",i);
-  document.body.dataset.evidenceSource=evidenceSource;
-  document.body.dataset.evidenceRecords=String(evidenceCount);
-  document.body.dataset.evidenceRun=evidenceRun;
- }catch(e){
-  document.body.dataset.evidenceSource="UNAVAILABLE";
-  document.body.dataset.evidenceRecords="0";
-  console.warn("JARVIS evidence overlay unavailable:",e.message);
- }
+let currentRun="",connectionMode="OFFLINE";
+const recentEventIds=new Set();
+function clearEvidence(){
+ for(const hit of evidenceClickables){const n=hit.userData.node;for(const mesh of n.evidenceMeshes)evidenceLayer.remove(mesh);const i=selectables.indexOf(hit);if(i>=0)selectables.splice(i,1);}
+ evidenceClickables.length=0;evidenceCount=0;
 }
+function setConnection(mode,detail){
+ connectionMode=mode;
+ document.body.dataset.feedMode=mode;
+ document.body.dataset.feedDetail=detail||"";
+ const el=$("linkCount");
+ if(el)el.textContent=mode+" · "+(currentRun?"RUN "+currentRun:"NO RUN");
+}
+function receiveSnapshot(data,origin){
+ if(data.schema!=="pct-command-center-live-v1"||!Array.isArray(data.agents)||!Array.isArray(data.blockers)||!Array.isArray(data.claims))return;
+ // Do not let a delayed older fallback overwrite newer live state.
+ if(connectionMode==="LIVE"&&origin==="SNAPSHOT"&&currentRun&&currentRun!==String(data.run_id||""))return;
+ clearEvidence();recentEventIds.clear();
+ currentRun=String(data.run_id||"");evidenceRun=currentRun;
+ evidenceSource=origin==="LIVE"?"LIVE BOOTSTRAP":"DURABLE SNAPSHOT";
+ const laneState=new Map(data.agents.map(a=>[a.id,a]));
+ for(const n of agentNodes)n.liveState=laneState.get(n.agentId)||null;
+ data.claims.forEach((r,i)=>verifiedRecord(r,"claim",i));
+ data.blockers.forEach((r,i)=>verifiedRecord(r,"blocker",i));
+ document.body.dataset.evidenceSource=evidenceSource;
+ document.body.dataset.evidenceRecords=String(evidenceCount);
+ document.body.dataset.evidenceRun=evidenceRun;
+}
+function receiveEvent(event){
+ if(event.schema!=="pct-jarvis-event-v1"||!event.run_id)return;
+ const id=String(event.event_id||"");
+ if(id&&recentEventIds.has(id))return;
+ if(id){recentEventIds.add(id);if(recentEventIds.size>1000)recentEventIds.delete(recentEventIds.values().next().value);}
+ const run=String(event.run_id);
+ if(run!==currentRun){
+  currentRun=run;evidenceRun=run;clearEvidence();
+  for(const n of agentNodes)n.liveState=null;
+  document.body.dataset.evidenceRecords="0";
+  document.body.dataset.evidenceRun=run;
+ }
+ const n=evidenceAgentMap.get(String(event.agent_id||""));
+ if(n)n.liveState={...(n.liveState||{}),status:String(event.status||event.event_type||"EVENT"),phase:String(event.phase||""),percent:event.percent};
+ evidenceSource="LIVE EVENT";
+ document.body.dataset.evidenceSource=evidenceSource;
+ document.body.dataset.lastEvent=String(event.event_type||"");
+ document.body.dataset.lastEventId=id;
+ setConnection("LIVE","Latest live event: "+String(event.event_type||"unknown"));
+}
+connectResearchFeed({onSnapshot:receiveSnapshot,onEvent:receiveEvent,onState:setConnection});
+
 const allLabels=[];
 regions.forEach((r,i)=>allLabels.push({position:new THREE.Vector3(...r.center),el:label(null,r.name,true),region:true}));
 agentNodes.forEach(n=>allLabels.push({position:n.position,el:label(n,n.name,false),region:false}));
@@ -419,5 +448,4 @@ function frame(){
  composer.render();
 }
 $("detailPanel")?.classList.add("hidden");
-loadEvidence();
 frame();
