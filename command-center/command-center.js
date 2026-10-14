@@ -1,199 +1,56 @@
-(() => {
-  const params=new URLSearchParams(location.search);
-  const project=params.get("project")||"piratecartography";
-  const requestedRun=params.get("run")||"latest";
-  const apiBase=(params.get("api")||"http://127.0.0.1:8765").replace(/\/$/,"");
-  const wsBase=apiBase.replace(/^http/,"ws");
-
-  const agents=[
-    ["travellers","Travellers"],["spanish_simancas","Simancas"],["venetian","Venetian"],["french","French"],
-    ["british","British"],["dutch","Dutch"],["german","German"],["italian_states","Italian States"],
-    ["ottoman","Ottoman"],["north_african","North African"],["pirate_base","Pirate Base"],
-    ["pirate_biography","Pirate Biography"],["identity_resolution","Identity"],["timeline","Timeline"],
-    ["relationship_network","Network"],["contradiction","Contradiction"],["source_genealogy","Source Genealogy"]
-  ];
-  const state=new Map(agents.map(([id,label])=>[id,{id,label,status:"QUEUED",percent:0,phase:"Waiting",warnings:0,connector:"—"}]));
-  let events=[],socket,retryTimer,actualRun=requestedRun;
-  const $=id=>document.getElementById(id);
-  const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
-  const nodePos={spanish_simancas:[138,205],french:[300,160],venetian:[530,205],italian_states:[505,270],ottoman:[780,220],north_african:[650,405],british:[280,70],dutch:[375,78],german:[455,95]};
-  const core=[515,330];
-
-  function setConnection(status){
-    $("connection-label").textContent=status;
-    $("connection-dot").className="dot "+(status==="ONLINE"?"online":status==="CONNECTING"?"connecting":"offline");
-  }
-  function agentClass(a){return ["RUNNING","COMPLETED","FAILED","BLOCKED","QUEUED"].includes(a.status)?a.status.toLowerCase():"queued"}
-  function renderAgents(){
-    const values=[...state.values()];
-    $("agent-grid").innerHTML=values.map(a=>`
-      <article class="agent-card">
-        <header><h3>${esc(a.label)}</h3><span class="status ${agentClass(a)}">${esc(a.status)}</span></header>
-        <p class="meta">${esc(a.phase)} · ${esc(a.connector)}</p>
-        <div class="progress"><span style="transform:scaleX(${Math.max(0,Math.min(100,a.percent))/100})"></span></div>
-        <div class="mini"><span>${a.percent}%</span><span>${a.warnings} warnings</span></div>
-      </article>`).join("");
-
-    const active=values.filter(x=>x.status==="RUNNING");
-    $("metric-active").textContent=active.length;
-    $("metric-blocked").textContent=values.filter(x=>["BLOCKED","FAILED"].includes(x.status)).length;
-    $("metric-archives").textContent=new Set(active.map(x=>x.connector).filter(x=>x&&x!=="—")).size;
-    const progress=active.length?Math.round(active.reduce((n,x)=>n+x.percent,0)/active.length):
-      Math.round(values.reduce((n,x)=>n+x.percent,0)/values.length);
-    $("mission-progress-label").textContent=progress+"%";
-    $("mission-progress-bar").style.width=progress+"%";
-    const lead=active.sort((a,b)=>b.percent-a.percent)[0];
-    $("mission-phase").textContent=lead?.phase||"Waiting";
-    $("mission-route").textContent=lead?.connector||"—";
-    $("core-state").textContent=active.length?"RESEARCH CORE ACTIVE":"SYSTEM STANDBY";
-
-    $("priority-agents").innerHTML=values
-      .filter(x=>x.status==="RUNNING"||x.status==="BLOCKED"||x.status==="FAILED")
-      .slice(0,6)
-      .map(a=>`<div class="priority-agent"><b>${esc(a.label)} · ${esc(a.status)}</b><span>${esc(a.phase)}</span></div>`).join("") ||
-      '<div class="priority-agent"><b>Standby</b><span>No active research thread</span></div>';
-
-    renderOrbit(values);
-    renderMap(values);
-  }
-
-  function renderOrbit(values){
-    const important=values.filter(a=>["pirate_base","pirate_biography","identity_resolution","timeline","relationship_network","contradiction","source_genealogy"].includes(a.id));
-    const coords=[[22,24],[38,12],[61,13],[78,25],[83,55],[67,78],[35,81]];
-    $("agent-orbit").innerHTML=important.map((a,i)=>`
-      <div class="orb-agent ${agentClass(a)}" style="left:${coords[i][0]}%;top:${coords[i][1]}%">
-        <b>${esc(a.label)}</b><span>${esc(a.status)} · ${a.percent}%</span>
-      </div>`).join("");
-  }
-
-  function renderMap(values){
-    document.querySelectorAll(".archive-node").forEach(n=>n.classList.remove("active","blocked"));
-    const routeLayer=document.getElementById("route-layer"); routeLayer.innerHTML="";
-    for(const a of values){
-      const node=document.querySelector(`.archive-node[data-agent="${a.id}"]`);
-      if(!node) continue;
-      if(a.status==="RUNNING"){
-        node.classList.add("active");
-        const p=nodePos[a.id]; if(p) routeLayer.insertAdjacentHTML("beforeend",`<path class="route-line" d="M ${core[0]} ${core[1]} Q ${(core[0]+p[0])/2} ${Math.min(core[1],p[1])-70} ${p[0]} ${p[1]}"/>`);
-      }
-      if(["FAILED","BLOCKED"].includes(a.status)) node.classList.add("blocked");
-    }
-  }
-
-  function renderLog(){
-    const rows=events.slice(-250).reverse();
-    $("mission-log").innerHTML=rows.map(e=>{
-      const cls=(e.status==="FAILED"||e.status==="BLOCKED")?"fail":(e.warnings?.length?"warn":"");
-      return `<div class="log-row ${cls}"><time>${esc(new Date(e.created_utc||Date.now()).toLocaleTimeString())}</time><div class="agent">${esc(e.agent_id||e.event_type||"SYSTEM")}</div><div>${esc(e.phase||e.detail||e.status||e.event_type||"event")}</div></div>`;
-    }).join("")||'<div class="meta">Waiting for research events.</div>';
-
-    $("evidence-feed").innerHTML=rows.slice(0,18).map(e=>{
-      const cls=(e.status==="FAILED"||e.status==="BLOCKED")?"alert":(e.event_type==="agent_completed"?"good":"");
-      return `<div class="intel-item ${cls}"><div class="intel-top"><b>${esc(e.agent_id||"SYSTEM")}</b><time>${esc(new Date(e.created_utc||Date.now()).toLocaleTimeString())}</time></div><p>${esc(e.phase||e.detail||e.event_type||e.status||"event")}</p></div>`;
-    }).join("")||'<div class="meta">No evidence events yet.</div>';
-  }
-
-  function renderJobs(){
-    const grouped={};
-    for(const e of events){
-      const key=e.run_id||actualRun;
-      grouped[key]=grouped[key]||{run:key,status:"RUNNING",agents:new Set(),last:e.created_utc};
-      if(e.agent_id) grouped[key].agents.add(e.agent_id);
-      if(e.event_type==="agent_failed") grouped[key].status="FAILED";
-      if(e.event_type==="agent_completed" && grouped[key].status!=="FAILED") grouped[key].status="ACTIVE";
-      grouped[key].last=e.created_utc||grouped[key].last;
-    }
-    const rows=Object.values(grouped);
-    $("jobs-table").innerHTML=`<table><thead><tr><th>Run</th><th>Status</th><th>Agents</th><th>Last event</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.run)}</td><td>${esc(r.status)}</td><td>${r.agents.size}</td><td>${esc(r.last||"—")}</td></tr>`).join("")}</tbody></table>`;
-  }
-
-  function renderConnectors(){
-    const latest={}; for(const e of events){const c=e.connector_id||e.connector;if(c) latest[c]=e}
-    const ids=["pares_simancas_native","pares_simancas_browser","moreveneto_browser","sias_browser","archives_nationales_open_data"];
-    $("connector-grid").innerHTML=ids.map(id=>{
-      const e=latest[id]||{},status=e.status||"STANDBY";
-      return `<article class="connector-card"><header><h3>${esc(id)}</h3><span class="status ${status.toLowerCase()}">${esc(status)}</span></header><p class="meta">${esc(e.detail||"Registered archive connector")}</p></article>`;
-    }).join("");
-  }
-
-  function renderEvidence(){
-    const evidenceEvents=events.filter(e=>/evidence|source|candidate|claim|contradiction|genealogy/i.test([e.event_type,e.phase,e.detail].join(" ")));
-    $("evidence-list").innerHTML=evidenceEvents.slice(-100).reverse().map(e=>`<div class="intel-item"><b>${esc(e.agent_id||e.event_type)}</b><p>${esc(e.phase||e.detail||e.status||"Evidence event")}</p></div>`).join("")||'<div class="meta">No evidence-specific events yet.</div>';
-    const candidate=evidenceEvents.filter(e=>/candidate|claim/i.test([e.event_type,e.phase,e.detail].join(" "))).length;
-    const contradictions=evidenceEvents.filter(e=>/contradiction|conflict/i.test([e.event_type,e.phase,e.detail].join(" "))).length;
-    $("metric-claims").textContent=candidate;
-    $("metric-contradictions").textContent=contradictions;
-    $("claim-candidates").textContent=candidate;
-    $("claim-evidence").textContent=evidenceEvents.length;
-    $("claim-conflicts").textContent=contradictions;
-  }
-
-  function ingest(e){
-    events.push(e); if(events.length>600) events=events.slice(-600);
-    if(e.run_id){actualRun=e.run_id;$("run-id-label").textContent=actualRun;$("mission-run").textContent=actualRun}
-    if(e.agent_id && state.has(e.agent_id)){
-      const a=state.get(e.agent_id);
-      if(e.event_type==="agent_started") a.status="RUNNING";
-      else if(e.event_type==="agent_completed") a.status="COMPLETED";
-      else if(e.event_type==="agent_failed") a.status="FAILED";
-      else if(e.status) a.status=String(e.status).toUpperCase();
-      if(Number.isFinite(Number(e.percent))) a.percent=Number(e.percent);
-      if(e.phase) a.phase=e.phase;
-      if(e.connector_id||e.connector) a.connector=e.connector_id||e.connector;
-      a.warnings+=(e.warnings||[]).length;
-    }
-    const blob=[e.event_type,e.phase,e.detail].join(" ").toLowerCase();
-    if(blob.includes("genealogy")) $("qa-genealogy").textContent="ACTIVE";
-    if(blob.includes("contradiction")) $("qa-contradiction").textContent="ACTIVE";
-    if(blob.includes("original")&&blob.includes("inspect")) $("qa-original").textContent="IN REVIEW";
-    renderAgents();renderLog();renderJobs();renderConnectors();renderEvidence();
-  }
-
-  function loadPreviewData(){
-    if(events.length) return;
-    const now=new Date().toISOString();
-    const demo=[
-      {created_utc:now,event_type:"agent_started",agent_id:"venetian",phase:"Moreveneto catalogue search",percent:44,status:"RUNNING",connector_id:"moreveneto_browser"},
-      {created_utc:now,event_type:"agent_progress",agent_id:"spanish_simancas",phase:"PARES / AGS record discovery",percent:68,status:"RUNNING",connector_id:"pares_simancas_native"},
-      {created_utc:now,event_type:"agent_started",agent_id:"ottoman",phase:"Ottoman archive route discovery",percent:31,status:"RUNNING",connector_id:"—"},
-      {created_utc:now,event_type:"agent_completed",agent_id:"identity_resolution",phase:"4 historical name variants reviewed",percent:100,status:"COMPLETED"},
-      {created_utc:now,event_type:"agent_progress",agent_id:"timeline",phase:"Chronology consistency check",percent:73,status:"RUNNING"},
-      {created_utc:now,event_type:"agent_progress",agent_id:"contradiction",phase:"Contradiction search: competing account under review",percent:51,status:"RUNNING"},
-      {created_utc:now,event_type:"agent_completed",agent_id:"source_genealogy",phase:"Source genealogy map built",percent:100,status:"COMPLETED"},
-      {created_utc:now,event_type:"candidate_claim",agent_id:"pirate_biography",phase:"Candidate claim extracted from catalogue context",percent:57,status:"RUNNING"},
-      {created_utc:now,event_type:"evidence_candidate",agent_id:"pirate_base",phase:"Possible operational base reference discovered",percent:38,status:"RUNNING"}
-    ];
-    demo.forEach(ingest);
-    const note=document.createElement("div");note.className="preview-banner";note.textContent="PREVIEW MODE — visual demonstration. Live research data appears when the backend is connected.";document.querySelector(".shell").prepend(note);
-  }
-
-  async function loadSnapshot(){
-    try{
-      const r=await fetch(`${apiBase}/status/${encodeURIComponent(project)}/${encodeURIComponent(requestedRun)}`);
-      if(!r.ok) throw new Error("snapshot failed");
-      const data=await r.json(); actualRun=data.run_id||requestedRun;
-      $("run-id-label").textContent=actualRun;$("mission-run").textContent=actualRun;
-      events=[]; for(const e of data.events||[]) ingest(e);
-      if(!(data.events||[]).length) loadPreviewData();
-    }catch(_){loadPreviewData()}
-  }
-
-  function connect(){
-    clearTimeout(retryTimer);setConnection("CONNECTING");
-    try{socket=new WebSocket(`${wsBase}/ws/${encodeURIComponent(project)}/${encodeURIComponent(requestedRun)}`)}catch(_){retryTimer=setTimeout(connect,5000);return}
-    socket.onopen=()=>setConnection("ONLINE");
-    socket.onmessage=m=>{try{ingest(JSON.parse(m.data))}catch(_){}};
-    socket.onclose=()=>{setConnection("OFFLINE");loadPreviewData();retryTimer=setTimeout(connect,5000)};
-    socket.onerror=()=>socket.close();
-  }
-
-  document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>{
-    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-    document.querySelectorAll(".tab-panel").forEach(x=>x.classList.remove("active"));
-    btn.classList.add("active");$("tab-"+btn.dataset.tab).classList.add("active");
-  }));
-  $("clear-log").addEventListener("click",()=>{$("mission-log").innerHTML='<div class="meta">Local log view cleared.</div>';$("evidence-feed").innerHTML='<div class="meta">Local evidence view cleared.</div>'});
-  $("refresh-button").addEventListener("click",loadSnapshot);
-  $("run-id-label").textContent=requestedRun;$("mission-run").textContent=requestedRun;
-  renderAgents();renderConnectors();renderJobs();renderLog();renderEvidence();loadSnapshot();connect();
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const query=new URLSearchParams(location.search);
+let mode="operations", feedMode="evidence", map, mapLoaded=false, terrainOn=true, socket=null, poller=null;
+let api="", currentRun=query.get("run")||"latest", project=query.get("project")||"piratecartography", selected=null, events=[], liveConnected=false;
+const agents=[
+{id:"spanish_simancas",label:"Simancas",city:"Simancas, Spain",p:[-4.828,41.590]},
+{id:"venetian",label:"Venice",city:"Venice, Italy",p:[12.3155,45.4408]},
+{id:"french",label:"French",city:"Paris, France",p:[2.3522,48.8566]},
+{id:"british",label:"British",city:"London, UK",p:[-0.1276,51.5072]},
+{id:"dutch",label:"Dutch",city:"The Hague, Netherlands",p:[4.3007,52.0705]},
+{id:"german",label:"German",city:"Berlin, Germany",p:[13.405,52.52]},
+{id:"ottoman",label:"Ottoman",city:"Istanbul, Türkiye",p:[28.9784,41.0082]},
+{id:"north_african",label:"North African",city:"Algiers, Algeria",p:[3.0588,36.7538]},
+{id:"italian_states",label:"Italian States",city:"Rome, Italy (reference city)",p:[12.4964,41.9028]},
+{id:"travellers",label:"Travellers",city:"No single reference city",p:null},
+{id:"pirate_base",label:"Pirate Base",city:"No fixed archive location",p:null},
+{id:"pirate_biography",label:"Pirate Biography",city:"No fixed archive location",p:null},
+{id:"identity_resolution",label:"Identity Resolution",city:"Research logic",p:null},
+{id:"timeline",label:"Timeline",city:"Research logic",p:null},
+{id:"relationship_network",label:"Relationship Network",city:"Research logic",p:null},
+{id:"contradiction",label:"Contradiction",city:"Research logic",p:null},
+{id:"source_genealogy",label:"Source Genealogy",city:"Research logic",p:null}
+];
+const agentData=new Map(agents.map(a=>[a.id,{status:"NOT REPORTED",phase:"",percent:null}]));
+const markers=new Map();
+const escapeHtml=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function setConnection(label,cls,detail){$("connection-status").className="status "+cls;$("connection-status").textContent="● "+label;liveConnected=cls==="online";$("connection-detail").textContent=detail;$("core-state").textContent=liveConnected?"RESEARCH CORE · LIVE":"RESEARCH CORE · STANDBY";$("data-integrity").textContent=liveConnected?"Πραγματικά συμβάντα από συνδεδεμένο backend":"Χωρίς ζωντανά δεδομένα · κανένα αποτέλεσμα δεν προσομοιώνεται";}
+function setMode(next){mode=next;document.body.dataset.currentMode=next;document.querySelectorAll(".mode").forEach(b=>b.classList.toggle("active",b.dataset.mode===next));$("results-heading").textContent=next==="operations"?"Evidence & Mission Log":next==="evidence"?"Evidence Explorer":"Scientific Review & Decisions";feedMode=next==="operations"?"events":"evidence";document.querySelectorAll(".feed-tab").forEach(b=>b.classList.toggle("active",b.dataset.feed===feedMode));renderFeed();if(next==="decisions")$("review-summary").scrollIntoView({behavior:"smooth",block:"nearest"});}
+function formatTime(value){if(!value)return "—";const d=new Date(value);return Number.isNaN(d.getTime())?"—":d.toLocaleString("el-GR",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"});}
+function getAgent(id){return agents.find(x=>x.id===id);}
+function validStatus(s){return ["RUNNING","COMPLETED","FAILED","BLOCKED","QUEUED"].includes(s)?s:"NOT REPORTED";}
+function selectAgent(id){selected=id;document.querySelectorAll(".agent-row").forEach(x=>x.classList.toggle("selected",x.dataset.id===id));for(const [key,m] of markers)m.getElement()?.classList.toggle("selected",key===id);const a=getAgent(id);if(a?.p&&mapLoaded){map.flyTo({center:a.p,zoom:6,pitch:38,duration:900});$("map-focus-label").textContent=a.city;}else if(a){$("map-focus-label").textContent=a.label+" (χωρίς γεωγραφική θέση)";} }
+function renderAgents(){let count=0;$("agents-list").innerHTML=agents.map(a=>{const d=agentData.get(a.id),status=validStatus(d.status);if(status==="RUNNING")count++;return '<button type="button" class="agent-row '+(selected===a.id?"selected":"")+'" data-id="'+escapeHtml(a.id)+'"><span class="agent-symbol">✧</span><span><b>'+escapeHtml(a.label)+'</b><small>'+escapeHtml(d.phase||a.city)+'</small></span><span class="agent-state '+status.toLowerCase()+'">'+escapeHtml(status==="NOT REPORTED"?"—":status)+'</span></button>';}).join("");$("active-count").textContent=events.length?String(count):"—";document.querySelectorAll(".agent-row").forEach(b=>b.addEventListener("click",()=>selectAgent(b.dataset.id)));for(const a of agents){const marker=markers.get(a.id);if(marker)marker.getElement().classList.toggle("active",agentData.get(a.id).status==="RUNNING");}}
+function addArchiveMarkers(){for(const a of agents){if(!a.p)continue;const node=document.createElement("button");node.className="archive-pin";node.type="button";node.setAttribute("aria-label",a.label+" — "+a.city);node.title=a.label+" / "+a.city;const popup=new maplibregl.Popup({offset:18}).setHTML("<strong>"+escapeHtml(a.label)+"</strong><br>"+escapeHtml(a.city)+"<br><small>Θέση πόλης αναφοράς, όχι ιστορικό γεγονός.</small>");const marker=new maplibregl.Marker({element:node,anchor:"center"}).setLngLat(a.p).setPopup(popup).addTo(map);node.addEventListener("click",()=>selectAgent(a.id));markers.set(a.id,marker);}}
+function styleMap(){if(!map?.isStyleLoaded())return;const style=map.getStyle();for(const layer of style.layers||[]){const n=layer.id.toLowerCase();try{if(layer.type==="symbol"){if(/road|highway|street|poi|air|rail|transit|housenumber/.test(n))map.setLayoutProperty(layer.id,"visibility","none");continue;}if(layer.type==="background")map.setPaintProperty(layer.id,"background-color","#071824");if(layer.type==="fill"){if(/water|sea|ocean|lake/.test(n))map.setPaintProperty(layer.id,"fill-color","#092d3a");else if(/land|earth|landcover|natural/.test(n))map.setPaintProperty(layer.id,"fill-color","#274b4d");else if(/wood|forest|park|grass|green/.test(n))map.setPaintProperty(layer.id,"fill-color","#285357");}if(layer.type==="line"&&/water|river/.test(n))map.setPaintProperty(layer.id,"line-color","#1e6974");}catch(_){}}try{if(!map.getSource("jarvis-real-dem"))map.addSource("jarvis-real-dem",{type:"raster-dem",tiles:["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],tileSize:256,encoding:"terrarium",maxzoom:14,attribution:"Terrain © AWS Terrain Tiles"});map.addLayer({id:"jarvis-hillshade",type:"hillshade",source:"jarvis-real-dem",paint:{"hillshade-shadow-color":"#031119","hillshade-highlight-color":"#639b92","hillshade-accent-color":"#113b42","hillshade-exaggeration":0.6}});if(terrainOn)map.setTerrain({source:"jarvis-real-dem",exaggeration:1.2});}catch(err){console.warn("Terrain not available",err);}}
+function createMap(){if(!window.maplibregl){$("map-unavailable").hidden=false;return;}try{map=new maplibregl.Map({container:"map",style:"https://tiles.openfreemap.org/styles/liberty",center:[15.5,39.5],zoom:4.2,pitch:36,bearing:-7,antialias:true,attributionControl:true,maxPitch:65});map.addControl(new maplibregl.NavigationControl({showCompass:true}),"bottom-right");map.on("load",()=>{mapLoaded=true;styleMap();addArchiveMarkers();$("map-unavailable").hidden=true;});map.on("error",e=>{console.warn("MapLibre:",e.error?.message||e);if(!mapLoaded)$("map-unavailable").hidden=false;});}catch(e){$("map-unavailable").hidden=false;console.error(e);}}
+function eventInfo(e){return [e.phase,e.detail,e.event_type,e.status].filter(Boolean).join(" · ")||"Event";}
+function renderFeed(){const q=(document.body.dataset.search||"").toLowerCase();const filtered=events.filter(e=>!q||JSON.stringify(e).toLowerCase().includes(q));const arr=feedMode==="events"?filtered:filtered.filter(e=>/evidence|source|candidate|claim|contradiction|genealogy|archive|catalogue/i.test([e.event_type,e.phase,e.detail].join(" ")));const rows=arr.slice(-70).reverse();$("feed").innerHTML=rows.length?rows.map(e=>{const url=e.source_url||e.record_url||e.url;const link=typeof url==="string"&&/^https:\/\//.test(url)?'<a class="link" href="'+escapeHtml(url)+'" target="_blank" rel="noopener noreferrer">Πηγή ↗</a>':"";return '<div class="feed-entry"><div><b>'+escapeHtml(e.agent_id||e.event_type||"SYSTEM")+'</b> · '+escapeHtml(eventInfo(e))+' '+link+'</div><time>'+escapeHtml(formatTime(e.created_utc))+'</time></div>';}).join(""):'<p class="empty">Δεν υπάρχουν καταγεγραμμένα '+(feedMode==="evidence"?"τεκμήρια":"συμβάντα")+' στο επιλεγμένο run. Δεν εμφανίζονται δοκιμαστικά δεδομένα.</p>';}
+function rebuildFromEvents(){agentData.forEach(d=>{d.status="NOT REPORTED";d.phase="";d.percent=null;});for(const e of events){const d=agentData.get(e.agent_id);if(!d)continue;if(e.event_type==="agent_started")d.status="RUNNING";else if(e.event_type==="agent_completed")d.status="COMPLETED";else if(e.event_type==="agent_failed")d.status="FAILED";else if(e.status)d.status=String(e.status).toUpperCase();if(e.phase)d.phase=e.phase;if(e.percent!==undefined&&Number.isFinite(Number(e.percent)))d.percent=Number(e.percent);}renderAgents();renderFeed();$("run-label").textContent="RUN "+currentRun;$("review-summary").textContent=events.length?("Καταγράφηκαν "+events.length+" συμβάντα. Οι αναφορές σε υποψήφιους ισχυρισμούς απαιτούν αυτοψία πηγών και ρητή ανθρώπινη απόφαση."):"Δεν υπάρχει ενεργή, επαληθευμένη αξίωση προς έγκριση.";$("qa-genealogy").textContent=events.some(e=>/genealogy/i.test(eventInfo(e)))?"ΑΝΑΦΕΡΘΗΚΕ · ΕΛΕΓΧΟΣ":"ΕΚΚΡΕΜΕΙ";$("qa-contradictions").textContent=events.some(e=>/contradiction/i.test(eventInfo(e)))?"ΑΝΑΦΕΡΘΗΚΕ · ΕΛΕΓΧΟΣ":"ΕΚΚΡΕΜΕΙ";$("qa-original").textContent="ΔΕΝ ΕΧΕΙ ΕΛΕΓΧΘΕΙ";}
+function ingest(incoming){const key=x=>x.event_id||[x.created_utc,x.agent_id,x.event_type,x.phase,x.detail].join("|");const seen=new Set(events.map(key));for(const e of incoming){if(e&&typeof e==="object"&&!seen.has(key(e))){events.push(e);seen.add(key(e));if(e.run_id)currentRun=e.run_id;}}events.sort((a,b)=>String(a.created_utc||"").localeCompare(String(b.created_utc||"")));if(events.length>500)events=events.slice(-500);rebuildFromEvents();}
+function stopConnection(){if(socket){socket.onclose=null;socket.close();socket=null;}if(poller){clearInterval(poller);poller=null;}}
+async function fetchSnapshot(){if(!api)return;const controller=new AbortController();const t=setTimeout(()=>controller.abort(),8000);try{const r=await fetch(api+"/status/"+encodeURIComponent(project)+"/"+encodeURIComponent(query.get("run")||"latest"),{signal:controller.signal,cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const data=await r.json();if(!Array.isArray(data.events))throw Error("Invalid event snapshot");currentRun=data.run_id||currentRun;events=[];ingest(data.events);setConnection("ΣΥΝΔΕΔΕΜΕΝΟ","online","Live snapshot από "+api+". "+events.length+" πραγματικά συμβάντα.");}catch(err){setConnection("ΕΚΤΟΣ ΣΥΝΔΕΣΗΣ","offline","Αδυναμία ανάκτησης: "+err.message+". Έλεγξε HTTPS, CORS και τον server.");}finally{clearTimeout(t);}}
+function connect(){const candidate=$("api-url").value.trim().replace(/\/$/,"");if(!/^https?:\/\/[^/]+/i.test(candidate)){$("connection-detail").textContent="Χρειάζεται πλήρης διεύθυνση http(s)://server.";return;}if(location.protocol==="https:"&&candidate.startsWith("http:")&&!/^http:\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(candidate)){$("connection-detail").textContent="Από HTTPS απαιτείται HTTPS backend (mixed content).";return;}api=candidate;stopConnection();events=[];rebuildFromEvents();setConnection("ΣΥΝΔΕΣΗ...","connecting","Έλεγχος πραγματικού API…");fetchSnapshot();poller=setInterval(fetchSnapshot,15000);try{const ws=api.replace(/^http/,"ws")+"/ws/"+encodeURIComponent(project)+"/"+encodeURIComponent(query.get("run")||"latest");socket=new WebSocket(ws);socket.onmessage=e=>{try{ingest([JSON.parse(e.data)]);}catch(_){}};socket.onerror=()=>{};}catch(_){}}
+function prepareRequest(){const target=$("research-target").value.trim(),period=$("research-period").value.trim(),purpose=$("research-purpose").value.trim();if(!target){$("request-feedback").textContent="Συμπλήρωσε το αντικείμενο έρευνας.";return;}const payload={target:target,aliases:[],date_range:period,purpose:purpose,source:"jarvis_command_center_prepared_request"};$("request-json").value=JSON.stringify(payload,null,2);$("copy-feedback").textContent="Δεν έχει υποβληθεί ή εκτελεστεί.";$("request-dialog").showModal();$("request-feedback").textContent="Έτοιμο αίτημα προς αντιγραφή. Δεν ξεκίνησε έρευνα.";}
+document.querySelectorAll(".mode").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
+document.querySelectorAll(".feed-tab").forEach(b=>b.addEventListener("click",()=>{feedMode=b.dataset.feed;document.querySelectorAll(".feed-tab").forEach(x=>x.classList.toggle("active",x===b));renderFeed();}));
+$("reset-map").addEventListener("click",()=>{if(mapLoaded)map.flyTo({center:[15.5,39.5],zoom:4.2,pitch:36,bearing:-7});$("map-focus-label").textContent="Mediterranean basin";selected=null;renderAgents();for(const m of markers.values())m.getElement()?.classList.remove("selected");});
+$("toggle-terrain").addEventListener("click",()=>{terrainOn=!terrainOn;$("toggle-terrain").setAttribute("aria-pressed",String(terrainOn));if(mapLoaded&&map.getSource("jarvis-real-dem")){try{map.setTerrain(terrainOn?{source:"jarvis-real-dem",exaggeration:1.2}:null);}catch(e){console.warn(e);}}});
+$("prepare-request").addEventListener("click",prepareRequest);$("close-dialog").addEventListener("click",()=>$("request-dialog").close());
+$("copy-request").addEventListener("click",async()=>{try{await navigator.clipboard.writeText($("request-json").value);$("copy-feedback").textContent="Το JSON αντιγράφηκε. Δεν εκτελέστηκε έρευνα.";}catch(_){$("request-json").select();$("copy-feedback").textContent="Επίλεξε το κείμενο και αντέγραψέ το χειροκίνητα.";}});$("view-decisions").addEventListener("click",()=>setMode("decisions"));$("connect-api").addEventListener("click",connect);$("refresh").addEventListener("click",()=>api?fetchSnapshot():$("connection-detail").textContent="Για ζωντανά δεδομένα, σύνδεσε backend.");
+const qp=query.get("api");if(qp&&/^https?:\/\//i.test(qp)){$("api-url").value=qp;connect();}
+setConnection(api?"ΣΥΝΔΕΣΗ...":"ΔΕΝ ΕΧΕΙ ΣΥΝΔΕΘΕΙ",api?"connecting":"offline",api?"Γίνεται σύνδεση…":"Δεν έχει διαμορφωθεί backend. Ο χάρτης λειτουργεί ανεξάρτητα.");
+createMap();renderAgents();renderFeed();
 })();
