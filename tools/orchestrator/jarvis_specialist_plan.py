@@ -1,10 +1,20 @@
 #!/usr/bin/env python3
-"""Plan parallel specialist agents for a Piratecartography research request."""
+"""JARVIS planner for parallel specialist historical-research assignments.
+
+The planner owns source selection. Workers are executors and must not choose
+their own repositories/connectors.
+"""
 from __future__ import annotations
 import argparse,json,re
 from pathlib import Path
 
 REG=Path(__file__).with_name("specialist_agent_registry.json")
+
+from jarvis_specialist_routing import plan_routes,select_queries
+
+SOURCE_LIMIT=4
+FALLBACK_LIMIT=4
+TOTAL_QUERY_BUDGET=20
 
 def load_registry():
     return json.loads(REG.read_text(encoding="utf-8"))
@@ -31,15 +41,10 @@ def select_agents(kind:str):
 def render_queries(agent_id:str,target:str,date_range:str="",aliases:list[str]|None=None):
     reg=load_registry()["agents"][agent_id]
     aliases=aliases or []
-    ctx={
-      "target":target,
-      "date_range":date_range or "",
-      "aliases":" | ".join(aliases)
-    }
+    ctx={"target":target,"date_range":date_range or "","aliases":" | ".join(aliases)}
     out=[]
     for template in reg.get("query_families",[]):
-        q=template.format(**ctx)
-        q=re.sub(r"\s+"," ",q).strip()
+        q=re.sub(r"\s+"," ",template.format(**ctx)).strip()
         if q not in out: out.append(q)
     for alias in aliases[:3]:
         q=(f'"{alias}" {date_range}').strip()
@@ -47,24 +52,61 @@ def render_queries(agent_id:str,target:str,date_range:str="",aliases:list[str]|N
     return out[:int(reg.get("max_queries",8))]
 
 def build(target,purpose,date_range="",aliases=None,target_type="auto"):
+    aliases=list(aliases or [])
     kind=infer_kind(target,purpose,target_type)
-    agents=select_agents(kind)
-    return {
-      "schema":"pct-specialist-agent-plan-v1",
+    agent_ids=select_agents(kind)
+    reg=load_registry()["agents"]
+    plan={
+      "schema":"pct-specialist-agent-plan-v2",
+      "routing_authority":"JARVIS_PLANNER",
       "target":target,
+      "aliases":aliases,
       "target_type":kind,
       "date_range":date_range,
       "purpose":purpose,
-      "agents":[{
-         "agent_id":aid,
-         "label":load_registry()["agents"][aid]["label"],
-         "queries":render_queries(aid,target,date_range,aliases or []),
-         "outputs":load_registry()["agents"][aid].get("outputs",[]),
-         "source_routes":load_registry()["agents"][aid].get("source_routes",[])
-      } for aid in agents],
-      "parallel_agent_count":len(agents),
-      "verified_promotion_allowed":False
+      "source_limit_per_agent":SOURCE_LIMIT,
+      "fallback_limit_per_agent":FALLBACK_LIMIT,
+      "total_query_budget_per_agent":TOTAL_QUERY_BUDGET,
+      "agents":[],
+      "parallel_agent_count":len(agent_ids),
+      "verified_promotion_allowed":False,
+      "rule":"JARVIS assigns sources before execution. Specialist workers execute the assignment and may not self-route."
     }
+    for aid in agent_ids:
+        meta=reg[aid]
+        queries=render_queries(aid,target,date_range,aliases)
+        draft={
+          "agent_id":aid,
+          "label":meta["label"],
+          "queries":queries,
+          "outputs":meta.get("outputs",[]),
+          "source_routes":meta.get("source_routes",[]),
+        }
+        ranked=plan_routes(draft,plan,limit=SOURCE_LIMIT+FALLBACK_LIMIT)
+        assigned=ranked[:SOURCE_LIMIT]
+        fallbacks=ranked[SOURCE_LIMIT:SOURCE_LIMIT+FALLBACK_LIMIT]
+        assigned_queries=select_queries(queries,len(assigned),TOTAL_QUERY_BUDGET)
+        plan["agents"].append({
+          **draft,
+          "assignment_id":aid+":wave1",
+          "assignment_wave":1,
+          "assigned_sources":assigned,
+          "fallback_sources":fallbacks,
+          "assigned_queries":assigned_queries,
+          "query_budget":{
+            "total":len(assigned)*len(assigned_queries),
+            "max_total":TOTAL_QUERY_BUDGET,
+            "queries_per_source":len(assigned_queries),
+          },
+          "routing_decision":{
+            "authority":"JARVIS_PLANNER",
+            "strategy":"context_aware_deterministic_v1",
+            "selected_route_ids":[x["route_id"] for x in assigned],
+            "fallback_route_ids":[x["route_id"] for x in fallbacks],
+            "evidence_effect":"NONE_DISCOVERY_PRIORITY_ONLY",
+          }
+        })
+    return plan
 
 if __name__=="__main__":
     p=argparse.ArgumentParser()
