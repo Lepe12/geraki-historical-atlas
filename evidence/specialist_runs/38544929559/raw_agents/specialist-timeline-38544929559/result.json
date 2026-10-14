@@ -1,0 +1,2376 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "timeline",
+  "label": "Timeline Consistency Agent",
+  "assignment_id": "timeline:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "dated_events",
+    "chronology_conflicts",
+    "gaps",
+    "impossible_overlaps"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "7e07515a586f381a8bb5d61fc83ecafaaa59ee161b755236b03501bee6a5f8ae",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "timeline",
+    "assignment_id": "timeline:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:Archives diplomatiques France",
+      "repo:Gallica/BnF",
+      "repo:PARES / Archivo General de Simancas",
+      "repo:İSAM Kütüphanesi"
+    ],
+    "queries": [
+      "\"Alger\" 1683-1683",
+      "\"Alger\" chronology",
+      "\"Alger\" dated letter report",
+      "\"Alger\" voyage operation",
+      "\"Algiers\" 1683-1683"
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:Archives diplomatiques France",
+        "route_type": "repository_dispatch",
+        "repository": "Archives diplomatiques France",
+        "connector_id": null,
+        "score": 138,
+        "reason": [
+          "agent_profile",
+          "context:french",
+          "context:north_african"
+        ],
+        "context_profiles": [
+          "french",
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 134,
+        "reason": [
+          "agent_profile",
+          "context:french",
+          "context:north_african"
+        ],
+        "context_profiles": [
+          "french",
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:PARES / Archivo General de Simancas",
+        "route_type": "repository_dispatch",
+        "repository": "PARES / Archivo General de Simancas",
+        "connector_id": null,
+        "score": 112,
+        "reason": [
+          "agent_profile",
+          "context:north_african"
+        ],
+        "context_profiles": [
+          "french",
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:İSAM Kütüphanesi",
+        "route_type": "repository_dispatch",
+        "repository": "İSAM Kütüphanesi",
+        "connector_id": null,
+        "score": 98,
+        "reason": [
+          "agent_profile",
+          "context:north_african"
+        ],
+        "context_profiles": [
+          "french",
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "french",
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "french",
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 76,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "french",
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "registry:archives_nationales_open_data",
+        "route_type": "registered_connector",
+        "repository": null,
+        "connector_id": "archives_nationales_open_data",
+        "score": 73,
+        "reason": [
+          "context:french"
+        ],
+        "context_profiles": [
+          "french",
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Alger\" chronology",
+      "records": [
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3",
+          "title": "Formulaire de recherche dans tous les fonds",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88",
+          "title": "Fonds conservés à La Courneuve",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da",
+          "title": "Fonds conservés à Nantes",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f",
+          "title": "Fonds conservés à Nantes - recherche par carte",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f"
+        }
+      ],
+      "diagnostic": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22+chronology",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Algiers\" 1683-1683",
+      "records": [
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3",
+          "title": "Formulaire de recherche dans tous les fonds",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88",
+          "title": "Fonds conservés à La Courneuve",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da",
+          "title": "Fonds conservés à Nantes",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f",
+          "title": "Fonds conservés à Nantes - recherche par carte",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f"
+        }
+      ],
+      "diagnostic": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Algiers%22+1683-1683",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Alger\" dated letter report",
+      "records": [
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3",
+          "title": "Formulaire de recherche dans tous les fonds",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88",
+          "title": "Fonds conservés à La Courneuve",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da",
+          "title": "Fonds conservés à Nantes",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f",
+          "title": "Fonds conservés à Nantes - recherche par carte",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&mode=list",
+          "title": "Affichage liste",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&mode=list"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&mode=table",
+          "title": "Affichage tableau",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&mode=table"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&mode=mosaic",
+          "title": "Affichage mosaïque",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&mode=mosaic"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&mode=chrono",
+          "title": "Affichage frise chronologique",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&mode=chrono"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&mode=map",
+          "title": "Affichage carte",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&mode=map"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&sort=referencecode_asc",
+          "title": "Cote (A-Z)",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&sort=referencecode_asc"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&sort=referencecode_dsc",
+          "title": "Cote (Z-A)",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&sort=referencecode_dsc"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&sort=date_asc",
+          "title": "Date (0-9)",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&sort=date_asc"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&sort=date_dsc",
+          "title": "Date (9-0)",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&sort=date_dsc"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&sort=relevance",
+          "title": "Pertinence",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&sort=relevance"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report",
+          "title": "20 résultats par page",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&resultsPerPage=40",
+          "title": "40 résultats par page",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&resultsPerPage=40"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&resultsPerPage=80",
+          "title": "80 résultats par page",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20dated%20letter%20report&resultsPerPage=80"
+        }
+      ],
+      "diagnostic": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22+dated+letter+report",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Alger\" voyage operation",
+      "records": [
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3",
+          "title": "Formulaire de recherche dans tous les fonds",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88",
+          "title": "Fonds conservés à La Courneuve",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da",
+          "title": "Fonds conservés à Nantes",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f",
+          "title": "Fonds conservés à Nantes - recherche par carte",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&mode=list",
+          "title": "Affichage liste",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&mode=list"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&mode=table",
+          "title": "Affichage tableau",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&mode=table"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&mode=mosaic",
+          "title": "Affichage mosaïque",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&mode=mosaic"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&mode=chrono",
+          "title": "Affichage frise chronologique",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&mode=chrono"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&mode=map",
+          "title": "Affichage carte",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&mode=map"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&sort=referencecode_asc",
+          "title": "Cote (A-Z)",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&sort=referencecode_asc"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&sort=referencecode_dsc",
+          "title": "Cote (Z-A)",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&sort=referencecode_dsc"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&sort=date_asc",
+          "title": "Date (0-9)",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&sort=date_asc"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&sort=date_dsc",
+          "title": "Date (9-0)",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&sort=date_dsc"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&sort=relevance",
+          "title": "Pertinence",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&sort=relevance"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation",
+          "title": "20 résultats par page",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&resultsPerPage=40",
+          "title": "40 résultats par page",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&resultsPerPage=40"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&resultsPerPage=80",
+          "title": "80 résultats par page",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%20voyage%20operation&resultsPerPage=80"
+        }
+      ],
+      "diagnostic": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22+voyage+operation",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Alger\" 1683-1683",
+      "records": [
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3",
+          "title": "Formulaire de recherche dans tous les fonds",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88",
+          "title": "Fonds conservés à La Courneuve",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da",
+          "title": "Fonds conservés à Nantes",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f",
+          "title": "Fonds conservés à Nantes - recherche par carte",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&mode=list",
+          "title": "Affichage liste",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&mode=list"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&mode=table",
+          "title": "Affichage tableau",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&mode=table"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&mode=mosaic",
+          "title": "Affichage mosaïque",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&mode=mosaic"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&mode=chrono",
+          "title": "Affichage frise chronologique",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&mode=chrono"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&mode=map",
+          "title": "Affichage carte",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&mode=map"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&sort=referencecode_asc",
+          "title": "Cote (A-Z)",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&sort=referencecode_asc"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&sort=referencecode_dsc",
+          "title": "Cote (Z-A)",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&sort=referencecode_dsc"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&sort=date_asc",
+          "title": "Date (0-9)",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&sort=date_asc"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&sort=date_dsc",
+          "title": "Date (9-0)",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&sort=date_dsc"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&sort=relevance",
+          "title": "Pertinence",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&sort=relevance"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683",
+          "title": "20 résultats par page",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&resultsPerPage=40",
+          "title": "40 résultats par page",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&resultsPerPage=40"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&resultsPerPage=80",
+          "title": "80 résultats par page",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22%201683-1683&resultsPerPage=80"
+        }
+      ],
+      "diagnostic": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Alger%22+1683-1683",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Alger\" 1683-1683",
+      "records": [
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb469494557",
+          "title": "Plan du mouillage de Cachicque à quinze mille au ponant d'Alger / [par M. de Viviers]",
+          "creator": [
+            "Viviers, Guillaume Clément de (16..-1701). Cartographe"
+          ],
+          "date": [
+            "1683"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb469494557",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb469494557"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb34087269s",
+          "title": "Lettre écrite de Tolon le 13. juillet 1683. à un homme de qualitez, de tout ce qui c'est passé devant la ville d'Alger.",
+          "creator": [],
+          "date": [
+            "1683"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb34087269s",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb34087269s"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb407372565",
+          "title": "Plan du bombardement d'Alger / par Duquesne",
+          "creator": [
+            "Duquesne (16..-16..?). Auteur du texte"
+          ],
+          "date": [
+            "1683"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb407372565",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb407372565"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb469491631",
+          "title": "Carte de la baye d'Alger avec le dispositif de l'armée navalle de France lorque les galiotes jettoient des bombes dans lad[ite] ville soustenües par les vaisseaux et galères, comme il paroist par lad[ite] carte en l'année 1683",
+          "creator": [],
+          "date": [
+            "1683"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb469491631",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb469491631"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb407717489",
+          "title": "Description du royaume d'Alger / Par le P. Du Val géographe du roy",
+          "creator": [
+            "Duval, Pierre (1619-1683). Fonction indéterminée"
+          ],
+          "date": [
+            "1665"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb407717489",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb407717489"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb40675449m",
+          "title": "Alger",
+          "creator": [],
+          "date": [
+            "1683"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb40675449m",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb40675449m"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb46949120r",
+          "title": "[Plan de la manière dont les vaisseaux et galiottes estoient postez pour tirer des bombes sur Alger]",
+          "creator": [],
+          "date": [
+            "1683"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb46949120r",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb46949120r"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb469880411",
+          "title": "Plan d'une partie de la ville d'Alger avec son mosle",
+          "creator": [],
+          "date": [
+            "1683"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb469880411",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb469880411"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb40592123m",
+          "title": "Carte du roiaume d'Alger / par P. Duval",
+          "creator": [
+            "Duval, Pierre (1619-1683). Cartographe"
+          ],
+          "date": [
+            "1677"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb40592123m",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb40592123m"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb40737257h",
+          "title": "Plan d'Alger / par C. G. de Vertrox",
+          "creator": [
+            "Vertron, Claude-Charles Guyonnet de (1645-1715). Auteur du texte"
+          ],
+          "date": [
+            "1683"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb40737257h",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb40737257h"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb469490136",
+          "title": "Plan d'Alger",
+          "creator": [],
+          "date": [
+            "1863"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb469490136",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb469490136"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb46987976x",
+          "title": "Plan des parties de la ville d'Alger avec son mosle / Decombe",
+          "creator": [
+            "Combes, Benjamin de (1649?-1710). Cartographe"
+          ],
+          "date": [
+            "1683"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb46987976x",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb46987976x"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb469490078",
+          "title": "[Plan du mouillage des galiottes et des vaisseaux devant Alger] / [envoyé par le S. Renau]",
+          "creator": [
+            "Renau d'Éliçagaray, Bernard (1652-1719). Cartographe"
+          ],
+          "date": [
+            "1683"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb469490078",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb469490078"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb40598413k",
+          "title": "Les costes des royaumes de Fez, Alger, Tunis et Tripoli en Barbarie suivant les routiers et portolans de divers pilotes / par P. Du Val, ...",
+          "creator": [
+            "Duval, Pierre (1619-1683). Fonction indéterminée"
+          ],
+          "date": [
+            "1677"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb40598413k",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb40598413k"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb40594668f",
+          "title": "Carte du roiaume d'Alger / par P. Du Val, ... Esche - le 30 lieues chacune de 3000 pas géométriques [=0m. 075 ; 1 : 1 480 000 environ] ; F.D. Lapointe sc.",
+          "creator": [
+            "Duval, Pierre (1619-1683). Auteur du texte",
+            "La Pointe, François de (1640?-1699?). Auteur du texte"
+          ],
+          "date": [
+            "1665"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb40594668f",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb40594668f"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb324988021",
+          "title": "Mandement de Mgr l'évêque d'Amiens pour faire des quêtes, dont le produit doit servir à rétablir une église à Alger, en faveur des esclaves chrétiens : [29 octobre 1754] / [signé Louis-François-Gabriel, évêque d'Amiens]",
+          "creator": [
+            "Orléans de La Motte, Louis François Gabriel d' (1683-1774). Auteur du texte",
+            "Eglise catholique. Diocèse (Amiens). Auteur du texte"
+          ],
+          "date": [
+            "1754"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb324988021",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb324988021"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb40594669s",
+          "title": "Carte du roiaume d'Alger / par P. Du Val, ... ; F.D. Lapointe sc.",
+          "creator": [
+            "Duval, Pierre (1619-1683). Auteur du texte",
+            "La Pointe, François de (1640?-1699?). Fonction indéterminée"
+          ],
+          "date": [
+            "1677"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb40594669s",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb40594669s"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb407282179",
+          "title": "L'Empire des Turcs en Europe, en Asie et en Afrique avec les principales routes qu'y tiennent les caravanes / par P. Du Val,...",
+          "creator": [
+            "Duval, Pierre (1619-1683). Auteur du texte"
+          ],
+          "date": [
+            "1677"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb407282179",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb407282179"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb40615206j",
+          "title": "L'Empire des Turcs en Europe, en Asie et en Afrique avecque les pri[n]cipales routes qu'y tiennent les caravanes / Par P. Du Val",
+          "creator": [
+            "Duval, Pierre (1619-1683). Auteur du texte"
+          ],
+          "date": [
+            "1677"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb40615206j",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb40615206j"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb40615209k",
+          "title": "L'empire des Turcs en Europe, en Asie, et en Afrique, avecque les principales routes qu'y tiennent les caravanes / Par P. Du Val",
+          "creator": [
+            "Duval, Pierre (1619-1683). Auteur du texte"
+          ],
+          "date": [
+            "1686"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb40615209k",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb40615209k"
+          ]
+        }
+      ],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Alger++1683-1683%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Alger\" dated letter report",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Alger++dated+letter+report%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Alger\" chronology",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Alger++chronology%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Algiers\" 1683-1683",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Algiers++1683-1683%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Alger\" voyage operation",
+      "records": [
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb41143572k",
+          "title": "Les six derniers jours de Bagdad : journal d'un voyage de guerre / Mustapha Benfodil",
+          "creator": [
+            "Benfodil, Mustapha (1968-....). Auteur du texte"
+          ],
+          "date": [
+            "2003"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb41143572k",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb41143572k",
+            "ISBN 9961644220"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb38495695d",
+          "title": "[Le FLN au pouvoir en 1962] / Agence France-presse, agence photogr.",
+          "creator": [
+            "Agence France-Presse. Photographe"
+          ],
+          "date": [
+            "1962"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb38495695d",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb38495695d"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb38495708x",
+          "title": "[Le FLN dans le maquis et l'armée française en Algérie, 1959] / Agence France-Presse, agence photogr.",
+          "creator": [
+            "Agence France-Presse. Photographe"
+          ],
+          "date": [
+            "1959"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb38495708x",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb38495708x"
+          ]
+        }
+      ],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Alger++voyage+operation%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "\"Alger\" 1683-1683",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Alger%22+1683-1683 ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Alger%22+1683-1683 ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "\"Alger\" chronology",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Alger%22+chronology ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Alger%22+chronology ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "\"Algiers\" 1683-1683",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Algiers%22+1683-1683 ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Algiers%22+1683-1683 ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "\"Alger\" dated letter report",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Alger%22+dated+letter+report ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Alger%22+dated+letter+report ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "\"Alger\" voyage operation",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Alger%22+voyage+operation ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Alger%22+voyage+operation ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Alger\" 1683-1683",
+      "records": [
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "43eff474-0179-49e0-912d-de5017f4ee3b",
+          "title": "The Retreat of Turks, 1683-1730",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/43eff474-0179-49e0-912d-de5017f4ee3b"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "06776f42-211f-482a-ad99-27bef713c174",
+          "title": "Garp Ocaklarında Birliğin Bozulması: 18. Yüzyılda Cezayir-Tunus-Trablusgarp İlişkileri",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/06776f42-211f-482a-ad99-27bef713c174"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "a936bb77-ff7f-4d63-85ac-8e3fa3f123c2",
+          "title": "Kuloğulları ve Kuzey Afrika’daki Türk Varlığına Dair Bibliyografya Denemesi",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/a936bb77-ff7f-4d63-85ac-8e3fa3f123c2"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "6fc6fd14-9f1e-4a27-a4cb-3646a42da442",
+          "title": "Batılı Seyyahların Gözünden İstanbul ve Cezayir’de Kahve Kahvehane Kültürü (17. Yy - 19. Yy)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/6fc6fd14-9f1e-4a27-a4cb-3646a42da442"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "6fba83d0-f7c1-42ff-9fd7-b27e50ec5fd6",
+          "title": "Muslim Captives in Early Modern European Sculpture",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/6fba83d0-f7c1-42ff-9fd7-b27e50ec5fd6"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "4a9aa09b-efa8-4f1c-845e-6a16f1b5ba90",
+          "title": "Ottoman Provincial Organization in the Classical Period (1362-1799)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/4a9aa09b-efa8-4f1c-845e-6a16f1b5ba90"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "2b6f4efd-646e-4452-8583-9391c64c0295",
+          "title": "Beylerbeyilerden Dayılara Cezayir-i Garp Vilayeti / Eyaleti’nin Yönetimi ve Yöneticileri (16-18. Yüzyıllar)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/2b6f4efd-646e-4452-8583-9391c64c0295"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "a41c2969-5bc2-403f-a7a1-0b766a4b3542",
+          "title": "Technical Efficiency and Stability to Shocks: A Comparison between Islamic Banks and Conventional Banks in MENA Region",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/a41c2969-5bc2-403f-a7a1-0b766a4b3542"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "32e63e41-2191-4bf1-9a01-f625b8bceb66",
+          "title": "The Ottoman Empire in North Africa: A Question of Degree-Tripoli in the Seventeenth Century",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/32e63e41-2191-4bf1-9a01-f625b8bceb66"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "884d1ac8-9feb-465d-a0cd-0f06e6e3402b",
+          "title": "Polonya’da Türkoloji Araştırmaları ve Krakov Türkolojisinde Yapılan Çalışmalar",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/884d1ac8-9feb-465d-a0cd-0f06e6e3402b"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "3b0f964a-017a-483e-852f-839d821ef510",
+          "title": "Apulian Coastal Cities in the Pîrî Re’îs Kitâb-ı Bahriyye",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/3b0f964a-017a-483e-852f-839d821ef510"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "da89d8e9-ea97-4689-a9b1-8ce3e2f3df6f",
+          "title": "Zur Sultanischen Bestaetigung der Muslimischen Vasallen des Osmanischen Reiches Muslimische Beispielen für die Vasallenverhaeltnis der Christlichen Laender",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/da89d8e9-ea97-4689-a9b1-8ce3e2f3df6f"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "76f180d9-9c58-4363-a6b1-eb5f4a413460",
+          "title": "Garp Ocakları’nın Avrupa Ülkeleri ile Siyasi ve Diplomatik İlişkileri: Venedik Cumhuriyeti Örneği",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/76f180d9-9c58-4363-a6b1-eb5f4a413460"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "fac2e100-9ca0-49e1-a3bf-eedccae557db",
+          "title": "Archival Sources for the History of Sufism in the Ottoman Period",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/fac2e100-9ca0-49e1-a3bf-eedccae557db"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "3e7ba69e-bb79-436a-9acd-494b6eb5b226",
+          "title": "Archival Sources for the History of Sufism in the Ottoman Period",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/3e7ba69e-bb79-436a-9acd-494b6eb5b226"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "ad170da8-26d1-4cac-b7cd-60f3bc4c2e57",
+          "title": "The Life of Köprülüzade Fazıl Mustafa Pasha and his Reforms (1637-1691)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/ad170da8-26d1-4cac-b7cd-60f3bc4c2e57"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "32e52fa0-914f-45cb-b222-dfd596735391",
+          "title": "Yirminci Yüzyılda Vakıf Çalışmaları: Durum Tespiti",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/32e52fa0-914f-45cb-b222-dfd596735391"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "ab7a0813-4aec-42c4-9213-d46f2ca82f7a",
+          "title": "The Impact of the French Revolution on the Ottoman-Spanish Relations",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/ab7a0813-4aec-42c4-9213-d46f2ca82f7a"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "12870aac-8916-44d7-9c2d-dc95ba449ca5",
+          "title": "Geçmişten Günümüze Fransız Şarkiyatçılığı ve Kurumları",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/12870aac-8916-44d7-9c2d-dc95ba449ca5"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "21d10928-5bf7-47a0-b96c-06276ba51eda",
+          "title": "[Die Türken-und Was von Ihnen Blieb/the Turks-and What They Left to Us (Türkler ve Bize Bıraktıkları). Viyana 1978, 144 Sahife]",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/21d10928-5bf7-47a0-b96c-06276ba51eda"
+        }
+      ],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=%22Alger%22+1683-1683&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Algiers\" 1683-1683",
+      "records": [
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "32e63e41-2191-4bf1-9a01-f625b8bceb66",
+          "title": "The Ottoman Empire in North Africa: A Question of Degree-Tripoli in the Seventeenth Century",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/32e63e41-2191-4bf1-9a01-f625b8bceb66"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "6fba83d0-f7c1-42ff-9fd7-b27e50ec5fd6",
+          "title": "Muslim Captives in Early Modern European Sculpture",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/6fba83d0-f7c1-42ff-9fd7-b27e50ec5fd6"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "6fc6fd14-9f1e-4a27-a4cb-3646a42da442",
+          "title": "Batılı Seyyahların Gözünden İstanbul ve Cezayir’de Kahve Kahvehane Kültürü (17. Yy - 19. Yy)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/6fc6fd14-9f1e-4a27-a4cb-3646a42da442"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "1614dcc9-e5f3-428c-bf71-c8ca94b3b90f",
+          "title": "Müslüman-Hıristiyan İletişimi Bağlamında İlk Kuveykırların İslam ve Müslüman Alguısı",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/1614dcc9-e5f3-428c-bf71-c8ca94b3b90f"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "4a9aa09b-efa8-4f1c-845e-6a16f1b5ba90",
+          "title": "Ottoman Provincial Organization in the Classical Period (1362-1799)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/4a9aa09b-efa8-4f1c-845e-6a16f1b5ba90"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "5f1e5bd3-de4b-4301-8d2c-5791d94b4e15",
+          "title": "Vakıf Muhasebesi ve Kurumsal Etkinlik; Kayıt Sistemi, Defterler ve Denetim",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/5f1e5bd3-de4b-4301-8d2c-5791d94b4e15"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "f0dfdaaf-918c-43ad-95fb-6fd4b0f2f09e",
+          "title": "Osmanlıda İcâreteynin Başlangıç Tarihi Meselesi: İlk Uygulamalara Dair Tespitler",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/f0dfdaaf-918c-43ad-95fb-6fd4b0f2f09e"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "32e52fa0-914f-45cb-b222-dfd596735391",
+          "title": "Yirminci Yüzyılda Vakıf Çalışmaları: Durum Tespiti",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/32e52fa0-914f-45cb-b222-dfd596735391"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "84086c3d-0b27-458a-805b-efa735a8f546",
+          "title": "From Conquering Sultan to Sultan-Caliph: Feyzullah Efendi and Sultan Mustafa II",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/84086c3d-0b27-458a-805b-efa735a8f546"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "9a2782e1-6bee-4c54-9841-9c826bcdcbe7",
+          "title": "Alman Dilinde “Türk” Sözcüğünün Kullanım Alanlarına Geçmişten Günümüze Bir Bakış",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/9a2782e1-6bee-4c54-9841-9c826bcdcbe7"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "d42525df-83f4-4dda-ab0c-44c334f25030",
+          "title": "Different Opinions on Ottoman and German Political Military and Economic Relations",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/d42525df-83f4-4dda-ab0c-44c334f25030"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "3259dead-8c9f-42fd-94c9-d39626a9e2c9",
+          "title": "The Reign of Mehmed IV, 1648-87",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/3259dead-8c9f-42fd-94c9-d39626a9e2c9"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "6e6b853c-1968-4334-8de3-5fe4594260ee",
+          "title": "An Ottoman Envoy in Paris: Süleyman Ağa’s Mission to the Court of Louis XIV, 1669",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/6e6b853c-1968-4334-8de3-5fe4594260ee"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "335653e9-8773-4a83-951d-1699b2878e82",
+          "title": "Vakıfların Bazı Arşiv Kaynakları (Vakfiyeler, Şeriyye Sicilleri, Mühimmeler, Tahrîr Defterleri ve Vakıf Muhasebe Defterleri)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/335653e9-8773-4a83-951d-1699b2878e82"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "12906aa9-0a9c-4d48-b376-dc08315ff124",
+          "title": "The Re-establishment of Ottoman-Spanish Relations in 1872",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/12906aa9-0a9c-4d48-b376-dc08315ff124"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "a5df4409-69e8-4281-b524-a4bd3d06ea25",
+          "title": "Constructing Imperial Authority: Fazıl Ahmed Pasha’s Governorships in Erzurum and Damascus (1659-1661)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/a5df4409-69e8-4281-b524-a4bd3d06ea25"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "b78255c8-e849-4253-b9f9-6cf340e0da5b",
+          "title": "Mahkeme Kayıtları (Şer’iye Sicilleri): Literatür Değerlendirmesi ve Bibliyografya",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/b78255c8-e849-4253-b9f9-6cf340e0da5b"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "02bd5996-ea80-42be-9107-add1d1df1af2",
+          "title": "Kıbrıs Osmanlı Yönetiminde Kurulan İlk Vakıflar ve Özellikleri (Hicri 982-1003/ Miladi 1574-1595)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/02bd5996-ea80-42be-9107-add1d1df1af2"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "7fa97c89-e720-465c-a3a2-216867f23e46",
+          "title": "Ottoman Studies in Israel",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/7fa97c89-e720-465c-a3a2-216867f23e46"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "8d30d644-38c6-41a5-851c-b51ce6bbb08e",
+          "title": "Ottoman Armenians in the Period of Koca Ragib Pasha",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/8d30d644-38c6-41a5-851c-b51ce6bbb08e"
+        }
+      ],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=%22Algiers%22+1683-1683&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Alger\" dated letter report",
+      "records": [
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "56c28f08-614e-49b0-8f5e-2a6c4cb8bbc3",
+          "title": "Johannes Heyman (1667-1737) His Manuscript Collection and the Dutch Community of Izmir",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/56c28f08-614e-49b0-8f5e-2a6c4cb8bbc3"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "2c508ce2-1ed6-4f62-a771-d93c13d0cf81",
+          "title": "Views of the Press, Foreign and Domestic, on the Perspectives of Islam",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/2c508ce2-1ed6-4f62-a771-d93c13d0cf81"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "2327ba53-efbb-4f71-b934-fb0526c78e32",
+          "title": "Ottoman Empire, Borno, and Rabih: A Complicated Relation Between the 1840s and 1900s",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/2327ba53-efbb-4f71-b934-fb0526c78e32"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "982ff353-6e1e-437d-a8f1-77a179f3e727",
+          "title": "The Saga of an Algerian Patriot and Islamist",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/982ff353-6e1e-437d-a8f1-77a179f3e727"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "4c4dc784-1110-4430-b3ff-b380b1a53816",
+          "title": "Hacı Murad (Agi Morato): An Elusive Dignitary Active in the Second Half of the Sixteenth Century",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/4c4dc784-1110-4430-b3ff-b380b1a53816"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "f723c8a2-0321-46c5-a614-0ff02bbc2351",
+          "title": "The Saga of an Algerian Patriot and Islamist",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/f723c8a2-0321-46c5-a614-0ff02bbc2351"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "c361feec-a1b5-42f1-8af5-8df61478e46d",
+          "title": "The Question of Citizenship of the Algerian Immigrants in Syria, 1847-1900",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/c361feec-a1b5-42f1-8af5-8df61478e46d"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "d585d278-fe47-49b0-a55b-75ddd6bbb079",
+          "title": "Prolegomena to a Study of Secret Societies in Modern Egypt",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/d585d278-fe47-49b0-a55b-75ddd6bbb079"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "417d2806-6374-44d8-9632-3767128b7d34",
+          "title": "Local Shipyards in the Ottoman Empire: Lemnos Island (1780-1862)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/417d2806-6374-44d8-9632-3767128b7d34"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "cca94117-0be5-430f-86fe-770ba9ac3905",
+          "title": "Ottoman – Sokoto Relations during the 19th Century: An untold History",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/cca94117-0be5-430f-86fe-770ba9ac3905"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "60d7fbef-b4de-4383-8e1e-65338dd5bab1",
+          "title": "The Occupation Forces Evacuating Gazi Ayntâb as Part of the Ankara Agreement",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/60d7fbef-b4de-4383-8e1e-65338dd5bab1"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "2ad3cb5d-3239-4b42-b15b-6882135a9b67",
+          "title": "Fooling the Sultan: Information, Decision-Making and the “Mediterranean Faction” (1585-1587)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/2ad3cb5d-3239-4b42-b15b-6882135a9b67"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "dae7732f-8385-461b-ba55-fba39072828d",
+          "title": "The Moroccon Crises (1905-1911) and the Policies Implemented by the Ottoman Empire during the Crises",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/dae7732f-8385-461b-ba55-fba39072828d"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "0dc31a2d-540b-45c3-b69e-b287bfb2b6d0",
+          "title": "His Bailo’s Kapudan: Conversion, Tangled Loyalties and Hasan Veneziano Between Istanbul and Venice (1588-1591)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/0dc31a2d-540b-45c3-b69e-b287bfb2b6d0"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "a0673450-77d2-40cc-b7e8-7b6a8e9f5813",
+          "title": "Opposition to the Ottoman Caliphate in the Early Years of Abdülhamid II: 1877-1882",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/a0673450-77d2-40cc-b7e8-7b6a8e9f5813"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "f7d2ec46-3091-4cf0-ab46-3f8aac94c1ad",
+          "title": "An Ambassador Fallen in Disgrace: Duarte Catanho, The Portuguese-Ottoman Negociations and the Mediterranean Networks (1541-1546)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/f7d2ec46-3091-4cf0-ab46-3f8aac94c1ad"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "390086c6-7319-4bd8-ae45-9d799bac9636",
+          "title": "Ottoman Suzerainty Over Morocco During Abdulmelik’s Reign (1576-1578) A Reassessment",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/390086c6-7319-4bd8-ae45-9d799bac9636"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "baf0924d-9cf9-43cb-b457-c32d8ab3af8d",
+          "title": "East Encounters West: French Merchants and Islamic Law in the Ottoman Mediterranean (Late-Sixteenth and Early-Seventeenth Centuries)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/baf0924d-9cf9-43cb-b457-c32d8ab3af8d"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "d9473d26-c775-4867-ada3-614018ceceb0",
+          "title": "The Role of Traders and Muslim Scholars in the Spread of Islam and Muslim Culture in Zanzibar and East Africa",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/d9473d26-c775-4867-ada3-614018ceceb0"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "98f0c463-977e-4704-8c46-9c3787194a0e",
+          "title": "The Collection of Ottoman-Turkish Documents in Sweden",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/98f0c463-977e-4704-8c46-9c3787194a0e"
+        }
+      ],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=%22Alger%22+dated+letter+report&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Alger\" chronology",
+      "records": [
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "990358be-6ea0-4690-b165-9f24821e0f85",
+          "title": "Woman and Ottoman Tunisia: Revisiting the Chronology",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/990358be-6ea0-4690-b165-9f24821e0f85"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "ee6ed846-9ce7-4a13-b20f-9aabaf96ece5",
+          "title": "Ottoman-Moroccan Relations during the Reign of Sultan Abdul Hamid II",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/ee6ed846-9ce7-4a13-b20f-9aabaf96ece5"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "53ce42df-eef1-40dc-a69e-74b9fa485c77",
+          "title": "Tunisian Mizwala-s in Their Islamic Context",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/53ce42df-eef1-40dc-a69e-74b9fa485c77"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "390086c6-7319-4bd8-ae45-9d799bac9636",
+          "title": "Ottoman Suzerainty Over Morocco During Abdulmelik’s Reign (1576-1578) A Reassessment",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/390086c6-7319-4bd8-ae45-9d799bac9636"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "fcca2c92-c112-4b10-a7a3-4626d2f9e276",
+          "title": "Memoirs of Khair al-Din Barbarossa Its Truth, Importance and Historical Value",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/fcca2c92-c112-4b10-a7a3-4626d2f9e276"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "884d1ac8-9feb-465d-a0cd-0f06e6e3402b",
+          "title": "Polonya’da Türkoloji Araştırmaları ve Krakov Türkolojisinde Yapılan Çalışmalar",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/884d1ac8-9feb-465d-a0cd-0f06e6e3402b"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "2e771f8c-6711-482b-9365-3319ee6cc118",
+          "title": "Constructing 19th-century Hanafī Authority: The Case of Qur’anic Recitation for Pay",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/2e771f8c-6711-482b-9365-3319ee6cc118"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "5c92eaa8-e414-47dd-b3a7-390c53518e1b",
+          "title": "Türk Dünyasında Kronolojik Sistemler",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/5c92eaa8-e414-47dd-b3a7-390c53518e1b"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "e50911ee-3aec-4021-8449-3eaf68471841",
+          "title": "An Inquiry into the Ottomans’ Knowledge and Perception of the Gypsies in the Late 19th Century",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/e50911ee-3aec-4021-8449-3eaf68471841"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "2965d356-9e59-462b-b490-cf1b4cc332bf",
+          "title": "Osmanlı Sonrası Dönemde Güney-Doğu Avrupa'daki Müslüman Tarikatlar",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/2965d356-9e59-462b-b490-cf1b4cc332bf"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "b6d48575-0439-485d-bb1b-0ab0d04123ee",
+          "title": "Osmanlı Sonrası Dönemde Güney-Doğu Avrupa'daki Müslüman Tarikatlar",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/b6d48575-0439-485d-bb1b-0ab0d04123ee"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "f7d2ec46-3091-4cf0-ab46-3f8aac94c1ad",
+          "title": "An Ambassador Fallen in Disgrace: Duarte Catanho, The Portuguese-Ottoman Negociations and the Mediterranean Networks (1541-1546)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/f7d2ec46-3091-4cf0-ab46-3f8aac94c1ad"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "58ed2b41-2432-45bc-a0ed-b6e77b94c232",
+          "title": "Institutional Development and Political Activities of the Permanent Ottoman Embassy in Madrid (1857– 1922)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/58ed2b41-2432-45bc-a0ed-b6e77b94c232"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "963e5583-02e1-4f5d-ab8f-afaea7801cdb",
+          "title": "Tethys and Thalassa in Mosaic Art",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/963e5583-02e1-4f5d-ab8f-afaea7801cdb"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "bbb79ecf-2dab-43f6-b818-4c63f8241f14",
+          "title": "The Relationships Between Muslims and Christians: From Prophet Muhammad to Abbasid Caliph Mahdi",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/bbb79ecf-2dab-43f6-b818-4c63f8241f14"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "b0e4ca7c-90ef-4b0b-b8de-fccdab570df5",
+          "title": "Crete and Poems",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/b0e4ca7c-90ef-4b0b-b8de-fccdab570df5"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "b32db4bf-0da5-4ced-98cd-6477c634c9c1",
+          "title": "General Information on Two Manuscripts of Târîkh Mayyâfâriqîn Wa Âmid",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/b32db4bf-0da5-4ced-98cd-6477c634c9c1"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "31c45035-b556-4445-9e5f-e3bbfe8c8eef",
+          "title": "The Great Britain’s Azerbaijan Policy During the Years 1917-1920",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/31c45035-b556-4445-9e5f-e3bbfe8c8eef"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "2925f963-9f92-4c4e-95d3-e00deb0f2e2d",
+          "title": "A British Touch on Tanzimat: Architect William James Smith",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/2925f963-9f92-4c4e-95d3-e00deb0f2e2d"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "5244ea19-0a87-4fda-8534-09ecf2bebf86",
+          "title": "Problems of Identification of the \"Masters of Tabriz\"",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/5244ea19-0a87-4fda-8534-09ecf2bebf86"
+        }
+      ],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=%22Alger%22+chronology&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Alger\" voyage operation",
+      "records": [
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "f9043935-bdd7-4604-a97f-3d853b908d6d",
+          "title": "Relations Entre Alger Et Constantinople Sous La Gouvernement Du Dey Mohammed Ben Othmane Pacha (1766-1791), Selon Les Sources Espagnoles",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/f9043935-bdd7-4604-a97f-3d853b908d6d"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "61b919f3-53a1-4876-a6ec-23a394668d73",
+          "title": "Medicine et Sante en Algerie Pendant la Periode Ottomane",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/61b919f3-53a1-4876-a6ec-23a394668d73"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "58d8b13d-b100-4f24-a6f4-b87fe428bcf9",
+          "title": "Orientalism: From Expeditions to Colonialisation",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/58d8b13d-b100-4f24-a6f4-b87fe428bcf9"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "0c2930d1-896a-4856-93bb-dbfd3826c702",
+          "title": "Louis de Forbin's Journey to Egypt: The Remarking of France's Cultural Authority and Visual Emrpire After 1815",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/0c2930d1-896a-4856-93bb-dbfd3826c702"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "4c4dc784-1110-4430-b3ff-b380b1a53816",
+          "title": "Hacı Murad (Agi Morato): An Elusive Dignitary Active in the Second Half of the Sixteenth Century",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/4c4dc784-1110-4430-b3ff-b380b1a53816"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "1a47ebc5-e03b-4208-a4b0-eb76c3ef0a1b",
+          "title": "On Maritime Activities in the History of Islamic Civilization",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/1a47ebc5-e03b-4208-a4b0-eb76c3ef0a1b"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "2ad3cb5d-3239-4b42-b15b-6882135a9b67",
+          "title": "Fooling the Sultan: Information, Decision-Making and the “Mediterranean Faction” (1585-1587)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/2ad3cb5d-3239-4b42-b15b-6882135a9b67"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "440d3781-a325-4e16-bf4c-bf649c43d00c",
+          "title": "De Turc a Maure: Des Faux-Amis de L’Europe Moderne (XVIe-XVIIIe Siecle)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/440d3781-a325-4e16-bf4c-bf649c43d00c"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "ba3f7bf6-b9bd-4d8e-91fe-d4ad3332986b",
+          "title": "Les Projets de Croisade Français Contre l’Empire Ottoman au XVIIe siecle",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/ba3f7bf6-b9bd-4d8e-91fe-d4ad3332986b"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "d54810fb-8fd3-406c-9ef4-a1d3cd2b4ea2",
+          "title": "Contribution au rôle de la traite des esclaves dans le Sahara tripolitain au XIXe siècle : nouvelles découvertes en Libye et en Turquie",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/d54810fb-8fd3-406c-9ef4-a1d3cd2b4ea2"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "f1940d4b-7ef9-4d4d-a245-f5d0b86adb54",
+          "title": "Historiographie Espagnole Moderne sur l’Algérie Ottomane",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/f1940d4b-7ef9-4d4d-a245-f5d0b86adb54"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "8afedd9b-0b61-48f6-b233-43e6e233b192",
+          "title": "A New Ottoman Outlook on Africa: Note on Turn of the Century Literature",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/8afedd9b-0b61-48f6-b233-43e6e233b192"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "f7d2ec46-3091-4cf0-ab46-3f8aac94c1ad",
+          "title": "An Ambassador Fallen in Disgrace: Duarte Catanho, The Portuguese-Ottoman Negociations and the Mediterranean Networks (1541-1546)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/f7d2ec46-3091-4cf0-ab46-3f8aac94c1ad"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "2ff4ecaa-9c2d-4314-8e7e-8c3d0abbd8a7",
+          "title": "Eighteenth-Century European Medical Encounters with the Ottoman Levant",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/2ff4ecaa-9c2d-4314-8e7e-8c3d0abbd8a7"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "933a4a2f-94ce-48e0-bb7a-ccf5f0136670",
+          "title": "The Riddle of Piri Reis' 1513",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/933a4a2f-94ce-48e0-bb7a-ccf5f0136670"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "7e4e3006-c7b9-4605-98de-b19c721a3545",
+          "title": "Was There Room in Rum for Corsairs?: Who Was an Ottoman in the Naval Forces of the Ottoman Empire in the 15th and 16th Centuries?",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/7e4e3006-c7b9-4605-98de-b19c721a3545"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "a5df4409-69e8-4281-b524-a4bd3d06ea25",
+          "title": "Constructing Imperial Authority: Fazıl Ahmed Pasha’s Governorships in Erzurum and Damascus (1659-1661)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/a5df4409-69e8-4281-b524-a4bd3d06ea25"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "5761b198-0007-4c83-ae39-fd6580d072f6",
+          "title": "Un Contexte de Crises: Les Relations Economic-Financieres Entre la Turquie et la France de 1929 a 1944",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/5761b198-0007-4c83-ae39-fd6580d072f6"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "8e81756d-8341-4730-b11e-646a43e3a3bf",
+          "title": "Quand le Cahoua Redevient Cahvé: Histoire Ottomane de la Régence D’Alger, Historiographie Anticolonialiste Turque et Néo-ottomanisation au Maghreb",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/8e81756d-8341-4730-b11e-646a43e3a3bf"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "fcca2c92-c112-4b10-a7a3-4626d2f9e276",
+          "title": "Memoirs of Khair al-Din Barbarossa Its Truth, Importance and Historical Value",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/fcca2c92-c112-4b10-a7a3-4626d2f9e276"
+        }
+      ],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=%22Alger%22+voyage+operation&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "result_count": 182,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
