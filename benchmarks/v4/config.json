@@ -1,0 +1,107 @@
+{
+  "schema": "pct-benchmark-v4-config-v1",
+  "version": "4.0-pilot",
+  "purpose": "Externally auditable historical-research validation with blind research execution, frozen evidence, dual independent human review and adjudication.",
+  "pilot_case_count": 10,
+  "lanes": [
+    "greek",
+    "travellers",
+    "spanish_simancas",
+    "venetian",
+    "french",
+    "british",
+    "dutch",
+    "german",
+    "italian_states",
+    "ottoman",
+    "north_african"
+  ],
+  "blindness": {
+    "research_requests_path": "benchmarks/v4/cases/requests.json",
+    "expectations_path": "benchmarks/v4/gold/expectations.json",
+    "rule": "The research engine receives request fields only. Expected answers, reference sources and scoring labels are never injected into the research request.",
+    "official_run_requirement": "Fresh run on one declared engine revision with blind_execution_attested=true."
+  },
+  "official_review_requirements": {
+    "independent_human_reviewers": 2,
+    "distinct_reviewers": true,
+    "adjudicator_required": true,
+    "adjudicator_distinct_from_reviewers": true,
+    "final_status_required": true,
+    "candidate_hash_binding_required": true
+  },
+  "candidate_dimensions": {
+    "relevance": [
+      "RELEVANT",
+      "OFF_TARGET",
+      "INSUFFICIENT_CONTEXT"
+    ],
+    "evidence_quality": [
+      "PRIMARY_ORIGINAL",
+      "PRIMARY_FACSIMILE",
+      "PRIMARY_DERIVATIVE",
+      "SECONDARY",
+      "METADATA_ONLY",
+      "UNKNOWN"
+    ],
+    "locator_accuracy": [
+      "CORRECT",
+      "INCORRECT",
+      "NOT_APPLICABLE",
+      "UNVERIFIABLE"
+    ],
+    "genealogy_accuracy": [
+      "CORRECT",
+      "INCORRECT",
+      "NOT_ASSESSED",
+      "UNVERIFIABLE"
+    ],
+    "contradiction_detection": [
+      "DETECTED",
+      "MISSED",
+      "NOT_APPLICABLE",
+      "UNVERIFIABLE"
+    ],
+    "claim_support": [
+      "SUPPORTED",
+      "UNSUPPORTED",
+      "OVERSTATED",
+      "NOT_A_CLAIM",
+      "UNVERIFIABLE"
+    ]
+  },
+  "case_dimensions": {
+    "retrieval_outcome": [
+      "DETECTED",
+      "MISSED",
+      "CORRECT_NEGATIVE",
+      "FALSE_POSITIVE",
+      "NOT_SCORABLE"
+    ],
+    "abstention_quality": [
+      "CORRECT_ABSTENTION",
+      "SHOULD_HAVE_ABSTAINED",
+      "INCORRECT_ABSTENTION",
+      "NOT_APPLICABLE",
+      "UNVERIFIABLE"
+    ]
+  },
+  "metrics": [
+    "candidate_precision",
+    "reference_case_recall",
+    "negative_control_specificity",
+    "unsupported_claim_rate",
+    "exact_locator_accuracy",
+    "source_genealogy_accuracy",
+    "contradiction_detection_rate",
+    "abstention_quality_accuracy",
+    "inter_reviewer_raw_agreement",
+    "inter_reviewer_cohens_kappa"
+  ],
+  "rules": [
+    "Research Value and Evidence Confidence are not benchmark truth labels.",
+    "No AI label contributes to official v4 performance metrics.",
+    "Discovery retention is evaluated separately from historical verification.",
+    "A successful workflow run is not a scientific validation result."
+  ]
+}
