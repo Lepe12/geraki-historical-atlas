@@ -256,7 +256,8 @@ function setConnection(mode,detail){
 function receiveSnapshot(data,origin){
  if(data.schema!=="pct-command-center-live-v1"||!Array.isArray(data.agents)||!Array.isArray(data.blockers)||!Array.isArray(data.claims))return;
  // Do not let a delayed older fallback overwrite newer live state.
- if(connectionMode==="LIVE"&&origin==="SNAPSHOT"&&currentRun&&currentRun!==String(data.run_id||""))return;
+ if(connectionMode==="LIVE"&&origin==="SNAPSHOT")return;
+ if(connectionMode==="LIVE"&&origin==="LIVE"&&evidenceSource==="LIVE EVENT")return;
  clearEvidence();recentEventIds.clear();
  currentRun=String(data.run_id||"");evidenceRun=currentRun;
  evidenceSource=origin==="LIVE"?"LIVE BOOTSTRAP":"DURABLE SNAPSHOT";
