@@ -10,6 +10,7 @@ on:
       - "command-center/**"
       - "command-center-v3/**"
       - "command-center-v4/**"
+      - "command-center-v5/**"
       - "data.json"
       - "icons/**"
       - "generate_diorama_assets.py"
@@ -39,6 +40,18 @@ jobs:
         run: |
           mkdir -p _site/icons
           rsync -a --exclude '.git' --exclude '.github' --exclude '_site' ./ _site/
+
+      - name: Build standalone JARVIS APEX Research Network preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd command-center-v5
+          npm install --no-audit --no-fund
+          npm run build
+          cd ..
+          rm -rf _site/command-center-v5
+          mkdir -p _site/command-center-v5
+          cp -a command-center-v5/dist/. _site/command-center-v5/
 
       - name: Install Mercator settlement drawings
         shell: bash
