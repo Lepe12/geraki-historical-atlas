@@ -1,0 +1,79 @@
+name: Publish VERIFIED Research to Atlas
+
+on:
+  workflow_dispatch:
+    inputs:
+      approval_path:
+        description: 'Path under publication/approvals/ to an APPROVE_FOR_PUBLICATION JSON'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+
+      - name: Validate approval path
+        env:
+          APPROVAL_PATH: ${{ inputs.approval_path }}
+        run: |
+          set -euo pipefail
+          case "$APPROVAL_PATH" in
+            publication/approvals/*.json) ;;
+            *) echo "::error::approval_path must be under publication/approvals/"; exit 1 ;;
+          esac
+          test -f "$APPROVAL_PATH"
+
+      - name: Build hash-bound approved bundle
+        id: prepare
+        env:
+          APPROVAL_PATH: ${{ inputs.approval_path }}
+        run: |
+          set -euo pipefail
+          mkdir -p publication/approved
+          python3 tools/atlas_publication_bridge.py \
+            --mode prepare \
+            --approval "$APPROVAL_PATH" \
+            --output /tmp/atlas-publication-bundle.json
+          key=$(python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/atlas-publication-bundle.json',encoding='utf-8'))
+          print(d['publication_key'])
+          PY
+          )
+          echo "key=$key" >> "$GITHUB_OUTPUT"
+          cp /tmp/atlas-publication-bundle.json "publication/approved/$key.json"
+
+      - name: Publish only the approved VERIFIED bundle
+        run: |
+          set -euo pipefail
+          test -n "$AIRTABLE_TOKEN"
+          python3 tools/atlas_publication_bridge.py \
+            --mode publish \
+            --bundle "publication/approved/${{ steps.prepare.outputs.key }}.json" \
+            --output "publication/audit/${{ steps.prepare.outputs.key }}.json"
+
+      - name: Preserve publication bundle and audit
+        run: |
+          set -euo pipefail
+          git config user.name "atlas-publication[bot]"
+          git config user.email "atlas-publication@users.noreply.github.com"
+          git add "publication/approved/${{ steps.prepare.outputs.key }}.json" "publication/audit/${{ steps.prepare.outputs.key }}.json"
+          git diff --cached --quiet && exit 0
+          git commit -m "Publish VERIFIED research to Atlas ${{ steps.prepare.outputs.key }}"
+          for n in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort 2>/dev/null || true
+            sleep $((n*2))
+          done
+          echo "::error::Atlas publication succeeded remotely but audit commit could not be preserved."
+          exit 1
