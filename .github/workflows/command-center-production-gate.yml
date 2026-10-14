@@ -16,7 +16,7 @@ permissions:
   id-token: write
 
 env:
-  PCT_COMMAND_CENTER_URL: https://piratecartography.com/pct-api/live
+  PCT_COMMAND_CENTER_URL: https://www.piratecartography.com/pct-api/live
 
 jobs:
   production-gate:
@@ -51,7 +51,7 @@ jobs:
         run: |
           curl --fail --silent --show-error --max-time 10 \
             -D /tmp/pct-command-center-health.headers \
-            https://piratecartography.com/pct-api/live/health \
+            https://www.piratecartography.com/pct-api/live/health \
             -o /tmp/pct-command-center-health.json
           echo '--- RESPONSE HEADERS ---'
           cat /tmp/pct-command-center-health.headers
@@ -70,7 +70,7 @@ jobs:
         run: |
           probe_run="gate-$GITHUB_RUN_ID"
           python3 tools/orchestrator/jarvis_event_bus.py             --root /tmp/pct-command-center-probe             --run-id "$probe_run"             --event-type production_probe             --agent-id command_center             --phase "production gate"             --percent 100             --status COMPLETED             --detail "OIDC live transport verification"
-          curl --fail --silent --show-error --max-time 10             "https://piratecartography.com/pct-api/live/status/piratecartography/$probe_run"             -o /tmp/pct-command-center-status.json
+          curl --fail --silent --show-error --max-time 10             "https://www.piratecartography.com/pct-api/live/status/piratecartography/$probe_run"             -o /tmp/pct-command-center-status.json
           python3 - "$probe_run" <<'PY'
           import json,sys
           d=json.load(open('/tmp/pct-command-center-status.json'))
@@ -83,7 +83,7 @@ jobs:
         run: |
           node - <<'NODE'
           const tls=require('tls'),crypto=require('crypto');
-          const host='piratecartography.com',path='/pct-api/live/ws/piratecartography/latest';
+          const host='www.piratecartography.com',path='/pct-api/live/ws/piratecartography/latest';
           const key=crypto.randomBytes(16).toString('base64');
           const socket=tls.connect(443,host,{servername:host});
           let buf=Buffer.alloc(0),headerDone=false;
