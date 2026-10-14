@@ -1,0 +1,39 @@
+name: Atlas Publication Bridge CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/**'
+    paths:
+      - 'tools/atlas_publication_bridge.py'
+      - 'config/atlas_publication.json'
+      - '.github/workflows/atlas-publication-bridge-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile bridge
+        run: python3 -m py_compile tools/atlas_publication_bridge.py
+      - name: Fail-closed publication self-test
+        run: python3 tools/atlas_publication_bridge.py --mode self-test
+      - name: Validate publication policy
+        run: |
+          python3 - <<'PY'
+          import json
+          d=json.load(open('config/atlas_publication.json',encoding='utf-8'))
+          p=d['policy']
+          assert p['requires_final_verified'] is True
+          assert p['requires_explicit_publication_approval'] is True
+          assert p['publish_discovery'] is False
+          assert p['publish_unverified'] is False
+          assert p['automatic_geocoding'] is False
+          assert p['coordinate_replacement'] is False
+          print('ATLAS_PUBLICATION_POLICY_PASS')
+          PY
