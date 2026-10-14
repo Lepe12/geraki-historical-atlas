@@ -62,10 +62,15 @@ export default function App(){
    <div className="signal"><span className="prototype">RESEARCH NETWORK / V5</span><span className={"live-tag "+(entry?.sourceKind||"offline")}><i></i>{entry?.source|| (loadError?"NO DATA":"CONNECTING")}</span></div>
   </header>
   {tab==="NETWORK"?<main className="main-network">
-   <section className="intro-panel"><span className="eyebrow">SYSTEM 01 / THE INTELLIGENCE CORE</span><h1>A living network<br/><em>of historical inquiry.</em></h1><p>Ο JARVIS συντονίζει την έρευνα, ενώ οι αρχειακοί agents, οι πηγές και οι αντιφάσεις συνδέονται σε έναν ενιαίο ελεγχόμενο μηχανισμό.</p>
-    <div className="intro-actions"><button className="gold-cta" onClick={()=>{if(events.length){rewind();setPlaying(true)}else setNotice("Δεν υπάρχουν ερευνητικά συμβάντα για αναπαραγωγή.")}}><span>✧</span> ACTIVATE RESEARCH REPLAY <span>↗</span></button><button className="line-cta" onClick={()=>setDraftOpen(true)}>NEW RESEARCH MISSION →</button></div>
-    <div className="current"><span className="eyebrow">CURRENT RESEARCH DOSSIER</span><strong>{show(data?.mission?.target)}</strong><span>{show(data?.mission?.date_range)} • {show(data?.mission?.status)}</span><span className="run-key">RUN {show(data?.run_id)}</span></div>
-   </section>
+   <section className="intro-panel intelligence-console"><div className="console-title-row"><span className="eyebrow">JARVIS / RESEARCH CONTROL</span><span className="console-led" aria-hidden="true"/></div>
+     <h1>RESEARCH <em>NETWORK</em></h1>
+     <p className="console-lead">Πραγματικοί agents. Καταγεγραμμένες εργασίες. Κάθε κόμβος ανοίγει τον ερευνητικό του φάκελο.</p>
+     <div className="current"><span className="eyebrow">CURRENT MISSION / ARCHIVED RUN</span><strong>{show(data?.mission?.target)}</strong><span>{show(data?.mission?.date_range)} · {show(data?.mission?.status)}</span><span className="run-key">RUN {show(data?.run_id)}</span></div>
+     <div className="console-section-heading"><span>ARCHIVAL RESEARCH LANES</span><span>{agents.filter(a=>ARCHIVE_LANES.has(a.id)).length} LANES</span></div>
+     <div className="console-agent-list" aria-label="Select an archival research agent">{agents.filter(a=>ARCHIVE_LANES.has(a.id)).map(a=><button key={a.id} className={selected===a.id?"console-agent selected": "console-agent"} onClick={()=>showAgent(a.id)}><span className={"mini-led "+(a.status==="RUNNING"?"running":a.status==="COMPLETED"?"completed":"idle")}/><span className="agent-caption">{a.label}</span><small>{a.status==="COMPLETED"?"DONE":show(a.status)}</small><span aria-hidden="true">↗</span></button>)}</div>
+     <div className="console-signals"><span><b>{metric(data,"specialist_discovery_records")}</b> DISCOVERIES</span><span><b>{metric(data,"blocker_records")}</b> ACCESS BLOCKERS</span><span><b>{metric(data,"verified_events")}</b> VERIFIED EVENTS</span></div>
+     <div className="intro-actions"><button className="gold-cta" onClick={()=>{if(events.length){rewind();setPlaying(true)}else setNotice("Δεν υπάρχουν ερευνητικά συμβάντα για αναπαραγωγή.")}}><span>▶</span> ACTIVATE RESEARCH REPLAY <span>↗</span></button><button className="line-cta" onClick={()=>setDraftOpen(true)}>NEW RESEARCH MISSION →</button></div>
+    </section>
    <div className="network-world" aria-label="Interactive JARVIS research agent constellation">
      <div className="world-orbits" aria-hidden="true"><span></span><span></span><span></span></div>
      <div className="reasoning-stage">
@@ -74,7 +79,7 @@ export default function App(){
        <div className="particle-core" aria-hidden="true">{orbSupported?<ApexCore3D variant="particles" contained state={replayState}/>:<div className="fallback-core">✧</div>}</div>
        <button className="core-action" aria-label={isPlaying?"Pause recorded research playback":"Play recorded research"} onClick={()=>setPlaying(x=>!x)}><span className="core-title">JARVIS</span><small>{headlineState}</small></button>
      </div>
-     <div className="orbital-subtitle">ARCHIVE INTELLIGENCE <span>✦</span> VERIFIED PROVENANCE GATE</div>
+     <div className="orbital-subtitle">16 SOURCE-DRIVEN AGENTS <span>✦</span> NO AUTOMATIC HISTORICAL VERIFICATION</div>
    </div>
    <div className="mobile-agent-access"><button onClick={()=>setDirectoryOpen(true)}>✧ AGENT DIRECTORY <span>{agents.length} RESEARCH AGENTS ↗</span></button></div>
    {directoryOpen&&<div className="mobile-agent-sheet" aria-label="Agent directory"><div className="sheet-top"><strong>THE RESEARCH NETWORK</strong><button onClick={()=>setDirectoryOpen(false)} aria-label="Close agent directory">×</button></div><p>Επίλεξε έναν agent για να δεις πραγματικά συμβάντα και εμπόδια.</p><div className="agent-options">{agents.map(a=><button key={a.id} onClick={()=>showAgent(a.id)}><b>{a.label}</b><span>{a.status||"NOT REPORTED"}</span></button>)}</div></div>}
