@@ -23,6 +23,8 @@ def main():
         lines += [
             "## " + str(claim.get("claim_id")),
             "Status: **" + str(claim.get("machine_recommendation","UNRESOLVED")) + "**",
+            "Research Value: **" + str((claim.get("research_value") or {}).get("score","n/a")) + "/100**",
+            "Evidence Confidence: **" + str((claim.get("evidence_confidence") or {}).get("score","n/a")) + "/100**",
             "",
             "### Preserved claim/evidence text",
             str(claim.get("claim_text") or "_No controlled claim text recorded._"),
@@ -46,6 +48,9 @@ def main():
         unknowns=claim.get("uncertainties",[]) or ["NONE_RECORDED"]
         for u in unknowns:
             lines.append("- " + str(u))
+        lines += ["", "### Claim trail"]
+        for step in claim.get("claim_trail",[]) or []:
+            lines.append("- " + str(step.get("stage")) + ": " + str(step.get("status")))
         lines += ["", "### What could falsify this claim"]
         for f in claim.get("falsification_targets",[]):
             lines.append("- " + str(f))

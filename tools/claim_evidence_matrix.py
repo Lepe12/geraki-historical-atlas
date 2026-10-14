@@ -76,11 +76,29 @@ def build_lane(base: Path, lane: str):
                 "warning": "Discovery/OCR context is not an exact historical quotation."
             })
 
+        claim_trail = [
+            {"stage":"DISCOVERY","status":"PRESENT" if (c.get("context_excerpt") or c.get("title") or c.get("source_file")) else "MISSING",
+             "source_file":c.get("source_file"),"repository":c.get("repository"),"identifier":c.get("identifier"),"url":c.get("url")},
+            {"stage":"EXACT_LOCATOR","status":"EXACT" if locators else "UNRESOLVED","locators":locators},
+            {"stage":"ORIGINAL_INSPECTION","status":"COMPLETED" if c.get("original_inspected") else "PENDING"},
+            {"stage":"CONTROLLED_EXTRACTION","status":"COMPLETED" if (c.get("source_says") or c.get("controlled_transcription") or c.get("original_quote")) else "PENDING"},
+            {"stage":"SOURCE_GENEALOGY","status":"ASSESSED" if c.get("genealogy_checked") else "PENDING","evidence":c.get("genealogy_evidence",[])},
+            {"stage":"CORROBORATION","status":"ASSESSED" if c.get("corroborated") else "PENDING","independent_supporting_chains":support.get("independent_supporting_chains",[]) or []},
+            {"stage":"CONTRADICTION_SEARCH","status":"NOT_ASSESSED"},
+            {"stage":"HUMAN_REVIEW","status":review.get("review_status") or "NOT_REVIEWED"},
+            {"stage":"FINAL_VERIFICATION","status":"VERIFIED" if c.get("verified") else "PENDING"}
+        ]
+
         claims.append({
             "claim_id": "claim-" + str(cid),
             "candidate_id": cid,
             "lane": lane,
             "claim_text": claim_text(c),
+            "research_value": c.get("research_value"),
+            "evidence_confidence": c.get("evidence_confidence"),
+            "retention": c.get("retention"),
+            "claim_trail": claim_trail,
+            "researcher_inference": c.get("researcher_inference"),
             "claim_scope": {
                 "event_type": c.get("event_type"),
                 "actor": c.get("actor"),
@@ -120,7 +138,7 @@ def build_lane(base: Path, lane: str):
         })
 
     return {
-        "schema": "pct-claim-evidence-matrix-v1",
+        "schema": "pct-claim-evidence-matrix-v2",
         "generated_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "lane": lane,
         "claim_count": len(claims),
@@ -130,7 +148,8 @@ def build_lane(base: Path, lane: str):
             "Supporting-source count is not equivalent to independent corroboration.",
             "Contradictory evidence and unknowns must be recorded explicitly.",
             "Catalogue metadata and OCR discovery context cannot by themselves establish VERIFIED.",
-            "No automated stage may mark a claim VERIFIED."
+            "No automated stage may mark a claim VERIFIED.",
+            "Research Value and Evidence Confidence are separate; low confidence never deletes a research lead."
         ]
     }
 

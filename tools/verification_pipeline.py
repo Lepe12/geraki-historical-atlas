@@ -4,6 +4,7 @@ import json,os,pathlib,datetime,hashlib,sys
 sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from request_context import load_request
 from evidence_model import normalize_date,toponym_identity
+from research_relevance import candidate_research_value,evidence_confidence,retention_contract
 from exact_page_mapping import pages_for_hit
 from claim_evidence_matrix import build_lane as build_claim_evidence_matrix
 
@@ -76,7 +77,7 @@ for i,h in enumerate(events,1):
     src=h.get("file");related=pages_for_hit(pages,src,i-1,h.get("line"))
     topo=toponym_identity(h.get("place_match"),ctx["target"],ctx["aliases"])
     dnorm=normalize_date(" / ".join(str(y) for y in h.get("years_in_scope",[])), h.get("date_role","UNRESOLVED"))
-    candidates.append({
+    candidate={
       "candidate_id":f"{LANE}-event-{i:04d}","lane":LANE,"source_file":src,
       "source_type":"OCR_CONTEXT","evidence_state":"ACQUIRED" if related else "LOCATED",
       "place":topo,"date":dnorm,"event_terms":h.get("event_terms",[]),
@@ -86,13 +87,17 @@ for i,h in enumerate(events,1):
       "source_says":None,"researcher_inference":None,"original_inspected":False,
       "extracted":False,"corroborated":False,"machine_status":"NOT_ORIGINAL_VERIFIED",
       "human_review_status":"NOT_REVIEWED","verified":False
-    })
+    }
+    candidate["research_value"]=candidate_research_value(candidate,base=60)
+    candidate["evidence_confidence"]=evidence_confidence(candidate)
+    candidate["retention"]=retention_contract("PRIORITY")
+    candidates.append(candidate)
 
 for j,h in enumerate(catalogue_leads,1):
     if h.get("status")!="CATALOGUE_METADATA_LEAD":continue
     topo=toponym_identity(h.get("place_match"),ctx["target"],ctx["aliases"])
     dnorm=normalize_date(" / ".join(str(y) for y in h.get("years_in_scope",[])), h.get("date_role","UNRESOLVED"))
-    candidates.append({
+    candidate={
       "candidate_id":f"{LANE}-catalogue-{j:04d}","lane":LANE,
       "source_file":None,"source_type":"CATALOGUE_METADATA",
       "repository":h.get("repository"),"identifier":h.get("identifier"),"url":h.get("url"),"title":h.get("title"),
@@ -103,13 +108,17 @@ for j,h in enumerate(catalogue_leads,1):
       "extracted":False,"corroborated":False,"machine_status":"NOT_ORIGINAL_VERIFIED",
       "human_review_status":"NOT_REVIEWED","verified":False,
       "warning":"Catalogue metadata lead only; not historical evidence."
-    })
+    }
+    candidate["research_value"]=candidate_research_value(candidate,base=40)
+    candidate["evidence_confidence"]=evidence_confidence(candidate)
+    candidate["retention"]=retention_contract("REVIEW_REQUIRED")
+    candidates.append(candidate)
 
 write("structured_output/candidate_events.json",{
- "schema":"pct-structured-candidates-v3","generated_utc":NOW,"lane":LANE,
+ "schema":"pct-structured-candidates-v4","generated_utc":NOW,"lane":LANE,
  "events":candidates,"total_ocr_event_hits":len(events),
  "total_catalogue_event_leads":len([x for x in catalogue_leads if x.get("status")=="CATALOGUE_METADATA_LEAD"]),
- "rule":"Candidates are review objects, not historical facts."
+ "rule":"Candidates are review objects, not historical facts. Every candidate remains visible in Research Discovery even when scientific verification is blocked."
 })
 
 write("corroboration/corroboration_queue.json",{
@@ -144,6 +153,8 @@ for claim in claim_matrix.get("claims",[]):
     source_first_lines.extend([
       "## "+str(claim.get("claim_id")),
       "Status: **"+str(claim.get("machine_recommendation","UNRESOLVED"))+"**",
+      "Research Value: **"+str((claim.get("research_value") or {}).get("score","n/a"))+"/100**",
+      "Evidence Confidence: **"+str((claim.get("evidence_confidence") or {}).get("score","n/a"))+"/100**",
       "",
       "### Preserved claim/evidence text",
       str(claim.get("claim_text") or "_No controlled claim text recorded._"),
