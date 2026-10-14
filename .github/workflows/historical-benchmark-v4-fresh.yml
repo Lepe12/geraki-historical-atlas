@@ -44,35 +44,6 @@ jobs:
             --output "benchmarks/v4/fresh_dispatch/${GITHUB_RUN_ID}.json" \
             --wait
 
-      - name: Bind fresh runs to Benchmark v4
-        run: |
-          python3 - <<'PY'
-          import json,os
-          from pathlib import Path
-          dispatch=Path('benchmarks/v4/fresh_dispatch')/(os.environ['GITHUB_RUN_ID']+'.json')
-          d=json.loads(dispatch.read_text(encoding='utf-8'))
-          p=Path('benchmarks/v4/run_bindings.json')
-          current=json.loads(p.read_text(encoding='utf-8'))
-          by={x['case_id']:x for x in current.get('bindings',[])}
-          for r in d.get('runs',[]):
-              row=by.setdefault(r['case_id'],{'case_id':r['case_id']})
-              row.update({
-                'run_id':r['run_id'],
-                'baseline_only':False,
-                'blind_execution_attested':True,
-                'expected_engine_commit':d.get('expected_engine_commit'),
-                'frozen_branch':d.get('frozen_branch'),
-                'run_status':r.get('status'),
-                'run_conclusion':r.get('conclusion'),
-                'run_url':r.get('html_url')
-              })
-          current['status']='FRESH_BLIND_RUNS_COMPLETED' if d.get('all_completed') else 'FRESH_BLIND_RUNS_INCOMPLETE'
-          current['official_engine_commit_expected']=d.get('expected_engine_commit')
-          current['frozen_branch']=d.get('frozen_branch')
-          current['bindings']=[by[k] for k in sorted(by)]
-          p.write_text(json.dumps(current,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-          PY
-
       - name: Preserve immutable dispatch result
         run: |
           git config user.name "benchmark-v4[bot]"
