@@ -2,74 +2,61 @@
 
 ## Principle
 
-Technical workflow success is not historical verification.
+Technical workflow success is not historical verification. Discovery must remain visible even when it cannot yet support a claim.
 
-A machine-generated candidate may advance only through explicit evidence states and human decisions.
+## Canonical evidence progression
 
-## Review sequence
+`DISCOVERED -> LOCATED -> ACQUIRED -> EXACT_PAGE_MAPPED -> ORIGINAL_INSPECTED -> EXTRACTED -> GENEALOGY_CHECKED -> CORROBORATED`
 
-1. DISCOVERED
-2. LOCATED
-3. ACQUIRED
-4. ORIGINAL_INSPECTED
-5. EXTRACTED
-6. CORROBORATED
-7. HUMAN_REVIEWED
-8. VERIFIED
+Human oversight is then layered on top:
 
-The operational evidence state list remains seven machine/evidence stages; HUMAN_REVIEWED is an oversight status layered before final VERIFIED.
+`HUMAN_REVIEWED -> VERIFIED`
+
+A record may remain unresolved at any earlier stage without being deleted from Research Discovery.
 
 ## Human review
 
 Use `tools/apply_human_review.py` with an explicit review JSON.
 
-An ACCEPT review requires:
+An ACCEPT review requires, at minimum:
 
-- candidate_id
-- reviewer
-- evidence_examined
-- original_inspected = true
-- exact_locator (page / folio / image / archival unit)
-- source_says
-- source_quality_score
-- decision = ACCEPT
+- candidate_id;
+- named reviewer;
+- evidence examined with hashes;
+- `original_inspected = true`;
+- exact source locator (archive/source identifier plus page/folio/leaf/canvas as applicable);
+- controlled statement of what the source says;
+- source-quality assessment;
+- `decision = ACCEPT`;
+- binding to the current candidate evidence checksum.
 
-An accepted human review marks the candidate:
-
-- HUMAN_REVIEWED
-- verification_eligible = true
-- verified = false
-
-It does **not** produce VERIFIED status.
+An accepted review makes the candidate review-eligible. It does **not** make it VERIFIED.
 
 ## Final verification
 
-Use `tools/finalize_verification.py` with a separate verification JSON.
+Use `tools/finalize_verification.py` with a separate verification record.
 
-VERIFY requires:
+VERIFY requires the accepted review plus:
 
-- prior ACCEPT human review
-- verification_eligible = true
-- original inspection
-- exact locator
-- extracted statement of what the source says
-- explicit claim_text
-- explicit claim_scope
-- source_genealogy_assessment
-- corroboration_assessment
-- recorded limitations
-- named verifier
+- exact claim text and scope;
+- binding to the current claim-matrix checksum;
+- source-genealogy assessment;
+- corroboration assessment;
+- contradiction-search status;
+- recorded uncertainties, limitations and falsification targets;
+- named verifier;
+- revalidation of inspected evidence.
 
-Only this explicit gate may set:
+Only this explicit gate may set `verified = true`.
 
-`verified = true`
+## Source genealogy
 
-## Source genealogy rule
+Different repositories, editions, translations or later retellings are not automatically independent sources. Shared identifiers/canonical sources are dependent by default; uncertain relationships remain unresolved until assessed.
 
-Repository diversity, multiple editions, translations, quotations, or repeated later narratives do not establish independent testimony.
+## Negative findings
 
-`SOURCE_GENEALOGY.json` is produced cross-lane. Exact shared identifiers or canonical URLs are automatically marked NOT_INDEPENDENT. Similar title/creator records are review leads only and remain independence-unknown.
+Absence of a finding is not evidence of absence unless search scope, repository coverage, access blockers and limitations are documented.
 
-## Negative rule
+## Research Discovery vs Scientific Claims
 
-Absence of a finding is not evidence of absence unless repository coverage, search scope, access blockers, and limitations are explicitly documented.
+A low-confidence, contradictory, rejected-for-acquisition or unresolved lead remains available in Research Discovery. Scientific verification controls claim strength, not whether the researcher is allowed to see the lead.
