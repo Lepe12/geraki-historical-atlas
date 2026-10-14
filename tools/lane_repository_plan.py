@@ -11,6 +11,7 @@ from jarvis_specialist_plan import build as specialist_plan
 lane=os.getenv("PCT_RESEARCH_LANE","travellers")
 rf,req,ctx=load_request()
 cfg={
+"greek":[("SearchCulture.gr / EKT","https://www.searchculture.gr"),("OpenArchives.gr / EKT","https://www.openarchives.gr"),("National Library of Greece Digital Collections","https://digitalcollections.nlg.gr"),("Anemi / University of Crete","https://anemi.lib.uoc.gr"),("Academia.edu Public Research","https://www.academia.edu"),("Google Books","https://books.google.com")],
 "travellers":[("SearchCulture.gr / EKT","https://www.searchculture.gr"),("Library of Congress","https://www.loc.gov"),("Gallica/BnF","https://catalogue.bnf.fr"),("BSB","https://www.digitale-sammlungen.de"),("Internet Archive","https://archive.org"),("Google Books","https://books.google.com")],
 "spanish_simancas":[("PARES / Archivo General de Simancas","https://pares.cultura.gob.es"),("Biblioteca Digital Hispánica","https://catalogo.bne.es")],
 "venetian":[("Archivio di Stato di Venezia / SIAS","https://sias-archivi.cultura.gov.it"),("Internet Culturale","https://www.internetculturale.it"),("Internet Archive","https://archive.org")],
@@ -22,7 +23,7 @@ cfg={
 "ottoman":[("Türkiye Devlet Arşivleri / BOA","https://katalog.devletarsivleri.gov.tr"),("İSAM Kütüphanesi","https://kutuphane.isam.org.tr"),("Internet Archive","https://archive.org")],
 "north_african":[("Gallica/BnF","https://catalogue.bnf.fr"),("Archives diplomatiques France","https://archivesdiplomatiques.diplomatie.gouv.fr"),("Biblioteca Digital Hispánica","https://catalogo.bne.es")]
 }
-langs={"spanish_simancas":["Spanish","Latin"],"venetian":["Italian","Venetian","Latin"],"french":["French"],"british":["English"],"dutch":["Dutch"],"german":["German","Latin"],"italian_states":["Italian","Latin"],"ottoman":["Ottoman Turkish","Turkish"],"north_african":["Arabic","Ottoman Turkish","French","Spanish","Italian"],"travellers":["French","Italian","English","Dutch","German","Spanish","Latin","Greek"]}
+langs={"greek":["Greek","Katharevousa","English","French","Italian","Latin"],"spanish_simancas":["Spanish","Latin"],"venetian":["Italian","Venetian","Latin"],"french":["French"],"british":["English"],"dutch":["Dutch"],"german":["German","Latin"],"italian_states":["Italian","Latin"],"ottoman":["Ottoman Turkish","Turkish"],"north_african":["Arabic","Ottoman Turkish","French","Spanish","Italian"],"travellers":["French","Italian","English","Dutch","German","Spanish","Latin","Greek"]}
 if lane not in cfg: raise SystemExit("Unknown PCT_RESEARCH_LANE: "+lane)
 terms=[ctx["target"]]+ctx["aliases"]
 ident=identity(req,ctx)
