@@ -2,7 +2,7 @@
 """Preserve research evidence in GitHub, including large files via deterministic chunks."""
 import argparse, hashlib, json, pathlib, shutil, datetime
 p=argparse.ArgumentParser();p.add_argument("--run-id",required=True);p.add_argument("--lane",required=True);a=p.parse_args()
-roots=["research_request_identity.json","research_lanes","repository_plans","lane_discovery","library_discovery","citation_chase_candidates","iiif_candidate_requests","library_acquisition","citation_chase_hits","event_first_hits","exact_page_acquisition","original_inspection","source_genealogy","corroboration","human_review","claim_evidence_matrix","verification","qa","structured_output","research_dossier","run_manifest","system_health"]
+roots=["research_request_identity.json","research_lanes","repository_plans","lane_discovery","research_discovery","library_discovery","citation_chase_candidates","iiif_candidate_requests","library_acquisition","citation_chase_hits","event_first_hits","exact_page_acquisition","original_inspection","source_genealogy","corroboration","human_review","claim_evidence_matrix","verification","qa","structured_output","research_dossier","run_manifest","system_health"]
 dest=pathlib.Path("evidence/runs")/a.run_id/a.lane;dest.mkdir(parents=True,exist_ok=True)
 items=[];chunk_size=20*1024*1024
 for root in roots:

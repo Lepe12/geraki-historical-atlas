@@ -4,6 +4,7 @@ import json,pathlib,datetime,re,sys
 sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from request_context import load_request
 from research_relevance import identity, rank
+from research_discovery_inventory import update_inventory
 rf,req,ctx=load_request()
 years=[int(y) for y in re.findall(r'\b(?:1[0-9]{3}|20[0-9]{2})\b',ctx['date_range'])]
 hi=max(years) if years else 1900
@@ -44,6 +45,7 @@ for lead in req.get("source_leads",[]):
     if not ident:continue
     selected.append({"identifier":ident,"title":lead.get("title"),"repository":repo,"discovery_repository":repo,"discovery_lane":"request_source_lead","connector_status":"REQUESTED_SOURCE_LEAD_NOT_YET_VALIDATED","url":lead.get("url") or ("https://archive.org/details/"+str(ident) if repo=="Internet Archive" else None),"acquisition_route":"INTERNET_ARCHIVE" if repo=="Internet Archive" else None,"source_lead":True,"verification_status":"NEEDS_EVIDENCE","next_stage":"ACQUIRE_AND_CHECK_ORIGINAL"})
 selected=rank(selected,identity(req,ctx))
-report={"schema":"pct-auto-router-v2","generated_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"request_file":d.get("request_file"),"selected":selected,"rule":"Selection is request-driven. Catalogue metadata is not evidence; inspect digitized original before claim use."}
+inventory=update_inventory(selected,"travellers","generic_library_and_source_leads")
+report={"schema":"pct-auto-router-v3","generated_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"request_file":d.get("request_file"),"selected":selected,"research_discovery_inventory":"research_discovery/all_findings.json","retained_discovery_count":inventory.get("retained_count",0),"rule":"Selection is request-driven. Catalogue metadata is not evidence; inspect digitized original before claim use. Non-priority records remain visible in Research Discovery."}
 (out/"routed_candidates.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
 print("generic routed",len(selected))

@@ -3,6 +3,7 @@
 import json,os,pathlib,datetime
 from request_context import load_request
 from research_relevance import identity, rank
+from research_discovery_inventory import update_inventory
 lane=os.getenv("PCT_RESEARCH_LANE","travellers")
 src=pathlib.Path("lane_discovery")/f"{lane}.json"
 out=pathlib.Path("citation_chase_candidates");out.mkdir(exist_ok=True)
@@ -35,6 +36,7 @@ for x in d.get("results",[]):
     if item["identifier"] or item["url"] or item["title"]:selected.append(item)
 rf,req,ctx=load_request()
 selected=rank(selected,identity(req,ctx))
-payload={"schema":"pct-repository-candidates-v2","generated_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"lane":lane,"request_file":d.get("request_file"),"selected":selected,"attempts":d.get("attempts",[]),"rule":"Repository provenance is retained end-to-end. Catalogue discovery is not evidence and cannot set VERIFIED."}
+inventory=update_inventory(selected,lane,"repository_lane_discovery")
+payload={"schema":"pct-repository-candidates-v3","generated_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"lane":lane,"request_file":d.get("request_file"),"selected":selected,"attempts":d.get("attempts",[]),"research_discovery_inventory":"research_discovery/all_findings.json","retained_discovery_count":inventory.get("retained_count",0),"rule":"Repository provenance is retained end-to-end. Catalogue discovery is not evidence and cannot set VERIFIED. Triage never deletes discovery records."}
 (out/"repository_candidates.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding="utf-8")
 print("repository candidates",lane,len(selected))

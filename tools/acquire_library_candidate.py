@@ -26,7 +26,9 @@ for x in candidates:
 
 # Assess before acquisition, retain every rejected/uncertain item in the backlog.
 ranked=rank(items,identity(req,ctx))
-held=[x for x in ranked if x['relevance_assessment']['status']!='PRIORITY' and not x.get('source_lead')]
+held_review=[x for x in ranked if x['relevance_assessment']['status']=='REVIEW_REQUIRED' and not x.get('source_lead')]
+off_target=[x for x in ranked if x['relevance_assessment']['status']=='EXCLUDE_FROM_ACQUISITION' and not x.get('source_lead')]
+held=held_review+off_target
 items=[x for x in ranked if x['relevance_assessment']['status']=='PRIORITY' or x.get('source_lead')]
 report_path=OUT/'acquisition_report.json'
 previous=json.loads(report_path.read_text()) if report_path.exists() else {}
@@ -45,7 +47,7 @@ started=time.monotonic()
 budget=max(1,int(os.getenv('PCT_ACQUISITION_BUDGET_SECONDS','360')))
 
 def checkpoint(remaining):
-    (OUT/'acquisition_backlog.json').write_text(json.dumps({'request_sha256':request_sha,'total_candidates':len(ranked),'completed':len(results),'deferred_count':len(remaining),'deferred':remaining,'review_required':held,'resume_command':'python3 tools/acquire_library_candidate.py','rule':'Rerun in the same request workspace to continue; completed objects are skipped. Held records are not silently discarded.'},ensure_ascii=False,indent=2))
+    (OUT/'acquisition_backlog.json').write_text(json.dumps({'request_sha256':request_sha,'total_candidates':len(ranked),'completed':len(results),'deferred_count':len(remaining),'deferred':remaining,'review_required':held_review,'excluded_from_auto_acquisition':off_target,'all_retained_discoveries':ranked,'research_discovery_inventory':'research_discovery/all_findings.json','resume_command':'python3 tools/acquire_library_candidate.py','rule':'Rerun in the same request workspace to continue; completed objects are skipped. REVIEW_REQUIRED and EXCLUDE_FROM_ACQUISITION remain visible research discoveries and are never silently discarded.'},ensure_ascii=False,indent=2))
     report={'schema':'pct-library-acquire-v3','generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'request_sha256':request_sha,'results':results,'deferred_count':len(remaining),'held_count':len(held),'total_candidates':len(ranked),'verification_status':'NEEDS_EVIDENCE','gate':'Acquisition is not inspection or verification.'}
     report_path.write_text(json.dumps(report,ensure_ascii=False,indent=2))
 checkpoint(pending)
