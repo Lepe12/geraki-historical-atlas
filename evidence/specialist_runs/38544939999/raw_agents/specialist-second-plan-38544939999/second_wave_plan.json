@@ -1,0 +1,178 @@
+{
+  "schema": "pct-specialist-agent-plan-v2",
+  "routing_authority": "JARVIS_PLANNER",
+  "target": "Zerphalon Control 91827",
+  "aliases": [
+    "Zerphalon-91827"
+  ],
+  "target_type": "all",
+  "date_range": "1670-1680",
+  "purpose": "Search for historical evidence concerning this target. Preserve uncertainty and abstain from factual claims if no documentary evidence exists.",
+  "source_limit_per_agent": 4,
+  "fallback_limit_per_agent": 4,
+  "total_query_budget_per_agent": 20,
+  "parallel_agent_count": 1,
+  "verified_promotion_allowed": false,
+  "rule": "JARVIS alone assigns second-wave fallback sources after evaluating first-wave outcomes.",
+  "assignment_wave": 2,
+  "agents": [
+    {
+      "agent_id": "identity_resolution",
+      "label": "Identity Resolution Agent",
+      "queries": [
+        "\"Zerphalon Control 91827\" variant spelling",
+        "\"Zerphalon Control 91827\" alias OR aliases",
+        "\"Zerphalon Control 91827\" historical name",
+        "\"Zerphalon Control 91827\" transliteration",
+        "\"Zerphalon-91827\" 1670-1680"
+      ],
+      "outputs": [
+        "entity_candidates",
+        "variant_names",
+        "same_entity_assessment",
+        "collision_warnings"
+      ],
+      "source_routes": [
+        "repo:SearchCulture.gr / EKT",
+        "repo:Gallica/BnF",
+        "repo:Internet Culturale",
+        "repo:Biblioteca Digital Hispánica",
+        "repo:Nationaal Archief",
+        "repo:Delpher",
+        "repo:OpenArchives.gr / EKT",
+        "repo:Academia.edu Public Research",
+        "repo:OpenAlex Scholarly Works",
+        "repo:Crossref Scholarly Metadata"
+      ],
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2,
+      "assigned_sources": [
+        {
+          "route_id": "repo:Nationaal Archief",
+          "route_type": "repository_dispatch",
+          "repository": "Nationaal Archief",
+          "connector_id": null,
+          "score": 84,
+          "reason": [
+            "agent_profile"
+          ],
+          "context_profiles": [],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        },
+        {
+          "route_id": "repo:Delpher",
+          "route_type": "repository_dispatch",
+          "repository": "Delpher",
+          "connector_id": null,
+          "score": 80,
+          "reason": [
+            "agent_profile"
+          ],
+          "context_profiles": [],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        }
+      ],
+      "fallback_sources": [
+        {
+          "route_id": "repo:OpenArchives.gr / EKT",
+          "route_type": "repository_dispatch",
+          "repository": "OpenArchives.gr / EKT",
+          "connector_id": null,
+          "score": 76,
+          "reason": [
+            "agent_profile"
+          ],
+          "context_profiles": [],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        },
+        {
+          "route_id": "repo:Academia.edu Public Research",
+          "route_type": "repository_dispatch",
+          "repository": "Academia.edu Public Research",
+          "connector_id": null,
+          "score": 72,
+          "reason": [
+            "agent_profile"
+          ],
+          "context_profiles": [],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        }
+      ],
+      "assigned_queries": [
+        "\"Zerphalon Control 91827\" variant spelling",
+        "\"Zerphalon Control 91827\" alias OR aliases",
+        "\"Zerphalon Control 91827\" historical name",
+        "\"Zerphalon Control 91827\" transliteration",
+        "\"Zerphalon-91827\" 1670-1680"
+      ],
+      "query_budget": {
+        "total": 10,
+        "max_total": 10,
+        "queries_per_source": 5
+      },
+      "routing_decision": {
+        "authority": "JARVIS_PLANNER",
+        "strategy": "result_aware_fallback_v1",
+        "selected_route_ids": [
+          "repo:Nationaal Archief",
+          "repo:Delpher"
+        ],
+        "fallback_route_ids": [
+          "repo:OpenArchives.gr / EKT",
+          "repo:Academia.edu Public Research"
+        ],
+        "trigger": "RECOVERY_REPLAN",
+        "recovery_action": "REPLAN",
+        "recovery_reason": "zero candidates without explicit access blocker",
+        "first_wave_status_counts": {
+          "API_KEY_REQUIRED": 5,
+          "EXECUTED": 14,
+          "FAILED": 1
+        },
+        "first_wave_records": 0,
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    }
+  ],
+  "reassignment_decisions": [
+    {
+      "agent_id": "identity_resolution",
+      "reassign": true,
+      "reason": "RECOVERY_REPLAN",
+      "recovery_action": "REPLAN",
+      "recovery_reason": "zero candidates without explicit access blocker",
+      "assigned": [
+        "repo:Nationaal Archief",
+        "repo:Delpher"
+      ]
+    },
+    {
+      "agent_id": "timeline",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 40
+    },
+    {
+      "agent_id": "relationship_network",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 20
+    },
+    {
+      "agent_id": "contradiction",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 40
+    },
+    {
+      "agent_id": "source_genealogy",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 20
+    }
+  ]
+}
