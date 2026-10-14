@@ -1,35 +1,21 @@
-# JARVIS Intelligence Chamber — Independent V0
+# JARVIS Intelligence Chamber — Independent 3D experiment
 
-A standalone, from-zero visual experiment exploring APEX-level cinematic composition with EVE Online star-map navigation mechanics. This is **not** V5 or an adaptation of V5. V5 and the stable Command Center remain unchanged.
+New, independent visual application in `jarvis-intelligence-chamber/`, NOT based on V5. Existing stable Command Center and V5 are untouched.
 
-## Open
+## Rendering
 
-Navigate to `jarvis-intelligence-chamber/index.html` using a static HTTP server, or open its published GitHub Pages path if your Pages deployment publishes the repository root. It uses relative paths and no external JavaScript frameworks. Google Fonts is optional and requires internet access.
+The active page uses `world3d.js` with **Three.js 0.184.0** loaded as an ES module from esm.sh. It creates a genuine WebGL 3D scene: PerspectiveCamera, physically spatial agent nodes, Three.js point-cloud particles, orbit rings, curved links with traveling event markers, fog, additive glow sprites, interactive raycasting and smooth orbital navigation. Desktop and mobile share the same camera system.
 
-## Controls
+Older `chamber.js` and `gpu-field.js` have been retained as non-active experiments only; **index.html does not load them**.
 
-- Drag to orbit the spatial constellation
-- Scroll / + / − to zoom
-- Select a node to open its informational dossier
-- Focus to navigate towards the selected node
-- Reset camera
-- Left menu: preset focus zones
+## Explore
 
-## Deliberate constraints
+Serve the folder over HTTP; opening through file:// may block remote modules. Drag to orbit; wheel to zoom; click a node to read its visual concept dossier; focus selected; reset camera. The interface uses illustrative agent categories and does NOT claim live runs, scientific validation, or historical geography.
 
-- This is a **visual proof of concept**: it does not dispatch jobs or show historical evidence.
-- All agents, their positions and links are illustrative topology; no geographic coordinates, historical routes, or verification claims.
-- The scene uses a custom Canvas 2D painter with 3D camera projection. It is **not** WebGL/Three.js, and does not reproduce the APEX particle shader or EVE's renderer.
-- No APEX copyrighted source code was copied into these files.
-- MIT-licensed APEX-UI code was studied as a technical and art-direction reference: https://github.com/RubenM1990/APEX-UI
-- Inspired by EVE Online's navigable maps: https://www.eveonline.com/new-eden-map
+## Verification status
 
-## Quality gate
+Source changes and GitHub write confirmations verified. A real browser interaction/rendering test **has not yet passed** in this session (external asset fetching was unavailable). Do not call the result production-ready or APEX-quality until Chromium visual inspection and performance review have been performed.
 
-1. Syntax check `node --check chamber.js`
-2. Serve and interact with the page in a desktop browser
-3. Review screenshot/recording side by side with APEX and EVE reference
-4. Test performance, contrast, interaction and mobile
-5. Only after visual sign-off consider transitioning to GPU-based Three.js/WebGL renderer and connecting to real JARVIS data.
+## Reference and licensing
 
-**No claim of APEX-level visual parity is made by this initial implementation.**
+Original UI implementation; no APEX source code embedded in world3d.js. Technical inspiration: https://github.com/RubenM1990/APEX-UI (MIT). Spatial navigation inspiration: https://www.eveonline.com/new-eden-map. EVE's world positioning is *not* used for historical places.
