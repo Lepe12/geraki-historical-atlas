@@ -4,6 +4,21 @@
 <canvas id="universe" aria-label="Explore the three-dimensional JARVIS intelligence network"></canvas>
 <div class="grain" aria-hidden="true"></div><div class="vignette" aria-hidden="true"></div>
 <div id="nodeLabels" aria-hidden="true"></div>
+<aside class="research-sidebar" aria-label="Research command">
+ <div class="research-overline">RESEARCH / COMMAND</div>
+ <h1>NEW RESEARCH</h1>
+ <form id="researchForm">
+  <label for="researchPrompt">HISTORICAL QUESTION</label>
+  <textarea id="researchPrompt" rows="4" maxlength="4000" placeholder="What would you like to investigate?" required></textarea>
+  <button type="submit" class="research-primary">PREPARE RESEARCH <span aria-hidden="true">↗</span></button>
+ </form>
+ <p class="research-feedback" id="researchFeedback" role="status" aria-live="polite">Creates a research request; does not launch a server run.</p>
+ <nav class="research-links" aria-label="Research workspace">
+  <a href="../command-center/" target="_blank" rel="noopener">COMMAND CENTER <span>↗</span></a>
+  <a href="../command-center-v5/" target="_blank" rel="noopener">ACTIVE RESEARCH <span>↗</span></a>
+  <a href="../command-center/" target="_blank" rel="noopener">EVIDENCE &amp; RESULTS <span>↗</span></a>
+ </nav>
+</aside>
 <div class="central-hud" id="centralHud" aria-hidden="true"><div class="core-word">JARVIS</div><div class="core-status"><i></i> INTELLIGENCE CORE</div></div>
 <div class="gesture-hint">DRAG TO EXPLORE <span>·</span> SCROLL TO ZOOM <span>·</span> SELECT A NODE</div>
 <aside class="detail-panel hidden" id="detailPanel" aria-label="Selected node">
@@ -14,4 +29,6 @@
 </aside>
 <div class="hover-controls"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button><button id="resetView" aria-label="Reset view">⌖</button></div>
 <div class="machine-telemetry" aria-hidden="true"><span id="coordinates"></span><span id="zoomLevel"></span><span id="fps">—</span><span id="clock"></span><span id="linkCount"></span></div>
-</main><script type="importmap">{"imports":{"three":"https://esm.sh/three@0.184.0"}}</script><script type="module" src="./world3d.js"></script></body></html>
+</main><script>
+(()=>{const form=document.getElementById("researchForm"),field=document.getElementById("researchPrompt"),feedback=document.getElementById("researchFeedback");form.addEventListener("submit",async e=>{e.preventDefault();const target=field.value.trim();if(!target){feedback.textContent="Enter a research question.";field.focus();return;}const request={target,aliases:[],date_range:"",purpose:"Historical evidence research",source:"jarvis_intelligence_chamber_prepared_request"};const json=JSON.stringify(request,null,2);try{await navigator.clipboard.writeText(json);feedback.textContent="Request copied. Open Command Center to review it. No research has started.";}catch(_){feedback.textContent="Clipboard unavailable. Your question is preserved here; no research has started.";}});})();
+</script><script type="importmap">{"imports":{"three":"https://esm.sh/three@0.184.0"}}</script><script type="module" src="./world3d.js"></script></body></html>
