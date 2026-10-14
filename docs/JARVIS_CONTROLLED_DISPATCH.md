@@ -1,26 +1,43 @@
 # JARVIS Controlled Dispatch
 
-JARVIS now has a guarded control plane for dispatching a bounded subset of the ten Piratecartography research lanes.
+**Status: current operating policy.**
 
-## Active safeguards
+JARVIS is the routing authority above the Piratecartography research lanes. The user supplies the research objective; JARVIS selects lanes automatically unless an explicit human override is supplied.
 
-- controlled_dispatch mode is enabled
-- repository kill switch is available in tools/orchestrator/jarvis_policy.json
-- an explicit target is required
-- explicit selected agents are required
-- maximum JARVIS dispatch is 3 agents at once
-- only the ten known lanes are allowed
-- duplicate request fingerprints are blocked by the audit store
-- every approved dispatch writes an append-only audit record
-- no automatic promotion to VERIFIED is allowed
-- WordPress, Plesk credentials and GitHub secrets administration remain outside scope
+## Current policy
 
-## Execution path
+Executable source of truth: `tools/orchestrator/jarvis_policy.json`.
 
-JARVIS Controlled Dispatch validates the request, writes the audit record, then invokes the existing pct-parallel-multi-agent workflow with only the selected lanes. The existing research pipeline preserves evidence and queues the host-local MariaDB storage intent.
+- mode: `controlled_dispatch`
+- expected research lanes: **11**
+- dispatch enabled: yes
+- kill switch: available
+- explicit target: required
+- explicit lane selection: **not required**
+- JARVIS automatic selection: enabled
+- normal automatic selection: 3–6 lanes according to context
+- weak/uncertain context: may widen to all 11 lanes
+- explicit broad/exhaustive research request: all 11 lanes
+- human lane override: allowed
+- absolute policy maximum: 11 parallel lanes
+- duplicate-work audit: required
+- automatic VERIFIED promotion: forbidden
+- arbitrary code/shell/subprocess assignments: forbidden
 
-Subset runs skip the full ten-lane aggregate gate, while ordinary runs with no selected-agent subset continue to use the full ten-lane health gate.
+## Research lanes
+
+`greek`, `travellers`, `spanish_simancas`, `venetian`, `french`, `british`, `dutch`, `german`, `italian_states`, `ottoman`, `north_african`.
+
+## Execution contract
+
+JARVIS validates the request, records the decision and selected lanes, and invokes the existing research pipeline. Scientific evidence gates remain downstream and independent from routing.
+
+Selecting a lane means **search this source family**. It does not mean every named archive within that lane was successfully accessed.
 
 ## Kill switch
 
-Set dispatch.kill_switch to true in tools/orchestrator/jarvis_policy.json. New JARVIS dispatches then fail closed before any agent workflow is launched.
+Set `dispatch.kill_switch` to `true` in `tools/orchestrator/jarvis_policy.json`. New controlled dispatches then fail closed before launch.
+
+## Scientific boundary
+
+JARVIS routing, successful agent execution and repository discovery never imply historical verification.
