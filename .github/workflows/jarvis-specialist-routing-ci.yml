@@ -1,0 +1,32 @@
+name: JARVIS Specialist Assignment CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/orchestrator/jarvis_specialist_plan.py'
+      - 'tools/orchestrator/jarvis_specialist_routing.py'
+      - 'tools/orchestrator/jarvis_specialist_worker.py'
+      - 'tools/orchestrator/jarvis_specialist_reassign.py'
+      - 'tools/orchestrator/jarvis_merge_specialist_waves.py'
+      - 'tools/orchestrator/specialist_agent_registry.json'
+      - 'tools/test_specialist_routing.py'
+      - '.github/workflows/jarvis-specialist-routing-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  assignment-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile JARVIS specialist code
+        run: python3 -m compileall -q tools/orchestrator tools/test_specialist_routing.py
+      - name: Enforce JARVIS-owned routing contract
+        run: python3 tools/test_specialist_routing.py
+      - name: Fail if worker regains routing authority
+        run: |
+          ! grep -q 'plan_routes(' tools/orchestrator/jarvis_specialist_worker.py
+          grep -q 'JARVIS_PLANNER_AUTHORITY_REQUIRED' tools/orchestrator/jarvis_specialist_worker.py
+          grep -q 'assigned_sources' tools/orchestrator/jarvis_specialist_worker.py
