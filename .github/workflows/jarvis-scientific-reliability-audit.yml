@@ -5,6 +5,9 @@ on:
   push:
     branches: [main]
     paths:
+      - 'tools/research_relevance.py'
+      - 'tools/research_discovery_inventory.py'
+      - 'tools/test_discovery_retention.py'
       - 'tools/claim_evidence_matrix.py'
       - 'tools/source_first_report.py'
       - 'tools/apply_claim_assessment.py'
@@ -26,6 +29,8 @@ jobs:
       - name: Compile scientific pipeline
         run: |
           python3 -m py_compile \
+            tools/research_relevance.py \
+            tools/research_discovery_inventory.py \
             tools/claim_evidence_matrix.py \
             tools/source_first_report.py \
             tools/apply_claim_assessment.py \
@@ -33,7 +38,10 @@ jobs:
             tools/verification_pipeline.py \
             tools/finalize_verification.py \
             tools/preserve_run_evidence.py
-      - name: Claim matrix unit test
-        run: PYTHONPATH=tools python3 -m unittest tools/test_claim_evidence_matrix.py -v
+      - name: Discovery retention and claim matrix unit tests
+        run: |
+          PYTHONPATH=tools python3 -m unittest \
+            tools/test_discovery_retention.py \
+            tools/test_claim_evidence_matrix.py -v
       - name: Existing scientific audit tests
         run: PYTHONPATH=tools python3 -m unittest tools/test_scientific_evidence_audit.py -v
