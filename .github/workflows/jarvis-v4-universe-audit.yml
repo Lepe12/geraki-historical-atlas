@@ -1,0 +1,34 @@
+name: JARVIS V4 Immersive Universe Browser Audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - "command-center-v4/**"
+      - ".github/workflows/jarvis-v4-universe-audit.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  chromium:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify authored JavaScript
+        run: |
+          node --check command-center-v4/universe.js
+          node --check command-center-v4/browser-smoke.mjs
+      - name: Install playwright
+        run: |
+          npm install --prefix command-center-v4 --no-save --no-audit --no-fund playwright@1.56.1
+          npx --prefix command-center-v4 playwright install chromium
+      - name: Exercise actual 3D research universe browser
+        run: node command-center-v4/browser-smoke.mjs
+      - name: Capture visual verification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jarvis-v4-browser-screens
+          path: |
+            /tmp/jarvis-v4-desktop.png
+            /tmp/jarvis-v4-mobile.png
+          if-no-files-found: ignore
