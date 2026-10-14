@@ -15,7 +15,12 @@ assert.equal(result.labels,23,"7 regions and 16 agents must exist");
 assert.ok(result.bodyWidth<=result.viewport+4,"No horizontal overflow");
 assert.ok(!report.errors.length,"No browser console/page errors");
 if(name==="desktop"){await page.locator("#zoomIn").click();await page.locator("#resetView").click();assert.equal(await page.locator(".left-panel").count(),0,"No sidebar dashboard");assert.equal(await page.locator(".masthead").count(),0,"No top dashboard");assert.equal(await page.getByText("PIRATECARTOGRAPHY").count(),0,"No unsolicited branding");// Verify real spatial fly-to navigation instead of screenshot-only smoke.
-await page.mouse.click(452,378);
+const regionXY=await page.evaluate(()=>{
+ const label=[...document.querySelectorAll(".node-label")].find(n=>n.textContent==="WESTERN ARCHIVES");
+ return {x:parseFloat(label.style.left),y:parseFloat(label.style.top)};
+});
+assert.ok(Number.isFinite(regionXY.x)&&Number.isFinite(regionXY.y),"Region projection exists");
+await page.mouse.click(regionXY.x,regionXY.y);
 await page.waitForTimeout(400);
 const region=await page.evaluate(()=>document.body.dataset.activeRegion);
 assert.ok(region&&region!=="OVERVIEW","Clicking the Western region must initiate 3D navigation");
