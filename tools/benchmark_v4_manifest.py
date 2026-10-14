@@ -121,11 +121,16 @@ def build(repo):
             health.get("all_lanes_operational") is True and
             health.get("request_fingerprint_ok") is True
         )
+        expected_engine=str(b.get("expected_engine_commit") or "").strip()
+        expected_engine_match=(not expected_engine) or (len(commits)==1 and commits[0]==expected_engine)
+        complete=complete and expected_engine_match
         eligible=bool(
             present and complete and not b.get("baseline_only",True) and
             b.get("blind_execution_attested") is True and
             len(commits)==1 and case.get("metric_included",True)
         )
+        row["expected_engine_commit"]=expected_engine or None
+        row["expected_engine_match"]=expected_engine_match
         row["system_health_present"]=bool(health)
         row["fresh_run_complete"]=complete
         row["eligible_for_official_metrics"]=eligible
