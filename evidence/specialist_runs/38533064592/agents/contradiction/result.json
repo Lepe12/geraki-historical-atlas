@@ -1,0 +1,989 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "contradiction",
+  "label": "Contradiction / Adversarial Agent",
+  "assignment_id": "contradiction:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "contradicting_evidence",
+    "alternative_explanations",
+    "uncertainties",
+    "falsification_leads"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "8a037c00942e6d5ec08e164014dd30d55ca9251e9610a908f23c2e79d4ed303a",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "contradiction",
+    "assignment_id": "contradiction:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:Gallica/BnF",
+      "repo:Archives diplomatiques France",
+      "repo:PARES / Archivo General de Simancas",
+      "repo:İSAM Kütüphanesi"
+    ],
+    "queries": [
+      "\"Argel\" disputed",
+      "\"Argel\" contradiction",
+      "\"Argel\" alternative account",
+      "\"Argel\" myth legend false",
+      "\"Algiers\" 1682-1682"
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 122,
+        "reason": [
+          "agent_profile",
+          "context:north_african"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Archives diplomatiques France",
+        "route_type": "repository_dispatch",
+        "repository": "Archives diplomatiques France",
+        "connector_id": null,
+        "score": 108,
+        "reason": [
+          "agent_profile",
+          "context:north_african"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:PARES / Archivo General de Simancas",
+        "route_type": "repository_dispatch",
+        "repository": "PARES / Archivo General de Simancas",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:north_african"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:İSAM Kütüphanesi",
+        "route_type": "repository_dispatch",
+        "repository": "İSAM Kütüphanesi",
+        "connector_id": null,
+        "score": 98,
+        "reason": [
+          "agent_profile",
+          "context:north_african"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 76,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 72,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "north_african"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Argel\" alternative account",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Argel++alternative+account%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Argel\" myth legend false",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Argel++myth+legend+false%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Argel\" contradiction",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Argel++contradiction%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Argel\" disputed",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Argel++disputed%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Algiers\" 1682-1682",
+      "records": [
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb33705525x",
+          "title": "Articles of peace and commerce between... Charles II... and... the bashaw, dey, aga... of... algiers concluded... on the tenth day of April 1682...",
+          "creator": [
+            "France. Secrétariat d'Etat aux affaires étrangères (1589-1791). Auteur du texte"
+          ],
+          "date": [
+            "1682"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb33705525x",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb33705525x"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb359458701",
+          "title": "Articles of peace & commerce between... Charles II... king of Great Britain... and... the bashaw, dey, aga and governours of... Algiers in Barbary: concluded by Arthur Herbert... on the tenth day of April, old stile, 1682...",
+          "creator": [
+            "Alger (Régence). Auteur du texte",
+            "Angleterre. Auteur du texte"
+          ],
+          "date": [
+            "1682"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb359458701",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb359458701"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30980424p",
+          "title": "A Complete history of Algiers, to which is prefixed an epitome of the general history of Barbary, from the earliest times, interspersed with many curious passages and remarks, not touched on by any writer whatever, by J. Morgan",
+          "creator": [
+            "Morgan, Joseph (16..-17.. ; actif en 1736). Auteur du texte"
+          ],
+          "date": [
+            "1731"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30980424p",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30980424p"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb316094971",
+          "title": "Historie van Barbaryen en des zelfs zee-roovers... in't Fransch beschreeven... en in't Nederduitsch gebracht door G. Van Broekhuizen...",
+          "creator": [
+            "Dan, Pierre (158.?-1649). Auteur du texte",
+            "Vries, Simon de (1628-1708). Auteur du texte"
+          ],
+          "date": [
+            "1684"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb316094971",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb316094971"
+          ]
+        }
+      ],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Algiers++1682-1682%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Argel\" disputed",
+      "records": [
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3",
+          "title": "Formulaire de recherche dans tous les fonds",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88",
+          "title": "Fonds conservés à La Courneuve",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da",
+          "title": "Fonds conservés à Nantes",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f",
+          "title": "Fonds conservés à Nantes - recherche par carte",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f"
+        }
+      ],
+      "diagnostic": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Argel%22+disputed",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Argel\" alternative account",
+      "records": [
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3",
+          "title": "Formulaire de recherche dans tous les fonds",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88",
+          "title": "Fonds conservés à La Courneuve",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da",
+          "title": "Fonds conservés à Nantes",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f",
+          "title": "Fonds conservés à Nantes - recherche par carte",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f"
+        }
+      ],
+      "diagnostic": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Argel%22+alternative+account",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Argel\" myth legend false",
+      "records": [
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3",
+          "title": "Formulaire de recherche dans tous les fonds",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88",
+          "title": "Fonds conservés à La Courneuve",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da",
+          "title": "Fonds conservés à Nantes",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f",
+          "title": "Fonds conservés à Nantes - recherche par carte",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f"
+        }
+      ],
+      "diagnostic": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Argel%22+myth+legend+false",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Argel\" contradiction",
+      "records": [
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3",
+          "title": "Formulaire de recherche dans tous les fonds",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88",
+          "title": "Fonds conservés à La Courneuve",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da",
+          "title": "Fonds conservés à Nantes",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f",
+          "title": "Fonds conservés à Nantes - recherche par carte",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f"
+        }
+      ],
+      "diagnostic": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Argel%22+contradiction",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Algiers\" 1682-1682",
+      "records": [
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3",
+          "title": "Formulaire de recherche dans tous les fonds",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88",
+          "title": "Fonds conservés à La Courneuve",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da",
+          "title": "Fonds conservés à Nantes",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f",
+          "title": "Fonds conservés à Nantes - recherche par carte",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f"
+        }
+      ],
+      "diagnostic": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Algiers%22+1682-1682",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "\"Argel\" disputed",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Argel%22+disputed ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Argel%22+disputed ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "\"Argel\" contradiction",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Argel%22+contradiction ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Argel%22+contradiction ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "\"Argel\" alternative account",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Argel%22+alternative+account ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Argel%22+alternative+account ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "\"Argel\" myth legend false",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Argel%22+myth+legend+false ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Argel%22+myth+legend+false ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Argel\" disputed",
+      "records": [],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=%22Argel%22+disputed&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "\"Algiers\" 1682-1682",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Algiers%22+1682-1682 ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Algiers%22+1682-1682 ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Argel\" contradiction",
+      "records": [
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "16f5abef-cf71-4830-bdf1-eaeb2ceb3a6f",
+          "title": "L’Empire Ottoman, le Maghreb et la Hongrie (XVIe-XIX Siecles)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/16f5abef-cf71-4830-bdf1-eaeb2ceb3a6f"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "098fc96b-d528-49d3-a59d-81b2bf4bfa8a",
+          "title": "Les Kulouglis: Des Algeriens Descendants des Turco-ottomans. Histoire de la Fusion D’une Ethnicite Ottomane dans I’identite Algrienne",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/098fc96b-d528-49d3-a59d-81b2bf4bfa8a"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "0dc31a2d-540b-45c3-b69e-b287bfb2b6d0",
+          "title": "His Bailo’s Kapudan: Conversion, Tangled Loyalties and Hasan Veneziano Between Istanbul and Venice (1588-1591)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/0dc31a2d-540b-45c3-b69e-b287bfb2b6d0"
+        }
+      ],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=%22Argel%22+contradiction&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Argel\" alternative account",
+      "records": [
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "d8a0b363-2590-4818-8f43-30b9d607f9fd",
+          "title": "The Secret Language of the Geygelli Yürüks",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/d8a0b363-2590-4818-8f43-30b9d607f9fd"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "2ad3cb5d-3239-4b42-b15b-6882135a9b67",
+          "title": "Fooling the Sultan: Information, Decision-Making and the “Mediterranean Faction” (1585-1587)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/2ad3cb5d-3239-4b42-b15b-6882135a9b67"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "d2035e7b-95e4-4850-ae19-b3dfd81def46",
+          "title": "The Balkan Wars of 1912/13 and Their Impact on the Development of Communal/National Identity",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/d2035e7b-95e4-4850-ae19-b3dfd81def46"
+        }
+      ],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=%22Argel%22+alternative+account&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Argel\" myth legend false",
+      "records": [
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "37baf1e9-15db-4de6-aaeb-16176e271c94",
+          "title": "'The Fruits of My Labour': Juan Pacheco and the Christian Representations of Ottoman Algiers in the Sixteenth Century",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/37baf1e9-15db-4de6-aaeb-16176e271c94"
+        }
+      ],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=%22Argel%22+myth+legend+false&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Algiers\" 1682-1682",
+      "records": [
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "737639bf-9b7f-44ef-a89c-57cf22f95e31",
+          "title": "The Casbah of Algiers: A Living Tapestry of Islamic Art and Heritage",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/737639bf-9b7f-44ef-a89c-57cf22f95e31"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "32e63e41-2191-4bf1-9a01-f625b8bceb66",
+          "title": "The Ottoman Empire in North Africa: A Question of Degree-Tripoli in the Seventeenth Century",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/32e63e41-2191-4bf1-9a01-f625b8bceb66"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "fb258575-c18a-41fa-a46c-bf95d058fe49",
+          "title": "Garp Ocaklarında Çözülme: İngiltere ve Fransa’nın Garp Ocaklarıyla Yaptığı Antlaşmalarda Birliği Bozucu Maddeler",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/fb258575-c18a-41fa-a46c-bf95d058fe49"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "2bf3c4fd-237c-49e0-993a-90aa4e93f477",
+          "title": "Works by Bosniaks in the Field of Logic in the Arabic Language",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/2bf3c4fd-237c-49e0-993a-90aa4e93f477"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "5b813cd3-0a7c-400b-8078-03fd96846a78",
+          "title": "Between Two Spaces: Enslavement and Labor in the Early Modern Ottoman Navt",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/5b813cd3-0a7c-400b-8078-03fd96846a78"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "b1c96571-1d03-40f2-a0b4-337594132910",
+          "title": "İngiliz Devlet Arşivinde ve Kütüphanelerinde Türkiye Tarihine Ait Bazı Malzemeye Dair",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/b1c96571-1d03-40f2-a0b4-337594132910"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "65eb3319-390e-40c1-a6c5-367cbfae4e7f",
+          "title": "İngiliz Devlet Arşivinde ve Kütüphanelerinde Türkiye Tarihine Ait Bazı Malzemeye Dair",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/65eb3319-390e-40c1-a6c5-367cbfae4e7f"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "f7d2ec46-3091-4cf0-ab46-3f8aac94c1ad",
+          "title": "An Ambassador Fallen in Disgrace: Duarte Catanho, The Portuguese-Ottoman Negociations and the Mediterranean Networks (1541-1546)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/f7d2ec46-3091-4cf0-ab46-3f8aac94c1ad"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "ded9aca4-c122-4e69-8c0d-d0044b265553",
+          "title": "Vakıf Mallarının Uzun Ömürlülüğünde Kiralama Biçimlerinin Rolü: Konya Mahkeme Hamamı Örneği (1464-1919)",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/ded9aca4-c122-4e69-8c0d-d0044b265553"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "d8ced0a0-7278-446c-80b6-b1b4bbeaf87e",
+          "title": "St. George and the Crescent the Correspondence of Genoese Ambassadors in Istanbul at the Time of Süleyman I",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/d8ced0a0-7278-446c-80b6-b1b4bbeaf87e"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "3259dead-8c9f-42fd-94c9-d39626a9e2c9",
+          "title": "The Reign of Mehmed IV, 1648-87",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/3259dead-8c9f-42fd-94c9-d39626a9e2c9"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "56c28f08-614e-49b0-8f5e-2a6c4cb8bbc3",
+          "title": "Johannes Heyman (1667-1737) His Manuscript Collection and the Dutch Community of Izmir",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/56c28f08-614e-49b0-8f5e-2a6c4cb8bbc3"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "07bcb261-38bb-4044-9180-97933a13ecbf",
+          "title": "III. Selim Dönemi Osmanlı Denizcliğinin XVII. Yüzyıl Divan Şiirine Yansımaları",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/07bcb261-38bb-4044-9180-97933a13ecbf"
+        },
+        {
+          "discovery_repository": "İSAM DSpace",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "2e94fc83-91f9-47fb-9e26-e06e0cf0b24b",
+          "title": "Printing Does Matter: İbrahim Müteferrika and His Contribution to Geography and Cartography in the Ottoman Empire",
+          "date": [],
+          "url": "https://makale.isam.org.tr/server/api/core/items/2e94fc83-91f9-47fb-9e26-e06e0cf0b24b"
+        }
+      ],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=%22Algiers%22+1682-1682&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "result_count": 45,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
