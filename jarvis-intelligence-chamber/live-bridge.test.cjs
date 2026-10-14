@@ -22,7 +22,7 @@ test("snapshot fallback plus websocket bootstrap and event transport",async()=>{
  assert.equal(h.snapshots[0][0].run_id,"100");
  assert.equal(h.state[0][0],"SNAPSHOT");
  assert.equal(h.sockets.length,1);
- assert.match(h.sockets[0].url,/^wss:\/\/www\.piratecartography\.com\/pct-api\/live\/ws\/piratecartography\/latest$/);
+ assert.match(h.sockets[0].url,/^wss:\/\/pct-live\.piratecartography\.com\/pct-api\/live\/ws\/piratecartography\/latest$/);
  h.sockets[0].onopen();
  assert.equal(h.state.at(-1)[0],"LIVE");
  h.sockets[0].onmessage({data:JSON.stringify({schema:"pct-command-center-bootstrap-v1",snapshot,events:[]})});
