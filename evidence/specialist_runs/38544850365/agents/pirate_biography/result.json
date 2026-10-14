@@ -1,0 +1,546 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "pirate_biography",
+  "label": "Pirate Biography Agent",
+  "assignment_id": "pirate_biography:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "identity",
+    "aliases",
+    "chronology",
+    "ships",
+    "associates",
+    "bases",
+    "operations",
+    "death",
+    "uncertainties"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "de5c3109b1dcf81942220f8ba1b535b85735f211d309a8f6471ea611f66786ad",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "pirate_biography",
+    "assignment_id": "pirate_biography:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:PARES / Archivo General de Simancas",
+      "repo:Gallica/BnF",
+      "repo:Biblioteca Digital Hispánica",
+      "repo:Academia.edu Public Research"
+    ],
+    "queries": [
+      "\"Milos\" pirate corsair biography",
+      "\"Milos\" aliases ships associates",
+      "\"Milos\" 1660-1680 archive",
+      "\"Milos\" death capture trial ransom",
+      "\"Milo\" 1660-1680"
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:PARES / Archivo General de Simancas",
+        "route_type": "repository_dispatch",
+        "repository": "PARES / Archivo General de Simancas",
+        "connector_id": null,
+        "score": 100,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 100,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 90,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Crossref Scholarly Metadata",
+        "route_type": "repository_dispatch",
+        "repository": "Crossref Scholarly Metadata",
+        "connector_id": null,
+        "score": 86,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "\"Milo\" 1660-1680",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milo%22+1660-1680 ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milo%22+1660-1680 ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" pirate corsair biography",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Milos++pirate+corsair+biography%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "\"Milos\" pirate corsair biography",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milos%22+pirate+corsair+biography ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milos%22+pirate+corsair+biography ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "\"Milos\" aliases ships associates",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milos%22+aliases+ships+associates ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milos%22+aliases+ships+associates ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "\"Milos\" death capture trial ransom",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milos%22+death+capture+trial+ransom ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milos%22+death+capture+trial+ransom ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "\"Milos\" 1660-1680 archive",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milos%22+1660-1680+archive ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Milos%22+1660-1680+archive ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" aliases ships associates",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Milos++aliases+ships+associates%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milo\" 1660-1680",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Milo++1660-1680%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" 1660-1680 archive",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Milos++1660-1680+archive%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" death capture trial ransom",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Milos++death+capture+trial+ransom%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" aliases ships associates",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Milos%22+AND+alma.all_for_ui%3D%22aliases%22+AND+alma.all_for_ui%3D%22ships%22+AND+alma.all_for_ui%3D%22associates%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" pirate corsair biography",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22Milos%22+pirate+corsair+biography",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" 1660-1680 archive",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Milos%22+AND+alma.all_for_ui%3D%221660-1680%22+AND+alma.all_for_ui%3D%22archive%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" aliases ships associates",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22Milos%22+aliases+ships+associates",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" pirate corsair biography",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Milos%22+AND+alma.all_for_ui%3D%22pirate%22+AND+alma.all_for_ui%3D%22corsair%22+AND+alma.all_for_ui%3D%22biography%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" 1660-1680 archive",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22Milos%22+1660-1680+archive",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milo\" 1660-1680",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Milo%22+AND+alma.all_for_ui%3D%221660-1680%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" death capture trial ransom",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22Milos%22+death+capture+trial+ransom",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milo\" 1660-1680",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22Milo%22+1660-1680",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Milos\" death capture trial ransom",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Milos%22+AND+alma.all_for_ui%3D%22death%22+AND+alma.all_for_ui%3D%22capture%22+AND+alma.all_for_ui%3D%22trial%22+AND+alma.all_for_ui%3D%22ransom%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "result_count": 0,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
