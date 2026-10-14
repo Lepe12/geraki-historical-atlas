@@ -1,0 +1,33 @@
+name: JARVIS V3 Research Theater Audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "command-center-v3/**"
+      - "command-center/live/latest.json"
+      - ".github/workflows/jarvis-v3-research-theater-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  theater:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Syntax checks
+        run: |
+          node --check command-center-v3/v3.js
+          node --check command-center-v3/theater.js
+          node --check command-center-v3/theater-smoke.mjs
+      - name: Real recorded-run interaction test
+        run: node command-center-v3/theater-smoke.mjs
+      - name: Scientific UI invariants
+        run: |
+          grep -q 'RESEARCH_WORKFLOW_NOT_HISTORICAL_ROUTE' command-center-v3/theater.js
+          grep -q 'NOT DISPATCHED' command-center-v3/index.html
+          grep -q 'READ ONLY' command-center-v3/index.html
+          grep -q 'tiles.openfreemap.org' command-center-v3/v3.js
