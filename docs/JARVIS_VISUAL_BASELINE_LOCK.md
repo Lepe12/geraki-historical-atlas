@@ -2,8 +2,8 @@
 
 Status: **LOCKED / CANONICAL 3D CORE**
 
-Canonical approved 3D baseline commit:
-`5223d9176e9d4f03bceccee0b32d94090024bd37`
+Canonical approved 3D baseline commit (extended zoom + live skull mode + Greek node):
+`872fdc04f440f440fbe1c3c0f8617e4348f90747`
 
 Restore renderer commit:
 `0bcd47edf252f0ff1eec84d2bda9a2e7fa5f555f`
