@@ -1,3 +1,5 @@
+> **HISTORICAL SNAPSHOT — NOT CURRENT CANONICAL STATUS.** This document is retained for audit chronology. For current architecture/status use `docs/CANONICAL_DOCUMENTATION.md` and `docs/SYSTEM_SPEC.md`.
+
 # Venetian archival connector: verified routing and access gate (2026-10-12)
 
 ## Primary official catalogue
