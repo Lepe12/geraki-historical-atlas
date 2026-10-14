@@ -36,8 +36,8 @@ class JarvisObserverTests(unittest.TestCase):
             }), encoding="utf-8")
 
             report = observe(run)
-            self.assertEqual(report["metrics"]["operational_agents"], 10)
-            self.assertEqual(report["metrics"]["candidate_sources"], 10)
+            self.assertEqual(report["metrics"]["operational_agents"], 11)
+            self.assertEqual(report["metrics"]["candidate_sources"], 11)
             self.assertFalse(report["guardrails"]["dispatch_performed"])
             self.assertFalse(report["guardrails"]["database_write_performed"])
             self.assertFalse(report["guardrails"]["verified_promotion_performed"])
