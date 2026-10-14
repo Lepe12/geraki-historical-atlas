@@ -32,7 +32,7 @@ function useFlatMap(reason){
  if(!window.L){$("map-error").hidden=false;return;}
  try{if(map?.remove){try{map.remove()}catch(_){}}$("map").replaceChildren();
  flatMap=L.map("map",{zoomControl:false,preferCanvas:true}).setView([38.8,16.5],5);
- L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png",{subdomains:"abcd",minZoom:2,maxZoom:18,attribution:"© OpenStreetMap contributors · © CARTO"}).addTo(flatMap);
+ L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{minZoom:2,maxZoom:18,attribution:"© OpenStreetMap contributors"}).addTo(flatMap);
  L.control.zoom({position:"bottomright"}).addTo(flatMap);
  map={isStyleLoaded:()=>false,getSource:()=>null,getLayer:()=>false,resize:()=>flatMap.invalidateSize(),flyTo:({center,zoom})=>flatMap.flyTo([center[1],center[0]],zoom||5),easeTo:({center,zoom})=>flatMap.flyTo([center[1],center[0]],zoom||5)};
  loaded=true;document.body.classList.add("flat-map-mode");$("map-error").hidden=true;
