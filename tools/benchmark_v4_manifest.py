@@ -24,6 +24,19 @@ def run_engine_commit(root):
             pass
     return sorted(commits)
 
+def run_request_payloads(root):
+    payloads={}
+    for lane in LANES:
+        p=root/lane/"run_manifest"/"manifest.json"
+        if not p.exists():continue
+        try:
+            d=read(p);payload=d.get("normalized_request") or {}
+            key=json.dumps(payload,ensure_ascii=False,sort_keys=True,separators=(",",":"))
+            payloads[key]=payload
+        except Exception:
+            pass
+    return list(payloads.values())
+
 def build(repo):
     repo=Path(repo)
     cfg=read(repo/"benchmarks/v4/config.json")
@@ -47,6 +60,14 @@ def build(repo):
           "engine_commits":commits,"eligible_for_official_metrics":eligible,
           "candidate_count":0,"claim_count":0,"missing_lanes":[]
         }
+        payloads=run_request_payloads(root) if present else []
+        expected_request={
+          "target":case.get("target"),"aliases":case.get("aliases",[]),
+          "date_range":case.get("date_range",""),"purpose":case.get("purpose","")
+        }
+        request_match=(len(payloads)==1 and all(payloads[0].get(k)==v for k,v in expected_request.items()))
+        row["run_request_variants"]=len(payloads)
+        row["request_matches_case"]=request_match
         if present:
             for lane in LANES:
                 cp=root/lane/"structured_output"/"candidate_events.json"
@@ -95,7 +116,7 @@ def build(repo):
             try:health=read(hp)
             except Exception:health={}
         complete=(
-            not row["missing_lanes"] and
+            not row["missing_lanes"] and request_match and
             health.get("all_lanes_pipeline_reports_present") is True and
             health.get("all_lanes_operational") is True and
             health.get("request_fingerprint_ok") is True
