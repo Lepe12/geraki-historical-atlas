@@ -231,7 +231,7 @@ function verifiedRecord(record,kind,index){
  const label=String(record?.repository||record?.description||record?.claim||id||kind).slice(0,200);
  const angle=(index+1)*2.3999632,rad=38+(index%8)*11;
  const pos=agent.position.clone().add(new THREE.Vector3(Math.cos(angle)*rad,Math.sin(angle)*rad*.7,(index%7-3)*9));
- const node=addNode(pos,agent.regionIndex,true,label);
+ const node={position:pos,regionIndex:agent.regionIndex,major:true,name:label,index:-1};
  node.evidence={kind,status,agent_id:agentId,id,label};
  const hue=kind==="blocker"?0xd88a4e:0x54dfb8;
  const spot=new THREE.Mesh(new THREE.SphereGeometry(3.8,9,6),new THREE.MeshBasicMaterial({color:hue,transparent:true,opacity:.94}));
