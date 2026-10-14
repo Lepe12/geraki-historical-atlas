@@ -1,6 +1,6 @@
 # Scientific evidence-gap audit
 
-`tools/scientific_evidence_audit.py` reads preserved candidate-event records, their request context and review sidecars. The existing aggregate-health step includes its complete report in `SYSTEM_HEALTH.json`; workflow permissions, ten lanes and storage schedules are unchanged.
+`tools/scientific_evidence_audit.py` reads preserved candidate-event records, their request context and review sidecars. The existing aggregate-health step includes its complete report in `SYSTEM_HEALTH.json`; workflow permissions, eleven lanes and storage schedules are unchanged.
 
 Run manually:
 
