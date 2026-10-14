@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail if the ten lane payloads do not share one exact research request identity."""
+"""Fail if all lane payloads do not share one exact research request identity."""
 import json,pathlib,sys
 LANES=["greek","travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]
 rows=[];missing=[]
