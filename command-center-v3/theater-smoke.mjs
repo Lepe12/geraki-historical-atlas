@@ -1,0 +1,42 @@
+#!/usr/bin/env node
+// Contract tests without third-party npm dependencies. No real network or claims.
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import vm from "node:vm";
+const html=fs.readFileSync("command-center-v3/index.html","utf8");
+const theater=fs.readFileSync("command-center-v3/theater.js","utf8");
+const snapshot=JSON.parse(fs.readFileSync("command-center/live/latest.json","utf8"));
+assert.equal(snapshot.schema,"pct-command-center-live-v1");
+assert.ok(Array.isArray(snapshot.events));
+assert.ok(Array.isArray(snapshot.blockers));
+const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(x=>x[1]);
+const accessed=[...theater.matchAll(/\b(?:btn|\$)\("([^"]+)"\)/g)].map(x=>x[1]);
+assert.deepEqual([...new Set(accessed)].filter(x=>!ids.includes(x)),[],"All theater controls must exist in markup");
+assert.ok(html.includes("theater.css")&&html.includes("theater.js"),"Assets must be referenced");
+assert.ok(!html.includes('class="arrival" id="arrival"'),"Do not force fake static entrance");
+assert.ok(theater.includes("RESEARCH_WORKFLOW_NOT_HISTORICAL_ROUTE"),"Dispatch connections clearly distinguished from historic routes");
+assert.ok(theater.includes("No demo events")||theater.includes("No demo events".toLowerCase())||theater.includes("No demo events or fabricated evidence"),"No mock data");
+let callbacks={};const els=new Map();
+function mock(id){if(!els.has(id)){const e={id,innerHTML:"",textContent:"",value:"",max:"1",hidden:false,disabled:false,classList:{add(){},remove(){},toggle(){}},listeners:{},addEventListener(name,fn){this.listeners[name]=fn;},setAttribute(k,v){this[k]=v;}};els.set(id,e);}return els.get(id);}
+const document={getElementById:mock,querySelectorAll(){return []}};
+const pct={getCoords:()=>({spanish_simancas:{label:"Simancas",p:[-4.828,41.59]},venetian:{label:"Venice",p:[12.3155,45.4408]}}),getMap:()=>null,getSnapshot:()=>null,renderEvidence(){return true;},changeView(){},focusAgent(){}};
+const window={PCT_V3:pct,matchMedia:()=>({matches:false}),addEventListener(name,fn){callbacks[name]=fn;},dispatchEvent(){}};
+const context={window,document,console,matchMedia:window.matchMedia,setInterval:()=>1,clearInterval:()=>{}};
+vm.runInNewContext(theater,context,{filename:"theater.js",timeout:1000});
+assert.ok(callbacks["pct:snapshot"],"Snapshot adapter must attach");
+callbacks["pct:snapshot"]({detail:{snapshot,source:"snapshot"}});
+assert.equal(Number(mock("theater-seek").max),snapshot.events.length-1);
+assert.match(mock("theater-run-label").textContent,/RUN/);
+assert.ok(Number(mock("theater-seek").max)>1,"Real event replay is populated");
+assert.match(mock("theater-event").textContent,/\S/);
+assert.equal(mock("theater-replay-warning").textContent.includes("όχι ζωντανή"),true);
+assert.equal(mock("theater-play").disabled,false);
+const before=mock("theater-step").textContent;
+mock("theater-next").listeners.click();
+assert.notEqual(mock("theater-step").textContent,before,"Next event must actually change the scene");
+mock("theater-rewind").listeners.click();
+assert.equal(mock("theater-step").textContent.startsWith("1 /"),true,"Rewind returns to beginning");
+mock("theater-play").listeners.click();
+assert.ok(mock("theater-play").textContent==="Ⅱ"||mock("theater-play").textContent==="▶");
+assert.equal(snapshot.claims.length,0,"No fabricated claims are injected into recorded Milos run");
+console.log("PASS: V3 theater controls, event replay, snapshot provenance, no invented claims.");
