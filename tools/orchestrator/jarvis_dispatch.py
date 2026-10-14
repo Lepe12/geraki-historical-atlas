@@ -1,16 +1,23 @@
 #!/usr/bin/env python3
-"""Guarded JARVIS controlled-dispatch preflight."""
+"""Guarded JARVIS controlled-dispatch preflight.
+
+The user supplies the research problem. JARVIS owns agent selection unless an
+explicit manual override is supplied.
+"""
 from __future__ import annotations
 import argparse, hashlib, json
 from pathlib import Path
 from typing import Any
 
+from jarvis_agent_planner import plan_agents
 from jarvis_runtime_guard import validate_runtime_policy
 
 POLICY_PATH = Path("tools/orchestrator/jarvis_policy.json")
 
+
 def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
 
 def canonical_request(req: dict[str, Any]) -> dict[str, Any]:
     target = str(req.get("target", "")).strip()
@@ -28,9 +35,21 @@ def canonical_request(req: dict[str, Any]) -> dict[str, Any]:
         "selected_agents": [str(x).strip() for x in selected if str(x).strip()],
     }
 
+
 def fingerprint(payload: dict[str, Any]) -> str:
     raw = json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def _dedupe(values: list[str]) -> list[str]:
+    seen = set()
+    out = []
+    for value in values:
+        if value not in seen:
+            out.append(value)
+            seen.add(value)
+    return out
+
 
 def validate(req: dict[str, Any], policy: dict[str, Any]) -> dict[str, Any]:
     dispatch = policy.get("dispatch", {})
@@ -44,26 +63,59 @@ def validate(req: dict[str, Any], policy: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("DISPATCH_DISABLED")
     if dispatch.get("kill_switch"):
         raise ValueError("KILL_SWITCH_ACTIVE")
+
     payload = canonical_request(req)
     if dispatch.get("require_explicit_target", True) and not payload["target"]:
         raise ValueError("TARGET_REQUIRED")
-    if dispatch.get("require_explicit_selected_agents", True) and not payload["selected_agents"]:
-        raise ValueError("SELECTED_AGENTS_REQUIRED")
-    allowed = set(dispatch.get("allowed_agents", []))
-    unknown = [a for a in payload["selected_agents"] if a not in allowed]
-    if unknown:
-        raise ValueError("AGENT_NOT_ALLOWED:" + ",".join(unknown))
-    seen = set(); selected = []
-    for lane in payload["selected_agents"]:
-        if lane not in seen:
-            selected.append(lane); seen.add(lane)
-    max_parallel = int(dispatch.get("max_parallel", 3))
+
+    allowed_list = list(dispatch.get("allowed_agents", []))
+    allowed = set(allowed_list)
+    max_parallel = int(dispatch.get("max_parallel", len(allowed_list) or 1))
     if max_parallel < 1:
         raise ValueError("INVALID_MAX_PARALLEL")
+
+    requested = _dedupe(payload["selected_agents"])
+    if requested:
+        if not dispatch.get("manual_override_allowed", True):
+            raise ValueError("MANUAL_AGENT_OVERRIDE_DISABLED")
+        unknown = [a for a in requested if a not in allowed]
+        if unknown:
+            raise ValueError("AGENT_NOT_ALLOWED:" + ",".join(unknown))
+        selected = requested
+        selection = {
+            "schema": "pct-jarvis-agent-selection-v1",
+            "authority": "HUMAN_OVERRIDE",
+            "strategy": "manual_override",
+            "confidence": "EXPLICIT",
+            "matched_profiles": [],
+            "selected_agents": selected,
+            "ranking": [{"agent_id": a, "score": None, "reasons": ["manual_override"]} for a in selected],
+            "rule": "Manual override supplied explicitly; JARVIS records but does not expand it.",
+        }
+    else:
+        if dispatch.get("require_explicit_selected_agents", False):
+            raise ValueError("SELECTED_AGENTS_REQUIRED")
+        if not dispatch.get("auto_select_agents", True):
+            raise ValueError("JARVIS_AUTO_SELECTION_DISABLED")
+        selection = plan_agents(payload, policy)
+        selected = _dedupe(selection.get("selected_agents", []))
+        unknown = [a for a in selected if a not in allowed]
+        if unknown:
+            raise ValueError("PLANNER_SELECTED_DISALLOWED_AGENT:" + ",".join(unknown))
+        if not selected:
+            raise ValueError("JARVIS_SELECTED_NO_AGENTS")
+
     if len(selected) > max_parallel:
         raise ValueError("TOO_MANY_SELECTED_AGENTS:%d>%d" % (len(selected), max_parallel))
+
     payload["selected_agents"] = selected
+    payload["agent_selection"] = selection
+    payload["workflow_selected_agents"] = (
+        "" if len(selected) == len(allowed_list) and set(selected) == allowed
+        else ",".join(selected)
+    )
     return payload
+
 
 def existing_fingerprints(audit_root: Path) -> dict[str, str]:
     found = {}
@@ -79,22 +131,26 @@ def existing_fingerprints(audit_root: Path) -> dict[str, str]:
             found[fp] = run_id
     return found
 
+
 def build_audit(req_path: Path, payload: dict[str, Any], run_id: str) -> dict[str, Any]:
     return {
-        "schema": "pct-jarvis-dispatch-audit-v1",
+        "schema": "pct-jarvis-dispatch-audit-v2",
         "run_id": run_id,
         "request_file": req_path.as_posix(),
         "request_fingerprint": fingerprint(payload),
         "mode": "controlled_dispatch",
+        "agent_selection": payload["agent_selection"],
         "selected_agents": payload["selected_agents"],
+        "workflow_selected_agents": payload["workflow_selected_agents"],
         "target": payload["target"],
         "date_range": payload["date_range"],
         "purpose": payload["purpose"],
         "decision": "DISPATCH_APPROVED",
         "verified_promotion_allowed": False,
         "wordpress_access": False,
-        "server_credentials_access": False
+        "server_credentials_access": False,
     }
+
 
 def main() -> None:
     p = argparse.ArgumentParser()
@@ -106,15 +162,17 @@ def main() -> None:
     args = p.parse_args()
     if not args.run_id.isdigit():
         raise ValueError("INVALID_RUN_ID")
+
     policy = load_json(POLICY_PATH)
     payload = validate(load_json(args.request), policy)
     audit = build_audit(args.request, payload, args.run_id)
     if audit["request_fingerprint"] in existing_fingerprints(args.audit_root):
         raise ValueError("DUPLICATE_DISPATCH_REQUEST")
+
     matrix = json.dumps(payload["selected_agents"], separators=(",", ":"))
     if args.github_output:
         def one_line(value):
-            return str(value).replace("\\r", " ").replace("\\n", " ").strip()
+            return str(value).replace("\r", " ").replace("\n", " ").strip()
         with args.github_output.open("a", encoding="utf-8") as fh:
             fh.write("matrix=%s\n" % matrix)
             fh.write("request_fingerprint=%s\n" % audit["request_fingerprint"])
@@ -123,10 +181,22 @@ def main() -> None:
             fh.write("date_range=%s\n" % one_line(payload["date_range"]))
             fh.write("purpose=%s\n" % one_line(payload["purpose"]))
             fh.write("selected_agents=%s\n" % one_line(",".join(payload["selected_agents"])))
+            fh.write("workflow_selected_agents=%s\n" % one_line(payload["workflow_selected_agents"]))
+            fh.write("selection_authority=%s\n" % one_line(payload["agent_selection"]["authority"]))
+            fh.write("selection_strategy=%s\n" % one_line(payload["agent_selection"]["strategy"]))
+
     if args.write_audit:
         args.write_audit.parent.mkdir(parents=True, exist_ok=True)
         args.write_audit.write_text(json.dumps(audit, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
-    print(json.dumps({"status":"CONTROLLED_DISPATCH_APPROVED","matrix":payload["selected_agents"],"request_fingerprint":audit["request_fingerprint"]}))
+
+    print(json.dumps({
+        "status": "CONTROLLED_DISPATCH_APPROVED",
+        "authority": payload["agent_selection"]["authority"],
+        "strategy": payload["agent_selection"]["strategy"],
+        "matrix": payload["selected_agents"],
+        "request_fingerprint": audit["request_fingerprint"],
+    }, ensure_ascii=False))
+
 
 if __name__ == "__main__":
     main()
