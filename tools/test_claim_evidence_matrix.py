@@ -12,7 +12,9 @@ class ClaimMatrixTests(unittest.TestCase):
             (b/"human_review").mkdir()
             (b/"structured_output"/"candidate_events.json").write_text(json.dumps({"events":[{
               "candidate_id":"x1","source_file":"a.txt","source_type":"OCR_CONTEXT","context_excerpt":"possible event",
-              "original_inspected":False,"extracted":False,"corroborated":False
+              "original_inspected":False,"extracted":False,"corroborated":False,
+              "research_value":{"score":78},"evidence_confidence":{"score":8},
+              "retention":{"retention_status":"RETAINED_RESEARCH_DISCOVERY"}
             }]}))
             (b/"corroboration"/"corroboration_queue.json").write_text(json.dumps({"candidate_events":[]}))
             (b/"source_genealogy"/"genealogy_queue.json").write_text(json.dumps({"sources":[]}))
@@ -23,6 +25,13 @@ class ClaimMatrixTests(unittest.TestCase):
             self.assertEqual(c["machine_recommendation"],"UNRESOLVED")
             self.assertIn("ORIGINAL_NOT_INSPECTED",c["uncertainties"])
             self.assertEqual(c["contradiction_search_status"],"NOT_ASSESSED")
+            self.assertEqual(c["research_value"]["score"],78)
+            self.assertEqual(c["evidence_confidence"]["score"],8)
+            self.assertEqual(c["retention"]["retention_status"],"RETAINED_RESEARCH_DISCOVERY")
+            self.assertEqual([x["stage"] for x in c["claim_trail"]],[
+              "DISCOVERY","EXACT_LOCATOR","ORIGINAL_INSPECTION","CONTROLLED_EXTRACTION",
+              "SOURCE_GENEALOGY","CORROBORATION","CONTRADICTION_SEARCH","HUMAN_REVIEW","FINAL_VERIFICATION"
+            ])
 
 if __name__=="__main__":
     unittest.main()

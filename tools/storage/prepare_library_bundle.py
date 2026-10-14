@@ -17,7 +17,7 @@ def main():
     identity = json.loads(Path('research_request_identity.json').read_text(encoding='utf-8'))
     if not identity.get('research_job_id') or not identity.get('request_sha256') or not isinstance(identity.get('normalized_request'), dict):
         raise ValueError('PINNED_REQUEST_MISSING')
-    roots = ['research_request_identity.json', 'library_discovery', 'citation_chase_candidates',
+    roots = ['research_request_identity.json', 'research_discovery', 'library_discovery', 'citation_chase_candidates',
              'library_acquisition', 'citation_chase_hits', 'event_first_hits', 'exact_page_acquisition',
              'original_inspection', 'source_genealogy', 'corroboration', 'human_review',
              'verification', 'qa', 'structured_output', 'research_dossier', 'run_manifest']
