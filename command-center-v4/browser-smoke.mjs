@@ -1,0 +1,51 @@
+#!/usr/bin/env node
+import assert from "node:assert/strict";
+import {readFile} from "node:fs/promises";
+import {resolve,extname} from "node:path";
+import {createServer} from "node:http";
+import {chromium} from "playwright";
+const ROOT=resolve(".");
+const mime={".html":"text/html; charset=utf-8",".js":"text/javascript; charset=utf-8",".css":"text/css; charset=utf-8",".json":"application/json",".png":"image/png",".svg":"image/svg+xml",".jpg":"image/jpeg"};
+const server=createServer(async(req,res)=>{
+try{const pathname=decodeURIComponent(new URL(req.url,"http://localhost").pathname);const path=resolve(ROOT,"."+(pathname.endsWith("/")?pathname+"index.html":pathname));if(!path.startsWith(ROOT+"/")){res.writeHead(403);res.end();return;}const b=await readFile(path);res.writeHead(200,{"content-type":mime[extname(path)]||"application/octet-stream","cache-control":"no-store"});res.end(b);}catch(_){res.writeHead(404);res.end("Not found");}});
+await new Promise(ok=>server.listen(0,"127.0.0.1",ok));
+const base="http://127.0.0.1:"+server.address().port+"/command-center-v4/?api=http%3A%2F%2F127.0.0.1%3A9";
+let browser;
+try{
+browser=await chromium.launch({headless:true,args:["--no-sandbox","--disable-dev-shm-usage","--use-gl=swiftshader","--enable-unsafe-swiftshader"]});
+const page=await browser.newPage({viewport:{width:1600,height:900},deviceScaleFactor:1});
+const errors=[];page.on("pageerror",e=>errors.push(e.message));
+await page.goto(base,{waitUntil:"domcontentloaded",timeout:35000});
+await page.waitForFunction(()=>document.querySelector("#source-status")?.textContent.includes("DURABLE SNAPSHOT"),{timeout:30000});
+await page.waitForTimeout(3300);
+assert.equal(await page.locator("#mission-name").innerText(),"Milos");
+assert.match(await page.locator("#metric-blockers").innerText(),/\d+/);
+assert.ok(Number(await page.locator("#scrub").getAttribute("max"))>=130);
+assert.ok(await page.locator("#globe canvas").count()||await page.locator("#map2d .leaflet-container").count()||await page.locator("#map2d .leaflet-marker-icon").count(),"At least one geographic renderer");
+await page.screenshot({path:"/tmp/jarvis-v4-desktop.png",fullPage:true});
+const start=await page.locator("#playback-n").innerText();
+await page.locator("#forward").click();
+assert.notEqual(start,await page.locator("#playback-n").innerText());
+await page.locator('[data-mode="sources"]').click();
+await page.locator("#archive-records .record[data-record]").first().click();
+assert.match(await page.locator("#reader-footer").innerText(),/ACCESS BLOCKER/);
+await page.locator('[data-facet="events"]').click();
+assert.ok(await page.locator("#archive-records .record[data-record]").count()>0);
+await page.locator('[data-mode="investigate"]').click();
+await page.locator('#agent-filter').selectOption({index:1});
+assert.ok(await page.locator("#action-records .record[data-action]").count()>0);
+await page.locator('[data-mode="review"]').click();
+assert.equal(await page.locator(".guardian-actions button").first().isDisabled(),true);
+await page.locator('[data-mode="universe"]').click();
+await page.locator("#focus-milos").click();
+assert.deepEqual(errors,[],"No browser runtime JS exceptions");
+const mobile=await browser.newPage({viewport:{width:390,height:844},deviceScaleFactor:1});
+mobile.on("pageerror",e=>errors.push("mobile: "+e.message));
+await mobile.goto(base,{waitUntil:"domcontentloaded"});
+await mobile.waitForFunction(()=>document.querySelector("#source-status")?.textContent.includes("DURABLE SNAPSHOT"),{timeout:30000});
+await mobile.waitForTimeout(2500);
+await mobile.screenshot({path:"/tmp/jarvis-v4-mobile.png",fullPage:true});
+assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth+3),false,"Mobile should not have global horizontal overflow");
+assert.deepEqual(errors,[]);
+console.log("PASS: V4 cinematic globe or geographic fallback; authentic Milos snapshot; 142 event replay; blocker/source inspection; timeline agent filter; guarded human review; mobile view.");
+}finally{if(browser)await browser.close();await new Promise(ok=>server.close(ok));}
