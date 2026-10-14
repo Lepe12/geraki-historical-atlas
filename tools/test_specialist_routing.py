@@ -67,9 +67,8 @@ def main():
         assert agent["assignment_wave"]==2
         assert agent["assignment_id"].endswith(":wave2")
         assert agent["routing_decision"]["authority"]=="JARVIS_PLANNER"
-        assert agent["routing_decision"]["trigger"] in {
-          "NO_EXECUTED_SOURCE_AND_ZERO_RECORDS","ZERO_RECORDS_WITH_BLOCKERS","ZERO_RECORDS"
-        }
+        assert agent["routing_decision"]["trigger"]=="RECOVERY_REPLAN"
+        assert agent["routing_decision"]["recovery_action"]=="REPLAN"
         first=set(route_ids(amap[agent["agent_id"]]))
         second=set(route_ids(agent))
         assert not (first & second),(first,second)
@@ -81,6 +80,16 @@ def main():
     }
     wave2b=build_second_wave(milos,successful)
     assert "timeline" not in {x["agent_id"] for x in wave2b["agents"]}
+
+    escalated=dict(synthetic)
+    escalated["timeline"]={
+      "agent_id":"timeline","assignment_wave":1,"result_count":0,
+      "search_runs":[{"status":"AUTH_OR_BROWSER_REQUIRED","records":[],"diagnostic":"LOGIN_REQUIRED"}],
+    }
+    wave2c=build_second_wave(milos,escalated)
+    assert "timeline" not in {x["agent_id"] for x in wave2c["agents"]}
+    decision=next(x for x in wave2c["reassignment_decisions"] if x["agent_id"]=="timeline")
+    assert decision["recovery_action"]=="ESCALATE",decision
 
     print("JARVIS SPECIALIST ROUTING TESTS PASS",len(milos["agents"]),"wave1 agents",len(wave2["agents"]),"wave2 agents")
 
