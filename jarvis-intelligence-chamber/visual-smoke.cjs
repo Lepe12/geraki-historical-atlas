@@ -26,9 +26,9 @@ assert.equal(result.hasCentralHud,false,"Central JARVIS HUD must remain removed"
 if(name==="desktop"){
  assert.equal(result.hasSidebar,true,"Approved left command panel must remain");
  assert.equal(result.hasMasthead,true,"Approved masthead must remain");
- const before=await page.evaluate(()=>{const n=[...document.querySelectorAll(".node-label")].find(x=>x.textContent.includes("Greek Archives"));const r=n.getBoundingClientRect();return Math.hypot(r.left+r.width/2-innerWidth*.53,r.top+r.height/2-innerHeight*.5)});
+ const before=await page.evaluate(()=>{const n=[...document.querySelectorAll(".node-label")].find(x=>x.textContent.includes("Greece"));const r=n.getBoundingClientRect();return Math.hypot(r.left+r.width/2-innerWidth*.53,r.top+r.height/2-innerHeight*.5)});
  await page.locator("#zoomIn").click();await page.waitForTimeout(900);
- const after=await page.evaluate(()=>{const n=[...document.querySelectorAll(".node-label")].find(x=>x.textContent.includes("Greek Archives"));const r=n.getBoundingClientRect();return Math.hypot(r.left+r.width/2-innerWidth*.53,r.top+r.height/2-innerHeight*.5)});
+ const after=await page.evaluate(()=>{const n=[...document.querySelectorAll(".node-label")].find(x=>x.textContent.includes("Greece"));const r=n.getBoundingClientRect();return Math.hypot(r.left+r.width/2-innerWidth*.53,r.top+r.height/2-innerHeight*.5)});
  assert.ok(after>before+8,"Zoom-in must visibly increase projected node distance");
  await page.getByRole('button',{name:'⌘ Archival constellation 02',exact:true}).click();
  await page.waitForFunction(()=>!document.querySelector('#detailPanel').classList.contains('hidden'));
