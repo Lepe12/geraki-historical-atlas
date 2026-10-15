@@ -9,7 +9,6 @@
 
   const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
   const setState=(s,mode="")=>{status.textContent=s;panel.dataset.state=mode;};
-  const operatorKey=()=>{let key=sessionStorage.getItem("jarvis_operator_key")||"";if(!key){key=window.prompt("NABOU//X access key")||"";if(key)sessionStorage.setItem("jarvis_operator_key",key);}return key;};
 
   function open(){panel.classList.remove("hidden");}
   function render(){
@@ -21,8 +20,8 @@
     save.disabled=accepted===0;
   }
 
-  async function uploadPdf(file,key){
-    const r=await fetch(endpoint+"/knowledge/upload",{method:"POST",headers:{"authorization":"Bearer "+key,"content-type":"application/pdf","x-file-name":encodeURIComponent(file.name)},body:file});
+  async function uploadPdf(file){
+    const r=await fetch(endpoint+"/knowledge/upload",{method:"POST",headers:{"content-type":"application/pdf","x-file-name":encodeURIComponent(file.name)},body:file});
     let data={};try{data=await r.json()}catch(_){}
     if(!r.ok){const e=new Error(data.error||("upload_http_"+r.status));e.status=r.status;throw e;}
     return data;
@@ -103,21 +102,19 @@
 
   save.addEventListener("click",async()=>{
     const accepted=current.items.filter(x=>x.status==="accepted");if(!accepted.length||!current.file)return;
-    const key=operatorKey();if(!key){setState("ACCESS KEY REQUIRED TO SAVE","error");return;}
     save.disabled=true;setState("UPLOADING APPROVED SOURCE","working");
     try{
       if(!current.source_id){
-        const uploaded=await uploadPdf(current.file,key);
+        const uploaded=await uploadPdf(current.file);
         current.source_id=uploaded.source_id;
       }
       setState("SAVING APPROVED MEMORY","working");
-      const r=await fetch(endpoint+"/knowledge/review",{method:"POST",headers:{"authorization":"Bearer "+key,"content-type":"application/json"},body:JSON.stringify({source_id:current.source_id,pages:current.pages,items:accepted})});
+      const r=await fetch(endpoint+"/knowledge/review",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({source_id:current.source_id,pages:current.pages,items:accepted})});
       const data=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(data.error||("save_http_"+r.status)),{status:r.status});
       setState("LEARNED · "+data.accepted_items+" ITEMS","learned");
       source.textContent=(source.textContent||"SOURCE")+" · MEMORY SAVED";
     }catch(e){
-      if(e.status===401){sessionStorage.removeItem("jarvis_operator_key");setState("INVALID ACCESS KEY","error");}
-      else setState(e.message==="Failed to fetch"?"KNOWLEDGE BACKEND UNAVAILABLE":"MEMORY SAVE FAILED","error");
+      setState(e.message==="Failed to fetch"?"KNOWLEDGE BACKEND UNAVAILABLE":"MEMORY SAVE FAILED","error");
     }finally{save.disabled=false;}
   });
 
