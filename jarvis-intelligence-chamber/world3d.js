@@ -153,27 +153,94 @@ const glow=glowTexture();
 // Rich reactor atmosphere while keeping the cartographic constellations spatially dominant.
 const reactor=new THREE.Group();
 reactor.position.copy(nexus.position);world.add(reactor);
-const reactorCore=new THREE.Mesh(new THREE.IcosahedronGeometry(24,3),new THREE.MeshBasicMaterial({color:0x067dc8,toneMapped:true}));
-reactor.add(reactorCore);
-const plasma=new THREE.Mesh(new THREE.SphereGeometry(39,32,24),new THREE.ShaderMaterial({
- transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
- uniforms:{uTime:{value:0}},
- vertexShader:`varying vec3 vP;varying vec3 vN;void main(){vP=position;vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
- fragmentShader:`uniform float uTime;varying vec3 vP;varying vec3 vN;void main(){float noise=sin(vP.y*.42+uTime*1.4)*sin(vP.x*.31-uTime*.8)*sin(vP.z*.4+uTime*.6);float fresnel=pow(1.-abs(vN.z),1.6);float a=(.13+.22*noise+.43*fresnel);gl_FragColor=vec4(.005,.31,.82,clamp(a*.55,0.,.43));}`
-}));reactor.add(plasma);
-const haloLayers=[
- {size:510,color:0x024477,opacity:.12},
- {size:340,color:0x087db8,opacity:.16},
- {size:225,color:0x12b8e9,opacity:.18},
- {size:390,color:0xd08318,opacity:.055}
+
+// MEDITERRANEAN CORE LAB — the original NABOU reactor language, reshaped geographically.
+// No terrain slab and no globe: the sea itself is a volumetric particle/network reactor.
+const medGroup=new THREE.Group();reactor.add(medGroup);
+const MED={minLon:-6,maxLon:37,minLat:30,maxLat:46,sx:12.2,sz:12.2};
+const medPoint=(lon,lat,y=0)=>new THREE.Vector3((lon-15.5)*MED.sx,y,-(lat-38)*MED.sz);
+function mediterraneanMask(lon,lat){
+ if(lon<-5.8||lon>36.7||lat<30.1||lat>45.9)return false;
+ if(lon<-1.3&&lat>43.7)return false;
+ if(lon>30.5&&lat>42.5)return false;
+ if(lon>34.7&&lat>37.4)return false;
+ if(lon<0&&lat<34.2)return false;
+ if(lon>27&&lat<31.15)return false;
+ // carve obvious non-Mediterranean continental corners while retaining Adriatic/Aegean.
+ if(lon<4&&lat>43.9)return false;
+ if(lon>22&&lon<29&&lat>45.1)return false;
+ return true;
+}
+const medPositions=[],medColors=[],medNodes=[];
+for(let i=0;i<1500;i++){
+ const lon=MED.minLon+rand()*(MED.maxLon-MED.minLon),lat=MED.minLat+rand()*(MED.maxLat-MED.minLat);
+ if(!mediterraneanMask(lon,lat))continue;
+ const y=randomNormal()*13;
+ const p=medPoint(lon,lat,y);medNodes.push(p);medPositions.push(p.x,p.y,p.z);
+ const c=new THREE.Color(rand()>.91?0x9effff:0x35c6cb);
+ medColors.push(c.r,c.g,c.b);
+}
+const medGeo=new THREE.BufferGeometry();
+medGeo.setAttribute("position",new THREE.Float32BufferAttribute(medPositions,3));
+medGeo.setAttribute("color",new THREE.Float32BufferAttribute(medColors,3));
+const medCloud=new THREE.Points(medGeo,new THREE.PointsMaterial({map:glow,size:13.5,vertexColors:true,transparent:true,opacity:.86,sizeAttenuation:true,depthWrite:false,blending:THREE.AdditiveBlending}));
+medGroup.add(medCloud);
+
+// Dense internal intelligence lattice, using the exact additive network vocabulary of the old core.
+const medLinks=[];
+for(let i=0;i<medNodes.length;i++){
+ let best=-1,bestD=Infinity;
+ for(let k=0;k<9;k++){const j=Math.floor(rand()*medNodes.length);if(j===i)continue;const d=medNodes[i].distanceToSquared(medNodes[j]);if(d<bestD){bestD=d;best=j}}
+ if(best>=0&&bestD<11500)medLinks.push(...medNodes[i].toArray(),...medNodes[best].toArray());
+}
+const medLinkGeo=new THREE.BufferGeometry();
+medLinkGeo.setAttribute("position",new THREE.Float32BufferAttribute(medLinks,3));
+medGroup.add(new THREE.LineSegments(medLinkGeo,new THREE.LineBasicMaterial({color:0x58dce8,transparent:true,opacity:.20,depthWrite:false,blending:THREE.AdditiveBlending})));
+
+// Central radiating intelligence nexus remains, but now lives inside the Mediterranean silhouette.
+const medHub=medPoint(16.2,37.9,0),hubLinks=[];
+for(let i=0;i<115;i++){const p=medNodes[Math.floor(rand()*medNodes.length)];hubLinks.push(...medHub.toArray(),...p.toArray())}
+const hubGeo=new THREE.BufferGeometry();hubGeo.setAttribute("position",new THREE.Float32BufferAttribute(hubLinks,3));
+medGroup.add(new THREE.LineSegments(hubGeo,new THREE.LineBasicMaterial({color:0x6ef8f1,transparent:true,opacity:.16,depthWrite:false,blending:THREE.AdditiveBlending})));
+
+// Original reactor glow is preserved as layered holographic atmosphere, stretched to Mediterranean proportions.
+const medHaloLayers=[
+ {w:650,h:255,color:0x024477,opacity:.12},
+ {w:540,h:215,color:0x087db8,opacity:.15},
+ {w:420,h:170,color:0x12b8e9,opacity:.16},
+ {w:600,h:235,color:0xd08318,opacity:.045}
 ];
-for(const h of haloLayers){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:h.color,transparent:true,opacity:h.opacity,depthWrite:false,blending:THREE.AdditiveBlending}));sp.scale.set(h.size,h.size,1);reactor.add(sp)}
+for(const h of medHaloLayers){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:h.color,transparent:true,opacity:h.opacity,depthWrite:false,blending:THREE.AdditiveBlending}));sp.scale.set(h.w,h.h,1);medGroup.add(sp)}
+
+// Orbital scientific rings remain around the geographic reactor, not as a replacement globe.
 const energyBands=[];
 for(let i=0;i<4;i++){
- const radius=57+i*16;
- const band=new THREE.Mesh(new THREE.TorusGeometry(radius,i===1?2.1:.85,6,168),new THREE.MeshBasicMaterial({color:i%2?0xf4b63c:0x20e7ff,toneMapped:false,transparent:true,opacity:i===1?.92:.62,depthWrite:false,blending:THREE.AdditiveBlending}));
- band.rotation.set(.27+i*.42,.16+i*.53,i*.38);reactor.add(band);energyBands.push(band);
+ const curve=new THREE.EllipseCurve(0,0,285+i*18,102+i*13,0,Math.PI*2,false,i*.38);
+ const pts=curve.getPoints(190).map(p=>new THREE.Vector3(p.x,0,p.y));
+ const geo=new THREE.BufferGeometry().setFromPoints(pts);
+ const band=new THREE.LineLoop(geo,new THREE.LineBasicMaterial({color:i===1?0xf4b63c:0x20e7ff,transparent:true,opacity:i===1?.36:.25,depthWrite:false,blending:THREE.AdditiveBlending}));
+ band.rotation.set(.18+i*.12,.04+i*.09,i*.07);medGroup.add(band);energyBands.push(band);
 }
+
+// Real Natural Earth coastline is overlaid asynchronously as luminous reactor particles/strands.
+fetch("https://cdn.jsdelivr.net/gh/martynafford/natural-earth-geojson@master/50m/physical/ne_50m_land.json").then(r=>r.json()).then(gj=>{
+ const coast=[];
+ for(const f of gj.features||[]){
+  const polys=f.geometry?.type==="Polygon"?[f.geometry.coordinates]:f.geometry?.type==="MultiPolygon"?f.geometry.coordinates:[];
+  for(const rings of polys){const ring=rings?.[0]||[];let seg=[];
+   for(let i=0;i<ring.length;i+=2){const q=ring[i];if(q[0]>=MED.minLon&&q[0]<=MED.maxLon&&q[1]>=MED.minLat&&q[1]<=MED.maxLat)seg.push(medPoint(q[0],q[1],4))}
+   if(seg.length>2){const g=new THREE.BufferGeometry().setFromPoints(seg);medGroup.add(new THREE.Line(g,new THREE.LineBasicMaterial({color:0x8af8ff,transparent:true,opacity:.55,depthWrite:false,blending:THREE.AdditiveBlending})));coast.push(...seg)}
+  }
+ }
+ const cg=new THREE.BufferGeometry().setFromPoints(coast);
+ medGroup.add(new THREE.Points(cg,new THREE.PointsMaterial({map:glow,color:0xb8ffff,size:9,transparent:true,opacity:.88,depthWrite:false,blending:THREE.AdditiveBlending})));
+ document.body.dataset.mediterraneanCore="ACTIVE";
+ document.body.dataset.mediterraneanCoastParticles=String(coast.length);
+}).catch(()=>{document.body.dataset.mediterraneanCore="COASTLINE_LOAD_FAILED"});
+
+const reactorCore=new THREE.Mesh(new THREE.IcosahedronGeometry(7,2),new THREE.MeshBasicMaterial({color:0x5df8ff,transparent:true,opacity:.55}));
+reactorCore.position.copy(medHub);medGroup.add(reactorCore);
+const plasma={material:{uniforms:{uTime:{value:0}}}};
 const bloomTestMarker="JARVIS_BLOOM_ACTIVE";
 // Atmospheric depth: low-opacity cyan nebula behind the constellations.
 for(let i=0;i<9;i++){
@@ -423,7 +490,7 @@ function frame(){
  }
  if(!reduced){
   plasma.material.uniforms.uTime.value=time;
-  reactorCore.rotation.y=time*.11;
+  reactorCore.rotation.y=time*.11; medGroup.rotation.y=Math.sin(time*.12)*.018;
   for(let i=0;i<energyBands.length;i++){energyBands[i].rotation.y+=dt*(i%2?.15:-.11);energyBands[i].rotation.z+=dt*(i%2?-.09:.07)}
   for(const n of agentNodes.concat(nexus)){if(n.group)n.sprite.material.opacity=(n===nexus?.25:.52)+.09*Math.sin(time*.5+n.index)}
   nexus.rings[0].rotation.y=time*.06;nexus.rings[1].rotation.z=-time*.12;
