@@ -3,6 +3,10 @@ name: JARVIS Controlled Dispatch
 on:
   workflow_dispatch:
     inputs:
+      request_id:
+        description: "Optional UI request correlation ID"
+        required: false
+        type: string
       target:
         description: "Research target"
         required: true
@@ -104,6 +108,7 @@ jobs:
       - name: Dispatch JARVIS-planned unified research run
         env:
           GH_TOKEN: "${{ github.token }}"
+          REQUEST_ID: "${{ inputs.request_id }}"
           TARGET: "${{ steps.jarvis.outputs.target }}"
           ALIASES: "${{ steps.jarvis.outputs.aliases }}"
           DATE_RANGE: "${{ steps.jarvis.outputs.date_range }}"
@@ -113,6 +118,7 @@ jobs:
         run: |
           gh workflow run pct-parallel-multi-agent.yml \
             --ref main \
+            -f request_id="$REQUEST_ID" \
             -f target="$TARGET" \
             -f aliases="$ALIASES" \
             -f date_range="$DATE_RANGE" \
@@ -120,3 +126,4 @@ jobs:
             -f selected_agents="$SELECTED_AGENTS"
           echo "JARVIS_CONTROLLED_DISPATCH_SENT planned_agents=$JARVIS_SELECTED_AGENTS workflow_filter=$SELECTED_AGENTS"
           echo "Specialist agents are launched once inside pct-parallel-multi-agent.yml."
+

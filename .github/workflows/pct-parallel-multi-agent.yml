@@ -2,6 +2,10 @@ name: PCT Parallel Multi-Agent Research
 on:
   workflow_dispatch:
     inputs:
+      request_id:
+        description: "Optional UI request correlation ID"
+        required: false
+        type: string
       target:
         description: "Research target (place, person, event, institution)"
         required: true
@@ -40,6 +44,7 @@ env:
   PCT_SELECTED_AGENTS: ${{ inputs.selected_agents }}
   # Host-local MariaDB is primary. Airtable is retained only as an explicit legacy option.
   PCT_STORAGE_BACKEND: mariadb
+  PCT_UI_REQUEST_ID: ${{ inputs.request_id }}
   PCT_COMMAND_CENTER_URL: https://www.piratecartography.com/pct-api/live
 
 jobs:
@@ -385,14 +390,19 @@ jobs:
           python3 tools/orchestrator/jarvis_state_board.py \
             --run-id "$PCT_RUN_ID" \
             --output "evidence/runs/$PCT_RUN_ID/JARVIS_STATE_BOARD.json"
+          python3 tools/orchestrator/build_command_center_snapshot.py \
+            --run-id "$PCT_RUN_ID" \
+            --output "command-center/live/runs/$PCT_RUN_ID.json" \
+            --latest "command-center/live/latest.json"
       - name: Commit situation board
         env:
           PCT_RUN_ID: ${{ github.run_id }}
         run: |
           git config user.name "jarvis-orchestrator[bot]"
           git config user.email "jarvis-orchestrator@users.noreply.github.com"
-          git add "evidence/runs/$PCT_RUN_ID/JARVIS_STATE_BOARD.json"
+          git add "evidence/runs/$PCT_RUN_ID/JARVIS_STATE_BOARD.json" command-center/live/
           git diff --cached --quiet && exit 0
           git commit -m "JARVIS state board $PCT_RUN_ID"
           git pull --rebase origin main
           git push origin HEAD:main
+

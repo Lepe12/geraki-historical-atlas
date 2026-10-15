@@ -18,6 +18,7 @@ const OPERATOR_TOKEN=String(process.env.PCT_OPERATOR_TOKEN||"");
 const GITHUB_DISPATCH_TOKEN=String(process.env.PCT_GITHUB_DISPATCH_TOKEN||"");
 const CONTROLLED_WORKFLOW="jarvis-controlled-dispatch.yml";
 let lastDispatchAt=0;
+let latestLiveRun="";
 
 let baseline=null;
 let baselineFetchedAt=0;
@@ -36,11 +37,12 @@ function normalizePath(pathname){
 }
 function getJson(url){
   return new Promise((resolve,reject)=>{
-    https.get(url,{headers:{"user-agent":"piratecartography-command-center-live/1"}},r=>{
+    const request=https.get(url,{headers:{"user-agent":"piratecartography-command-center-live/1"}},r=>{
       let b="";r.setEncoding("utf8");
       r.on("data",c=>{b+=c;if(b.length>2_000_000){r.destroy();reject(new Error("response_too_large"));}});
       r.on("end",()=>{if((r.statusCode||500)>=400)return reject(new Error("http_"+r.statusCode));try{resolve(JSON.parse(b))}catch(e){reject(e)}});
     }).on("error",reject);
+    request.setTimeout(10000,()=>request.destroy(new Error("upstream_timeout")));
   });
 }
 function safeEqual(a,b){
@@ -67,6 +69,7 @@ function githubWorkflowDispatch(inputs){
       let b="";r.setEncoding("utf8");r.on("data",c=>b+=c);
       r.on("end",()=>{if(r.statusCode===204)return resolve();reject(new Error("github_dispatch_http_"+r.statusCode+(b?":"+b.slice(0,300):"")));});
     });
+    req.setTimeout(10000,()=>req.destroy(new Error("dispatch_timeout")));
     req.on("error",reject);req.end(body);
   });
 }
@@ -74,7 +77,7 @@ async function refreshBaseline(force=false){
   if(!force && Date.now()-baselineFetchedAt<15000 && baseline)return baseline;
   try{
     const d=await getJson(RAW_LATEST);
-    if(d&&d.schema==="pct-command-center-live-v1"){baseline=d;baselineFetchedAt=Date.now();}
+    if(d&&d.schema==="pct-command-center-live-v1"){const changed=JSON.stringify(d)!==JSON.stringify(baseline);baseline=d;baselineFetchedAt=Date.now();if(changed)setImmediate(publishSnapshots);}
   }catch(_){}
   return baseline;
 }
@@ -114,7 +117,9 @@ function readBody(req){
 function addEvent(e){
   const run=String(e.run_id||"");
   if(!/^[A-Za-z0-9_.:-]+$/.test(run))throw new Error("invalid_run");
+  latestLiveRun=newerRun(latestLiveRun,run);
   const arr=runEvents.get(run)||[];arr.push(e);if(arr.length>RUN_EVENTS_LIMIT)arr.splice(0,arr.length-RUN_EVENTS_LIMIT);runEvents.set(run,arr);
+  while(runEvents.size>100)runEvents.delete(runEvents.keys().next().value);
   broadcast(run,e);
 }
 function frameText(text){
@@ -135,19 +140,32 @@ function broadcast(run,e){
     }
   }
 }
+function newerRun(a,b){
+  if(!a)return String(b||"");if(!b)return String(a);
+  if(/^\d+$/.test(a)&&/^\d+$/.test(b))return BigInt(a)>BigInt(b)?String(a):String(b);
+  return String(b);
+}
+function eventSnapshot(run,events){
+  const agents=new Map();
+  for(const e of events)if(e.agent_id)agents.set(e.agent_id,{...(agents.get(e.agent_id)||{id:e.agent_id}),status:e.status||e.event_type,phase:e.phase,percent:e.percent});
+  return {schema:"pct-command-center-live-v1",project:"piratecartography",run_id:run,generated_utc:events.at(-1)?.created_utc||null,source:"AUTHENTICATED_LIVE_EVENTS",mission:{status:"RUNNING"},agents:[...agents.values()],claims:[],blockers:[],contradictions:{records:[]},events,safety:{automatic_verified:false,human_review_required:true}};
+}
 async function statusFor(run){
   const base=await refreshBaseline();
-  const actual=run==="latest"?(base?.run_id||"latest"):run;
+  const actual=run==="latest"?newerRun(base?.run_id,latestLiveRun):String(run);
   const live=runEvents.get(actual)||[];
-  if(!base)return {project:"piratecartography",run_id:actual,snapshot:null,events:live,transport:"WEBSOCKET_LIVE_NO_BASELINE"};
-  const chosen=(run==="latest"||String(base.run_id)===String(actual))?base:null;
-  return {project:"piratecartography",run_id:actual,snapshot:chosen,events:[...(chosen?.events||[]),...live].slice(-1000),transport:"WEBSOCKET_LIVE"};
+  const chosen=base&&String(base.run_id)===actual?base:(live.length?eventSnapshot(actual,live):null);
+  const events=[...(chosen?.events||[]),...live].filter((e,i,a)=>!e.event_id||a.findIndex(x=>x.event_id===e.event_id)===i).slice(-1000);
+  return {project:"piratecartography",run_id:actual||"latest",snapshot:chosen,events,transport:chosen?"WEBSOCKET_LIVE":"WEBSOCKET_LIVE_NO_BASELINE"};
+}
+async function publishSnapshots(){
+  for(const [run,clients] of sockets){if(!clients.size)continue;try{const state=await statusFor(run),frame=frameText(JSON.stringify({schema:"pct-command-center-bootstrap-v1",...state}));for(const socket of clients)if(!socket.destroyed)socket.write(frame);}catch(_){}}
 }
 const server=http.createServer(async(req,res)=>{
   try{
     const u=new URL(req.url,"http://localhost");const p=normalizePath(u.pathname);
     if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":"https://lepe12.github.io","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type"});return res.end();}
-    if(req.method==="GET"&&p==="/health"){const b=await refreshBaseline();return json(res,200,{status:"PASS",service:"piratecartography-command-center-live",websocket:true,dispatch_configured:Boolean(OPERATOR_TOKEN&&GITHUB_DISPATCH_TOKEN),baseline_run_id:b?.run_id||null});}
+    if(req.method==="GET"&&p==="/health"){const b=await refreshBaseline();return json(res,200,{status:"PASS",service:"piratecartography-command-center-live",websocket:true,dispatch_configured:Boolean(OPERATOR_TOKEN&&GITHUB_DISPATCH_TOKEN),revision:"run-sync-20261015",baseline_run_id:b?.run_id||null});}
     const sm=p.match(/^\/status\/([^/]+)\/([^/]+)$/);
     if(req.method==="GET"&&sm){if(sm[1]!=="piratecartography")return json(res,404,{error:"project"});return json(res,200,await statusFor(sm[2]));}
     if(req.method==="POST"&&p==="/dispatch"){
@@ -159,7 +177,9 @@ const server=http.createServer(async(req,res)=>{
       const query=String(body?.query||"").trim();
       if(query.length<3||query.length>500)return json(res,400,{error:"invalid_query"});
       const requestId="ui-"+Date.now().toString(36)+"-"+crypto.randomBytes(4).toString("hex");
+      lastDispatchAt=Date.now();
       await githubWorkflowDispatch({
+        request_id:requestId,
         target:query,
         aliases:"",
         date_range:"",
@@ -167,7 +187,7 @@ const server=http.createServer(async(req,res)=>{
         selected_agents:""
       });
       lastDispatchAt=Date.now();
-      return json(res,202,{status:"DISPATCHED",request_id:requestId,workflow:CONTROLLED_WORKFLOW});
+      return json(res,202,{status:"ACCEPTED",request_id:requestId,workflow:CONTROLLED_WORKFLOW});
     }
     if(req.method==="POST"&&p==="/events"){
       const auth=String(req.headers.authorization||"");if(!auth.startsWith("Bearer "))return json(res,401,{error:"missing_oidc"});
@@ -221,4 +241,5 @@ if(require.main===module || typeof PhusionPassenger !== "undefined"){
     loopback.listen(PORT,"127.0.0.1");
   }
 }
-module.exports={normalizePath,frameText,statusFor,verifyGithubOidc,safeEqual,server};
+module.exports={normalizePath,frameText,statusFor,verifyGithubOidc,safeEqual,newerRun,eventSnapshot,server};
+

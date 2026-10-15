@@ -79,6 +79,7 @@ def emit(root:Path,project:str,run_id:str,event_type:str,*,agent_id:str="",phase
       "event_id":datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ"),
       "created_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),
       "project":project,"run_id":run_id,"event_type":event_type,
+      "request_id":os.environ.get("PCT_UI_REQUEST_ID") or None,
       "agent_id":agent_id or None,"phase":phase or None,
       "percent":None if percent is None else max(0,min(100,int(percent))),
       "status":status or None,"artifacts":list(artifacts or []),
@@ -95,3 +96,4 @@ if __name__=="__main__":
     p.add_argument("--agent-id",default="");p.add_argument("--phase",default="");p.add_argument("--percent",type=int);p.add_argument("--status",default="");p.add_argument("--detail",default="")
     p.add_argument("--require-remote",action="store_true",help="Fail if GitHub OIDC live delivery does not succeed.")
     a=p.parse_args();print(json.dumps(emit(a.root,a.project,a.run_id,a.event_type,agent_id=a.agent_id,phase=a.phase,percent=a.percent,status=a.status,detail=a.detail,require_remote=a.require_remote),ensure_ascii=False))
+

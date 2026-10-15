@@ -1,42 +1,22 @@
-"use strict";
-const test=require("node:test"),assert=require("node:assert/strict"),fs=require("node:fs"),vm=require("node:vm"),path=require("node:path");
-const script=fs.readFileSync(path.join(__dirname,"live-bridge.js"),"utf8").replace("export function connectResearchFeed","function connectResearchFeed")+"\nthis.connectResearchFeed=connectResearchFeed;";
-function harness(fetchJson){
- const state=[],snapshots=[],events=[],timers=[];
- const sockets=[];
- class FakeWebSocket{constructor(url){this.url=url;sockets.push(this)}close(){this.onclose?.()}}
- const context={globalThis:{},URL,Set,Map,JSON,String,Array,Error,console,
-  setTimeout(fn){timers.push(fn);return timers.length},clearTimeout(){},};
- vm.runInNewContext(script,context);
- const stop=context.connectResearchFeed({
-   fetchImpl:async()=>({ok:true,json:async()=>fetchJson}),
-   WebSocketImpl:FakeWebSocket,
-   onState:(...a)=>state.push(a),onSnapshot:(...a)=>snapshots.push(a),onEvent:e=>events.push(e)
- });
- return {state,snapshots,events,timers,sockets,stop};
-}
-const snapshot={schema:"pct-command-center-live-v1",run_id:"100",agents:[],claims:[],blockers:[],safety:{automatic_verified:false}};
-test("snapshot fallback plus websocket bootstrap and event transport",async()=>{
- const h=harness(snapshot);
- await new Promise(resolve=>setImmediate(resolve));
- assert.equal(h.snapshots[0][0].run_id,"100");
- assert.equal(h.state[0][0],"SNAPSHOT");
- assert.equal(h.sockets.length,1);
- assert.match(h.sockets[0].url,/^wss:\/\/pct-live\.piratecartography\.com\/pct-api\/live\/ws\/piratecartography\/latest$/);
- h.sockets[0].onopen();
- assert.equal(h.state.at(-1)[0],"LIVE");
- h.sockets[0].onmessage({data:JSON.stringify({schema:"pct-command-center-bootstrap-v1",snapshot,events:[]})});
- assert.equal(h.snapshots.at(-1)[1],"LIVE");
- h.sockets[0].onmessage({data:JSON.stringify({schema:"pct-jarvis-event-v1",run_id:"200",event_type:"agent_started",agent_id:"venetian"})});
- assert.equal(h.events.length,1);
- h.sockets[0].onclose();
- assert.equal(h.state.at(-1)[0],"RECONNECTING");
- h.stop();
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const modulePromise=import('data:text/javascript;base64,'+Buffer.from(fs.readFileSync(path.join(__dirname,'live-bridge.js'),'utf8')).toString('base64'));
+const snapshot=run=>({schema:'pct-command-center-live-v1',run_id:run,mission:{status:'COMPLETED'},agents:[],claims:[],blockers:[],events:[],safety:{automatic_verified:false}});
+test('snapshot fallback, real hostname contract, bootstrap, events and cleanup',async()=>{const {connectResearchFeed}=await modulePromise;const states=[],snaps=[],events=[],sockets=[];class FakeWS{constructor(url){this.url=url;sockets.push(this)}close(){this.onclose?.()}}
+ const stop=connectResearchFeed({fetchImpl:async()=>({ok:true,json:async()=>snapshot('100')}),WebSocketImpl:FakeWS,onState:(...x)=>states.push(x),onSnapshot:(...x)=>snaps.push(x),onEvent:x=>events.push(x)});
+ try{await new Promise(setImmediate);assert.equal(snaps[0][0].run_id,'100');assert.equal(states[0][0],'SNAPSHOT');assert.equal(sockets[0].url,'wss://pct-live.piratecartography.com/pct-api/live/ws/piratecartography/latest');sockets[0].onopen();sockets[0].onmessage({data:JSON.stringify({schema:'pct-command-center-bootstrap-v1',snapshot:snapshot('100'),events:[]})});sockets[0].onmessage({data:JSON.stringify({schema:'pct-jarvis-event-v1',run_id:'200',event_id:'new',agent_id:'greek',status:'RUNNING'})});assert.equal(snaps.at(-1)[0].run_id,'200');assert.equal(snaps.at(-1)[0].agents[0].status,'RUNNING');assert.equal(snaps.at(-1)[0].claims.length,0);sockets[0].onmessage({data:JSON.stringify({schema:'pct-command-center-bootstrap-v1',snapshot:snapshot('100')})});assert.equal(snaps.at(-1)[0].run_id,'200');}finally{stop();}
 });
-test("invalid snapshot never becomes research evidence",async()=>{
- const h=harness({...snapshot,safety:{automatic_verified:true}});
- await new Promise(resolve=>setImmediate(resolve));
- assert.equal(h.snapshots.length,0);
- assert.equal(h.state[0][0],"OFFLINE");
- h.stop();
+test('new run never inherits old claims or blockers and older events cannot rewind it',async()=>{const {applyResearchEvent}=await modulePromise;const old={...snapshot('100'),claims:[{title:'old'}],blockers:[{}]};const next=applyResearchEvent(old,{schema:'pct-jarvis-event-v1',run_id:'200',event_id:'1',agent_id:'greek',status:'RUNNING'});assert.equal(next.claims.length,0);assert.equal(next.blockers.length,0);assert.equal(next.run_id,'200');assert.equal(applyResearchEvent(next,{schema:'pct-jarvis-event-v1',run_id:'100'}),next);});
+test('lane completion waits for mission gate; durable completion is terminal',async()=>{const {applyResearchEvent,missionState}=await modulePromise;const a=applyResearchEvent(null,{schema:'pct-jarvis-event-v1',run_id:'200',event_id:'1',agent_id:'greek',status:'RUNNING'});assert.equal(missionState(a),'RESEARCH ACTIVE');const b=applyResearchEvent(a,{schema:'pct-jarvis-event-v1',run_id:'200',event_id:'2',agent_id:'greek',status:'COMPLETED'});assert.notEqual(missionState(b),'RESEARCH ACTIVE');assert.equal(missionState({...b,mission:{status:'COMPLETED'}}),'COMPLETED');});
+test('invalid scientific snapshot never becomes displayed research',async()=>{const {connectResearchFeed}=await modulePromise;const snaps=[];class FakeWS{close(){}}const stop=connectResearchFeed({fetchImpl:async()=>({ok:true,json:async()=>({...snapshot('1'),safety:{automatic_verified:true}})}),WebSocketImpl:FakeWS,onSnapshot:x=>snaps.push(x)});try{await new Promise(setImmediate);assert.equal(snaps.length,0);}finally{stop();}});
+test('results panel follows run change and does not call blockers contradictions',async()=>{const {missionState}=await modulePromise;const vm=require('node:vm'),elements=new Map(),listeners=new Map();let callbacks;function el(id){if(!elements.has(id))elements.set(id,{textContent:'',innerHTML:'',classList:{add(){},remove(){},toggle(){}},insertBefore(){},remove(){elements.delete(id)}});return elements.get(id)}
+ const scope={document:{getElementById:el,body:{dataset:{}},createElement:()=>({})},window:{addEventListener:(n,f)=>listeners.set(n,f),dispatchEvent(){}},CustomEvent:class{},MutationObserver:class{observe(){}},connectResearchFeed:x=>callbacks=x,missionState,URL,console};
+ vm.runInNewContext(fs.readFileSync(path.join(__dirname,'research-ui.js'),'utf8').replace(/^import[^\n]*\n/,''),scope);
+ callbacks.onSnapshot({...snapshot('100'),claims:[{title:'previous claim'}],blockers:[{repository:'access blocker'}]});callbacks.onSnapshot({...snapshot('200'),agents:[{id:'greek',status:'RUNNING'}],mission:{status:'RUNNING'}});
+ assert.equal(el('resultsRun').textContent,'RUN 200');assert.ok(!el('resultsList').innerHTML.includes('previous claim'));
+ listeners.get('jarvis:results-filter')({detail:{filter:'contradictions'}});assert.match(el('resultsList').innerHTML,/No recorded contradictions/);assert.ok(!el('resultsList').innerHTML.includes('access blocker'));
+ callbacks.onSnapshot({...snapshot('200'),agents:[{id:'greek',status:'COMPLETED'}]});assert.equal(el('missionState').textContent,'COMPLETED');
+});
+test('dispatch acknowledgement stays queued until its own correlated run event',async()=>{const vm=require('node:vm'),listeners=new Map(),elements=new Map();function el(id){if(!elements.has(id))elements.set(id,{value:'unit query',textContent:'',disabled:false,classList:{remove(){},add(){}},addEventListener:(n,f)=>listeners.set(id+':'+n,f),focus(){}});return elements.get(id)}const body={dataset:{currentResearchRun:'100'}};const context={document:{getElementById:el,body},window:{addEventListener:(n,f)=>listeners.set(n,f),dispatchEvent(){}},sessionStorage:{getItem:()=> 'test-only-not-a-credential',removeItem(){},setItem(){}},CustomEvent:class{},fetch:async()=>({ok:true,json:async()=>({status:'ACCEPTED',request_id:'ui-unit'})}),Error,console};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'operator-command.js'),'utf8'),context);
+ await listeners.get('operatorCommand:submit')({preventDefault(){}});assert.equal(el('commandState').textContent,'REQUEST ACCEPTED — WAITING FOR RUN');listeners.get('jarvis:research-state')({detail:{run_id:'200',request_id:'other',state:'RESEARCH ACTIVE'}});assert.equal(el('commandState').textContent,'REQUEST ACCEPTED — WAITING FOR RUN');listeners.get('jarvis:research-state')({detail:{run_id:'201',request_id:'ui-unit',state:'RESEARCH ACTIVE'}});assert.equal(el('commandState').textContent,'RESEARCH ACTIVE');listeners.get('jarvis:research-state')({detail:{run_id:'201',state:'COMPLETED'}});assert.equal(el('commandState').textContent,'COMPLETED');
 });

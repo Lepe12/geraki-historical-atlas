@@ -5,7 +5,7 @@ import json
 import os
 import pathlib
 
-LANES = ['travellers', 'spanish_simancas', 'venetian', 'french', 'british',
+LANES = ['greek', 'travellers', 'spanish_simancas', 'venetian', 'french', 'british',
          'dutch', 'german', 'italian_states', 'ottoman', 'north_african']
 
 
@@ -35,3 +35,4 @@ def queue(root, run_id):
 
 if __name__ == '__main__':
     print(json.dumps(queue(pathlib.Path('evidence/runs'), os.environ.get('PCT_RUN_ID', ''))))
+

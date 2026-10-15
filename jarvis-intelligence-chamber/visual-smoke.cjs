@@ -8,6 +8,8 @@ await page.goto(process.env.JARVIS_TEST_URL||"http://127.0.0.1:4179/jarvis-intel
 await page.waitForFunction(()=>/^[0-9]+ FPS$/.test(document.querySelector("#fps")?.textContent||""),{timeout:30000});
 const result=await page.evaluate(()=>({canvasWidth:document.querySelector("#universe")?.width,labels:document.querySelectorAll(".node-label").length,bodyWidth:document.body.scrollWidth,viewport:innerWidth,detailHidden:document.querySelector("#detailPanel")?.classList.contains("hidden"),fps:document.querySelector("#fps")?.textContent,hasGreek:[...document.querySelectorAll(".node-label")].some(n=>n.textContent.includes("Greek Archives")),hasMasthead:!!document.querySelector(".masthead"),hasSidebar:!!document.querySelector(".left-panel"),hasCentralHud:!!document.querySelector(".central-hud")}));
 report.screens.push({name,...result});
+await page.waitForFunction(()=>document.body.dataset.researchFeed==='LIVE'&&document.body.dataset.currentResearchRun,{timeout:20000});
+report.transport={url:page.url(),mode:await page.evaluate(()=>document.body.dataset.researchFeed),run:await page.evaluate(()=>document.body.dataset.currentResearchRun)};
 await page.screenshot({path:out+"/"+name+".png",fullPage:true});
 assert.ok(result.canvasWidth>100,"Renderer must own visible canvas");
 assert.match(result.fps,/^[0-9]+ FPS$/,"Frame loop must advance");
@@ -23,14 +25,16 @@ if(name==="desktop"){
  await page.locator("#zoomIn").click();await page.waitForTimeout(900);
  const after=await page.evaluate(()=>{const n=[...document.querySelectorAll(".node-label")].find(x=>x.textContent.includes("Greek Archives"));const r=n.getBoundingClientRect();return Math.hypot(r.left+r.width/2-innerWidth*.53,r.top+r.height/2-innerHeight*.5)});
  assert.ok(after>before+8,"Zoom-in must visibly increase projected node distance");
- await page.evaluate(()=>window.__jarvisSetActiveAgents?.(["greek","venetian"]));
- await page.waitForFunction(()=>document.body.dataset.skullMode==="ACTIVE");
- await page.waitForTimeout(900);
- await page.screenshot({path:out+"/desktop-active-skull.png"});
- const mode=await page.evaluate(()=>({skull:document.body.dataset.skullMode,active:document.body.dataset.activeAgents}));
- assert.equal(mode.skull,"ACTIVE","Active agents must trigger skull mode");
- assert.equal(mode.active,"2","Active agent count must be exposed");
- report.activeMode=mode;
+ const point=await page.evaluate(()=>{const e=[...document.querySelectorAll('.node-label')].find(n=>n.textContent.includes('Greek Archives'));return{x:parseFloat(e.style.left),y:parseFloat(e.style.top)}});
+ await page.mouse.click(point.x,point.y);
+ await page.waitForFunction(()=>!document.querySelector('#detailPanel').classList.contains('hidden'));
+ assert.match(await page.locator('#detailLive').innerText(),/RUN/);
+ await page.getByRole('button',{name:'CONTRADICTIONS',exact:true}).click();
+ assert.ok(!(await page.locator('#resultsList').innerText()).includes('BLOCKER ·'),'Contradictions must not display access blockers');
+ await page.locator('#closeResults').click();
+ const layout=await page.evaluate(()=>{const a=document.querySelector('#operatorQuery').getBoundingClientRect(),b=document.querySelector('.exp-rail').getBoundingClientRect();return Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left))*Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));});
+ assert.equal(layout,0,'Command input must not overlap the experimental rail');
+ report.realFeedChecked=true;
  await page.locator("#resetView").click();
 }
 await page.close();}
