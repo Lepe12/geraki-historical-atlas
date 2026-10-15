@@ -1,8 +1,8 @@
 "use strict";
 (()=>{
   const $=id=>document.getElementById(id);
-  const panel=$("learningPanel"),toggle=$("learningToggle"),close=$("closeLearning"),input=$("learningFile"),status=$("learningState"),source=$("learningSource"),list=$("learningItems"),summary=$("learningSummary"),save=$("learningSave");
-  if(!panel||!toggle||!close||!input||!status||!source||!list||!summary||!save)return;
+  const panel=$("learningPanel"),toggle=$("learningToggle"),close=$("closeLearning"),input=$("learningFile"),analyze=$("learningAnalyze"),status=$("learningState"),source=$("learningSource"),list=$("learningItems"),summary=$("learningSummary"),save=$("learningSave");
+  if(!panel||!toggle||!close||!input||!analyze||!status||!source||!list||!summary||!save)return;
 
   const endpoint="https://pct-live.piratecartography.com/pct-api/live";
   let current={source_id:"",file:null,pages:[],items:[]};
@@ -71,20 +71,33 @@
   toggle.addEventListener("click",()=>{open();});
   close.addEventListener("click",()=>panel.classList.add("hidden"));
 
-  input.addEventListener("change",async()=>{
-    const file=input.files?.[0];if(!file)return;
-    open();current={source_id:"",file,pages:[],items:[]};render();
+  input.addEventListener("change",()=>{
+    const file=input.files?.[0];
+    open();
+    current={source_id:"",file:file||null,pages:[],items:[]};
+    render();
+    analyze.disabled=!file;
+    if(!file){source.textContent="No source loaded.";setState("READY");return;}
     source.textContent=file.name+" · "+(file.size/1048576).toFixed(1)+" MB";
-    if(file.type!=="application/pdf"&&!file.name.toLowerCase().endsWith(".pdf")){setState("PDF REQUIRED","error");return;}
-    if(file.size>25*1024*1024){setState("PDF TOO LARGE","error");return;}
+    if(file.type!=="application/pdf"&&!file.name.toLowerCase().endsWith(".pdf")){setState("PDF REQUIRED","error");analyze.disabled=true;return;}
+    if(file.size>25*1024*1024){setState("PDF TOO LARGE","error");analyze.disabled=true;return;}
+    setState("PDF READY — PRESS ANALYZE","ready");
+  });
+
+  analyze.addEventListener("click",async()=>{
+    const file=current.file;if(!file)return;
+    analyze.disabled=true;save.disabled=true;
     try{
       setState("READING PDF LOCALLY","working");
       current.pages=await extractPages(file);
       setState("BUILDING REVIEW","working");
       current.items=proposals(current.pages);
-      setState("REVIEW REQUIRED","ready");render();
+      setState(current.items.length?"REVIEW REQUIRED":"NO KNOWLEDGE EXTRACTED",current.items.length?"ready":"error");
+      render();
     }catch(e){
       setState("PDF READ FAILED","error");
+    }finally{
+      analyze.disabled=false;
     }
   });
 
