@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#02060d"><title>JARVIS — Intelligence Universe</title><link rel="stylesheet" href="./chamber.css?v=approved-20261015-ui4"></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#02060d"><title>JARVIS — Intelligence Universe</title><link rel="stylesheet" href="./chamber.css?v=approved-20261015-ui5"></head>
 <body>
 <div id="app">
 <canvas id="universe" aria-label="Interactive three-dimensional research intelligence network"></canvas>
@@ -29,5 +29,29 @@
 <div class="map-scale"><span class="scale-label">NETWORK DEPTH</span><div class="scale-tracks"><span></span><span></span><span></span><span></span><span></span></div><span id="zoomLevel">01 / CLUSTER</span></div>
 <div class="nav-tools"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button><button id="resetView" aria-label="Reset camera">⌖</button></div>
 <footer class="bottom-hud"><div class="bottom-caption"><div class="crosshair">⌖</div><div><b>SPATIAL COMMAND MODE</b><span>DRAG TO ORBIT <i>·</i> SCROLL TO ZOOM <i>·</i> SELECT A SECTOR</span></div></div><div class="system-readout"><div class="readout"><span>SECTORS</span><strong>17</strong></div><div class="readout"><span>LINKS</span><strong id="linkCount">24</strong></div><div class="readout"><span>FRAME</span><strong id="fps">—</strong></div></div><div class="attribution">INSPIRED BY APEX × EVE MAP<br>INDEPENDENT VISUAL PROTOTYPE</div></footer>
-<div class="mobile-hint">DRAG · ZOOM · SELECT</div>
-</div><script src="./chamber.js?v=approved-20261015-zoom2" defer></script><script src="./gpu-field.js?v=approved-20261014b" defer></script><script src="./operator-command.js?v=20261015b" defer></script><script type="module" src="./research-ui.js?v=20261015a"></script></body></html>
+<section class="exp-ui" id="expUi" aria-label="Experimental command layer">
+  <div class="exp-status" id="expStatus">
+    <span><i></i> CORE <b id="expCoreState">CONNECTING</b></span>
+    <span>ACTIVE <b id="expActiveCount">0</b></span>
+    <span>CLAIMS <b id="expClaimsCount">0</b></span>
+    <span>BLOCKERS <b id="expBlockersCount">0</b></span>
+  </div>
+  <div class="exp-rail">
+    <div class="exp-modes" id="expModes">
+      <button class="active" data-mode="universe">UNIVERSE</button>
+      <button data-mode="active">ACTIVE</button>
+      <button data-mode="evidence">EVIDENCE</button>
+      <button data-mode="contradictions">CONTRADICTIONS</button>
+    </div>
+    <div class="exp-filters" id="expFilters">
+      <span>FILTER</span>
+      <button class="active" data-filter="all">ALL</button>
+      <button data-filter="claims">CLAIMS</button>
+      <button data-filter="blockers">BLOCKERS</button>
+    </div>
+    <button class="exp-zen" id="expZen" type="button">ZEN</button>
+    <button class="exp-remove" id="expRemove" type="button" title="Hide experimental UI">×</button>
+  </div>
+</section>
+<button class="exp-restore hidden" id="expRestore" type="button">LAB UI</button><div class="mobile-hint">DRAG · ZOOM · SELECT</div>
+</div><script src="./chamber.js?v=approved-20261015-zoom2" defer></script><script src="./gpu-field.js?v=approved-20261014b" defer></script><script src="./operator-command.js?v=20261015b" defer></script><script type="module" src="./research-ui.js?v=20261015a"></script><script type="module" src="./experimental-ui.js?v=20261015a"></script></body></html>
