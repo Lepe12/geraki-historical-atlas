@@ -12,6 +12,11 @@ REG=Path(__file__).with_name("specialist_agent_registry.json")
 
 from jarvis_specialist_routing import plan_routes,select_queries
 
+try:
+    from naboux_memory import load as load_memory, successful_queries, retrieve
+except Exception:
+    load_memory=successful_queries=retrieve=None
+
 SOURCE_LIMIT=4
 FALLBACK_LIMIT=4
 TOTAL_QUERY_BUDGET=20
@@ -54,6 +59,15 @@ def render_queries(agent_id:str,target:str,date_range:str="",aliases:list[str]|N
 def build(target,purpose,date_range="",aliases=None,target_type="auto"):
     aliases=list(aliases or [])
     kind=infer_kind(target,purpose,target_type)
+    memory=None
+    memory_context=[]
+    if load_memory:
+        try:
+            memory=load_memory()
+            memory_context=retrieve(memory,target+" "+purpose,limit=6) if retrieve else []
+        except Exception:
+            memory=None
+            memory_context=[]
     agent_ids=select_agents(kind)
     reg=load_registry()["agents"]
     plan={
@@ -70,11 +84,22 @@ def build(target,purpose,date_range="",aliases=None,target_type="auto"):
       "agents":[],
       "parallel_agent_count":len(agent_ids),
       "verified_promotion_allowed":False,
+      "memory_context":memory_context,
+      "memory_policy":"Persistent memory is retrieval/routing assistance only; it never verifies a historical claim.",
       "rule":"JARVIS assigns sources before execution. Specialist workers execute the assignment and may not self-route."
     }
     for aid in agent_ids:
         meta=reg[aid]
         queries=render_queries(aid,target,date_range,aliases)
+        if memory is not None and successful_queries:
+            try:
+                learned=successful_queries(memory,aid,limit=4)
+                for q in learned:
+                    if target.casefold() in q.casefold() and q not in queries:
+                        queries.append(q)
+                queries=queries[:int(meta.get("max_queries",8))]
+            except Exception:
+                pass
         draft={
           "agent_id":aid,
           "label":meta["label"],
