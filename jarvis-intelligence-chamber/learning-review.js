@@ -5,11 +5,11 @@
   if(!panel||!toggle||!close||!input||!status||!source||!list||!summary||!save)return;
 
   const endpoint="https://pct-live.piratecartography.com/pct-api/live";
-  let current={source_id:"",pages:[],items:[]};
+  let current={source_id:"",file:null,pages:[],items:[]};
 
   const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
   const setState=(s,mode="")=>{status.textContent=s;panel.dataset.state=mode;};
-  const operatorKey=()=>{let key=sessionStorage.getItem("jarvis_operator_key")||"";if(!key){key=window.prompt("NABOU//X operator key")||"";if(key)sessionStorage.setItem("jarvis_operator_key",key);}return key;};
+  const operatorKey=()=>{let key=sessionStorage.getItem("jarvis_operator_key")||"";if(!key){key=window.prompt("NABOU//X access key")||"";if(key)sessionStorage.setItem("jarvis_operator_key",key);}return key;};
 
   function open(){panel.classList.remove("hidden");}
   function render(){
@@ -18,7 +18,7 @@
     const pending=current.items.length-accepted-rejected;
     summary.textContent=current.items.length?accepted+" accepted · "+rejected+" rejected · "+pending+" pending":"No extracted knowledge yet.";
     list.innerHTML=current.items.length?current.items.map((x,i)=>'<article class="learning-item" data-i="'+i+'" data-status="'+esc(x.status)+'"><div class="learning-item-head"><span>'+esc(x.type.toUpperCase())+'</span><small>PAGE '+esc(x.page||"—")+' · '+Math.round((x.confidence||.5)*100)+'%</small></div><div class="learning-item-text" contenteditable="'+(x.editing?"true":"false")+'">'+esc(x.text)+'</div><div class="learning-actions"><button data-act="accept">ACCEPT</button><button data-act="reject">REJECT</button><button data-act="edit">'+(x.editing?"DONE":"EDIT")+'</button></div></article>').join(""):'<div class="learning-empty">Upload a PDF to inspect what NABOU//X extracts before anything enters memory.</div>';
-    save.disabled=!current.source_id||accepted===0;
+    save.disabled=accepted===0;
   }
 
   async function uploadPdf(file,key){
@@ -74,22 +74,18 @@
 
   input.addEventListener("change",async()=>{
     const file=input.files?.[0];if(!file)return;
-    open();current={source_id:"",pages:[],items:[]};render();
+    open();current={source_id:"",file,pages:[],items:[]};render();
     source.textContent=file.name+" · "+(file.size/1048576).toFixed(1)+" MB";
     if(file.type!=="application/pdf"&&!file.name.toLowerCase().endsWith(".pdf")){setState("PDF REQUIRED","error");return;}
     if(file.size>25*1024*1024){setState("PDF TOO LARGE","error");return;}
-    const key=operatorKey();if(!key){setState("OPERATOR KEY REQUIRED","error");return;}
     try{
-      setState("UPLOADING PRIVATE SOURCE","working");
-      const uploaded=await uploadPdf(file,key);current.source_id=uploaded.source_id;
-      setState("READING PDF","working");
+      setState("READING PDF LOCALLY","working");
       current.pages=await extractPages(file);
       setState("BUILDING REVIEW","working");
       current.items=proposals(current.pages);
       setState("REVIEW REQUIRED","ready");render();
     }catch(e){
-      if(e.status===401){sessionStorage.removeItem("jarvis_operator_key");setState("INVALID OPERATOR KEY","error");}
-      else setState(e.message==="Failed to fetch"?"KNOWLEDGE BACKEND UNAVAILABLE":"INGEST FAILED","error");
+      setState("PDF READ FAILED","error");
     }
   });
 
@@ -106,17 +102,22 @@
   });
 
   save.addEventListener("click",async()=>{
-    const key=operatorKey();if(!key){setState("OPERATOR KEY REQUIRED","error");return;}
-    const accepted=current.items.filter(x=>x.status==="accepted");if(!accepted.length)return;
-    save.disabled=true;setState("SAVING MEMORY","working");
+    const accepted=current.items.filter(x=>x.status==="accepted");if(!accepted.length||!current.file)return;
+    const key=operatorKey();if(!key){setState("ACCESS KEY REQUIRED TO SAVE","error");return;}
+    save.disabled=true;setState("UPLOADING APPROVED SOURCE","working");
     try{
+      if(!current.source_id){
+        const uploaded=await uploadPdf(current.file,key);
+        current.source_id=uploaded.source_id;
+      }
+      setState("SAVING APPROVED MEMORY","working");
       const r=await fetch(endpoint+"/knowledge/review",{method:"POST",headers:{"authorization":"Bearer "+key,"content-type":"application/json"},body:JSON.stringify({source_id:current.source_id,pages:current.pages,items:accepted})});
       const data=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(data.error||("save_http_"+r.status)),{status:r.status});
       setState("LEARNED · "+data.accepted_items+" ITEMS","learned");
       source.textContent=(source.textContent||"SOURCE")+" · MEMORY SAVED";
     }catch(e){
-      if(e.status===401){sessionStorage.removeItem("jarvis_operator_key");setState("INVALID OPERATOR KEY","error");}
-      else setState("MEMORY SAVE FAILED","error");
+      if(e.status===401){sessionStorage.removeItem("jarvis_operator_key");setState("INVALID ACCESS KEY","error");}
+      else setState(e.message==="Failed to fetch"?"KNOWLEDGE BACKEND UNAVAILABLE":"MEMORY SAVE FAILED","error");
     }finally{save.disabled=false;}
   });
 
