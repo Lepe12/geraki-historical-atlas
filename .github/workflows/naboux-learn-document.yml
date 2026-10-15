@@ -1,0 +1,46 @@
+name: NABOU X Learn Document
+
+on:
+  workflow_dispatch:
+    inputs:
+      subject:
+        description: 'Canonical subject/person/place the document is about'
+        required: true
+        type: string
+      document_path:
+        description: 'Path to a PDF/TXT/MD already present in this repository'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  learn:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+      - name: Install PDF reader
+        run: pip install pypdf
+      - name: Ingest document into NABOU X research memory
+        env:
+          SUBJECT: ${{ inputs.subject }}
+          DOCUMENT_PATH: ${{ inputs.document_path }}
+        run: |
+          PYTHONPATH=tools/memory python3 tools/memory/learn_document.py             --subject "$SUBJECT" --document "$DOCUMENT_PATH"             --memory data/naboux_memory.json
+      - name: Preserve research memory
+        run: |
+          git config user.name "naboux-memory[bot]"
+          git config user.email "naboux-memory@users.noreply.github.com"
+          git add data/naboux_memory.json
+          git diff --cached --quiet && exit 0
+          git commit -m "NABOU X learn document: ${{ inputs.subject }}"
+          for n in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git rebase --abort 2>/dev/null || true
+            sleep $((n*2))
+          done
+          exit 1
