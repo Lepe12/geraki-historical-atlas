@@ -5,7 +5,7 @@
   const endpoint="https://pct-live.piratecartography.com/pct-api/live/dispatch";
   let waitingForRun=false,previousRun="";
   const setState=(text,mode="")=>{state.textContent=text;form.classList.remove("is-pending","is-error");if(mode)form.classList.add(mode);window.dispatchEvent(new CustomEvent("jarvis:mission-state",{detail:{state:text}}));};
-  function operatorKey(){let key=sessionStorage.getItem("jarvis_operator_key")||"";if(!key){key=window.prompt("JARVIS operator key")||"";if(key)sessionStorage.setItem("jarvis_operator_key",key);}return key;}
+  function operatorKey(){let key=sessionStorage.getItem("jarvis_operator_key")||"";if(!key){key=window.prompt("NABOU//X operator key")||"";if(key)sessionStorage.setItem("jarvis_operator_key",key);}return key;}
   async function dispatch(query,key){const r=await fetch(endpoint,{method:"POST",headers:{"content-type":"application/json","authorization":"Bearer "+key},body:JSON.stringify({query})});let data={};try{data=await r.json()}catch(_){}if(!r.ok){const err=new Error(data.error||("dispatch_http_"+r.status));err.status=r.status;throw err;}return data;}
   window.addEventListener("jarvis:research-state",e=>{const d=e.detail||{};if(waitingForRun&&d.request_id&&d.request_id===document.body.dataset.dispatchRequest){waitingForRun=false;document.body.dataset.operatorRun=d.run_id;setState(d.state||"RUN RECEIVED");}else if(!waitingForRun&&document.body.dataset.operatorRun&&d.run_id===document.body.dataset.operatorRun){setState(d.state||"RUN RECEIVED");}});
   input.addEventListener("input",()=>setState(input.value.trim()?"QUERY READY":"READY"));
