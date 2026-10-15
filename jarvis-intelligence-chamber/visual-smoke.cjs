@@ -4,7 +4,12 @@ const fs=require("node:fs"),assert=require("node:assert/strict");
 const out="jarvis-intelligence-chamber/screenshots";fs.mkdirSync(out,{recursive:true});
 const report={created_at:new Date().toISOString(),screens:[],errors:[]};
 try{for(const [name,width,height] of [["desktop",1600,900],["mobile",390,844]]){const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:1});page.on("pageerror",e=>report.errors.push(name+": "+e.message));page.on("console",m=>{if(m.type()==="error")report.errors.push(name+": "+m.text())});
-await page.goto(process.env.JARVIS_TEST_URL||"http://127.0.0.1:4179/jarvis-intelligence-chamber/",{waitUntil:"networkidle",timeout:60000});
+const target=process.env.JARVIS_TEST_URL||"http://127.0.0.1:4179/jarvis-intelligence-chamber/";
+// The local renderer harness is outside the production CORS allowlist.
+// Forward the actual read-only status response; never fabricate research data.
+// Public URL checks use the server's real CORS headers without this adapter.
+if(new URL(target).hostname==='127.0.0.1')await page.route('https://pct-live.piratecartography.com/pct-api/live/status/**',async route=>{const response=await route.fetch();assert.equal(response.status(),200);await route.fulfill({response,headers:{...response.headers(),'access-control-allow-origin':new URL(target).origin}})});
+await page.goto(target,{waitUntil:"networkidle",timeout:60000});
 await page.waitForFunction(()=>/^[0-9]+ FPS$/.test(document.querySelector("#fps")?.textContent||""),{timeout:30000});
 const result=await page.evaluate(()=>({canvasWidth:document.querySelector("#universe")?.width,labels:document.querySelectorAll(".node-label").length,bodyWidth:document.body.scrollWidth,viewport:innerWidth,detailHidden:document.querySelector("#detailPanel")?.classList.contains("hidden"),fps:document.querySelector("#fps")?.textContent,hasGreek:[...document.querySelectorAll(".node-label")].some(n=>n.textContent.includes("Greek Archives")),hasMasthead:!!document.querySelector(".masthead"),hasSidebar:!!document.querySelector(".left-panel"),hasCentralHud:!!document.querySelector(".central-hud")}));
 report.screens.push({name,...result});
@@ -16,7 +21,7 @@ assert.match(result.fps,/^[0-9]+ FPS$/,"Frame loop must advance");
 assert.equal(result.labels,17,"17 research nodes including Greek Archives must exist");
 assert.equal(result.hasGreek,true,"Greek Archives node must exist");
 assert.ok(result.bodyWidth<=result.viewport+4,"No horizontal overflow");
-assert.ok(!report.errors.length,"No browser console/page errors");
+assert.ok(!report.errors.length,"No browser console/page errors: "+report.errors.join('; '));
 assert.equal(result.hasCentralHud,false,"Central JARVIS HUD must remain removed");
 if(name==="desktop"){
  assert.equal(result.hasSidebar,true,"Approved left command panel must remain");
