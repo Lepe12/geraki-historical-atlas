@@ -19,7 +19,7 @@ const RUN_EVENTS_LIMIT=1000;
 const OPERATOR_TOKEN=String(process.env.PCT_OPERATOR_TOKEN||"");
 const GITHUB_DISPATCH_TOKEN=String(process.env.PCT_GITHUB_DISPATCH_TOKEN||"");
 const CONTROLLED_WORKFLOW="jarvis-controlled-dispatch.yml";
-const KNOWLEDGE_DIR=process.env.PCT_KNOWLEDGE_DIR||path.join(__dirname,"knowledge-data");
+const KNOWLEDGE_DIR=process.env.PCT_KNOWLEDGE_DIR||path.join(typeof __dirname==="string"?__dirname:".","knowledge-data");
 const KNOWLEDGE_UPLOAD_DIR=path.join(KNOWLEDGE_DIR,"uploads");
 const KNOWLEDGE_INDEX=path.join(KNOWLEDGE_DIR,"index.json");
 const MAX_PDF_BYTES=25*1024*1024;
