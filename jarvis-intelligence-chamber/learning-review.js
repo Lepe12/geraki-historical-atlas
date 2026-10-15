@@ -51,21 +51,24 @@
       const k=type+"|"+text.toLowerCase();if(seen.has(k))return;seen.add(k);
       items.push({id:"k-"+items.length,type,text,page,confidence,status:"pending",editing:false});
     };
-    const stop=new Set(["The","This","That","From","With","There","Their","They","For","And","But","Not","Chapter","Page","Figure","Table","Introduction","Conclusion","References","Bibliography"]);
+    const stop=new Set(["The","This","That","From","With","There","Their","They","For","And","But","Not","Chapter","Page","Figure","Table","Introduction","Conclusion","References","Bibliography","Κεφάλαιο","Σελίδα","Εισαγωγή","Συμπέρασμα","Βιβλιογραφία"]);
+    let claimCount=0;
     for(const pg of pages){
-      const text=pg.text||"";
+      const text=String(pg.text||"").replace(/\s+/g," ").trim();if(!text)continue;
       for(const m of text.matchAll(/\b(1[45-9]\d{2}|20\d{2})\b/g)) add("date",m[1],pg.page,.96);
-      for(const m of text.matchAll(/\b[\p{Lu}][\p{L}’'.-]{2,}(?:\s+[\p{Lu}][\p{L}’'.-]{2,}){0,3}\b/gu)){
+      for(const m of text.matchAll(/[\p{Lu}][\p{L}’'.-]{2,}(?:\s+[\p{Lu}][\p{L}’'.-]{2,}){0,3}/gu)){
         const v=m[0].trim();if(stop.has(v)||v.length>90)continue;add("entity",v,pg.page,.68);
       }
-      const sentences=text.split(/(?<=[.!?;])\s+/).filter(s=>s.length>=45&&s.length<=420);
+      let sentences=text.split(/(?<=[.!?;·])\s+/).map(s=>s.trim()).filter(s=>s.length>=35&&s.length<=500);
+      if(!sentences.length&&text.length>=35)sentences=[...text.match(/.{35,420}(?:\s|$)/g)||[]].map(s=>s.trim());
       for(const s of sentences){
-        if(/\b(1[45-9]\d{2}|20\d{2})\b/.test(s)||/\b[\p{Lu}][\p{L}’'.-]{2,}\s+[\p{Lu}][\p{L}’'.-]{2,}\b/u.test(s)) add("claim",s,pg.page,.62);
-        if(items.filter(x=>x.type==="claim").length>=80)break;
+        const looksInformative=/\b(1[45-9]\d{2}|20\d{2})\b/.test(s)||/[\p{Lu}][\p{L}’'.-]{2,}\s+[\p{Lu}][\p{L}’'.-]{2,}/u.test(s)||/[Α-ΩΆΈΉΊΌΎΏ][\p{L}’'.-]{2,}/u.test(s);
+        if(looksInformative||claimCount<24){add("claim",s,pg.page,looksInformative?.62:.52);claimCount++;}
+        if(claimCount>=100)break;
       }
-      if(items.length>=220)break;
+      if(items.length>=260)break;
     }
-    return items.slice(0,220);
+    return items.slice(0,260);
   }
 
   toggle.addEventListener("click",()=>{open();});
@@ -90,9 +93,17 @@
     try{
       setState("READING PDF LOCALLY","working");
       current.pages=await extractPages(file);
+      const textChars=current.pages.reduce((n,p)=>n+String(p.text||"").trim().length,0);
+      if(textChars<40){
+        current.items=[];
+        setState("NO TEXT LAYER — OCR REQUIRED","error");
+        summary.textContent="The PDF appears scanned or image-only. OCR is required before knowledge extraction.";
+        list.innerHTML='<div class="learning-empty">No usable text layer was found in this PDF. NABOU//X did not invent knowledge from an unreadable source.</div>';
+        return;
+      }
       setState("BUILDING REVIEW","working");
       current.items=proposals(current.pages);
-      setState(current.items.length?"REVIEW REQUIRED":"NO KNOWLEDGE EXTRACTED",current.items.length?"ready":"error");
+      setState(current.items.length?"REVIEW REQUIRED":"TEXT FOUND — EXTRACTION NEEDS REVIEW",current.items.length?"ready":"error");
       render();
     }catch(e){
       setState("PDF READ FAILED","error");
