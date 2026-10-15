@@ -4,6 +4,8 @@
 const http=require("http");
 const https=require("https");
 const crypto=require("crypto");
+const fs=require("fs");
+const path=require("path");
 const {URL}=require("url");
 
 const PORT=Number(process.env.PORT||process.env.PCT_COMMAND_CENTER_PORT||8787);
@@ -17,6 +19,11 @@ const RUN_EVENTS_LIMIT=1000;
 const OPERATOR_TOKEN=String(process.env.PCT_OPERATOR_TOKEN||"");
 const GITHUB_DISPATCH_TOKEN=String(process.env.PCT_GITHUB_DISPATCH_TOKEN||"");
 const CONTROLLED_WORKFLOW="jarvis-controlled-dispatch.yml";
+const KNOWLEDGE_DIR=process.env.PCT_KNOWLEDGE_DIR||path.join(__dirname,"knowledge-data");
+const KNOWLEDGE_UPLOAD_DIR=path.join(KNOWLEDGE_DIR,"uploads");
+const KNOWLEDGE_INDEX=path.join(KNOWLEDGE_DIR,"index.json");
+const MAX_PDF_BYTES=25*1024*1024;
+fs.mkdirSync(KNOWLEDGE_UPLOAD_DIR,{recursive:true});
 let lastDispatchAt=0;
 let latestLiveRun="";
 
@@ -107,13 +114,34 @@ async function verifyGithubOidc(token){
   if(!ok)throw new Error("bad_signature");
   return payload;
 }
-function readBody(req){
+function readBody(req,maxBytes=MAX_BODY){
   return new Promise((resolve,reject)=>{
     let b="";req.setEncoding("utf8");
-    req.on("data",c=>{b+=c;if(Buffer.byteLength(b)>MAX_BODY){reject(new Error("body_too_large"));req.destroy();}});
+    req.on("data",c=>{b+=c;if(Buffer.byteLength(b)>maxBytes){reject(new Error("body_too_large"));req.destroy();}});
     req.on("end",()=>resolve(b));req.on("error",reject);
   });
 }
+function readRawBody(req,maxBytes=MAX_PDF_BYTES){
+  return new Promise((resolve,reject)=>{
+    const chunks=[];let total=0;
+    req.on("data",chunk=>{total+=chunk.length;if(total>maxBytes){reject(new Error("body_too_large"));req.destroy();return;}chunks.push(chunk);});
+    req.on("end",()=>resolve(Buffer.concat(chunks)));req.on("error",reject);
+  });
+}
+function operatorAuthorized(req){
+  const auth=String(req.headers.authorization||"");
+  return Boolean(OPERATOR_TOKEN&&auth.startsWith("Bearer ")&&safeEqual(auth.slice(7),OPERATOR_TOKEN));
+}
+function readKnowledgeIndex(){
+  try{const v=JSON.parse(fs.readFileSync(KNOWLEDGE_INDEX,"utf8"));return Array.isArray(v)?v:[];}catch(_){return [];}
+}
+function writeKnowledgeIndex(index){
+  fs.writeFileSync(KNOWLEDGE_INDEX,JSON.stringify(index,null,2));
+}
+function safeFileName(name){
+  return String(name||"source.pdf").replace(/[^A-Za-z0-9._() -]+/g,"_").slice(0,180)||"source.pdf";
+}
+function knowledgeRecordPath(id){return path.join(KNOWLEDGE_DIR,id+".json");}
 function addEvent(e){
   const run=String(e.run_id||"");
   if(!/^[A-Za-z0-9_.:-]+$/.test(run))throw new Error("invalid_run");
@@ -164,10 +192,58 @@ async function publishSnapshots(){
 const server=http.createServer(async(req,res)=>{
   try{
     const u=new URL(req.url,"http://localhost");const p=normalizePath(u.pathname);
-    if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":"https://lepe12.github.io","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type"});return res.end();}
-    if(req.method==="GET"&&p==="/health"){const b=await refreshBaseline();return json(res,200,{status:"PASS",service:"piratecartography-command-center-live",websocket:true,dispatch_configured:Boolean(OPERATOR_TOKEN&&GITHUB_DISPATCH_TOKEN),revision:"run-sync-20261015",baseline_run_id:b?.run_id||null});}
+    if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":"https://lepe12.github.io","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type,x-file-name"});return res.end();}
+    if(req.method==="GET"&&p==="/health"){const b=await refreshBaseline();return json(res,200,{status:"PASS",service:"piratecartography-command-center-live",websocket:true,dispatch_configured:Boolean(OPERATOR_TOKEN&&GITHUB_DISPATCH_TOKEN),knowledge_memory:true,revision:"learning-memory-v1",baseline_run_id:b?.run_id||null});}
     const sm=p.match(/^\/status\/([^/]+)\/([^/]+)$/);
     if(req.method==="GET"&&sm){if(sm[1]!=="piratecartography")return json(res,404,{error:"project"});return json(res,200,await statusFor(sm[2]));}
+    if(req.method==="POST"&&p==="/knowledge/upload"){
+      if(!operatorAuthorized(req))return json(res,401,{error:"invalid_operator_key"});
+      const type=String(req.headers["content-type"]||"").toLowerCase();
+      if(!type.includes("application/pdf"))return json(res,415,{error:"pdf_required"});
+      const raw=await readRawBody(req);
+      if(raw.length<5||raw.subarray(0,5).toString("ascii")!=="%PDF-")return json(res,400,{error:"invalid_pdf"});
+      const sourceId="src-"+Date.now().toString(36)+"-"+crypto.randomBytes(4).toString("hex");
+      const original=safeFileName(decodeURIComponent(String(req.headers["x-file-name"]||"source.pdf")));
+      const stored=sourceId+".pdf";
+      fs.writeFileSync(path.join(KNOWLEDGE_UPLOAD_DIR,stored),raw,{flag:"wx"});
+      const index=readKnowledgeIndex();
+      index.unshift({source_id:sourceId,original_name:original,size:raw.length,state:"PENDING_REVIEW",uploaded_at:new Date().toISOString(),accepted_items:0});
+      writeKnowledgeIndex(index.slice(0,500));
+      return json(res,201,{status:"UPLOADED",source_id:sourceId,original_name:original,size:raw.length});
+    }
+    if(req.method==="POST"&&p==="/knowledge/review"){
+      if(!operatorAuthorized(req))return json(res,401,{error:"invalid_operator_key"});
+      const body=JSON.parse(await readBody(req,8*1024*1024));
+      const sourceId=String(body?.source_id||"");
+      if(!/^src-[A-Za-z0-9-]+$/.test(sourceId))return json(res,400,{error:"invalid_source_id"});
+      const index=readKnowledgeIndex(),meta=index.find(x=>x.source_id===sourceId);
+      if(!meta)return json(res,404,{error:"source_not_found"});
+      const pages=Array.isArray(body.pages)?body.pages.slice(0,2000).map(p=>({page:Number(p.page)||0,text:String(p.text||"").slice(0,30000)})):[];
+      const items=Array.isArray(body.items)?body.items.slice(0,5000).filter(x=>x&&x.status==="accepted").map((x,i)=>({id:String(x.id||("item-"+i)),type:String(x.type||"claim"),text:String(x.text||"").slice(0,4000),page:Number(x.page)||null,confidence:Number(x.confidence)||0.5,source_id:sourceId,status:"accepted"})):[];
+      const record={schema:"naboux-knowledge-source-v1",source_id:sourceId,original_name:meta.original_name,reviewed_at:new Date().toISOString(),pages,items};
+      fs.writeFileSync(knowledgeRecordPath(sourceId),JSON.stringify(record,null,2));
+      meta.state="LEARNED";meta.reviewed_at=record.reviewed_at;meta.accepted_items=items.length;writeKnowledgeIndex(index);
+      return json(res,200,{status:"LEARNED",source_id:sourceId,accepted_items:items.length,pages:pages.length});
+    }
+    if(req.method==="GET"&&p==="/knowledge/sources"){
+      if(!operatorAuthorized(req))return json(res,401,{error:"invalid_operator_key"});
+      return json(res,200,{schema:"naboux-knowledge-index-v1",sources:readKnowledgeIndex()});
+    }
+    if(req.method==="GET"&&p==="/knowledge/search"){
+      if(!operatorAuthorized(req))return json(res,401,{error:"invalid_operator_key"});
+      const q=String(u.searchParams.get("q")||"").trim().toLowerCase();
+      if(q.length<2)return json(res,400,{error:"query_too_short"});
+      const results=[];
+      for(const meta of readKnowledgeIndex().filter(x=>x.state==="LEARNED").slice(0,500)){
+        try{
+          const rec=JSON.parse(fs.readFileSync(knowledgeRecordPath(meta.source_id),"utf8"));
+          for(const item of rec.items||[])if(String(item.text||"").toLowerCase().includes(q))results.push({...item,original_name:meta.original_name});
+          for(const pg of rec.pages||[])if(String(pg.text||"").toLowerCase().includes(q))results.push({type:"page_match",text:String(pg.text).slice(0,1200),page:pg.page,source_id:meta.source_id,original_name:meta.original_name});
+        }catch(_){}
+        if(results.length>=100)break;
+      }
+      return json(res,200,{schema:"naboux-knowledge-search-v1",query:q,results:results.slice(0,100)});
+    }
     if(req.method==="POST"&&p==="/dispatch"){
       if(!OPERATOR_TOKEN||!GITHUB_DISPATCH_TOKEN)return json(res,503,{error:"dispatch_not_configured"});
       const auth=String(req.headers.authorization||"");
