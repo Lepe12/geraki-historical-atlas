@@ -70,6 +70,7 @@ jobs:
           d=json.load(open('/tmp/pct-command-center-health.json'))
           assert d.get('status')=='PASS',d
           assert d.get('websocket') is True,d
+          assert d.get('revision')=='no-session-dispatch-v1',('stale production backend',d)
           print('PLESK LIVE BACKEND PASS',d)
           PY
 
