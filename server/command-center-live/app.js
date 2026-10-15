@@ -19,6 +19,8 @@ const RUN_EVENTS_LIMIT=1000;
 const OPERATOR_TOKEN=String(process.env.PCT_OPERATOR_TOKEN||"");
 const GITHUB_DISPATCH_TOKEN=String(process.env.PCT_GITHUB_DISPATCH_TOKEN||"");
 const CONTROLLED_WORKFLOW="jarvis-controlled-dispatch.yml";
+const SESSION_COOKIE="naboux_session";
+const SESSION_MAX_AGE=30*24*60*60;
 const KNOWLEDGE_DIR=process.env.PCT_KNOWLEDGE_DIR||path.join(typeof __dirname==="string"?__dirname:".","knowledge-data");
 const KNOWLEDGE_UPLOAD_DIR=path.join(KNOWLEDGE_DIR,"uploads");
 const KNOWLEDGE_INDEX=path.join(KNOWLEDGE_DIR,"index.json");
@@ -35,7 +37,7 @@ let jwksCache={at:0,keys:[]};
 
 function json(res,status,obj,extra={}){
   const body=JSON.stringify(obj);
-  res.writeHead(status,{"content-type":"application/json; charset=utf-8","cache-control":"no-store","access-control-allow-origin":"https://lepe12.github.io","x-content-type-options":"nosniff",...extra});
+  res.writeHead(status,{"content-type":"application/json; charset=utf-8","cache-control":"no-store","access-control-allow-origin":"https://lepe12.github.io","access-control-allow-credentials":"true","x-content-type-options":"nosniff",...extra});
   res.end(body);
 }
 function normalizePath(pathname){
@@ -132,6 +134,25 @@ function operatorAuthorized(req){
   const auth=String(req.headers.authorization||"");
   return Boolean(OPERATOR_TOKEN&&auth.startsWith("Bearer ")&&safeEqual(auth.slice(7),OPERATOR_TOKEN));
 }
+function sessionSignature(exp){
+  return crypto.createHmac("sha256",OPERATOR_TOKEN).update("naboux-session|"+exp).digest("base64url");
+}
+function issueSessionCookie(){
+  const exp=Math.floor(Date.now()/1000)+SESSION_MAX_AGE;
+  const value=exp+"."+sessionSignature(exp);
+  return SESSION_COOKIE+"="+value+"; Max-Age="+SESSION_MAX_AGE+"; Path="+PREFIX+"; HttpOnly; Secure; SameSite=None; Partitioned";
+}
+function sessionAuthorized(req){
+  if(!OPERATOR_TOKEN)return false;
+  const raw=String(req.headers.cookie||"");
+  const part=raw.split(/;\s*/).find(x=>x.startsWith(SESSION_COOKIE+"="));
+  if(!part)return false;
+  const value=part.slice(SESSION_COOKIE.length+1),dot=value.indexOf(".");
+  if(dot<1)return false;
+  const exp=Number(value.slice(0,dot)),sig=value.slice(dot+1);
+  if(!Number.isFinite(exp)||exp<Math.floor(Date.now()/1000))return false;
+  return safeEqual(sig,sessionSignature(exp));
+}
 function readKnowledgeIndex(){
   try{const v=JSON.parse(fs.readFileSync(KNOWLEDGE_INDEX,"utf8"));return Array.isArray(v)?v:[];}catch(_){return [];}
 }
@@ -192,8 +213,13 @@ async function publishSnapshots(){
 const server=http.createServer(async(req,res)=>{
   try{
     const u=new URL(req.url,"http://localhost");const p=normalizePath(u.pathname);
-    if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":"https://lepe12.github.io","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type,x-file-name"});return res.end();}
-    if(req.method==="GET"&&p==="/health"){const b=await refreshBaseline();return json(res,200,{status:"PASS",service:"piratecartography-command-center-live",websocket:true,dispatch_configured:Boolean(OPERATOR_TOKEN&&GITHUB_DISPATCH_TOKEN),knowledge_memory:true,revision:"learning-memory-v2",baseline_run_id:b?.run_id||null});}
+    if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":"https://lepe12.github.io","access-control-allow-credentials":"true","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type,x-file-name"});return res.end();}
+    if(req.method==="GET"&&p==="/health"){const b=await refreshBaseline();return json(res,200,{status:"PASS",service:"piratecartography-command-center-live",websocket:true,dispatch_configured:Boolean(OPERATOR_TOKEN&&GITHUB_DISPATCH_TOKEN),knowledge_memory:true,session_auth:true,revision:"session-auth-v1",baseline_run_id:b?.run_id||null});}
+    if(req.method==="GET"&&p==="/session"){return json(res,200,{authenticated:sessionAuthorized(req)});}
+    if(req.method==="POST"&&p==="/session"){
+      if(!operatorAuthorized(req))return json(res,401,{error:"invalid_operator_key"});
+      return json(res,200,{status:"SESSION_READY"},{"set-cookie":issueSessionCookie()});
+    }
     const sm=p.match(/^\/status\/([^/]+)\/([^/]+)$/);
     if(req.method==="GET"&&sm){if(sm[1]!=="piratecartography")return json(res,404,{error:"project"});return json(res,200,await statusFor(sm[2]));}
     if(req.method==="POST"&&p==="/knowledge/upload"){
@@ -242,8 +268,7 @@ const server=http.createServer(async(req,res)=>{
     }
     if(req.method==="POST"&&p==="/dispatch"){
       if(!OPERATOR_TOKEN||!GITHUB_DISPATCH_TOKEN)return json(res,503,{error:"dispatch_not_configured"});
-      const auth=String(req.headers.authorization||"");
-      if(!auth.startsWith("Bearer ")||!safeEqual(auth.slice(7),OPERATOR_TOKEN))return json(res,401,{error:"invalid_operator_key"});
+      if(!sessionAuthorized(req)&&!operatorAuthorized(req))return json(res,401,{error:"session_required"});
       if(Date.now()-lastDispatchAt<8000)return json(res,429,{error:"dispatch_rate_limited"});
       const body=JSON.parse(await readBody(req));
       const query=String(body?.query||"").trim();
