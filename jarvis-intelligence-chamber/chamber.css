@@ -65,3 +65,35 @@ body[data-core-state="COMPLETE"] .core-word{color:#fff0cf;text-shadow:0 0 30px r
 .result-item small{display:block;font:8px var(--mono);color:#789ba8;margin-top:5px}
 .result-item a{display:inline-block;color:#8ce7ef;font:9px var(--mono);margin-top:6px}
 @media(max-width:720px){.exp-rail{bottom:72px;max-width:calc(100vw - 24px)}.operator-command{z-index:9}.activity-strip{z-index:6}}
+
+/* UI hierarchy cleanup: query first, compact activity second */
+.activity-strip{
+  left:50%!important;
+  top:80%!important;
+  bottom:auto!important;
+  transform:translate(-50%,-50%)!important;
+  width:auto!important;
+  min-width:280px;
+  max-width:min(520px,calc(100vw - 48px));
+  padding:6px 10px!important;
+  border:1px solid rgba(91,197,220,.14)!important;
+  background:rgba(3,12,22,.38)!important;
+  box-shadow:none!important;
+  clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,0 100%);
+}
+.activity-strip.is-idle{min-width:0;width:auto!important;padding:5px 9px!important;opacity:.7}
+.activity-strip.is-idle .activity-lines{display:none}
+.activity-strip.is-idle .activity-head{margin:0}
+.activity-head{margin-bottom:5px!important}
+.activity-lines{gap:3px!important}
+@media(max-width:720px){
+  .activity-strip{
+    left:50%!important;
+    right:auto!important;
+    top:80%!important;
+    width:auto!important;
+    min-width:220px;
+    max-width:calc(100vw - 32px);
+    transform:translate(-50%,-50%)!important;
+  }
+}
