@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#02060d"><title>JARVIS — Intelligence Universe</title><link rel="stylesheet" href="./chamber.css?v=approved-20261015-ui3"></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#02060d"><title>JARVIS — Intelligence Universe</title><link rel="stylesheet" href="./chamber.css?v=approved-20261015-ui4"></head>
 <body>
 <div id="app">
 <canvas id="universe" aria-label="Interactive three-dimensional research intelligence network"></canvas>
@@ -14,10 +14,20 @@
     <input id="operatorQuery" name="operatorQuery" type="text" maxlength="500" spellcheck="false" placeholder="Ask JARVIS a historical research question…" aria-label="Historical research question">
     <button id="executeQuery" type="submit">EXECUTE <span>↗</span></button>
   </div>
-</form><div id="nodeLabels" aria-hidden="true"></div>
+</form><section class="activity-strip" id="activityStrip" aria-live="polite">
+  <div class="activity-head"><span>LIVE ACTIVITY</span><strong id="missionState">READY</strong></div>
+  <div class="activity-lines" id="activityLines"><div>Waiting for research activity…</div></div>
+</section>
+<section class="recent-queries" id="recentQueries" aria-label="Recent research queries"><span>RECENT</span><div id="recentQueryList"></div></section>
+<button class="results-toggle" id="resultsToggle" type="button">RESULTS <span id="resultsCount">0</span></button>
+<aside class="results-drawer hidden" id="resultsDrawer">
+  <div class="results-head"><span>RESEARCH RESULTS</span><button id="closeResults" type="button">×</button></div>
+  <div class="results-summary"><strong id="resultsRun">NO RUN</strong><span id="resultsMeta">0 claims · 0 blockers</span></div>
+  <div class="results-list" id="resultsList"><div class="result-empty">No research findings yet.</div></div>
+</aside><div id="nodeLabels" aria-hidden="true"></div>
 <aside class="detail-panel" id="detailPanel"><div class="detail-head"><span id="detail-number">SECTOR / 00</span><button id="closeDetail" aria-label="Close details">×</button></div><div class="detail-type" id="detailType">SELECT A RESEARCH SECTOR</div><h2 id="detailTitle">Intelligence network</h2><div class="detail-rule"></div><p id="detailDescription">Orbit, zoom and explore the network. Select a luminous node to inspect its function.</p><div class="detail-meta"><div><span>NETWORK ROLE</span><strong id="detailRole">NAVIGATION</strong></div><div><span>DATA STATE</span><strong id="detailState">VISUAL ONLY</strong></div></div><button class="detail-action" id="focusButton">FOCUS THIS SECTOR <span>↗</span></button></aside>
 <div class="map-scale"><span class="scale-label">NETWORK DEPTH</span><div class="scale-tracks"><span></span><span></span><span></span><span></span><span></span></div><span id="zoomLevel">01 / CLUSTER</span></div>
 <div class="nav-tools"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button><button id="resetView" aria-label="Reset camera">⌖</button></div>
 <footer class="bottom-hud"><div class="bottom-caption"><div class="crosshair">⌖</div><div><b>SPATIAL COMMAND MODE</b><span>DRAG TO ORBIT <i>·</i> SCROLL TO ZOOM <i>·</i> SELECT A SECTOR</span></div></div><div class="system-readout"><div class="readout"><span>SECTORS</span><strong>17</strong></div><div class="readout"><span>LINKS</span><strong id="linkCount">24</strong></div><div class="readout"><span>FRAME</span><strong id="fps">—</strong></div></div><div class="attribution">INSPIRED BY APEX × EVE MAP<br>INDEPENDENT VISUAL PROTOTYPE</div></footer>
 <div class="mobile-hint">DRAG · ZOOM · SELECT</div>
-</div><script src="./chamber.js?v=approved-20261015-zoom2" defer></script><script src="./gpu-field.js?v=approved-20261014b" defer></script><script src="./operator-command.js?v=20261015a" defer></script></body></html>
+</div><script src="./chamber.js?v=approved-20261015-zoom2" defer></script><script src="./gpu-field.js?v=approved-20261014b" defer></script><script src="./operator-command.js?v=20261015b" defer></script><script type="module" src="./research-ui.js?v=20261015a"></script></body></html>
