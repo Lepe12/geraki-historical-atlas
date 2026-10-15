@@ -32,3 +32,12 @@ body.exp-mode-active .activity-strip{border-color:rgba(255,88,88,.26);box-shadow
 body.exp-mode-evidence .results-drawer,body.exp-mode-contradictions .results-drawer{opacity:1;transform:none;pointer-events:auto}
 @media(max-width:1050px){.exp-status{right:18px}.exp-rail{bottom:96px}.exp-filters{display:none}}
 @media(max-width:720px){.exp-status{top:12px;right:10px;gap:3px}.exp-status span:nth-child(n+3){display:none}.exp-rail{bottom:84px;width:calc(100% - 24px);justify-content:center}.exp-modes button{padding:6px 5px;font-size:7px}.exp-modes button:nth-child(4){display:none}}
+
+/* APEX-inspired live behavior, adapted to JARVIS */
+body[data-core-state="PLANNING"] .core-word{text-shadow:0 0 34px rgba(81,224,237,.95),0 0 85px rgba(22,138,175,.8)}
+body[data-core-state="ACTIVE"] .core-word{animation:coreActivePulse 1.45s ease-in-out infinite;text-shadow:0 0 40px rgba(81,224,237,1),0 0 100px rgba(22,138,175,.9)}
+body[data-core-state="BLOCKED"] .core-word{color:#ffd7d7;text-shadow:0 0 32px rgba(255,76,76,.95),0 0 85px rgba(180,35,35,.7)}
+body[data-core-state="BLOCKED"] .core-status{color:#ff8a8a}
+body[data-core-state="COMPLETE"] .core-word{color:#fff0cf;text-shadow:0 0 30px rgba(235,189,118,.75),0 0 75px rgba(178,122,45,.55)}
+@keyframes coreActivePulse{50%{transform:scale(1.045);letter-spacing:.25em}}
+.agent-overview{display:grid;gap:0}.agent-overview-head{padding-bottom:10px;margin-bottom:4px;border-bottom:1px solid rgba(104,196,217,.14)}.agent-overview-head span{color:var(--gold)!important}.agent-overview-head strong{color:#72e5ef!important}.agent-overview div{align-items:flex-start}.agent-overview div strong{max-width:145px;line-height:1.35;overflow-wrap:anywhere}.agent-overview div:nth-child(2) strong{color:#e7f7fa}
