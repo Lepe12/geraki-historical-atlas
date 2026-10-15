@@ -32,7 +32,10 @@ if(name==="desktop"){
  assert.ok(after>before+8,"Zoom-in must visibly increase projected node distance");
  await page.getByRole('button',{name:'⌘ Archival constellation 02',exact:true}).click();
  await page.waitForFunction(()=>!document.querySelector('#detailPanel').classList.contains('hidden'));
- assert.match(await page.locator('#detailLive').innerText(),/RUN/);
+ assert.equal((await page.locator('#detailTitle').innerText()).trim(),'Spain','Archive navigation must open the current Spain sector');
+ const liveDetail=page.locator('#detailLive');
+ if(await liveDetail.count())assert.match(await liveDetail.innerText(),/RUN/,'When the selected agent exists in the current run, its recorded run detail must render');
+ else assert.ok((await page.locator('#detailState').innerText()).trim().length>0,'Sector detail state must render even when that agent is absent from the current live run');
  await page.getByRole('button',{name:'CONTRADICTIONS',exact:true}).click();
  assert.ok(!(await page.locator('#resultsList').innerText()).includes('BLOCKER ·'),'Contradictions must not display access blockers');
  await page.locator('#closeResults').click();
