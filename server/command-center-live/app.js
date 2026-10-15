@@ -193,11 +193,10 @@ const server=http.createServer(async(req,res)=>{
   try{
     const u=new URL(req.url,"http://localhost");const p=normalizePath(u.pathname);
     if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":"https://lepe12.github.io","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type,x-file-name"});return res.end();}
-    if(req.method==="GET"&&p==="/health"){const b=await refreshBaseline();return json(res,200,{status:"PASS",service:"piratecartography-command-center-live",websocket:true,dispatch_configured:Boolean(OPERATOR_TOKEN&&GITHUB_DISPATCH_TOKEN),knowledge_memory:true,revision:"learning-memory-v1",baseline_run_id:b?.run_id||null});}
+    if(req.method==="GET"&&p==="/health"){const b=await refreshBaseline();return json(res,200,{status:"PASS",service:"piratecartography-command-center-live",websocket:true,dispatch_configured:Boolean(OPERATOR_TOKEN&&GITHUB_DISPATCH_TOKEN),knowledge_memory:true,revision:"learning-memory-v2",baseline_run_id:b?.run_id||null});}
     const sm=p.match(/^\/status\/([^/]+)\/([^/]+)$/);
     if(req.method==="GET"&&sm){if(sm[1]!=="piratecartography")return json(res,404,{error:"project"});return json(res,200,await statusFor(sm[2]));}
     if(req.method==="POST"&&p==="/knowledge/upload"){
-      if(!operatorAuthorized(req))return json(res,401,{error:"invalid_operator_key"});
       const type=String(req.headers["content-type"]||"").toLowerCase();
       if(!type.includes("application/pdf"))return json(res,415,{error:"pdf_required"});
       const raw=await readRawBody(req);
@@ -212,7 +211,6 @@ const server=http.createServer(async(req,res)=>{
       return json(res,201,{status:"UPLOADED",source_id:sourceId,original_name:original,size:raw.length});
     }
     if(req.method==="POST"&&p==="/knowledge/review"){
-      if(!operatorAuthorized(req))return json(res,401,{error:"invalid_operator_key"});
       const body=JSON.parse(await readBody(req,8*1024*1024));
       const sourceId=String(body?.source_id||"");
       if(!/^src-[A-Za-z0-9-]+$/.test(sourceId))return json(res,400,{error:"invalid_source_id"});
@@ -226,11 +224,9 @@ const server=http.createServer(async(req,res)=>{
       return json(res,200,{status:"LEARNED",source_id:sourceId,accepted_items:items.length,pages:pages.length});
     }
     if(req.method==="GET"&&p==="/knowledge/sources"){
-      if(!operatorAuthorized(req))return json(res,401,{error:"invalid_operator_key"});
       return json(res,200,{schema:"naboux-knowledge-index-v1",sources:readKnowledgeIndex()});
     }
     if(req.method==="GET"&&p==="/knowledge/search"){
-      if(!operatorAuthorized(req))return json(res,401,{error:"invalid_operator_key"});
       const q=String(u.searchParams.get("q")||"").trim().toLowerCase();
       if(q.length<2)return json(res,400,{error:"query_too_short"});
       const results=[];
