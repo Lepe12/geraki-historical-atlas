@@ -11,7 +11,7 @@ const target=process.env.JARVIS_TEST_URL||"http://127.0.0.1:4179/jarvis-intellig
 if(new URL(target).hostname==='127.0.0.1')await page.route('https://pct-live.piratecartography.com/pct-api/live/status/**',async route=>{const response=await route.fetch();assert.equal(response.status(),200);await route.fulfill({response,headers:{...response.headers(),'access-control-allow-origin':new URL(target).origin}})});
 await page.goto(target,{waitUntil:"networkidle",timeout:60000});
 await page.waitForFunction(()=>/^[0-9]+ FPS$/.test(document.querySelector("#fps")?.textContent||""),{timeout:30000});
-const result=await page.evaluate(()=>({canvasWidth:document.querySelector("#universe")?.width,labels:document.querySelectorAll(".node-label").length,bodyWidth:document.body.scrollWidth,viewport:innerWidth,detailHidden:document.querySelector("#detailPanel")?.classList.contains("hidden"),fps:document.querySelector("#fps")?.textContent,hasGreek:[...document.querySelectorAll(".node-label")].some(n=>n.textContent.includes("Greek Archives")),hasMasthead:!!document.querySelector(".masthead"),hasSidebar:!!document.querySelector(".left-panel"),hasCentralHud:!!document.querySelector(".central-hud")}));
+const result=await page.evaluate(()=>({canvasWidth:document.querySelector("#universe")?.width,labels:document.querySelectorAll(".node-label").length,bodyWidth:document.body.scrollWidth,viewport:innerWidth,detailHidden:document.querySelector("#detailPanel")?.classList.contains("hidden"),fps:document.querySelector("#fps")?.textContent,hasGreek:[...document.querySelectorAll(".node-label")].some(n=>n.textContent.includes("Greece")),hasMasthead:!!document.querySelector(".masthead"),hasSidebar:!!document.querySelector(".left-panel"),hasCentralHud:!!document.querySelector(".central-hud")}));
 report.screens.push({name,...result});
 await page.waitForFunction(()=>document.body.dataset.researchFeed==='LIVE'&&document.body.dataset.currentResearchRun,{timeout:20000});
 report.transport={url:page.url(),mode:await page.evaluate(()=>document.body.dataset.researchFeed),run:await page.evaluate(()=>document.body.dataset.currentResearchRun)};
@@ -19,7 +19,7 @@ await page.screenshot({path:out+"/"+name+".png",fullPage:true});
 assert.ok(result.canvasWidth>100,"Renderer must own visible canvas");
 assert.match(result.fps,/^[0-9]+ FPS$/,"Frame loop must advance");
 assert.equal(result.labels,17,"17 research nodes including Greek Archives must exist");
-assert.equal(result.hasGreek,true,"Greek Archives node must exist");
+assert.equal(result.hasGreek,true,"Greece research node must exist");
 assert.ok(result.bodyWidth<=result.viewport+4,"No horizontal overflow");
 assert.ok(!report.errors.length,"No browser console/page errors: "+report.errors.join('; '));
 assert.equal(result.hasCentralHud,false,"Central JARVIS HUD must remain removed");
