@@ -13,7 +13,7 @@ REG=Path(__file__).with_name("specialist_agent_registry.json")
 from jarvis_specialist_routing import plan_routes,select_queries
 
 try:
-    from naboux_memory import load as load_memory, successful_queries, retrieve
+    from tools.memory.naboux_memory import load as load_memory, successful_queries, retrieve
 except Exception:
     load_memory=successful_queries=retrieve=None
 
