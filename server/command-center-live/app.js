@@ -134,6 +134,11 @@ function operatorAuthorized(req){
   const auth=String(req.headers.authorization||"");
   return Boolean(OPERATOR_TOKEN&&auth.startsWith("Bearer ")&&safeEqual(auth.slice(7),OPERATOR_TOKEN));
 }
+function trustedWebOrigin(req){
+  const origin=String(req.headers.origin||"");
+  const referer=String(req.headers.referer||"");
+  return origin==="https://lepe12.github.io"||referer.startsWith("https://lepe12.github.io/");
+}
 function sessionSignature(exp){
   return crypto.createHmac("sha256",OPERATOR_TOKEN).update("naboux-session|"+exp).digest("base64url");
 }
@@ -214,7 +219,7 @@ const server=http.createServer(async(req,res)=>{
   try{
     const u=new URL(req.url,"http://localhost");const p=normalizePath(u.pathname);
     if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":"https://lepe12.github.io","access-control-allow-credentials":"true","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type,x-file-name"});return res.end();}
-    if(req.method==="GET"&&p==="/health"){const b=await refreshBaseline();return json(res,200,{status:"PASS",service:"piratecartography-command-center-live",websocket:true,dispatch_configured:Boolean(OPERATOR_TOKEN&&GITHUB_DISPATCH_TOKEN),knowledge_memory:true,session_auth:true,revision:"session-auth-v1",baseline_run_id:b?.run_id||null});}
+    if(req.method==="GET"&&p==="/health"){const b=await refreshBaseline();return json(res,200,{status:"PASS",service:"piratecartography-command-center-live",websocket:true,dispatch_configured:Boolean(GITHUB_DISPATCH_TOKEN),knowledge_memory:true,session_auth:true,revision:"no-session-dispatch-v1",baseline_run_id:b?.run_id||null});}
     if(req.method==="GET"&&p==="/session"){return json(res,200,{authenticated:sessionAuthorized(req)});}
     if(req.method==="POST"&&p==="/session"){
       if(!operatorAuthorized(req))return json(res,401,{error:"invalid_operator_key"});
@@ -267,8 +272,8 @@ const server=http.createServer(async(req,res)=>{
       return json(res,200,{schema:"naboux-knowledge-search-v1",query:q,results:results.slice(0,100)});
     }
     if(req.method==="POST"&&p==="/dispatch"){
-      if(!OPERATOR_TOKEN||!GITHUB_DISPATCH_TOKEN)return json(res,503,{error:"dispatch_not_configured"});
-      if(!sessionAuthorized(req)&&!operatorAuthorized(req))return json(res,401,{error:"session_required"});
+      if(!GITHUB_DISPATCH_TOKEN)return json(res,503,{error:"dispatch_not_configured"});
+      if(!trustedWebOrigin(req))return json(res,403,{error:"origin_not_allowed"});
       if(Date.now()-lastDispatchAt<8000)return json(res,429,{error:"dispatch_rate_limited"});
       const body=JSON.parse(await readBody(req));
       const query=String(body?.query||"").trim();
