@@ -39,6 +39,7 @@ if(name==="desktop"){
  const layout=await page.evaluate(()=>{const a=document.querySelector('#operatorQuery').getBoundingClientRect(),b=document.querySelector('.exp-rail').getBoundingClientRect();return Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left))*Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));});
  assert.equal(layout,0,'Command input must not overlap the experimental rail');
  report.realFeedChecked=true;
+ await page.getByRole('button',{name:'Close details',exact:true}).click();
  await page.locator("#resetView").click();
 }
 await page.close();}
