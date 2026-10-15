@@ -1,8 +1,8 @@
 "use strict";
 (()=>{
   const $=id=>document.getElementById(id);
-  const panel=$("learningPanel"),toggle=$("learningToggle"),close=$("closeLearning"),pick=$("learningPick"),input=$("learningFile"),status=$("learningState"),source=$("learningSource"),list=$("learningItems"),summary=$("learningSummary"),save=$("learningSave");
-  if(!panel||!toggle||!close||!pick||!input||!status||!source||!list||!summary||!save)return;
+  const panel=$("learningPanel"),toggle=$("learningToggle"),close=$("closeLearning"),input=$("learningFile"),status=$("learningState"),source=$("learningSource"),list=$("learningItems"),summary=$("learningSummary"),save=$("learningSave");
+  if(!panel||!toggle||!close||!input||!status||!source||!list||!summary||!save)return;
 
   const endpoint="https://pct-live.piratecartography.com/pct-api/live";
   let current={source_id:"",pages:[],items:[]};
@@ -71,7 +71,6 @@
 
   toggle.addEventListener("click",()=>{open();});
   close.addEventListener("click",()=>panel.classList.add("hidden"));
-  pick.addEventListener("click",()=>input.click());
 
   input.addEventListener("change",async()=>{
     const file=input.files?.[0];if(!file)return;
