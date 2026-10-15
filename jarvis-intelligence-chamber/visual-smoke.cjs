@@ -30,8 +30,7 @@ if(name==="desktop"){
  await page.locator("#zoomIn").click();await page.waitForTimeout(900);
  const after=await page.evaluate(()=>{const n=[...document.querySelectorAll(".node-label")].find(x=>x.textContent.includes("Greek Archives"));const r=n.getBoundingClientRect();return Math.hypot(r.left+r.width/2-innerWidth*.53,r.top+r.height/2-innerHeight*.5)});
  assert.ok(after>before+8,"Zoom-in must visibly increase projected node distance");
- const point=await page.evaluate(()=>{const e=[...document.querySelectorAll('.node-label')].find(n=>n.textContent.includes('Greek Archives'));return{x:parseFloat(e.style.left),y:parseFloat(e.style.top)}});
- await page.mouse.click(point.x,point.y);
+ await page.getByRole('button',{name:'⌘ Archival constellation 02',exact:true}).click();
  await page.waitForFunction(()=>!document.querySelector('#detailPanel').classList.contains('hidden'));
  assert.match(await page.locator('#detailLive').innerText(),/RUN/);
  await page.getByRole('button',{name:'CONTRADICTIONS',exact:true}).click();
