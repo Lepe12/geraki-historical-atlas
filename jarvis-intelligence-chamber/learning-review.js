@@ -10,7 +10,7 @@
   const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
   const setState=(s,mode="")=>{status.textContent=s;panel.dataset.state=mode;};
 
-  function open(){panel.classList.remove("hidden");}
+  function open(){const results=$("resultsDrawer");if(results)results.classList.add("hidden");panel.classList.remove("hidden");}
   function render(){
     const accepted=current.items.filter(x=>x.status==="accepted").length;
     const rejected=current.items.filter(x=>x.status==="rejected").length;
