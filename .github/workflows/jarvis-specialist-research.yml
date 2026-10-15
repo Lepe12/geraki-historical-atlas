@@ -215,6 +215,17 @@ jobs:
           python3 tools/orchestrator/jarvis_specialist_aggregate.py \
             --root normalized \
             --output SPECIALIST_AGGREGATE.json
+      - name: Learn from specialist run
+        env:
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          PYTHONPATH=tools/memory python3 - <<'PY'
+          import os
+          from naboux_memory import load,save,learn_results_tree
+          m=load("data/naboux_memory.json")
+          learn_results_tree(m,"normalized",os.environ["RUN_ID"])
+          save(m,"data/naboux_memory.json")
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: specialist-normalized-${{ github.run_id }}
@@ -235,7 +246,7 @@ jobs:
           done
           git config user.name "jarvis-orchestrator[bot]"
           git config user.email "jarvis-orchestrator@users.noreply.github.com"
-          git add "$dest"
+          git add "$dest" data/naboux_memory.json
           git diff --cached --quiet && exit 0
           git commit -m "Preserve JARVIS specialist research run $RUN_ID"
           for n in 1 2 3 4 5; do
