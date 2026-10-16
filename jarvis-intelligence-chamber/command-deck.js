@@ -13,12 +13,33 @@
  const activityBtn=add('◷ LIVE FEED','deckActivity',false,()=>setActivity(!activity.classList.contains('deck-expanded')));
  add('⌖ RESET VIEW','deckReset',false,()=>$('resetView')?.click());
  app.appendChild(controls);
+
+ // Search real sectors and focus them in the existing animated research map.
+ const finder=document.createElement('section');finder.className='deck-finder';finder.hidden=true;finder.setAttribute('aria-label','Find research sector');
+ finder.innerHTML='<label for="deckFindInput">FIND RESEARCH SECTOR</label><input id="deckFindInput" type="search" autocomplete="off" placeholder="Venice, Greece, contradictions…" aria-label="Search research sectors"><div class="deck-find-results" id="deckFindResults" role="listbox"></div>';
+ const searchButton=add('⌕ FIND NODE','deckFindButton',false,()=>toggleFinder(finder.hidden));
+ function toggleFinder(open){finder.hidden=!open;searchButton.setAttribute('aria-expanded',String(open));if(open){populateFinder();finder.querySelector('input').focus()}}
+ function populateFinder(){
+  const input=finder.querySelector('input'),results=finder.querySelector('#deckFindResults'),term=input.value.trim().toLocaleLowerCase();
+  results.replaceChildren();
+  const sectors=(window.__nabouSectors||[]).filter(s=>s.name.toLocaleLowerCase().includes(term));
+  for(const sector of sectors){
+   const b=document.createElement('button');b.type='button';b.className='deck-find-item';b.textContent=sector.name+' · '+sector.kind.toUpperCase();
+   b.addEventListener('click',()=>{window.dispatchEvent(new CustomEvent('nabou:focus-sector',{detail:{id:sector.id}}));toggleFinder(false)});
+   results.appendChild(b);
+  }
+  if(!sectors.length){const empty=document.createElement('p');empty.textContent='No matching sectors';results.appendChild(empty)}
+ }
+ finder.querySelector('input').addEventListener('input',populateFinder);
+ app.appendChild(finder);
+
  setNav(window.matchMedia('(max-width:900px)').matches?false:true);
  const head=activity.querySelector('.activity-head');
  if(head){head.tabIndex=0;head.setAttribute('role','button');head.setAttribute('aria-label','Toggle expanded live activity');head.addEventListener('click',()=>activityBtn.click());head.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();activityBtn.click()}})}
  document.addEventListener('keydown',e=>{
   if(e.altKey&&!e.ctrlKey&&!e.metaKey&&e.key.toLowerCase()==='e'){e.preventDefault();nav.click()}
   if(e.key==='Escape'){
+   if(!finder.hidden)toggleFinder(false);
    if(activity.classList.contains('deck-expanded'))setActivity(false);
    if(window.matchMedia('(max-width:900px)').matches)setNav(false);
   }
