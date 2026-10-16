@@ -12,6 +12,7 @@ function add(parent,id,label,action){const b=document.createElement('button');b.
 add(left,'map','◈ Σύμπαν',()=>{if(!results.classList.contains('hidden'))$('closeResults')?.click();if(!learning.classList.contains('hidden'))$('closeLearning')?.click();document.body.classList.remove('workspace-study');document.querySelector('[data-view="universe"]')?.click();});
 add(left,'results','▤ Ευρήματα',()=>{if(results.classList.contains('hidden'))$('resultsToggle')?.click();else $('closeResults')?.click();});
 add(left,'learning','▣ Πηγές / PDF',()=>{if(learning.classList.contains('hidden'))$('learningToggle')?.click();else $('closeLearning')?.click();});
+add(right,'active','✦ Ενεργοί',()=>document.querySelector('#expModes [data-mode="active"]')?.click());
 add(right,'agents','⌘ Τομείς',()=>$('deckNav')?.click());
 add(right,'activity','◷ Πορεία',()=>$('deckActivity')?.click());
 const status=document.createElement('span');status.className='workspace-state';status.setAttribute('role','status');right.prepend(status);
@@ -20,7 +21,7 @@ function sync(){
  const r=!results.classList.contains('hidden'),l=!learning.classList.contains('hidden');
  document.body.classList.toggle('workspace-results',r);
  document.body.classList.toggle('workspace-learning',l);
- for(const [id,b] of buttons)b.setAttribute('aria-pressed',String(id==='results'?r:id==='learning'?l:id==='map'?!r&&!l:id==='activity'?!!$('activityStrip')?.classList.contains('deck-expanded'):id==='agents'?!document.body.classList.contains('deck-nav-closed'):false));
+ for(const [id,b] of buttons)b.setAttribute('aria-pressed',String(id==='results'?r:id==='learning'?l:id==='map'?!r&&!l:id==='activity'?!!$('activityStrip')?.classList.contains('deck-expanded'):id==='agents'?!document.body.classList.contains('deck-nav-closed'):id==='active'?document.body.classList.contains('exp-mode-active'):false));
  const n=$('resultsCount')?.textContent?.trim();buttons.get('results').textContent='▤ Ευρήματα'+(n&&n!=='0'?' · '+n:'');
  const mission=$('missionState')?.textContent?.trim();const connection=$('expCoreState')?.textContent?.trim();status.textContent=(mission&&mission!=='READY'?mission:connection&&connection!=='CONNECTING'?connection:'Έτοιμο');
 }
@@ -53,5 +54,6 @@ input?.addEventListener('change',()=>{
  document.body.classList.toggle('workspace-study',!!pdfUrl);
  if(pdfUrl&&learning.classList.contains('hidden'))$('learningToggle')?.click();
 });
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('operatorQuery')?.focus();}});
 window.addEventListener('pagehide',()=>{if(pdfUrl)URL.revokeObjectURL(pdfUrl)});
 })();
