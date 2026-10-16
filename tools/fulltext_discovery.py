@@ -216,6 +216,10 @@ def iiif_search(source,terms,out,deadline=None):
         url=service+('&' if '?' in service else '?')+urlencode({'q':term})
         try:
             data=get_json(url)
+            # MDZ returns a bare, typed AnnotationList for a valid zero hit.
+            # Accept this exact response, while rejecting error/unknown JSON.
+            if data.get('@type')=='sc:AnnotationList' and 'resources' not in data and 'hits' not in data:
+                data.update(resources=[],hits=[])
             if not isinstance(data.get('resources'),list):raise ValueError('IIIF_SEARCH_RESPONSE_UNRECOGNIZED')
             # IIIF empty annotation lists may omit the optional hits extension.
             if 'hits' not in data and not data['resources']:data['hits']=[]

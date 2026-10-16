@@ -86,6 +86,14 @@ class FulltextTests(unittest.TestCase):
         self.assertEqual(rows,[])
         self.assertEqual(attempts[0]['status'],'EXECUTED')
 
+    def test_native_bsb_bare_annotation_list_is_zero_but_error_json_is_not(self):
+        manifest={'service':{'@id':'https://example.org/search','profile':'http://iiif.io/api/search/1/search'}}
+        for response,status in [({'@type':'sc:AnnotationList'},'EXECUTED'),({'error':'unavailable'},'REMOTE_ERROR')]:
+            with tempfile.TemporaryDirectory() as td,patch('fulltext_discovery.get_json',side_effect=[manifest,response]):
+                rows,attempts=iiif_search({'url':'https://example.org/manifest','provenance':'test'},['name'],Path(td))
+            self.assertEqual(rows,[])
+            self.assertEqual(attempts[0]['status'],status)
+
     def test_snapshot_preserves_fulltext_page_and_identity_uncertainty(self):
         from orchestrator.build_command_center_snapshot import discovery_results
         row={'identifier':'book/canvas/42','title':'Unrelated catalogue title','discovery_repository':'IIIF Full Text',
