@@ -1,0 +1,327 @@
+{
+  "schema": "pct-specialist-agent-plan-v2",
+  "routing_authority": "JARVIS_PLANNER",
+  "target": "Ιωαννης καψης μήλος",
+  "aliases": [],
+  "target_type": "all",
+  "research_focus": {
+    "schema": "pct-research-focus-v1",
+    "kind": "auto",
+    "entity": "Ιωαννης καψης μήλος",
+    "names": [
+      "Ιωαννης καψης μήλος"
+    ],
+    "roles": [],
+    "places": [],
+    "interpretation": "REQUEST_CONSTRAINTS_NOT_VERIFIED_FACTS"
+  },
+  "date_range": "",
+  "purpose": "Ιωαννης καψης μήλος",
+  "source_limit_per_agent": 4,
+  "fallback_limit_per_agent": 4,
+  "total_query_budget_per_agent": 20,
+  "parallel_agent_count": 2,
+  "verified_promotion_allowed": false,
+  "memory_context": [],
+  "memory_policy": "Persistent memory is retrieval/routing assistance only; it never verifies a historical claim.",
+  "rule": "JARVIS alone assigns second-wave fallback sources after evaluating first-wave outcomes.",
+  "assignment_wave": 2,
+  "agents": [
+    {
+      "agent_id": "identity_resolution",
+      "label": "Identity Resolution Agent",
+      "queries": [
+        "\"Ιωαννης καψης μήλος\" variant spelling",
+        "\"Ιωαννης καψης μήλος\" alias OR aliases",
+        "\"Ιωαννης καψης μήλος\" historical name",
+        "\"Ιωαννης καψης μήλος\" transliteration"
+      ],
+      "outputs": [
+        "entity_candidates",
+        "variant_names",
+        "same_entity_assessment",
+        "collision_warnings"
+      ],
+      "source_routes": [
+        "repo:SearchCulture.gr / EKT",
+        "repo:Gallica/BnF",
+        "repo:Internet Culturale",
+        "repo:Biblioteca Digital Hispánica",
+        "repo:Nationaal Archief",
+        "repo:Delpher",
+        "repo:OpenArchives.gr / EKT",
+        "repo:Academia.edu Public Research",
+        "repo:OpenAlex Scholarly Works",
+        "repo:Crossref Scholarly Metadata"
+      ],
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2,
+      "assigned_sources": [
+        {
+          "route_id": "repo:Academia.edu Public Research",
+          "route_type": "repository_dispatch",
+          "repository": "Academia.edu Public Research",
+          "connector_id": null,
+          "score": 92,
+          "reason": [
+            "agent_profile",
+            "context:greek_aegean"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        },
+        {
+          "route_id": "repo:Biblioteca Digital Hispánica",
+          "route_type": "repository_dispatch",
+          "repository": "Biblioteca Digital Hispánica",
+          "connector_id": null,
+          "score": 88,
+          "reason": [
+            "agent_profile"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        }
+      ],
+      "fallback_sources": [
+        {
+          "route_id": "repo:OpenAlex Scholarly Works",
+          "route_type": "repository_dispatch",
+          "repository": "OpenAlex Scholarly Works",
+          "connector_id": null,
+          "score": 88,
+          "reason": [
+            "agent_profile",
+            "context:greek_aegean"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        },
+        {
+          "route_id": "repo:Nationaal Archief",
+          "route_type": "repository_dispatch",
+          "repository": "Nationaal Archief",
+          "connector_id": null,
+          "score": 84,
+          "reason": [
+            "agent_profile"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        }
+      ],
+      "assigned_queries": [
+        "\"Ιωαννης καψης μήλος\" variant spelling",
+        "\"Ιωαννης καψης μήλος\" alias OR aliases",
+        "\"Ιωαννης καψης μήλος\" historical name",
+        "\"Ιωαννης καψης μήλος\" transliteration"
+      ],
+      "query_budget": {
+        "total": 8,
+        "max_total": 8,
+        "queries_per_source": 4
+      },
+      "routing_decision": {
+        "authority": "JARVIS_PLANNER",
+        "strategy": "result_aware_fallback_v1",
+        "selected_route_ids": [
+          "repo:Academia.edu Public Research",
+          "repo:Biblioteca Digital Hispánica"
+        ],
+        "fallback_route_ids": [
+          "repo:OpenAlex Scholarly Works",
+          "repo:Nationaal Archief"
+        ],
+        "trigger": "RECOVERY_REPLAN",
+        "recovery_action": "REPLAN",
+        "recovery_reason": "zero candidates without explicit access blocker",
+        "first_wave_status_counts": {
+          "API_KEY_REQUIRED": 4,
+          "EXECUTED": 8,
+          "REMOTE_ACCESS_BLOCKED": 4
+        },
+        "first_wave_records": 0,
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    },
+    {
+      "agent_id": "source_genealogy",
+      "label": "Source Genealogy Agent",
+      "queries": [
+        "\"Ιωαννης καψης μήλος\" cited by",
+        "\"Ιωαννης καψης μήλος\" bibliography sources",
+        "\"Ιωαννης καψης μήλος\" edition translation",
+        "\"Ιωαννης καψης μήλος\" chronicle manuscript"
+      ],
+      "outputs": [
+        "source_chains",
+        "derivative_sources",
+        "independence_warnings",
+        "primary_source_targets"
+      ],
+      "source_routes": [
+        "repo:Gallica/BnF",
+        "repo:Biblioteca Digital Hispánica",
+        "repo:The National Archives Public Content",
+        "repo:Internet Culturale",
+        "repo:Delpher",
+        "repo:Deutsche Digitale Bibliothek",
+        "repo:Academia.edu Public Research",
+        "repo:OpenAlex Scholarly Works",
+        "repo:Crossref Scholarly Metadata",
+        "repo:OpenArchives.gr / EKT",
+        "repo:Anemi / University of Crete"
+      ],
+      "assignment_id": "source_genealogy:wave2",
+      "assignment_wave": 2,
+      "assigned_sources": [
+        {
+          "route_id": "repo:The National Archives Public Content",
+          "route_type": "repository_dispatch",
+          "repository": "The National Archives Public Content",
+          "connector_id": null,
+          "score": 92,
+          "reason": [
+            "agent_profile"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        },
+        {
+          "route_id": "repo:OpenAlex Scholarly Works",
+          "route_type": "repository_dispatch",
+          "repository": "OpenAlex Scholarly Works",
+          "connector_id": null,
+          "score": 92,
+          "reason": [
+            "agent_profile",
+            "context:greek_aegean"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        }
+      ],
+      "fallback_sources": [
+        {
+          "route_id": "repo:OpenArchives.gr / EKT",
+          "route_type": "repository_dispatch",
+          "repository": "OpenArchives.gr / EKT",
+          "connector_id": null,
+          "score": 90,
+          "reason": [
+            "agent_profile",
+            "context:greek_aegean"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        },
+        {
+          "route_id": "repo:Crossref Scholarly Metadata",
+          "route_type": "repository_dispatch",
+          "repository": "Crossref Scholarly Metadata",
+          "connector_id": null,
+          "score": 86,
+          "reason": [
+            "agent_profile",
+            "context:greek_aegean"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        }
+      ],
+      "assigned_queries": [
+        "\"Ιωαννης καψης μήλος\" cited by",
+        "\"Ιωαννης καψης μήλος\" bibliography sources",
+        "\"Ιωαννης καψης μήλος\" edition translation",
+        "\"Ιωαννης καψης μήλος\" chronicle manuscript"
+      ],
+      "query_budget": {
+        "total": 8,
+        "max_total": 8,
+        "queries_per_source": 4
+      },
+      "routing_decision": {
+        "authority": "JARVIS_PLANNER",
+        "strategy": "result_aware_fallback_v1",
+        "selected_route_ids": [
+          "repo:The National Archives Public Content",
+          "repo:OpenAlex Scholarly Works"
+        ],
+        "fallback_route_ids": [
+          "repo:OpenArchives.gr / EKT",
+          "repo:Crossref Scholarly Metadata"
+        ],
+        "trigger": "RECOVERY_RETRY",
+        "recovery_action": "RETRY",
+        "recovery_reason": "transient execution failure",
+        "first_wave_status_counts": {
+          "EXECUTED": 12,
+          "REMOTE_ACCESS_BLOCKED": 4
+        },
+        "first_wave_records": 0,
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    }
+  ],
+  "reassignment_decisions": [
+    {
+      "agent_id": "identity_resolution",
+      "reassign": true,
+      "reason": "RECOVERY_REPLAN",
+      "recovery_action": "REPLAN",
+      "recovery_reason": "zero candidates without explicit access blocker",
+      "assigned": [
+        "repo:Academia.edu Public Research",
+        "repo:Biblioteca Digital Hispánica"
+      ]
+    },
+    {
+      "agent_id": "timeline",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 16
+    },
+    {
+      "agent_id": "relationship_network",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 16
+    },
+    {
+      "agent_id": "contradiction",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 16
+    },
+    {
+      "agent_id": "source_genealogy",
+      "reassign": true,
+      "reason": "RECOVERY_RETRY",
+      "recovery_action": "RETRY",
+      "recovery_reason": "transient execution failure",
+      "assigned": [
+        "repo:The National Archives Public Content",
+        "repo:OpenAlex Scholarly Works"
+      ]
+    }
+  ]
+}
