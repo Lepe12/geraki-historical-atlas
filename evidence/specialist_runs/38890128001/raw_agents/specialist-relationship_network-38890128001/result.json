@@ -1,0 +1,539 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "relationship_network",
+  "label": "Relationship Network Agent",
+  "assignment_id": "relationship_network:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "persons",
+    "ships",
+    "places",
+    "patrons",
+    "states",
+    "relationship_edges"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "90b557453b8f8f806ac4f7cf6c76e50b9b516b678ea8783ea3f342b540e2ba3f",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "relationship_network",
+    "assignment_id": "relationship_network:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "registry:moreveneto_browser",
+      "repo:PARES / Archivo General de Simancas",
+      "repo:Internet Culturale",
+      "repo:Archives diplomatiques France"
+    ],
+    "queries": [
+      "\"πετρο λαντζα\"",
+      "\"πετρο λαντζα\" captain",
+      "\"πετρο λαντζα\" associates"
+    ],
+    "operation": "search",
+    "search_budget": 12,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "registry:moreveneto_browser",
+        "route_type": "registered_connector",
+        "repository": null,
+        "connector_id": "moreveneto_browser",
+        "score": 108,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:PARES / Archivo General de Simancas",
+        "route_type": "repository_dispatch",
+        "repository": "PARES / Archivo General de Simancas",
+        "connector_id": null,
+        "score": 100,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 100,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Archives diplomatiques France",
+        "route_type": "repository_dispatch",
+        "repository": "Archives diplomatiques France",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 85,
+        "reason": [
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 81,
+        "reason": [
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 80,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 3,
+    "total_search_budget": 12,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "moreveneto_browser",
+      "repository": "Archivio di Stato di Venezia / Moreveneto",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "\"πετρο λαντζα\"",
+      "records": [],
+      "provenance": {
+        "module": "connectors/moreveneto_browser_search.py",
+        "returncode": 2,
+        "stdout_excerpt": "{\n  \"status\": \"BROWSER_EXECUTED_NO_API_CONFIRMATION\",\n  \"source\": \"Archivio di Stato di Venezia / moreveneto\",\n  \"query\": \"\\\"πετρο λαντζα\\\"\",\n  \"graphql_responses\": [],\n  \"term_visible\": false,\n  \"body_excerpt\": \"Home\\nPatrimonio\\nGalleria\\nRicerca\\nCerca nel patrimonio\\n Cerca in tutti i campi delle schede\\nAggregazione logica\\n0\\nFamiglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n",
+        "stderr_excerpt": ""
+      },
+      "blockers": [
+        {
+          "code": "BROWSER_EXECUTED_NO_API_CONFIRMATION",
+          "detail": "miglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n"
+        }
+      ],
+      "warnings": [
+        "Connector process returned non-zero exit status."
+      ],
+      "next_best_route": "human_archive_review",
+      "evidence_level": "DISCOVERY_ONLY",
+      "retrieved_utc": "2026-10-16T10:55:38.862561+00:00",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "moreveneto_browser",
+      "repository": "Archivio di Stato di Venezia / Moreveneto",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "\"πετρο λαντζα\" captain",
+      "records": [],
+      "provenance": {
+        "module": "connectors/moreveneto_browser_search.py",
+        "returncode": 2,
+        "stdout_excerpt": "{\n  \"status\": \"BROWSER_EXECUTED_NO_API_CONFIRMATION\",\n  \"source\": \"Archivio di Stato di Venezia / moreveneto\",\n  \"query\": \"\\\"πετρο λαντζα\\\" captain\",\n  \"graphql_responses\": [],\n  \"term_visible\": false,\n  \"body_excerpt\": \"Home\\nPatrimonio\\nGalleria\\nRicerca\\nCerca nel patrimonio\\n Cerca in tutti i campi delle schede\\nAggregazione logica\\n0\\nFamiglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n",
+        "stderr_excerpt": ""
+      },
+      "blockers": [
+        {
+          "code": "BROWSER_EXECUTED_NO_API_CONFIRMATION",
+          "detail": "miglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n"
+        }
+      ],
+      "warnings": [
+        "Connector process returned non-zero exit status."
+      ],
+      "next_best_route": "human_archive_review",
+      "evidence_level": "DISCOVERY_ONLY",
+      "retrieved_utc": "2026-10-16T10:55:49.509569+00:00",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "moreveneto_browser",
+      "repository": "Archivio di Stato di Venezia / Moreveneto",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "\"πετρο λαντζα\" associates",
+      "records": [],
+      "provenance": {
+        "module": "connectors/moreveneto_browser_search.py",
+        "returncode": 2,
+        "stdout_excerpt": "{\n  \"status\": \"BROWSER_EXECUTED_NO_API_CONFIRMATION\",\n  \"source\": \"Archivio di Stato di Venezia / moreveneto\",\n  \"query\": \"\\\"πετρο λαντζα\\\" associates\",\n  \"graphql_responses\": [],\n  \"term_visible\": false,\n  \"body_excerpt\": \"Home\\nPatrimonio\\nGalleria\\nRicerca\\nCerca nel patrimonio\\n Cerca in tutti i campi delle schede\\nAggregazione logica\\n0\\nFamiglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n",
+        "stderr_excerpt": ""
+      },
+      "blockers": [
+        {
+          "code": "BROWSER_EXECUTED_NO_API_CONFIRMATION",
+          "detail": "miglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n"
+        }
+      ],
+      "warnings": [
+        "Connector process returned non-zero exit status."
+      ],
+      "next_best_route": "human_archive_review",
+      "evidence_level": "DISCOVERY_ONLY",
+      "retrieved_utc": "2026-10-16T10:56:00.175998+00:00",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"πετρο λαντζα\" associates",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%B1%CE%BD%CF%84%CE%B6%CE%B1%22+associates ; HTTPError: HTTP Error 429: Too Many Requests",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%B1%CE%BD%CF%84%CE%B6%CE%B1%22+associates ; HTTPError: HTTP Error 429: Too Many Requests"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"πετρο λαντζα\"",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%B1%CE%BD%CF%84%CE%B6%CE%B1%22 ; HTTPError: HTTP Error 429: Too Many Requests",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%B1%CE%BD%CF%84%CE%B6%CE%B1%22 ; HTTPError: HTTP Error 429: Too Many Requests"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"πετρο λαντζα\" captain",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%B1%CE%BD%CF%84%CE%B6%CE%B1%22+captain ; HTTPError: HTTP Error 429: Too Many Requests",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%B1%CE%BD%CF%84%CE%B6%CE%B1%22+captain ; HTTPError: HTTP Error 429: Too Many Requests"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πετρο λαντζα\"",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%B1%CE%BD%CF%84%CE%B6%CE%B1%22&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πετρο λαντζα\" captain",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%B1%CE%BD%CF%84%CE%B6%CE%B1%22+captain&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πετρο λαντζα\" associates",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%B1%CE%BD%CF%84%CE%B6%CE%B1%22+associates&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πετρο λαντζα\"",
+      "records": [
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3",
+          "title": "Formulaire de recherche dans tous les fonds",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88",
+          "title": "Fonds conservés à La Courneuve",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da",
+          "title": "Fonds conservés à Nantes",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f",
+          "title": "Fonds conservés à Nantes - recherche par carte",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f"
+        }
+      ],
+      "diagnostic": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%B1%CE%BD%CF%84%CE%B6%CE%B1%22",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πετρο λαντζα\" captain",
+      "records": [
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3",
+          "title": "Formulaire de recherche dans tous les fonds",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88",
+          "title": "Fonds conservés à La Courneuve",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da",
+          "title": "Fonds conservés à Nantes",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f",
+          "title": "Fonds conservés à Nantes - recherche par carte",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f"
+        }
+      ],
+      "diagnostic": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%B1%CE%BD%CF%84%CE%B6%CE%B1%22+captain",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πετρο λαντζα\" associates",
+      "records": [
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3",
+          "title": "Formulaire de recherche dans tous les fonds",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2b4c3297-ee46-4201-93b2-6921dd6d9dd3"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88",
+          "title": "Fonds conservés à La Courneuve",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/9b04e4da-cf51-4b2c-88bc-402144900e88"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da",
+          "title": "Fonds conservés à Nantes",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/a14decce-27db-476a-8080-7b4da80b09da"
+        },
+        {
+          "discovery_repository": "Archives diplomatiques France",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f",
+          "title": "Fonds conservés à Nantes - recherche par carte",
+          "date": [],
+          "url": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/form/2a756f2c-9ea5-40b0-b4da-1846c984142f"
+        }
+      ],
+      "diagnostic": "https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22%CF%80%CE%B5%CF%84%CF%81%CE%BF+%CE%BB%CE%B1%CE%BD%CF%84%CE%B6%CE%B1%22+associates",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "result_count": 12,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
