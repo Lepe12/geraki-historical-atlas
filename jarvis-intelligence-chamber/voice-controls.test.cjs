@@ -26,6 +26,12 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
   const url='http://127.0.0.1:'+server.address().port+'/jarvis-intelligence-chamber/';
   await page.goto(url);await page.waitForFunction(()=>document.body.dataset.currentResearchRun==='100');
   assert.equal(await page.locator('#voicePanel').isVisible(),false);
+  assert.equal(await page.locator('#operatorCommand #voiceToggle, #operatorCommand #voicePanel').count(),0,'Voice must be outside the research form');
+  const formBefore=await page.locator('#operatorCommand').boundingBox();
+  await page.locator('#voiceToggle').click();
+  assert.deepEqual(await page.locator('#operatorCommand').boundingBox(),formBefore,'Opening voice must not resize or move the research form');
+  const dockBounds=await page.locator('#voiceToggle').boundingBox();assert(dockBounds.x<100,'Voice belongs on the left');
+  await page.locator('#voiceClose').click();
   await page.locator('#voiceToggle').click();await page.locator('#voiceMic').click();
   assert.equal(await page.locator('#voiceMic').getAttribute('aria-pressed'),'true');
   assert.equal(await page.evaluate(()=>__speech.instances[0].lang),'el-GR');
