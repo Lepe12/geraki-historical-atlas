@@ -1,66 +1,226 @@
-/* NABOU//X Command Deck: interaction layer only, preserve original palette, 3D scene and bloom */
-@media (min-width: 901px) {
-  .left-panel {left:20px!important;top:132px!important;width:264px!important;max-height:calc(100dvh - 265px);padding:17px 14px 16px;background:linear-gradient(110deg,rgba(7,22,38,.82),rgba(4,15,29,.42));border:1px solid rgba(81,224,237,.15);backdrop-filter:blur(18px);transition:transform .32s,opacity .32s}
-  body.deck-nav-closed .left-panel {transform:translateX(calc(-100% - 32px));opacity:0;pointer-events:none}
-  .detail-panel:not(.hidden) {top:130px!important;right:20px!important;width:340px!important;min-height:0!important;max-height:calc(100dvh - 253px)!important;overflow-y:auto;scrollbar-width:thin;background:linear-gradient(135deg,rgba(8,27,44,.94),rgba(4,13,27,.88))!important;border-color:rgba(81,224,237,.27)!important}
-  .operator-command {top:auto!important;bottom:101px!important;transform:translateX(-50%)!important;left:50%!important;width:min(770px,calc(100vw - 660px))!important;min-width:390px}
-  .activity-strip {top:auto!important;bottom:55px!important;transform:translateX(-50%)!important;max-width:min(680px,calc(100vw - 660px))!important}
-  .activity-strip.deck-expanded {bottom:164px!important;width:min(650px,calc(100vw - 660px))!important;background:rgba(3,14,26,.94)!important;box-shadow:0 12px 60px #000b!important}
-  .activity-strip.deck-expanded .activity-lines {display:flex!important;max-height:180px!important;overflow:auto}
-  .exp-rail {bottom:17px!important}
-  .nav-tools {right:24px!important;bottom:160px!important}
-  .map-scale {bottom:170px!important}
-  .results-drawer:not(.hidden){top:130px!important;bottom:94px!important;max-height:calc(100dvh - 224px)}
-  .learning-panel:not(.hidden){top:130px!important;bottom:94px!important}
-  .bottom-hud {pointer-events:none}
+/* NABOU//X coherent workspace layout.
+   Keeps the existing palette, glow, 2D/3D renderers and research functionality intact. */
+
+.deck-controls{
+  position:absolute;z-index:12;left:22px;top:103px;display:flex;gap:7px;align-items:center
 }
-.deck-controls{position:absolute;z-index:12;left:22px;top:105px;display:flex;gap:8px;align-items:center}
-.deck-control{background:rgba(3,15,28,.84);color:#a7e7ef;border:1px solid rgba(81,224,237,.33);box-shadow:0 0 22px rgba(38,159,193,.12),inset 0 1px rgba(255,255,255,.06);backdrop-filter:blur(14px);padding:10px 14px;min-height:38px;cursor:pointer;font:10px var(--mono);letter-spacing:.1em;transition:background .2s,border-color .2s}
-.deck-control:hover,.deck-control[aria-expanded="true"]{background:rgba(33,98,115,.48);border-color:rgba(81,224,237,.7);color:#f0feff}
-.deck-control:focus-visible{outline:2px solid #51e0ed;outline-offset:3px}
+.deck-control{
+  min-height:36px;padding:8px 12px;border:1px solid rgba(81,224,237,.28);
+  background:linear-gradient(180deg,rgba(6,24,38,.88),rgba(3,13,25,.78));
+  color:#a9dbe4;box-shadow:0 10px 30px #0006,inset 0 1px rgba(255,255,255,.04);
+  backdrop-filter:blur(14px);cursor:pointer;font:9px var(--mono);letter-spacing:.10em;
+  transition:background .2s,border-color .2s,color .2s
+}
+.deck-control:hover,.deck-control[aria-expanded="true"]{
+  color:#e9fcff;border-color:rgba(81,224,237,.62);background:rgba(37,111,132,.38)
+}
+.deck-control:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+
+/* Navigation becomes a real workspace panel instead of floating text over the universe. */
+.left-panel{
+  transition:transform .3s ease,opacity .3s ease!important
+}
+body.deck-nav-closed .left-panel{
+  transform:translateX(calc(-100% - 38px))!important;opacity:0!important;pointer-events:none!important
+}
+
+/* Make node text readable without turning it into dashboard chrome. */
+.node-label{
+  font-size:10px!important;letter-spacing:.055em!important;
+  padding:2px 4px;border-radius:2px;
+  background:linear-gradient(90deg,rgba(1,10,18,.46),rgba(1,10,18,0));
+  text-shadow:0 0 8px #001922,0 0 18px #00131e!important
+}
+
+/* Live activity is compact by default and intentionally expandable. */
 .activity-head{cursor:pointer;user-select:none}
-.activity-head::after{content:'  ↗';color:#51e0ed;margin-left:10px}
-.deck-expanded .activity-head::after{content:'  ↙'}
-.left-panel .section-btn{min-height:42px!important;font-size:11px!important}
-.left-panel .label{font-size:10px}
-.detail-panel .detail-type,.detail-panel .detail-meta,.detail-panel .detail-head{font-size:10px}
-.detail-panel #detailDescription{font-size:12px;line-height:1.7}
-.node-label{pointer-events:none}
-#app:has(.detail-panel:not(.hidden)) .deck-controls{z-index:12}
-@media (min-width:901px) and (max-width:1350px) {
-  .operator-command{width:min(650px,calc(100vw - 480px))!important}
-  .activity-strip{max-width:min(600px,calc(100vw - 480px))!important}
-  .left-panel{width:214px!important}
-  .detail-panel:not(.hidden){width:290px!important}
+.activity-head::after{content:"↗";margin-left:10px;color:var(--cyan);opacity:.72}
+.activity-strip.deck-expanded .activity-head::after{content:"↙"}
+.activity-strip.deck-expanded .activity-lines{display:grid!important;overflow:auto!important;scrollbar-width:thin}
+.activity-strip.deck-expanded{z-index:11!important}
+
+/* Right-side drawers share one geometry, so they never stack over one another. */
+.results-drawer,.learning-panel,.detail-panel{
+  scrollbar-width:thin
 }
-@media (max-width:900px) {
-  .deck-controls{top:78px;left:12px}
-  .deck-control{font-size:9px;padding:8px 10px}
-  .left-panel{z-index:13!important;top:124px!important;left:12px!important;width:min(300px,calc(100vw - 24px))!important;max-height:calc(100dvh - 210px);overflow:auto;background:rgba(4,16,30,.96);border:1px solid rgba(81,224,237,.35);padding:12px;backdrop-filter:blur(18px)}
-  body.deck-nav-closed .left-panel{display:none}
-  .detail-panel:not(.hidden){top:124px!important;right:12px!important;left:auto!important;width:min(340px,calc(100vw - 24px))!important;max-height:calc(100dvh - 255px)!important;overflow:auto;background:rgba(4,16,30,.95)!important}
-  .operator-command{top:auto!important;bottom:101px!important;left:12px!important;right:12px!important;transform:none!important;width:auto!important;min-width:0!important}
-  .activity-strip{top:auto!important;bottom:64px!important;transform:translateX(-50%)!important}
-  .activity-strip.deck-expanded{bottom:170px!important;max-width:calc(100vw - 24px)!important;background:rgba(4,16,30,.96)!important}
-  .activity-strip.deck-expanded .activity-lines{display:flex!important;max-height:110px;overflow:auto}
-  .exp-rail{bottom:8px!important}
-  .nav-tools{bottom:245px!important}
-}
-@media(max-height:690px) and (min-width:901px){
- .operator-command{bottom:73px!important}
- .activity-strip{bottom:32px!important}
- .activity-strip.deck-expanded{bottom:135px!important}
- .exp-rail{bottom:5px!important}
+.results-drawer,.learning-panel{
+  box-shadow:0 28px 90px #000b,inset 0 1px rgba(220,249,255,.05)!important
 }
 
+/* Results and learning controls form one unobtrusive tool cluster. */
+.results-toggle,.learning-toggle{
+  min-height:34px!important;padding:8px 11px!important;
+  background:rgba(4,18,29,.80)!important;backdrop-filter:blur(12px);
+  box-shadow:0 10px 30px #0006!important
+}
+.results-toggle:hover,.learning-toggle:hover{
+  border-color:rgba(81,224,237,.58)!important;color:#e8fbfd!important
+}
 
-.deck-finder{position:absolute;z-index:18;top:154px;left:22px;width:min(360px,calc(100vw - 44px));max-height:min(460px,65dvh);padding:15px;background:linear-gradient(130deg,rgba(5,23,38,.98),rgba(2,12,25,.97));border:1px solid rgba(81,224,237,.5);box-shadow:0 25px 90px #000b,0 0 35px rgba(40,188,224,.10);backdrop-filter:blur(18px);display:flex;flex-direction:column;gap:10px}
-.deck-finder[hidden]{display:none!important}
-.deck-finder label{font:10px var(--mono);letter-spacing:.15em;color:var(--gold)}
-.deck-finder input{width:100%;min-height:44px;background:rgba(7,32,49,.8);border:1px solid rgba(81,224,237,.4);color:#e4fbff;padding:10px 12px;font:13px Inter,Arial,sans-serif;outline:none}
-.deck-finder input:focus{border-color:#51e0ed;box-shadow:0 0 0 2px rgba(81,224,237,.16)}
-.deck-find-results{overflow:auto;display:flex;flex-direction:column;gap:4px}
-.deck-find-item{width:100%;min-height:41px;text-align:left;padding:10px 12px;border:1px solid rgba(81,224,237,.09);background:rgba(21,61,80,.27);color:#d5edf4;cursor:pointer;font:11px var(--mono)}
-.deck-find-item:hover,.deck-find-item:focus-visible{background:rgba(39,137,159,.3);border-color:rgba(81,224,237,.55);outline:none}
-.deck-find-results p{font:12px Inter,Arial,sans-serif;color:#8eb3c2}
-@media(max-width:900px){.deck-finder{left:12px;top:123px;width:calc(100vw - 24px)}}
+/* Dense review content becomes readable. */
+.result-item b{font-size:10px!important}
+.result-item span{font-size:12px!important;line-height:1.55!important}
+.result-item small{font-size:9px!important;line-height:1.45!important}
+.learning-item-text{font-size:12px!important;line-height:1.65!important}
+.learning-actions button{font-size:9px!important;min-height:31px!important}
+.learning-item-head span,.learning-item-head small{font-size:9px!important}
+.detail-live div{font-size:9px!important;line-height:1.45}
+
+/* Desktop: three clear zones — navigation, universe, inspector. */
+@media(min-width:901px){
+  .masthead{height:88px!important;padding-top:23px!important}
+  .center-title{top:23px!important}
+
+  .left-panel{
+    left:22px!important;top:148px!important;width:270px!important;
+    max-height:calc(100dvh - 260px)!important;overflow:auto;
+    padding:16px 15px 18px!important;
+    background:linear-gradient(118deg,rgba(6,23,38,.82),rgba(3,12,24,.48))!important;
+    border:1px solid rgba(81,224,237,.15);box-shadow:0 20px 70px #0006;
+    backdrop-filter:blur(17px)
+  }
+  .left-panel .separator{margin:15px 0!important}
+  .left-panel .label{font-size:10px!important;margin-bottom:10px!important}
+  .section-btn{min-height:42px!important;font-size:11px!important;padding:10px!important}
+  .signal-row{font-size:10px!important;margin-bottom:10px!important}
+  .signal-row em{font-size:9px!important}
+  .bottom-panel-note{font-size:8px!important;line-height:1.7!important;padding-top:14px!important}
+
+  .detail-panel:not(.hidden),
+  .results-drawer:not(.hidden),
+  .learning-panel:not(.hidden){
+    top:116px!important;right:22px!important;bottom:105px!important;
+    width:380px!important;max-height:none!important
+  }
+  .detail-panel:not(.hidden){
+    min-height:0!important;overflow:auto!important;padding:20px 22px 24px!important;
+    background:linear-gradient(135deg,rgba(8,28,45,.95),rgba(3,12,25,.90))!important;
+    border-color:rgba(81,224,237,.28)!important
+  }
+  .detail-panel h2{font-size:34px!important;margin-bottom:14px!important}
+  .detail-panel p{font-size:12px!important;line-height:1.72!important;min-height:0!important}
+  .detail-type{margin-top:18px!important;font-size:9px!important}
+  .detail-meta span{font-size:9px!important}
+  .detail-meta strong{font-size:10px!important}
+
+  .operator-command{
+    left:50%!important;top:auto!important;bottom:86px!important;
+    transform:translateX(-50%)!important;
+    width:min(780px,calc(100vw - 760px))!important;min-width:430px!important;
+    padding:10px 13px 11px!important;
+    background:linear-gradient(180deg,rgba(6,23,37,.88),rgba(3,12,23,.78))!important
+  }
+  .operator-command input{font-size:14px!important}
+  .activity-strip{
+    left:50%!important;top:auto!important;bottom:43px!important;
+    transform:translateX(-50%)!important;
+    width:min(680px,calc(100vw - 800px))!important;min-width:360px!important;
+    max-width:none!important;padding:6px 10px!important;
+    background:rgba(3,12,22,.46)!important
+  }
+  .activity-strip.is-idle{width:auto!important;min-width:0!important}
+  .activity-strip.deck-expanded{
+    bottom:142px!important;width:min(650px,calc(100vw - 800px))!important;min-width:440px!important;
+    padding:10px 12px!important;background:rgba(3,14,27,.96)!important;
+    border:1px solid rgba(81,224,237,.25)!important;box-shadow:0 20px 70px #000b!important
+  }
+  .activity-strip.deck-expanded .activity-lines{max-height:190px!important}
+
+  .results-toggle{right:22px!important;bottom:61px!important}
+  .learning-toggle{right:22px!important;top:72px!important}
+
+  .map-scale{right:26px!important;top:118px!important}
+  .nav-tools{right:26px!important;bottom:150px!important}
+  #app:has(.detail-panel:not(.hidden)) .map-scale,
+  #app:has(.results-drawer:not(.hidden)) .map-scale,
+  #app:has(.learning-panel:not(.hidden)) .map-scale{
+    right:420px!important
+  }
+  #app:has(.detail-panel:not(.hidden)) .nav-tools,
+  #app:has(.results-drawer:not(.hidden)) .nav-tools,
+  #app:has(.learning-panel:not(.hidden)) .nav-tools{
+    right:420px!important
+  }
+
+  .bottom-hud{
+    min-height:72px!important;padding:13px 24px 15px!important;
+    background:linear-gradient(transparent,#020711f2)!important
+  }
+  .system-readout{gap:24px!important}
+  .readout strong{font-size:17px!important}
+  .attribution{font-size:7px!important}
+
+  /* Keep the existing research-mode rail, but out of the command input. */
+  .exp-rail{bottom:6px!important;padding:4px 6px!important;opacity:.84}
+  .exp-rail button{padding:5px 7px!important;font-size:7px!important}
+}
+
+/* Mid-size desktop: preserve center working area instead of squeezing every panel. */
+@media(min-width:901px) and (max-width:1360px){
+  .left-panel{width:220px!important}
+  .detail-panel:not(.hidden),.results-drawer:not(.hidden),.learning-panel:not(.hidden){width:330px!important}
+  .operator-command{width:min(650px,calc(100vw - 600px))!important;min-width:360px!important}
+  .activity-strip{width:min(560px,calc(100vw - 640px))!important;min-width:300px!important}
+  .activity-strip.deck-expanded{width:min(540px,calc(100vw - 640px))!important;min-width:340px!important}
+  #app:has(.detail-panel:not(.hidden)) .map-scale,
+  #app:has(.results-drawer:not(.hidden)) .map-scale,
+  #app:has(.learning-panel:not(.hidden)) .map-scale,
+  #app:has(.detail-panel:not(.hidden)) .nav-tools,
+  #app:has(.results-drawer:not(.hidden)) .nav-tools,
+  #app:has(.learning-panel:not(.hidden)) .nav-tools{right:366px!important}
+}
+
+/* Tablet/mobile: drawers take precedence, the universe stays behind them, controls remain reachable. */
+@media(max-width:900px){
+  .deck-controls{left:12px;top:80px;gap:5px}
+  .deck-control{min-height:33px;padding:7px 9px;font-size:8px}
+
+  .left-panel{
+    z-index:13!important;left:12px!important;top:124px!important;
+    width:min(300px,calc(100vw - 24px))!important;max-height:calc(100dvh - 230px)!important;
+    overflow:auto;padding:13px!important;
+    background:rgba(4,16,30,.97)!important;border:1px solid rgba(81,224,237,.32);
+    box-shadow:0 24px 80px #000b;backdrop-filter:blur(18px)
+  }
+  body.deck-nav-closed .left-panel{display:none!important}
+
+  .detail-panel:not(.hidden),.results-drawer:not(.hidden),.learning-panel:not(.hidden){
+    z-index:15!important;left:10px!important;right:10px!important;top:122px!important;bottom:122px!important;
+    width:auto!important;max-height:none!important;overflow:auto!important
+  }
+
+  .operator-command{
+    left:10px!important;right:10px!important;top:auto!important;bottom:72px!important;
+    width:auto!important;min-width:0!important;transform:none!important
+  }
+  .operator-command-row{grid-template-columns:18px 1fr auto!important}
+  .operator-command input{font-size:12px!important}
+  .activity-strip{
+    left:50%!important;right:auto!important;top:auto!important;bottom:39px!important;
+    width:auto!important;min-width:220px!important;max-width:calc(100vw - 20px)!important;
+    transform:translateX(-50%)!important
+  }
+  .activity-strip.deck-expanded{
+    bottom:142px!important;width:calc(100vw - 20px)!important;max-width:none!important;
+    background:rgba(4,16,30,.97)!important
+  }
+  .activity-strip.deck-expanded .activity-lines{max-height:120px!important}
+
+  .results-toggle{right:10px!important;bottom:188px!important}
+  .learning-toggle{right:10px!important;top:82px!important}
+
+  .map-scale{display:none!important}
+  .nav-tools{right:12px!important;bottom:198px!important}
+  .bottom-hud{min-height:56px!important;padding:10px 12px!important}
+  .system-readout{gap:14px!important}.readout strong{font-size:15px!important}
+  .exp-rail{bottom:3px!important;max-width:calc(100vw - 12px)!important;overflow-x:auto}
+}
+
+/* Short screens: protect command entry and inspector from vertical collision. */
+@media(max-height:700px) and (min-width:901px){
+  .left-panel{top:125px!important;max-height:calc(100dvh - 215px)!important}
+  .detail-panel:not(.hidden),.results-drawer:not(.hidden),.learning-panel:not(.hidden){top:104px!important;bottom:84px!important}
+  .operator-command{bottom:65px!important}
+  .activity-strip{bottom:28px!important}
+  .activity-strip.deck-expanded{bottom:124px!important}
+}
