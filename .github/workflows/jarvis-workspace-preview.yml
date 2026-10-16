@@ -1,0 +1,39 @@
+name: NABOU workspace preview
+on:
+  pull_request:
+    paths:
+      - 'jarvis-intelligence-chamber/workspace-preview*'
+      - '.github/workflows/jarvis-workspace-preview.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'jarvis-intelligence-chamber/workspace-preview*'
+      - '.github/workflows/jarvis-workspace-preview.yml'
+permissions:
+  contents: read
+jobs:
+  preview-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate preview syntax
+        run: |
+          node --check jarvis-intelligence-chamber/workspace-preview.js
+          node --check jarvis-intelligence-chamber/workspace-preview-feed.js
+          node --check jarvis-intelligence-chamber/workspace-preview-canvas.js
+      - name: Install browser
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Verify isolated preview interactions and responsive layout
+        run: node jarvis-intelligence-chamber/workspace-preview.test.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nabou-workspace-preview
+          path: jarvis-intelligence-chamber/screenshots/workspace-preview-*.png
+          if-no-files-found: warn
