@@ -90,7 +90,11 @@
   });
   navBtn.setAttribute('aria-controls','sectorNavigation');navPanel.id='sectorNavigation';
   activityBtn.setAttribute('aria-controls','activityStrip');
-  const help=document.createElement('p');help.className='tool-help';help.textContent='Σύρετε για περιστροφή · κύλιση για zoom · επιλέξτε τομέα για περιγραφή και κατάσταση.';navPanel.appendChild(help);
+  const viewRail=document.querySelector('.exp-rail');
+  if(viewRail){
+    const heading=document.createElement('div');heading.className='view-rail-label label';heading.textContent='ΠΡΟΒΟΛΗ';viewRail.prepend(heading);
+    navPanel.querySelector('.nav-sections').after(viewRail);
+  }
   document.addEventListener('keydown',e=>{
 
     if(e.key==='Escape'){
