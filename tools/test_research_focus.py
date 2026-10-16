@@ -69,6 +69,10 @@ class ResearchFocusTests(unittest.TestCase):
                 self.assertNotEqual(q.strip('"'),'Ιωάννη')
                 self.assertNotIn('variant spelling',q)
         self.assertTrue(any('Ιωάννης Καψής' in q for q in focused_queries(self.focus)))
+        first=focused_queries(self.focus)[:3]
+        self.assertIn('"Ιωάννη Καψή"',first)
+        self.assertIn('"Ιωάννης Καψής"',first)
+        self.assertIn('"Καψή" "Μήλου"',first)
 
     def test_actual_searchculture_execution_has_no_generic_fallback(self):
         req={'target':self.target,'aliases':[],'purpose':'Research this person'}

@@ -56,21 +56,25 @@ def focused_queries(focus, qualifiers=()):
     contexts=[*focus.get('places',[]),*focus.get('roles',[])]
     for name in focus['names']:
         q='"'+name.replace('"','')+'"'
-        for context in contexts:
-            queries.append(q+' "'+context.replace('"','')+'"')
         queries.append(q)
         # Mechanical Greek inflection search hypothesis, not a historical alias.
         # E.g. a supplied accusative name may be indexed in the nominative.
         nominative=' '.join(w+'ς' if fold(w).endswith('η') else w for w in name.split())
+        nq=None
         if nominative!=name and focus['kind']=='person':
             nq='"'+nominative.replace('"','')+'"'
             queries.append(nq)
-            for context in contexts: queries.append(nq+' "'+context.replace('"','')+'"')
         words=_words(name)
         if focus['kind']=='person' and len(words)>=2:
             surname=words[-1]
             for context in contexts:
                 queries.append('"'+surname+'" "'+context.replace('"','')+'"')
+        # The first three queries must cover name spelling and a contextual
+        # route even on repositories capped at three requests. Do not spend
+        # that whole budget on increasingly strict copies of one inflection.
+        for context in contexts:
+            queries.append(q+' "'+context.replace('"','')+'"')
+            if nq: queries.append(nq+' "'+context.replace('"','')+'"')
         for qualifier in qualifiers:
             if str(qualifier).strip(): queries.append(q+' '+str(qualifier).strip())
     return list(dict.fromkeys(queries))
