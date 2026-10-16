@@ -20,6 +20,7 @@ for x in d.get("results",[]):
       "title":x.get("title"),
       "creator":x.get("creator"),"archival_reference":x.get("archival_reference"),"specialist_agent":x.get("specialist_agent"),
       "description":x.get("description"),"subject":x.get("subject"),"context_excerpt":x.get("context_excerpt"),"mediatype":x.get("mediatype"),
+      "metadata_text":x.get("metadata_text"),"snippet":x.get("snippet"),
       "date":x.get("date"),
       "repository":repo,
       "discovery_repository":repo,

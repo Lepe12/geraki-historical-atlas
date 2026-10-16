@@ -5,6 +5,7 @@ sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from connectors.bsb_sru import search_bsb
 from connectors.repository_connectors import dispatch
 from research_relevance import discovery_queries
+from research_focus import decompose, focused_queries
 lane=os.getenv("PCT_RESEARCH_LANE","travellers")
 plan=json.loads(pathlib.Path(f"repository_plans/{lane}.json").read_text(encoding="utf-8"))
 out=pathlib.Path("lane_discovery");out.mkdir(exist_ok=True)
@@ -91,7 +92,8 @@ for r in plan["repositories"]:
                 repo_terms.append("__SC_FILTER__|ekt_place="+target+"|ekt_chronology="+year)
                 if any("\u0370"<=ch<="\u03ff" for ch in target) and " " not in target:
                     repo_terms.append("__SC_FILTER__|ekt_place=Νήσος "+target+"|ekt_chronology="+year)
-        repo_terms += ["πειρατές","αιχμαλωσία"]
+        # Keep the request anchored. Unqualified piracy/captivity searches
+        # previously filled named-person results with unrelated catalogue hits.
         repo_terms=list(dict.fromkeys(q for q in repo_terms if q))[:int(os.getenv("PCT_SEARCHCULTURE_QUERY_LIMIT","10"))]
     if name=="The National Archives Public Content":
         ys=[x for x in str(plan.get("date_range","")).replace("-"," ").split() if x.isdigit()]
@@ -136,6 +138,10 @@ for r in plan["repositories"]:
         cap=len(repo_terms)
         interleaved=[q for group in zip_longest(repo_terms,focused,specialist_queries) for q in group if q]
         repo_terms=list(dict.fromkeys(interleaved))[:cap]
+    focus=plan.get('target_identity',{}).get('focus') or decompose(plan['target'],plan.get('aliases',[]))
+    if focus['kind']=='person':
+        cap=max(3,len(repo_terms))
+        repo_terms=focused_queries(focus,('history','voyage','corsair'))[:cap]
     for q in repo_terms:
         try:
             if name=="Internet Archive":

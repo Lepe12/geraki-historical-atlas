@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Build a real-data Command Center snapshot from durable JARVIS evidence."""
 from __future__ import annotations
-import argparse,datetime,json
+import argparse,datetime,json,sys
 from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parent.parent))
+from research_relevance import identity, assess
 
 LANE_LABELS={
  "greek":"Greek","travellers":"Travellers","spanish_simancas":"Simancas","venetian":"Venetian","french":"French",
@@ -60,7 +62,7 @@ def research_request(run_root:Path):
             }
     return {}
 
-def discovery_results(run_root:Path):
+def discovery_results(run_root:Path,request=None):
     """Publish retained leads and executed-query coverage, independently of claims."""
     discoveries=[];coverage=[];seen=set()
     for lane in LANE_LABELS:
@@ -73,13 +75,19 @@ def discovery_results(run_root:Path):
             if key in seen:continue
             seen.add(key)
             assessment=row.get("relevance_assessment") or {}
+            if request and request.get('target'):
+                ident=identity(request,request)
+                current=assess(row,ident)
+                assessment=current if ident['type']=='person' else {**current,**assessment,'topical_match':current['topical_match']}
             discoveries.append({
                 "lane":lane,"identifier":row.get("identifier"),"title":row.get("title"),
                 "repository":row.get("repository") or row.get("discovery_repository"),
                 "url":row.get("url") or row.get("digital_url"),"date":row.get("date"),
                 "creator":row.get("creator"),"evidence_state":"DISCOVERED",
+                "context_excerpt":str(row.get('context_excerpt') or row.get('description') or row.get('snippet') or '')[:600],
                 "triage_status":assessment.get("status") or "REVIEW_REQUIRED",
                 "triage_reasons":assessment.get("reasons") or [],
+                "topical_match":assessment.get("topical_match"),
                 "research_value":assessment.get("research_value"),
                 "evidence_confidence":assessment.get("evidence_confidence"),
                 "fallback_for":row.get("fallback_for"),"fallback_reason":row.get("fallback_reason"),
@@ -114,7 +122,7 @@ def build(repo:Path,run_id:str):
     spec=read(repo/"evidence/specialist_runs"/run_id/"SPECIALIST_AGGREGATE.json",{})
     request=research_request(run_root)
     claims=candidate_claims(run_root)
-    discoveries,coverage=discovery_results(run_root)
+    discoveries,coverage=discovery_results(run_root,request)
     request_id=request_id_for(run_root)
     agents=[]
     events=specialist_events(repo,run_id)
@@ -170,6 +178,7 @@ def build(repo:Path,run_id:str):
         "aliases":request.get("aliases") or [],
         "date_range":request.get("date_range") or "",
         "purpose":request.get("purpose") or "Historical research operation",
+        "research_focus":identity(request,request)['focus'] if request.get('target') else None,
         "status":"COMPLETED",
         "selected_lanes":int(summary.get("selected_lanes",len([a for a in agents if a["kind"]=="research_lane"])) or 0)
       },

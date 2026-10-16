@@ -3,6 +3,7 @@ import hashlib
 import json
 import re
 import unicodedata
+from research_focus import decompose, focused_queries, topical_match
 
 
 def norm(value):
@@ -23,7 +24,8 @@ def identity(req, ctx):
     if not isinstance(regions, list) or any(not isinstance(x, str) for x in regions):
         raise ValueError('REGION_TERMS_MUST_BE_STRINGS')
     kind = supplied.get('type') or ('place' if re.search(r'\bisland\b|\bharbou?r\b|\bport\b|νησ', norm(ctx.get('purpose'))) else 'unknown')
-    return {'target': ctx['target'], 'aliases': ctx.get('aliases', []), 'type': kind,
+    focus=decompose(ctx['target'],ctx.get('aliases', []),ctx.get('purpose',''),kind,regions)
+    return {'target': ctx['target'], 'aliases': ctx.get('aliases', []), 'type': focus['kind'], 'focus':focus,
             'region_terms': regions, 'date_range': ctx.get('date_range', ''),
             'rule': 'User-supplied geographic context is a search constraint, not source evidence.'}
 
@@ -135,7 +137,9 @@ def assess(record, ident):
     title = norm(record.get('title'))
     context = ' '.join(norm(record.get(k)) for k in ('title','description','subject','context_excerpt'))
     names = [ident['target'], *ident.get('aliases', [])]
-    name_match = any(contains(context, n) for n in names if n)
+    focus=ident.get('focus') or decompose(ident['target'],ident.get('aliases',[]),kind=ident.get('type','unknown'),regions=ident.get('region_terms',[]))
+    topical=topical_match(record,focus)
+    name_match = topical['category']=='TARGET_MATCH'
     regional = any(contains(context, n) for n in ident.get('region_terms', []) if n)
     history = bool(HISTORY.search(context))
     geographic = bool(GEO.search(context)) or regional
@@ -171,9 +175,18 @@ def assess(record, ident):
     if OFF_TOPIC.search(title): research_score-=25;rv_reasons.append('OFF_TOPIC_PENALTY')
     if NOISE.search(title) and not (geographic and history): research_score-=35;rv_reasons.append('TOPIC_COLLISION_PENALTY')
     research_score=_clamp(research_score)
+    # Generic maritime/history vocabulary is useful context, not an answer about
+    # a named person. Keep every discovery but prevent it outranking name hits.
+    if focus['kind']=='person':
+        if topical['category']=='POSSIBLE_TARGET':
+            status='REVIEW_REQUIRED';research_score=min(65,max(45,research_score));reasons.append('SURNAME_CONTEXT_REQUIRES_IDENTITY_REVIEW')
+        elif not name_match:
+            status='EXCLUDE_FROM_ACQUISITION';research_score=min(research_score,20)
+            reasons.append('NO_TARGET_IDENTITY_MATCH')
 
     return {
         'status':status,'score':score,'reasons':reasons,
+        'topical_match':topical,
         'identity_status':'POSSIBLE_MATCH' if name_match else 'REGIONAL_CONTEXT' if regional else 'UNRESOLVED',
         'research_value':{
             'score':research_score,'label':_label(research_score,[(80,'HIGH'),(55,'MEDIUM'),(0,'LOW')]),
@@ -188,11 +201,15 @@ def assess(record, ident):
 
 def rank(records, ident):
     assessed=[{**x,'relevance_assessment':assess(x,ident)} for x in records]
-    return sorted(assessed,key=lambda x:(-x['relevance_assessment']['research_value']['score'],
+    order={'TARGET_MATCH':0,'POSSIBLE_TARGET':1,'CONTEXT_ONLY':2,'UNMATCHED':3}
+    return sorted(assessed,key=lambda x:(order[x['relevance_assessment']['topical_match']['category']],-x['relevance_assessment']['research_value']['score'],
                                          -x['relevance_assessment']['score']))
 
 
 def discovery_queries(ident, recovery=False):
+    focus=ident.get('focus') or decompose(ident['target'],ident.get('aliases',[]),kind=ident.get('type','unknown'),regions=ident.get('region_terms',[]))
+    if focus['kind']=='person':
+        return focused_queries(focus,('history','voyage','corsair'))
     names=list(dict.fromkeys([ident['target'],*ident.get('aliases',[])]));queries=[]
     if recovery and ident.get('region_terms'):
         for region in ident['region_terms'][:4]:

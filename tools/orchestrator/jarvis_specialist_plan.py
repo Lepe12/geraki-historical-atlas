@@ -5,8 +5,10 @@ The planner owns source selection. Workers are executors and must not choose
 their own repositories/connectors.
 """
 from __future__ import annotations
-import argparse,json,re
+import argparse,json,re,sys
 from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parent.parent))
+from research_focus import decompose, focused_queries
 
 REG=Path(__file__).with_name("specialist_agent_registry.json")
 
@@ -58,7 +60,8 @@ def render_queries(agent_id:str,target:str,date_range:str="",aliases:list[str]|N
 
 def build(target,purpose,date_range="",aliases=None,target_type="auto"):
     aliases=list(aliases or [])
-    kind=infer_kind(target,purpose,target_type)
+    focus=decompose(target,aliases,purpose,target_type)
+    kind=focus['kind'] if focus['kind'] not in ('auto','unknown','all') else infer_kind(target,purpose,target_type)
     memory=None
     memory_context=[]
     if load_memory:
@@ -76,6 +79,7 @@ def build(target,purpose,date_range="",aliases=None,target_type="auto"):
       "target":target,
       "aliases":aliases,
       "target_type":kind,
+      "research_focus":focus,
       "date_range":date_range,
       "purpose":purpose,
       "source_limit_per_agent":SOURCE_LIMIT,
@@ -91,6 +95,15 @@ def build(target,purpose,date_range="",aliases=None,target_type="auto"):
     for aid in agent_ids:
         meta=reg[aid]
         queries=render_queries(aid,target,date_range,aliases)
+        if focus['kind']=='person':
+            # Put actual identity/context searches inside the bounded budget;
+            # appending 'variant spelling' does not discover name variants.
+            qualifiers={'identity_resolution':['history','biography'],
+                        'timeline':[date_range,'chronology'],
+                        'source_genealogy':['sources','bibliography'],
+                        'contradiction':['disputed','history'],
+                        'relationship_network':['captain','associates']}.get(aid,['history'])
+            queries=focused_queries(focus,qualifiers)[:int(meta.get('max_queries',8))]
         if memory is not None and successful_queries:
             try:
                 learned=successful_queries(memory,aid,limit=4)

@@ -6,6 +6,8 @@ It does not invent historical spellings: historical name variants come from the
 request; generic event vocabulary is controlled here and every emitted query is
 preserved in the repository plan for audit.
 """
+from research_focus import decompose, focused_queries
+
 EVENT_TERMS={
  "greek":["πειρατεία","πειρατής","πειρατές","κουρσάρος","κουρσάροι","επιδρομή","λεηλασία","αιχμαλωσία","λύτρα","ρεσάλτο","πειρατικό","corsair","piracy","pirate","Aegean","Αιγαίο","Αρχιπέλαγος"],
  "travellers":["pirate","corsair","privateer","raid","captivity","ransom","pillage","πειρατής","πειρατές","κουρσάρος","κουρσάροι","επιδρομή","αιχμαλωσία","λύτρα","λεηλασία","κατάληψη","ρεσάλτο"],
@@ -20,6 +22,10 @@ EVENT_TERMS={
  "north_african":["corsaire","pirata","corsario","ghazwa","captif","esclave","rançon","galera","galeras","navío","navíos"]
 }
 def expand_queries(lane,target,aliases,date_range="",max_queries=0):
+    focus=decompose(target,aliases)
+    if focus['kind']=='person':
+        queries=focused_queries(focus,([str(date_range)] if date_range else [])+EVENT_TERMS.get(lane,EVENT_TERMS['travellers']))
+        return queries[:max_queries] if max_queries and max_queries>0 else queries
     names=[]
     for raw in [target]+list(aliases or []):
         v=str(raw).strip()

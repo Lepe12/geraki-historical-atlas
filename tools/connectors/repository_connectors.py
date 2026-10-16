@@ -568,6 +568,10 @@ def _public_site_index(q,lane,repository,domain,max_records=20):
         raw=_get(url,timeout=20).decode("utf-8","replace")
     except Exception as exc:
         return "REMOTE_ACCESS_BLOCKED",[],url+" ; "+type(exc).__name__+": "+str(exc)
+    # A 200 response can be an anti-bot challenge, not a completed search.
+    # Never translate failed coverage into a false zero-result statement.
+    if any(marker in raw.casefold() for marker in ('anomaly.js','challenge-form','bots use duckduckgo too')):
+        return "REMOTE_ACCESS_BLOCKED",[],url+" ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
     parser=_LinkParser(); parser.feed(raw)
     rows=[]; seen=set()
     for href,title in parser.links:
@@ -604,6 +608,8 @@ def _public_site_index(q,lane,repository,domain,max_records=20):
           "discovery_route":"PUBLIC_WEB_INDEX",
         })
         if len(rows)>=max_records: break
+    if not rows and not any(marker in raw.casefold() for marker in ('no-results','no results found')):
+        return "REMOTE_ACCESS_BLOCKED",[],url+" ; PUBLIC_WEB_INDEX_UNRECOGNIZED_RESPONSE: no readable result list or explicit empty result"
     return "EXECUTED",rows,url
 
 def openalex_works(q,lane):

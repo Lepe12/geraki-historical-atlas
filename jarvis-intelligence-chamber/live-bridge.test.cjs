@@ -18,7 +18,15 @@ test('results panel follows run change and does not call blockers contradictions
  callbacks.onSnapshot({...snapshot('200'),agents:[{id:'greek',status:'COMPLETED'}]});assert.equal(el('missionState').textContent,'COMPLETED');
  listeners.get('jarvis:results-filter')({detail:{filter:'all'}});
  callbacks.onSnapshot({...snapshot('200'),discoveries:[{title:'Unresolved lead',triage_status:'REVIEW_REQUIRED',verified:false}],coverage:[{repository:'Blocked catalogue',status:'REMOTE_RATE_LIMITED',queries:[{query:'test query',status:'REMOTE_RATE_LIMITED',hits:0}]}]});
- assert.equal(el('resultsCount').textContent,1);assert.match(el('resultsList').innerHTML,/Unresolved lead/);assert.match(el('resultsList').innerHTML,/test query/);
+ assert.equal(el('resultsCount').textContent,0);assert.match(el('resultsList').innerHTML,/Αταύτιστα ευρήματα/);assert.match(el('resultsList').innerHTML,/Unresolved lead/);assert.match(el('resultsList').innerHTML,/test query/);
+ callbacks.onSnapshot({...snapshot('200'),discoveries:[
+ {title:'Ιωάννης Καψής της Μήλου',topical_match:{category:'TARGET_MATCH',reason:'NAME_TOKENS_IN_SOURCE'}},
+ {title:'Ιωάννης Παπαδόπουλος',topical_match:{category:'UNMATCHED'}},
+ {title:'Πειρατεία στο Αιγαίο',topical_match:{category:'CONTEXT_ONLY'}}]});
+ assert.equal(el('resultsCount').textContent,1);
+ assert.match(el('resultsMeta').textContent,/1 πιθανές σχετικές αναφορές/);
+ assert.match(el('resultsList').innerHTML,/<details[^>]*><summary>Αταύτιστα ευρήματα/);
+ assert.ok(el('resultsList').innerHTML.indexOf('Ιωάννης Καψής')<el('resultsList').innerHTML.indexOf('Ιωάννης Παπαδόπουλος'));
  listeners.get('jarvis:dispatch-accepted')({detail:{request_id:'ui-new'}});
  callbacks.onSnapshot({...snapshot('300'),request_id:'unrelated',claims:[{title:'wrong query'}]});
  assert.equal(el('resultsRun').textContent,'WAITING FOR YOUR RUN');assert.ok(!el('resultsList').innerHTML.includes('wrong query'));assert.ok(!el('resultsList').innerHTML.includes('Unresolved lead'));
