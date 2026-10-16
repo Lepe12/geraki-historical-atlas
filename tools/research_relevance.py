@@ -4,6 +4,7 @@ import json
 import re
 import unicodedata
 from research_focus import decompose, focused_queries, topical_match
+from fulltext_discovery import text_match
 
 
 def norm(value):
@@ -139,6 +140,8 @@ def assess(record, ident):
     names = [ident['target'], *ident.get('aliases', [])]
     focus=ident.get('focus') or decompose(ident['target'],ident.get('aliases',[]),kind=ident.get('type','unknown'),regions=ident.get('region_terms',[]))
     topical=topical_match(record,focus)
+    fulltext_match=text_match(record,focus) if record.get('fulltext_hit') else None
+    if fulltext_match:topical=fulltext_match
     name_match = topical['category']=='TARGET_MATCH'
     regional = any(contains(context, n) for n in ident.get('region_terms', []) if n)
     history = bool(HISTORY.search(context))
@@ -183,6 +186,9 @@ def assess(record, ident):
         elif not name_match:
             status='EXCLUDE_FROM_ACQUISITION';research_score=min(research_score,20)
             reasons.append('NO_TARGET_IDENTITY_MATCH')
+    if fulltext_match:
+        status='PRIORITY';research_score=max(research_score,70)
+        reasons.append('FULLTEXT_CONTEXT_REQUIRES_IDENTITY_REVIEW')
 
     return {
         'status':status,'score':score,'reasons':reasons,
