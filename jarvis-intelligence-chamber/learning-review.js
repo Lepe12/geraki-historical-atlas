@@ -11,12 +11,40 @@
   const setState=(s,mode="")=>{status.textContent=s;panel.dataset.state=mode;};
 
   function open(){const results=$("resultsDrawer");if(results)results.classList.add("hidden");panel.classList.remove("hidden");}
+  let reviewPage=0;
+  const batchSize=50;
+  const reader=document.createElement("section");
+  reader.className="learning-source";
+  reader.innerHTML='<label>PDF PAGE <input type="number" min="1" value="1" aria-label="PDF page number" style="width:80px"></label><small class="coverage"></small><pre style="white-space:pre-wrap;max-height:240px;overflow:auto;user-select:text"></pre>';
+  list.before(reader);
+  const pageInput=reader.querySelector("input"),pageText=reader.querySelector("pre"),coverage=reader.querySelector(".coverage");
+  function showPage(){
+    const n=Math.max(1,Math.min(current.pages.length,Number(pageInput.value)||1));
+    pageInput.value=n;pageInput.max=current.pages.length||1;
+    pageText.textContent=current.pages[n-1]?.text||"No extracted text on this page. Image-only pages require OCR.";
+  }
+  pageInput.addEventListener("change",showPage);
+  const pager=document.createElement("div");pager.className="learning-actions";
+  const previous=document.createElement("button"),next=document.createElement("button"),position=document.createElement("span");
+  previous.type=next.type="button";previous.textContent="PREVIOUS 50";next.textContent="NEXT 50";
+  pager.append(previous,position,next);list.after(pager);
+  previous.addEventListener("click",()=>{reviewPage=Math.max(0,reviewPage-1);render();});
+  next.addEventListener("click",()=>{reviewPage++;render();});
   function render(){
+    reader.hidden=!current.pages.length;
+    const readable=current.pages.filter(p=>p.text.trim().length>=40).length;
+    coverage.textContent=current.pages.length?`${current.pages.length} / ${current.pages.length} pages read · ${readable} with text · ${current.pages.length-readable} blank or requiring OCR. PDF page numbers; printed pagination unverified.`:"";
+    showPage();
+    reviewPage=Math.min(reviewPage,Math.max(0,Math.ceil(current.items.length/batchSize)-1));
+    const offset=reviewPage*batchSize;
+    pager.hidden=!current.items.length;
+    previous.disabled=reviewPage===0;next.disabled=offset+batchSize>=current.items.length;
+    position.textContent=` ${offset+1}–${Math.min(offset+batchSize,current.items.length)} / ${current.items.length} `;
     const accepted=current.items.filter(x=>x.status==="accepted").length;
     const rejected=current.items.filter(x=>x.status==="rejected").length;
     const pending=current.items.length-accepted-rejected;
     summary.textContent=current.items.length?accepted+" accepted · "+rejected+" rejected · "+pending+" pending":"No extracted knowledge yet.";
-    list.innerHTML=current.items.length?current.items.map((x,i)=>'<article class="learning-item" data-i="'+i+'" data-status="'+esc(x.status)+'"><div class="learning-item-head"><span>'+esc(x.type.toUpperCase())+'</span><small>PAGE '+esc(x.page||"—")+' · '+Math.round((x.confidence||.5)*100)+'%</small></div><div class="learning-item-text" contenteditable="'+(x.editing?"true":"false")+'">'+esc(x.text)+'</div><div class="learning-actions"><button data-act="accept">ACCEPT</button><button data-act="reject">REJECT</button><button data-act="edit">'+(x.editing?"DONE":"EDIT")+'</button></div></article>').join(""):'<div class="learning-empty">Upload a PDF to inspect what NABOU//X extracts before anything enters memory.</div>';
+    list.innerHTML=current.items.length?current.items.slice(offset,offset+batchSize).map((x,j)=>'<article class="learning-item" data-i="'+(offset+j)+'" data-status="'+esc(x.status)+'"><div class="learning-item-head"><span>'+esc(x.extraction_kind==="excerpt"?"EXCERPT — UNVERIFIED":x.type.toUpperCase())+'</span><small>PAGE '+esc(x.page||"—")+' · '+(x.confidence==null?'CONFIDENCE UNASSESSED':Math.round(x.confidence*100)+'%')+'</small></div><div class="learning-item-text" contenteditable="'+(x.editing?"true":"false")+'">'+esc(x.text)+'</div><div class="learning-actions"><button data-act="accept">ACCEPT</button><button data-act="reject">REJECT</button><button data-act="edit">'+(x.editing?"DONE":"EDIT")+'</button></div></article>').join(""):'<div class="learning-empty">Upload a PDF to inspect what NABOU//X extracts before anything enters memory.</div>';
     save.disabled=accepted===0;
   }
 
@@ -38,37 +66,45 @@
     const pdf=await pdfjs.getDocument({data:bytes}).promise,pages=[];
     for(let n=1;n<=pdf.numPages;n++){
       const page=await pdf.getPage(n),tc=await page.getTextContent();
-      const text=tc.items.map(x=>x.str||"").join(" ").replace(/\s+/g," ").trim();
+      const text=tc.items.map(x=>(x.str||"")+(x.hasEOL?"\n":" ")).join("").replace(/[ \t]+/g," ").trim();
       pages.push({page:n,text});
+      page.cleanup();
+      await new Promise(resolve=>setTimeout(resolve,0));
       if(n%5===0||n===pdf.numPages)setState("READING "+n+" / "+pdf.numPages,"working");
     }
+    await pdf.destroy();
     return pages;
   }
 
   function proposals(pages){
     const items=[],seen=new Set(),add=(type,text,page,confidence)=>{
       text=String(text||"").replace(/\s+/g," ").trim();if(text.length<3)return;
-      const k=type+"|"+text.toLowerCase();if(seen.has(k))return;seen.add(k);
-      items.push({id:"k-"+items.length,type,text,page,confidence,status:"pending",editing:false});
+      const k=type+"|"+page+"|"+text.toLowerCase();if(seen.has(k))return;seen.add(k);
+      items.push({id:"k-"+items.length,type:type==="excerpt"?"claim":type,extraction_kind:type,text,page,pdf_page:page,printed_page:null,confidence,extraction_method:"text_layer_heuristic",verification_status:"UNREVIEWED",status:"pending",editing:false});
     };
-    const stop=new Set(["The","This","That","From","With","There","Their","They","For","And","But","Not","Chapter","Page","Figure","Table","Introduction","Conclusion","References","Bibliography","Κεφάλαιο","Σελίδα","Εισαγωγή","Συμπέρασμα","Βιβλιογραφία"]);
-    let claimCount=0;
+    const stop=new Set("την τον της του των το τα τις τους στη στην στο στον και εις από απο για με ο η οι εν ένας μια ένα αυτό αυτή σελίδες περιεχόμενα κεφάλαιο βιβλιογραφία the this that from with there their they for and but not chapter page figure table introduction conclusion references bibliography".split(" "));
+    const normalized=t=>t.normalize("NFD").replace(/\p{M}/gu,"").toLowerCase();
     for(const pg of pages){
       const text=String(pg.text||"").replace(/\s+/g," ").trim();if(!text)continue;
-      for(const m of text.matchAll(/\b(1[45-9]\d{2}|20\d{2})\b/g)) add("date",m[1],pg.page,.96);
-      for(const m of text.matchAll(/[\p{Lu}][\p{L}’'.-]{2,}(?:\s+[\p{Lu}][\p{L}’'.-]{2,}){0,3}/gu)){
-        const v=m[0].trim();if(stop.has(v)||v.length>90)continue;add("entity",v,pg.page,.68);
+      for(const m of text.matchAll(/(?<!\d)(1\d{3}|20\d{2})(?!\d)/g)) add("date",m[1],pg.page,null);
+      // Conservative name candidates; capitals alone do not establish identity.
+      for(const m of text.matchAll(/[\p{Lu}][\p{Ll}’'-]{2,}(?:\s+[\p{Lu}][\p{Ll}’'-]{2,}){1,3}/gu)){
+        const v=m[0].trim();if(v.length>90||v.split(/\s+/).some(w=>stop.has(normalized(w))))continue;
+        add("entity",v,pg.page,null);
       }
-      let sentences=text.split(/(?<=[.!?;·])\s+/).map(s=>s.trim()).filter(s=>s.length>=35&&s.length<=500);
-      if(!sentences.length&&text.length>=35)sentences=[...text.match(/.{35,420}(?:\s|$)/g)||[]].map(s=>s.trim());
-      for(const s of sentences){
-        const looksInformative=/\b(1[45-9]\d{2}|20\d{2})\b/.test(s)||/[\p{Lu}][\p{L}’'.-]{2,}\s+[\p{Lu}][\p{L}’'.-]{2,}/u.test(s)||/[Α-ΩΆΈΉΊΌΎΏ][\p{L}’'.-]{2,}/u.test(s);
-        if(looksInformative||claimCount<24){add("claim",s,pg.page,looksInformative?.62:.52);claimCount++;}
-        if(claimCount>=100)break;
+      // Preserve every passage for review, including contents and OCR noise.
+      // Do not label a sentence a verified historical claim.
+      const passages=text.match(/[^.!?]+(?:[.!?]+|$)/g)||[text];
+      for(const passage of passages){
+        const words=passage.trim().split(/\s+/);let chunk="";
+        for(const word of words){
+          if(chunk.length+word.length>800){add("excerpt",chunk,pg.page,null);chunk="";}
+          chunk+=(chunk?" ":"")+word;
+        }
+        if(chunk.length>=35)add("excerpt",chunk,pg.page,null);
       }
-      if(items.length>=260)break;
     }
-    return items.slice(0,260);
+    return items;
   }
 
   toggle.addEventListener("click",()=>{open();});
@@ -89,7 +125,8 @@
 
   analyze.addEventListener("click",async()=>{
     const file=current.file;if(!file)return;
-    analyze.disabled=true;save.disabled=true;
+    analyze.disabled=true;input.disabled=true;save.disabled=true;
+    current.items=[];reviewPage=0;render();
     try{
       setState("READING PDF LOCALLY","working");
       current.pages=await extractPages(file);
@@ -105,10 +142,11 @@
       current.items=proposals(current.pages);
       setState(current.items.length?"REVIEW REQUIRED":"TEXT FOUND — EXTRACTION NEEDS REVIEW",current.items.length?"ready":"error");
       render();
+      summary.textContent+=" · Automatic candidates and verbatim excerpts; OCR and historical verification pending.";
     }catch(e){
       setState("PDF READ FAILED","error");
     }finally{
-      analyze.disabled=false;
+      analyze.disabled=false;input.disabled=false;
     }
   });
 
