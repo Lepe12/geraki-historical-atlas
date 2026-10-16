@@ -24,10 +24,12 @@ export function applyResearchEvent(snapshot,event){
 }
 function createFeed({onSnapshot,onEvent,onState,WebSocketImpl=globalThis.WebSocket,fetchImpl=globalThis.fetch,endpoint='https://pct-live.piratecartography.com/pct-api/live',retryMs=12000,pollMs=15000,runId}){
  let closed=false,socket=null,retry=null,poll=null,connected=false,snapshot=null,liveSeen=false,polling=false,revision='';
+ let waitingRequest='';
  let selectedRun=runId||new URLSearchParams(globalThis.location?.search||'').get('run')||'latest';if(!/^\d+$/.test(selectedRun))selectedRun='latest';
  const seen=new Set(),status=(m,d='')=>{if(!closed)onState?.(m,d);};
  function acceptSnapshot(data,origin){
   if(closed||!validSnapshot(data)||(selectedRun!=='latest'&&String(data.run_id)!==selectedRun)||olderRun(data.run_id,snapshot?.run_id))return;
+  if(waitingRequest){const id=data.request_id||(data.events||[]).find(e=>e.request_id)?.request_id;if(id!==waitingRequest)return;waitingRequest='';selectedRun=String(data.run_id);}
   const same=String(data.run_id)===String(snapshot?.run_id);
   if(same&&snapshot?.generated_utc&&data.generated_utc&&data.generated_utc<snapshot.generated_utc)return;
   const sig=JSON.stringify(data);if(sig===revision)return;
@@ -42,6 +44,7 @@ function createFeed({onSnapshot,onEvent,onState,WebSocketImpl=globalThis.WebSock
  }
  function acceptEvent(e,replayed){
   if(!eventSchema(e)||!/^\d+$/.test(String(e.run_id))||(selectedRun!=='latest'&&String(e.run_id)!==selectedRun)||olderRun(e.run_id,snapshot?.run_id))return;
+  if(waitingRequest){if(e.request_id!==waitingRequest)return;waitingRequest='';selectedRun=String(e.run_id);}
   if(e.event_id&&seen.has(e.event_id))return;
   if(e.event_id){seen.add(e.event_id);if(seen.size>2000)seen.delete(seen.values().next().value);}
   if(!replayed){const next=applyResearchEvent(snapshot,e);if(next!==snapshot){snapshot=next;liveSeen=true;onSnapshot?.(snapshot,'LIVE');}}
@@ -63,11 +66,13 @@ function createFeed({onSnapshot,onEvent,onState,WebSocketImpl=globalThis.WebSock
  }
  fallback().finally(()=>{if(!closed){open();poll=setInterval(refresh,pollMs);}});
  const stop=()=>{closed=true;clearTimeout(retry);clearInterval(poll);socket?.close();};
- stop.selectRun=run=>{const id=/^\d+$/.test(String(run))?String(run):'latest';if(closed||id===selectedRun)return;selectedRun=id;snapshot=null;revision='';liveSeen=false;seen.clear();clearTimeout(retry);if(socket){socket.onclose=null;socket.onmessage=null;socket.close();}connected=false;open();refresh();};
+ stop.selectRun=(run,force=false)=>{const id=/^\d+$/.test(String(run))?String(run):'latest';if(closed||(id===selectedRun&&!waitingRequest&&!force))return;waitingRequest='';selectedRun=id;snapshot=null;revision='';liveSeen=false;seen.clear();clearTimeout(retry);if(socket){socket.onclose=null;socket.onmessage=null;socket.close();}connected=false;open();refresh();};
+ stop.waitForRequest=id=>{waitingRequest=String(id||'');snapshot=null;revision='';seen.clear();selectedRun='latest';status('WAITING','Waiting for request '+waitingRequest);refresh();};
  return stop;
 }
 let shared=null;
-export function selectResearchRun(run){shared?.stop?.selectRun(run);}
+export function selectResearchRun(run,force=false){if(force&&shared){shared.snapshot=null;for(const x of shared.subscribers)x.onReset?.();}shared?.stop?.selectRun(run,force);}
+export function waitForResearchRequest(id){if(!shared)return;shared.snapshot=null;shared.origin=null;for(const x of shared.subscribers)x.onReset?.();shared.stop.waitForRequest(id);}
 export function connectResearchFeed(options={}){
  // Injected transports remain isolated for deterministic contract tests.
  if(options.WebSocketImpl||options.fetchImpl||options.endpoint)return createFeed(options);

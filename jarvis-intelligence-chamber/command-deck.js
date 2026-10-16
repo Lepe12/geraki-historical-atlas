@@ -39,7 +39,7 @@
   }
 
   const navBtn=button('◧ NAVIGATION','deckNav',true,()=>setNav(document.body.classList.contains('deck-nav-closed')));
-  const activityBtn=button('◷ ACTIVITY','deckActivity',false,()=>setActivity(!activity.classList.contains('deck-expanded')));
+  const activityBtn=button('◷ ΠΟΡΕΙΑ','deckActivity',false,()=>setActivity(!activity.classList.contains('deck-expanded')));
   button('⌖ ΕΠΑΝΑΦΟΡΑ ΧΑΡΤΗ','deckReset',false,()=>$('resetView')?.click());
   app.appendChild(controls);
 

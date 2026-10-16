@@ -11,5 +11,4 @@ filters.addEventListener("click",e=>{const b=e.target.closest("button[data-filte
 zen.onclick=()=>{const on=!body.classList.contains("zen-mode");body.classList.toggle("zen-mode",on);zen.textContent=on?"EXIT ZEN":"ZEN";};
 remove.onclick=()=>setHidden(true);restore.onclick=()=>setHidden(false);
 if(localStorage.getItem("jarvis_exp_ui")==="off")setHidden(true);
-connectResearchFeed({onSnapshot:s=>{const agents=s.agents||[];active.textContent=agents.filter(a=>a.status&&!isTerminal(a.status)).length;claims.textContent=(s.claims||[]).length;blockers.textContent=(s.blockers||[]).length;},onState:m=>{core.textContent=m;core.parentElement?.classList.toggle("warn",m==="OFFLINE"||m==="RECONNECTING");}});
-
+connectResearchFeed({onReset:()=>{active.textContent=claims.textContent=blockers.textContent="0";},onSnapshot:s=>{const agents=s.agents||[];active.textContent=agents.filter(a=>a.status&&!isTerminal(a.status)).length;claims.textContent=(s.claims||[]).length;blockers.textContent=(s.blockers||[]).length;},onState:m=>{core.textContent=m;core.parentElement?.classList.toggle("warn",m==="OFFLINE"||m==="RECONNECTING");}});
