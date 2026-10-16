@@ -33,6 +33,7 @@
     if(open)activity.classList.remove('is-idle');
   }
   function closeRightPanels(except){
+    if(document.body.classList.contains('workspace-ready') && except) return;
     if(except!=='results' && results && !results.classList.contains('hidden')) $('closeResults')?.click();
     if(except!=='learning' && learning && !learning.classList.contains('hidden')) $('closeLearning')?.click();
     if(except!=='detail' && inspector && !inspector.classList.contains('hidden')) $('closeDetail')?.click();
