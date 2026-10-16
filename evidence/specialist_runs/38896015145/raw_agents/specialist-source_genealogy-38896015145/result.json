@@ -1,0 +1,577 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "source_genealogy",
+  "label": "Source Genealogy Agent",
+  "assignment_id": "source_genealogy:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "source_chains",
+    "derivative_sources",
+    "independence_warnings",
+    "primary_source_targets"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "235faab540f3e0abb736e4a18a99c2bd51dd27adad08237a8701e6d576e756fc",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "source_genealogy",
+    "assignment_id": "source_genealogy:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:Biblioteca Digital Hispánica",
+      "repo:Academia.edu Public Research"
+    ],
+    "queries": [
+      "\"Βρες ιστορικές πηγές για τον Ιωάννη Καψή\"",
+      "\"Βρες ιστορικές πηγές για τον Ιωάννης Καψής\"",
+      "\"Καψή\" \"Μήλου, μεταξύ 1670–1680\"",
+      "\"Καψή\" \"βασιλιά\"",
+      "\"Βρες ιστορικές πηγές για τον Ιωάννης Καψής\" \"Μήλου, μεταξύ 1670–1680\""
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 108,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 100,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 90,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Crossref Scholarly Metadata",
+        "route_type": "repository_dispatch",
+        "repository": "Crossref Scholarly Metadata",
+        "connector_id": null,
+        "score": 86,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "\"Βρες ιστορικές πηγές για τον Ιωάννη Καψή\"",
+      "records": [],
+      "diagnostic": "HTTPError: HTTP Error 403: Forbidden",
+      "blockers": [
+        {
+          "code": "EXECUTION_FAILED",
+          "detail": "HTTPError: HTTP Error 403: Forbidden"
+        }
+      ],
+      "warnings": [
+        "Repository connector raised an exception."
+      ],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Βρες ιστορικές πηγές για τον Ιωάννη Καψή\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%92%CF%81%CE%B5%CF%82+%CE%B9%CF%83%CF%84%CE%BF%CF%81%CE%B9%CE%BA%CE%AD%CF%82+%CF%80%CE%B7%CE%B3%CE%AD%CF%82+%CE%B3%CE%B9%CE%B1+%CF%84%CE%BF%CE%BD+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7+%CE%9A%CE%B1%CF%88%CE%AE+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" \"Μήλου, μεταξύ 1670–1680\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE+++%CE%9C%CE%AE%CE%BB%CE%BF%CF%85%2C+%CE%BC%CE%B5%CF%84%CE%B1%CE%BE%CF%8D+1670%E2%80%931680+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Βρες ιστορικές πηγές για τον Ιωάννης Καψής\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%92%CF%81%CE%B5%CF%82+%CE%B9%CF%83%CF%84%CE%BF%CF%81%CE%B9%CE%BA%CE%AD%CF%82+%CF%80%CE%B7%CE%B3%CE%AD%CF%82+%CE%B3%CE%B9%CE%B1+%CF%84%CE%BF%CE%BD+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" \"βασιλιά\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE+++%CE%B2%CE%B1%CF%83%CE%B9%CE%BB%CE%B9%CE%AC+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Βρες ιστορικές πηγές για τον Ιωάννης Καψής\" \"Μήλου, μεταξύ 1670–1680\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%92%CF%81%CE%B5%CF%82+%CE%B9%CF%83%CF%84%CE%BF%CF%81%CE%B9%CE%BA%CE%AD%CF%82+%CF%80%CE%B7%CE%B3%CE%AD%CF%82+%CE%B3%CE%B9%CE%B1+%CF%84%CE%BF%CE%BD+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82+++%CE%9C%CE%AE%CE%BB%CE%BF%CF%85%2C+%CE%BC%CE%B5%CF%84%CE%B1%CE%BE%CF%8D+1670%E2%80%931680+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "\"Βρες ιστορικές πηγές για τον Ιωάννης Καψής\"",
+      "records": [],
+      "diagnostic": "RemoteDisconnected: Remote end closed connection without response",
+      "blockers": [
+        {
+          "code": "EXECUTION_FAILED",
+          "detail": "RemoteDisconnected: Remote end closed connection without response"
+        }
+      ],
+      "warnings": [
+        "Repository connector raised an exception."
+      ],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "\"Καψή\" \"Μήλου, μεταξύ 1670–1680\"",
+      "records": [],
+      "diagnostic": "RemoteDisconnected: Remote end closed connection without response",
+      "blockers": [
+        {
+          "code": "EXECUTION_FAILED",
+          "detail": "RemoteDisconnected: Remote end closed connection without response"
+        }
+      ],
+      "warnings": [
+        "Repository connector raised an exception."
+      ],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "\"Βρες ιστορικές πηγές για τον Ιωάννης Καψής\" \"Μήλου, μεταξύ 1670–1680\"",
+      "records": [],
+      "diagnostic": "RemoteDisconnected: Remote end closed connection without response",
+      "blockers": [
+        {
+          "code": "EXECUTION_FAILED",
+          "detail": "RemoteDisconnected: Remote end closed connection without response"
+        }
+      ],
+      "warnings": [
+        "Repository connector raised an exception."
+      ],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "\"Καψή\" \"βασιλιά\"",
+      "records": [],
+      "diagnostic": "RemoteDisconnected: Remote end closed connection without response",
+      "blockers": [
+        {
+          "code": "EXECUTION_FAILED",
+          "detail": "RemoteDisconnected: Remote end closed connection without response"
+        }
+      ],
+      "warnings": [
+        "Repository connector raised an exception."
+      ],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Βρες ιστορικές πηγές για τον Ιωάννη Καψή\"",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%92%CF%81%CE%B5%CF%82+%CE%B9%CF%83%CF%84%CE%BF%CF%81%CE%B9%CE%BA%CE%AD%CF%82+%CF%80%CE%B7%CE%B3%CE%AD%CF%82+%CE%B3%CE%B9%CE%B1+%CF%84%CE%BF%CE%BD+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7+%CE%9A%CE%B1%CF%88%CE%AE%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%92%CF%81%CE%B5%CF%82+%CE%B9%CF%83%CF%84%CE%BF%CF%81%CE%B9%CE%BA%CE%AD%CF%82+%CF%80%CE%B7%CE%B3%CE%AD%CF%82+%CE%B3%CE%B9%CE%B1+%CF%84%CE%BF%CE%BD+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7+%CE%9A%CE%B1%CF%88%CE%AE%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Βρες ιστορικές πηγές για τον Ιωάννης Καψής\"",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%92%CF%81%CE%B5%CF%82+%CE%B9%CF%83%CF%84%CE%BF%CF%81%CE%B9%CE%BA%CE%AD%CF%82+%CF%80%CE%B7%CE%B3%CE%AD%CF%82+%CE%B3%CE%B9%CE%B1+%CF%84%CE%BF%CE%BD+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%92%CF%81%CE%B5%CF%82+%CE%B9%CF%83%CF%84%CE%BF%CF%81%CE%B9%CE%BA%CE%AD%CF%82+%CF%80%CE%B7%CE%B3%CE%AD%CF%82+%CE%B3%CE%B9%CE%B1+%CF%84%CE%BF%CE%BD+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Καψή\" \"Μήλου, μεταξύ 1670–1680\"",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%9A%CE%B1%CF%88%CE%AE%22+%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%85%2C+%CE%BC%CE%B5%CF%84%CE%B1%CE%BE%CF%8D+1670%E2%80%931680%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%9A%CE%B1%CF%88%CE%AE%22+%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%85%2C+%CE%BC%CE%B5%CF%84%CE%B1%CE%BE%CF%8D+1670%E2%80%931680%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Καψή\" \"βασιλιά\"",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%9A%CE%B1%CF%88%CE%AE%22+%22%CE%B2%CE%B1%CF%83%CE%B9%CE%BB%CE%B9%CE%AC%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%9A%CE%B1%CF%88%CE%AE%22+%22%CE%B2%CE%B1%CF%83%CE%B9%CE%BB%CE%B9%CE%AC%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" \"βασιλιά\"",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%9A%CE%B1%CF%88%CE%AE%22+AND+alma.all_for_ui%3D%22%CE%B2%CE%B1%CF%83%CE%B9%CE%BB%CE%B9%CE%AC%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Βρες ιστορικές πηγές για τον Ιωάννη Καψή\"",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%92%CF%81%CE%B5%CF%82+%CE%B9%CF%83%CF%84%CE%BF%CF%81%CE%B9%CE%BA%CE%AD%CF%82+%CF%80%CE%B7%CE%B3%CE%AD%CF%82+%CE%B3%CE%B9%CE%B1+%CF%84%CE%BF%CE%BD+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7+%CE%9A%CE%B1%CF%88%CE%AE%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Βρες ιστορικές πηγές για τον Ιωάννης Καψής\" \"Μήλου, μεταξύ 1670–1680\"",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%92%CF%81%CE%B5%CF%82+%CE%B9%CF%83%CF%84%CE%BF%CF%81%CE%B9%CE%BA%CE%AD%CF%82+%CF%80%CE%B7%CE%B3%CE%AD%CF%82+%CE%B3%CE%B9%CE%B1+%CF%84%CE%BF%CE%BD+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%85%2C+%CE%BC%CE%B5%CF%84%CE%B1%CE%BE%CF%8D+1670%E2%80%931680%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%92%CF%81%CE%B5%CF%82+%CE%B9%CF%83%CF%84%CE%BF%CF%81%CE%B9%CE%BA%CE%AD%CF%82+%CF%80%CE%B7%CE%B3%CE%AD%CF%82+%CE%B3%CE%B9%CE%B1+%CF%84%CE%BF%CE%BD+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%85%2C+%CE%BC%CE%B5%CF%84%CE%B1%CE%BE%CF%8D+1670%E2%80%931680%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Βρες ιστορικές πηγές για τον Ιωάννης Καψής\"",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%92%CF%81%CE%B5%CF%82+%CE%B9%CF%83%CF%84%CE%BF%CF%81%CE%B9%CE%BA%CE%AD%CF%82+%CF%80%CE%B7%CE%B3%CE%AD%CF%82+%CE%B3%CE%B9%CE%B1+%CF%84%CE%BF%CE%BD+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" \"Μήλου, μεταξύ 1670–1680\"",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%9A%CE%B1%CF%88%CE%AE%22+AND+alma.all_for_ui%3D%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%85%2C+%CE%BC%CE%B5%CF%84%CE%B1%CE%BE%CF%8D+1670%E2%80%931680%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Βρες ιστορικές πηγές για τον Ιωάννης Καψής\" \"Μήλου, μεταξύ 1670–1680\"",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%92%CF%81%CE%B5%CF%82+%CE%B9%CF%83%CF%84%CE%BF%CF%81%CE%B9%CE%BA%CE%AD%CF%82+%CF%80%CE%B7%CE%B3%CE%AD%CF%82+%CE%B3%CE%B9%CE%B1+%CF%84%CE%BF%CE%BD+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+AND+alma.all_for_ui%3D%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%85%2C+%CE%BC%CE%B5%CF%84%CE%B1%CE%BE%CF%8D+1670%E2%80%931680%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "result_count": 0,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
