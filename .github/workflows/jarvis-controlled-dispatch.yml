@@ -43,6 +43,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            jarvis_dispatch_requests
+            evidence/jarvis/dispatch_audit
 
       - id: request
         name: Resolve one explicit request
