@@ -11,10 +11,10 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
   page.on('pageerror',e=>errors.push(e.message));
   const current={schema:'pct-command-center-live-v1',run_id:'100',mission:{status:'COMPLETED',target:'Ιωάννης Καψής'},agents:[],claims:[],discoveries:[{title:'Σχετική πηγή',context_excerpt:'Απόσπασμα προς έλεγχο.',topical_match:{category:'POSSIBLE_TARGET'},evidence_state:'DISCOVERED',repository:'Αρχείο'}],blockers:[{description:'Πρόσβαση περιορισμένη'}],events:[],safety:{automatic_verified:false}};
   const setupRoutes=async p=>{
-   await p.route(/https:\/\/(fonts|cdn)\./,r=>r.abort());
+   await p.route('https://**',r=>r.abort());
    await p.route('https://raw.githubusercontent.com/**',r=>r.fulfill({json:current}));
    await p.route('https://pct-live.piratecartography.com/**',r=>{if(r.request().url().endsWith('/dispatch'))dispatches++;return r.fulfill({json:{snapshot:current,events:[]}})});
-   await p.routeWebSocket('wss://**',()=>{});
+   await p.addInitScript(()=>{ window.WebSocket=class {close(){} }; });
   };
   await setupRoutes(page);
   await page.addInitScript(()=>{
