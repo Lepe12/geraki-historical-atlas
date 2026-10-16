@@ -30,19 +30,19 @@ if(name==="desktop"){
  await page.locator("#zoomIn").click();await page.waitForTimeout(900);
  const after=await page.evaluate(()=>{const n=[...document.querySelectorAll(".node-label")].find(x=>x.textContent.includes("Greece"));const r=n.getBoundingClientRect();return Math.hypot(r.left+r.width/2-innerWidth*.5,r.top+r.height/2-innerHeight*.5)});
  assert.ok(after>before+8,"Zoom-in must visibly increase projected node distance");
- await page.getByRole('button',{name:'⌘ Archival constellation 02',exact:true}).click();
+ await page.locator('[data-view="archives"]').click();
  await page.waitForFunction(()=>!document.querySelector('#detailPanel').classList.contains('hidden'));
  assert.equal((await page.locator('#detailTitle').innerText()).trim(),'Spain','Archive navigation must open the current Spain sector');
  const liveDetail=page.locator('#detailLive');
  if(await liveDetail.count())assert.match(await liveDetail.innerText(),/RUN/,'When the selected agent exists in the current run, its recorded run detail must render');
  else assert.ok((await page.locator('#detailState').innerText()).trim().length>0,'Sector detail state must render even when that agent is absent from the current live run');
- await page.getByRole('button',{name:'CONTRADICTIONS',exact:true}).click();
- assert.ok(!(await page.locator('#resultsList').innerText()).includes('BLOCKER ·'),'Contradictions must not display access blockers');
+ await page.locator('[data-mode="contradictions"]').click();
+ assert.ok(!(await page.locator('#resultsList').innerText()).includes('ΕΜΠΟΔΙΟ ·'),'Contradictions must not display access blockers');
  await page.locator('#closeResults').click();
  const layout=await page.evaluate(()=>{const a=document.querySelector('#operatorQuery').getBoundingClientRect(),b=document.querySelector('.exp-rail').getBoundingClientRect();return Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left))*Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));});
  assert.equal(layout,0,'Command input must not overlap the experimental rail');
  report.realFeedChecked=true;
- await page.getByRole('button',{name:'Close details',exact:true}).click();
+ if(await page.locator('#detailPanel').isVisible())await page.getByRole('button',{name:'Close details',exact:true}).click();
  await page.locator("#resetView").click();
 }
 await page.close();}

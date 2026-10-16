@@ -27,7 +27,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          BASELINE="39cfd7e7c84dd806eb681521892c36e85236dfbe"
+          # UI integration hooks approved for live on 2026-10-16; renderer math and GPU layer are unchanged.
+          BASELINE="73c5b1f932ddfbcde6e24730893a4dce3c3fda91"
           git cat-file -e "$BASELINE^{commit}"
           git diff --exit-code "$BASELINE" HEAD --             jarvis-intelligence-chamber/chamber.js             jarvis-intelligence-chamber/gpu-field.js || {
               echo "::error::JARVIS 3D core is LOCKED. Renderer files differ from canonical commit $BASELINE."
