@@ -1,0 +1,77 @@
+// Browser contracts use synthetic speech APIs. No microphone, audio upload, or research dispatch.
+const {chromium}=require('playwright');
+const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('node:http'),path=require('node:path');
+(async()=>{
+ const root=path.resolve(__dirname,'..');
+ const server=http.createServer((req,res)=>{let file=path.join(root,new URL(req.url,'http://localhost').pathname);if(file.endsWith(path.sep))file+='index.html';try{res.setHeader('content-type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':file.endsWith('.svg')?'image/svg+xml':'text/html');res.end(fs.readFileSync(file))}catch{res.statusCode=404;res.end()}});
+ await new Promise(r=>server.listen(0,'127.0.0.1',r));
+ const browser=await chromium.launch({headless:true,...(process.env.JARVIS_BROWSER_EXECUTABLE?{executablePath:process.env.JARVIS_BROWSER_EXECUTABLE,args:['--no-sandbox','--no-zygote','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']}: {})});
+ try {
+  const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];let dispatches=0;
+  page.on('pageerror',e=>errors.push(e.message));
+  const current={schema:'pct-command-center-live-v1',run_id:'100',mission:{status:'COMPLETED',target:'Ιωάννης Καψής'},agents:[],claims:[],discoveries:[{title:'Σχετική πηγή',context_excerpt:'Απόσπασμα προς έλεγχο.',topical_match:{category:'POSSIBLE_TARGET'},evidence_state:'DISCOVERED',repository:'Αρχείο'}],blockers:[{description:'Πρόσβαση περιορισμένη'}],events:[],safety:{automatic_verified:false}};
+  const setupRoutes=async p=>{
+   await p.route('https://**',r=>r.abort());
+   await p.route('https://raw.githubusercontent.com/**',r=>r.fulfill({json:current}));
+   await p.route('https://pct-live.piratecartography.com/**',r=>{if(r.request().url().endsWith('/dispatch'))dispatches++;return r.fulfill({json:{snapshot:current,events:[]}})});
+   await p.addInitScript(()=>{ window.WebSocket=class {close(){} }; });
+  };
+  await setupRoutes(page);
+  await page.addInitScript(()=>{
+   window.__speech={spoken:[],cancelled:0,voices:[],instances:[],voiceListeners:[]};
+   Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>__speech.voices,addEventListener:(_,f)=>__speech.voiceListeners.push(f),cancel:()=>__speech.cancelled++,speak:u=>__speech.spoken.push(u)}});
+   window.SpeechSynthesisUtterance=class {constructor(text){this.text=text}};
+   window.SpeechRecognition=class {constructor(){__speech.instances.push(this)}start(){this.onstart?.()}stop(){this.onend?.()}abort(){this.aborted=true}};
+  });
+  const url='http://127.0.0.1:'+server.address().port+'/jarvis-intelligence-chamber/';
+  await page.goto(url);await page.waitForFunction(()=>document.body.dataset.currentResearchRun==='100');
+  assert.equal(await page.locator('#voicePanel').isVisible(),false);
+  await page.locator('#voiceToggle').click();await page.locator('#voiceMic').click();
+  assert.equal(await page.locator('#voiceMic').getAttribute('aria-pressed'),'true');
+  assert.equal(await page.evaluate(()=>__speech.instances[0].lang),'el-GR');
+  await page.evaluate(()=>{const result=[{transcript:'Ιωάννης Καψής στη Μήλο'}];result.isFinal=true;__speech.instances[0].onresult({results:[result]});__speech.instances[0].onend()});
+  assert.equal(await page.locator('#operatorQuery').inputValue(),'Ιωάννης Καψής στη Μήλο');
+  assert.equal(dispatches,0,'Dictation must never submit research');
+  await page.locator('#voiceMic').click();
+  await page.evaluate(()=>__speech.instances.at(-1).onerror({error:'not-allowed'}));
+  assert.match(await page.locator('#voiceStatus').textContent(),/Δεν δόθηκε άδεια/);
+  assert.equal(await page.locator('#operatorQuery').inputValue(),'Ιωάννης Καψής στη Μήλο');
+  await page.evaluate(()=>{__speech.voices=[{name:'Greek One',lang:'el-GR',voiceURI:'greek-one'},{name:'Greek Two',lang:'el-GR',voiceURI:'greek-two'}];__speech.voiceListeners.forEach(f=>f())});
+  await page.locator('#voicePanel details').evaluate(e=>e.open=true);
+  await page.locator('#voiceChoice').selectOption('greek-two');await page.locator('#voiceRead').click();
+  const spoken=await page.evaluate(()=>({text:__speech.spoken.at(-1).text,voice:__speech.spoken.at(-1).voice.voiceURI}));
+  assert.match(spoken.text,/1 πιθανές σχετικές αναφορές/);assert.match(spoken.text,/απαιτούν έλεγχο/);assert.equal(spoken.voice,'greek-two');
+  await page.locator('#voiceMic').click();assert.equal(await page.evaluate(()=>document.body.dataset.voiceState),'LISTENING','Microphone must interrupt playback');
+  await page.locator('#voiceStop').click();assert.equal(await page.evaluate(()=>document.body.dataset.voiceState),'IDLE');
+  const before=await page.locator('#operatorQuery').inputValue();
+  await page.evaluate(()=>__speech.instances.at(-1).onresult?.({results:[]}));assert.equal(await page.locator('#operatorQuery').inputValue(),before);
+  await page.locator('#resultsToggle').click();
+  await page.locator('.inspect-result').click();
+  await page.locator('#voiceReadDiscovery').click();
+  assert.match(await page.evaluate(()=>__speech.spoken.at(-1).text),/Απόσπασμα προς έλεγχο/);
+  assert.match(await page.evaluate(()=>__speech.spoken.at(-1).text),/δεν αποτελεί ιστορική επαλήθευση/);
+  await page.evaluate(()=>__speech.spoken.at(-1).onend());
+  assert.equal(await page.evaluate(()=>document.body.dataset.voiceState),'IDLE');
+  await page.locator('#voiceRead').click();await page.evaluate(()=>__speech.spoken.at(-1).onerror());
+  assert.match(await page.locator('#voiceStatus').textContent(),/δεν μπόρεσε να ξεκινήσει/);
+  await page.locator('#voiceAuto').check();
+  await page.evaluate(()=>window.dispatchEvent(new CustomEvent('jarvis:dispatch-accepted',{detail:{request_id:'own'}})));
+  const acceptedCount=await page.evaluate(()=>__speech.spoken.length);
+  await page.evaluate(()=>window.dispatchEvent(new CustomEvent('jarvis:research-state',{detail:{run_id:'other',request_id:'other',state:'RESEARCH ACTIVE'}})));
+  assert.equal(await page.evaluate(()=>__speech.spoken.length),acceptedCount,'Unrelated runs must not be announced');
+  for(let i=0;i<2;i++)await page.evaluate(()=>window.dispatchEvent(new CustomEvent('jarvis:research-state',{detail:{run_id:'200',request_id:'own',state:'RESEARCH ACTIVE'}})));
+  assert.equal(await page.evaluate(()=>__speech.spoken.length),acceptedCount+1,'Start is announced once');
+  await page.locator('#voiceClose').click();assert.equal(await page.evaluate(()=>document.body.dataset.voiceState),'IDLE');
+  await page.locator('#voiceToggle').click();
+  fs.mkdirSync(path.join(__dirname,'screenshots'),{recursive:true});
+  await page.screenshot({path:path.join(__dirname,'screenshots/voice-desktop.png')});
+  await page.setViewportSize({width:390,height:844});
+  const bounds=await page.locator('#voicePanel').boundingBox();assert(bounds.x>=0&&bounds.y>=0&&bounds.x+bounds.width<=390,'Voice controls must fit mobile viewport');
+  assert(await page.locator('#voiceMic').isVisible());await page.screenshot({path:path.join(__dirname,'screenshots/voice-mobile.png')});
+  const fallback=await browser.newPage();await setupRoutes(fallback);
+  await fallback.addInitScript(()=>{Object.defineProperty(window,'SpeechRecognition',{value:undefined});Object.defineProperty(window,'webkitSpeechRecognition',{value:undefined});Object.defineProperty(window,'speechSynthesis',{value:undefined});});
+  await fallback.goto(url);await fallback.locator('#voiceToggle').click();assert(await fallback.locator('#voiceMic').isDisabled());assert(await fallback.locator('#voiceRead').isDisabled());assert(await fallback.locator('#operatorQuery').isEnabled());
+  assert.equal(dispatches,0);assert.deepEqual(errors,[]);
+  console.log('PASS voice: Greek dictation, permission failure, manual submission, selectable voices, interruption, request correlation, mobile layout and unsupported-browser fallback. Synthetic speech only.');
+ } finally {await browser.close();server.close();}
+})().catch(e=>{console.error(e);process.exitCode=1});
