@@ -2,6 +2,24 @@ import unittest
 from research_query import split_research_query
 
 class ResearchQueryTests(unittest.TestCase):
+    def test_actual_unaccented_request(self):
+        q="βρες πληροφοριες για Ιωάννη Καψή"
+        self.assertEqual(split_research_query(q),("Ιωάννη Καψή","",q))
+
+    def test_accent_case_and_unicode_variants(self):
+        import unicodedata
+        for command in ["ΒΡΕΣ ΠΛΗΡΟΦΟΡΙΕΣ ΓΙΑ", "βρες πληροφορίες για", "ψαξε για", "Ψάξε για", "αναζητησε πηγες σχετικα με"]:
+            for name in ["Ιωάννη Καψή","Ανδρέα Μιαούλη"]:
+                q=command+" "+name
+                self.assertEqual(split_research_query(q)[0],name)
+                q=unicodedata.normalize("NFD",q)
+                self.assertEqual(split_research_query(q)[0],unicodedata.normalize("NFD",name))
+
+    def test_unaccented_period_and_empty_target(self):
+        self.assertEqual(split_research_query("ψαξε για τη Ροδο την περιοδο 1600–1700")[:2],("Ροδο","1600-1700"))
+        with self.assertRaisesRegex(ValueError,"REQUIRES_TARGET"):
+            split_research_query("βρες πληροφοριες για ")
+
     def test_greek_query_keeps_original_question(self):
         q="Βρες πηγές για τη Μήλο την περίοδο 1660–1680"
         self.assertEqual(split_research_query(q),("Μήλο","1660-1680",q))
