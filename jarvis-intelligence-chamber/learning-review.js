@@ -11,7 +11,7 @@
   const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
   const setState=(s,mode="")=>{status.textContent=s;panel.dataset.state=mode;};
 
-  function open(){const results=$("resultsDrawer");if(results)results.classList.add("hidden");panel.classList.remove("hidden");}
+  function open(){const results=$("resultsDrawer");if(results && !document.body.classList.contains("workspace-ready"))results.classList.add("hidden");panel.classList.remove("hidden");}
   let reviewPage=0;
   const batchSize=50;
   const reader=document.createElement("section");
