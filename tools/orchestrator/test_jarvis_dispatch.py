@@ -1,8 +1,25 @@
-import unittest
-from jarvis_dispatch import validate, fingerprint
+import unittest,json,tempfile
+from pathlib import Path
+from jarvis_dispatch import validate, fingerprint,build_audit,duplicate_submission
 
 
 class JarvisDispatchTests(unittest.TestCase):
+    def test_new_submission_can_repeat_question_but_replay_is_blocked(self):
+        payload={'agent_selection':{},'selected_agents':[],'workflow_selected_agents':'',
+                 'target':'Same historical question','date_range':'','purpose':'research'}
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            first=build_audit(Path('request.json'),payload,'1','ui-first')
+            (root/'1.json').write_text(json.dumps(first))
+            second=build_audit(Path('request.json'),payload,'2','ui-second')
+            self.assertEqual(first['request_fingerprint'],second['request_fingerprint'])
+            self.assertFalse(duplicate_submission(second,root))
+            self.assertTrue(duplicate_submission(first,root))
+            legacy=build_audit(Path('request.json'),payload,'3')
+            self.assertTrue(duplicate_submission(legacy,root))
+        with self.assertRaisesRegex(ValueError,'INVALID_REQUEST_ID'):
+            build_audit(Path('request.json'),payload,'4','invalid request id')
+
     def setUp(self):
         self.policy={
             "mode":"controlled_dispatch",

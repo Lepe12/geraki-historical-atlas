@@ -78,10 +78,13 @@ jobs:
 
       - id: jarvis
         name: JARVIS plans agents and validates guarded dispatch
+        env:
+          REQUEST_ID: ${{ inputs.request_id }}
         run: |
           python3 tools/orchestrator/jarvis_dispatch.py \
             --request "${{ steps.request.outputs.request_file }}" \
             --run-id "${{ github.run_id }}" \
+            --request-id "$REQUEST_ID" \
             --github-output "$GITHUB_OUTPUT" \
             --write-audit ".jarvis_runtime/dispatch_audit.json"
 

@@ -5,7 +5,7 @@ The user supplies the research problem. JARVIS owns agent selection unless an
 explicit manual override is supplied.
 """
 from __future__ import annotations
-import argparse, hashlib, json
+import argparse, hashlib, json, re
 from pathlib import Path
 from typing import Any
 
@@ -134,10 +134,13 @@ def existing_fingerprints(audit_root: Path) -> dict[str, str]:
     return found
 
 
-def build_audit(req_path: Path, payload: dict[str, Any], run_id: str) -> dict[str, Any]:
+def build_audit(req_path: Path, payload: dict[str, Any], run_id: str, request_id: str="") -> dict[str, Any]:
+    if request_id and not re.fullmatch(r'[A-Za-z0-9._:-]{1,128}',request_id):
+        raise ValueError('INVALID_REQUEST_ID')
     return {
         "schema": "pct-jarvis-dispatch-audit-v2",
         "run_id": run_id,
+        "request_id":request_id or None,
         "request_file": req_path.as_posix(),
         "request_fingerprint": fingerprint(payload),
         "mode": "controlled_dispatch",
@@ -154,10 +157,21 @@ def build_audit(req_path: Path, payload: dict[str, Any], run_id: str) -> dict[st
     }
 
 
+def duplicate_submission(audit: dict[str, Any], root: Path) -> bool:
+    if not audit.get('request_id'):
+        return audit['request_fingerprint'] in existing_fingerprints(root)
+    for path in root.glob('*.json'):
+        try:previous=load_json(path)
+        except (OSError,ValueError):continue
+        if previous.get('request_id')==audit['request_id']:return True
+    return False
+
+
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--request", type=Path, required=True)
     p.add_argument("--run-id", required=True)
+    p.add_argument("--request-id", default="")
     p.add_argument("--audit-root", type=Path, default=Path("evidence/jarvis/dispatch_audit"))
     p.add_argument("--github-output", type=Path)
     p.add_argument("--write-audit", type=Path)
@@ -167,8 +181,8 @@ def main() -> None:
 
     policy = load_json(POLICY_PATH)
     payload = validate(load_json(args.request), policy)
-    audit = build_audit(args.request, payload, args.run_id)
-    if audit["request_fingerprint"] in existing_fingerprints(args.audit_root):
+    audit = build_audit(args.request, payload, args.run_id,args.request_id)
+    if duplicate_submission(audit,args.audit_root):
         raise ValueError("DUPLICATE_DISPATCH_REQUEST")
 
     matrix = json.dumps(payload["selected_agents"], separators=(",", ":"))
