@@ -22,13 +22,14 @@
 
   function setNav(open){
     document.body.classList.toggle('deck-nav-closed',!open);
+    navPanel.inert=!open;
     navBtn.setAttribute('aria-expanded',String(open));
-    navBtn.textContent=open?'◧ HIDE NAV':'◧ NAVIGATION';
+    navBtn.textContent=open?'◧ ΚΛΕΙΣΙΜΟ ΤΟΜΕΩΝ':'◧ ΤΟΜΕΙΣ';
   }
   function setActivity(open){
     activity.classList.toggle('deck-expanded',open);
     activityBtn.setAttribute('aria-expanded',String(open));
-    activityBtn.textContent=open?'◷ COLLAPSE ACTIVITY':'◷ ACTIVITY';
+    activityBtn.textContent=open?'◷ ΣΥΜΠΤΥΞΗ ΠΟΡΕΙΑΣ':'◷ ΠΟΡΕΙΑ';
     if(open)activity.classList.remove('is-idle');
   }
   function closeRightPanels(except){
@@ -38,8 +39,8 @@
   }
 
   const navBtn=button('◧ NAVIGATION','deckNav',true,()=>setNav(document.body.classList.contains('deck-nav-closed')));
-  const activityBtn=button('◷ ACTIVITY','deckActivity',false,()=>setActivity(!activity.classList.contains('deck-expanded')));
-  button('⌖ RESET','deckReset',false,()=>$('resetView')?.click());
+  const activityBtn=button('◷ ΠΟΡΕΙΑ','deckActivity',false,()=>setActivity(!activity.classList.contains('deck-expanded')));
+  button('⌖ ΕΠΑΝΑΦΟΡΑ ΧΑΡΤΗ','deckReset',false,()=>$('resetView')?.click());
   app.appendChild(controls);
 
   setNav(!window.matchMedia('(max-width:900px)').matches);
@@ -72,8 +73,32 @@
     if(window.matchMedia('(max-width:900px)').matches)setNav(false);
   }));
 
+  const panels=[results,learning,inspector].filter(Boolean);
+  const triggers=new Map([[results,$('resultsToggle')],[learning,$('learningToggle')]]);
+  panels.forEach(panel=>{
+    panel.tabIndex=-1; panel.setAttribute('role','region');
+    const trigger=triggers.get(panel);
+    if(trigger){trigger.setAttribute('aria-controls',panel.id);trigger.setAttribute('aria-expanded',String(!panel.classList.contains('hidden')));}
+    let wasOpen=!panel.classList.contains('hidden');
+    new MutationObserver(()=>{
+      const open=!panel.classList.contains('hidden');
+      trigger?.setAttribute('aria-expanded',String(open));
+      if(open&&!wasOpen){closeRightPanels(panel===results?'results':panel===learning?'learning':'detail');if(window.matchMedia('(max-width:900px)').matches)setNav(false);panel.focus({preventScroll:true});}
+      if(!open&&wasOpen&&panel.contains(document.activeElement))trigger?.focus({preventScroll:true});
+      wasOpen=open;
+    }).observe(panel,{attributes:true,attributeFilter:['class']});
+  });
+  navBtn.setAttribute('aria-controls','sectorNavigation');navPanel.id='sectorNavigation';
+  activityBtn.setAttribute('aria-controls','activityStrip');
+  const viewRail=document.querySelector('.exp-rail');
+  if(viewRail){
+    const heading=document.createElement('div');heading.className='view-rail-label label';heading.textContent='ΠΡΟΒΟΛΗ';viewRail.prepend(heading);
+    navPanel.querySelector('.nav-sections').after(viewRail);
+  }
   document.addEventListener('keydown',e=>{
+
     if(e.key==='Escape'){
+      closeRightPanels();
       if(activity.classList.contains('deck-expanded'))setActivity(false);
       if(window.matchMedia('(max-width:900px)').matches)setNav(false);
     }

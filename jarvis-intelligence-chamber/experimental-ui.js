@@ -8,8 +8,9 @@ function setMode(mode){body.classList.remove("exp-mode-active","exp-mode-evidenc
 function setFilter(filter){filters.querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.filter===filter));window.dispatchEvent(new CustomEvent("jarvis:results-filter",{detail:{filter}}));if(filter!=="all")window.dispatchEvent(new Event("jarvis:results-open"));}
 modes.addEventListener("click",e=>{const b=e.target.closest("button[data-mode]");if(b)setMode(b.dataset.mode);});
 filters.addEventListener("click",e=>{const b=e.target.closest("button[data-filter]");if(b)setFilter(b.dataset.filter);});
-zen.onclick=()=>{const on=!body.classList.contains("zen-mode");body.classList.toggle("zen-mode",on);zen.textContent=on?"EXIT ZEN":"ZEN";};
+zen.onclick=()=>{const on=!body.classList.contains("zen-mode");body.classList.toggle("zen-mode",on);zen.textContent=on?"ΕΠΙΣΤΡΟΦΗ":"ΚΑΘΑΡΗ ΠΡΟΒΟΛΗ";};
 remove.onclick=()=>setHidden(true);restore.onclick=()=>setHidden(false);
 if(localStorage.getItem("jarvis_exp_ui")==="off")setHidden(true);
-connectResearchFeed({onSnapshot:s=>{const agents=s.agents||[];active.textContent=agents.filter(a=>a.status&&!isTerminal(a.status)).length;claims.textContent=(s.claims||[]).length;blockers.textContent=(s.blockers||[]).length;},onState:m=>{core.textContent=m;core.parentElement?.classList.toggle("warn",m==="OFFLINE"||m==="RECONNECTING");}});
+connectResearchFeed({onReset:()=>{active.textContent=claims.textContent=blockers.textContent="0";},onSnapshot:s=>{const agents=s.agents||[];active.textContent=agents.filter(a=>a.status&&!isTerminal(a.status)).length;claims.textContent=(s.claims||[]).length;blockers.textContent=(s.blockers||[]).length;},onState:m=>{core.textContent=m;core.parentElement?.classList.toggle("warn",m==="OFFLINE"||m==="RECONNECTING");}});
+
 
