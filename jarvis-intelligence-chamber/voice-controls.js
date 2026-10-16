@@ -9,7 +9,9 @@
   const toggle = document.createElement('button');
   toggle.type = 'button'; toggle.id = 'voiceToggle'; toggle.className = 'voice-toggle';
   toggle.textContent = 'ΦΩΝΗ'; toggle.setAttribute('aria-expanded', 'false'); toggle.setAttribute('aria-controls', 'voicePanel');
-  form.querySelector('.operator-command-label').insertBefore(toggle, document.getElementById('commandState'));
+  const dock = document.createElement('div');
+  dock.id = 'voiceDock'; dock.className = 'voice-dock';
+  dock.append(toggle); document.getElementById('app').append(dock);
   const panel = document.createElement('section');
   panel.id = 'voicePanel'; panel.className = 'voice-panel'; panel.hidden = true;
   panel.setAttribute('aria-label', 'Φωνή NABOU');
@@ -20,7 +22,7 @@
     <label for="voiceChoice">Φωνή ανάγνωσης της συσκευής</label><select id="voiceChoice"></select><small id="voiceAvailability"></small>
     <label class="voice-auto"><input type="checkbox" id="voiceAuto"> Να ακούγονται η έναρξη και η ολοκλήρωση της δικής μου έρευνας</label></details>
     <small>Η υπαγόρευση συμπληρώνει το πεδίο. Ελέγξτε το κείμενο και πατήστε «ΕΡΕΥΝΑ» για αποστολή. Ο browser ενδέχεται να στέλνει τον ήχο στην υπηρεσία αναγνώρισής του. Η ανάγνωση χρησιμοποιεί τα καταγεγραμμένα δεδομένα της έρευνας.</small>`;
-  form.append(panel);
+  dock.append(panel);
   const $ = id => document.getElementById(id);
   const mic = $('voiceMic'), read = $('voiceRead'), stop = $('voiceStop'), status = $('voiceStatus');
   const language = $('voiceLanguage'), choice = $('voiceChoice'), auto = $('voiceAuto');
