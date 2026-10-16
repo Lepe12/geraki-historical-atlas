@@ -14,7 +14,7 @@ function setStatus(s){
  state=s.mission.status==='READY'?'ready':s.mission.status==='COMPLETED'?'complete':s.mission.status==='QUEUED'?'waiting':s.mission.status==='FAILED'?'failed':'running';
  const active=s.agents.filter(a=>!['COMPLETED','IDLE','FAILED','BLOCKED'].includes(a.status));
  const copy={ready:['Έτοιμο για νέα έρευνα','Γράψε το ερώτημα, τον τόπο ή την περίοδο που σε ενδιαφέρει.','＋'],waiting:['Το αίτημα παραλήφθηκε','Αναμονή εκκίνησης. Η έρευνα δεν έχει αρχίσει ακόμη.','◷'],running:['Η έρευνα εκτελείται',active.length?'Αναζήτηση πηγών σε ελληνικές συλλογές και αφηγηματικά έργα.':'Η έρευνα συνεχίζεται. Αναμονή της επόμενης ερευνητικής φάσης.','◉'],complete:['Η έρευνα ολοκληρώθηκε','Δείγματα από προηγούμενη έρευνα για τον Κρεβελιέ. Απαιτείται έλεγχος της τεκμηρίωσής τους.','✓'],failed:['Η έρευνα διακόπηκε','Διάβασε την αιτία στην αναλυτική πορεία πριν δοκιμάσεις ξανά.','!']}[state];
- body.dataset.workspaceState=state;$('workspaceStatus').textContent=copy[0];$('workspaceStatusDetail').textContent=copy[1];$('missionSymbol').textContent=copy[2];$('workspaceActive').textContent=active.length;$('workspaceActiveLabel').textContent=state==='complete'?'agents σε εργασία':'agents σε εργασία';
+ body.dataset.workspaceState=state;$('workspaceStatus').textContent=copy[0]+(state==='running'&&active.length?' · '+active.length+' agents':'');$('missionCard').title=copy[1];$('workspaceStatusDetail').textContent=copy[1];$('missionSymbol').textContent=copy[2];$('workspaceActive').textContent=active.length;$('workspaceActiveLabel').textContent=state==='complete'?'agents σε εργασία':'agents σε εργασία';
  $('commandState').textContent=state==='ready'?'Έτοιμο':state==='complete'?'Ολοκληρώθηκε':state==='waiting'?'Το αίτημα παραλήφθηκε':'Σε εξέλιξη';
  const index={ready:-1,waiting:0,running:1,complete:2,failed:1}[state];document.querySelectorAll('[data-step]').forEach((li,i)=>{li.classList.toggle('done',i<index||state==='complete');if(i===index)li.setAttribute('aria-current','step');else li.removeAttribute('aria-current');});
  document.querySelectorAll('[data-preview-state]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.previewState===state)));
@@ -34,7 +34,7 @@ $('learningToggle').onclick=()=>{$('learningPanel').classList.toggle('hidden');}
 // Review-only preview: uploads and memory writes remain on the approved live interface.
 $('learningAnalyze').disabled=true;$('learningFile').addEventListener('change',()=>{$('learningSource').textContent=$('learningFile').files[0]?.name||'Δεν έχει επιλεγεί αρχείο';$('learningState').textContent='Προεπισκόπηση διάταξης — η πραγματική ανάλυση παραμένει στο live';});
 $('activityToggle').onclick=()=>{const open=body.classList.toggle('workspace-activity-open');$('activityToggle').setAttribute('aria-expanded',String(open));};
-const voiceDock=$('voiceDock');if(voiceDock){$('voiceRailSlot').append(voiceDock);$('voiceToggle').innerHTML='<span>◖</span> Φωνή<small>Υπαγόρευση και ανάγνωση</small>';$('voiceToggle').classList.add('rail-button');}
+const voiceDock=$('voiceDock');if(voiceDock){$('voiceRailSlot').append(voiceDock);$('voiceToggle').innerHTML='<span>◖</span> Φωνή';$('voiceToggle').classList.add('rail-button');}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('mapFilters').hidden=true;$('historyPanel').hidden=true;$('learningPanel').classList.add('hidden');body.classList.remove('workspace-activity-open');}});
 new ResizeObserver(resize).observe($('mapStage'));
 const purposes={'Spain':'Αναζήτηση σε ισπανικά αρχεία και συλλογές.','Venice':'Αναζήτηση σε βενετικές αρχειακές πηγές.','Greece':'Αναζήτηση σε ελληνικές συλλογές, βιβλία και αποθετήρια.','Travellers & Narratives':'Εντοπισμός περιηγητών και αφηγηματικών πηγών.','Source Genealogy':'Έλεγχος αν οι πηγές αντιγράφουν η μία την άλλη.','Identity Resolution':'Έλεγχος αν οι διαφορετικές γραφές αφορούν το ίδιο πρόσωπο.','Contradictions':'Εντοπισμός διαφωνιών ανάμεσα σε πηγές.','Relationship Networks':'Έλεγχος σχέσεων που υποστηρίζονται από πηγές.','Chronology':'Έλεγχος χρονολογιών και ακολουθίας γεγονότων.'};
@@ -44,3 +44,15 @@ function polishResults(){for(const row of $('resultsList').querySelectorAll('.re
 new MutationObserver(polishResults).observe($('resultsList'),{childList:true,subtree:true});polishResults();
 
 setInterval(()=>{if(state==='waiting'&&acceptedAt){$('workspaceActive').textContent=Math.floor((Date.now()-acceptedAt)/1000);$('workspaceActiveLabel').textContent='δευτ. αναμονής';}},1000);
+
+// Show one inspector at a time and reserve real map space beside it.
+const inspectors=['resultsDrawer','detailPanel','historyPanel','learningPanel','voicePanel'];
+let visibleInspectors=new Set();
+const isInspectorOpen=id=>{const el=$(id);return el&&!el.hidden&&!el.classList.contains('hidden');};
+function hideInspector(id){const el=$(id);if(!el||!isInspectorOpen(id))return;if(['historyPanel','voicePanel'].includes(id))el.hidden=true;else el.classList.add('hidden');const trigger={resultsDrawer:'resultsToggle',historyPanel:'historyToggle',learningPanel:'learningToggle',voicePanel:'voiceToggle'}[id];if(trigger)$(trigger)?.setAttribute('aria-expanded','false');}
+function reconcileInspectors(){const now=inspectors.filter(isInspectorOpen),opened=now.filter(id=>!visibleInspectors.has(id)),keep=opened.at(-1)||now.at(-1);for(const id of now)if(id!==keep)hideInspector(id);visibleInspectors=new Set(keep?[keep]:[]);body.classList.toggle('workspace-inspector-open',!!keep);$('learningToggle').setAttribute('aria-expanded',String(keep==='learningPanel'));if(keep)body.classList.remove('workspace-activity-open');resize();}
+const inspectorObserver=new MutationObserver(reconcileInspectors);
+for(const id of inspectors)if($(id))inspectorObserver.observe($(id),{attributes:true,attributeFilter:['class','hidden']});
+reconcileInspectors();
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){for(const id of inspectors)hideInspector(id);$('filterToggle').setAttribute('aria-expanded','false');$('historyToggle').setAttribute('aria-expanded','false');$('activityToggle').setAttribute('aria-expanded','false');}});
+for(const button of document.querySelectorAll('[data-preview-state]'))button.addEventListener('click',()=>button.closest('details').open=false);
