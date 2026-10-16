@@ -88,26 +88,6 @@ jobs:
             --github-output "$GITHUB_OUTPUT" \
             --write-audit ".jarvis_runtime/dispatch_audit.json"
 
-      - name: Test control plane
-        run: |
-          python3 -m compileall -q tools/orchestrator
-          PYTHONPATH=tools/orchestrator python3 -m unittest \
-            tools/orchestrator/test_jarvis_agent_planner.py \
-            tools/orchestrator/test_jarvis_dispatch.py \
-            tools/orchestrator/test_research_query.py -v
-
-      - name: Commit append-only dispatch audit
-        run: |
-          set -euo pipefail
-          mkdir -p evidence/jarvis/dispatch_audit
-          test ! -e "evidence/jarvis/dispatch_audit/${{ github.run_id }}.json"
-          cp .jarvis_runtime/dispatch_audit.json "evidence/jarvis/dispatch_audit/${{ github.run_id }}.json"
-          git config user.name "jarvis-orchestrator[bot]"
-          git config user.email "jarvis-orchestrator@users.noreply.github.com"
-          git add "evidence/jarvis/dispatch_audit/${{ github.run_id }}.json"
-          git commit -m "JARVIS approve controlled dispatch ${{ github.run_id }}"
-          bash tools/push_with_retry.sh
-
       - name: Dispatch JARVIS-planned unified research run
         env:
           GH_TOKEN: "${{ github.token }}"
@@ -130,3 +110,22 @@ jobs:
           echo "JARVIS_CONTROLLED_DISPATCH_SENT planned_agents=$JARVIS_SELECTED_AGENTS workflow_filter=$SELECTED_AGENTS"
           echo "Specialist agents are launched once inside pct-parallel-multi-agent.yml."
 
+      - name: Test control plane
+        run: |
+          python3 -m compileall -q tools/orchestrator
+          PYTHONPATH=tools/orchestrator python3 -m unittest \
+            tools/orchestrator/test_jarvis_agent_planner.py \
+            tools/orchestrator/test_jarvis_dispatch.py \
+            tools/orchestrator/test_research_query.py -v
+
+      - name: Commit append-only dispatch audit
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/jarvis/dispatch_audit
+          test ! -e "evidence/jarvis/dispatch_audit/${{ github.run_id }}.json"
+          cp .jarvis_runtime/dispatch_audit.json "evidence/jarvis/dispatch_audit/${{ github.run_id }}.json"
+          git config user.name "jarvis-orchestrator[bot]"
+          git config user.email "jarvis-orchestrator@users.noreply.github.com"
+          git add "evidence/jarvis/dispatch_audit/${{ github.run_id }}.json"
+          git commit -m "JARVIS approve controlled dispatch ${{ github.run_id }}"
+          bash tools/push_with_retry.sh
