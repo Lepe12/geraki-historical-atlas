@@ -27,7 +27,7 @@ function renderResults(){
  $('exportResults').disabled=!snapshot;
  document.querySelectorAll('[data-result-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.resultFilter===resultFilter)));
  meta.textContent=related.length+' πιθανές σχετικές αναφορές · '+supporting.length+' γενικού πλαισίου · '+unmatched.length+' αταύτιστα · '+claims.length+' ιστορικοί ισχυρισμοί · '+blockers.length+' εμπόδια';
- const groups=resultFilter==='contradictions'?[[contradictions,'CONTRADICTION']]:resultFilter==='claims'?[[claims,'CLAIM']]:resultFilter==='blockers'?[[blockers,'BLOCKER']]:[[related,'DISCOVERY'],[claims,'CLAIM'],[supporting,'CONTEXT ONLY'],[unmatched,'UNMATCHED'],[coverage,'SOURCE SEARCH'],[blockers,'BLOCKER']];
+ const groups=resultFilter==='related'?[[related,'DISCOVERY']]:resultFilter==='context'?[[supporting,'CONTEXT ONLY'],[unmatched,'UNMATCHED']]:resultFilter==='sources'?[[coverage,'SOURCE SEARCH']]:resultFilter==='contradictions'?[[contradictions,'CONTRADICTION']]:resultFilter==='claims'?[[claims,'CLAIM']]:resultFilter==='blockers'?[[blockers,'BLOCKER']]:[[related,'DISCOVERY'],[claims,'CLAIM'],[supporting,'CONTEXT ONLY'],[unmatched,'UNMATCHED'],[coverage,'SOURCE SEARCH'],[blockers,'BLOCKER']];
  const q=$('resultSearch').value.trim().toLocaleLowerCase();
  const filtered=groups.map(([records,kind])=>[sortRecords(records).filter(r=>!q||JSON.stringify(r).toLocaleLowerCase().includes(q)),kind]);
  const total=filtered.reduce((n,[rows])=>n+rows.length,0);resultPage=Math.min(resultPage,Math.max(0,Math.ceil(total/pageSize)-1));
@@ -51,7 +51,7 @@ function updateDetail(){
 }
 window.addEventListener('jarvis:mission-state',e=>{if(e.detail?.state)mission.textContent=e.detail.state;});
 window.addEventListener('jarvis:dispatch-accepted',e=>{requestedId=e.detail?.request_id||'';snapshot=null;events=[];resultFilter='all';waitForResearchRequest(requestedId);if(window.history&&window.location){const u=new URL(window.location.href);u.searchParams.delete('run');window.history.replaceState(null,'',u);}renderResults();renderActivity();drawer.classList.remove('hidden');});
-window.addEventListener('jarvis:results-filter',e=>{resultPage=0;resultFilter=['all','claims','blockers','contradictions'].includes(e.detail?.filter)?e.detail.filter:'all';renderResults();});
+window.addEventListener('jarvis:results-filter',e=>{resultPage=0;resultFilter=['all','related','context','sources','claims','blockers','contradictions'].includes(e.detail?.filter)?e.detail.filter:'all';renderResults();});
 window.addEventListener('jarvis:results-open',()=>drawer.classList.remove('hidden'));window.addEventListener('jarvis:results-close',()=>drawer.classList.add('hidden'));
 toggle.onclick=()=>drawer.classList.toggle('hidden');close.onclick=()=>drawer.classList.add('hidden');
 new MutationObserver(updateDetail).observe($('detailTitle'),{childList:true,subtree:true,characterData:true});
