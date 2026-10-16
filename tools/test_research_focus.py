@@ -31,6 +31,11 @@ class ResearchFocusTests(unittest.TestCase):
                       'Ιωάννης Καποδίστριας, βασιλιάς της Μήλου',
                       'Ιωάννης Καψήτας ιστορία','Πειρατές στο Αιγαίο']:
             self.assertNotIn(topical_match({'title':title},self.focus)['category'],('TARGET_MATCH','POSSIBLE_TARGET'),title)
+        # Real-run failure: names of different authors in a long contents list.
+        self.assertEqual(topical_match({'title':'Ιωάννης Σχολαστικός. '+('Άλλο άρθρο. '*30)+'του Γιάννη Καψή'},decompose('Ιωάννη Καψή'))['category'],'UNMATCHED')
+        distant='Ιωάννης Καψής, δημοσιογράφος. '+('Άσχετη παράγραφος. '*30)+'Μήλου, βασιλιάς.'
+        self.assertEqual(topical_match({'title':distant},self.focus)['category'],'POSSIBLE_TARGET')
+        self.assertEqual(topical_match({'title':distant},self.focus)['reason'],'NAME_WITHOUT_REQUEST_CONTEXT')
         self.assertEqual(topical_match({'title':'Καψής της Μήλου'},self.focus)['category'],'POSSIBLE_TARGET')
         self.assertEqual(topical_match({'title':'Καψής, σύγχρονος δημοσιογράφος'},self.focus)['category'],'UNMATCHED')
 

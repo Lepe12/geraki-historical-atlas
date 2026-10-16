@@ -76,14 +76,18 @@ def focused_queries(focus, qualifiers=()):
     return list(dict.fromkeys(queries))
 
 
-def _token_match(text, name):
+def _token_pattern(name):
     """Bounded Greek inflection tolerance; no first-name-only identity match."""
     n=fold(name)
     if re.search(r'[α-ω]',n):
         n=re.sub(r'(?:ησ|η|οσ|ου|ασ|α|εσ|ε|ο)$','',n)
         if len(n)>=3:
-            return bool(re.search(r'(?<!\w)'+re.escape(n)+r'(?:ησ|η|οσ|ου|ασ|α|εσ|ε|ο|ων|ουσ)?(?!\w)',text))
-    return bool(re.search(r'(?<!\w)'+re.escape(fold(name))+r'(?!\w)',text))
+            return r'(?<!\w)'+re.escape(n)+r'(?:ησ|η|οσ|ου|ασ|α|εσ|ε|ο|ων|ουσ)?(?!\w)'
+    return r'(?<!\w)'+re.escape(fold(name))+r'(?!\w)'
+
+
+def _token_match(text,name):
+    return bool(re.search(_token_pattern(name),text))
 
 
 def topical_match(record, focus):
@@ -98,13 +102,25 @@ def topical_match(record, focus):
         if focus['kind']=='person' and len(words)>=2:
             # Surname AND at least one given-name token; a matching given name
             # by itself is never a match. Still a candidate, never verified identity.
-            if _token_match(text,words[-1]) and any(_token_match(text,w) for w in words[:-1]):
+            # Name parts must occur together, not anywhere in a long catalogue
+            # description (e.g. one author called Ioannis and another Kapsis).
+            gap=r'[\s,.-]{1,8}(?:[^\W\d_]\.[\s]{0,4})?'
+            pattern=gap.join(_token_pattern(w) for w in words)
+            name_hit=re.search(pattern,text)
+            if name_hit:
+                local=text[max(0,name_hit.start()-180):name_hit.end()+180]
+                places=[p for p in focus.get('places',[]) if _token_match(local,p)]
+                roles=[r for r in focus.get('roles',[]) if _token_match(local,r)]
                 constrained=bool(focus.get('places') or focus.get('roles'))
                 return {'category':'POSSIBLE_TARGET' if constrained and not (places or roles) else 'TARGET_MATCH',
                         'reason':'NAME_WITHOUT_REQUEST_CONTEXT' if constrained and not (places or roles) else 'NAME_TOKENS_IN_SOURCE',
                         'matched_name':name,'places':places,'roles':roles}
-            if _token_match(text,words[-1]) and (places or roles):
-                return {'category':'POSSIBLE_TARGET','reason':'SURNAME_WITH_REQUEST_CONTEXT','matched_name':name,'places':places,'roles':roles}
+            for hit in re.finditer(_token_pattern(words[-1]),text):
+                local=text[max(0,hit.start()-180):hit.end()+180]
+                local_places=[p for p in focus.get('places',[]) if _token_match(local,p)]
+                local_roles=[r for r in focus.get('roles',[]) if _token_match(local,r)]
+                if local_places or local_roles:
+                    return {'category':'POSSIBLE_TARGET','reason':'SURNAME_WITH_REQUEST_CONTEXT','matched_name':name,'places':local_places,'roles':local_roles}
         elif name and re.search(r'(?<!\w)'+re.escape(fold(name))+r'(?!\w)',text):
             return {'category':'TARGET_MATCH','reason':'TARGET_PHRASE_IN_SOURCE','matched_name':name,'places':places,'roles':roles}
     return {'category':'CONTEXT_ONLY' if places else 'UNMATCHED',
