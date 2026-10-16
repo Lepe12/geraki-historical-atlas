@@ -5,6 +5,7 @@
   if(!panel||!toggle||!close||!input||!analyze||!status||!source||!list||!summary||!save)return;
 
   const endpoint="https://pct-live.piratecartography.com/pct-api/live";
+  let saving=false;
   let current={source_id:"",file:null,pages:[],items:[]};
 
   const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
@@ -43,9 +44,9 @@
     const accepted=current.items.filter(x=>x.status==="accepted").length;
     const rejected=current.items.filter(x=>x.status==="rejected").length;
     const pending=current.items.length-accepted-rejected;
-    summary.textContent=current.items.length?accepted+" accepted · "+rejected+" rejected · "+pending+" pending":"No extracted knowledge yet.";
-    list.innerHTML=current.items.length?current.items.slice(offset,offset+batchSize).map((x,j)=>'<article class="learning-item" data-i="'+(offset+j)+'" data-status="'+esc(x.status)+'"><div class="learning-item-head"><span>'+esc(x.extraction_kind==="excerpt"?"EXCERPT — UNVERIFIED":x.type.toUpperCase())+'</span><small>PAGE '+esc(x.page||"—")+' · '+(x.confidence==null?'CONFIDENCE UNASSESSED':Math.round(x.confidence*100)+'%')+'</small></div><div class="learning-item-text" contenteditable="'+(x.editing?"true":"false")+'">'+esc(x.text)+'</div><div class="learning-actions"><button data-act="accept">ACCEPT</button><button data-act="reject">REJECT</button><button data-act="edit">'+(x.editing?"DONE":"EDIT")+'</button></div></article>').join(""):'<div class="learning-empty">Upload a PDF to inspect what NABOU//X extracts before anything enters memory.</div>';
-    save.disabled=accepted===0;
+    summary.textContent=current.items.length?accepted+" accepted · "+rejected+" rejected · "+pending+" pending":"Δεν υπάρχουν ακόμη στοιχεία προς έλεγχο.";
+    list.innerHTML=current.items.length?current.items.slice(offset,offset+batchSize).map((x,j)=>'<article class="learning-item" data-i="'+(offset+j)+'" data-status="'+esc(x.status)+'"><div class="learning-item-head"><span>'+esc(x.saved?"ΑΠΟΘΗΚΕΥΜΕΝΟ":x.extraction_kind==="excerpt"?"EXCERPT — UNVERIFIED":x.type.toUpperCase())+'</span><small>PAGE '+esc(x.page||"—")+' · '+(x.confidence==null?'CONFIDENCE UNASSESSED':Math.round(x.confidence*100)+'%')+'</small></div><div class="learning-item-text" contenteditable="'+(x.editing?"true":"false")+'">'+esc(x.text)+'</div><div class="learning-actions"><button data-act="accept">ΕΓΚΡΙΣΗ</button><button data-act="reject">ΑΠΟΡΡΙΨΗ</button><button data-act="edit">'+(x.editing?"ΤΕΛΟΣ ΕΠΕΞΕΡΓΑΣΙΑΣ":"ΕΠΕΞΕΡΓΑΣΙΑ")+'</button></div></article>').join(""):'<div class="learning-empty">Επιλέξτε PDF και πατήστε Ανάλυση. Εδώ θα εμφανιστούν τα στοιχεία για έλεγχο.</div>';
+    save.disabled=saving||!current.items.some(x=>x.status==="accepted"&&!x.saved);
   }
 
   async function uploadPdf(file){
@@ -116,11 +117,11 @@
     current={source_id:"",file:file||null,pages:[],items:[]};
     render();
     analyze.disabled=!file;
-    if(!file){source.textContent="No source loaded.";setState("READY");return;}
+    if(!file){source.textContent="Δεν έχει επιλεγεί αρχείο.";setState("READY");return;}
     source.textContent=file.name+" · "+(file.size/1048576).toFixed(1)+" MB";
     if(file.type!=="application/pdf"&&!file.name.toLowerCase().endsWith(".pdf")){setState("PDF REQUIRED","error");analyze.disabled=true;return;}
-    if(file.size>25*1024*1024){setState("PDF TOO LARGE","error");analyze.disabled=true;return;}
-    setState("PDF READY — PRESS ANALYZE","ready");
+    if(file.size>25*1024*1024){setState("Το PDF υπερβαίνει τα 25 MB","error");analyze.disabled=true;return;}
+    setState("Το PDF είναι έτοιμο — πατήστε Ανάλυση","ready");
   });
 
   analyze.addEventListener("click",async()=>{
@@ -140,19 +141,22 @@
       }
       setState("BUILDING REVIEW","working");
       current.items=proposals(current.pages);
-      setState(current.items.length?"REVIEW REQUIRED":"TEXT FOUND — EXTRACTION NEEDS REVIEW",current.items.length?"ready":"error");
+      setState(current.items.length?"Ελέγξτε τα στοιχεία πριν την αποθήκευση":"TEXT FOUND — EXTRACTION NEEDS REVIEW",current.items.length?"ready":"error");
       render();
       summary.textContent+=" · Automatic candidates and verbatim excerpts; OCR and historical verification pending.";
     }catch(e){
-      setState("PDF READ FAILED","error");
+      setState("Αποτυχία ανάγνωσης — δοκιμάστε ξανά ή επιλέξτε άλλο PDF","error");
     }finally{
       analyze.disabled=false;input.disabled=false;
     }
   });
 
+  list.addEventListener("input",e=>{const card=e.target.closest(".learning-item");if(card&&e.target.matches(".learning-item-text")){const item=current.items[Number(card.dataset.i)];if(item)item.text=e.target.textContent.trim();}});
   list.addEventListener("click",e=>{
-    const b=e.target.closest("button[data-act]"),card=e.target.closest(".learning-item");if(!b||!card)return;
+    const b=e.target.closest("button[data-act]"),card=e.target.closest(".learning-item");if(!b||!card||saving)return;
     const i=Number(card.dataset.i),item=current.items[i];if(!item)return;
+    if(item.saved)return;
+    if(item.editing){item.text=card.querySelector(".learning-item-text")?.textContent?.trim()||item.text;}
     if(b.dataset.act==="accept"){item.status="accepted";item.editing=false;}
     if(b.dataset.act==="reject"){item.status="rejected";item.editing=false;}
     if(b.dataset.act==="edit"){
@@ -160,10 +164,14 @@
       else item.editing=true;
     }
     render();
+    if(item.editing)list.querySelector(`[data-i="${i}"] .learning-item-text`)?.focus();
   });
 
   save.addEventListener("click",async()=>{
-    const accepted=current.items.filter(x=>x.status==="accepted");if(!accepted.length||!current.file)return;
+    if(saving)return;
+    list.querySelectorAll(".learning-item").forEach(card=>{const item=current.items[Number(card.dataset.i)];if(item?.editing){item.text=card.querySelector(".learning-item-text")?.textContent?.trim()||item.text;item.editing=false;}});
+    const accepted=current.items.filter(x=>x.status==="accepted"&&!x.saved);if(!accepted.length||!current.file)return;
+    saving=true;input.disabled=true;analyze.disabled=true;list.inert=true;
     save.disabled=true;setState("UPLOADING APPROVED SOURCE","working");
     try{
       if(!current.source_id){
@@ -173,11 +181,12 @@
       setState("SAVING APPROVED MEMORY","working");
       const r=await fetch(endpoint+"/knowledge/review",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({source_id:current.source_id,pages:current.pages,items:accepted})});
       const data=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(data.error||("save_http_"+r.status)),{status:r.status});
-      setState("LEARNED · "+data.accepted_items+" ITEMS","learned");
+      accepted.forEach(x=>x.saved=true);
+      setState("Αποθηκεύτηκαν "+data.accepted_items+" στοιχεία","learned");
       source.textContent=(source.textContent||"SOURCE")+" · MEMORY SAVED";
     }catch(e){
-      setState(e.message==="Failed to fetch"?"KNOWLEDGE BACKEND UNAVAILABLE":"MEMORY SAVE FAILED","error");
-    }finally{save.disabled=false;}
+      setState(e.message==="Failed to fetch"?"KNOWLEDGE BACKEND UNAVAILABLE":"Αποτυχία αποθήκευσης — τα στοιχεία παραμένουν για νέα προσπάθεια","error");
+    }finally{saving=false;input.disabled=false;analyze.disabled=false;list.inert=false;render();}
   });
 
   render();

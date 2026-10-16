@@ -1,29 +1,30 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#02060d"><title>NABOU//X — Intelligence Universe</title><link rel="stylesheet" href="./chamber.css?v=research-ui-20261016-53acf2e"><link rel="stylesheet" href="./command-deck.css?v=cinematic-ergonomics-20261016"></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#02060d"><title>NABOU//X — Intelligence Universe</title><link rel="stylesheet" href="./chamber.css?v=research-ui-20261016-53acf2e"><link rel="stylesheet" href="./command-deck.css?v=usability-20261016-2"></head>
 <script type="importmap">{"imports":{"./live-bridge.js":"./live-bridge.js?v=run-sync-20261015"}}</script>
 <body>
 <div id="app">
 <canvas id="universe" aria-label="Interactive three-dimensional research intelligence network"></canvas>
 <div class="grain" aria-hidden="true"></div><div class="vignette" aria-hidden="true"></div>
 <header class="masthead"><div class="center-title"><span class="overline">NABOU//X / SPATIAL INTELLIGENCE ENGINE</span><strong>THE RESEARCH UNIVERSE</strong><div class="coordinates" id="coordinates">X +024.77 / Y -018.56 / Z +004.31</div></div><div class="right-head"><span class="system-dot"></span><span>SCHEMATIC NETWORK</span><span class="vertical-rule"></span><span id="clock">--:--:-- UTC</span></div></header>
-<aside class="left-panel"><div class="separator"></div><div class="label">NAVIGATE THE NETWORK</div><div class="nav-sections"><button class="section-btn active" data-view="universe"><span class="glyph">◈</span><span>Universe overview</span><span class="index">01</span></button><button class="section-btn" data-view="archives"><span class="glyph">⌘</span><span>Archival constellation</span><span class="index">02</span></button><button class="section-btn" data-view="analysis"><span class="glyph">⌬</span><span>Scientific intelligence</span><span class="index">03</span></button><button class="section-btn" data-view="sources"><span class="glyph">⊞</span><span>Source universe</span><span class="index">04</span></button></div><div class="separator"></div><div class="label">NETWORK SIGNALS</div><div class="signal-row"><span><i class="led cyan"></i> Archive research</span><em>11 sectors</em></div><div class="signal-row"><span><i class="led amber"></i> Scientific analysis</span><em>6 sectors</em></div><div class="signal-row"><span><i class="led dim"></i> Connection topology</span><em>Spatial model</em></div><div class="bottom-panel-note">LIVE CONNECTION · RECORDED RUN DATA<br>SCIENTIFIC RESULTS ARE NOT SIMULATED</div></aside>
+<aside class="left-panel"><div class="separator"></div><div class="label">ΤΟΜΕΙΣ ΕΡΕΥΝΑΣ</div><div class="nav-sections"><button class="section-btn active" data-view="universe"><span class="glyph">◈</span><span>Επισκόπηση δικτύου</span><span class="index">01</span></button><button class="section-btn" data-view="archives"><span class="glyph">⌘</span><span>Αρχειακές πηγές</span><span class="index">02</span></button><button class="section-btn" data-view="analysis"><span class="glyph">⌬</span><span>Επιστημονική ανάλυση</span><span class="index">03</span></button><button class="section-btn" data-view="sources"><span class="glyph">⊞</span><span>Δίκτυο πηγών</span><span class="index">04</span></button></div><div class="separator"></div><div class="label">NETWORK SIGNALS</div><div class="signal-row"><span><i class="led cyan"></i> Archive research</span><em>11 sectors</em></div><div class="signal-row"><span><i class="led amber"></i> Scientific analysis</span><em>6 sectors</em></div><div class="signal-row"><span><i class="led dim"></i> Connection topology</span><em>Spatial model</em></div><div class="bottom-panel-note">LIVE CONNECTION · RECORDED RUN DATA<br>SCIENTIFIC RESULTS ARE NOT SIMULATED</div></aside>
 <form class="operator-command" id="operatorCommand" autocomplete="off">
-  <div class="operator-command-label"><span>OPERATOR QUERY</span><small id="commandState">READY</small></div>
+  <div class="operator-command-label"><span>ΕΡΩΤΗΜΑ ΕΡΕΥΝΑΣ</span><small role="status" id="commandState">READY</small></div>
   <div class="operator-command-row">
     <span class="command-prompt">›</span>
-    <input id="operatorQuery" name="operatorQuery" type="text" maxlength="500" spellcheck="false" placeholder="Ask NABOU//X a historical research question…" aria-label="Historical research question">
-    <button id="executeQuery" type="submit">EXECUTE <span>↗</span></button>
+    <input id="operatorQuery" name="operatorQuery" aria-describedby="queryHelp" required type="text" maxlength="500" spellcheck="false" placeholder="Πρόσωπο ή θέμα, τόπος και περίοδος…" aria-label="Historical research question">
+    <button id="executeQuery" type="submit">ΕΡΕΥΝΑ <span>↗</span></button>
   </div>
+<small class="query-help" id="queryHelp">Περιγράψτε τι θέλετε να βρείτε. Τα ευρήματα και οι πηγές θα εμφανιστούν στο «Ευρήματα».</small>
 </form><section class="activity-strip" id="activityStrip" aria-live="polite">
-  <div class="activity-head"><span>LIVE ACTIVITY</span><strong id="missionState">READY</strong></div>
+  <div class="activity-head"><span>ΠΟΡΕΙΑ ΕΡΕΥΝΑΣ</span><strong id="missionState">READY</strong></div>
   <div class="activity-lines" id="activityLines"><div>Waiting for research activity…</div></div>
 </section>
-<button class="results-toggle" id="resultsToggle" type="button">RESULTS <span id="resultsCount">0</span></button>
-<button class="learning-toggle" id="learningToggle" type="button">LEARNING <span>＋</span></button>
+<button class="results-toggle" id="resultsToggle" type="button">ΕΥΡΗΜΑΤΑ <span id="resultsCount">0</span></button>
+<button class="learning-toggle" id="learningToggle" type="button">ΜΕΛΕΤΗ PDF <span>＋</span></button>
 <aside class="results-drawer hidden" id="resultsDrawer">
-  <div class="results-head"><span>RESEARCH RESULTS</span><button id="closeResults" type="button" aria-label="Close results">×</button></div>
+  <div class="results-head"><span>ΕΥΡΗΜΑΤΑ ΕΡΕΥΝΑΣ</span><button id="closeResults" type="button" aria-label="Close results">×</button></div>
   <div class="results-summary"><strong id="resultsRun">NO RUN</strong><span id="resultsMeta">0 claims · 0 blockers</span></div>
-  <div class="results-list" id="resultsList"><div class="result-empty">No research findings yet.</div></div>
+  <div class="results-tools"><div id="resultTabs" role="group" aria-label="Προβολή ευρημάτων"><button type="button" data-result-filter="all" aria-pressed="true">Όλα</button><button type="button" data-result-filter="claims">Ισχυρισμοί</button><button type="button" data-result-filter="contradictions">Αντιφάσεις</button><button type="button" data-result-filter="blockers">Εμπόδια</button></div><label class="tool-help" for="resultSearch">Αναζήτηση στα εμφανιζόμενα ευρήματα</label><input id="resultSearch" type="search" placeholder="Λέξη, όνομα ή πηγή…"><button id="exportResults" type="button" disabled>Λήψη δεδομένων έρευνας ↓</button><small class="tool-help">Πηγές και υποψήφιοι ισχυρισμοί χρειάζονται έλεγχο. Μηδενικοί ισχυρισμοί δεν σημαίνουν απουσία πηγών.</small></div><div class="results-list" id="resultsList"><div class="result-empty">No research findings yet.</div></div>
 </aside><div id="nodeLabels"></div>
 <aside class="detail-panel" id="detailPanel"><div class="detail-head"><span id="detail-number">SECTOR / 00</span><button id="closeDetail" aria-label="Close details">×</button></div><div class="detail-type" id="detailType">SELECT A RESEARCH SECTOR</div><h2 id="detailTitle">Intelligence network</h2><div class="detail-rule"></div><p id="detailDescription">Orbit, zoom and explore the network. Select a luminous node to inspect its function.</p><div class="detail-meta"><div><span>NETWORK ROLE</span><strong id="detailRole">NAVIGATION</strong></div><div><span>DATA STATE</span><strong id="detailState">SELECT AN AGENT</strong></div></div><button class="detail-action" id="focusButton">FOCUS THIS SECTOR <span>↗</span></button></aside>
 <div class="map-scale"><span class="scale-label">NETWORK DEPTH</span><div class="scale-tracks"><span></span><span></span><span></span><span></span><span></span></div><span id="zoomLevel">01 / CLUSTER</span></div>
@@ -38,10 +39,10 @@
   </div>
   <div class="exp-rail">
     <div class="exp-modes" id="expModes">
-      <button class="active" data-mode="universe">UNIVERSE</button>
-      <button data-mode="active">ACTIVE</button>
-      <button data-mode="evidence">EVIDENCE</button>
-      <button data-mode="contradictions">CONTRADICTIONS</button>
+      <button class="active" data-mode="universe">ΔΙΚΤΥΟ</button>
+      <button data-mode="active" title="Εστίαση στους ενεργούς τομείς">ΕΝΕΡΓΟΙ</button>
+      <button data-mode="evidence" title="Προβολή υποψήφιων ισχυρισμών">ΙΣΧΥΡΙΣΜΟΙ</button>
+      <button data-mode="contradictions">ΑΝΤΙΦΑΣΕΙΣ</button>
     </div>
     <div class="exp-filters" id="expFilters">
       <span>FILTER</span>
@@ -54,15 +55,15 @@
   </div>
 </section>
 <aside class="learning-panel hidden" id="learningPanel" aria-label="NABOU X learning review">
-  <div class="learning-head"><div><span>KNOWLEDGE INGESTION</span><strong>LEARNING REVIEW</strong></div><button id="closeLearning" type="button" aria-label="Close learning review">×</button></div>
+  <div class="learning-head"><div><span>ΑΝΑΓΝΩΣΗ ΚΑΙ ΕΛΕΓΧΟΣ ΠΗΓΗΣ</span><strong>ΜΕΛΕΤΗ PDF</strong></div><button id="closeLearning" type="button" aria-label="Close learning review">×</button></div>
   <div class="learning-source">
-    <input id="learningFile" class="learning-file" type="file" accept="application/pdf,.pdf" aria-label="Upload PDF to NABOU X learning">
-    <button id="learningAnalyze" class="learning-analyze" type="button" disabled>ANALYZE PDF ↗</button>
-    <div><b id="learningState">READY</b><small id="learningSource">No source loaded.</small></div>
+    <label for="learningFile" class="tool-help">1. Επιλογή PDF · έως 25 MB</label><input id="learningFile" class="learning-file" type="file" accept="application/pdf,.pdf" aria-label="Upload PDF to NABOU X learning">
+    <button id="learningAnalyze" class="learning-analyze" type="button" disabled>2. ΑΝΑΛΥΣΗ PDF ↗</button>
+    <div><b role="status" id="learningState">READY</b><small id="learningSource">No source loaded.</small></div>
   </div>
-  <div class="learning-rule"></div>
-  <div class="learning-review-head"><span>EXTRACTED KNOWLEDGE</span><small id="learningSummary">No extracted knowledge yet.</small></div>
+  <p class="tool-help">1. Επιλογή αρχείου → 2. Ανάλυση → 3. Έλεγχος στοιχείων → 4. Αποθήκευση εγκεκριμένων. Σαρωμένα PDF χωρίς κείμενο χρειάζονται OCR.</p><div class="learning-rule"></div>
+  <div class="learning-review-head"><span>ΣΤΟΙΧΕΙΑ ΠΡΟΣ ΕΛΕΓΧΟ</span><small id="learningSummary">No extracted knowledge yet.</small></div>
   <div class="learning-items" id="learningItems"><div class="learning-empty">Upload a PDF to inspect what NABOU//X extracts before anything enters memory.</div></div>
-  <div class="learning-footer"><span>Nothing enters persistent memory until you approve it.</span><button id="learningSave" type="button" disabled>SAVE APPROVED MEMORY ↗</button></div>
+  <div class="learning-footer"><span>Εγκρίνετε τα στοιχεία και μετά αποθηκεύστε τα. Η έγκριση δεν αποτελεί ιστορική επαλήθευση.</span><button id="learningSave" type="button" disabled>ΑΠΟΘΗΚΕΥΣΗ ΕΓΚΕΚΡΙΜΕΝΩΝ ↗</button></div>
 </aside><button class="exp-restore hidden" id="expRestore" type="button">LAB UI</button><div class="mobile-hint">DRAG · ZOOM · SELECT</div>
-</div><script src="./chamber.js?v=workspace-v2-20261016" defer></script><script src="./gpu-field.js?v=approved-20261014b" defer></script><script src="./operator-command.js?v=request-results-v1-20261016" defer></script><script type="module" src="./research-ui.js?v=fulltext-sources-v1-20261016"></script><script type="module" src="./experimental-ui.js?v=run-sync-20261015"></script><script src="./learning-review.js?v=full-document-review-v7-20261016" defer></script><script src="./command-deck.js?v=workspace-v2-20261016" defer></script></body></html>
+</div><script src="./chamber.js?v=usability-20261016-2" defer></script><script src="./gpu-field.js?v=approved-20261014b" defer></script><script src="./operator-command.js?v=usability-20261016-2" defer></script><script type="module" src="./research-ui.js?v=usability-20261016-2"></script><script type="module" src="./experimental-ui.js?v=run-sync-20261015"></script><script src="./learning-review.js?v=usability-20261016-2" defer></script><script src="./command-deck.js?v=usability-20261016-2" defer></script></body></html>
