@@ -265,6 +265,7 @@ function receiveSnapshot(data,origin){
  clearEvidence();recentEventIds.clear();
  currentRun=String(data.run_id||"");evidenceRun=currentRun;
  researchSnapshot=data;
+ localPending=false;document.body.dataset.researchVisual="RUN_RECEIVED";
  evidenceSource=origin==="LIVE"?"LIVE BOOTSTRAP":"DURABLE SNAPSHOT";
  const laneState=new Map(data.agents.map(a=>[a.id,a]));
  for(const n of agentNodes)n.liveState=laneState.get(n.agentId)||null;
@@ -290,12 +291,18 @@ function receiveEvent(event){
  const n=evidenceAgentMap.get(String(event.agent_id||""));
  if(n)n.liveState={...(n.liveState||{}),status:String(event.status||event.event_type||"EVENT"),phase:String(event.phase||""),percent:event.percent};
  if(n&&selected===n)select(n);
+ localPending=false;document.body.dataset.researchVisual="LIVE";
  evidenceSource="LIVE EVENT";
  document.body.dataset.evidenceSource=evidenceSource;
  document.body.dataset.lastEvent=String(event.event_type||"");
  document.body.dataset.lastEventId=id;
  setConnection("LIVE","Latest live event: "+String(event.event_type||"unknown"));
 }
+let localPending=false;
+window.addEventListener("jarvis:operator-query",()=>{localPending=true;document.body.dataset.researchVisual="SUBMITTING";});
+window.addEventListener("jarvis:dispatch-accepted",()=>{localPending=true;document.body.dataset.researchVisual="QUEUED";});
+window.addEventListener("jarvis:research-selection",()=>{localPending=false;document.body.dataset.researchVisual="SELECTED";});
+window.addEventListener("jarvis:mission-state",e=>{if(/FAILED|ERROR|BLOCKED|OFFLINE|TIMEOUT|401|403|429|503|δεν υπάρχει σύνδεση|καθυστέρησε/i.test(String(e.detail?.state||""))){localPending=false;document.body.dataset.researchVisual="ERROR";}});
 connectResearchFeed({onSnapshot:receiveSnapshot,onEvent:receiveEvent,onState:setConnection});
 
 const allLabels=[];
@@ -435,6 +442,21 @@ function frame(){
   }
   positions.needsUpdate=true;
  }
+ // Pending means the request was submitted/accepted, not that specialists started.
+ // Red is reserved for actual RUNNING specialist states received from the live feed.
+ const runningStatus=st=>/^(RUNNING|ACTIVE|IN_PROGRESS|STARTED|WORKING|RESEARCH ACTIVE)$/i.test(String(st||"").trim());
+ for(const n of agentNodes){
+  const running=runningStatus(n.liveState?.status);
+  const color=running?0xff454e:CYAN;
+  n.group?.children?.forEach(obj=>{
+   if(obj.isMesh&&obj.material?.color&&obj.material.visible!==false)obj.material.color.setHex(color);
+  });
+  if(n.sprite?.material?.color)n.sprite.material.color.setHex(color);
+  if(running&&n.sprite?.material)n.sprite.material.opacity=.78+.14*Math.sin(time*5);
+ }
+ const reactorColor=localPending?0xffbd4a:0x067dc8;
+ reactorCore.material.color.setHex(reactorColor);
+ document.body.dataset.researchVisual=localPending?(document.body.dataset.researchVisual==="SUBMITTING"?"SUBMITTING":"QUEUED"):(agentNodes.some(n=>runningStatus(n.liveState?.status))?"AGENTS_RUNNING":document.body.dataset.researchVisual||"IDLE");
  // Depth-based labels with collision avoidance and region-to-agent focus transitions.
  const occupied=[];
  const labelsByPriority=allLabels.slice().sort((a,b)=>Number(b.region)-Number(a.region));
