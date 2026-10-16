@@ -1,0 +1,334 @@
+{
+  "schema": "pct-specialist-agent-plan-v2",
+  "routing_authority": "JARVIS_PLANNER",
+  "target": "πετρος λάντζας",
+  "aliases": [],
+  "target_type": "person",
+  "research_focus": {
+    "schema": "pct-research-focus-v1",
+    "kind": "person",
+    "entity": "πετρος λάντζας",
+    "names": [
+      "πετρος λάντζας"
+    ],
+    "roles": [],
+    "places": [],
+    "interpretation": "REQUEST_CONSTRAINTS_NOT_VERIFIED_FACTS"
+  },
+  "date_range": "",
+  "purpose": "πετρος λάντζας",
+  "source_limit_per_agent": 4,
+  "fallback_limit_per_agent": 4,
+  "total_query_budget_per_agent": 20,
+  "parallel_agent_count": 2,
+  "verified_promotion_allowed": false,
+  "memory_context": [],
+  "memory_policy": "Persistent memory is retrieval/routing assistance only; it never verifies a historical claim.",
+  "rule": "JARVIS alone assigns second-wave fallback sources after evaluating first-wave outcomes.",
+  "assignment_wave": 2,
+  "agents": [
+    {
+      "agent_id": "pirate_biography",
+      "label": "Pirate Biography Agent",
+      "queries": [
+        "\"πετρος λάντζας\"",
+        "\"πετρος λάντζας\" history"
+      ],
+      "outputs": [
+        "identity",
+        "aliases",
+        "chronology",
+        "ships",
+        "associates",
+        "bases",
+        "operations",
+        "death",
+        "uncertainties"
+      ],
+      "source_routes": [
+        "repo:PARES / Archivo General de Simancas",
+        "repo:Biblioteca Digital Hispánica",
+        "repo:Gallica/BnF",
+        "repo:The National Archives Public Content",
+        "repo:Nationaal Archief",
+        "repo:Archives diplomatiques France",
+        "repo:Academia.edu Public Research",
+        "repo:OpenAlex Scholarly Works",
+        "repo:Crossref Scholarly Metadata",
+        "repo:OpenArchives.gr / EKT"
+      ],
+      "assignment_id": "pirate_biography:wave2",
+      "assignment_wave": 2,
+      "assigned_sources": [
+        {
+          "route_id": "repo:OpenAlex Scholarly Works",
+          "route_type": "repository_dispatch",
+          "repository": "OpenAlex Scholarly Works",
+          "connector_id": null,
+          "score": 92,
+          "reason": [
+            "agent_profile",
+            "context:greek_aegean"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        },
+        {
+          "route_id": "repo:OpenArchives.gr / EKT",
+          "route_type": "repository_dispatch",
+          "repository": "OpenArchives.gr / EKT",
+          "connector_id": null,
+          "score": 90,
+          "reason": [
+            "agent_profile",
+            "context:greek_aegean"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        }
+      ],
+      "fallback_sources": [
+        {
+          "route_id": "repo:The National Archives Public Content",
+          "route_type": "repository_dispatch",
+          "repository": "The National Archives Public Content",
+          "connector_id": null,
+          "score": 88,
+          "reason": [
+            "agent_profile"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        },
+        {
+          "route_id": "repo:Crossref Scholarly Metadata",
+          "route_type": "repository_dispatch",
+          "repository": "Crossref Scholarly Metadata",
+          "connector_id": null,
+          "score": 86,
+          "reason": [
+            "agent_profile",
+            "context:greek_aegean"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        }
+      ],
+      "assigned_queries": [
+        "\"πετρος λάντζας\"",
+        "\"πετρος λάντζας\" history"
+      ],
+      "query_budget": {
+        "total": 4,
+        "max_total": 4,
+        "queries_per_source": 2
+      },
+      "routing_decision": {
+        "authority": "JARVIS_PLANNER",
+        "strategy": "result_aware_fallback_v1",
+        "selected_route_ids": [
+          "repo:OpenAlex Scholarly Works",
+          "repo:OpenArchives.gr / EKT"
+        ],
+        "fallback_route_ids": [
+          "repo:The National Archives Public Content",
+          "repo:Crossref Scholarly Metadata"
+        ],
+        "trigger": "RECOVERY_REPLAN",
+        "recovery_action": "REPLAN",
+        "recovery_reason": "zero candidates without explicit access blocker",
+        "first_wave_status_counts": {
+          "ACCESS_BLOCKED": 2,
+          "EXECUTED": 4,
+          "REMOTE_ACCESS_BLOCKED": 2
+        },
+        "first_wave_records": 0,
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    },
+    {
+      "agent_id": "source_genealogy",
+      "label": "Source Genealogy Agent",
+      "queries": [
+        "\"πετρος λάντζας\"",
+        "\"πετρος λάντζας\" sources",
+        "\"πετρος λάντζας\" bibliography"
+      ],
+      "outputs": [
+        "source_chains",
+        "derivative_sources",
+        "independence_warnings",
+        "primary_source_targets"
+      ],
+      "source_routes": [
+        "repo:Gallica/BnF",
+        "repo:Biblioteca Digital Hispánica",
+        "repo:The National Archives Public Content",
+        "repo:Internet Culturale",
+        "repo:Delpher",
+        "repo:Deutsche Digitale Bibliothek",
+        "repo:Academia.edu Public Research",
+        "repo:OpenAlex Scholarly Works",
+        "repo:Crossref Scholarly Metadata",
+        "repo:OpenArchives.gr / EKT",
+        "repo:Anemi / University of Crete"
+      ],
+      "assignment_id": "source_genealogy:wave2",
+      "assignment_wave": 2,
+      "assigned_sources": [
+        {
+          "route_id": "repo:The National Archives Public Content",
+          "route_type": "repository_dispatch",
+          "repository": "The National Archives Public Content",
+          "connector_id": null,
+          "score": 92,
+          "reason": [
+            "agent_profile"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        },
+        {
+          "route_id": "repo:OpenAlex Scholarly Works",
+          "route_type": "repository_dispatch",
+          "repository": "OpenAlex Scholarly Works",
+          "connector_id": null,
+          "score": 92,
+          "reason": [
+            "agent_profile",
+            "context:greek_aegean"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        }
+      ],
+      "fallback_sources": [
+        {
+          "route_id": "repo:OpenArchives.gr / EKT",
+          "route_type": "repository_dispatch",
+          "repository": "OpenArchives.gr / EKT",
+          "connector_id": null,
+          "score": 90,
+          "reason": [
+            "agent_profile",
+            "context:greek_aegean"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        },
+        {
+          "route_id": "repo:Crossref Scholarly Metadata",
+          "route_type": "repository_dispatch",
+          "repository": "Crossref Scholarly Metadata",
+          "connector_id": null,
+          "score": 86,
+          "reason": [
+            "agent_profile",
+            "context:greek_aegean"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        }
+      ],
+      "assigned_queries": [
+        "\"πετρος λάντζας\"",
+        "\"πετρος λάντζας\" sources",
+        "\"πετρος λάντζας\" bibliography"
+      ],
+      "query_budget": {
+        "total": 6,
+        "max_total": 6,
+        "queries_per_source": 3
+      },
+      "routing_decision": {
+        "authority": "JARVIS_PLANNER",
+        "strategy": "result_aware_fallback_v1",
+        "selected_route_ids": [
+          "repo:The National Archives Public Content",
+          "repo:OpenAlex Scholarly Works"
+        ],
+        "fallback_route_ids": [
+          "repo:OpenArchives.gr / EKT",
+          "repo:Crossref Scholarly Metadata"
+        ],
+        "trigger": "RECOVERY_REPLAN",
+        "recovery_action": "REPLAN",
+        "recovery_reason": "zero candidates without explicit access blocker",
+        "first_wave_status_counts": {
+          "EXECUTED": 9,
+          "REMOTE_ACCESS_BLOCKED": 3
+        },
+        "first_wave_records": 0,
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    }
+  ],
+  "reassignment_decisions": [
+    {
+      "agent_id": "pirate_biography",
+      "reassign": true,
+      "reason": "RECOVERY_REPLAN",
+      "recovery_action": "REPLAN",
+      "recovery_reason": "zero candidates without explicit access blocker",
+      "assigned": [
+        "repo:OpenAlex Scholarly Works",
+        "repo:OpenArchives.gr / EKT"
+      ]
+    },
+    {
+      "agent_id": "identity_resolution",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 25
+    },
+    {
+      "agent_id": "timeline",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 8
+    },
+    {
+      "agent_id": "relationship_network",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 12
+    },
+    {
+      "agent_id": "contradiction",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 27
+    },
+    {
+      "agent_id": "source_genealogy",
+      "reassign": true,
+      "reason": "RECOVERY_REPLAN",
+      "recovery_action": "REPLAN",
+      "recovery_reason": "zero candidates without explicit access blocker",
+      "assigned": [
+        "repo:The National Archives Public Content",
+        "repo:OpenAlex Scholarly Works"
+      ]
+    }
+  ]
+}
