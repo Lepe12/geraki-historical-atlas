@@ -50,7 +50,7 @@ function createFeed({onSnapshot,onEvent,onState,WebSocketImpl=globalThis.WebSock
   if(waitingRequest){if(e.request_id!==waitingRequest)return;completeWaiting();selectedRun=String(e.run_id);}
   if(e.event_id&&seen.has(e.event_id))return;
   if(e.event_id){seen.add(e.event_id);if(seen.size>2000)seen.delete(seen.values().next().value);}
-  if(!replayed){const next=applyResearchEvent(snapshot,e);if(next!==snapshot){snapshot=next;liveSeen=true;onSnapshot?.(snapshot,'LIVE');}}
+  if(!replayed||!snapshot||String(snapshot.run_id)!==String(e.run_id)){const next=applyResearchEvent(snapshot,e);if(next!==snapshot){snapshot=next;liveSeen=true;onSnapshot?.(snapshot,'LIVE');}}
   onEvent?.(e);
  }
  async function fallback(){
@@ -67,10 +67,10 @@ function createFeed({onSnapshot,onEvent,onState,WebSocketImpl=globalThis.WebSock
    socket.onclose=()=>{connected=false;if(!closed){status('RECONNECTING','Socket disconnected');fallback();retry=setTimeout(open,retryMs);}};
   }catch(_){fallback();if(!closed)retry=setTimeout(open,retryMs);}
  }
- fallback().finally(()=>{if(!closed){open();schedulePoll();}});
+ fallback().finally(()=>{if(!closed){if(!socket)open();schedulePoll();}});
  const stop=()=>{closed=true;clearTimeout(retry);clearInterval(poll);socket?.close();};
  stop.selectRun=(run,force=false)=>{const id=/^\d+$/.test(String(run))?String(run):'latest';if(closed||(id===selectedRun&&!waitingRequest&&!force))return;completeWaiting();selectedRun=id;snapshot=null;revision='';liveSeen=false;seen.clear();clearTimeout(retry);if(socket){socket.onclose=null;socket.onmessage=null;socket.close();}connected=false;open();refresh();};
- stop.waitForRequest=id=>{waitingRequest=String(id||'');snapshot=null;revision='';seen.clear();selectedRun='latest';status('WAITING','Waiting for request '+waitingRequest);schedulePoll();refresh();};
+ stop.waitForRequest=id=>{waitingRequest=String(id||'');snapshot=null;revision='';seen.clear();selectedRun='latest';clearTimeout(retry);if(socket){socket.onclose=null;socket.onmessage=null;socket.close();}connected=false;status('WAITING','Waiting for request '+waitingRequest);open();schedulePoll();refresh();};
  return stop;
 }
 let shared=null;
