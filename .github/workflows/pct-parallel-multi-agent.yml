@@ -65,6 +65,14 @@ jobs:
         with:
           fetch-depth: 2
           filter: blob:none
+          sparse-checkout: |
+            tools
+            config
+            data
+            library_discovery_requests
+      - name: Announce actual request preparation
+        run: |
+          python3 tools/orchestrator/jarvis_event_bus.py --run-id "$GITHUB_RUN_ID" --event-type mission_preparing --agent-id jarvis --phase request_validation --status PREPARING --detail "Research runner started; validating the canonical request"
       - id: identity
         name: Resolve canonical research request once
         run: |

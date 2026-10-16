@@ -63,6 +63,13 @@ jobs:
       matrix: ${{ steps.plan.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            config
+            data
       - name: Validate JARVIS assignment logic
         run: python3 tools/test_specialist_routing.py
       - id: plan
@@ -103,10 +110,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            config
+            data
       - uses: actions/download-artifact@v4
         with:
           name: specialist-plan-${{ github.run_id }}
+      - name: Announce specialist runtime preparation
+        run: |
+          python3 tools/orchestrator/jarvis_event_bus.py --root "specialist_output/${{ matrix.agent }}/command_center" --run-id "$GITHUB_RUN_ID" --event-type agent_preparing --agent-id "${{ matrix.agent }}" --phase runtime_setup --status PREPARING --detail "Agent runner is preparing its assigned sources"
+      - id: browser_wave1
+        name: Check whether the assignment needs a browser
+        env:
+          AGENT_ID: ${{ matrix.agent }}
+        run: |
+          python3 - <<'PYTHON' >> "$GITHUB_OUTPUT"
+          import json, os
+          plan=json.load(open("specialist_plan.json",encoding="utf-8"))
+          agent=next(x for x in plan["agents"] if x["agent_id"]==os.environ["AGENT_ID"])
+          # Registered connector routes may need Playwright; repository API routes do not.
+          needs_browser=any(x.get("route_type")=="registered_connector" for x in agent.get("assigned_sources",[]))
+          print("required="+str(needs_browser).lower())
+          PYTHON
       - name: Install browser support for JARVIS-assigned browser routes
+        if: steps.browser_wave1.outputs.required == 'true'
         run: |
           python -m pip install --upgrade pip
           pip install playwright
@@ -121,6 +152,10 @@ jobs:
             --event-root "specialist_output/${{ matrix.agent }}/command_center" \
             --history-path "specialist_output/${{ matrix.agent }}/task_history.jsonl" \
             --output "specialist_output/${{ matrix.agent }}/result.json"
+      - name: Announce specialist runtime failure
+        if: failure()
+        run: |
+          python3 tools/orchestrator/jarvis_event_bus.py --root "specialist_output/${{ matrix.agent }}/command_center" --run-id "$GITHUB_RUN_ID" --event-type agent_failed --agent-id "${{ matrix.agent }}" --phase runtime_failed --status FAILED --detail "Agent setup or execution failed; inspect the workflow log"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -135,6 +170,13 @@ jobs:
       matrix: ${{ steps.reassign.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            config
+            data
       - uses: actions/download-artifact@v4
         with:
           name: specialist-plan-${{ github.run_id }}
@@ -173,10 +215,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            config
+            data
       - uses: actions/download-artifact@v4
         with:
           name: specialist-second-plan-${{ github.run_id }}
+      - name: Announce specialist runtime preparation
+        run: |
+          python3 tools/orchestrator/jarvis_event_bus.py --root "specialist_second_output/${{ matrix.agent }}/command_center" --run-id "$GITHUB_RUN_ID" --event-type agent_preparing --agent-id "${{ matrix.agent }}" --phase runtime_setup --status PREPARING --detail "Agent runner is preparing its assigned sources"
+      - id: browser_wave2
+        name: Check whether the assignment needs a browser
+        env:
+          AGENT_ID: ${{ matrix.agent }}
+        run: |
+          python3 - <<'PYTHON' >> "$GITHUB_OUTPUT"
+          import json, os
+          plan=json.load(open("second_wave_plan.json",encoding="utf-8"))
+          agent=next(x for x in plan["agents"] if x["agent_id"]==os.environ["AGENT_ID"])
+          # Registered connector routes may need Playwright; repository API routes do not.
+          needs_browser=any(x.get("route_type")=="registered_connector" for x in agent.get("assigned_sources",[]))
+          print("required="+str(needs_browser).lower())
+          PYTHON
       - name: Install browser support for JARVIS fallback assignments
+        if: steps.browser_wave2.outputs.required == 'true'
         run: |
           python -m pip install --upgrade pip
           pip install playwright
@@ -191,6 +257,10 @@ jobs:
             --event-root "specialist_second_output/${{ matrix.agent }}/command_center" \
             --history-path "specialist_second_output/${{ matrix.agent }}/task_history.jsonl" \
             --output "specialist_second_output/${{ matrix.agent }}/result.json"
+      - name: Announce specialist runtime failure
+        if: failure()
+        run: |
+          python3 tools/orchestrator/jarvis_event_bus.py --root "specialist_second_output/${{ matrix.agent }}/command_center" --run-id "$GITHUB_RUN_ID" --event-type agent_failed --agent-id "${{ matrix.agent }}" --phase runtime_failed --status FAILED --detail "Agent setup or execution failed; inspect the workflow log"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

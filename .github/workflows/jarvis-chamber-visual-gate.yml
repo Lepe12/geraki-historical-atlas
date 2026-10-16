@@ -38,6 +38,8 @@ jobs:
           python3 -m http.server 4179 --bind 127.0.0.1 > /tmp/jarvis-server.log 2>&1 &
       - name: Browser visual verification
         run: node jarvis-intelligence-chamber/visual-smoke.cjs
+      - name: Verify immediate startup feedback and real agent preparation
+        run: node jarvis-intelligence-chamber/startup-feedback.test.cjs
       - name: Upload visual evidence
         if: always()
         uses: actions/upload-artifact@v4
