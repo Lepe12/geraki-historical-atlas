@@ -1,0 +1,399 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "pirate_biography",
+  "label": "Pirate Biography Agent",
+  "assignment_id": "pirate_biography:wave2",
+  "assignment_wave": 2,
+  "requested_outputs": [
+    "identity",
+    "aliases",
+    "chronology",
+    "ships",
+    "associates",
+    "bases",
+    "operations",
+    "death",
+    "uncertainties"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "b654eff00d9fc24e356ef258a572e34dacf4d257857745a351ce1ca96133e627",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "pirate_biography",
+    "assignment_id": "pirate_biography:wave2",
+    "assignment_wave": 2,
+    "route_ids": [
+      "repo:OpenAlex Scholarly Works",
+      "repo:OpenArchives.gr / EKT"
+    ],
+    "queries": [
+      "\"Ιωάννης Καψής\"",
+      "\"Καψής\" \"Μήλου 1670–1680\"",
+      "\"Καψής\" \"βασιλιάς\"",
+      "\"Ιωάννης Καψής\" \"Μήλου 1670–1680\"",
+      "\"Ιωάννης Καψής\" history"
+    ],
+    "operation": "search",
+    "search_budget": 10,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "result_aware_fallback_v1",
+    "routes": [
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 90,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Crossref Scholarly Metadata",
+        "route_type": "repository_dispatch",
+        "repository": "Crossref Scholarly Metadata",
+        "connector_id": null,
+        "score": 86,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 10,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Ιωάννης Καψής\"",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aopenarchives.gr+%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "https://html.duckduckgo.com/html/?q=site%3Aopenarchives.gr+%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Καψής\" \"Μήλου 1670–1680\"",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aopenarchives.gr+%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%85+1670%E2%80%931680%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "https://html.duckduckgo.com/html/?q=site%3Aopenarchives.gr+%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%85+1670%E2%80%931680%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Καψής\" \"βασιλιάς\"",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aopenarchives.gr+%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+%22%CE%B2%CE%B1%CF%83%CE%B9%CE%BB%CE%B9%CE%AC%CF%82%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "https://html.duckduckgo.com/html/?q=site%3Aopenarchives.gr+%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+%22%CE%B2%CE%B1%CF%83%CE%B9%CE%BB%CE%B9%CE%AC%CF%82%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Ιωάννης Καψής\" \"Μήλου 1670–1680\"",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aopenarchives.gr+%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%85+1670%E2%80%931680%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "https://html.duckduckgo.com/html/?q=site%3Aopenarchives.gr+%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%85+1670%E2%80%931680%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Ιωάννης Καψής\" history",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aopenarchives.gr+%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+history ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "https://html.duckduckgo.com/html/?q=site%3Aopenarchives.gr+%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+history ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:OpenAlex Scholarly Works",
+      "repository": "OpenAlex Scholarly Works",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ιωάννης Καψής\"",
+      "records": [],
+      "diagnostic": "https://api.openalex.org/works?search=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&per_page=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:OpenAlex Scholarly Works",
+      "repository": "OpenAlex Scholarly Works",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ιωάννης Καψής\" history",
+      "records": [],
+      "diagnostic": "https://api.openalex.org/works?search=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+history&per_page=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:OpenAlex Scholarly Works",
+      "repository": "OpenAlex Scholarly Works",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψής\" \"Μήλου 1670–1680\"",
+      "records": [],
+      "diagnostic": "https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%85+1670%E2%80%931680%22&per_page=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:OpenAlex Scholarly Works",
+      "repository": "OpenAlex Scholarly Works",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ιωάννης Καψής\" \"Μήλου 1670–1680\"",
+      "records": [],
+      "diagnostic": "https://api.openalex.org/works?search=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%85+1670%E2%80%931680%22&per_page=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:OpenAlex Scholarly Works",
+      "repository": "OpenAlex Scholarly Works",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψής\" \"βασιλιάς\"",
+      "records": [
+        {
+          "discovery_repository": "OpenAlex Scholarly Works",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "https://openalex.org/W3145920255",
+          "title": "Παράνομος τύπος, λογοκρισία και προπαγάνδα κατά τη διάρκεια της δικτατορίας των συνταγματαρχών 1967-1974",
+          "creator": [],
+          "date": [
+            "2016-01-01"
+          ],
+          "url": "http://hdl.handle.net/10442/hedi/37505",
+          "doi": "https://doi.org/10.12681/eadd/37505",
+          "type": "dissertation",
+          "cited_by_count": 0,
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "OPENALEX_API"
+        },
+        {
+          "discovery_repository": "OpenAlex Scholarly Works",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "https://openalex.org/W7217968859",
+          "title": "Η πειρατεία στο Αιγαίο κατά τον 16ο και 17ο αιώνα: μια εφαρμογή animation",
+          "creator": [
+            "Αστέρια Αναστασιάδου"
+          ],
+          "date": [
+            "2022-10-10"
+          ],
+          "url": "http://hdl.handle.net/11610/24531",
+          "doi": null,
+          "type": "article",
+          "cited_by_count": 0,
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "OPENALEX_API"
+        },
+        {
+          "discovery_repository": "OpenAlex Scholarly Works",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "https://openalex.org/W59416325",
+          "title": "Η ΘΡΑΚΗ ΚΑΤΑ ΤΟΥΣ 10ο - 12ο ΑΙΩΝΕΣ:ΣΥΜΒΟΛΗ ΣΤΗ ΜΕΛΕΤΗ ΤΗΣ ΠΟΛΙΤΙΚΗΣ ΔΙΟΙΚΗΤΙΚΗΣ ΚΑΙ ΕΚΚΛΗΣΙΑΣΤΙΚΗΣ ΤΗΣ ΕΞΕΛΙΞΗΣ",
+          "creator": [
+            "ΧΡΙΣΤΟΣ ΚΥΡΙΑΖΟΠΟΥΛΟΣ"
+          ],
+          "date": [
+            "1997-01-01"
+          ],
+          "url": "https://doi.org/10.12681/eadd/10577",
+          "doi": "https://doi.org/10.12681/eadd/10577",
+          "type": "dissertation",
+          "cited_by_count": 0,
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "OPENALEX_API"
+        },
+        {
+          "discovery_repository": "OpenAlex Scholarly Works",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "https://openalex.org/W4390053384",
+          "title": "Manuscripts of disciples of Ioannikios and Sophronios Likhudes (new information)",
+          "creator": [
+            "Dzhamilia N. Ramazanova"
+          ],
+          "date": [
+            "2023-12-15"
+          ],
+          "url": "https://doi.org/10.52607/26587157_2023_17_25",
+          "doi": "https://doi.org/10.52607/26587157_2023_17_25",
+          "type": "article",
+          "cited_by_count": 1,
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "OPENALEX_API"
+        }
+      ],
+      "diagnostic": "https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+%22%CE%B2%CE%B1%CF%83%CE%B9%CE%BB%CE%B9%CE%AC%CF%82%22&per_page=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave2",
+      "assignment_wave": 2
+    }
+  ],
+  "result_count": 4,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
