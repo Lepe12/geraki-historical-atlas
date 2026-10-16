@@ -90,7 +90,8 @@ jobs:
           python3 -m compileall -q tools/orchestrator
           PYTHONPATH=tools/orchestrator python3 -m unittest \
             tools/orchestrator/test_jarvis_agent_planner.py \
-            tools/orchestrator/test_jarvis_dispatch.py -v
+            tools/orchestrator/test_jarvis_dispatch.py \
+            tools/orchestrator/test_research_query.py -v
 
       - name: Commit append-only dispatch audit
         run: |
@@ -102,8 +103,7 @@ jobs:
           git config user.email "jarvis-orchestrator@users.noreply.github.com"
           git add "evidence/jarvis/dispatch_audit/${{ github.run_id }}.json"
           git commit -m "JARVIS approve controlled dispatch ${{ github.run_id }}"
-          git pull --rebase origin main
-          git push origin HEAD:main
+          bash tools/push_with_retry.sh
 
       - name: Dispatch JARVIS-planned unified research run
         env:

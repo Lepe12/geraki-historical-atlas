@@ -60,6 +60,44 @@ def research_request(run_root:Path):
             }
     return {}
 
+def discovery_results(run_root:Path):
+    """Publish retained leads and executed-query coverage, independently of claims."""
+    discoveries=[];coverage=[];seen=set()
+    for lane in LANE_LABELS:
+        root=run_root/lane
+        inv=read(root/"research_discovery/all_findings.json",{})
+        raw=read(root/"lane_discovery"/f"{lane}.json",{})
+        rows=inv.get("findings") or raw.get("results") or []
+        for row in rows:
+            key=(lane,row.get("repository") or row.get("discovery_repository"),str(row.get("identifier") or row.get("url") or row.get("title")))
+            if key in seen:continue
+            seen.add(key)
+            assessment=row.get("relevance_assessment") or {}
+            discoveries.append({
+                "lane":lane,"identifier":row.get("identifier"),"title":row.get("title"),
+                "repository":row.get("repository") or row.get("discovery_repository"),
+                "url":row.get("url") or row.get("digital_url"),"date":row.get("date"),
+                "creator":row.get("creator"),"evidence_state":"DISCOVERED",
+                "triage_status":assessment.get("status") or "REVIEW_REQUIRED",
+                "triage_reasons":assessment.get("reasons") or [],
+                "research_value":assessment.get("research_value"),
+                "evidence_confidence":assessment.get("evidence_confidence"),
+                "fallback_for":row.get("fallback_for"),"fallback_reason":row.get("fallback_reason"),
+                "verified":False,
+            })
+        for attempt in raw.get("attempts",[]):
+            coverage.append({"lane":lane,"repository":attempt.get("repository"),
+                "status":attempt.get("status"),"hits":attempt.get("hits",0),
+                "queries":[{"query":q.get("query"),"status":q.get("status"),"hits":q.get("hits",0)} for q in attempt.get("queries",[])],
+                "url":attempt.get("base_url")})
+    return discoveries,coverage
+
+def request_id_for(run_root:Path):
+    for lane in LANE_LABELS:
+        data=read(run_root/lane/"research_request_identity.json",{})
+        if data.get("request_id"):return data["request_id"]
+    return None
+
 def build(repo:Path,run_id:str):
     run_root=repo/"evidence/runs"/run_id
     if not run_root.exists():raise SystemExit("RUN_NOT_FOUND:"+run_id)
@@ -67,12 +105,15 @@ def build(repo:Path,run_id:str):
     spec=read(repo/"evidence/specialist_runs"/run_id/"SPECIALIST_AGGREGATE.json",{})
     request=research_request(run_root)
     claims=candidate_claims(run_root)
+    discoveries,coverage=discovery_results(run_root)
+    request_id=request_id_for(run_root)
     agents=[]
     events=specialist_events(repo,run_id)
     blockers=[]
 
     for row in board.get("lanes",[]) or []:
         lane=row.get("lane")
+        if row.get("status")=="NOT_SELECTED":continue
         b=row.get("blockers",[]) or []
         blockers.extend({"agent_id":lane,**x} for x in b if isinstance(x,dict))
         agents.append({
@@ -86,7 +127,7 @@ def build(repo:Path,run_id:str):
         events.append({
           "schema":"pct-command-center-derived-event-v1",
           "event_id":f"{run_id}:{lane}:final","created_utc":board.get("generated_utc"),
-          "project":"piratecartography","run_id":run_id,"event_type":"agent_completed",
+          "project":"piratecartography","run_id":run_id,"request_id":request_id,"event_type":"agent_completed",
           "agent_id":lane,"phase":row.get("status"),"percent":100,"status":"COMPLETED",
           "warnings":[str(x.get("status")) for x in b[:5] if isinstance(x,dict)],
           "detail":f"{row.get('candidate_events',0)} candidate events; {len(b)} blockers"
@@ -111,7 +152,7 @@ def build(repo:Path,run_id:str):
     summary=board.get("summary") or {}
     return {
       "schema":"pct-command-center-live-v1",
-      "project":"piratecartography","run_id":run_id,
+      "project":"piratecartography","run_id":run_id,"request_id":request_id,
       "generated_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),
       "source":"DURABLE_GITHUB_EVIDENCE",
       "live_transport":"SNAPSHOT_BASELINE",
@@ -126,6 +167,8 @@ def build(repo:Path,run_id:str):
       "metrics":{
         "agents":len(agents),
         "candidate_claims":len(claims),
+        "retained_discoveries":len(discoveries),
+        "repositories_attempted":len(coverage),
         "verified_events":sum(1 for c in claims if c.get("verified")),
         "specialist_discovery_records":specialist_records,
         "contradiction_search_records":contradiction_leads,
@@ -134,6 +177,9 @@ def build(repo:Path,run_id:str):
       },
       "agents":agents,
       "claims":claims[:500],
+      "discoveries":discoveries,
+      "coverage":coverage,
+      "evidence_url":f"https://github.com/Lepe12/geraki-historical-atlas/tree/main/evidence/runs/{run_id}",
       "contradictions":{
         "status":"SEARCH_OUTPUT_NOT_ADJUDICATED",
         "search_records":contradiction_leads,

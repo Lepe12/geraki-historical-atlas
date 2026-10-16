@@ -19,7 +19,7 @@ def canonical_request():
 
 def write_identity(path="research_request_identity.json"):
     rf,req,ctx,payload,digest,job_id=canonical_request()
-    out={"schema":"agent-piracy-request-identity-v1","research_job_id":job_id,"request_file":rf.name,"request_sha256":digest,"normalized_request":payload}
+    out={"schema":"agent-piracy-request-identity-v1","research_job_id":job_id,"request_id":os.getenv("PCT_UI_REQUEST_ID") or None,"request_file":rf.name,"request_sha256":digest,"normalized_request":payload}
     pathlib.Path(path).write_text(json.dumps(out,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print("REQUEST IDENTITY",job_id,rf.name,digest)
     return out

@@ -13,6 +13,11 @@ def main():
         (base/"travellers/structured_output/candidate_events.json").write_text(json.dumps({"events":[{"candidate_id":"c1","title":"lead","verified":False}]}))
         (base/"travellers/research_lanes").mkdir(parents=True)
         (base/"travellers/research_lanes/travellers.json").write_text(json.dumps({"normalized_request":{"target":"Milos","date_range":"1660-1680","purpose":"test"}}))
+        (base/"travellers/research_request_identity.json").write_text(json.dumps({"request_id":"ui-test"}))
+        (base/"travellers/research_discovery").mkdir()
+        (base/"travellers/research_discovery/all_findings.json").write_text(json.dumps({"findings":[{"identifier":"lead-1","title":"Unresolved source","url":"https://example.org/source","relevance_assessment":{"status":"EXCLUDE_FROM_ACQUISITION","reasons":["TOPIC_COLLISION"],"research_value":{"score":10},"evidence_confidence":{"score":5}}}]}))
+        (base/"travellers/lane_discovery").mkdir()
+        (base/"travellers/lane_discovery/travellers.json").write_text(json.dumps({"attempts":[{"repository":"Catalogue","status":"REMOTE_RATE_LIMITED","hits":0,"queries":[{"query":"Milos","status":"REMOTE_RATE_LIMITED","hits":0}]}]}))
         (base/"JARVIS_STATE_BOARD.json").write_text(json.dumps({"generated_utc":"2026-10-14T00:00:00+00:00","summary":{"selected_lanes":1},"lanes":[{"lane":"travellers","status":"NO_CANDIDATE_TO_VERIFY","candidate_events":1,"verified_events":0,"blockers":[]}]}))
         sroot=r/"evidence/specialist_runs"/run;sroot.mkdir(parents=True)
         (sroot/"SPECIALIST_AGGREGATE.json").write_text(json.dumps({"agents":[{"agent_id":"contradiction","label":"Contradiction","search_runs":2,"records":3,"blockers":[],"requested_outputs":[]}]}))
@@ -23,6 +28,14 @@ def main():
         assert out["metrics"]["contradiction_search_records"]==3
         assert out["claims"][0]["verified"] is False
         assert out["safety"]["automatic_verified"] is False
+        assert out["request_id"]=="ui-test"
+        assert out["discoveries"][0]["triage_status"]=="EXCLUDE_FROM_ACQUISITION"
+        assert out["discoveries"][0]["verified"] is False
+        assert out["coverage"][0]["queries"][0]["status"]=="REMOTE_RATE_LIMITED"
+        assert out["metrics"]["retained_discoveries"]==1
+        (base/"travellers/structured_output/candidate_events.json").write_text('{"events":[]}')
+        out=build(r,run)
+        assert not out["claims"] and len(out["discoveries"])==1 and len(out["coverage"])==1
         print("COMMAND CENTER SNAPSHOT TEST PASS")
 
 if __name__=="__main__":main()

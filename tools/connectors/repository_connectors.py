@@ -366,7 +366,22 @@ def delpher_sru(q,lane):
 
 def google_books(q,lane):
     url="https://www.googleapis.com/books/v1/volumes?"+urllib.parse.urlencode({"q":q,"maxResults":20,"printType":"books"})
-    d=_json(url);out=[]
+    try:
+        d=_json(url)
+    except urllib.error.HTTPError as exc:
+        if exc.code not in (403,429,502,503,504): raise
+        status="REMOTE_RATE_LIMITED" if exc.code==429 else "REMOTE_ACCESS_BLOCKED" if exc.code==403 else "REMOTE_UNAVAILABLE"
+        # Query an independent public catalogue, never bypass Google's controls.
+        # Preserve the original failure and attribute every fallback record to BnF.
+        try:
+            fallback_status, rows, detail=bnf_sru(q,lane)
+            for row in rows:
+                row["fallback_for"]="Google Books"
+                row["fallback_reason"]=status
+            return status,rows,f"Google Books HTTP {exc.code}; fallback {fallback_status}: {detail}"
+        except Exception as fallback_error:
+            return status,[],f"Google Books HTTP {exc.code}; BnF fallback failed: {type(fallback_error).__name__}"
+    out=[]
     for it in d.get("items",[]):
         v=it.get("volumeInfo",{})
         out.append({"discovery_repository":"Google Books","discovery_lane":lane,

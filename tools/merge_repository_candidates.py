@@ -25,6 +25,7 @@ for x in d.get("results",[]):
       "discovery_repository":repo,
       "discovery_lane":lane,
       "connector_status":x.get("connector_status","EXECUTED"),
+      "fallback_for":x.get("fallback_for"),"fallback_reason":x.get("fallback_reason"),
       "url":x.get("url"),
       "digital_url":x.get("digital_url"),
       "iiif_manifest_candidates":x.get("iiif_manifest_candidates",[]),

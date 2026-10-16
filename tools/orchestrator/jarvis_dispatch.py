@@ -11,6 +11,7 @@ from typing import Any
 
 from jarvis_agent_planner import plan_agents
 from jarvis_runtime_guard import validate_runtime_policy
+from research_query import split_research_query
 
 POLICY_PATH = Path("tools/orchestrator/jarvis_policy.json")
 
@@ -21,6 +22,7 @@ def load_json(path: Path) -> dict[str, Any]:
 
 def canonical_request(req: dict[str, Any]) -> dict[str, Any]:
     target = str(req.get("target", "")).strip()
+    target, date_range, purpose = split_research_query(target, req.get("date_range", ""), req.get("purpose", ""))
     aliases = req.get("aliases", [])
     if isinstance(aliases, str):
         aliases = [x.strip() for x in aliases.split("|") if x.strip()]
@@ -30,8 +32,8 @@ def canonical_request(req: dict[str, Any]) -> dict[str, Any]:
     return {
         "target": target,
         "aliases": [str(x).strip() for x in aliases if str(x).strip()],
-        "date_range": str(req.get("date_range", "")).strip(),
-        "purpose": str(req.get("purpose", "")).strip(),
+        "date_range": date_range,
+        "purpose": purpose,
         "selected_agents": [str(x).strip() for x in selected if str(x).strip()],
     }
 

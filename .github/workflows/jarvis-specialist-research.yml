@@ -3,6 +3,9 @@ name: JARVIS Specialist Historical Research
 on:
   workflow_call:
     inputs:
+      request_id:
+        default: ""
+        type: string
       target:
         required: true
         type: string
@@ -20,6 +23,9 @@ on:
         type: string
   workflow_dispatch:
     inputs:
+      request_id:
+        default: ""
+        type: string
       target:
         description: 'Research target'
         required: true
@@ -47,7 +53,8 @@ permissions:
   id-token: write
 
 env:
-  PCT_COMMAND_CENTER_URL: https://www.piratecartography.com/pct-api/live
+  PCT_UI_REQUEST_ID: ${{ inputs.request_id }}
+  PCT_COMMAND_CENTER_URL: https://pct-live.piratecartography.com/pct-api/live
 
 jobs:
   prepare:

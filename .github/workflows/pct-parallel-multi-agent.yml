@@ -45,7 +45,7 @@ env:
   # Host-local MariaDB is primary. Airtable is retained only as an explicit legacy option.
   PCT_STORAGE_BACKEND: mariadb
   PCT_UI_REQUEST_ID: ${{ inputs.request_id }}
-  PCT_COMMAND_CENTER_URL: https://www.piratecartography.com/pct-api/live
+  PCT_COMMAND_CENTER_URL: https://pct-live.piratecartography.com/pct-api/live
 
 jobs:
   prepare:
@@ -127,6 +127,7 @@ jobs:
     needs: prepare
     uses: ./.github/workflows/jarvis-specialist-research.yml
     with:
+      request_id: ${{ inputs.request_id }}
       target: ${{ needs.prepare.outputs.target }}
       aliases: ${{ needs.prepare.outputs.aliases }}
       date_range: ${{ needs.prepare.outputs.date_range }}
@@ -295,8 +296,7 @@ jobs:
           python3 tools/storage/queue_mariadb_storage.py
           git add "evidence/runs/${{ github.run_id }}/MARIADB_STORAGE_INTENT.json"
           git diff --cached --quiet || git commit -m "Queue MariaDB persistence: run ${{ github.run_id }}"
-          git pull --rebase origin main
-          git push origin HEAD:main
+          bash tools/push_with_retry.sh
       - name: Synchronize legacy research state to Airtable
         if: env.PCT_STORAGE_BACKEND == 'airtable'
         env:
@@ -306,8 +306,7 @@ jobs:
           python3 tools/airtable_sync.py
           git add "evidence/runs/${{ github.run_id }}/AIRTABLE_SYNC.json"
           git diff --cached --quiet || git commit -m "Airtable sync report: run ${{ github.run_id }}"
-          git pull --rebase origin main
-          git push origin HEAD:main
+          bash tools/push_with_retry.sh
       - name: Enforce all-lane operational and request-integrity gate
         if: env.PCT_SELECTED_AGENTS == ''
         run: |
@@ -366,8 +365,7 @@ jobs:
           git config user.email "jarvis-orchestrator@users.noreply.github.com"
           git add "jarvis_escalation_requests/$PCT_RUN_ID.json"
           git commit -m "JARVIS queue archive escalation $PCT_RUN_ID"
-          git pull --rebase origin main
-          git push origin HEAD:main
+          bash tools/push_with_retry.sh
 
 
   jarvis-state-board:
@@ -403,6 +401,5 @@ jobs:
           git add "evidence/runs/$PCT_RUN_ID/JARVIS_STATE_BOARD.json" command-center/live/
           git diff --cached --quiet && exit 0
           git commit -m "JARVIS state board $PCT_RUN_ID"
-          git pull --rebase origin main
-          git push origin HEAD:main
+          bash tools/push_with_retry.sh
 
