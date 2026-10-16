@@ -1,0 +1,237 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "pirate_base",
+  "label": "Pirate Base / Anchorage Agent",
+  "assignment_id": "pirate_base:wave2",
+  "assignment_wave": 2,
+  "requested_outputs": [
+    "base_classification",
+    "use_frequency",
+    "logistics",
+    "actors",
+    "date_ranges",
+    "evidence_gaps"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "4b2b94da3448df812cd48696bc408ced5e6189e46205f21313a908983a13314b",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "pirate_base",
+    "assignment_id": "pirate_base:wave2",
+    "assignment_wave": 2,
+    "route_ids": [
+      "repo:PARES / Archivo General de Simancas",
+      "repo:Gallica/BnF"
+    ],
+    "queries": [
+      "Geraki Laconia fortifications pirate base corsair base anchorage harbour refuge",
+      "Geraki Laconia fortifications pirates corsairs provisioning repairs captives ransom",
+      "Geraki Laconia fortifications historical harbour anchorage fort cave island piracy",
+      "Geraki Laconia fortifications pirates corsairs"
+    ],
+    "operation": "search",
+    "search_budget": 8,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "result_aware_fallback_v1",
+    "routes": [
+      {
+        "route_id": "repo:PARES / Archivo General de Simancas",
+        "route_type": "repository_dispatch",
+        "repository": "PARES / Archivo General de Simancas",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 80,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [],
+    "queries_per_route": 4,
+    "total_search_budget": 8,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Geraki Laconia fortifications pirate base corsair base anchorage harbour refuge",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Geraki+Laconia+fortifications+pirate+base+corsair+base+anchorage+harbour+refuge%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "Geraki Laconia fortifications pirates corsairs",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Geraki+Laconia+fortifications+pirates+corsairs ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Geraki+Laconia+fortifications+pirates+corsairs ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "Geraki Laconia fortifications pirates corsairs provisioning repairs captives ransom",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Geraki+Laconia+fortifications+pirates+corsairs+provisioning+repairs+captives+ransom ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Geraki+Laconia+fortifications+pirates+corsairs+provisioning+repairs+captives+ransom ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "Geraki Laconia fortifications historical harbour anchorage fort cave island piracy",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Geraki+Laconia+fortifications+historical+harbour+anchorage+fort+cave+island+piracy ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Geraki+Laconia+fortifications+historical+harbour+anchorage+fort+cave+island+piracy ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "Geraki Laconia fortifications pirate base corsair base anchorage harbour refuge",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Geraki+Laconia+fortifications+pirate+base+corsair+base+anchorage+harbour+refuge ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Geraki+Laconia+fortifications+pirate+base+corsair+base+anchorage+harbour+refuge ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Geraki Laconia fortifications pirates corsairs provisioning repairs captives ransom",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Geraki+Laconia+fortifications+pirates+corsairs+provisioning+repairs+captives+ransom%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Geraki Laconia fortifications historical harbour anchorage fort cave island piracy",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Geraki+Laconia+fortifications+historical+harbour+anchorage+fort+cave+island+piracy%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Geraki Laconia fortifications pirates corsairs",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Geraki+Laconia+fortifications+pirates+corsairs%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    }
+  ],
+  "result_count": 0,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}

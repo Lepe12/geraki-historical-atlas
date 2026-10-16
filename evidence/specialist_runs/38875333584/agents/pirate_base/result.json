@@ -1,0 +1,645 @@
+{
+  "schema": "pct-specialist-agent-result-v5",
+  "agent_id": "pirate_base",
+  "label": "Pirate Base / Anchorage Agent",
+  "assignment_waves": [
+    {
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1,
+      "routing": {
+        "authority": "JARVIS_PLANNER",
+        "strategy": "context_aware_deterministic_v1",
+        "routes": [
+          {
+            "route_id": "registry:moreveneto_browser",
+            "route_type": "registered_connector",
+            "repository": null,
+            "connector_id": "moreveneto_browser",
+            "score": 100,
+            "reason": [
+              "agent_profile"
+            ],
+            "context_profiles": [],
+            "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+          },
+          {
+            "route_id": "repo:SearchCulture.gr / EKT",
+            "route_type": "repository_dispatch",
+            "repository": "SearchCulture.gr / EKT",
+            "connector_id": null,
+            "score": 96,
+            "reason": [
+              "agent_profile"
+            ],
+            "context_profiles": [],
+            "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+          },
+          {
+            "route_id": "repo:Internet Culturale",
+            "route_type": "repository_dispatch",
+            "repository": "Internet Culturale",
+            "connector_id": null,
+            "score": 92,
+            "reason": [
+              "agent_profile"
+            ],
+            "context_profiles": [],
+            "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+          },
+          {
+            "route_id": "repo:İSAM Kütüphanesi",
+            "route_type": "repository_dispatch",
+            "repository": "İSAM Kütüphanesi",
+            "connector_id": null,
+            "score": 88,
+            "reason": [
+              "agent_profile"
+            ],
+            "context_profiles": [],
+            "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+          }
+        ],
+        "fallback_sources_not_executed": [
+          {
+            "route_id": "repo:PARES / Archivo General de Simancas",
+            "route_type": "repository_dispatch",
+            "repository": "PARES / Archivo General de Simancas",
+            "connector_id": null,
+            "score": 84,
+            "reason": [
+              "agent_profile"
+            ],
+            "context_profiles": [],
+            "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+          },
+          {
+            "route_id": "repo:Gallica/BnF",
+            "route_type": "repository_dispatch",
+            "repository": "Gallica/BnF",
+            "connector_id": null,
+            "score": 80,
+            "reason": [
+              "agent_profile"
+            ],
+            "context_profiles": [],
+            "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+          }
+        ],
+        "queries_per_route": 4,
+        "total_search_budget": 16,
+        "worker_self_routing": false,
+        "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+      },
+      "result_count": 0
+    },
+    {
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2,
+      "routing": {
+        "authority": "JARVIS_PLANNER",
+        "strategy": "result_aware_fallback_v1",
+        "routes": [
+          {
+            "route_id": "repo:PARES / Archivo General de Simancas",
+            "route_type": "repository_dispatch",
+            "repository": "PARES / Archivo General de Simancas",
+            "connector_id": null,
+            "score": 84,
+            "reason": [
+              "agent_profile"
+            ],
+            "context_profiles": [],
+            "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+          },
+          {
+            "route_id": "repo:Gallica/BnF",
+            "route_type": "repository_dispatch",
+            "repository": "Gallica/BnF",
+            "connector_id": null,
+            "score": 80,
+            "reason": [
+              "agent_profile"
+            ],
+            "context_profiles": [],
+            "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+          }
+        ],
+        "fallback_sources_not_executed": [],
+        "queries_per_route": 4,
+        "total_search_budget": 8,
+        "worker_self_routing": false,
+        "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+      },
+      "result_count": 0
+    }
+  ],
+  "requested_outputs": [
+    "base_classification",
+    "use_frequency",
+    "logistics",
+    "actors",
+    "date_ranges",
+    "evidence_gaps"
+  ],
+  "search_runs": [
+    {
+      "connector_id": "moreveneto_browser",
+      "repository": "Archivio di Stato di Venezia / Moreveneto",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "Geraki Laconia fortifications pirate base corsair base anchorage harbour refuge",
+      "records": [],
+      "provenance": {
+        "module": "connectors/moreveneto_browser_search.py",
+        "returncode": 2,
+        "stdout_excerpt": "{\n  \"status\": \"BROWSER_EXECUTED_NO_API_CONFIRMATION\",\n  \"source\": \"Archivio di Stato di Venezia / moreveneto\",\n  \"query\": \"Geraki Laconia fortifications pirate base corsair base anchorage harbour refuge\",\n  \"graphql_responses\": [],\n  \"term_visible\": false,\n  \"body_excerpt\": \"Home\\nPatrimonio\\nGalleria\\nRicerca\\nCerca nel patrimonio\\n Cerca in tutti i campi delle schede\\nAggregazione logica\\n0\\nFamiglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n",
+        "stderr_excerpt": ""
+      },
+      "blockers": [
+        {
+          "code": "BROWSER_EXECUTED_NO_API_CONFIRMATION",
+          "detail": "miglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n"
+        }
+      ],
+      "warnings": [
+        "Connector process returned non-zero exit status."
+      ],
+      "next_best_route": "human_archive_review",
+      "evidence_level": "DISCOVERY_ONLY",
+      "retrieved_utc": "2026-10-16T08:44:05.896044+00:00",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "moreveneto_browser",
+      "repository": "Archivio di Stato di Venezia / Moreveneto",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "Geraki Laconia fortifications pirates corsairs provisioning repairs captives ransom",
+      "records": [],
+      "provenance": {
+        "module": "connectors/moreveneto_browser_search.py",
+        "returncode": 2,
+        "stdout_excerpt": "{\n  \"status\": \"BROWSER_EXECUTED_NO_API_CONFIRMATION\",\n  \"source\": \"Archivio di Stato di Venezia / moreveneto\",\n  \"query\": \"Geraki Laconia fortifications pirates corsairs provisioning repairs captives ransom\",\n  \"graphql_responses\": [],\n  \"term_visible\": false,\n  \"body_excerpt\": \"Home\\nPatrimonio\\nGalleria\\nRicerca\\nCerca nel patrimonio\\n Cerca in tutti i campi delle schede\\nAggregazione logica\\n0\\nFamiglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n",
+        "stderr_excerpt": ""
+      },
+      "blockers": [
+        {
+          "code": "BROWSER_EXECUTED_NO_API_CONFIRMATION",
+          "detail": "miglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n"
+        }
+      ],
+      "warnings": [
+        "Connector process returned non-zero exit status."
+      ],
+      "next_best_route": "human_archive_review",
+      "evidence_level": "DISCOVERY_ONLY",
+      "retrieved_utc": "2026-10-16T08:44:16.691199+00:00",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "moreveneto_browser",
+      "repository": "Archivio di Stato di Venezia / Moreveneto",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "Geraki Laconia fortifications historical harbour anchorage fort cave island piracy",
+      "records": [],
+      "provenance": {
+        "module": "connectors/moreveneto_browser_search.py",
+        "returncode": 2,
+        "stdout_excerpt": "{\n  \"status\": \"BROWSER_EXECUTED_NO_API_CONFIRMATION\",\n  \"source\": \"Archivio di Stato di Venezia / moreveneto\",\n  \"query\": \"Geraki Laconia fortifications historical harbour anchorage fort cave island piracy\",\n  \"graphql_responses\": [],\n  \"term_visible\": false,\n  \"body_excerpt\": \"Home\\nPatrimonio\\nGalleria\\nRicerca\\nCerca nel patrimonio\\n Cerca in tutti i campi delle schede\\nAggregazione logica\\n0\\nFamiglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n",
+        "stderr_excerpt": ""
+      },
+      "blockers": [
+        {
+          "code": "BROWSER_EXECUTED_NO_API_CONFIRMATION",
+          "detail": "miglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n"
+        }
+      ],
+      "warnings": [
+        "Connector process returned non-zero exit status."
+      ],
+      "next_best_route": "human_archive_review",
+      "evidence_level": "DISCOVERY_ONLY",
+      "retrieved_utc": "2026-10-16T08:44:27.474486+00:00",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "moreveneto_browser",
+      "repository": "Archivio di Stato di Venezia / Moreveneto",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "Geraki Laconia fortifications pirates corsairs",
+      "records": [],
+      "provenance": {
+        "module": "connectors/moreveneto_browser_search.py",
+        "returncode": 2,
+        "stdout_excerpt": "{\n  \"status\": \"BROWSER_EXECUTED_NO_API_CONFIRMATION\",\n  \"source\": \"Archivio di Stato di Venezia / moreveneto\",\n  \"query\": \"Geraki Laconia fortifications pirates corsairs\",\n  \"graphql_responses\": [],\n  \"term_visible\": false,\n  \"body_excerpt\": \"Home\\nPatrimonio\\nGalleria\\nRicerca\\nCerca nel patrimonio\\n Cerca in tutti i campi delle schede\\nAggregazione logica\\n0\\nFamiglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n",
+        "stderr_excerpt": ""
+      },
+      "blockers": [
+        {
+          "code": "BROWSER_EXECUTED_NO_API_CONFIRMATION",
+          "detail": "miglia\\n0\\nLuogo\\n0\\nOggetto culturale\\n0\\nOrganizzazione\\n0\\nPersona\\n0\\nRelazione con\\n Persona Luogo Organizzazione Famiglia\\nLa tua ricerca non ha dato risultati, prova a cambiare i filtri\\n \\n0  Nessun risultato\\nOrdina per\\nOrdine per pertinenza\\nOrdine alfabetico (A→Z)\\nOrdine alfabetico (Z→A)\\n\\nLa tua ricerca non ha dato risultati. Prova a cambiare i parametri oppure a resettare la ricerca cliccando sul pulsante sottostante.\\n\\nResetta la ricerca\\nArchivio di Stato di Venezia\\n\\nCampo dei Frari San Polo, 3002\\n30125 Venezia\\nCentralino +39 041.5222281\\nE-mail: as-ve@beniculturali.it\\nPosta certificata: mbac-as-ve@mailcert.beniculturali.it\\nP.IVA/Cod.Fis. 80012400273\\n\\nArianna4View is powered by Hyperborea\\n\\nv1.0.0\",\n  \"screenshot\": \"evidence/browser_sessions/moreveneto/screenshots/search-result.png\",\n  \"audit_log\": \"evidence/browser_sessions/moreveneto/audit.jsonl\",\n  \"warning\": \"Catalogue/browser discovery only; original archival documents are not verified by this step.\"\n}\n"
+        }
+      ],
+      "warnings": [
+        "Connector process returned non-zero exit status."
+      ],
+      "next_best_route": "human_archive_review",
+      "evidence_level": "DISCOVERY_ONLY",
+      "retrieved_utc": "2026-10-16T08:44:38.257054+00:00",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "Geraki Laconia fortifications pirate base corsair base anchorage harbour refuge",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "Geraki Laconia fortifications pirates corsairs provisioning repairs captives ransom",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "Geraki Laconia fortifications historical harbour anchorage fort cave island piracy",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "Geraki Laconia fortifications pirates corsairs",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Geraki Laconia fortifications pirates corsairs",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=Geraki+Laconia+fortifications+pirates+corsairs&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Geraki Laconia fortifications pirate base corsair base anchorage harbour refuge",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=Geraki+Laconia+fortifications+pirate+base+corsair+base+anchorage+harbour+refuge&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Geraki Laconia fortifications historical harbour anchorage fort cave island piracy",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=Geraki+Laconia+fortifications+historical+harbour+anchorage+fort+cave+island+piracy&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Geraki Laconia fortifications pirates corsairs provisioning repairs captives ransom",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=Geraki+Laconia+fortifications+pirates+corsairs+provisioning+repairs+captives+ransom&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Geraki Laconia fortifications pirates corsairs",
+      "records": [],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=Geraki+Laconia+fortifications+pirates+corsairs&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Geraki Laconia fortifications historical harbour anchorage fort cave island piracy",
+      "records": [],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=Geraki+Laconia+fortifications+historical+harbour+anchorage+fort+cave+island+piracy&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Geraki Laconia fortifications pirate base corsair base anchorage harbour refuge",
+      "records": [],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=Geraki+Laconia+fortifications+pirate+base+corsair+base+anchorage+harbour+refuge&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:İSAM Kütüphanesi",
+      "repository": "İSAM Kütüphanesi",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Geraki Laconia fortifications pirates corsairs provisioning repairs captives ransom",
+      "records": [],
+      "diagnostic": "https://makale.isam.org.tr/server/api/discover/search/objects?query=Geraki+Laconia+fortifications+pirates+corsairs+provisioning+repairs+captives+ransom&size=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Geraki Laconia fortifications pirate base corsair base anchorage harbour refuge",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Geraki+Laconia+fortifications+pirate+base+corsair+base+anchorage+harbour+refuge%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "Geraki Laconia fortifications pirates corsairs",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Geraki+Laconia+fortifications+pirates+corsairs ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Geraki+Laconia+fortifications+pirates+corsairs ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "Geraki Laconia fortifications pirates corsairs provisioning repairs captives ransom",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Geraki+Laconia+fortifications+pirates+corsairs+provisioning+repairs+captives+ransom ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Geraki+Laconia+fortifications+pirates+corsairs+provisioning+repairs+captives+ransom ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "Geraki Laconia fortifications historical harbour anchorage fort cave island piracy",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Geraki+Laconia+fortifications+historical+harbour+anchorage+fort+cave+island+piracy ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Geraki+Laconia+fortifications+historical+harbour+anchorage+fort+cave+island+piracy ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "Geraki Laconia fortifications pirate base corsair base anchorage harbour refuge",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Geraki+Laconia+fortifications+pirate+base+corsair+base+anchorage+harbour+refuge ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Geraki+Laconia+fortifications+pirate+base+corsair+base+anchorage+harbour+refuge ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Geraki Laconia fortifications pirates corsairs provisioning repairs captives ransom",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Geraki+Laconia+fortifications+pirates+corsairs+provisioning+repairs+captives+ransom%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Geraki Laconia fortifications historical harbour anchorage fort cave island piracy",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Geraki+Laconia+fortifications+historical+harbour+anchorage+fort+cave+island+piracy%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Geraki Laconia fortifications pirates corsairs",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Geraki+Laconia+fortifications+pirates+corsairs%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    }
+  ],
+  "result_count": 0,
+  "verified_promotion_allowed": false,
+  "rule": "Merged discovery preserves every JARVIS assignment wave; aggregation never verifies historical claims."
+}
