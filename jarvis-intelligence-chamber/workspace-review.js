@@ -24,7 +24,9 @@ function sync(){
  const n=$('resultsCount')?.textContent?.trim();buttons.get('results').textContent='▤ Ευρήματα'+(n&&n!=='0'?' · '+n:'');
  const mission=$('missionState')?.textContent?.trim();const connection=$('expCoreState')?.textContent?.trim();status.textContent=(mission&&mission!=='READY'?mission:connection&&connection!=='CONNECTING'?connection:'Έτοιμο');
 }
-new MutationObserver(sync).observe(app,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class']});
+[results,learning,$('activityStrip')].filter(Boolean).forEach(el=>new MutationObserver(sync).observe(el,{attributes:true,attributeFilter:['class']}));
+$('resultsCount')&&new MutationObserver(sync).observe($('resultsCount'),{childList:true,characterData:true,subtree:true});
+['jarvis:mission-state','jarvis:research-state','jarvis:research-selection'].forEach(ev=>window.addEventListener(ev,sync));
 sync();document.body.classList.add('workspace-ready');
 // Side-by-side original PDF preview, local to browser. Never uploads or approves anything.
 const input=$('learningFile'),items=$('learningItems');
