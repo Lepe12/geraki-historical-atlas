@@ -37,7 +37,7 @@ function mountStudy(){
  study=document.createElement('div');study.className='workspace-study-grid';
  viewer=document.createElement('div');viewer.className='workspace-pdf-viewer';
  const review=document.createElement('div');review.className='workspace-study-source';
- items.parentNode.insertBefore(study,items);study.append(viewer,review);review.append(items);
+ items.parentNode.insertBefore(study,items);study.append(viewer,review);const extractedPage=items.previousElementSibling;if(extractedPage?.classList.contains('learning-source'))review.append(extractedPage);review.append(items);const pager=items.nextElementSibling;if(pager?.classList.contains('learning-actions'))review.append(pager);
  viewer.innerHTML='<div class="workspace-pdf-empty">Επιλέξτε PDF για ταυτόχρονη προβολή πρωτοτύπου και στοιχείων προς έλεγχο.</div>';
 }
 mountStudy();
