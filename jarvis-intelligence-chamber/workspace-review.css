@@ -1,0 +1,57 @@
+/* NABOU//X workspace usability revision — review branch only.
+   Existing 3D renderer, palette and research endpoints are untouched. */
+:root{--workspace-readable:#d8eaf1;--workspace-muted:#9ab9c8}
+body.workspace-ready .deck-controls{display:none!important}
+body.workspace-ready .results-toggle,body.workspace-ready .learning-toggle{display:none!important}
+body.workspace-ready .exp-rail{display:none!important}
+body.workspace-ready .exp-restore{display:none!important}
+.workspace-toolbar{position:absolute;z-index:31;top:91px;left:24px;right:24px;display:flex;align-items:center;justify-content:space-between;gap:14px;pointer-events:none}
+.workspace-group{display:flex;align-items:center;flex-wrap:wrap;gap:5px;pointer-events:auto;padding:6px;background:rgba(2,12,24,.82);border:1px solid rgba(91,201,224,.18);border-radius:10px;backdrop-filter:blur(16px);box-shadow:0 8px 32px #0005}
+.workspace-button{font:600 12px/1.35 system-ui,sans-serif!important;letter-spacing:.01em!important;color:var(--workspace-readable);background:transparent;border:1px solid transparent;border-radius:7px;padding:10px 13px;min-height:40px;cursor:pointer;white-space:nowrap}
+.workspace-button:hover,.workspace-button:focus-visible{background:rgba(75,183,213,.14);outline-color:#75d7ef}
+.workspace-button[aria-pressed="true"]{color:#b6f3ff;background:rgba(43,133,168,.23);border-color:rgba(92,207,237,.38)}
+.workspace-button .ws-count{color:#8ddff2;margin-left:5px}
+.workspace-right{margin-left:auto}
+.workspace-state{font:500 12px system-ui,sans-serif;color:#aed7e7;padding:0 10px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.workspace-ready .left-panel{top:165px!important}
+body.workspace-ready .left-panel .section-btn{font-size:12px!important;min-height:44px!important}
+body.workspace-ready .left-panel .label{font-size:11px!important}
+body.workspace-ready .left-panel .signal-row{font-size:11px!important}
+body.workspace-ready .left-panel .signal-row em,body.workspace-ready .left-panel .bottom-panel-note{font-size:10px!important}
+body.workspace-ready .operator-command{z-index:25!important}
+body.workspace-ready .operator-command-label,body.workspace-ready .query-help{font-size:12px!important;line-height:1.5!important}
+body.workspace-ready .operator-command input{font-size:16px!important}
+body.workspace-ready .operator-command button{font-size:13px!important;min-height:44px!important}
+body.workspace-ready .activity-head{font-size:11px!important}
+body.workspace-ready .activity-lines{font-size:12px!important}
+body.workspace-ready .result-item,body.workspace-ready .result-empty,body.workspace-ready .learning-items{font-size:13px!important;line-height:1.6!important}
+body.workspace-ready .result-item small,body.workspace-ready .tool-help,body.workspace-ready .results-meta,body.workspace-ready .learning-panel p{font-size:11px!important;line-height:1.55!important}
+body.workspace-ready .result-item button,body.workspace-ready .results-tools button,body.workspace-ready .learning-panel button{min-height:34px;font-size:12px!important}
+body.workspace-ready .results-drawer:not(.hidden),body.workspace-ready .learning-panel:not(.hidden){width:min(680px,calc(100vw - 330px))!important;top:149px!important;bottom:82px!important}
+body.workspace-ready .detail-panel:not(.hidden){top:149px!important}
+body.workspace-ready.workspace-results .results-drawer,body.workspace-ready.workspace-learning .learning-panel{z-index:27}
+body.workspace-ready.workspace-study .learning-panel:not(.hidden){width:min(1100px,calc(100vw - 90px))!important}
+.workspace-study-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+.workspace-pdf-viewer{border:1px solid rgba(97,188,216,.25);background:#071523;border-radius:9px;overflow:hidden;min-height:360px}
+.workspace-pdf-viewer iframe{border:0;display:block;width:100%;height:min(60vh,650px);background:#f2f2f2}
+.workspace-pdf-label{font:600 12px system-ui,sans-serif;color:#aaddf0;padding:12px}
+.workspace-study-source{min-width:0}
+.workspace-pdf-empty{padding:25px;color:#aec5d0;font:13px/1.5 system-ui,sans-serif}
+body.workspace-ready .results-head,body.workspace-ready .learning-head{font-size:13px!important}
+body.workspace-ready .results-drawer button:focus-visible,body.workspace-ready .learning-panel button:focus-visible{outline:2px solid #7ee3ef;outline-offset:2px}
+@media(min-width:901px) and (max-width:1300px){
+ body.workspace-ready .operator-command{width:calc(100vw - 580px)!important;min-width:320px!important}
+ body.workspace-ready .activity-strip{width:calc(100vw - 620px)!important;min-width:280px!important}
+}
+@media(max-width:900px){
+ .workspace-toolbar{top:73px;left:9px;right:9px;flex-wrap:wrap;gap:6px}
+ .workspace-group{padding:3px;gap:1px;max-width:100%;overflow-x:auto;flex-wrap:nowrap}
+ .workspace-right{margin-left:0}
+ .workspace-button{font-size:11px!important;min-height:37px;padding:8px 9px}
+ .workspace-state{font-size:11px}
+ body.workspace-ready .results-drawer:not(.hidden),body.workspace-ready .learning-panel:not(.hidden),body.workspace-ready .detail-panel:not(.hidden){top:172px!important;right:8px!important;left:8px!important;width:auto!important;bottom:12px!important}
+ body.workspace-ready .left-panel{top:172px!important}
+ body.workspace-ready.workspace-study .learning-panel:not(.hidden){width:auto!important}
+ .workspace-study-grid{grid-template-columns:1fr}
+ .workspace-pdf-viewer iframe{height:330px}
+}
