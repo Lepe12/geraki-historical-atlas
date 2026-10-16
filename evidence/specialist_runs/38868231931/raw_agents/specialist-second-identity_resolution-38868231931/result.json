@@ -1,0 +1,310 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "identity_resolution",
+  "label": "Identity Resolution Agent",
+  "assignment_id": "identity_resolution:wave2",
+  "assignment_wave": 2,
+  "requested_outputs": [
+    "entity_candidates",
+    "variant_names",
+    "same_entity_assessment",
+    "collision_warnings"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "32600b9a2f3330f72cfe931f34e222ce70d97d4647a9e8251f0e9232bfd251c6",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "identity_resolution",
+    "assignment_id": "identity_resolution:wave2",
+    "assignment_wave": 2,
+    "route_ids": [
+      "repo:Academia.edu Public Research",
+      "repo:Biblioteca Digital Hispánica"
+    ],
+    "queries": [
+      "\"Ιωάννη Καψή\" \"Μήλου\"",
+      "\"Ιωάννη Καψή\" \"βασιλιά\"",
+      "\"Ιωάννη Καψή\"",
+      "\"Ιωάννης Καψής\"",
+      "\"Καψή\" \"βασιλιά\""
+    ],
+    "operation": "search",
+    "search_budget": 10,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "result_aware_fallback_v1",
+    "routes": [
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 10,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Ιωάννης Καψής\"",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Ιωάννη Καψή\" \"Μήλου\"",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7+%CE%9A%CE%B1%CF%88%CE%AE%22+%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%85%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7+%CE%9A%CE%B1%CF%88%CE%AE%22+%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%85%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Ιωάννη Καψή\" \"βασιλιά\"",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7+%CE%9A%CE%B1%CF%88%CE%AE%22+%22%CE%B2%CE%B1%CF%83%CE%B9%CE%BB%CE%B9%CE%AC%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7+%CE%9A%CE%B1%CF%88%CE%AE%22+%22%CE%B2%CE%B1%CF%83%CE%B9%CE%BB%CE%B9%CE%AC%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Ιωάννη Καψή\"",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7+%CE%9A%CE%B1%CF%88%CE%AE%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7+%CE%9A%CE%B1%CF%88%CE%AE%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Καψή\" \"βασιλιά\"",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%9A%CE%B1%CF%88%CE%AE%22+%22%CE%B2%CE%B1%CF%83%CE%B9%CE%BB%CE%B9%CE%AC%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "https://html.duckduckgo.com/html/?q=site%3Aacademia.edu+%22%CE%9A%CE%B1%CF%88%CE%AE%22+%22%CE%B2%CE%B1%CF%83%CE%B9%CE%BB%CE%B9%CE%AC%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" \"βασιλιά\"",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%9A%CE%B1%CF%88%CE%AE%22+AND+alma.all_for_ui%3D%22%CE%B2%CE%B1%CF%83%CE%B9%CE%BB%CE%B9%CE%AC%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ιωάννης Καψής\"",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ιωάννη Καψή\" \"βασιλιά\"",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7+%CE%9A%CE%B1%CF%88%CE%AE%22+AND+alma.all_for_ui%3D%22%CE%B2%CE%B1%CF%83%CE%B9%CE%BB%CE%B9%CE%AC%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ιωάννη Καψή\"",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7+%CE%9A%CE%B1%CF%88%CE%AE%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ιωάννη Καψή\" \"Μήλου\"",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7+%CE%9A%CE%B1%CF%88%CE%AE%22+AND+alma.all_for_ui%3D%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%85%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2
+    }
+  ],
+  "result_count": 0,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
