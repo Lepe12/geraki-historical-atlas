@@ -25,11 +25,14 @@ export function applyResearchEvent(snapshot,event){
 function createFeed({onSnapshot,onEvent,onState,WebSocketImpl=globalThis.WebSocket,fetchImpl=globalThis.fetch,endpoint='https://pct-live.piratecartography.com/pct-api/live',retryMs=12000,pollMs=15000,runId}){
  let closed=false,socket=null,retry=null,poll=null,connected=false,snapshot=null,liveSeen=false,polling=false,revision='';
  let waitingRequest='';
+ const startupPollMs=2000;
+ const schedulePoll=()=>{clearInterval(poll);if(!closed)poll=setInterval(refresh,waitingRequest?startupPollMs:pollMs);};
+ const completeWaiting=()=>{waitingRequest='';schedulePoll();};
  let selectedRun=runId||new URLSearchParams(globalThis.location?.search||'').get('run')||'latest';if(!/^\d+$/.test(selectedRun))selectedRun='latest';
  const seen=new Set(),status=(m,d='')=>{if(!closed)onState?.(m,d);};
  function acceptSnapshot(data,origin){
   if(closed||!validSnapshot(data)||(selectedRun!=='latest'&&String(data.run_id)!==selectedRun)||olderRun(data.run_id,snapshot?.run_id))return;
-  if(waitingRequest){const id=data.request_id||(data.events||[]).find(e=>e.request_id)?.request_id;if(id!==waitingRequest)return;waitingRequest='';selectedRun=String(data.run_id);}
+  if(waitingRequest){const id=data.request_id||(data.events||[]).find(e=>e.request_id)?.request_id;if(id!==waitingRequest)return;completeWaiting();selectedRun=String(data.run_id);}
   const same=String(data.run_id)===String(snapshot?.run_id);
   if(same&&snapshot?.generated_utc&&data.generated_utc&&data.generated_utc<snapshot.generated_utc)return;
   const sig=JSON.stringify(data);if(sig===revision)return;
@@ -44,7 +47,7 @@ function createFeed({onSnapshot,onEvent,onState,WebSocketImpl=globalThis.WebSock
  }
  function acceptEvent(e,replayed){
   if(!eventSchema(e)||!/^\d+$/.test(String(e.run_id))||(selectedRun!=='latest'&&String(e.run_id)!==selectedRun)||olderRun(e.run_id,snapshot?.run_id))return;
-  if(waitingRequest){if(e.request_id!==waitingRequest)return;waitingRequest='';selectedRun=String(e.run_id);}
+  if(waitingRequest){if(e.request_id!==waitingRequest)return;completeWaiting();selectedRun=String(e.run_id);}
   if(e.event_id&&seen.has(e.event_id))return;
   if(e.event_id){seen.add(e.event_id);if(seen.size>2000)seen.delete(seen.values().next().value);}
   if(!replayed){const next=applyResearchEvent(snapshot,e);if(next!==snapshot){snapshot=next;liveSeen=true;onSnapshot?.(snapshot,'LIVE');}}
@@ -54,7 +57,7 @@ function createFeed({onSnapshot,onEvent,onState,WebSocketImpl=globalThis.WebSock
   try{const r=await fetchImpl('https://raw.githubusercontent.com/Lepe12/geraki-historical-atlas/main/command-center/live/'+(selectedRun==='latest'?'latest':'runs/'+selectedRun)+'.json',{cache:'no-store',signal:AbortSignal.timeout(10000)});if(!r.ok)throw Error('snapshot_http_'+r.status);const s=await r.json();if(!validSnapshot(s))throw Error('invalid_snapshot');acceptSnapshot(s,'SNAPSHOT');if(!connected)status('SNAPSHOT','Recorded run '+String(s.run_id));}
   catch(e){if(!connected)status('OFFLINE',String(e.message||e));}
  }
- async function refresh(){if(closed||polling)return;polling=true;try{const r=await fetchImpl(endpoint+'/status/piratecartography/'+selectedRun,{cache:'no-store',signal:AbortSignal.timeout(10000)});if(!r.ok)throw Error('status_http_'+r.status);const d=await r.json();if(!closed){acceptSnapshot(d.snapshot,'LIVE');for(const e of d.events||[])acceptEvent(e,true);}}catch(_){/* Socket state remains independently visible. */}finally{polling=false;await fallback();}}
+ async function refresh(){if(closed||polling)return;polling=true;try{const r=await fetchImpl(endpoint+'/status/piratecartography/'+selectedRun,{cache:'no-store',signal:AbortSignal.timeout(10000)});if(!r.ok)throw Error('status_http_'+r.status);const d=await r.json();if(!closed){acceptSnapshot(d.snapshot,'LIVE');for(const e of d.events||[])acceptEvent(e,true);}}catch(_){/* Socket state remains independently visible. */}finally{polling=false;if(!waitingRequest)await fallback();}}
  function open(){
   if(closed||!WebSocketImpl){fallback();return;}
   try{const url=new URL(endpoint);if(url.protocol!=='https:')throw Error('secure_endpoint_required');socket=new WebSocketImpl('wss://'+url.host+url.pathname.replace(/\/$/,'')+'/ws/piratecartography/'+selectedRun);
@@ -64,10 +67,10 @@ function createFeed({onSnapshot,onEvent,onState,WebSocketImpl=globalThis.WebSock
    socket.onclose=()=>{connected=false;if(!closed){status('RECONNECTING','Socket disconnected');fallback();retry=setTimeout(open,retryMs);}};
   }catch(_){fallback();if(!closed)retry=setTimeout(open,retryMs);}
  }
- fallback().finally(()=>{if(!closed){open();poll=setInterval(refresh,pollMs);}});
+ fallback().finally(()=>{if(!closed){open();schedulePoll();}});
  const stop=()=>{closed=true;clearTimeout(retry);clearInterval(poll);socket?.close();};
- stop.selectRun=(run,force=false)=>{const id=/^\d+$/.test(String(run))?String(run):'latest';if(closed||(id===selectedRun&&!waitingRequest&&!force))return;waitingRequest='';selectedRun=id;snapshot=null;revision='';liveSeen=false;seen.clear();clearTimeout(retry);if(socket){socket.onclose=null;socket.onmessage=null;socket.close();}connected=false;open();refresh();};
- stop.waitForRequest=id=>{waitingRequest=String(id||'');snapshot=null;revision='';seen.clear();selectedRun='latest';status('WAITING','Waiting for request '+waitingRequest);refresh();};
+ stop.selectRun=(run,force=false)=>{const id=/^\d+$/.test(String(run))?String(run):'latest';if(closed||(id===selectedRun&&!waitingRequest&&!force))return;completeWaiting();selectedRun=id;snapshot=null;revision='';liveSeen=false;seen.clear();clearTimeout(retry);if(socket){socket.onclose=null;socket.onmessage=null;socket.close();}connected=false;open();refresh();};
+ stop.waitForRequest=id=>{waitingRequest=String(id||'');snapshot=null;revision='';seen.clear();selectedRun='latest';status('WAITING','Waiting for request '+waitingRequest);schedulePoll();refresh();};
  return stop;
 }
 let shared=null;
