@@ -371,6 +371,9 @@ jobs:
   jarvis-state-board:
     needs: [prepare, research-lanes]
     if: always()
+    concurrency:
+      group: pct-command-center-publish
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     permissions:
       contents: write

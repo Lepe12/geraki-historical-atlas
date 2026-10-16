@@ -98,6 +98,15 @@ def request_id_for(run_root:Path):
         if data.get("request_id"):return data["request_id"]
     return None
 
+def publish_latest(latest:Path,data:dict,payload:str):
+    current=str(read(latest,{}).get("run_id", ""))
+    incoming=str(data.get("run_id", ""))
+    if current.isdigit() and incoming.isdigit() and int(current)>int(incoming):
+        return False
+    latest.parent.mkdir(parents=True,exist_ok=True)
+    latest.write_text(payload,encoding="utf-8")
+    return True
+
 def build(repo:Path,run_id:str):
     run_root=repo/"evidence/runs"/run_id
     if not run_root.exists():raise SystemExit("RUN_NOT_FOUND:"+run_id)
@@ -202,5 +211,5 @@ if __name__=="__main__":
     out=repo/a.output;out.parent.mkdir(parents=True,exist_ok=True)
     payload=json.dumps(data,ensure_ascii=False,indent=2)+"\n";out.write_text(payload,encoding="utf-8")
     if a.latest:
-        latest=repo/a.latest;latest.parent.mkdir(parents=True,exist_ok=True);latest.write_text(payload,encoding="utf-8")
+        publish_latest(repo/a.latest,data,payload)
     print("COMMAND CENTER SNAPSHOT",data["run_id"],"agents",data["metrics"]["agents"],"claims",data["metrics"]["candidate_claims"],"specialist records",data["metrics"]["specialist_discovery_records"])

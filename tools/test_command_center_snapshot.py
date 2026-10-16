@@ -4,7 +4,7 @@ import json,sys,tempfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parent
 sys.path.insert(0,str(ROOT/"orchestrator"))
-from build_command_center_snapshot import build
+from build_command_center_snapshot import build,publish_latest
 
 def main():
     with tempfile.TemporaryDirectory() as t:
@@ -36,6 +36,9 @@ def main():
         (base/"travellers/structured_output/candidate_events.json").write_text('{"events":[]}')
         out=build(r,run)
         assert not out["claims"] and len(out["discoveries"])==1 and len(out["coverage"])==1
+        latest=r/"latest.json";latest.write_text('{"run_id":"200"}')
+        assert not publish_latest(latest,{"run_id":"123"},'{"run_id":"123"}')
+        assert json.loads(latest.read_text())["run_id"]=="200"
         print("COMMAND CENTER SNAPSHOT TEST PASS")
 
 if __name__=="__main__":main()
