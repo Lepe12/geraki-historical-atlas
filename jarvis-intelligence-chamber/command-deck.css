@@ -1,226 +1,220 @@
-/* NABOU//X coherent workspace layout.
-   Keeps the existing palette, glow, 2D/3D renderers and research functionality intact. */
+/* NABOU//X cinematic ergonomics layer
+   Preserve renderer/glow/palette. Improve hierarchy without adding dashboard boxes. */
 
 .deck-controls{
-  position:absolute;z-index:12;left:22px;top:103px;display:flex;gap:7px;align-items:center
+  position:absolute;z-index:12;left:24px;top:105px;display:flex;gap:14px;align-items:center;
+  padding:0;background:transparent;border:0;box-shadow:none;backdrop-filter:none
 }
 .deck-control{
-  min-height:36px;padding:8px 12px;border:1px solid rgba(81,224,237,.28);
-  background:linear-gradient(180deg,rgba(6,24,38,.88),rgba(3,13,25,.78));
-  color:#a9dbe4;box-shadow:0 10px 30px #0006,inset 0 1px rgba(255,255,255,.04);
-  backdrop-filter:blur(14px);cursor:pointer;font:9px var(--mono);letter-spacing:.10em;
-  transition:background .2s,border-color .2s,color .2s
+  min-height:28px;padding:4px 0;border:0;background:transparent;color:#6f98a8;
+  box-shadow:none;backdrop-filter:none;cursor:pointer;
+  font:8px var(--mono);letter-spacing:.14em;transition:color .2s,text-shadow .2s
 }
-.deck-control:hover,.deck-control[aria-expanded="true"]{
-  color:#e9fcff;border-color:rgba(81,224,237,.62);background:rgba(37,111,132,.38)
-}
-.deck-control:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+.deck-control::before{content:"";display:inline-block;width:11px;height:1px;margin-right:7px;vertical-align:middle;background:rgba(81,224,237,.35)}
+.deck-control:hover,.deck-control[aria-expanded="true"]{color:#dffaff;text-shadow:0 0 14px rgba(81,224,237,.35)}
+.deck-control:focus-visible{outline:1px solid var(--cyan);outline-offset:4px}
 
-/* Navigation becomes a real workspace panel instead of floating text over the universe. */
+/* Left rail stays cinematic and open, not boxed. */
 .left-panel{
-  transition:transform .3s ease,opacity .3s ease!important
+  transition:transform .3s ease,opacity .3s ease!important;
+  background:linear-gradient(90deg,rgba(2,10,20,.50),rgba(2,10,20,.16),transparent 100%)!important;
+  border:0!important;border-left:1px solid rgba(81,224,237,.16)!important;
+  box-shadow:none!important;backdrop-filter:none!important;
+  padding:6px 0 6px 16px!important
 }
 body.deck-nav-closed .left-panel{
-  transform:translateX(calc(-100% - 38px))!important;opacity:0!important;pointer-events:none!important
+  transform:translateX(calc(-100% - 40px))!important;opacity:0!important;pointer-events:none!important
 }
+.left-panel .separator{margin:13px 0!important;background:linear-gradient(90deg,rgba(129,220,236,.24),transparent)!important}
+.left-panel .label{font-size:9px!important;letter-spacing:.14em!important;color:#638594!important}
+.section-btn{
+  min-height:34px!important;padding:7px 8px!important;font-size:10px!important;
+  border-left:1px solid transparent!important
+}
+.section-btn:hover,.section-btn.active{
+  background:linear-gradient(90deg,rgba(39,104,124,.20),transparent 84%)!important
+}
+.section-btn.active{border-left-color:var(--cyan)!important}
+.signal-row{font-size:9px!important;margin-bottom:9px!important}
+.signal-row em{font-size:8px!important}
+.bottom-panel-note{font-size:7px!important;line-height:1.65!important;padding-top:12px!important}
 
-/* Make node text readable without turning it into dashboard chrome. */
+/* Keep the center visually clean. */
 .node-label{
-  font-size:10px!important;letter-spacing:.055em!important;
-  padding:2px 4px;border-radius:2px;
-  background:linear-gradient(90deg,rgba(1,10,18,.46),rgba(1,10,18,0));
-  text-shadow:0 0 8px #001922,0 0 18px #00131e!important
+  font-size:9px!important;letter-spacing:.04em!important;background:none!important;padding:0!important;
+  text-shadow:0 0 7px #00131d,0 0 16px #00131d!important
+}
+.node-label small{opacity:.72}
+
+/* Operator command becomes the main interaction surface, not a floating card. */
+.operator-command{
+  background:linear-gradient(180deg,rgba(5,19,31,.68),rgba(2,10,19,.52))!important;
+  border:0!important;border-top:1px solid rgba(81,224,237,.22)!important;
+  border-bottom:1px solid rgba(81,224,237,.10)!important;
+  box-shadow:0 14px 50px #0007!important;backdrop-filter:blur(12px)!important;
+  clip-path:none!important
+}
+.operator-command-label{margin-bottom:5px!important}
+.operator-command input{font-size:15px!important;letter-spacing:.015em!important}
+.operator-command button{
+  border:0!important;border-left:1px solid rgba(81,224,237,.22)!important;
+  background:transparent!important;padding:9px 12px!important
+}
+.operator-command button:hover{background:rgba(50,143,165,.12)!important}
+
+/* Activity is a status line until the user asks for detail. */
+.activity-strip{
+  border:0!important;border-top:1px solid rgba(91,197,220,.12)!important;
+  background:rgba(2,9,17,.34)!important;box-shadow:none!important;clip-path:none!important;
+  backdrop-filter:blur(8px)!important
+}
+.activity-strip.is-idle{opacity:.62!important}
+.activity-head{font-size:8px!important;margin:0!important}
+.activity-lines{font-size:9px!important}
+.activity-strip:not(.deck-expanded) .activity-lines{max-height:22px!important;overflow:hidden!important}
+.activity-strip.deck-expanded{
+  background:rgba(3,14,26,.95)!important;
+  border:1px solid rgba(81,224,237,.18)!important;box-shadow:0 18px 60px #000a!important
 }
 
-/* Live activity is compact by default and intentionally expandable. */
-.activity-head{cursor:pointer;user-select:none}
-.activity-head::after{content:"↗";margin-left:10px;color:var(--cyan);opacity:.72}
-.activity-strip.deck-expanded .activity-head::after{content:"↙"}
-.activity-strip.deck-expanded .activity-lines{display:grid!important;overflow:auto!important;scrollbar-width:thin}
-.activity-strip.deck-expanded{z-index:11!important}
-
-/* Right-side drawers share one geometry, so they never stack over one another. */
-.results-drawer,.learning-panel,.detail-panel{
-  scrollbar-width:thin
+/* Inspector/results/learning share the same elegant glass plane. */
+.detail-panel:not(.hidden),.results-drawer:not(.hidden),.learning-panel:not(.hidden){
+  background:linear-gradient(135deg,rgba(7,24,39,.92),rgba(3,11,23,.86))!important;
+  border:0!important;border-left:1px solid rgba(81,224,237,.22)!important;
+  border-top:1px solid rgba(81,224,237,.12)!important;
+  box-shadow:-22px 28px 90px #0009!important;backdrop-filter:blur(18px)!important;
+  clip-path:none!important
 }
-.results-drawer,.learning-panel{
-  box-shadow:0 28px 90px #000b,inset 0 1px rgba(220,249,255,.05)!important
+.detail-panel h2{font-size:36px!important;letter-spacing:.055em!important}
+.detail-panel p{font-size:12px!important;line-height:1.72!important}
+.detail-type,.detail-head{font-size:9px!important}
+.detail-meta span{font-size:8px!important}.detail-meta strong{font-size:10px!important}
+.detail-action{
+  border:0!important;border-top:1px solid rgba(81,224,237,.18)!important;
+  background:transparent!important;padding:12px 2px!important
 }
+.detail-action:hover{background:linear-gradient(90deg,rgba(64,157,179,.11),transparent)!important}
 
-/* Results and learning controls form one unobtrusive tool cluster. */
+/* Results and learning are tools, not competing cards. */
 .results-toggle,.learning-toggle{
-  min-height:34px!important;padding:8px 11px!important;
-  background:rgba(4,18,29,.80)!important;backdrop-filter:blur(12px);
-  box-shadow:0 10px 30px #0006!important
+  min-height:28px!important;padding:5px 0!important;border:0!important;background:transparent!important;
+  box-shadow:none!important;backdrop-filter:none!important;color:#7fa2af!important
 }
-.results-toggle:hover,.learning-toggle:hover{
-  border-color:rgba(81,224,237,.58)!important;color:#e8fbfd!important
+.results-toggle:hover,.learning-toggle:hover{color:#dffaff!important;text-shadow:0 0 12px rgba(81,224,237,.3)}
+.results-toggle{right:26px!important}
+.learning-toggle{right:26px!important}
+.results-toggle::before,.learning-toggle::before{content:"";display:inline-block;width:10px;height:1px;margin-right:7px;vertical-align:middle;background:rgba(81,224,237,.35)}
+
+/* Bottom HUD is reduced so it stops eating the map. */
+.bottom-hud{
+  min-height:58px!important;padding:10px 24px 11px!important;
+  background:linear-gradient(transparent,#020711dc)!important;border-top:1px solid rgba(83,139,160,.10)!important
 }
+.system-readout{gap:22px!important}.readout span{font-size:7px!important}.readout strong{font-size:16px!important}
+.attribution{font-size:7px!important;opacity:.62!important}
 
-/* Dense review content becomes readable. */
-.result-item b{font-size:10px!important}
-.result-item span{font-size:12px!important;line-height:1.55!important}
-.result-item small{font-size:9px!important;line-height:1.45!important}
-.learning-item-text{font-size:12px!important;line-height:1.65!important}
-.learning-actions button{font-size:9px!important;min-height:31px!important}
-.learning-item-head span,.learning-item-head small{font-size:9px!important}
-.detail-live div{font-size:9px!important;line-height:1.45}
+/* Research-mode rail becomes quieter and stays out of the command area. */
+.exp-rail{
+  bottom:3px!important;padding:2px 4px!important;border-color:rgba(89,196,216,.10)!important;
+  background:rgba(2,11,20,.34)!important;box-shadow:none!important;opacity:.60
+}
+.exp-rail:hover{opacity:.92}
+.exp-rail button{font-size:7px!important;padding:4px 6px!important}
 
-/* Desktop: three clear zones — navigation, universe, inspector. */
+/* Desktop geometry: wide clean universe, subtle left rail, one right panel. */
 @media(min-width:901px){
-  .masthead{height:88px!important;padding-top:23px!important}
-  .center-title{top:23px!important}
-
+  .masthead{height:86px!important;padding-top:22px!important}
+  .center-title{top:22px!important}
   .left-panel{
-    left:22px!important;top:148px!important;width:270px!important;
-    max-height:calc(100dvh - 260px)!important;overflow:auto;
-    padding:16px 15px 18px!important;
-    background:linear-gradient(118deg,rgba(6,23,38,.82),rgba(3,12,24,.48))!important;
-    border:1px solid rgba(81,224,237,.15);box-shadow:0 20px 70px #0006;
-    backdrop-filter:blur(17px)
+    left:24px!important;top:150px!important;width:232px!important;
+    max-height:calc(100dvh - 244px)!important;overflow:auto!important
   }
-  .left-panel .separator{margin:15px 0!important}
-  .left-panel .label{font-size:10px!important;margin-bottom:10px!important}
-  .section-btn{min-height:42px!important;font-size:11px!important;padding:10px!important}
-  .signal-row{font-size:10px!important;margin-bottom:10px!important}
-  .signal-row em{font-size:9px!important}
-  .bottom-panel-note{font-size:8px!important;line-height:1.7!important;padding-top:14px!important}
 
-  .detail-panel:not(.hidden),
-  .results-drawer:not(.hidden),
-  .learning-panel:not(.hidden){
-    top:116px!important;right:22px!important;bottom:105px!important;
-    width:380px!important;max-height:none!important
+  .detail-panel:not(.hidden),.results-drawer:not(.hidden),.learning-panel:not(.hidden){
+    top:112px!important;right:24px!important;bottom:82px!important;width:410px!important;max-height:none!important;overflow:auto!important
   }
-  .detail-panel:not(.hidden){
-    min-height:0!important;overflow:auto!important;padding:20px 22px 24px!important;
-    background:linear-gradient(135deg,rgba(8,28,45,.95),rgba(3,12,25,.90))!important;
-    border-color:rgba(81,224,237,.28)!important
-  }
-  .detail-panel h2{font-size:34px!important;margin-bottom:14px!important}
-  .detail-panel p{font-size:12px!important;line-height:1.72!important;min-height:0!important}
-  .detail-type{margin-top:18px!important;font-size:9px!important}
-  .detail-meta span{font-size:9px!important}
-  .detail-meta strong{font-size:10px!important}
 
   .operator-command{
-    left:50%!important;top:auto!important;bottom:86px!important;
-    transform:translateX(-50%)!important;
-    width:min(780px,calc(100vw - 760px))!important;min-width:430px!important;
-    padding:10px 13px 11px!important;
-    background:linear-gradient(180deg,rgba(6,23,37,.88),rgba(3,12,23,.78))!important
+    left:50%!important;top:auto!important;bottom:64px!important;
+    transform:translateX(-50%)!important;width:min(860px,calc(100vw - 690px))!important;min-width:460px!important
   }
-  .operator-command input{font-size:14px!important}
   .activity-strip{
-    left:50%!important;top:auto!important;bottom:43px!important;
-    transform:translateX(-50%)!important;
-    width:min(680px,calc(100vw - 800px))!important;min-width:360px!important;
-    max-width:none!important;padding:6px 10px!important;
-    background:rgba(3,12,22,.46)!important
+    left:50%!important;top:auto!important;bottom:29px!important;
+    transform:translateX(-50%)!important;width:min(720px,calc(100vw - 760px))!important;min-width:340px!important;max-width:none!important
   }
-  .activity-strip.is-idle{width:auto!important;min-width:0!important}
   .activity-strip.deck-expanded{
-    bottom:142px!important;width:min(650px,calc(100vw - 800px))!important;min-width:440px!important;
-    padding:10px 12px!important;background:rgba(3,14,27,.96)!important;
-    border:1px solid rgba(81,224,237,.25)!important;box-shadow:0 20px 70px #000b!important
+    bottom:124px!important;width:min(700px,calc(100vw - 760px))!important;min-width:420px!important
   }
-  .activity-strip.deck-expanded .activity-lines{max-height:190px!important}
+  .activity-strip.deck-expanded .activity-lines{max-height:170px!important;overflow:auto!important}
 
-  .results-toggle{right:22px!important;bottom:61px!important}
-  .learning-toggle{right:22px!important;top:72px!important}
+  .results-toggle{bottom:49px!important}
+  .learning-toggle{top:70px!important}
 
-  .map-scale{right:26px!important;top:118px!important}
-  .nav-tools{right:26px!important;bottom:150px!important}
-  #app:has(.detail-panel:not(.hidden)) .map-scale,
-  #app:has(.results-drawer:not(.hidden)) .map-scale,
-  #app:has(.learning-panel:not(.hidden)) .map-scale{
-    right:420px!important
-  }
-  #app:has(.detail-panel:not(.hidden)) .nav-tools,
-  #app:has(.results-drawer:not(.hidden)) .nav-tools,
-  #app:has(.learning-panel:not(.hidden)) .nav-tools{
-    right:420px!important
-  }
+  .map-scale{right:28px!important;top:116px!important}
+  .nav-tools{right:28px!important;bottom:132px!important}
 
-  .bottom-hud{
-    min-height:72px!important;padding:13px 24px 15px!important;
-    background:linear-gradient(transparent,#020711f2)!important
-  }
-  .system-readout{gap:24px!important}
-  .readout strong{font-size:17px!important}
-  .attribution{font-size:7px!important}
-
-  /* Keep the existing research-mode rail, but out of the command input. */
-  .exp-rail{bottom:6px!important;padding:4px 6px!important;opacity:.84}
-  .exp-rail button{padding:5px 7px!important;font-size:7px!important}
-}
-
-/* Mid-size desktop: preserve center working area instead of squeezing every panel. */
-@media(min-width:901px) and (max-width:1360px){
-  .left-panel{width:220px!important}
-  .detail-panel:not(.hidden),.results-drawer:not(.hidden),.learning-panel:not(.hidden){width:330px!important}
-  .operator-command{width:min(650px,calc(100vw - 600px))!important;min-width:360px!important}
-  .activity-strip{width:min(560px,calc(100vw - 640px))!important;min-width:300px!important}
-  .activity-strip.deck-expanded{width:min(540px,calc(100vw - 640px))!important;min-width:340px!important}
   #app:has(.detail-panel:not(.hidden)) .map-scale,
   #app:has(.results-drawer:not(.hidden)) .map-scale,
   #app:has(.learning-panel:not(.hidden)) .map-scale,
   #app:has(.detail-panel:not(.hidden)) .nav-tools,
   #app:has(.results-drawer:not(.hidden)) .nav-tools,
-  #app:has(.learning-panel:not(.hidden)) .nav-tools{right:366px!important}
+  #app:has(.learning-panel:not(.hidden)) .nav-tools{right:450px!important}
 }
 
-/* Tablet/mobile: drawers take precedence, the universe stays behind them, controls remain reachable. */
-@media(max-width:900px){
-  .deck-controls{left:12px;top:80px;gap:5px}
-  .deck-control{min-height:33px;padding:7px 9px;font-size:8px}
+/* Mid-size desktop keeps the map dominant. */
+@media(min-width:901px) and (max-width:1360px){
+  .left-panel{width:205px!important}
+  .detail-panel:not(.hidden),.results-drawer:not(.hidden),.learning-panel:not(.hidden){width:340px!important}
+  .operator-command{width:min(700px,calc(100vw - 560px))!important;min-width:380px!important}
+  .activity-strip{width:min(590px,calc(100vw - 620px))!important;min-width:300px!important}
+  .activity-strip.deck-expanded{width:min(560px,calc(100vw - 620px))!important;min-width:340px!important}
+  #app:has(.detail-panel:not(.hidden)) .map-scale,
+  #app:has(.results-drawer:not(.hidden)) .map-scale,
+  #app:has(.learning-panel:not(.hidden)) .map-scale,
+  #app:has(.detail-panel:not(.hidden)) .nav-tools,
+  #app:has(.results-drawer:not(.hidden)) .nav-tools,
+  #app:has(.learning-panel:not(.hidden)) .nav-tools{right:378px!important}
+}
 
+/* Tablet/mobile: overlay only when needed. */
+@media(max-width:900px){
+  .deck-controls{left:12px;top:80px;gap:10px}
+  .deck-control{font-size:7px}
   .left-panel{
-    z-index:13!important;left:12px!important;top:124px!important;
-    width:min(300px,calc(100vw - 24px))!important;max-height:calc(100dvh - 230px)!important;
-    overflow:auto;padding:13px!important;
-    background:rgba(4,16,30,.97)!important;border:1px solid rgba(81,224,237,.32);
-    box-shadow:0 24px 80px #000b;backdrop-filter:blur(18px)
+    z-index:13!important;left:12px!important;top:122px!important;width:min(270px,calc(100vw - 24px))!important;
+    max-height:calc(100dvh - 210px)!important;overflow:auto!important;
+    background:linear-gradient(90deg,rgba(3,14,27,.96),rgba(3,14,27,.72),rgba(3,14,27,.30))!important;
+    border-left-color:rgba(81,224,237,.30)!important;padding:10px 0 10px 14px!important
   }
   body.deck-nav-closed .left-panel{display:none!important}
-
   .detail-panel:not(.hidden),.results-drawer:not(.hidden),.learning-panel:not(.hidden){
-    z-index:15!important;left:10px!important;right:10px!important;top:122px!important;bottom:122px!important;
+    z-index:15!important;left:10px!important;right:10px!important;top:118px!important;bottom:108px!important;
     width:auto!important;max-height:none!important;overflow:auto!important
   }
-
   .operator-command{
-    left:10px!important;right:10px!important;top:auto!important;bottom:72px!important;
+    left:10px!important;right:10px!important;top:auto!important;bottom:58px!important;
     width:auto!important;min-width:0!important;transform:none!important
   }
   .operator-command-row{grid-template-columns:18px 1fr auto!important}
   .operator-command input{font-size:12px!important}
   .activity-strip{
-    left:50%!important;right:auto!important;top:auto!important;bottom:39px!important;
-    width:auto!important;min-width:220px!important;max-width:calc(100vw - 20px)!important;
-    transform:translateX(-50%)!important
+    left:50%!important;right:auto!important;top:auto!important;bottom:24px!important;
+    width:auto!important;min-width:210px!important;max-width:calc(100vw - 20px)!important;transform:translateX(-50%)!important
   }
-  .activity-strip.deck-expanded{
-    bottom:142px!important;width:calc(100vw - 20px)!important;max-width:none!important;
-    background:rgba(4,16,30,.97)!important
-  }
-  .activity-strip.deck-expanded .activity-lines{max-height:120px!important}
-
-  .results-toggle{right:10px!important;bottom:188px!important}
-  .learning-toggle{right:10px!important;top:82px!important}
-
+  .activity-strip.deck-expanded{bottom:118px!important;width:calc(100vw - 20px)!important}
+  .activity-strip.deck-expanded .activity-lines{max-height:115px!important}
+  .results-toggle{right:10px!important;bottom:170px!important}
+  .learning-toggle{right:10px!important;top:80px!important}
   .map-scale{display:none!important}
-  .nav-tools{right:12px!important;bottom:198px!important}
-  .bottom-hud{min-height:56px!important;padding:10px 12px!important}
-  .system-readout{gap:14px!important}.readout strong{font-size:15px!important}
-  .exp-rail{bottom:3px!important;max-width:calc(100vw - 12px)!important;overflow-x:auto}
+  .nav-tools{right:10px!important;bottom:176px!important}
+  .bottom-hud{min-height:48px!important;padding:8px 10px!important}
+  .exp-rail{bottom:1px!important;max-width:calc(100vw - 10px)!important;overflow-x:auto}
 }
 
-/* Short screens: protect command entry and inspector from vertical collision. */
 @media(max-height:700px) and (min-width:901px){
-  .left-panel{top:125px!important;max-height:calc(100dvh - 215px)!important}
-  .detail-panel:not(.hidden),.results-drawer:not(.hidden),.learning-panel:not(.hidden){top:104px!important;bottom:84px!important}
-  .operator-command{bottom:65px!important}
-  .activity-strip{bottom:28px!important}
-  .activity-strip.deck-expanded{bottom:124px!important}
+  .left-panel{top:128px!important;max-height:calc(100dvh - 198px)!important}
+  .detail-panel:not(.hidden),.results-drawer:not(.hidden),.learning-panel:not(.hidden){top:102px!important;bottom:70px!important}
+  .operator-command{bottom:51px!important}
+  .activity-strip{bottom:20px!important}
+  .activity-strip.deck-expanded{bottom:108px!important}
 }
