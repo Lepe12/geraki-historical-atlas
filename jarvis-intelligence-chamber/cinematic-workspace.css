@@ -1,33 +1,187 @@
-/* Cinematic navigation over existing navy/ice/cyan color tokens. */
-.nx-workspace .nabou-rail,.nx-workspace .deck-controls,.nx-workspace .left-panel,.nx-workspace .results-toggle,.nx-workspace .learning-toggle{display:none!important}
-.nx-ui{position:absolute;inset:0;z-index:19;pointer-events:none}
-.nx-dock{pointer-events:auto;position:absolute;left:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:4px;padding:16px 7px;background:linear-gradient(90deg,rgba(2,10,20,.92),rgba(3,14,27,.55));border-left:1px solid var(--line);box-shadow:15px 0 65px rgba(0,0,0,.20);backdrop-filter:blur(18px)}
-.nx-dock button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:68px;min-height:64px;background:transparent;border:0;border-left:2px solid transparent;color:var(--faint);cursor:pointer;transition:background .24s,border-color .24s,color .24s}
-.nx-dock button>span{color:var(--cyan);font:30px/1 var(--display);text-shadow:0 0 12px rgba(81,224,237,.25)}
-.nx-dock button>small{font:9px/1.2 var(--mono);letter-spacing:.01em}
-.nx-dock button:hover,.nx-dock button[aria-current="page"]{border-left-color:var(--cyan);background:linear-gradient(90deg,rgba(81,224,237,.16),transparent);color:var(--white)}
-.nx-dock button:focus-visible,.nx-agent:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
-.nx-drawer{pointer-events:none;opacity:0;transform:translateX(-22px);position:absolute;left:102px;top:15%;bottom:12%;width:min(380px,calc(100vw - 130px));padding:24px 22px;background:linear-gradient(115deg,rgba(7,24,39,.97),rgba(3,11,23,.87));border-left:1px solid rgba(81,224,237,.4);border-top:1px solid rgba(81,224,237,.12);box-shadow:24px 26px 90px #0009;backdrop-filter:blur(22px);transition:opacity .3s,transform .3s}
+/* NABOU//X UI SHELL — single owner for navigation + panels only.
+   3D renderer, canvas, camera, node positions and map logic are intentionally untouched. */
+
+.nx-workspace .nabou-rail,
+.nx-workspace .deck-controls,
+.nx-workspace .left-panel,
+.nx-workspace .results-toggle,
+.nx-workspace .learning-toggle{display:none!important}
+
+/* --- EVE / Neocom-style primary rail --- */
+.nx-ui{position:absolute;inset:0;z-index:24;pointer-events:none}
+.nx-dock{
+  pointer-events:auto;position:absolute;left:0;top:0;bottom:0;width:58px;
+  display:flex;flex-direction:column;align-items:stretch;gap:2px;
+  padding:64px 0 12px;
+  background:linear-gradient(90deg,rgba(2,8,16,.96),rgba(4,15,27,.88));
+  border-right:1px solid rgba(100,213,230,.22);
+  box-shadow:14px 0 42px rgba(0,0,0,.34);
+  backdrop-filter:blur(14px)
+}
+.nx-dock::before{
+  content:"N/X";position:absolute;top:15px;left:0;width:58px;height:34px;
+  display:grid;place-items:center;color:#d9f9ff;
+  font:600 13px/1 var(--mono);letter-spacing:.08em;
+  text-shadow:0 0 16px rgba(81,224,237,.55)
+}
+.nx-dock button{
+  position:relative;width:58px;height:48px;min-height:48px;padding:0;
+  display:grid;place-items:center;border:0;border-left:2px solid transparent;
+  background:transparent;color:#6d91a0;cursor:pointer;overflow:visible;
+  transition:background .16s,border-color .16s,color .16s
+}
+.nx-dock button::after{
+  content:attr(aria-label);position:absolute;left:66px;top:50%;
+  transform:translate(6px,-50%);opacity:0;pointer-events:none;
+  white-space:nowrap;padding:7px 10px;
+  background:rgba(4,16,28,.97);border:1px solid rgba(81,224,237,.22);
+  color:#d9f4fa;font:9px/1 var(--mono);letter-spacing:.08em;
+  box-shadow:0 10px 28px rgba(0,0,0,.45);
+  transition:opacity .14s,transform .14s
+}
+.nx-dock button:hover::after{opacity:1;transform:translate(0,-50%)}
+.nx-dock button>span{
+  color:#7ba8b7;font:23px/1 var(--display);
+  text-shadow:0 0 10px rgba(81,224,237,.15);
+  transition:color .16s,text-shadow .16s,transform .16s
+}
+.nx-dock button>small{display:none}
+.nx-dock button:hover,
+.nx-dock button[aria-current="page"]{
+  color:#e6fbff;background:linear-gradient(90deg,rgba(81,224,237,.13),rgba(81,224,237,.015));
+  border-left-color:#66ddea
+}
+.nx-dock button:hover>span,
+.nx-dock button[aria-current="page"]>span{
+  color:#eaffff;text-shadow:0 0 16px rgba(81,224,237,.62);transform:scale(1.05)
+}
+.nx-dock button:nth-child(3),
+.nx-dock button:nth-child(6){margin-top:10px}
+.nx-dock button:nth-child(3)::before,
+.nx-dock button:nth-child(6)::before{
+  content:"";position:absolute;left:12px;right:12px;top:-6px;height:1px;
+  background:rgba(105,188,204,.16)
+}
+.nx-dock button:focus-visible,.nx-agent:focus-visible{outline:1px solid #6edbe7;outline-offset:-2px}
+
+/* --- Agent browser: docked left panel, never enters the 3D center --- */
+.nx-drawer{
+  pointer-events:none;opacity:0;position:absolute;left:58px;top:0;bottom:0;width:330px;
+  padding:78px 16px 18px;transform:translateX(-18px);
+  background:linear-gradient(90deg,rgba(4,15,27,.975),rgba(5,19,32,.94));
+  border-right:1px solid rgba(81,224,237,.22);
+  box-shadow:22px 0 58px rgba(0,0,0,.38);
+  backdrop-filter:blur(18px);
+  transition:opacity .2s,transform .2s
+}
 .nx-drawer.nx-open{pointer-events:auto;opacity:1;transform:translateX(0)}
-.nx-drawer header{display:flex;align-items:center;justify-content:space-between;color:var(--cyan);font:10px var(--mono);letter-spacing:.12em}
-.nx-drawer header button{font:28px var(--display);color:var(--white);border:0;background:transparent;cursor:pointer}
-.nx-drawer h2{font:400 38px/1.1 var(--display);letter-spacing:.12em;margin:24px 0 8px;color:var(--white)}
-.nx-drawer p{font:12px/1.6 Inter,Arial,sans-serif;color:#96b7c7;margin:0 0 25px}
-.nx-agent-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;overflow:auto;max-height:calc(100% - 130px);align-content:start}
-.nx-agent{position:relative;text-align:left;min-height:46px;border:0;border-left:1px solid rgba(81,224,237,.18);background:linear-gradient(90deg,rgba(81,224,237,.055),transparent);padding:10px 9px 10px 16px;color:var(--white);font:11px/1.4 Inter,Arial,sans-serif;cursor:pointer}
-.nx-agent:before{content:"";position:absolute;left:6px;top:19px;width:3px;height:3px;border-radius:100%;background:var(--cyan);box-shadow:0 0 9px var(--cyan)}
-.nx-agent:hover{border-left-color:var(--cyan);background:linear-gradient(90deg,rgba(81,224,237,.19),transparent)}
-@media(max-width:900px){.nx-dock{left:2px;gap:0;padding:5px 3px}.nx-dock button{width:48px;min-height:47px}.nx-dock button>span{font-size:21px}.nx-dock button>small{font-size:7px}.nx-drawer{left:56px;top:100px;bottom:110px;width:calc(100vw - 65px);padding:16px}.nx-drawer h2{font-size:28px}.nx-agent-grid{grid-template-columns:1fr 1fr}.nx-agent{font-size:10px}}
-@media(max-height:600px){.nx-dock button{min-height:40px}.nx-dock button>span{font-size:19px}}
-@media(prefers-reduced-motion:reduce){.nx-drawer,.nx-dock button{transition:none}}
+.nx-drawer header{
+  position:absolute;left:0;right:0;top:0;height:54px;padding:0 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid rgba(81,224,237,.15);
+  background:rgba(5,18,30,.82);color:#89cbd6;
+  font:9px var(--mono);letter-spacing:.14em
+}
+.nx-drawer header button{
+  width:30px;height:30px;border:0;background:transparent;color:#bfeaf0;
+  font:23px/1 var(--display);cursor:pointer
+}
+.nx-drawer h2{
+  margin:0 0 5px;color:#eefcff;
+  font:400 24px/1.05 var(--display);letter-spacing:.10em
+}
+.nx-drawer p{margin:0 0 17px;color:#789aa8;font:10px/1.5 var(--mono)}
+.nx-agent-grid{
+  display:block;max-height:calc(100vh - 145px);overflow:auto;
+  scrollbar-width:thin;scrollbar-color:rgba(81,224,237,.25) transparent
+}
+.nx-agent{
+  position:relative;width:100%;min-height:38px;padding:9px 12px 9px 20px;
+  text-align:left;border:0;border-bottom:1px solid rgba(81,224,237,.07);
+  background:transparent;color:#bdd3da;font:10px/1.4 var(--mono);
+  cursor:pointer;transition:background .14s,color .14s
+}
+.nx-agent::before{
+  content:"";position:absolute;left:7px;top:16px;width:4px;height:4px;border-radius:50%;
+  background:#5ecbd8;box-shadow:0 0 8px rgba(81,224,237,.5)
+}
+.nx-agent:hover{background:rgba(81,224,237,.07);color:#efffff}
+.nx-agent[data-activity="active"]::before{background:#ff6d6d;box-shadow:0 0 12px #ff6d6d}
+.nx-agent[data-activity="active"]{background:linear-gradient(90deg,rgba(255,86,86,.08),transparent)}
 
+/* --- Right-side work panels: one family, one geometry --- */
+.nx-workspace .detail-panel,
+.nx-workspace .results-drawer,
+.nx-workspace .learning-panel{
+  box-sizing:border-box!important;
+  border:1px solid rgba(103,190,207,.20)!important;
+  border-top-color:rgba(112,220,235,.30)!important;
+  border-radius:0!important;
+  background:linear-gradient(145deg,rgba(5,18,31,.965),rgba(3,11,22,.94))!important;
+  box-shadow:-18px 24px 70px rgba(0,0,0,.46)!important;
+  backdrop-filter:blur(18px)!important;
+  clip-path:none!important
+}
+.nx-workspace .detail-panel:not(.hidden){
+  top:92px!important;right:24px!important;left:auto!important;bottom:auto!important;
+  width:340px!important;min-height:360px!important;max-height:calc(100vh - 155px)!important;
+  padding:18px 18px 20px!important;overflow:auto!important
+}
+.nx-workspace .results-drawer:not(.hidden),
+.nx-workspace .learning-panel:not(.hidden){
+  top:80px!important;right:24px!important;left:auto!important;bottom:24px!important;
+  width:min(500px,calc(100vw - 120px))!important;height:auto!important;
+  max-height:none!important;padding:18px!important;overflow:auto!important
+}
+.nx-workspace .detail-head,
+.nx-workspace .results-head,
+.nx-workspace .learning-head{
+  min-height:38px!important;margin:-18px -18px 16px!important;padding:0 12px!important;
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  background:linear-gradient(90deg,rgba(81,224,237,.08),rgba(4,14,24,.35))!important;
+  border-bottom:1px solid rgba(81,224,237,.14)!important;
+  color:#90c3cf!important
+}
+.nx-workspace .detail-head button,
+.nx-workspace .results-head button,
+.nx-workspace .learning-head button{
+  border:0!important;background:transparent!important;color:#bddfe6!important;cursor:pointer!important
+}
+.nx-workspace .detail-panel h2{font-size:29px!important;line-height:1.05!important;margin:8px 0 14px!important}
+.nx-workspace .detail-panel p{font-size:11px!important;line-height:1.7!important}
+.nx-workspace .detail-meta{gap:10px!important}
+.nx-workspace .detail-meta>div{
+  padding:10px!important;border-left:1px solid rgba(81,224,237,.16)!important;
+  background:linear-gradient(90deg,rgba(81,224,237,.045),transparent)!important
+}
+.nx-workspace .result-item,
+.nx-workspace .learning-item{border-color:rgba(81,224,237,.10)!important}
 
-/* Unified panel ownership: the Photon dock is the only visible primary navigation. */
-.nx-workspace .activity-strip{transition:opacity .2s,transform .2s,background .2s,border-color .2s}
+/* Native activity strip remains functional; menu opens/closes its detail state. */
+.nx-workspace .activity-strip{transition:background .18s,border-color .18s,box-shadow .18s}
 .nx-workspace .activity-strip:not(.nx-activity-open) .activity-lines{max-height:22px;overflow:hidden}
 .nx-workspace .activity-strip.nx-activity-open{
-  background:rgba(3,14,26,.95)!important;
+  background:rgba(3,14,26,.94)!important;
   border:1px solid rgba(81,224,237,.18)!important;
-  box-shadow:0 18px 60px #000a!important
+  box-shadow:0 14px 46px rgba(0,0,0,.42)!important
 }
-.nx-workspace .nx-dock button[aria-current="page"]>span{color:var(--white)}
+
+/* No rule in this file targets #universe, canvas, #nodeLabels, camera controls or 3D geometry. */
+
+@media(max-width:900px){
+ .nx-dock{width:48px;padding-top:54px}
+ .nx-dock::before{width:48px;top:10px;font-size:11px}
+ .nx-dock button{width:48px;height:44px;min-height:44px}
+ .nx-dock button>span{font-size:20px}
+ .nx-dock button::after{display:none}
+ .nx-drawer{left:48px;width:calc(100vw - 48px);padding:68px 12px 14px}
+ .nx-workspace .detail-panel:not(.hidden),
+ .nx-workspace .results-drawer:not(.hidden),
+ .nx-workspace .learning-panel:not(.hidden){
+   left:54px!important;right:7px!important;top:68px!important;bottom:8px!important;
+   width:auto!important;max-height:none!important
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .nx-drawer,.nx-dock button,.nx-dock button::after{transition:none}
+}
