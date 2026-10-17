@@ -1,0 +1,22 @@
+/* Cinematic navigation over existing navy/ice/cyan color tokens. */
+.nx-workspace .nabou-rail,.nx-workspace .deck-controls,.nx-workspace .left-panel{display:none!important}
+.nx-ui{position:absolute;inset:0;z-index:19;pointer-events:none}
+.nx-dock{pointer-events:auto;position:absolute;left:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:4px;padding:16px 7px;background:linear-gradient(90deg,rgba(2,10,20,.92),rgba(3,14,27,.55));border-left:1px solid var(--line);box-shadow:15px 0 65px rgba(0,0,0,.20);backdrop-filter:blur(18px)}
+.nx-dock button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:68px;min-height:64px;background:transparent;border:0;border-left:2px solid transparent;color:var(--faint);cursor:pointer;transition:background .24s,border-color .24s,color .24s}
+.nx-dock button>span{color:var(--cyan);font:30px/1 var(--display);text-shadow:0 0 12px rgba(81,224,237,.25)}
+.nx-dock button>small{font:9px/1.2 var(--mono);letter-spacing:.01em}
+.nx-dock button:hover,.nx-dock button[aria-current="page"]{border-left-color:var(--cyan);background:linear-gradient(90deg,rgba(81,224,237,.16),transparent);color:var(--white)}
+.nx-dock button:focus-visible,.nx-agent:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.nx-drawer{pointer-events:none;opacity:0;transform:translateX(-22px);position:absolute;left:102px;top:15%;bottom:12%;width:min(380px,calc(100vw - 130px));padding:24px 22px;background:linear-gradient(115deg,rgba(7,24,39,.97),rgba(3,11,23,.87));border-left:1px solid rgba(81,224,237,.4);border-top:1px solid rgba(81,224,237,.12);box-shadow:24px 26px 90px #0009;backdrop-filter:blur(22px);transition:opacity .3s,transform .3s}
+.nx-drawer.nx-open{pointer-events:auto;opacity:1;transform:translateX(0)}
+.nx-drawer header{display:flex;align-items:center;justify-content:space-between;color:var(--cyan);font:10px var(--mono);letter-spacing:.12em}
+.nx-drawer header button{font:28px var(--display);color:var(--white);border:0;background:transparent;cursor:pointer}
+.nx-drawer h2{font:400 38px/1.1 var(--display);letter-spacing:.12em;margin:24px 0 8px;color:var(--white)}
+.nx-drawer p{font:12px/1.6 Inter,Arial,sans-serif;color:#96b7c7;margin:0 0 25px}
+.nx-agent-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;overflow:auto;max-height:calc(100% - 130px);align-content:start}
+.nx-agent{position:relative;text-align:left;min-height:46px;border:0;border-left:1px solid rgba(81,224,237,.18);background:linear-gradient(90deg,rgba(81,224,237,.055),transparent);padding:10px 9px 10px 16px;color:var(--white);font:11px/1.4 Inter,Arial,sans-serif;cursor:pointer}
+.nx-agent:before{content:"";position:absolute;left:6px;top:19px;width:3px;height:3px;border-radius:100%;background:var(--cyan);box-shadow:0 0 9px var(--cyan)}
+.nx-agent:hover{border-left-color:var(--cyan);background:linear-gradient(90deg,rgba(81,224,237,.19),transparent)}
+@media(max-width:900px){.nx-dock{left:2px;gap:0;padding:5px 3px}.nx-dock button{width:48px;min-height:47px}.nx-dock button>span{font-size:21px}.nx-dock button>small{font-size:7px}.nx-drawer{left:56px;top:100px;bottom:110px;width:calc(100vw - 65px);padding:16px}.nx-drawer h2{font-size:28px}.nx-agent-grid{grid-template-columns:1fr 1fr}.nx-agent{font-size:10px}}
+@media(max-height:600px){.nx-dock button{min-height:40px}.nx-dock button>span{font-size:19px}}
+@media(prefers-reduced-motion:reduce){.nx-drawer,.nx-dock button{transition:none}}
