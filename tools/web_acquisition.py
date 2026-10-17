@@ -50,6 +50,7 @@ def acquire(url,out,fetcher=fetch,follow=True):
     stem=hashlib.sha256(final.encode()).hexdigest()[:24]
     files=[];links=[];pages=[];errors=[]
     is_pdf=data.startswith(b'%PDF-')
+    if re.search(r'\.pdf(?:$|\?)',str(url),re.I) and not is_pdf:raise ValueError('EXPECTED_PDF_NOT_RETURNED')
     if is_pdf:
         binary=out/(stem+'.pdf');binary.write_bytes(data);files.append(str(binary))
         text=out/(stem+'.txt')
@@ -83,7 +84,7 @@ def acquire(url,out,fetcher=fetch,follow=True):
     for link in links:
         try:link=public_url(link,resolve=False)
         except ValueError:continue
-        if re.search(r'\.pdf(?:$|\?)|/article/download/|/bitstream/',link,re.I):pdfs.append(link)
+        if re.search(r'\.pdf(?:$|\?)|/article/download/|/article/view/\d+/\d+|/bitstream/',link,re.I):pdfs.append(link)
     for link in pdfs:
         if follow and len(record['linked_documents'])<2:
             try:record['linked_documents'].append(acquire(link,out,fetcher,follow=False))
@@ -97,10 +98,10 @@ def acquire(url,out,fetcher=fetch,follow=True):
 
 def bibliographic_queries(text):
     queries=[]
-    for match in re.finditer(r'«([^»]{20,240})»|<<([^<>]{20,240})>>',text):
+    for match in re.finditer(r'(?:«|<<|“)([^»”<>]{20,240}?)(?:»|>>|”)',text):
         before=text[max(0,match.start()-300):match.start()]
         folded=''.join(c for c in unicodedata.normalize('NFD',before) if not unicodedata.combining(c)).casefold()
         if not re.search(r'δημοσιευ|βιβλιογραφ|publication|bibliograph|references|πηγ',folded):continue
-        title=' '.join((match.group(1) or match.group(2)).split())
+        title=' '.join(match.group(1).split())
         if len(title.split())>=4 and title not in queries:queries.append(title)
     return queries[:2]

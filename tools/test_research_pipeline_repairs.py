@@ -66,16 +66,27 @@ class PipelineRepairs(unittest.TestCase):
             with self.assertRaises(ValueError):public_url(url,resolve=False)
         with self.assertRaises(ValueError):acquire('https://instagram.com/p/x',self.root,fetcher=lambda u:None)
     def test_linked_document_and_citation_title_provenance(self):
-        source=b'<html><p>A publication &lt;&lt;A historical bibliography of maritime correspondence&gt;&gt;</p><a href="/paper.pdf">PDF</a><p>'+b'source text '*20+b'</p></html>'
+        source=b'<html><p>A publication &lt;&lt;A historical bibliography of maritime correspondence&gt;&gt;</p><a href="/bitstream/document.txt">PDF</a><p>'+b'source text '*20+b'</p></html>'
         def remote(url):
-            if url.endswith('.pdf'):return b'plain linked archival text '*10,'text/plain',url
+            if url.endswith('.txt'):return b'plain linked archival text '*10,'text/plain',url
             return source,'text/html',url
         result=acquire('https://archive.example/source',self.root,fetcher=remote)
         self.assertEqual(result['status'],'TEXT_ACQUIRED')
-        self.assertEqual(result['linked_documents'][0]['url'],'https://archive.example/paper.pdf')
+        self.assertEqual(result['linked_documents'][0]['url'],'https://archive.example/bitstream/document.txt')
         self.assertEqual(result['bibliographic_queries'],['A historical bibliography of maritime correspondence'])
         self.assertFalse(result['original_inspected'])
         self.assertTrue(all(pathlib.Path(f).exists() for f in result['files']))
+    def test_pdf_redirect_to_html_is_not_reported_as_acquired_pdf(self):
+        with self.assertRaisesRegex(ValueError,'EXPECTED_PDF_NOT_RETURNED'):
+            acquire('https://archive.example/paper.pdf',self.root,fetcher=lambda u:(b'<html>unrelated redirected page</html>','text/html','https://other.example/'))
+    def test_greek_person_inflections_are_search_hypotheses(self):
+        from candidate_context import variants,assess
+        terms=variants('Ανδρέα Νικολάου',[])
+        self.assertIn('Ανδρέας Νικολάου',terms)
+        hits=assess('Ανδρέας Νικολάου pirate 1578.',terms,1577,1583,target_kind='person')
+        self.assertTrue(any(h['decision']=='RETAIN_CANDIDATE' for h in hits))
+    def test_mixed_citation_quote_marks(self):
+        self.assertEqual(bibliographic_queries('Η δημοσίευση << Α historical correspondence study of maritime sources»'),['Α historical correspondence study of maritime sources'])
     @unittest.skipUnless(shutil.which('pdftotext'),'poppler required')
     def test_real_pdf_extraction_keeps_scan_indexes_not_invented_printed_pages(self):
         # A minimal two-page PDF, generated offline without package dependencies.
