@@ -50,11 +50,13 @@ def decompose(target, aliases=(), purpose='', kind='unknown', regions=()):
             'interpretation':'REQUEST_CONSTRAINTS_NOT_VERIFIED_FACTS'}
 
 
-def focused_queries(focus, qualifiers=()):
+def focused_queries(focus, qualifiers=(), include_hypotheses=False):
     """Every query retains a complete name, or surname with explicit context."""
     queries=[]
     contexts=[*focus.get('places',[]),*focus.get('roles',[])]
-    for name in focus['names']:
+    batches=[]
+    for name in (retrieval_names(focus) if include_hypotheses else focus['names']):
+        queries=[]
         q='"'+name.replace('"','')+'"'
         queries.append(q)
         # Mechanical Greek inflection search hypothesis, not a historical alias.
@@ -77,7 +79,26 @@ def focused_queries(focus, qualifiers=()):
             if nq: queries.append(nq+' "'+context.replace('"','')+'"')
         for qualifier in qualifiers:
             if str(qualifier).strip(): queries.append(q+' '+str(qualifier).strip())
-    return list(dict.fromkeys(queries))
+        batches.append(queries)
+    # Cover each supplied spelling before spending the budget on qualifiers.
+    from itertools import zip_longest
+    return list(dict.fromkeys(q for group in zip_longest(*batches) for q in group if q))
+
+
+def retrieval_names(focus):
+    """Mechanical cross-script search hypotheses, never attested aliases.
+
+    Keep these out of focus['names'] so matching/verification cannot silently
+    promote a transliteration to a historically established identity.
+    """
+    names=list(focus['names'])
+    greek=dict(zip('αβγδεζηθικλμνξοπρστυφχψω',
+                   ['a','v','g','d','e','z','i','th','i','k','l','m','n','x','o','p','r','s','t','y','f','ch','ps','o']))
+    for name in focus['names']:
+        if re.search(r'[α-ω]',fold(name)):
+            text=fold(name).replace('ου','ou').replace('ντ','nt').replace('μπ','mp')
+            names.append(''.join(greek.get(c,c) for c in text))
+    return list(dict.fromkeys(names))
 
 
 def _token_pattern(name):
@@ -127,6 +148,17 @@ def topical_match(record, focus):
                     return {'category':'POSSIBLE_TARGET','reason':'SURNAME_WITH_REQUEST_CONTEXT','matched_name':name,'places':local_places,'roles':local_roles}
         elif name and re.search(r'(?<!\w)'+re.escape(fold(name))+r'(?!\w)',text):
             return {'category':'TARGET_MATCH','reason':'TARGET_PHRASE_IN_SOURCE','matched_name':name,'places':places,'roles':roles}
+    # Cross-script full-name matches remain explicitly provisional. Mechanical
+    # spelling is useful retrieval evidence, never proof of historical identity.
+    if focus['kind']=='person':
+        for name in retrieval_names(focus):
+            if name in focus['names']:continue
+            words=_words(name)
+            if len(words)<2:continue
+            pattern=r'[\s,.-]{1,8}'.join(_token_pattern(w) for w in words)
+            if re.search(pattern,text):
+                return {'category':'POSSIBLE_TARGET','reason':'TRANSLITERATION_REQUIRES_IDENTITY_REVIEW',
+                        'matched_name':name,'places':places,'roles':roles,'query_hypothesis':True}
     return {'category':'CONTEXT_ONLY' if places else 'UNMATCHED',
             'reason':'REQUEST_PLACE_ONLY' if places else 'NO_TARGET_IDENTITY_MATCH',
             'matched_name':None,'places':places,'roles':roles}

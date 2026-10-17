@@ -556,13 +556,24 @@ def pares_simancas(q,lane):
     except Exception as exc:
         return "ACCESS_BLOCKED",[],url+" ; "+type(exc).__name__+": "+str(exc)
 
+class _WebResultParser(_LinkParser):
+    """Only search-result titles, excluding navigation and advertising links."""
+    def handle_starttag(self,tag,attrs):
+        if tag.lower()=='a':
+            data=dict(attrs)
+            if 'result__a' not in data.get('class','').split():
+                self._href=None;self._buf=[]
+                return
+        super().handle_starttag(tag,attrs)
+
+
 def _public_site_index(q,lane,repository,domain,max_records=20):
     """Bounded public-web discovery for repositories without a stable anonymous API.
 
     This discovers public landing pages only. It does not bypass login, paywalls,
     download controls, robots restrictions, or prove the historical claim.
     """
-    query=("site:"+domain+" "+str(q)).strip()
+    query=(("site:"+domain+" ") if domain else "")+str(q)
     url="https://html.duckduckgo.com/html/?"+urllib.parse.urlencode({"q":query})
     try:
         raw=_get(url,timeout=20).decode("utf-8","replace")
@@ -572,7 +583,7 @@ def _public_site_index(q,lane,repository,domain,max_records=20):
     # Never translate failed coverage into a false zero-result statement.
     if any(marker in raw.casefold() for marker in ('anomaly.js','challenge-form','bots use duckduckgo too')):
         return "REMOTE_ACCESS_BLOCKED",[],url+" ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
-    parser=_LinkParser(); parser.feed(raw)
+    parser=_WebResultParser(); parser.feed(raw)
     rows=[]; seen=set()
     for href,title in parser.links:
         u=href
@@ -587,7 +598,11 @@ def _public_site_index(q,lane,repository,domain,max_records=20):
             host=urllib.parse.urlsplit(u).netloc.casefold()
         except Exception:
             continue
-        if not host or not (host==domain.casefold() or host.endswith("."+domain.casefold())):
+        if not host or urllib.parse.urlsplit(u).scheme not in ('http','https'):
+            continue
+        if domain and not (host==domain.casefold() or host.endswith("."+domain.casefold())):
+            continue
+        if not domain and (host=='duckduckgo.com' or host.endswith('.duckduckgo.com')):
             continue
         if not title or len(title.strip())<4:
             continue
@@ -715,6 +730,8 @@ def unsupported(repository, reason="No stable anonymous machine-search connector
     return "AUTH_OR_BROWSER_REQUIRED",[],reason
 
 def dispatch(repository,q,lane):
+    if repository=="Public Web Source Discovery":
+        return _public_site_index(q,lane,repository,None,20)
     """Dispatch exact repository labels from lane_repository_plan.py."""
     if repository=="Gallica/BnF": return bnf_sru(q,lane)  # catalogue SRU is stable public fallback
     if repository=="Google Books": return google_books(q,lane)

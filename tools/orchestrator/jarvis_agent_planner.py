@@ -50,7 +50,9 @@ BROAD_MARKERS = (
 PROFILE_RULES: dict[str, dict[str, Any]] = {
     "greek_aegean": {
         "patterns": [
-            r"[\u0370-\u03ff]",
+            # Input language is not historical geography. A Greek-written
+            # personal name must not silently exclude the Spanish archives.
+            r"\b(?:αιγαιο|κυκλαδ|ελλαδ|ελλην|ιονιο|κερκυρ|παργ|μηλο|μαν[ηι]|μορεα)",
             r"\baegean\b", r"\bcyclad", r"\bgree(?:ce|k)\b",
             r"\bionian\b", r"\bcorfu\b", r"\bparga\b", r"\bmilos\b",
             r"\bmelos\b", r"\bmani\b", r"\bmorea\b",

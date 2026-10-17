@@ -43,6 +43,30 @@ class ResearchFocusTests(unittest.TestCase):
         row={'title':'Γενική ναυτική ιστορία','query':self.target,'source_lead':True,'url':'https://example/Ιωάννη-Καψή'}
         self.assertEqual(topical_match(row,self.focus)['category'],'UNMATCHED')
 
+    def test_small_query_budgets_cover_aliases_before_qualifiers(self):
+        focus=decompose('Πέτρος λαντζας',['Pedro Lanza','Pietro Lanza'])
+        queries=focused_queries(focus,('corsario','galera'),include_hypotheses=True)
+        self.assertEqual(queries[:3],['"Πέτρος λαντζας"','"Pedro Lanza"','"Pietro Lanza"'])
+        self.assertIn('"petros lantzas"',queries[:4])
+        self.assertNotIn('petros lantzas',focus['names'])
+        mechanical=topical_match({'title':'Petros Lantzas in historical correspondence'},decompose('Πέτρος λαντζας'))
+        self.assertEqual(mechanical['category'],'POSSIBLE_TARGET')
+        self.assertTrue(mechanical['query_hypothesis'])
+        self.assertEqual(topical_match({'title':'Petros somebody else'},focus)['category'],'UNMATCHED')
+
+    def test_open_web_discovers_external_sources_without_navigation(self):
+        from connectors.repository_connectors import dispatch
+        body=b'''<a href="https://duckduckgo.com/about">About search</a>
+        <a class="result__a" href="https://university.example/papers/lanza.pdf">Historical research on Pedro Lanza</a>
+        <a class="result__a" href="javascript:alert(1)">Invalid result</a>'''
+        with patch('connectors.repository_connectors._get',return_value=body) as remote:
+            status,rows,detail=dispatch('Public Web Source Discovery','"Pedro Lanza"','travellers')
+        self.assertEqual(status,'EXECUTED')
+        self.assertEqual(len(rows),1)
+        self.assertEqual(rows[0]['url'],'https://university.example/papers/lanza.pdf')
+        self.assertEqual(rows[0]['verification_status'],'UNVERIFIED_DISCOVERY')
+        self.assertNotIn('site%3A',remote.call_args.args[0])
+
     def test_ranking_and_retention(self):
         req={'target':self.target,'aliases':[],'purpose':'historical research'}
         ident=identity(req,req)

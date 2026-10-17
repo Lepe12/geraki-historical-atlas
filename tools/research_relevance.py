@@ -215,7 +215,7 @@ def rank(records, ident):
 def discovery_queries(ident, recovery=False):
     focus=ident.get('focus') or decompose(ident['target'],ident.get('aliases',[]),kind=ident.get('type','unknown'),regions=ident.get('region_terms',[]))
     if focus['kind']=='person':
-        return focused_queries(focus,('history','voyage','corsair'))
+        return focused_queries(focus,('history','voyage','corsair'),include_hypotheses=True)
     names=list(dict.fromkeys([ident['target'],*ident.get('aliases',[])]));queries=[]
     if recovery and ident.get('region_terms'):
         for region in ident['region_terms'][:4]:

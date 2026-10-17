@@ -6,6 +6,7 @@ from connectors.bsb_sru import search_bsb
 from connectors.repository_connectors import dispatch
 from research_relevance import discovery_queries
 from research_focus import decompose, focused_queries
+from historical_query_expansion import EVENT_TERMS
 lane=os.getenv("PCT_RESEARCH_LANE","travellers")
 plan=json.loads(pathlib.Path(f"repository_plans/{lane}.json").read_text(encoding="utf-8"))
 out=pathlib.Path("lane_discovery");out.mkdir(exist_ok=True)
@@ -50,6 +51,9 @@ results=[];attempts=[]
 for r in plan["repositories"]:
     name=r["name"]; repo_records=[]; statuses=[]; diagnostics=[]
     repo_terms=list(terms)
+    if name=="Public Web Source Discovery":
+        focus=plan.get('target_identity',{}).get('focus') or decompose(plan['target'],plan.get('aliases',[]))
+        repo_terms=focused_queries(focus,include_hypotheses=True)[:6]
     if lane=="travellers" and name in ("Gallica/BnF","BSB","Internet Archive","Google Books"):
         ys=[x for x in str(plan.get("date_range","")).replace("-"," ").split() if x.isdigit()]
         names=[str(plan.get("target") or "").strip()]+[str(x).strip() for x in plan.get("aliases",[]) if str(x).strip()]
@@ -141,7 +145,9 @@ for r in plan["repositories"]:
     focus=plan.get('target_identity',{}).get('focus') or decompose(plan['target'],plan.get('aliases',[]))
     if focus['kind']=='person':
         cap=max(3,len(repo_terms))
-        repo_terms=focused_queries(focus,('history','voyage','corsair'))[:cap]
+        # Keep the lane's language and alternate names within bounded budgets.
+        # Generic English qualifiers previously replaced every archive's plan.
+        repo_terms=focused_queries(focus,EVENT_TERMS.get(lane,()),include_hypotheses=name!="SearchCulture.gr / EKT")[:min(cap,16)]
     for q in repo_terms:
         try:
             if name=="Internet Archive":

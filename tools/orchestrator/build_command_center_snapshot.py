@@ -97,7 +97,7 @@ def discovery_results(run_root:Path,request=None):
         for attempt in raw.get("attempts",[]):
             coverage.append({"lane":lane,"repository":attempt.get("repository"),
                 "status":attempt.get("status"),"hits":attempt.get("hits",0),
-                "queries":[{"query":q.get("query"),"status":q.get("status"),"hits":q.get("hits",0)} for q in attempt.get("queries",[])],
+                "queries":[{"query":q.get("query"),"status":q.get("status"),"hits":q.get("hits",0),"detail":q.get("detail")} for q in attempt.get("queries",[])],
                 "url":attempt.get("base_url")})
     return discoveries,coverage
 
