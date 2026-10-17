@@ -49,5 +49,5 @@ canvas.addEventListener("wheel",e=>{e.preventDefault();zoom=Math.max(.45,Math.mi
 document.getElementById("zoomIn")?.addEventListener("click",()=>{if(enabled)zoom=Math.min(3.5,zoom*1.25)});
 document.getElementById("zoomOut")?.addEventListener("click",()=>{if(enabled)zoom=Math.max(.45,zoom/1.25)});
 document.getElementById("resetView")?.addEventListener("click",()=>{yaw=-.16;pitch=.48;zoom=1});
-load();requestAnimationFrame(paint);enable(true);
+load();requestAnimationFrame(paint);enable(false);const launch=()=>{if(/^[0-9]+ FPS$/.test(document.getElementById("fps")?.textContent||""))enable(true);else setTimeout(launch,100);};launch();
 })();
