@@ -5,6 +5,7 @@ from request_context import load_request
 from urllib.parse import urlsplit
 from research_focus import decompose
 from candidate_context import assess, catalogue_assess, variants, POLICY
+from section_extraction import build_findings, answer_report, render_answer
 
 rf, req, ctx = load_request()
 terms=variants(ctx['target'],ctx['aliases'])
@@ -46,6 +47,18 @@ def dedupe(items):
         else: output[key]={**item,'occurrence_count':1}
     return list(output.values())
 
+section_report=build_findings(pathlib.Path('.'),ctx)
+section_hits=[{**f,'lead_type':'SOURCE_SECTION'} for f in section_report['findings'] if f['decision']=='RETAIN_CANDIDATE']
+# Prefer the complete, source-attributed paragraph over a legacy substring hit.
+hits=[h for h in hits if not any(f['file']==h.get('file') and f['locator']['start_line']<=h.get('line',0)<=f['locator']['end_line'] for f in section_hits)]
+hits.extend(section_hits)
+context_leads.extend({**f,'status':f['reason'],'lead_type':'SOURCE_SECTION'} for f in section_report['findings'] if f['decision']!='RETAIN_CANDIDATE')
+structured=pathlib.Path('structured_output');structured.mkdir(exist_ok=True)
+(structured/'extracted_findings.json').write_text(json.dumps(section_report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+answer=answer_report(section_report)
+dossier=pathlib.Path('research_dossier');dossier.mkdir(exist_ok=True)
+(dossier/'answer.json').write_text(json.dumps(answer,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+(dossier/'answer.md').write_text(render_answer(answer),encoding='utf-8')
 hits=dedupe(hits);context_leads=dedupe(context_leads);catalogue_leads=dedupe(catalogue_leads)
 report={'schema':'pct-event-first-general-v6','policy':POLICY,'request_file':rf.name,
         'target':ctx['target'],'aliases':ctx['aliases'],'date_range':[lo,hi],

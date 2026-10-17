@@ -30,6 +30,7 @@ def candidate_claims(run_root:Path):
               "place":c.get("place"),"date":c.get("date"),
               "repository":c.get("repository"),"identifier":c.get("identifier"),
               "url":c.get("url"),"original_inspected":bool(c.get("original_inspected")),
+              **{k:c.get(k) for k in ('context_excerpt','acquired_text_excerpt','text_locator','date_basis','date_evidence','identity_association','extraction_method','extraction_uncertainties','reported_cited_pages','exact_page_candidates') if c.get(k) is not None},
               "verified":bool(c.get("verified"))
             })
     return claims
@@ -141,6 +142,7 @@ def build(repo:Path,run_id:str):
     spec=read(repo/"evidence/specialist_runs"/run_id/"SPECIALIST_AGGREGATE.json",{})
     request=research_request(run_root)
     claims=candidate_claims(run_root)
+    answers=[{'lane':lane,**answer} for lane in LANE_LABELS if (answer:=read(run_root/lane/'research_dossier/answer.json',{}))]
     discoveries,coverage=discovery_results(run_root,request)
     request_id=request_id_for(run_root)
     try:from .jarvis_state_board import lane_state
@@ -219,6 +221,8 @@ def build(repo:Path,run_id:str):
       },
       "agents":agents,
       "claims":claims[:500],
+      "research_answer":{'status':'PROVISIONAL_SOURCE_FINDINGS' if any(a.get('findings') for a in answers) else 'INSUFFICIENT_ACQUIRED_EVIDENCE',
+                         'lanes':answers,'verified_claims':0,'rule':'Source-attributed findings are not verified historical conclusions.'},
       "discoveries":discoveries,
       "coverage":coverage,
       "evidence_url":f"https://github.com/Lepe12/geraki-historical-atlas/tree/main/evidence/runs/{run_id}",

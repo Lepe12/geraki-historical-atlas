@@ -73,26 +73,31 @@ write("source_genealogy/genealogy_queue.json",{
 page_by_source={}
 for p in pages:page_by_source.setdefault(str(p.get("source_file","")),[]).append(p)
 candidates=[]
-def pdf_matches(file,line):
+def pdf_matches(file,line,end_line=None):
     found=[]
     for record in acq:
         document=record.get('web_acquisition') or {}
         if not any(pathlib.Path(f).name==file for f in document.get('files',[]) if str(f).endswith('.txt')):continue
         for page in document.get('pages',[]):
-            if page.get('start_line',0)<=int(line or 0)<=page.get('end_line',-1):
+            if page.get('start_line',0)<=int(end_line or line or 0) and page.get('end_line',-1)>=int(line or 0):
                 found.append({'identifier':record.get('identifier'),'source_file':file,'printed_page':None,
                               'scan_index_0_based':page['scan_index_0_based'],'pdf_file':document.get('pdf_file'),
                               'mapping_basis':'PDF_TEXT_PAGE_BOUNDARY','original_inspected':False})
     return found
 
 for i,h in enumerate(events,1):
-    src=h.get("file");related=pages_for_hit(pages,src,i-1,h.get("line"))+pdf_matches(src,h.get("line"))
+    src=h.get("file");related=pages_for_hit(pages,src,i-1,h.get("line"))+pdf_matches(src,h.get("line"),(h.get('locator') or {}).get('end_line'))
     topo=(toponym_identity(h.get("place_match"),ctx["target"],ctx["aliases"])
           if decompose(ctx['target'],ctx['aliases'])['kind']!='person' else None)
     dnorm=normalize_date(" / ".join(str(y) for y in h.get("years_in_scope",[])), h.get("date_role","UNRESOLVED"))
     candidate={
       "candidate_id":f"{LANE}-event-{i:04d}","lane":LANE,"source_file":src,
-      "source_type":"OCR_CONTEXT","evidence_state":"ACQUIRED" if related else "LOCATED",
+      "source_type":h.get('source_type') or "OCR_CONTEXT","evidence_state":"ACQUIRED" if related or h.get('evidence_state')=='ACQUIRED' else "LOCATED",
+      "title":h.get('title'),"url":h.get('url'),"identifier":h.get('identifier'),"repository":h.get('repository'),
+      "acquired_text_excerpt":h.get('evidence_excerpt'),"text_locator":h.get('locator'),
+      "extraction_method":h.get('extraction_method'),"extraction_uncertainties":h.get('uncertainties',[]),
+      "date_basis":h.get('date_basis'),"date_evidence":h.get('date_evidence'),
+      "identity_association":h.get('target_entity'),"reported_cited_pages":h.get('reported_cited_pages',[]),
       "place":topo,"target_entity":{"kind":decompose(ctx["target"],ctx["aliases"])["kind"],"observed_name":h.get("place_match"),"identity_status":"UNVERIFIED"},"date":dnorm,"event_terms":h.get("event_terms",[]),
       "event_type":"UNKNOWN","actor":"UNKNOWN","context_excerpt":h.get("context_excerpt"),
       "exact_page_candidates":[{"identifier":p.get("identifier"),"printed_page":p.get("printed_page"),"leaf":p.get("leaf"),"image_file":p.get("image_file"),"pdf_file":p.get("pdf_file"),"scan_index_0_based":p.get("scan_index_0_based")} for p in related],
