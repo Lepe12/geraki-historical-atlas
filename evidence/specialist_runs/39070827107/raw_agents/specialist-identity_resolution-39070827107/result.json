@@ -1,0 +1,1567 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "identity_resolution",
+  "label": "Identity Resolution Agent",
+  "assignment_id": "identity_resolution:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "entity_candidates",
+    "variant_names",
+    "same_entity_assessment",
+    "collision_warnings"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "a0066b21bb803c98c7130c70525b1b354a843502dcef4d6f1fcaf747e2991c74",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "identity_resolution",
+    "assignment_id": "identity_resolution:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:SearchCulture.gr / EKT",
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:OpenArchives.gr / EKT"
+    ],
+    "queries": [
+      "\"Πέτρο Λάντζα\"",
+      "\"Πέτρο Λάντζα\" history",
+      "\"Πέτρο Λάντζα\" biography"
+    ],
+    "operation": "search",
+    "search_budget": 12,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 130,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 102,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 3,
+    "total_search_budget": 12,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "\"Πέτρο Λάντζα\" biography",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "\"Πέτρο Λάντζα\"",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "\"Πέτρο Λάντζα\" history",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\"",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\" biography",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22+biography&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\" history",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22+history&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\" history",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1++history%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\" biography",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1++biography%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\" biography",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18217",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18217",
+          "title": "openarchives.gr | Ο Μαύρος Καβαλάρης: Οι βιογραφίες του Νικόλαου Πλαστήρα",
+          "description": "Ελλάδας συγκέντρωσαν γύρω τους ... . Δεκατέσσερα κείμενα που διεκδικούν τον χαρακτήρα της βιογραφίας έχουν εντοπιστεί, ενώ το χρονικό εύρος της δημοσίευσής τους έχει ιδιαίτερο ενδιαφέρον: από το 1923 έως και το 1952, ο Πλαστήρας γνώρισε",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" biography",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15123?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15123?language=en",
+          "title": "openarchives.gr | Το δοξαστικό των αποστίχων της Μ.Τετάρτης \"Κύριε η εν πολλαις αμαρτίαις...\": από τον Πέτρο Λαμπαδάριο στον Κωνσταντίνο Πρίγγο.",
+          "description": "openarchives ... gr ... Το δοξαστικό των αποστίχων της Μ.Τετάρτης \"Κύριε η εν πολλαις αμαρτίαις...\": από τον Πέτρο Λαμπαδάριο στον Κωνσταντίνο Πρίγγο.\n\n...\n\n> # Το δοξαστικό των αποστίχων της Μ.Τετάρτης \"Κύριε η εν πολλαις αμαρτίαις...\": από τον Πέτρο Λαμπαδάριο στον Κωνσταντίνο Πρίγγο.\n> \n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15123 RDF/XML JSON-LD \n> \n> \n\nTitle\n\n Το δοξαστικό των αποστίχων της Μ.Τετάρτης \"Κύριε η εν πολλαις αμαρτίαις...\": από τον Πέτρο Λαμπαδάριο στον Κωνσταντίνο Πρίγγο. (EL) \n\nCreator\n\n Μαλάκος, Ιωάννης (EL) \n\nContributor\n\n Πάρης, Νεκτάριος (EL) Ρεντζεπέρη, Άννα-Μαρία (EL) \n\nType\n\n Bachelor's Degree Paper (EN) \n\n Text (EN) \n\nIssued\n\n 2012-08-27T16:23:54Z 2012 (EL) \n\nYear\n\nDescription\n\n Η βιβλιοθήκη διαθέτει αντίτυπο της πτυχιακής μόνο σε ηλεκτρονική μορφή. (EL) \n\n Πτυχιακή εργασία--Πανεπιστήμιο Μακεδονίας, Θεσσαλονίκη, 2012. (EL) \n\n ΠΤΥ ΜΕΤ/6 2012 (EL)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" biography",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/kypseli/000054-11128_889",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/kypseli/000054-11128_889",
+          "title": "openarchives.gr | Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα)",
+          "description": "openarchives.gr | Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα)\n\n Το τεκμήριο παρέχεται από τον φορέα : Ανοικτό Πανεπιστήμιο Κύπρου \n\n Αποθετήριο : Ψηφιακό Αποθετήριο Κυψέλη \n\nΤίτλος\n\n Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα) \n\nΣυντελεστής\n\n Spanos, Leonidas \n\n Ματθοπούλου, Ευαγγελία \n\n Μητρόπολη Κιτίου \n\n Εκκλησιαστική Επιτροπή Ιεράς Μονής Αγίου Γεωργίου Κοντού \n\n Σπανός, Λεωνίδας \n\nΤύπος\n\n Ψηφιακή εικόνα \n\n \n\nΗμερομηνία έκδοσης\n\n 2012-10-23 2006 2006-09-10 2012-10-23T10:17:19Z \n\nΧρονολογία\n\n 2006 - 2012 (EL) \n\nΕπιστημονικό πεδίο\n\n Ανθρωπιστικές Επιστήμες και Τέχνες Τέχνες (Τέχνες, Ιστορία της Τέχνης, Ερμηνευτικές Τέχνες, Μουσική) (EL) \n\nΘέμα\n\n Λάρνακα \n\n Δήμος Λάρνακας \n\n Εκκλησία \n\n Πατριάρχης Αλεξανδρείας Πέτρος Ζ' \n\nΔικαιώματα\n\nΠάροχος\n\n Ανοικτό Πανεπιστήμιο Κύπρου \n\nΑποθετήριο / συλλογή\n\nΕπιμέρους συλλογή\n\n Κύπρος: τόποι μνήμης – χώροι τέχνης",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" biography",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_39075",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_39075",
+          "title": "openarchives.gr | Πεζά κείμενα λογίων του 16ου και 17ου αι., σε δημώδη ελληνική γλώσσα, βάσει αυτόγραφων χειρόγραφων κωδίκων",
+          "description": "Πεζά κείμενα λογίων του 16ου και 17ου αι., σε δημώδη ελληνική γλώσσα, βάσει αυτόγραφων χειρόγραφων κωδίκων \n\nΔημιουργός\n\n Papaioannou, Anastasios Παπαϊωάννου, Αναστάσιος \n\nΤύπος\n\n PhD Thesis \n\n Διπλωματική εργασία Διδακτορική διατριβή (EL)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" biography",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_3725?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_3725?language=en",
+          "title": "openarchives.gr | Πειραματική εργασία",
+          "description": "Title\n\n Η σημασία της ενδοσκοπικής λαπαροσκοπικής εντεροσκόπησης \n\n Πειραματική εργασία \n\nCreator\n\n Γεωργιάδης, Πέτρος \n\nContributor\n\n Μανωλάς, Κ. Μηνόπουλος, Γ. Σιμόπουλος, Κ. \n\nType\n\n doctoralThesis \n\n \n\n Thesis PhD thesis (EN) \n\nDate\n\n 2015-11-30T23:23:27Z 1999 \n\nYear\n\n 1999 (EN) \n\nDescription\n\n Βιβλιογραφία σ. 82-98 98 \n\nScientific field\n\n Medical and Health Sciences ▶ Clinical Medicine Surgery (EN) \n\nSubject\n\n Intestine, Small--Diseases Λεπτό έντερο Εντεροσκόπηση Ενδοσκόπηση Endoscopic surgery--Complications Enteroscopy \n\nLanguage\n\n Greek \n\nPublisher\n\n duth \n\n Τμήμα Ιατρικής,Τομέας Χειρουργικός\n\n...\n\nτρ ... ργ",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" biography",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-143022?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-143022?language=en",
+          "title": "openarchives.gr | Liber XX. 1341-1342. Fo 76r, No 653. Εκλέγονται πέντε σοφοί πρός μελέτην της καταστάσεως εν Κρήτη καί της αλληλογραφίας του εν Κωνσταντινουπόλει πρεσβευτού Πέτρου Ντά Κανάλη. Εξελέγησαν : Σέρ Μάρκος Λορεδάνος επίτροπος, Σέρ Μάρκος Ιουστινιάνης επίτροπος, Σέρ Φράγκος Κουϊρίνος, Σέρ Νικόλαος Γραδόνικος υιός Δόγη, Σέρ Μάρκος Ρουτζίνης. 1342, Αυγούστου 24, αριθ. εγγράφου 20 (σε περίληψη)",
+          "description": "κα ... α ... του ... πος\n\n...\n\nCreator\n\n Θεοτόκης , Σπυρίδων Μ. \n\nType\n\n Διοικητικά έγγραφα \n\nDate\n\n 1936 \n\nYear\n\n 1936 (EN)\n\n...\n\nΒλέπε τον πρόλογο της έκδοσης στη Συλλογή Μελέτες Ιστορίας Δικαίου, (Σπυρίδων Μ. Θεοτόκης, Θεσπίσματα της Βενετικής Γερουσίας 1281-1385, (Μνημεία της Ελληνικής Ιστορίας 2, τεύχος 1), Αθήνα 1936, σσ. ια΄-ιη΄). Βλ. σημειώσεις και σχόλια στις σ. 241-242. Βλ. το ευρετήριο των εγγράφων στις σ. 299-329 της έκδοσης.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" biography",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/portal/collections/psepheda",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/portal/collections/psepheda",
+          "title": "OpenArchives.gr | Ψηφίδα - Ψηφιακή Βιβλιοθήκη και Ιδρυματικό Καταθετήριο του Πανεπιστημίου Μακεδονίας",
+          "description": "Η ΨΗΦΙΔΑ - Ψηφιακή Βιβλιοθήκη και Ιδρυματικό Καταθετήριο αποτελεί την Υπηρεσία της Βιβλιοθήκης & Κέντρου Πληροφόρησης του Πανεπιστημίου Μακεδονίας που συγκεντρώνει ψηφιακό/ηλεκτρονικό υλικό με σκοπό ... και την διατήρηση και συντήρηση της καταγεγραμμένης",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" biography",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_32106",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_32106",
+          "title": "openarchives.gr | Joseph of Androussa (1770-1844): the first Minister of Religion and Law and first Bishop of Messinia",
+          "description": "after the Revolution of 1821. It attempts to understand this multi-dimentional personality and the era of his active ... discusses the aforementioned edited manuscripts. The Bishop of Messina (from Androussa) was a person of great significance for pre",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" biography",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/theatrepolis/000166-30782?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/theatrepolis/000166-30782?language=en",
+          "title": "openarchives.gr | Angelos’ Film (2000) by Péter Forgács: from home movies to the History of the Future",
+          "description": "openarchives. ... Angelos’ Film (2000) ... Péter Forgács: from home movies to ... History of ... Future\n\n...\n\ninstitution ... Department of ... Studies ... University ... Peloponn\n\n...\n\nTitle\n\n Angelos’ Film (2000) του Péter Forgács: από τις home movies στην Ιστορία του μέλλοντος (EL) \n\n Angelos’ Film (2000) by Péter Forgács: from home movies to the History of the Future (EN) \n\nCreator\n\n Βασιλείου, Θανάσης \n\nType\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\nDate\n\n 2022-07-11\n\n...\n\nYear\n\n...\n\nDescription\n\n...\n\nΟ Péter Forgács είναι ένας σύγχρονος ρακοσυλλέκτης home movies. Αλλά όπως και ο ρακοσυλλέκτης του Μποντλέρ, είναι αυτός που θα δώσει μια νέα ζωή και μία νέα θέση στα κινηματογραφικά ρετάλια των ευκατάστατων οικογενειών της Ευρώπης, των δεκαετιών του 1930 και του 1940. Επαναχρησιμοποιώντας εικόνες που δεν γυρίστηκαν ποτέ για αυτόν τον σκοπό, προτείνει μία νέα κινηματογραφική ιστορική γραφή, συναντώντας τις αρχές της μικρο-ιστορίας όπου το ιστορικά αδιάφορο συναντά και αναμετράται με το ιστορικά καθοριστικό. Στο Angelos’ Film (2000) ο Forgács βρίσκει είκοσι-έξι λεπτά που διασώθηκαν από το υλικό του Έλληνα επιχειρηματία, Άγγελου Παπαναστασίου, πριν και κατά τη διάρκεια της κατοχής. Οι ευχάριστες και ακίνδυνες λήψεις της οικογένειας εναλλάσσονται -και ουσιαστικά προστατεύουν μέσα στην ίδια μπομπίνα- με τις «άλλες» για τις οποίες ο Παπαναστασίου έθεσε σε κίνδυνο τη ζωή του και αφορούν στη φρίκη του πολέμου. Ο Forgács, επεμβαίνοντας στο υλικό με κάθε δυνατό τρόπο, θα προσπαθήσει να διακρίνει –όπως σχεδόν σε όλο του το έργο- αυτό που μπορεί να κρύψει, μπροστά στα μάτια του θεατή, η πιο αδιάφορη εικόνα. (EL)\n\n...\n\nPeter Forgacs is a modern “ragpicker”, a scavenger of home movies. Just like Baudelaire’s ragpicker, though, he is the one who breathes new life into and finds a new place for the cinematic scraps left behind by the affluent European families of the 1930s and the 1940s. By reusing images which were never made for this purpose, Forgacs suggests a new form of cinematic historical narrative, one that merges with the principles of micro-history where the quotidian, the historically inconsequential, meets and measures itself against historical significance. In Angelos’ Film (2000), Forgacs finds 26 minutes of footage rescued from the material of Greek businessman Angelos Papanastasiou, shot before and during the German occupation. The safe and pleasant shots of the family alternate with the “other” shots, the ones about the horror of war for which Papanastasiou risked his life, essentially shielding them, protecting them within the same reel. By interfering with the material in every possible way, Forgacs attempts – as he does throughout his work – to discern that which even the most mundane image can hide right before the viewer’s eyes. (EN)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" biography",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_9212?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_9212?language=en",
+          "title": "openarchives.gr | Αλέξανδρος Ρίζου Δορ(ρο)μούσης (1769-Πέστη 1841) : η πολιτισμική ταυτότητα ενός θεσσαλού εμπόρου της Διασποράς",
+          "description": "Γ ... νος μιας δραστήριας εμπορ ... οικογένειας που ξεκίνησε από τον Τ ... ρ ... βο της ... εσσαλίας και εγκαταστάθηκε στην Π ... στη κατά την τελευταία δεκαετία του 18ου αι., ο Αλέξανδρος Δορμούσης ... ρο ... σης ( ... ει σπανι ... ) αποτελεί μια ενδιαφέρου ... περίπτωση της ... ικής διασποράς. Μέτοχος ... αργ ... μος ... ρέ ... τή ... τις",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" biography",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:openarchives.gr \\\"Πέτρο Λάντζα\\\" biography\", \"providers\": [{\"provider\": \"google\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"PROVIDER_ERROR\"}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 10, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 10, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15123?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15123?language=en",
+          "title": "openarchives.gr | Το δοξαστικό των αποστίχων της Μ.Τετάρτης \"Κύριε η εν πολλαις αμαρτίαις...\": από τον Πέτρο Λαμπαδάριο στον Κωνσταντίνο Πρίγγο.",
+          "description": "openarchives.gr | Το δοξαστικό των αποστίχων της Μ.Τετάρτης \"Κύριε η εν πολλαις αμαρτίαις...\": από τον Πέτρο Λαμπαδάριο στον Κωνσταντίνο Πρίγγο.\n\n> # Το δοξαστικό των αποστίχων της Μ.Τετάρτης \"Κύριε η εν πολλαις αμαρτίαις...\": από τον Πέτρο Λαμπαδάριο στον Κωνσταντίνο Πρίγγο.\n> \n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15123 RDF/XML JSON-LD \n> \n> \n\nTitle\n\n Το δοξαστικό των αποστίχων της Μ.Τετάρτης \"Κύριε η εν πολλαις αμαρτίαις...\": από τον Πέτρο Λαμπαδάριο στον Κωνσταντίνο Πρίγγο. (EL) \n\nCreator\n\n Μαλάκος, Ιωάννης (EL) \n\nContributor\n\n Πάρης, Νεκτάριος (EL) Ρεντζεπέρη, Άννα-Μαρία (EL) \n\nType\n\n Bachelor's Degree Paper (EN) \n\n Text (EN) \n\nIssued\n\n 2012-08-27T16:23:54Z 2012 (EL)\n\n...\n\nYear\n\n...\n\nDescription\n\n Η βιβλιοθήκη διαθέτει ... τυπο της ... τυχιακής ... σε ... τρονική μορ ... . ... EL)\n\n...\n\nΠτυχιακή εργασία--Πανεπιστήμιο Μακεδονίας, Θεσσαλονίκη, ... 2012. (EL)\n\n...\n\nΥ ... ΕΤ ... 2 ... 12 (EL)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/portal/collections/psepheda",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/portal/collections/psepheda",
+          "title": "OpenArchives.gr | Ψηφίδα - Ψηφιακή Βιβλιοθήκη και Ιδρυματικό Καταθετήριο του Πανεπιστημίου Μακεδονίας",
+          "description": "Η ΨΗΦΙΔΑ - Ψηφιακή Βιβλιοθήκη και Ιδρυματικό Καταθετήριο αποτελεί την Υπηρεσία της Βιβλιοθήκης & Κέντρου ... του Πανεπιστημίου Μακεδονίας που ... , της δια βίου μάθησης, καθώς και την διατήρηση και συντήρηση της καταγεγραμμένης γνώσης.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/kypseli/000054-11128_889",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/kypseli/000054-11128_889",
+          "title": "openarchives.gr | Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα)",
+          "description": "openarchives.gr | Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα)\n\n Το τεκμήριο παρέχεται από τον φορέα : Ανοικτό Πανεπιστήμιο Κύπρου \n\n Αποθετήριο : Ψηφιακό Αποθετήριο Κυψέλη \n\nΤίτλος\n\n Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα) \n\nΣυντελεστής\n\n Spanos, Leonidas \n\n Ματθοπούλου, Ευαγγελία \n\n Μητρόπολη Κιτίου \n\n Εκκλησιαστική Επιτροπή Ιεράς Μονής Αγίου Γεωργίου Κοντού \n\n Σπανός, Λεωνίδας \n\nΤύπος\n\n Ψηφιακή εικόνα \n\n \n\nΗμερομηνία έκδοσης\n\n 2012-10-23 2006 2006-09-10 2012-10-23T10:17:19Z \n\nΧρονολογία\n\n 2006 - 2012 (EL) \n\nΕπιστημονικό πεδίο\n\n Ανθρωπιστικές Επιστήμες και Τέχνες Τέχνες (Τέχνες, Ιστορία της Τέχνης, Ερμηνευτικές Τέχνες, Μουσική) (EL) \n\nΘέμα\n\n Λάρνακα \n\n Δήμος Λάρνακας \n\n Εκκλησία \n\n Πατριάρχης Αλεξανδρείας Πέτρος Ζ' \n\nΔικαιώματα\n\nΠάροχος\n\n Ανοικτό Πανεπιστήμιο Κύπρου \n\nΑποθετήριο / συλλογή\n\nΕπιμέρους συλλογή\n\n Κύπρος: τόποι μνήμης – χώροι τέχνης",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pyxida/000170-123456789_5446",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pyxida/000170-123456789_5446",
+          "title": "openarchives.gr | Δασική πολιτική ιδία εν Ελλάδι: μετά στοιχείων αγροτικής πολιτικής",
+          "description": "openarchives.gr | Δασική πολιτική ιδία εν Ελλάδι: μετά στοιχείων αγροτικής πολιτικής\n\n Το τεκμήριο παρέχεται από τον φορέα : Οικονομικό Πανεπιστήμιο Αθηνών \n\n Αποθετήριο : ΠΥΞΙΔΑ \n\nΤίτλος\n\n Δασική πολιτική ιδία εν Ελλάδι: μετά στοιχείων αγροτικής πολιτικής (EL) \n\nΔημιουργός\n\n Κοντός, Πέτρος Η. (EL) \n\nΤύπος\n\n Text \n\nΗμερομηνία έκδοσης\n\n 2025-03-26T19:33:46Z 1929 \n\nΧρονολογία\n\n 1929 (EL) \n\nΠεριγραφή\n\n Βιβλίον πρώτον. Εισαγωγή (EL) \n\nΕκδότης\n\n Σακελλάριος, Δ. Π. (EL) \n\nΠάροχος\n\n Οικονομικό Πανεπιστήμιο Αθηνών",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_3725?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_3725?language=en",
+          "title": "openarchives.gr | Πειραματική εργασία",
+          "description": "Dem\n\n...\n\nTitle\n\n Η σημασία της ενδοσκοπικής λαπαροσκοπικής εντεροσκόπησης \n\n Πειραματική εργασία \n\nCreator\n\n Γεωργιάδης, Πέτρος \n\nContributor\n\n Μανωλάς, Κ. Μηνόπουλος, Γ. Σιμόπουλος, Κ. \n\nType\n\n doctoralThesis \n\n \n\n Thesis PhD thesis (EN) \n\nDate\n\n 2015-11-30T23:23:27Z 1999 \n\nYear\n\n 1999 (EN) \n\nDescription\n\n Βιβλιογραφία σ. 82-98 98 \n\nScientific field\n\n Medical and Health Sciences ▶ Clinical Medicine Surgery (EN) \n\nSubject\n\n Intestine, Small--Diseases Λεπτό έντερο Εντεροσκόπηση Ενδοσκόπηση Endoscopic surgery--Complications Enteroscopy \n\nLanguage\n\n Greek \n\nPublisher\n\n duth \n\n Τμήμα Ιατρικής,Τομέας Χειρουργικός \n\nSchool ... Department / Institute\n\n...\n\nΔημοκ ... τειο Πανεπιστήμιο Θράκης ▶ Σχολή Επιστημών Υγείας ▶ Τμήμα Ιατρικής Τομέας Χειρουργικής",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-143022",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-143022",
+          "title": "openarchives.gr | Liber XX. 1341-1342. Fo 76r, No 653. Εκλέγονται πέντε σοφοί πρός μελέτην της καταστάσεως εν Κρήτη καί της αλληλογραφίας του εν Κωνσταντινουπόλει πρεσβευτού Πέτρου Ντά Κανάλη. Εξελέγησαν : Σέρ Μάρκος Λορεδάνος επίτροπος, Σέρ Μάρκος Ιουστινιάνης επίτροπος, Σέρ Φράγκος Κουϊρίνος, Σέρ Νικόλαος Γραδόνικος υιός Δόγη, Σέρ Μάρκος Ρουτζίνης. 1342, Αυγούστου 24, αριθ. εγγράφου 20 (σε περίληψη)",
+          "description": "openarchives.gr | Liber XX. 1341-1342. Fo 76r, No 653. Εκλέγονται πέντε σοφοί πρός μελέτην της καταστάσεως εν Κρήτη καί της αλληλογραφίας του εν Κωνσταντινουπόλει πρεσβευτού Πέτρου Ντά Κανάλη. Εξελέγησαν : Σέρ Μάρκος Λορεδάνος επίτροπος, Σέρ Μάρκος Ιουστινιάνης επίτροπος, Σέρ Φράγκος Κουϊρίνος, Σέρ Νικόλαος Γραδόνικος υιός Δόγη, Σέρ Μάρκος Ρουτζίνης. 1342, Αυγούστου 24, αριθ. εγγράφου 20 (σε περίληψη)\n\n...\n\n> # Liber XX. 1341-1342. Fo 76r, No 653. Εκλέγονται πέντε σοφοί πρός μελέτην της καταστάσεως εν Κρήτη καί της αλληλογραφίας του εν Κωνσταντινουπόλει πρεσβευτού Πέτρου Ντά Κανάλη. Εξελέγησαν : Σέρ Μάρκος Λορεδάνος επίτροπος, Σέρ Μάρκος Ιουστινιάνης επίτροπος, Σέρ Φράγκος Κουϊρίνος, Σέρ Νικόλαος Γραδόνικος υιός Δόγη, Σέρ Μάρκος Ρουτζίνης. 1342, Αυγούστου 24, αριθ. εγγράφου 20 (σε περίληψη)\n> \n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-143022 RDF/XML JSON-LD \n> \n>\n\n...\n\nτλος\n\n...\n\nLiber XX. 1341-1342. Fo 76r, No 653. Εκλέγονται πέντε σοφοί πρός μελέτην της καταστάσεως εν Κρήτη καί της αλληλογραφίας του εν Κωνσταντινουπόλει πρεσβευτού Πέτρου Ντά Κανάλη. Εξελέγησαν : Σέρ Μάρκος Λορεδάνος επίτροπος, Σέρ Μάρκος Ιουστινιάνης επίτροπος, Σέρ Φράγκος Κουϊρίνος, Σέρ Νικόλαος Γραδόνικος υιός Δόγη, Σέρ Μάρκος Ρουτζίνης. 1342, Αυγούστου 24, αριθ. εγγράφου 20 (σε περίληψη)\n\n...\n\nΔημιουργός\n\n Θεοτόκης , Σπυρίδων Μ. \n\nΤύπος\n\n Διοικητικά έγγραφα \n\nΗμερομηνία\n\n 1936\n\n...\n\nνο\n\n...\n\n1936 (EL)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hypatia/000061-11400_9804",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hypatia/000061-11400_9804",
+          "title": "openarchives.gr | Γενική εξέταση ούρων",
+          "description": "openarchives ... Γεν ... εξέταση ούρων\n\n...\n\nΤο τεκμήριο παρέχεται από τον φορέα : ΤΕΙ Αθήνας \n\n Αποθετήριο : Υπατία - Ιδρυματικό Αποθετήριο \n\nΤίτλος\n\n Γενική εξέταση ούρων (EL) \n\nΔημιουργός\n\n Καρκαλούσος, Πέτρος (EL) \n\nΤύπος\n\n book \n\n \n\nΗμερομηνία\n\n 2015-05-06T16:37:26Z 2015-05-06 \n\nΗμερομηνία έκδοσης\n\n 2011-03-27 \n\nΧρονολογία\n\n 2015 (EL) \n\nΠεριγραφή\n\n 94 \n\n Βιβλίο που δημιουργήθηκε από την ελεύθερη εγκυκλοπαίδεια wikipedia. Δημιουργήθηκε από τον ίδιο [Καρκαλούσο Πέτρο] με την συνδρομή σπουδαστών του τμήματος των ιατρικών εργαστηρίων που παρακολουθούσαν το μάθημα \"ανάλυση βιολογικών υγρών και εκκριμάτων\". Περιλαμβάνει ολόκληρη τη γενική εξέταση ούρων αλλά και επιπλέον κεφάλαια για ασθένειες που σχετίζονται με τα ούρα. (EL)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_13734",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_13734",
+          "title": "openarchives.gr | Παλαιολόγειες απεικονίσεις του Απόστολου Πέτρου : ζητήματα τεχνικής και τεχνοτροπίας",
+          "description": "> # Παλαιολόγειες απεικονίσεις του Απόστολου Πέτρου : ζητήματα τεχνικής και τεχνοτροπίας\n> \n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_13734 RDF/XML JSON-LD \n> \n>\n\n...\n\nμήριο παρέχεται από τον φορέα ... επιστήμιο Θεσσαλίας\n\n...\n\nποθετήριο : ... ρυματικό Αποθετήριο Πανεπιστημίου Θεσσαλίας\n\n...\n\nΤίτλος\n\n Παλαιολόγειες απεικονίσεις του Απόστολου Πέτρου : ζητήματα τεχνικής και τεχνοτροπίας (EL) \n\nΔημιουργός\n\n Κατσούλης, Δημήτριος (EL) \n\nΣυντελεστής\n\n Πανεπιστήμιο Θεσσαλίας - Βιβλιοθήκη και Κέντρο Πληροφόρησης (EL) \n\n Βασιλάκη, Μαρία (EL)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_19445?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_19445?language=en",
+          "title": "openarchives.gr | Στατιστική ανάλυση δεδομένων από επιχειρήσεις-εφαρμογή",
+          "description": "Title\n\n Στατιστική ανάλυση δεδομένων από επιχειρήσεις-εφαρμογή (EL) \n\nCreator\n\n Περαντάκος, Πέτρος Χατζηδημητρίου, Μιχαέλα Αλεξανδροπούλου, Παναγιώτα \n\nContributor\n\n Καρυώτη, Βασιλική \n\nType\n\n Πτυχιακή Εργασία (EL) \n\n Thesis Bachelor thesis (EN) \n\nIssued\n\n 2021-10-30 2021-09-22T09:10:17Z \n\nYear\n\n 2021 (EN)\n\n...\n\nDescription\n\n...\n\nΗ ανάλυση επιχειρησιακών δεδομένων, θεωρείται ο βασικός στόχος για την επίτευξη των απαιτούμενων επιχειρηματικών και αναπτυξιακών ερωτημάτων. Η επεξεργασία των δεδομένων επιτυγχάνεται με τη συλλογή, την επεξεργασία και την επεξήγηση των συμπερασμάτων που προέκυψαν, έτσι ώστε να είναι όσο το δυνατό πιο ορθή η λήψη των αποφάσεων από τις επιχειρήσεις σύμφωνα με τα δεδομένα που έχουν στη βάση τους. Σκοπός της παρούσας εργασίας είναι αφενός η βιβλιογραφική ανασκόπηση της επιστήμης της στατιστικής, στο πεδίο ανάλυσης των δεδομένων από επιχειρήσεις και αφετέρου η πρακτική εφαρμογή της ανάλυσης ενός σετ επιχειρησιακών δεδομένων με σκοπό την εξαγωγή χρήσιμων συμπερασμάτων. Μέσω της πρακτικής εφαρμογής της στατιστικής ανάλυσης των επιχειρησιακών δεδομένων, επιχειρείται να αναδειχθεί η χρησιμότητά της από όλες τις επιχειρήσεις που διαθέτουν σαφείς αναπτυξιακούς στόχους και να υποδειχθούν οι ενδεχόμενοι περιορισμοί που μπορεί να προκύψουν, όταν η στατιστική ανάλυση εκτελείται με ένα ευρέως διατιθέμενο στατιστικό πακέτο όπως το SPSS και από μη εξειδικευμένους στατιστικούς αναλυτές. (EL)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/asem/000131-38857",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/asem/000131-38857",
+          "title": "openarchives.gr | ΣΥΜΕΩΝ ΟΥΡΕΣΗΣ ΠΑΛΑΙΟΛΟΓΟΣ, ΑΥΤΟΚΡΑΤΟΡΑΣ ΤΩΝ ΤΡΙΚΑΛΩΝ",
+          "description": "ΣΥΜΕΩΝ ΟΥΡΕΣΗΣ ΠΑΛΑΙΟΛΟΓΟΣ, ΑΥΤΟΚΡΑΤΟΡΑΣ ΤΩΝ ΤΡΙΚΑΛΩΝ (EL) \n\n SIMEON UROŠ PALAIOLOGOS, EMPEROR OF TRIKALA (EN) \n\nΔημιουργός\n\n Osswald, Brendan\n\n...\n\nΤο παρόν άρθρο παρουσιάζει τις σχετικές με την πολιτική καριέρα του βασιλέα της Θεσσαλίας Συμεών Ουρέση Παλαιολόγου πηγές και εν συνεχεία αναφέρεται στις φάσεις του βίου και της δράσης του Σερβοβυζαντινού ηγεμόνα. Ειδικότερα δε, αναφέρεται στη νεότητά του στη Σερβία, στα χρόνια του ως δεσπότη της Ηπείρου (ca. 1348-1356), στις πολιτικές του ενέργειες στη Σερβία, και εντέλει στην εγκατάστασή του στη Θεσσαλία (1359 κ.ε.), και βεβαίως στη σχέση του με τους περιφερειακούς και υποταγμένους σε αυτόν ηγεμόνες, όπως τους Πέτρο Λιώσα, Ιωάννη Σπάτα και Θωμά Πρέλουμπο στην Ήπειρο, τον δεσπότη Ιωάννη Κομνηνό στη νότια Αλβανία, και τον Ραδοσλάβο Χλάπενο στη δυτική Μακεδονία. Πέραν τούτων, το άρθρο εξετάζει ποικίλες πτυχές της βασιλείας του, δηλαδή την αυτοκρατορική του ιδεολογία, τη διοίκηση, τη θρησκευτική του πολιτική αλλά και το ζήτημα της λεγομένης «Σερβοκρατίας». Τέλος, εξετάζει τα περί του θανάτου και της μνήμης αυτού. (EL)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:openarchives.gr \\\"Πέτρο Λάντζα\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"PROVIDER_ERROR\"}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 10, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 10, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\" history",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/kypseli/000054-11128_889",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/kypseli/000054-11128_889",
+          "title": "openarchives.gr | Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα)",
+          "description": "openarchives.gr | Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα)\n\n Το τεκμήριο παρέχεται από τον φορέα : Ανοικτό Πανεπιστήμιο Κύπρου \n\n Αποθετήριο : Ψηφιακό Αποθετήριο Κυψέλη \n\nΤίτλος\n\n Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα) \n\nΣυντελεστής\n\n Spanos, Leonidas \n\n Ματθοπούλου, Ευαγγελία \n\n Μητρόπολη Κιτίου \n\n Εκκλησιαστική Επιτροπή Ιεράς Μονής Αγίου Γεωργίου Κοντού \n\n Σπανός, Λεωνίδας \n\nΤύπος\n\n Ψηφιακή εικόνα \n\n \n\nΗμερομηνία έκδοσης\n\n 2012-10-23 2006 2006-09-10 2012-10-23T10:17:19Z \n\nΧρονολογία\n\n 2006 - 2012 (EL) \n\nΕπιστημονικό πεδίο\n\n Ανθρωπιστικές Επιστήμες και Τέχνες Τέχνες (Τέχνες, Ιστορία της Τέχνης, Ερμηνευτικές Τέχνες, Μουσική) (EL) \n\nΘέμα\n\n Λάρνακα \n\n Δήμος Λάρνακας \n\n Εκκλησία \n\n Πατριάρχης Αλεξανδρείας Πέτρος Ζ' \n\nΔικαιώματα\n\nΠάροχος\n\n Ανοικτό Πανεπιστήμιο Κύπρου \n\nΑποθετήριο / συλλογή\n\nΕπιμέρους συλλογή\n\n Κύπρος: τόποι μνήμης – χώροι τέχνης",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-143022?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-143022?language=en",
+          "title": "openarchives.gr | Liber XX. 1341-1342. Fo 76r, No 653. Εκλέγονται πέντε σοφοί πρός μελέτην της καταστάσεως εν Κρήτη καί της αλληλογραφίας του εν Κωνσταντινουπόλει πρεσβευτού Πέτρου Ντά Κανάλη. Εξελέγησαν : Σέρ Μάρκος Λορεδάνος επίτροπος, Σέρ Μάρκος Ιουστινιάνης επίτροπος, Σέρ Φράγκος Κουϊρίνος, Σέρ Νικόλαος Γραδόνικος υιός Δόγη, Σέρ Μάρκος Ρουτζίνης. 1342, Αυγούστου 24, αριθ. εγγράφου 20 (σε περίληψη)",
+          "description": "openarchives.gr | Liber XX. 1341-1342. Fo 76r, No 653. Εκλέγονται πέντε σοφοί πρός μελέτην της καταστάσεως εν Κρήτη καί της αλληλογραφίας του εν Κωνσταντινουπόλει πρεσβευτού Πέτρου Ντά Κανάλη. Εξελέγησαν : Σέρ Μάρκος Λορεδάνος επίτροπος, Σέρ Μάρκος Ιουστινιάνης επίτροπος, Σέρ Φράγκος Κουϊρίνος, Σέρ Νικόλαος Γραδόνικος υιός Δόγη, Σέρ Μάρκος Ρουτζίνης. 1342, Αυγούστου 24, αριθ. εγγράφου 20 (σε περίληψη)\n\n...\n\n> # Liber XX. 1341-1342. Fo 76r, No 653. Εκλέγονται πέντε σοφοί πρός μελέτην της καταστάσεως εν Κρήτη καί της αλληλογραφίας του εν Κωνσταντινουπόλει πρεσβευτού Πέτρου Ντά Κανάλη. Εξελέγησαν : Σέρ Μάρκος Λορεδάνος επίτροπος, Σέρ Μάρκος Ιουστινιάνης επίτροπος, Σέρ Φράγκος Κουϊρίνος, Σέρ Νικόλαος Γραδόνικος υιός Δόγη, Σέρ Μάρκος Ρουτζίνης. 1342, Αυγούστου 24, αριθ. εγγράφου 20 (σε περίληψη)\n> \n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-143022 RDF/XML JSON-LD \n> \n>\n\n...\n\nTitle\n\n Liber XX. 1341-1342. Fo 76r, No 653. Εκλέγονται πέντε σοφοί πρός μελέτην της καταστάσεως εν Κρήτη καί της αλληλογραφίας του εν Κωνσταντινουπόλει πρεσβευτού Πέτρου Ντά Κανάλη. Εξελέγησαν : Σέρ Μάρκος Λορεδάνος επίτροπος, Σέρ Μάρκος Ιουστινιάνης επίτροπος, Σέρ Φράγκος Κουϊρίνος, Σέρ Νικόλαος Γραδόνικος υιός Δόγη, Σέρ Μάρκος Ρουτζίνης. 1342, Αυγούστου 24, αριθ. εγγράφου 20 (σε περίληψη)\n\n...\n\nCreator\n\n Θεοτόκης , Σπυρίδων Μ. \n\nType\n\n Διοικητικά έγγραφα \n\nDate\n\n 1936 \n\nYear\n\n 1936 (EN) \n\nDescription\n\n Βλέπε τον πρόλογο της έκδοσης στη Συλλογή Μελέτες Ιστορίας Δικαίου, (Σπυρίδων Μ. Θεοτόκης, Θεσπίσματα της Βενετικής Γερουσίας 1281-1385, (Μνημεία της Ελληνικής Ιστορίας 2, τεύχος 1), Αθήνα 1936, σσ. ια΄-ιη΄). Βλ. σημειώσεις και σχόλια στις σ. 241-242. Βλ. το ευρετήριο των εγγράφων στις σ. 299-329 της έκδοσης.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/esperia/000084-1997",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/esperia/000084-1997",
+          "title": "openarchives.gr | ΔΥΤΙΚΟΙ ΚΑΙ ΤΟΥΡΚΟΙ ΠΕΙΡΑΤΕΣ ΣΤΗΝ ΚΥΠΡΟ ΚΑΙ ΤΟΝ ΕΥΡΥΤΕΡΟ ΜΕΣΟΓΕΙΑΚΟ ΧΩΡΟ ΕΠΙ ΦΡΑΓΚΟΚΡΑΤΙΑΣ",
+          "description": "The article examines and discusses the impact of piracy on the Lusignan kingdom of Cyprus. The pirates originated from Western Europe on the one hand, notably the Genoese and Catalans, and on the other from Turkish lands. The relations of the Lusignan kingdom with the pirates changed over the course of the centuries. References to piracy in the waters around Cyprus in the thirteenth century are largely confined to the acts of the synods of the island’s Latin Church. From the fourteenth century onwards, however, measures with a view to combating piracy, especially that practiced by Turkish marauders based on the emirates along the Eastern Aegean littoral, are recorded, especially under King Hugh IV (1324-1359) and his successor, King Peter I (1359-1369). These efforts culminated in the formation of naval leagues in the first half of the fourteenth century between Venice, the papacy, the Hospitallers of Rhodes, as well as Byzantium and Cyprus occasionally, in order to combat Turkish piracy. The capture of Smyrna in 1344, held by the Latins until 1402, was the crowning success of their operations. Following its defeat by Genoa in the war of 1373-1374, however, Lusignan Cyprus was not in a position to combat piracy anymore, becoming instead a haven for Catalan pirates who systematically raided the coasts of Mamluk Egypt and Syria. The Mamluk invasion of Cyprus in 1426, leading to the defeat and further impoverishment of the kingdom, put a stop to such raids from Lusignan Cyprus, although Genoese-occupied Famagusta continued to provide facilities for Catalan pirates who raided the coastal areas of Egypt and Syria. Instead, the enfeebled kingdom of Cyprus became a victim of the systematic depredations of Turkish pirates operating chiefly from the emirate of Karaman. At the end of the Lusignan period, following the civil war between Queen Charlotte and her illegitimate half-brother James, who by the year 1464 had emerged victorious, Catalan pirates who had supported James’ cause became prominent officers of state until they were displaced and exiled by the Venetians, following the death of James and the Venetian annexation of Cyprus in 1473. (EN)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_13734",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_13734",
+          "title": "openarchives.gr | Παλαιολόγειες απεικονίσεις του Απόστολου Πέτρου : ζητήματα τεχνικής και τεχνοτροπίας",
+          "description": "Παλαιολόγειες απεικονίσεις του Απόστολου Πέτρου : ζητήματα τεχνικής και τεχνοτροπίας (EL) \n\nΔημιουργός\n\n Κατσούλης, Δημήτριος (EL) \n\nΣυντελεστής\n\n Πανεπιστήμιο Θεσσαλίας - Βιβλιοθήκη και Κέντρο Πληροφόρησης (EL",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/asem/000131-38857",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/asem/000131-38857",
+          "title": "openarchives.gr | ΣΥΜΕΩΝ ΟΥΡΕΣΗΣ ΠΑΛΑΙΟΛΟΓΟΣ, ΑΥΤΟΚΡΑΤΟΡΑΣ ΤΩΝ ΤΡΙΚΑΛΩΝ",
+          "description": "Το παρόν άρθρο παρουσιάζει τις σχετικές με την πολιτική καριέρα του βασιλέα της Θεσσαλίας Συμεών Ουρέση Παλαιολόγου πηγές και εν συνεχεία αναφέρεται στις φάσεις του βίου και της δράσης του Σερβοβυζαντινού ηγεμόνα. Ειδικότερα δε, αναφέρεται στη νεότητά του στη Σερβία, στα χρόνια του ως δεσπότη της Ηπείρου (ca. 1348-1356), στις πολιτικές του ενέργειες στη Σερβία, και εντέλει στην εγκατάστασή του στη Θεσσαλία (1359 κ.ε.), και βεβαίως στη σχέση του με τους περιφερειακούς και υποταγμένους σε αυτόν ηγεμόνες, όπως τους Πέτρο Λιώσα, Ιωάννη Σπάτα και Θωμά Πρέλουμπο στην Ήπειρο, τον δεσπότη Ιωάννη Κομνηνό στη νότια Αλβανία, και τον Ραδοσλάβο Χλάπενο στη δυτική Μακεδονία. Πέραν τούτων, το άρθρο εξετάζει ποικίλες πτυχές της βασιλείας του, δηλαδή την αυτοκρατορική του ιδεολογία, τη διοίκηση, τη θρησκευτική του πολιτική αλλά και το ζήτημα της λεγομένης «Σερβοκρατίας». Τέλος, εξετάζει τα περί του θανάτου και της μνήμης αυτού. (EL)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_10642?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_10642?language=en",
+          "title": "openarchives.gr | THE GREEK PRESENCE IN THE LIFE AND THE TRADITION OF PETRITSONITISSIS MONASTERY (BATSKOVO)",
+          "description": "THERE ARE ABOUT 100 MANUSCRIPTS REDEEMED FROM THE LIBRARY OF BATCHKOVO. FROM THESE MANUSCRIPTS AND FROM THE NAMES MENTIONED IN THE NOTES OF THE CONVENT, WEDERIVE USEFUL INFORMATION ABOUT THE GREEK PRESENCE IN THE CONVENT FROM THE 15TH TO THE 19TH CENTURY. THEY INTRODUCE 30 PERSONALITIES THAT PLAYED IMPORTANT ROLE IN THE GREEK PRESENCE OF BATCHKOVO. THEY ALSO BRING OUT THE CONTRIBUTION OF ABBOTS AND MONKS, WHILE THEY OUTLINE TREIR CLOSE RELATION TO THE PATRIARCH AND METROPOLITAN CONVENT, INFLUENCING ITS LIF E, TRADITION AND HISTORY.DURING THE SAME PERIOD (15TH-19TH CENTURY) THERE IS A MANUSCRIPT REPRODUCTION WORKSHOP. SINCE THE 17TH CENTURY THE CONVENT HAS BEEN PATRIACHIC. FURTHERMORE, WE GET IMPORTANT EVIDENCE FROM BUILDING TRANSCRIPTIONS AND REPLICS. THE MANUSCRIPTS ALSO REFER TO THE FOUNDER OF THE CONVENT.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/kypseli/000054-11128_378",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/kypseli/000054-11128_378",
+          "title": "openarchives.gr | Ρόλοι και ταυτότητες του πατέρα στην Ελληνική Χριστιανική λογοτεχνία της Ύστερης Αρχαιότητας",
+          "description": "Η οικογένεια ήταν ένας ιδιαίτερα σημαντικός θεσμός για τις μεσογειακές κοινωνίες της αρχαιότητας, καθώς αποτελούσε το βασικό κύτταρο αναπαραγωγής και τον πρωταρχικό πυρήνα κοινωνικής οργάνωσης. Έτσι οι αρχαίοι Έλληνες, οι Ρωμαίοι και οι Εβραίοι, παρά τις άλλες διαφορές τους, είχαν κοινές απόψεις για τον γάμο και την οικογένεια. Σύμφωνα με αυτές, ο γάμος δεν ήταν απλώς μια δυνατότητα ή ένα ανθρώπινο δικαίωμα, αλλά καθήκον του πολίτη απέναντι στην πατρίδα του. Ο άνθρωπος της Ύστερης Αρχαιότητας όφειλε να παντρευτεί και να κάνει παιδιά, ειδάλλως θα είχε να αντιμετωπίσει την περιφρόνηση του περίγυρου και τα εμπόδια που ορθώνονταν από το οικογενειακό δίκαιο που θέσπισε ο Αύγουστος. Η πατρική εξουσία αποτελούσε τον θεμέλιο λίθο της αρχαίας οικογένειας. Ο πατέρας δικαιούνταν να επιβάλλει την άποψή του για τα τρέχοντα θέματα στα άλλα μέλη και είχε την δυνατότητα να διαμορφώσει το μέλλον των τέκνων του φροντίζοντας για την εκπαίδευσή τους, προετοιμάζοντας το έδαφος για έναν καλό γάμο κ.λ.π. Επιπλέον, σύμφωνα με το Ρωμαϊκό Δίκαιο ο paterfamilias ασκούσε απόλυτη εξουσία πάνω στα τέκνα του ανεξαρτήτως της ηλικίας τους. Θεωρητικά η patria potestas του έδινε δικαίωμα ζωής και θανάτου πάνω σε αυτά, αλλά κάτι τέτοιο κατά την Ύστερη Αρχαιότητα φαίνεται να αφορούσε κυρίως σε περιουσιακά ζητήματα. Επειδή όμως τα ενήλικα τέκνα δεν είχαν πρόσβαση στα περιουσιακά στοιχεία της οικογένειάς τους χωρίς την άδεια του paterfamilias, μπορούσαν να δημιουργηθούν εντάσεις και να προκληθεί μεγάλη δυσφορία. Ο νόμος παρείχε βεβαίως κάποιες δικλείδες ασφαλείας, όπως το peculium, ένα περιουσιακό στοιχείο ή ένα ποσό που ο πατέρας παραχωρούσε στα τέκνα για να το διαχειρίζονται όπως επιθυμούν ή η emancipatio, νομική διαδικασία χειραφέτησης που καθιστούσε τα τέκνα sui iuris, δηλαδή ανεξάρτητα. Ωστόσο και αυτές βρίσκονταν στην διακριτική ευχέρεια του paterfamilias. Η Εκκλησία κόμισε μια διαφορετική οπτική για τον γάμο και την οικογένεια, καθώς εξαρχής τοποθέτησε στο επίκεντρο την σχέση των δύο συζύγων και όχι τον πατέρα και τις σχέσεις του με τα υπόλοιπα μέλη του νοικοκυριού. Στην Καινή Διαθήκη δεν θεωρείται ως σκοπός του γάμου η αναπαραγωγή, αλλά η συμβίωση αυτή καθεαυτή, καθώς βοηθούσε τους δυο συζύγους να τιθασεύσουν τις σαρκικές τους ανάγκες. Επιπλέον, ο γάμος θεωρήθηκε ιερό μυστήριο, θεσμός ευλογημένος από τον Θεό, μια ένωση η οποία γίνεται για να διαρκέσει αιώνια και όχι απλώς μια νομική διαδικασία ή μια συμφωνία ανάμεσα σε δυο οικογένειες. Τέλος, το Χριστιανικό αρχέτυπο του Καλού Πατέρα, ο οποίος δεν επιβάλλει την εξουσία του, αλλά δίνει χώρο και ευκαιρία στα άλλα μέλη της οικογένειας να επιλέξουν τον δικό τους δρόμο, σε συνδυασμό με τον σημαντικό ρόλο που αναγνωρίζονταν στην μητέρα αλλά και τις γυναίκες γενικότερα στην Καινή Διαθήκη, οδήγησαν στη δημιουργία ενός νέου προτύπου οικογένειας, όπου η εξουσία του πατέρα ήταν σημαντικά μειωμένη και αντίστοιχα της μητέρας διευρυμένη. Η ανά χείρας διατριβή εξετάζει τον ρόλο του πατέρα, την εξουσία και την επιρροή του πάνω στα άλλα μέλη της οικογένειάς του, καθώς και την αντίληψη που υπήρχε για την πατρότητα στη Χριστιανική λογοτεχνία της Ύστερης Αρχαιότητας. Για να επιτευχθεί αυτό, χρησιμοποιήθηκε ένα ευρύτατο φάσμα πηγών (Μαρτύρια, Βίους αγίων, Συλλογές Θαυμάτων, επιστολές, ποιήματα, κτλ), όχι μόνο προκειμένου να σχηματίσουμε το ιστορικό πρόσωπο του πατέρα, αλλά για να κατανοήσουμε πώς αυτός παρουσιάζεται σε αυτά τα κείμενα. Επιδίωξή μας είναι να κατανοήσουμε τον τρόπο με τον οποίο οι συγγραφείς μετατρέπουν την πραγματικότητά τους, την κοινή εμπειρία της εποχής τους, σε λογοτεχνικό έργο το οποίο ταυτοχρόνως λειτουργεί και ως πρότυπο για τους αναγνώστες του. Το πρώτο κεφάλαιο εξετάζει τους πατεράδες που εμφανίζονται στα Μαρτύρια. Σε αυτά τα κείμενα, τα οποία στέκονται ανάμεσα στην Καινή Διαθήκη και τους Βίους των αγίων, είναι ιδιαίτερα ισχυρή η αμφισβήτηση του θεσμού της οικογένειας. Ο γάμος και η ερωτική επαφή τοποθετούνται στον αντίποδα της Χριστιανικής ζωής. Γενικά μπορούμε να διακρίνουμε δύο τύπους πατέρα σε αυτά: τον ευσεβή Χριστιανό, όπως ο Πλακίδας/Ευστάθιος, ο οποίος προσηλύτισε την σύζυγο και τα τέκνα του στον Χριστιανισμό και στο τέλος εκτελέστηκε μαζί τους στο αμφιθέατρο σε ένα χαρακτηριστικό Χριστιανικό ευτυχές τέλος. Η κύρια αγωνία εκείνου του πατέρα είναι η σωτηρία της ψυχής των μελών της οικογένειάς του, όχι κάποιο ενδιαφέρον για την ευτυχία ή την επιτυχία τους μέσα στον κόσμο. Στην αντίπερα όχθη στέκεται ο ασεβής, εθνικός πατέρας, ο οποίος καταλήγει να γίνεται ο διώκτης του ίδιου του τέκνου που είχε ασπαστεί τον Χριστιανισμό, όπως έγινε ο Πολέμιος για τον Χρύσανθο στο πρώτο μέρος του Μαρτυρίου που είναι αφιερωμένο στον τελευταίο. Οι συγκεκριμένοι πατεράδες θέλουν να ελέγχουν ακόμα και την συνείδηση των απογόνων τους. Μεγάλο ενδιαφέρον έχουν τα Μαρτύρια που αναφέρονται στη σύγκρουση του εθνικού πατέρα με την χριστιανή κόρη του, δεδομένης της πολύ στενής σχέσης τους. Αν ο εθνικός πατέρας σταματούσε να καταπιέζει τον χριστιανό γιο του μόλις εκείνος ανεξαρτητοποιούνταν, η εξουσία πάνω στην κόρη σταματούσε μόνο με τον θάνατό της, για τον οποίο μάλιστα έφερε συχνά ο ίδιος έμμεση ή άμεση ευθύνη. Σε αυτές τις ιστορίες μπορούμε να διακρίνουμε και αιμομικτικά υπονοούμενα. Το κεφάλαιο ολοκληρώνεται με τον σχολιασμό της σχέσης της Περπετούας με τον πατέρα της, όπως αποτυπώνεται στο περίφημο ημερολόγιό της. Εκεί δεν συναντάμε την αγριότητα των άλλων Μαρτυρίων, παρόλα αυτά η σταδιακή ανεξαρτητοποίηση της νεαρής γυναίκας από την πατρική εξουσία, την φέρνει όλο και πιο κοντά στον θάνατο. Η προσοχή μας στο επόμενο δεύτερο κεφάλαιο στρέφεται στον πατέρα του αγίου. Εξαιτίας ίσως των καθηκόντων του, ο πατέρας στη Χριστιανική λογοτεχνία της Ύστερης Αρχαιότητας, έχει καταστεί σύμβολο της εγκόσμιας ζωής, ενώ αντιθέτως η μητέρα διατηρεί στενότερη σχέση με το μυστικιστικό, θρησκευτικό στοιχείο. Για να μπορέσει λοιπόν κανείς να ξεκινήσει το ασκητικό στάδιο θα πρέπει να απαλλαγεί από τον πατέρα του –να τον «σκοτώσει», για να χρησιμοποιήσουμε την φροϋδική ορολογία– και κατά συνέπεια να προσδεθεί στην μητέρα του. Με βάση τους Βίους των αγίων της περιόδου μελετάμε την σχέση του πατέρα με το τέκνο του από την αρχή, την σύλληψη, μέχρι το τέλος, που είναι είτε ο θάνατος του πατέρα είτε η υιοθέτηση του μοναχισμού από το τέκνο. Στις ιστορίες αυτές η μητέρα διατηρεί κυρίαρχο ρόλο, καθώς συχνά ήταν εκείνη που ωθούσε το τέκνο προς εκείνη την κατεύθυνση. Είναι χαρακτηριστικό ότι ενώ έχει γραφτεί Βίος για τη μακαρία Μάρθα, μητέρα του αγ. Συμεών Στυλίτη του Νέου, δεν έχουμε αντίστοιχο κείμενο για τον πατέρα του ίδιου ή κάποιου άλλου αγίου. Οι συγγραφείς για να υπογραμμίσουν τη στενή σχέση ανάμεσα στους αγίους και τις μητέρες τους παρέθεταν ιστορίες της θαυματουργικής τους σύλληψης ή όνειρα και οράματα που προφήτευαν σε εκείνες το μέλλον των τέκνων τους. Οι ιστορίες αυτές αφενός μεν μειώνουν την συμβολή του πατέρα στην ανατροφή ή ακόμα και τη σύλληψη του παιδιού και αφετέρου προετοιμάζουν τον αναγνώστη για την τελική σύγκρουση του πατέρα με το τέκνο του. Εδώ βέβαια δεν αναφέρονται βιαιότητες ανάλογες με εκείνες των Μαρτυρίων, όμως η σχέση πατέρα και τέκνου κάθε άλλο παρά εύκολη ήταν. Χαρακτηριστικό είναι το παράδειγμα του Υπατίου, ο οποίος εγκατέλειψε τα εγκόσμια όταν ο πατέρας του χειροδίκησε εναντίον του. Παρόλα αυτά η συμβολή του πατέρα στην οικογένεια παρέμενε πολύ σημαντική, όπως δείχνουν οι δραματικές συνέπειες που είχε ο θάνατός του, ειδικά στα μεσαία και χαμηλότερα στρώματα. Επιπλέον, η πατρική επιρροή μπορεί να ανιχνευτεί ακόμα και σε Βίους που δεν αναφέρουν κάτι για τον πατέρα του αγίου, όπως εκείνος του Πορφυρίου Γάζης ή του Συμεών του Σαλού. Έπειτα η μελέτη μας κατευθύνεται στον πατέρα του λαϊκού. Τα Θαύματα, το λογοτεχνικό είδος που έχει στο κέντρο της αφήγησης τον απλό άνθρωπο, μας βοηθά να διερευνήσουμε την patria potestas στην καθημερινότητα. Η μελέτη του τυπικού της ικεσία δείχνει ότι ο πατέρας κατά την περίοδο αυτή εξουσίαζε και το πρόσωπο του τέκνου του. Οι συγγραφείς όμως των συλλογών θαυμάτων επιλέγουν να παρουσιάσουν αυτή την εξουσία ως ευθύνη προς το παιδί και όχι ως έλεγχο ή επιβολή. Έτσι ένας πατέρας έπρεπε να κάνει ό,τι ήταν δυνατόν για να θεραπεύσει το τέκνο του που υπόφερε, να ξοδέψει χρόνο και χρήμα, ακόμα και να γονατίσει, να κλάψει και να παρακαλέσει, να ταπεινωθεί παρακαλώντας τον άγιο ή τα λείψανα να βοηθήσουν. Με αυτό τον τρόπο η μορφή του πατέρα κυριαρχεί στα Θαύματα, αλλά η συμπεριφορά του απέχει πολύ από το κλασικό ανδρικό πρότυπο. Το τελευταίο κεφάλαιο είναι αφιερωμένο στους πατέρες των Καππαδοκών Πατέρων της Εκλκλησίας, τον Βασίλειο τον πρεσβύτερο και τον Γρηγόριο τον πρεσβύτερο. Ο πρώτος πέθανε όταν η πρωτότοκη κόρη του, η Μακρίνα, και οι δυο μεγαλύτεροι γιοι του ήταν έφηβοι. Η Μακρίνα «χρησιμοποίησε» κατά κάποιον τρόπο τον πατέρα της για να μπορέσει να αφοσιωθεί στον ασκητικό τρόπο ζωής που επιθυμούσε, καθώς ισχυρίστηκε ότι επιθυμία του Βασιλείου του πρεσβύτερου ήταν να παντρευτεί τον αρραβωνιαστικό της, ο οποίος στο μεταξύ είχε πεθάνει. Έτσι μπόρεσε να αποκρούσει αποτελεσματικά τις άλλες προτάσεις που της είχαν γίνει. Αντιθέτως, τα αγόρια της οικογένειας, με εξαίρεση τον Πέτρο, ο οποίος γεννήθηκε μετά τον θάνατο του πατέρα του, πριν αφιερωθούν στον μοναχικό βίο, ακολούθησαν το παράδειγμά του. Τόσο ο Βασίλειος Καισαρείας, όσο ο Ναυκράτιος και ο Γρηγόριος Νύσσης, εργάστηκαν ως ρήτορες για κάποιο διάστημα. Με άλλα λόγια, ο νεκρός paterafamilias συνέχιζε να ασκεί εξουσία πάνω στους γιους του. Στον αντίποδα, ο Γρηγόριος ο πρεσβύτερος πέθανε σχεδόν 100 ετών, όταν ο συνονόματος γιος του ήταν ήδη μεσήλικας. Με οδηγό κυρίως τα αυτοβιογραφικά κείμενα του Ναζιανζηνού παρακολουθούμε την μακρά σχέση τους η οποία κάθε άλλο παρά ανέφελη ήταν. Είναι αξιοσημείωτο ότι ο γέροντας μπορούσε να διαμορφώνει τη ζωή του γιου του μέχρι το τέλος. Και ο Γρηγόριος Ναζιανζηνός, ο οποίος στα νεανικά του χρόνια επιχειρούσε με κάθε τρόπο να διαφοροποιηθεί από εκείνον, στο τέλος το μόνο που επιθυμούσε ήταν να καταλάβει την θέση του στην τοπική Εκκλησία και τη ζωή της μητέρας του και να μοιραστούν τον ίδιο τάφο, όπως ήδη μοιράζονταν το ίδιο όνομα. Η διδακτορική αυτή διατριβή δείχνει ότι κατά την Ύστερη Αρχαιότητα οι χριστιανοί συγγραφείς άντλησαν εικόνες και εκφράσεις από παλαιότερα κείμενα για να περιγράψουν τον πατέρα και τις σχέσεις του με τα άλλα μέλη της οικογένειας. Η Αγία Γραφή και κυρίως οι πατεράδες που ζητούσαν από τον Ιησού να θεραπεύσει τα τέκνα τους καθώς και ο Καλός Πατέρας των παραβολών αποτέλεσαν ιδιαίτερα ισχυρή επιρροή. Επιπλέον παρατηρήσαμε ότι η εξουσία τους είναι μειωμένη σε σχέση με τους πατεράδες που απεικονίζονται στην Εθνική λογοτεχνία, καθώς πολλές από τις αρμοδιότητές τους τις έχει αναλάβει η μητέρα. Τέλος, θα πρέπει να υπογραμμίσουμε ότι στα κείμενα αυτά δεν κυριαρχεί ένας τύπος πατέρα, αλλά συναντάμε πολλούς και διαφορετικούς χαρακτήρες που δεν παραπέμπουν σε κλασικά ή βιβλικά πρότυπα, αλλά εκφράζουν την προσωπική εμπειρία και αντίληψη του συγγραφέα. Η διαδικασία απομείωσης της εξουσίας του πατέρα που ξεκίνησε υπό την επίδραση του Χριστιανισμού, δεν σταμάτησε φυσικά με την λήξη αυτής της περιόδου. Παρόλα αυτά ο ρόλος του πατέρα στη ζωή των παιδιών του, αλλά και γενικότερα στην οικογένεια, παρέμενε σημαντικός και πολυδιάστατος. Σε ειδικές περιστάσεις η μητέρα μπορούσε να αντικαταστήσει τον σύζυγό της, αλλά η συμβολή του στην διαμόρφωση της προσωπικότητας των τέκνων του ήταν πολύ δύσκολο να υποκατασταθεί. Τέλος, αν και οι σχετικές αναφορές δεν είναι πολλές αριθμητικά, διαθέτουν πλούτο και βάθος. Έτσι η Χριστιανική λογοτεχνία της περιόδου αποδεικνύεται μια πολύ πλούσια πηγή τόσο για την μελέτη του ρόλου και της ταυτότητας του πατέρα και της οικογένειας εν γένει, όσο και για την διακρίβωση των τάσεων που διαμορφώνονται στην κοινωνία.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15123?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15123?language=en",
+          "title": "openarchives.gr | Το δοξαστικό των αποστίχων της Μ.Τετάρτης \"Κύριε η εν πολλαις αμαρτίαις...\": από τον Πέτρο Λαμπαδάριο στον Κωνσταντίνο Πρίγγο.",
+          "description": "openarchives.gr | Το δοξαστικό των αποστίχων της Μ.Τετάρτης \"Κύριε η εν πολλαις αμαρτίαις...\": από τον Πέτρο Λαμπαδάριο στον Κωνσταντίνο Πρίγγο.\n\n...\n\n> # Το δοξαστικό των αποστίχων της Μ.Τετάρτης \"Κύριε η εν πολλαις αμαρτίαις...\": από τον Πέτρο Λαμπαδάριο στον Κωνσταντίνο Πρίγγο.\n> \n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15123 RDF/XML JSON-LD \n> \n> \n\nTitle\n\n Το δοξαστικό των αποστίχων της Μ.Τετάρτης \"Κύριε η εν πολλαις αμαρτίαις...\": από τον Πέτρο Λαμπαδάριο στον Κωνσταντίνο Πρίγγο. (EL) \n\nCreator\n\n Μαλάκος, Ιωάννης (EL) \n\nContributor\n\n Πάρης, Νεκτάριος (EL) Ρεντζεπέρη, Άννα-Μαρία (EL) \n\nType\n\n Bachelor's Degree Paper (EN) \n\n Text (EN) \n\nIssued\n\n 2012-08-27T16:23:54Z 2012 (EL) \n\nYear\n\nDescription\n\n Η βιβλιοθήκη διαθέτει αντίτυπο της πτυχιακής μόνο σε ηλεκτρονική μορφή. (EL) \n\n Πτυχιακή εργασία--Πανεπιστήμιο Μακεδονίας, Θεσσαλονίκη, 2012. (EL) \n\n ΠΤΥ ΜΕΤ/6 2012 (EL)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_25301",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_25301",
+          "title": "openarchives.gr | The epilepsy of the Emperor Theodore II Lascaris (1254-1258)",
+          "description": "The epilepsy of the Emperor Theodore II Lascaris (1254-1258) (EN)\n\n...\n\nLascaratos, ... (EN ... )\n\n...\n\nThe study of contemporary historic sources affords us a clinical picture of the epilepsy of the Byzantine Emperor, Theodore II Lascaris (1254-1258). It appears that he suffered from an epileptic disorder of rather generalized tonic-clonic type (grand mal), which started to afflict him in all probability before the age of 30 years. Numerous incidents described by many historians of his entourage reveal that he also had serious behavior disorders that the famous Byzantine historian, George Pachymeres, directly attributed to his disease. (EN)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/theatrepolis/000166-30782?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/theatrepolis/000166-30782?language=en",
+          "title": "openarchives.gr | Angelos’ Film (2000) by Péter Forgács: from home movies to the History of the Future",
+          "description": "openarchives.gr | Angelos’ Film (2000) by Péter Forgács: from home movies to the History of the Future\n\n...\n\nThis item is provided by the institution : Department of Theatre Studies, University of Peloponnese\n\n...\n\nTitle\n\n Angelos’ Film (2000) του Péter Forgács: από τις home movies στην Ιστορία του μέλλοντος (EL) \n\n Angelos’ Film (2000) by Péter Forgács: from home movies to the History of the Future (EN) \n\nCreator\n\n Βασιλείου, Θανάσης \n\nType\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\nDate\n\n 2022-07-11 \n\nYear\n\nDescription\n\n...\n\nΟ Péter Forgács είναι ένας σύγχρονος ρακοσυλλέκτης home movies. Αλλά όπως και ο ρακοσυλλέκτης του Μποντλέρ, είναι αυτός που θα δώσει μια νέα ζωή και μία νέα θέση στα κινηματογραφικά ρετάλια των ευκατάστατων οικογενειών της Ευρώπης, των δεκαετιών του 1930 και του 1940. Επαναχρησιμοποιώντας εικόνες που δεν γυρίστηκαν ποτέ για αυτόν τον σκοπό, προτείνει μία νέα κινηματογραφική ιστορική γραφή, συναντώντας τις αρχές της μικρο-ιστορίας όπου το ιστορικά αδιάφορο συναντά και αναμετράται με το ιστορικά καθοριστικό. Στο Angelos’ Film (2000) ο Forgács βρίσκει είκοσι-έξι λεπτά που διασώθηκαν από το υλικό του Έλληνα επιχειρηματία, Άγγελου Παπαναστασίου, πριν και κατά τη διάρκεια της κατοχής. Οι ευχάριστες και ακίνδυνες λήψεις της οικογένειας εναλλάσσονται -και ουσιαστικά προστατεύουν μέσα στην ίδια μπομπίνα- με τις «άλλες» για τις οποίες ο Παπαναστασίου έθεσε σε κίνδυνο τη ζωή του και αφορούν στη φρίκη του πολέμου. Ο Forgács, επεμβαίνοντας στο υλικό με κάθε δυνατό τρόπο, θα προσπαθήσει να διακρίνει –όπως σχεδόν σε όλο του το έργο- αυτό που μπορεί να κρύψει, μπροστά στα μάτια του θεατή, η πιο αδιάφορη εικόνα. (EL)\n\n...\n\nPeter Forgacs is a modern “ragpicker”, a scavenger of home movies. Just like Baudelaire’s ragpicker, though, he is the one who breathes new life into and finds a new place for the cinematic scraps left behind by the affluent European families of the 1930s and the 1940s. By reusing images which were never made for this purpose, Forgacs suggests a new form of cinematic historical narrative, one that merges with the principles of micro-history where the quotidian, the historically inconsequential, meets and measures itself against historical significance. In Angelos’ Film (2000), Forgacs finds 26 minutes of footage rescued from the material of Greek businessman Angelos Papanastasiou, shot before and during the German occupation. The safe and pleasant shots of the family alternate with the “other” shots, the ones about the horror of war for which Papanastasiou risked his life, essentially shielding them, protecting them within the same reel. By interfering with the material in every possible way, Forgacs attempts – as he does throughout his work – to discern that which even the most mundane image can hide right before the viewer’s eyes. (EN)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:openarchives.gr \\\"Πέτρο Λάντζα\\\" history\", \"providers\": [{\"provider\": \"google\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"PROVIDER_ERROR\"}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 10, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 10, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "result_count": 30,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}

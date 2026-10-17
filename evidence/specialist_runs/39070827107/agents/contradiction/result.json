@@ -1,0 +1,1879 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "contradiction",
+  "label": "Contradiction / Adversarial Agent",
+  "assignment_id": "contradiction:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "contradicting_evidence",
+    "alternative_explanations",
+    "uncertainties",
+    "falsification_leads"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "702e7ae8d35b542c0d39cbfda634b5db9a644b84998ff2f1db1801c4ee441d9b",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "contradiction",
+    "assignment_id": "contradiction:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:Gallica/BnF",
+      "repo:The National Archives Public Content",
+      "repo:Academia.edu Public Research",
+      "repo:PARES / Archivo General de Simancas"
+    ],
+    "queries": [
+      "\"Πέτρο Λάντζα\"",
+      "\"Πέτρο Λάντζα\" disputed",
+      "\"Πέτρο Λάντζα\" history"
+    ],
+    "operation": "search",
+    "search_budget": 12,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 108,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:PARES / Archivo General de Simancas",
+        "route_type": "repository_dispatch",
+        "repository": "PARES / Archivo General de Simancas",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:İSAM Kütüphanesi",
+        "route_type": "repository_dispatch",
+        "repository": "İSAM Kütüphanesi",
+        "connector_id": null,
+        "score": 90,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Archives diplomatiques France",
+        "route_type": "repository_dispatch",
+        "repository": "Archives diplomatiques France",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Crossref Scholarly Metadata",
+        "route_type": "repository_dispatch",
+        "repository": "Crossref Scholarly Metadata",
+        "connector_id": null,
+        "score": 86,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 3,
+    "total_search_budget": 12,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\" disputed",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1++disputed%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\" history",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1++history%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\" history",
+      "records": [
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/32917909/Petras_Siteia_e_Pre_and_Proto_palatial_cemetery_in_context",
+          "url": "https://www.academia.edu/32917909/Petras_Siteia_e_Pre_and_Proto_palatial_cemetery_in_context",
+          "title": "Petras, Siteia e Pre-and Proto-palatial cemetery in context",
+          "description": "Tomb A evolved from a roofed chamber to a bone enclosure during the Middle Minoan period. Tomb B was constructed as a low peribolos, used for primary and ...",
+          "date": [],
+          "search_providers": [
+            "google"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/69588182/Helen_Sullivan_The_Communal_Mind_and_the_Master_Artifice_Atenas_Stochastis_2009_pp_722",
+          "url": "https://www.academia.edu/69588182/Helen_Sullivan_The_Communal_Mind_and_the_Master_Artifice_Atenas_Stochastis_2009_pp_722",
+          "title": "(PDF) Helen Sullivan, The Communal Mind and the Master ...",
+          "description": "1. Ciorănescu, Al. Documente privitoare la istoria rom nilor culese dîn archivele dîn Simancas, Bucuresti 1940.\n2. Conrotte, M. España y los países musulmanes durante el ministerio de Floridablanca, Madrid 1909. Corral Castanedo, A. \"Unas conspiraciones contra el sultan turco en tiempo de Felipe III\", Simancas. Estudios de Historia Moderna, 1 (1950), 383-415.\n3. Doussinague, J. M. La política internacional de Fernando el Católico, Madrid 1944.\n4. Doussinague, J. M. La política internacional de Fernando el Católico, Madrid 1944. ----La política exterior de España en el siglo XVI, Madrid 1949. Fernández Duro, C. El gran duque de Osuna y su marina. Jornadas contra turcos y venecianos (1602-1624), Madrid 1885.\n5. Floristán Imízcoz, J.-M. Documentos neogriegos en el Archivo de Simancas, Madrid 1987 (= Fuentes para la política oriental de los Austrias. La documentación griega del Archivo de Simancas, 1571-1621, Univ. de León, 1988).\n6. Floristán Imízcoz, J.-M. \"Felipe II y la empresa de Grecia tras Lepanto (1571-1578)\", Erytheia, 15 (1994), 155-190.\n7. Garrigues, E. Un desliz diplomático. La paz hispano-turca, Madrid 1962.\n8. Gil, Luis -Gil, Juan \"Ficciόn y realidad en el 'Viaje de Turquía'. Glosas y comentarios al recorrido por Grecia\", Revista de Filologia Española, 45 (1962), 89-160.\n9. Gil, Luis \"De la 'Sancta empresa de Grecia contra Turcos' \", Erytheia, 16 (1995), 97-115.\n10. ----\"Griegos en España (siglos XV-XVII), Erytheia, 18 (1997), 111-132.\n11. González Palencia, A. \"Los turcos en el conocimiento de los españoles\", Conferencias sobre Lepanto, fasc. I, Madrid 1947, 51-79.\n12. Hassiotis, I. K. \"Fuentes de la historia griega moderna en archivos y bibliotecas españoles\", Hispania, 29/111 (1969), 133-164.\n13. ----Σχέσεις Eλλήνων και Iσπανών στα χρόνια της Tουρκοκρατίας (Relaciones greco-españolas durante la época de la dominación otomana), Tesalónica 1969. ----Oι Έλληνες στις παραμονές της ναυμαχίας της Nαυπάκτου, 1568-1571 (Los griegos en la víspera de la batalla naval de Lepanto, 1568-1571), Tesalónica 1970. ----Iσπανικά έγγραφα της κυπριακής ιστορίας, IΣT΄-IZ' αι. (Documentos españoles de la historia chipriota, siglos XVI-XVII), Nicosia 1972.\n14. ----\"H Kρήτη και οι Iσπανοί στα χρόνια της Bενετοκρατίας\" (Creta y los españoles en la época de la dominación veneciana), Actas del III Congreso Cretológico, vol. 2, Atenas 1974, 342-370.\n15. ----\"Venezia e i dominî veneziani tramite di informazioni sui Turchi per gli Spagnoli nel sec.\n16. XVI\", Venezia centro di mediazione tra Oriente e Occidente (secoli XV-XVI), (A. Pertusi ed.), vol. 1, Florecia, 1977, 117-142.\n17. ----\"Spanish Policy towards the Greek Insurrectionary Movements in the Early Seventeenth Century\", Actes du IIe Congrès Intern. des Etudes du Sud-est Européen, vol. 3, Atenas 1978, 313- 329. ----\"Juan, José Eliodoro Bouligny και Lorenzo Mabili de Bouligny: Oι πρόγονοι του Mαβίλη και η διπλωματική τους αλληλογραφία, τέλη IH'-αρχές IΘ' αιώνα\" (Juan, José Eliodoro Bouligny y Lorenzo Mabili de Bouligny: Los antepasados del poeta griego Mavilis y su correspondencia diplomática, finales del siglo XVIII y comienzos del XIX)\", Mnemon, 7 (1979), 99-117. Cf. su versión castellana en: Erytheia, 7/2 (1986), 279-301.\n18. ----\"H Πελοπόννησος στο πλαίσιο της μεσογειακής πολιτικής του Kαρόλου E΄\" (El Peloponeso en el marco de la política mediterranea de Carlos V), Peloponnesiaká, 15 (1984), 187-244 (cf. versión castellana en: Erytheia, 19, 1998, 79-115).\n19. ----\"Oι Aλεξιανοί της Mινόρκας. Συμβολή στην ιστορία των ελληνικών αποδημιών κατά τον IH' αιώνα\" (Los Alexianos de Menorca: Contribución a la historia de las emigraciones griegas en el siglo XVIII), Rodoniá: Homenaje a M. I. Manúsacas, Atenas-Retimno 1994, 649-660.\n20. ----Πηγές της κυπριακής ιστορίας από το ισπανικό αρχείο Simancas. Aπό τη μικροϊστορία της κυπριακής διασποράς κατά τον IΣT' και IZ' αιώνα (Fuentes de la historia chipriota sacadas del archivo español de Simancas. De la microhistoria de la diáspora chipriota en los siglos XVI-XVII), Nicosia 2000.\n21. ----\"Hacia una re-evaluación de Lepanto\", Volver a Cervantes: Actas del IV Congreso Internacional de la Asociación de Carvantistas, Antonio Bernat Vistarini ed., vol. 1, Palma (de Mallorca) 2001, 37-45.\n22. ----\"El mundo neohelénico en la literatura española del Siglo de Oro\", Cultura Neogriega. Tradición y modernidad -Gaurko Greziaren Kultura. Tradizioa eta modernitatea -Νεοελληνικός Πολιτισμός. Παράδοση και Νεωτερικότητα, Javier Alonso Aldama -Olga Omatos Saenz eds., Vitoria- Gasteiz 2006, σ. 289-308.\n23. Ibañez de Ibero, C. (marqués de Mulhacen) Carlos V y su política mediterránea, Madrid 1962. (Ibañez de Ibero, C.) marqués de Mulhacén, Política mediterránea de España, 1704-1951, Madrid 1952. Laiglesia, F. de Estudios históricos, Madrid 1908.\n24. Láscaris, M. \" Πέτρος Λάντζας, διοικητής της Πάργας (1573) και όργανον των Iσπανών εν\n25. Hπείρω, 1596-1608\" (Pedro Lantsas, gobernador de Parga en 1573 y agente de ls españoles en el Epiro, 1596-1608), Homanaje a Epiro, en memoria de Chr. Sulis, Atenas 1956, 103-118, 237-253.\n26. Láscaris, M. \"Eκκλήσεις του επισκόπου Mάνης Nεοφύτου προς τους Iσπανούς (1612-1613) διά την απελευθέρωσιν της Πελοποννήσου\" (Peticiones de socorro del vescovo de Mani Neofito a los españoles para la liberación del Peloponeso, 1612-1613), Helleniká, 15 (1957), 293-310.\n27. \\ Martín Corrales, E. \"Relaciones de España con el Imperio Otomano en los siglos XVIII y XIX\", en Martín Asuero, P. (ed.) España-Turquía. Del enfrentamiento al análisis mutuo, Constantinopla 2003, 253-270.\n28. Mas, A. Les Turcs dans la littérature espagnole du siècle d'or. Recherches sur l'évolution d'un thème litteraire, vols. 1-2, París 1967.\n29. Merle, A. Le miroir ottoman: Une image politique des hommes dans la littérature géographique espagnole et française (XVIe-XVIIe siècles), París 2003. Moral, J. M. del El virrey de Nápoles don Pedro de Toledo y la guerra contra el Turco, Madrid 1966. Morales Lezcano, V. Africanismo y orientalismo español en el siglo XIX, Madrid 1988. Morales Lezcano, V. España y la Cuestion de Oriente, Madrid 1992.\n30. Ochoa Brun, M.-Á \"Los comienzos de la Legación de España en Atenas\", Cuadernos de la\n31. Escuela Diplomática, no. 4 (Junio 1990), 57-94. Cf. su versión ampliada y bilingüe: Διπλωματικά ισπανο-ελληνικά γεγονότα κατά τον 19ο αιώνα /Episodios diplomáticos hispano-griegos en el siglo XIX, Atenas 1998. ----Historia de la Diplomacia Española, vols. 1-6, Madrid 1990-2000.\n32. ----España y las islas griegas. Una visión histórica, Madrid 2001.\n33. Pradells Nadal, J. Diplomacia y comercio. La expansión consular españona en el siglo XVIII, Alicante 1992.\n34. Randa, Al. Pro Republica Christiana: Die Walachei im \"langen\" Türkenkrieg der katholischen Universalmächte (1593-1606), Munich 1964.\n35. Salvá, J. La Orden de Malta y las acciones navales españolas contra turcos y berberiscos en los siglos XVI y XVII, Madrid 1944.\n36. Sánchez Montes, J. Franceses, protestantes, turcos: Los españoles ante la política internacional de Carlos V, Pamplona 1951.\n37. Sánchez Ortega, M.-E. \"Las relaciones hispano-turcas en el siglo XVIII\", Hispania, 49/171 (1989), 151-195.\n38. Sola, E. -de la Peña, J. F. Cervantes y la Berbería (Cervantes, mundo turco-berberisco y servicios secretos en la época de Felipe II), México 1995.\n39. Spremić, M. Dubrovnik i Aragontsi, 1442-1495, Belgrado 1971 (versión italiana: Dubrovnik e gli Aragonesi, 1442-1495, Palermo 1986).\n40. Tadić, J. Spanija i Dubrovnik u XVI veku (España y Dubrovnik en el siglo XVI), Belgrado 1932.\n41. Tamborra, A. Gli stati italiani, l'Europa e il problema turco dopo Lepanto, Florencia 1961.\n42. Tovar Llorente, A. \"Una petición de socorro de los griegos de Maina a Felipe II en 1584-1585\", Boletín de la Real Academia de la Historia, 142 (1958), 343-363.\nView morearrow_downward",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/13133937/The_Last_Multi_Cultural_Encounter_in_Medieval_Sicily_A_Dominican_Scholar_an_Arabic_Inscription_and_a_Jewish_Legend",
+          "url": "https://www.academia.edu/13133937/The_Last_Multi_Cultural_Encounter_in_Medieval_Sicily_A_Dominican_Scholar_an_Arabic_Inscription_and_a_Jewish_Legend",
+          "title": "(PDF) The Last Multi-Cultural Encounter in Medieval Sicily: A Dominican Scholar, an Arabic Inscription, and a Jewish Legend",
+          "description": "Renaissance Hebraism in Sicily intertwined with Christian anti-Jewish polemics, influencing\n...\n's interactions with Jewish scholars reflect attempts at historical validation amid conversionist pressures.\n3. In",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/34806794/_%CE%97_%CF%83%CF%84%CF%81%CE%B1%CF%84%CE%B9%CF%89%CF%84%CE%B9%CE%BA%CE%AE_%CE%B4%CF%81%CE%AC%CF%83%CE%B7_%CF%84%CF%89%CE%BD_%CE%A6%CE%B9%CE%BB%CE%B5%CE%BB%CE%BB%CE%AE%CE%BD%CF%89%CE%BD_%CF%83%CF%84%CE%B7_%CE%BC%CE%AC%CF%87%CE%B7_%CF%84%CE%BF%CF%85_%CE%A0%CE%AD%CF%84%CE%B1_%CE%9E%CE%B1%CE%BD%CE%B1%CE%B4%CE%B9%CE%B1%CE%B2%CE%AC%CE%B6%CE%BF%CE%BD%CF%84%CE%B1%CF%82_%CF%84%CE%BF%CE%BD_Daniel_Johann_Elster_%CE%BA%CE%B1%CE%B9_%CF%84%CE%B9%CF%82_%CE%AC%CE%BB%CE%BB%CE%B5%CF%82_%CF%80%CE%B7%CE%B3%CE%AD%CF%82_",
+          "url": "https://www.academia.edu/34806794/_%CE%97_%CF%83%CF%84%CF%81%CE%B1%CF%84%CE%B9%CF%89%CF%84%CE%B9%CE%BA%CE%AE_%CE%B4%CF%81%CE%AC%CF%83%CE%B7_%CF%84%CF%89%CE%BD_%CE%A6%CE%B9%CE%BB%CE%B5%CE%BB%CE%BB%CE%AE%CE%BD%CF%89%CE%BD_%CF%83%CF%84%CE%B7_%CE%BC%CE%AC%CF%87%CE%B7_%CF%84%CE%BF%CF%85_%CE%A0%CE%AD%CF%84%CE%B1_%CE%9E%CE%B1%CE%BD%CE%B1%CE%B4%CE%B9%CE%B1%CE%B2%CE%AC%CE%B6%CE%BF%CE%BD%CF%84%CE%B1%CF%82_%CF%84%CE%BF%CE%BD_Daniel_Johann_Elster_%CE%BA%CE%B1%CE%B9_%CF%84%CE%B9%CF%82_%CE%AC%CE%BB%CE%BB%CE%B5%CF%82_%CF%80%CE%B7%CE%B3%CE%AD%CF%82_",
+          "title": "(PDF) «Η στρατιωτική δράση των Φιλελλήνων στη μάχη του Πέτα. Ξαναδιαβάζοντας τον Daniel-Johann Elster και τις άλλες πηγές»",
+          "description": "Την εντονότερη έκφραση του Φιλελληνισμού, που ... στην εκστρατεία του στην Ήπειρο προς ενίσχυση των Σουλιωτών. Στις 4 Ιουλίου ... το εν λόγω τάγμα συγκρούστηκε στο χωριό Πέτα με ... τη στρατιωτική επιχείρηση των Φιλελλήνων στη",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/17719475/%CE%A3%CF%85%CE%BC%CE%B2%CE%BF%CE%BB%CE%AE_%CF%83%CF%84%CE%B7%CE%BD_%CE%B9%CF%83%CF%84%CE%BF%CF%81%CE%AF%CE%B1_%CF%84%CE%BF%CF%85_%CE%B2%CE%BF%CF%81%CE%B5%CE%B9%CE%BF%CE%B7%CF%80%CE%B5%CE%B9%CF%81%CF%89%CF%84%CE%B9%CE%BA%CE%BF%CF%8D_%CE%B5%CE%BB%CE%BB%CE%B7%CE%BD%CE%B9%CF%83%CE%BC%CE%BF%CF%8D_%CF%84%CE%B1_%CF%84%CE%AD%CE%BB%CE%B7_%CF%84%CE%BF%CF%85_16%CE%BF%CF%85_%CE%B1%CE%B9%CF%8E%CE%BD%CE%B1_%CE%9C%CE%B1%CF%84%CE%B8%CE%B1%CE%AF%CE%BF%CF%82_%CE%A0%CE%B1%CF%80%CE%B1%CE%B3%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82_A_contribution_to_the_history_of_the_Nothern_Epirus_Hellenism_Mathiew_Papagiannis_",
+          "url": "https://www.academia.edu/17719475/%CE%A3%CF%85%CE%BC%CE%B2%CE%BF%CE%BB%CE%AE_%CF%83%CF%84%CE%B7%CE%BD_%CE%B9%CF%83%CF%84%CE%BF%CF%81%CE%AF%CE%B1_%CF%84%CE%BF%CF%85_%CE%B2%CE%BF%CF%81%CE%B5%CE%B9%CE%BF%CE%B7%CF%80%CE%B5%CE%B9%CF%81%CF%89%CF%84%CE%B9%CE%BA%CE%BF%CF%8D_%CE%B5%CE%BB%CE%BB%CE%B7%CE%BD%CE%B9%CF%83%CE%BC%CE%BF%CF%8D_%CF%84%CE%B1_%CF%84%CE%AD%CE%BB%CE%B7_%CF%84%CE%BF%CF%85_16%CE%BF%CF%85_%CE%B1%CE%B9%CF%8E%CE%BD%CE%B1_%CE%9C%CE%B1%CF%84%CE%B8%CE%B1%CE%AF%CE%BF%CF%82_%CE%A0%CE%B1%CF%80%CE%B1%CE%B3%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82_A_contribution_to_the_history_of_the_Nothern_Epirus_Hellenism_Mathiew_Papagiannis_",
+          "title": "Συμβολή στην ιστορία του βορειοηπειρωτικού ελληνισμού ...",
+          "description": "νέα στοιχεία που εντοπίστηκαν για δύο επιφανείς βορειοηπειρώτες, τους Ματθαίο Παπαγιάννη και Πάνο Στόλικο, ... να συμβάλουμε στη συνολική εικόνα της ευρύτερης περιοχής ... δραστηριότητα του ελληνικού πληθυσμού την περίοδο της",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/37611892/%CE%97_%CE%AF%CE%B4%CF%81%CF%85%CF%83%CE%B7_%CE%BA%CE%B1%CE%B9_%CE%BF%CE%B9_%CE%B1%CF%80%CE%B1%CF%81%CF%87%CE%AD%CF%82_%CE%BB%CE%B5%CE%B9%CF%84%CE%BF%CF%85%CF%81%CE%B3%CE%AF%CE%B1%CF%82_%CF%84%CE%B7%CF%82_%CE%91%CE%B8%CF%89%CE%BD%CE%B9%CE%BA%CE%AE%CF%82_%CE%A0%CE%BF%CE%BB%CE%B9%CF%84%CE%B5%CE%AF%CE%B1%CF%82_The_foundation_establishment_and_the_beginning_of_operation_of_the_Athonic_State",
+          "url": "https://www.academia.edu/37611892/%CE%97_%CE%AF%CE%B4%CF%81%CF%85%CF%83%CE%B7_%CE%BA%CE%B1%CE%B9_%CE%BF%CE%B9_%CE%B1%CF%80%CE%B1%CF%81%CF%87%CE%AD%CF%82_%CE%BB%CE%B5%CE%B9%CF%84%CE%BF%CF%85%CF%81%CE%B3%CE%AF%CE%B1%CF%82_%CF%84%CE%B7%CF%82_%CE%91%CE%B8%CF%89%CE%BD%CE%B9%CE%BA%CE%AE%CF%82_%CE%A0%CE%BF%CE%BB%CE%B9%CF%84%CE%B5%CE%AF%CE%B1%CF%82_The_foundation_establishment_and_the_beginning_of_operation_of_the_Athonic_State",
+          "title": "Η ίδρυση και οι απαρχές λειτουργίας της Αθωνικής Πολιτείας. // The foundation (establishment) and the beginning of operation of the Athonic State.",
+          "description": "), as well as the fi rst monasteries which were established in Athos and its surroundings. Th ... - 944) by which the administrative and economic independence of the Holy Mountain was established and secured. In",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/40627463/%CE%92%CE%B9%CE%B2%CE%BB%CE%B9%CE%BF%CE%BA%CF%81%CE%B9%CF%83%CE%AF%CE%B1_%CE%9B%CE%B1%CE%BC%CF%80%CF%81%CE%B9%CE%BD%CE%AE%CF%82_%CE%9A%CE%BF%CF%85%CE%B6%CE%AD%CE%BB%CE%B7_%CE%94%CE%B5%CE%BD_%CE%AE%CF%84%CE%B1%CE%BD_%CF%86%CF%85%CE%B3%CE%AE_%CF%83%CF%84%CE%BF_%CF%80%CE%B1%CF%81%CE%B5%CE%BB%CE%B8%CF%8C%CE%BD_",
+          "url": "https://www.academia.edu/40627463/%CE%92%CE%B9%CE%B2%CE%BB%CE%B9%CE%BF%CE%BA%CF%81%CE%B9%CF%83%CE%AF%CE%B1_%CE%9B%CE%B1%CE%BC%CF%80%CF%81%CE%B9%CE%BD%CE%AE%CF%82_%CE%9A%CE%BF%CF%85%CE%B6%CE%AD%CE%BB%CE%B7_%CE%94%CE%B5%CE%BD_%CE%AE%CF%84%CE%B1%CE%BD_%CF%86%CF%85%CE%B3%CE%AE_%CF%83%CF%84%CE%BF_%CF%80%CE%B1%CF%81%CE%B5%CE%BB%CE%B8%CF%8C%CE%BD_",
+          "title": "(PDF) Βιβλιοκρισία Λαμπρινής Κουζέλη, «Δεν ήταν φυγή στο παρελθόν»",
+          "description": "ιχνηλατεί την πορεία των Άγγελου ... , Παντελή Πρεβελάκη και Θανάση Πετσάλη ... Διομήδη προς το ιστορικό μυθιστόρημα σε απόψεις και σχόλιά τους που απαντούν σε ... 1930, μια απομάκρυνση από τους φθαρμένους",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/44220372/%CE%A3%CF%85%CE%BD%CE%AD%CE%BD%CF%84%CE%B5%CF%85%CE%BE%CE%B7_%CE%BC%CE%B5_%CF%84%CE%BF%CE%BD_%CF%83%CF%85%CE%B3%CE%B3%CF%81%CE%B1%CF%86%CE%AD%CE%B1_%CE%B1%CE%BD%CE%B1%CE%BB%CF%85%CF%84%CE%AE_%CE%A0%CE%AD%CF%84%CF%81%CE%BF_%CE%91%CF%81%CE%B3%CF%85%CF%81%CE%AF%CE%BF%CF%85_Interview_with_Petros_Argyriou_Author_Political_analyst_Greece_",
+          "url": "https://www.academia.edu/44220372/%CE%A3%CF%85%CE%BD%CE%AD%CE%BD%CF%84%CE%B5%CF%85%CE%BE%CE%B7_%CE%BC%CE%B5_%CF%84%CE%BF%CE%BD_%CF%83%CF%85%CE%B3%CE%B3%CF%81%CE%B1%CF%86%CE%AD%CE%B1_%CE%B1%CE%BD%CE%B1%CE%BB%CF%85%CF%84%CE%AE_%CE%A0%CE%AD%CF%84%CF%81%CE%BF_%CE%91%CF%81%CE%B3%CF%85%CF%81%CE%AF%CE%BF%CF%85_Interview_with_Petros_Argyriou_Author_Political_analyst_Greece_",
+          "title": "(PDF) Συνέντευξη με τον συγγραφέα-αναλυτή Πέτρο Αργυρίου | Interview with Petros Argyriou, Author-Political analyst (Greece)",
+          "description": "Η Βασιλική Β. Παππά γεννήθηκε στα Τρίκαλα και διαμένει στη Θεσσαλονίκη. Σπούδασε Θεολογία στα πανεπιστήμια Θεσσαλονίκης και Βελιγραδίου. Είναι κάτοχος τριών μεταπτυχιακών διπλωμάτων με άριστα ... Ιστορία, στη Χριστιανική Ηθική και στην",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/44238633/%CE%A0%CE%B1%CF%84%CF%81%CE%B9%CE%B1%CF%81%CF%87%CE%B9%CE%BA%CE%BF%CE%AF_%CE%BF%CF%86%CF%86%CE%B9%CE%BA%CE%B9%CE%AC%CE%BB%CE%B9%CE%BF%CE%B9_%CE%BA%CE%B1%CE%B9_%CF%83%CF%84%CE%B1%CF%85%CF%81%CE%BF%CF%80%CE%B7%CE%B3%CE%B9%CE%B1%CE%BA%CE%AC_%CE%BC%CE%BF%CE%BD%CE%B1%CF%83%CF%84%CE%AE%CF%81%CE%B9%CE%B1_%CF%83%CE%B5_%CF%83%CF%87%CE%AD%CF%83%CE%B7_%CE%B1%CE%BB%CE%BB%CE%B7%CE%BB%CE%B5%CE%BE%CE%AC%CF%81%CF%84%CE%B7%CF%83%CE%B7%CF%82_%CE%9F_%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82_%CE%BF_%CE%A0%CE%B5%CE%BB%CE%BF%CF%80%CE%BF%CE%BD%CE%BD%CE%AE%CF%83%CE%B9%CE%BF%CF%82_ca_1730_1778_%CE%BA%CE%B1%CE%B9_%CF%84%CE%BF_%CF%83%CF%84%CE%B1%CF%85%CF%81%CE%BF%CF%80%CE%B7%CE%B3%CE%B9%CE%B1%CE%BA%CF%8C_%CE%BC%CE%BF%CE%BD%CF%8D%CE%B4%CF%81%CE%B9%CE%BF_%CF%84%CE%BF%CF%85_%CE%A4%CE%B9%CE%BC%CE%AF%CE%BF%CF%85_%CE%A0%CF%81%CE%BF%CE%B4%CF%81%CF%8C%CE%BC%CE%BF%CF%85_%CF%83%CF%84%CE%B7%CE%BD_%CE%A4%CF%81%CF%8D%CF%80%CE%B7_%CE%9B%CE%B1%CE%BA%CF%89%CE%BD%CE%AF%CE%B1%CF%82",
+          "url": "https://www.academia.edu/44238633/%CE%A0%CE%B1%CF%84%CF%81%CE%B9%CE%B1%CF%81%CF%87%CE%B9%CE%BA%CE%BF%CE%AF_%CE%BF%CF%86%CF%86%CE%B9%CE%BA%CE%B9%CE%AC%CE%BB%CE%B9%CE%BF%CE%B9_%CE%BA%CE%B1%CE%B9_%CF%83%CF%84%CE%B1%CF%85%CF%81%CE%BF%CF%80%CE%B7%CE%B3%CE%B9%CE%B1%CE%BA%CE%AC_%CE%BC%CE%BF%CE%BD%CE%B1%CF%83%CF%84%CE%AE%CF%81%CE%B9%CE%B1_%CF%83%CE%B5_%CF%83%CF%87%CE%AD%CF%83%CE%B7_%CE%B1%CE%BB%CE%BB%CE%B7%CE%BB%CE%B5%CE%BE%CE%AC%CF%81%CF%84%CE%B7%CF%83%CE%B7%CF%82_%CE%9F_%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82_%CE%BF_%CE%A0%CE%B5%CE%BB%CE%BF%CF%80%CE%BF%CE%BD%CE%BD%CE%AE%CF%83%CE%B9%CE%BF%CF%82_ca_1730_1778_%CE%BA%CE%B1%CE%B9_%CF%84%CE%BF_%CF%83%CF%84%CE%B1%CF%85%CF%81%CE%BF%CF%80%CE%B7%CE%B3%CE%B9%CE%B1%CE%BA%CF%8C_%CE%BC%CE%BF%CE%BD%CF%8D%CE%B4%CF%81%CE%B9%CE%BF_%CF%84%CE%BF%CF%85_%CE%A4%CE%B9%CE%BC%CE%AF%CE%BF%CF%85_%CE%A0%CF%81%CE%BF%CE%B4%CF%81%CF%8C%CE%BC%CE%BF%CF%85_%CF%83%CF%84%CE%B7%CE%BD_%CE%A4%CF%81%CF%8D%CF%80%CE%B7_%CE%9B%CE%B1%CE%BA%CF%89%CE%BD%CE%AF%CE%B1%CF%82",
+          "title": "(PDF) Πατριαρχικοί οφφικιάλιοι και σταυροπηγιακά μοναστήρια σε σχέση αλληλεξάρτησης: Ο Πέτρος ο Πελοποννήσιος (ca 1730-1778) και το σταυροπηγιακό μονύδριο του Τιμίου Προδρόμου στην Τρύπη Λακωνίας",
+          "description": "## Abstract\n\nThe present article consists of a critical publication and commentary on a little-known yet never before published archival document on Petros the Peloponnesian (ca 1730-1778), an emblematic personality of ecclesiastical music after the Fall of Constantinople. It is a patriarchal beneficent letter issued by the Patriarch Samuel I Chatzeris (1763-1768 and 1773-1774) on March 1764 with which Petros becomes Exarch of the Stavropegian Monastery of the Holy Forerunner at Trypi of Laconia.\n\n...\n\nΤόμος 91ος ¥ Τεῦχος 2ον ¥ 'Απρίλιος - 'Ιούνιος 2020 Πατριαρχικοὶ ὀφφικιάλιοι καὶ σταυροπηγιακὰ μοναστήρια σὲ σχέση ἀλληλεξάρτησης: Ὁ Πέτρος ὁ Πελοποννήσιος (ca 1730-1778) καὶ τὸ σταυροπηγιακὸ μονύδριο τοῦ Τιμίου Προδρόμου στὴν Τρύπη Λακωνίας* Δημητρίου Θ. Βαχαβιώλου** Στὴ βάση τῆς κατάφυτης κλιτύος τῆς Ξεροβούνας, ποὺ βρίσκεται βόρεια τοῦ χωριοῦ Τρύπη τῆς Λακεδαίμονος πλησίον τῶν πηγῶν τοῦ ποταμοῦ Κνακίωνα, βρίσκεται ὁ ναΐσκος τοῦ Ἀι-Γιαννάκη1. Πρόκειται γιὰ ἕναν σταυρεπίστεγο ναΐσκο τῆς ἁπλούστερης παραλλαγῆς τοῦ τύπου, τῆς παραλλαγῆς Α1, κατὰ τὴν ταξινόμηση τοῦ Ὀρλάνδου, ποὺ κτίστηκε κατὰ * Ἡ παροῦσα ἐργασία ἀποτελεῖ ἀπότοκo συνεργασίας μὲ τὸν κ. Εὐάγγελο Θεοδώρου, ἐρευνητὴ τῆς ἐκκλησιαστικῆς μουσικῆς, γιὰ τὴν ἱστορικὴ τεκμηρίωση κάποιων κεφαλαίων τῆς μυθιστορηματικῆς αὐτοβιογραφίας τοῦ Πέτρου τοῦ Πελοποννησίου, ποὺ συντάχθηκε ἀπὸ τὸν τελευταῖο καὶ κυκλοφορήθηκε πρόσφατα ἀπὸ τὶς ἐκδόσεις Κυπρῆς (Εὐ. Θεοδώρου, Πέτρος ὁ Πελοποννήσιος: Μυθιστορηματικὴ Βιογραφία, ἐκδ. Κυπρῆς, Ἀθήνα 2019). Στὸ πλαίσιο αὺτῆς τῆς συνεργασίας, γνωρίσαμε γιὰ πρώτη φορὰ τὸ ὑπὸ ἔκδοση ἀρχειακὸ τεκμήριο, ἀντίγραφο τοῦ ὁποίου εἶχε παραχωρηθεῖ στὸν Ὅμιλο Φίλων Ἔργου Λαμπαδαρίου Πέτρου (Ο.Φ.Ε.Λ.Π.) ἀπὸ τὸ Ἀρχειοφυλάκειο τοῦ Οἰκουμενικοῦ Πατριαρχείου, ὕστερα ἀπὸ σχετικὸ αἴτημα τοῦ κ. Παναγιώτη Τζανάκου, στὸ πλαίσιο τῆς ἔρευνας καὶ τῆς μελέτης τοῦ βίου καὶ τοῦ ἔργου τοῦ Πέτρου τοῦ Πελοποννησίου. Θερμὲς εὐχαριστίες ὀφείλονται στοὺς κκ. Παναγιώτη Τζανᾶκο, Εὐάγγελο Θεοδώρου, Γεώργιο Νικολάου, Χαρίτωνα Καρανάσιο καὶ Δημήτριο Ἀγορίτσα, οἱ ὁποῖοι συνέβαλαν καθοριστικὰ στὴ μελέτη καὶ τὴ μεταγραφὴ τοῦ τεκμηρίου. ** Ὁ Δημήτριος Θ. Βαχαβιῶλος εἶναι διδάκτωρ Βυζαντινῆς Ἱστορίας τοῦ Πανεπιστημίου Ἰωαννίνων. 1. Γιὰ τὴν ἀκριβῆ θέση τοῦ μονυδρίου βλ. Ν. Β. Δρανδάκης, «Ὁ ναὸς τῶν Ἁγίων Θεοδώρων τῆς Λακωνικῆς Τρύπης», Ἐπετηρὶς Ἑταιρείας Βυζαντινῶν Σπουδῶν 25 (1955), σ. 87. Γιὰ τὸν ποταμὸ Κνακίωνα, τὶς πηγές του καὶ τὴ διαδρομὴ ποὺ ἀκολουθεῖ βλ. Κ. Π. Δάρμος, Οἱ ἀρχαῖοι ποταμοὶ τῆς Πελοποννήσου, ἐκδ. Ἀνοιχτὴ Πόλη, Ἀθήνα 2007, σ. 163 κ.ἑ. ΘΕΟΛΟΓΙΑ 91, 2 (2020) 251-269 Δ. Βαχαβιώλου Θεολογία 2/2020 τὴν ὕστερη βυζαντινὴ περίοδο2. Ὁ ναΐσκος παρουσιάζει σήμερα μορφὴ κτίσματος ποὺ ἔχει κάτοψη μορφῆς ταῦ (Τ), καθὼς ὁ παρακείμενος ποταμὸς παρέσυρε τὸ ἀνατολικό του τμῆμα κάποια στιγμὴ πρὶν ἀπὸ τὰ μέσα τοῦ 18ου αἰῶνα3. Σύντομα ὅμως ἐπισκευάσθηκε μὲ τέτοιο τρόπο ὥστε νὰ παρουσιάζει κάτοψη σχήματος ταῦ (Τ), ἐνῶ κοσμήθηκε μὲ ζωγραφικὸ διάκοσμο ποὺ χρονολογεῖται ἐπιγραφικὰ τὸ 17434. Παρ’ ὅλο ποὺ τὰ διαθέσιμα στοιχεῖα εἶναι περιορισμένα γιὰ τὸν συγκεκριμένο ναΐσκο, εἶναι γνωστὸ ὅτι παλαιότερα ἀποτελοῦσε καθολικὸ ὁμώνυμου μονυδρίου ἀπὸ τὸ ὁποῖο σώζονται ἀρκετὰ ἐρείπια, χαμένα μέσα στὴν πυκνὴ βλάστηση τῆς περιοχῆς. Ὅσα εἶναι γνωστὰ γιὰ τὸ μονύδριο αὐτὸ εἶναι τελείως ἀποσπασματικά. Οἱ παλαιότερες γνωστὲς σήμερα μαρτυρίες γι’ αὐτὸ ἀνάγονται στὶς πρῶτες δεκαετίες τοῦ 14ου αἰῶνα, ἂν πράγματι τὸ μονύδριο αὐτὸ ταυτίζεται μὲ τὸ ἀναφερόμενο σὲ ἐπιγραφὴ κίονα τοῦ ἁγίου Δημητρίου Μυστρᾶ: μονύδριον τοῦ Τιμίου Προδρόμου καὶ Βαπτιστοῦ Ἰωάννου τῆς χαλκωλ(α)μ(π)τιόσσης, ποὺ βρισκόταν πλησίον τοῦ παραπόρτου τῆς Λακεδαιμονίας5. Ὡστόσο, οἱ περισσότερες διαθέσιμες μαρτυρίες ἀνάγονται στὸν 18ο αἰῶνα, ὅταν δηλαδὴ οἱ κάτοικοι μερίμνησαν γιὰ τὴν ἀνακαίνιση τοῦ μονυδρίου, τὴν ἵδρυση σχολείου καὶ ξενῶνα διερχομένων ποὺ θὰ στεγάζονταν στὰ κελιά 2. Γιὰ τὸν ναΐσκο αὐτὸν βλ. Δρανδάκης, ὅ.π., σ. 87 σημ. 2 καὶ Ἀ. Βελμάχος, «Ἕνα χωριὸ μὲ 40 μοναστήρια», Λακωνικὰ 2 (Μάρτιος-Ἀπρίλιος 1964), σσ. 77-78, ὅπου παρατίθενται ἐπιγραμματικὲς ἀναφορὲς σὲ παραδόσεις τῆς περιοχῆς γιὰ τὴν ἀνοικοδόμησή του κατὰ τὸν 9ο αἰῶνα ἀλλὰ καὶ γιὰ τὴν ἐκτεταμένη κτηματική του περιουσία. Ἂς σημειωθεῖ ὅτι νεώτερα στοιχεῖα γιὰ τὸν ναΐσκο αὐτὸ παρουσιάσθηκαν ἀπὸ τὸν κ. Χρῆστο Σταυρᾶκο, Καθηγητὴ Βυζαντινῆς Ἱστορίας τοῦ Πανεπιστημίου Ἰωαννίνων, καὶ τὴν κ. Εὐαγγελία Πάντου, Διευθύντρια τῆς Ἐφορείας Ἀρχαιοτήτων Λακωνίας στὴ Β΄ Ἐπιστημονικὴ Συνάντηση μὲ θέμα: «Τὸ Ἀρχαιολογικὸ Ἔργο στὴν Πελοπόννησο», ποὺ διοργανώθηκε ἀπὸ τὸ Τμῆμα Ἱστορίας, Ἀρχαιολογίας καὶ Πολιτισμικῆς Διαχείρισης τοῦ Πανεπιστημίου Πελοποννήσου στὴν Καλαμάτα (1-4 Νοεμβρίου 2017) καὶ τῆς ὁποίας τὰ πρακτικὰ ἀναμένεται νὰ ἐκδοθοῦν σύντομα. 3. Γιὰ τὴν καταστροφὴ ἑνὸς τμήματος τοῦ ναοῦ ἀπὸ τὸν παρακείμενο ποταμὸ βλ. Δρανδάκης, ὅ.π., σ. 87 σημ. 2. Βελμάχος, ὅ.π., σ. 77. 4. Ἡ πληροφορία σχετικὰ μὲ τὴ διακόσμηση τοῦ ναΐσκου ὀφείλεται στὴν κ. Εὐαγγελία Πάντου, πρὸς τὴν ὁποία ἐκφράζονται θερμὲς εὐχαριστίες. 5. G. Millet, «Inscriptions byzantines de Mistra», Bulletin de Correspondance Hellénique 23 (1899), 12526-28. Γιὰ τὴν ταύτιση μὲ τὸ ἀναφερόμενο στὴν ἐπιγραφὴ αὐτὴ μονύδριο βλ. J.-Α. Buchón, La Grèce continentale et la Morée. Voyage en 1840 et 44, ἐκδ. Librairie de Charles Gosselin, Paris 1843, σ. 439. 252 ΠΑΤΡΙΑΡΧΙΚΟΙ ΟΦΦΙΚΙΑΛΙΟΙ ΚΑΙ ΣΤΑΥΡΟΠΗΓΙΑΚΑ ΜΟΝΑΣΤΗΡΙΑ ΣΕ ΑΛΛΗΛΕΞΑΡΤΗΣΗ του καὶ τὴ μετατροπή του σὲ σταυροπηγιακό6. Τὸ μονύδριο παρέμεινε σὲ λειτουργία μέχρι καὶ τὴν ἐποχὴ τῆς Ἀντιβασιλείας (1833-1835), ὁπότε διαλύθηκε κατ’ ἐφαρμογὴν σχετικῆς ἀντιμοναστηριακῆς νομοθετικῆς διάταξης τῆς Ἀντιβασιλείας, καθὼς εἶχε λιγότερους ἀπὸ ἕξι μοναχούς7. Στὰ ἐλάχιστα ποὺ γνωρίζαμε ἕως τώρα σχετικὰ μὲ αὐτὸ τὸ μονύδριο, μποροῦμε νὰ προσθέσουμε ὅσα ἀναφέρονται σὲ ἕνα πατριαρχικὸ εὐεργετήριο γράμμα ποὺ ἐκδόθηκε τὸν Μάρτιο 1764, δηλαδὴ κατὰ τὴ διάρκεια τῆς α΄ πατριαρχείας τοῦ Σαμουὴλ Α΄ Χαντζερῆ (1763- 1768)8. Παρ’ ὅλο ποὺ τὸ πρωτότυπο ἔγγραφο λανθάνει, τὸ περιεχόμενό του μᾶς εἶναι γνωστὸ ἀπὸ τὸ ἴσον τοῦ προτοτύπου εὐεργετηρίου γράμματος ποὺ ἔχει καταχωρισθεῖ στὴ σελίδα 251 τοῦ κώδικα Ε΄ τοῦ Ἀρχειοφυλακείου τοῦ Οἰκουμενικοῦ Πατριαρχείου. Πρόκειται γιὰ τὸ ἀκριβὲς ἀντίγραφο τοῦ πατριαρχικοῦ αὐτοῦ εὐεργετηρίου γράμματος, ὅπως αὐτὸ καταχωρίσθηκε σὲ ἕναν ἀπὸ τοὺς τόμους τοῦ λεγομένου Ἱεροῦ Κώδικος τοῦ Οἰκουμενικοῦ Πατριαρχείου, τοῦ χειρογράφου κώδικα στὸν ὁποῖο καταγραφόταν πρὸς κατοχύρωση τὸ περιεχόμενο κάθε 6. Ἀθ. Τ. Γριτσόπουλος, «Ἡ Πελοποννησιακὴ Παιδεία μετὰ τὴν Ἅλωσιν», στό: Πρακτικὰ τοῦ Β΄ Διεθνοῦς Συνεδρίου Πελοποννησιακῶν Σπουδῶν (Πάτραι, 25-31 Μαΐου 1980), Ἑταιρεία Πελοποννησιακῶν Σπουδῶν, Πελοποννησιακά, Παράρτημα, ἀρ. 8, ἐν Ἀθήναις 1981-82, σ. 287 (στὸ ἑξῆς: Γριτσόπουλος, «Ἡ Πελοποννησιακὴ Παιδεία»)· Ἀθ. Τ. Γριτσόπουλος, Ἡ Ἐκκλησία τῆς Πελοποννήσου μετὰ τὴν Ἅλωσιν, Ἑταιρεία Πελοποννησιακῶν Σπουδῶν: Ἐπιστημονικὴ Βιβλιοθήκη, ἀρ. 5, Ἀθῆναι 1992, σσ. 220-221 (στὸ ἑξῆς: Γριτσόπουλος, Ἐκκλησία τῆς Πελοποννήσου). Ἂς σημειωθεῖ πάντως ὅτι μικρὴ ἀδελφότητα μόναζε στὸ συγκεκριμένο μονύδριο κατὰ τὴ διάρκεια τῆς Β΄ Ἑνετοκρατίας (1685-1715), ὅπως τεκμηριώνεται ἀπὸ τὴν καταγραφὴ τῶν ἐκκλησιαστικῶν ἱδρυμάτων ποὺ διενεργήθηκε ἀπὸ τοὺς Βενετοὺς στὰ τέλη τοῦ 17ου αἰῶνα· Δέσπ. Στεφ. Μιχάλαγα, Συμβολὴ στὴν Ἐκκλησιαστικὴ Ἱστορία τῆς Πελοποννήσου κατὰ τὴ Β΄ Βενετοκρατία (1685-1715), Ἐκδόσεις Κληροδοτήματος Βασιλικῆς Δ. Μωραΐτου 4, Ἀθήνα 2008, σ. 404. 7. Σὲ καταγραφὴ τῆς ἐκκλησιαστικῆς περιουσίας μοναστηριῶν καὶ ὁρισμένων οἰκισμῶν τῆς Ἱ. Μητροπόλεως Λακεδαιμονίας τοῦ ἔτους 1829 ἀναφέρεται ὅτι τὸ μονύδριο εἶχε μόνο τρεῖς μοναχούς, ποὺ προσπαθοῦσαν ἀπεγνωσμένα νὰ ἀνακαινίσουν τὸ μοναστήρι τους, καθώς: «... κατὰ κακὴν τύχην τὸ ἀπερασμένον ἔτος τὸ κατεδάφισεν ὅλον ὁ ποταμός...» [Ἑλ. Δ. Μπελιᾶ, «Μοναστηριακὰ Λακωνίας», Λακωνικαὶ Σπουδαὶ 1 (1972), σ. 363]. 8. Γιὰ τὸν πατριάρχη Σαμουὴλ Α΄ Χαντζερῆ, βλ. Β. Κ. Μπακοῦρος, Σαμουὴλ Χαντζερῆς ὁ Βυζάντιος (1700-1775): Ἡ συμβολή του στὴν πνευματικὴ κίνηση τοῦ Γένους κατὰ τὸν 18ο αἰῶνα, ἐκδ. Πρόσωπον, Ἀθήνα 2008 (στὸ ἑξῆς: Μπακοῦρος, Σαμουὴλ Χαντζερῆς). 253 Δ. Βαχαβιώλου Θεολογία 2/2020 ἀποφάσεως καὶ διοικητικῆς πράξεως τοῦ Οἰκουμενικοῦ Πατριάρχου καὶ τῆς Συνόδου τοῦ Οἰκουμενικοῦ Πατριαρχείου9. Στὸ καταχωρισμένο στὸν κώδικα αὐτὸν ἴσον παλαιότερων ἀποφάσεων προσέφευγαν οἱ ἁρμόδιες ὑπηρεσίες τοῦ Οἰκουμενικοῦ Πατριαρχείου καὶ τῆς Συνόδου, μὲ σκοπὸ νὰ ἐπιλύσουν τὰ ζητήματα ποὺ κατὰ καιροὺς ἀνέκυπταν, εἰδικὰ ὅταν δὲν εἶχαν στὴ διάθεσή τους τὰ λυτὰ ἔγγραφα ποὺ εἶχαν ἐπιδοθεῖ στοὺς ἄμεσα ἐνδιαφερομένους. Γι’ αὐτὸν τὸν λόγο ἄλλωστε οἱ σωζόμενες στὴν ἐποχή μας ἑνότητες τοῦ Ἱεροῦ Κώδικα συνιστοῦν μία πολὺ σημαντικὴ ἱστορικὴ πηγή10. Σύμφωνα λοιπὸν μὲ τὸ περιεχόμενο τοῦ ἀρχειακοῦ αὐτοῦ τεκμηρίου, ὁ πατριάρχης Σαμουὴλ Α΄ Χαντζερῆς ἐκχωρεῖ ἐφ’ ὅρου ζωῆς σὲ κάποιον Πέτρο, ποὺ ὑπηρετοῦσε ὡς δομέστικος τῆς Μεγάλης τοῦ Χριστοῦ Ἐκκλησίας, τὸ ποσὸ ποὺ ὄφειλε νὰ καταβάλλει κάθε ἔτος στὸ Οἰκουμενικὸ Πατριαρχεῖο τὸ μονύδριο τοῦ Τιμίου Προδρόμου στὴν Τρύπη εἰς ἔνδειξιν ὑποταγῆς του σὲ αὐτό (στ. 1-8). Ἡ ἐκχώρηση τοῦ ἐτησίου αὐτοῦ συμβολικοῦ ποσοῦ στὸν συγκεκριμένο ὀφφικιάλιο τῆς Μεγάλης τοῦ Χριστοῦ Ἐκκλησίας γίνεται μὲ σκοπὸ τὴ μερικὴ ἀνταμοιβή του γιὰ τὶς ἱεροψαλτικὲς ὑπηρεσίες ποὺ μὲ προθυμία προσέφερε στὴ Μεγάλη του Χριστοῦ Ἐκκλησία (στ. 8-10). Ἀκολούθως, ὅπως παρατηρεῖται συχνὰ σὲ πατριαρχικὰ ἔγγραφα, ἀπειλεῖται μὲ ἀργία –σὲ περίπτωση ποὺ εἶναι κληρικός– καὶ μὲ ἀφορισμὸ ὁποιοσδήποτε ἐναντιωθεῖ στὴν ἀπόφαση αὐτή, πρακτικὴ ποὺ προφανῶς ἀποσκοποῦσε στὴν ἀποτροπὴ ὁποιαδήποτε ἀντιδράσεως (στ. 10-13)11. Στὸ τέλος, μετὰ ἀπὸ τὴν παράθεση τῆς τυπικῆς φράσεως ποὺ ἐπιβεβαιοῖ τὴν καταχώρηση τοῦ εὐεργετηρίου αὐτοῦ γράμματος στὸν Ἱερὸ Κώδικα τοῦ Οἰκουμενικοῦ Πατριαρχείου (στ. 14-15) καὶ τὴ σημείωση τῆς χρονολογίας ἀπολύσεως τοῦ ἐγγράφου (στ. 16), παρατίθενται οἱ ὑπογραφὲς τῶν μελῶν τῆς 9. Δ. Ἀποστολόπουλος, Ὁ «ἱερὸς κῶδιξ» τοῦ Πατριαρχείου Κωνσταντινουπόλεως στὸ β΄ μισὸ τοῦ ιε΄ αἰῶνα. Τὰ μόνα γνωστὰ σπαράγματα [ΕΙΕ/ΚΝΕ: Θεσμοὶ καὶ Ἰδεολογία στὴ νεοελληνικὴ κοινωνία, ἀρ. 43], Ἀθήνα 1992, σ. 51. 10. Ἀποστολόπουλος, ὅ.π., σ. 77 κ.ἑ. 11. Γιὰ τὴ χρήση τῆς ἀόριστης ἀφοριστικῆς ἀπειλῆς ὡς μέσου διασφάλισης πατριαρχικῶν ἀποφάσεων βλ. Π. Δ. Μιχαηλάρης, Ἀφορισμός. Ἡ προσαρμογὴ μιᾶς ποινῆς στὶς ἀναγκαιότητες τῆς Τουρκοκρατίας, Ἐθνικὸ Ἵδρυμα Ἐρευνῶν/Κέντρο Νεοελληνικῶν Ἐρευνῶν: Θεσμοὶ καὶ Ἰδεολογία στὴ νεοελληνικὴ κοινωνία, ἀρ. 60, Ἀθήνα 2004, σσ. 193-196. 254 ΠΑΤΡΙΑΡΧΙΚΟΙ ΟΦΦΙΚΙΑΛΙΟΙ ΚΑΙ ΣΤΑΥΡΟΠΗΓΙΑΚΑ ΜΟΝΑΣΤΗΡΙΑ ΣΕ ΑΛΛΗΛΕΞΑΡΤΗΣΗ πατριαρχικῆς συνόδου, ποὺ τοιουτοτρόπως καταδεικνύουν ὅτι συν- αινοῦν στὴν ἀπόφαση αὐτὴ καὶ ἐνισχύουν ἐπιπρόσθετα τὸ κῦρος της (στ. 17-20). Ὁ πατριάρχης Σαμουὴλ Α΄ Χαντζερῆς εἶχε ἐκδώσει ἕνα ἀκόμη ἔγγραφο ποὺ ἀφοροῦσε τὸ μονύδριο τοῦ Τιμίου Προδρόμου. Πρόκειται γιὰ τὸ πατριαρχικὸ καὶ συνοδικὸ σιγίλλιο μὲ τὸ ὁποῖο ἀποδιδόταν στὸ μονύδριο ἡ σταυροπηγιακὴ ἰδιότητα, τὸν Φεβρουάριο τοῦ 1764, ὕστερα ἀπὸ αἴτημα τῆς τοπικῆς κοινωνίας, καὶ ρυθμίζονταν σὲ ἁδρὲς γραμμὲς λεπτομέρειες σχετικὰ μὲ τὴ λειτουργία τοῦ σχολείου καὶ τοῦ ξενῶνα διερχομένων ποὺ στεγάζονταν σὲ κελιά του12. Ἂν καὶ τὸ πρωτότυπο τοῦ πατριαρχικοῦ αὐτοῦ σιγιλλίου λανθάνει, ἔχουμε στὴ διάθεσή μας τὸ ἀκριβές του ἀντίγραφο ποὺ ἔχει καταχωρισθεῖ στὶς σελίδες 249-250 τοῦ κώδικα Ε΄ τοῦ Οἰκουμενικοῦ Πατριαρχείου13. Τὸ γεγονὸς ὅτι τὸ πατριαρχικὸ σιγίλλιο ἀνακηρύξεως τοῦ μονυδρίου σὲ σταυροπηγιακὸ καταλαμβάνει τὶς ἀμέσως προηγούμενες σελίδες τοῦ ὑπὸ ἐξέταση ἐγγράφου, ὑπογραμμίζει χωρὶς ἀμφιβολία τὴ χρονικὴ ἐγγύτητα τῶν δύο αὐτῶν διοικητικῶν πράξεων. Μὲ ἄλλα λόγια, πρόκειται γιὰ διοικητικὲς πράξεις ποὺ συντάχθηκαν μὲ διαφορὰ ἴσως ἀκόμη καὶ μιᾶς ἡμέρας. Τὸ προαναφερθὲν πατριαρχικὸ σιγίλλιο καθόριζε μεταξὺ ἄλλων ὅτι τὸ μονύδριο εἶχε τὴν ὑποχρέωση νὰ καταβάλλει κάθε χρόνο εἴκοσι γρόσια στὸ Οἰκουμενικὸ Πατριαρχεῖο εἰς ἔνδειξη ὑποταγῆς σὲ αὐτό (στ. 4-5)14. Πρόκειται γιὰ τὴ συνήθη συμβολικὴ συμβολὴ ποὺ κάθε σταυροπηγιακὸ μοναστῆρι ἦταν ὑποχρεωμένο νὰ καταβάλλει ἀνὰ ἔτος, μὲ στόχο τὴ δήλωση καὶ κυρίως τὴν παγίωση τῆς ἐξαρτήσεώς του ἀπὸ τὸ Οἰκουμενικὸ 12. Ἰωακ. Φορόπουλος, «Πηγαὶ τῆς ἱστορίας τῆς ἱδρύσεως, συντηρήσεως καὶ διοικήσεως τῶν Σχολῶν τοῦ Γένους ἐν Κωνσταντινουπόλει καὶ ταῖς ἐπαρχίαις τοῦ Οἰκουμενικοῦ Θρόνου. Ἑλληνικὴ Σχολὴ Τρύπης τῆς Λακεδαίμονος», Ἐκκλησιαστικὴ Ἀλήθεια 20 (1900), σσ. 515-517 (στὸ ἑξῆς: Φορόπουλος, «Πηγαὶ τῆς ἱστορίας»). Γιὰ τὸ συνοδικὸ καὶ πατριαρχικὸ αὐτὸ σιγίλλιο βλ. ἀκόμη Τρ. Εὐαγγελίδης, Ἡ Παιδεία ἐπὶ Τουρκοκρατίας, τ. Α΄, ἐν Ἀθήναις 1936, σ. 361· Γριτσόπουλος, «Ἡ Πελοποννησιακὴ Παιδεία», σ. 287· Γριτσόπουλος, Ἐκκλησία τῆς Πελοποννήσου, σσ. 220-221· Ν. Π. Γεωργακόπουλος, Ἑλληνικὰ Σχολεῖα στὸ Μοριὰ στὴν περίοδο τῆς ὀθωμανικῆς κυριαρχίας καὶ τὴν Ἑλληνικὴ Ἐπανάσταση, Τρίπολη 2006, σ. 256. 13. Φορόπουλος, «Πηγαὶ τῆς ἱστορίας», σ. 517. 14. Φορόπουλος, «Πηγαὶ τῆς ἱστορίας», σ. 517: «... τὸ διορισθὲν ἤδη ἐτήσιον τῶν εἴκοσι γροσίων κατ’ ἔτος πρὸς τὴν καθ’ ἡμᾶς τοῦ Χριστοῦ μεγάλην Ἐκκλησίαν εἰς σημεῖον ὑποταγῆς καὶ γνωρισμὸν τῆς σταυροπηγιακῆς ἐμπεδώσεως». 255 Δ. Βαχαβιώλου Θεολογία 2/2020 Πατριαρχεῖο15. Οἱ συμβολικὲς καὶ συνήθως ἀμελητέες αὐτὲς καταβολὲς προσδιορίζονταν ἀπὸ τὸ πατριαρχικὸ ἔγγραφο μὲ τὸ ὁποῖο ρυθμιζόταν τὸ καθεστὼς ἐξαρτήσεώς τους ἀπὸ τὸ Οἰκουμενικὸ Πατριαρχεῖο καὶ συνήθως καταβάλλονταν σὲ εἶδος καὶ σπανιότερα σὲ χρήματα16. Κατὰ κανόνα, οἱ καταβολὲς αὐτὲς παρέμεναν σταθερὲς μὲ τὸ πέρασμα τοῦ χρόνου, ἀκόμη καὶ ὅταν ἀνανεωνόταν τὸ καθεστὼς ἐξαρτήσεώς τους ἀπὸ τὸ Οἰκουμενικὸ Πατριαρχεῖο, γεγονὸς ποὺ ὁπωσδήποτε ὑπογραμμίζει ἔτι περαιτέρω τὸν συμβολικό τους χαρακτῆρα17. Ὡστόσο, τὸ χρηματικὸ αὐτὸ ποσὸ ποὺ τὸ μονύδριο τοῦ Τιμίου Προδρόμου ὄφειλε νὰ καταβάλλει κάθε ἔτος στὸ Οἰκουμενικὸ Πατριαρ- χεῖο ὑποχρεωνόταν πλέον, βάσει τοῦ ἐκδιδόμενου στὴν παροῦσα ἐργασία ἀρχειακοῦ τεκμηρίου, νὰ τὸ ἀποδίδει σὲ κάποιον Πέτρο ποὺ ὑπηρετοῦσε τότε ὡς δομέστικος τοῦ πατριαρχικοῦ ναοῦ (στ. 3-4, 10- 14). Πρόκειται γιὰ τὸν Πέτρο τὸν Πελοποννήσιο (περ. 1730-1778), ἐμβληματικὴ προσωπικότητα τῆς ἐκκλησιαστικῆς μουσικῆς μετὰ ἀπὸ τὴν Ἅλωση. Λακωνικῆς καταγωγῆς, ὅπως ἄλλωστε δηλώνεται καὶ σὲ κάποιους ἀπὸ τοὺς κώδικες στοὺς ὁποίους παραδίδονται ἔργα του, μαθήτευσε κοντὰ σὲ ἐπιφανεῖς δασκάλους τῆς ἱεροψαλτικῆς τέχνης, ἀρχικὰ στὴ Σμύρνη καὶ ἀργότερα στὴν Κωνσταντινούπολη, ὅπου μάλιστα διετέλεσε λαμπαδάριος τῆς Μεγάλης τοῦ Χριστοῦ Ἐκκλησίας μεταξὺ τῶν ἐτῶν 1770/1-177818. Ἂν καὶ πέθανε σὲ σχετικὰ νεαρὴ ἡλικία κατὰ τὴ διάρκεια μιᾶς ἐπιδημίας πανώλης, μᾶλλον τὸ 1778, συναριθμεῖται 15. Γιὰ τὸ ἐτήσιον, γνωστὸ ἐπίσης καὶ ὡς κανονικόν, βλ. Ἰω. Μ. Κονιδάρης, Νομικὴ θεώρηση τῶν μοναστηριακῶν τυπικῶν, Ἀθήνα-Κομοτηνὴ 32000, σ. 180 κ.ἑ.· Μ. Παΐζη-Ἀποστολοπούλου, «“Τὸ κατ’ ἔτος στελλόμενον βούτυρον”. Δοσίματα στὸ Πατριαρχεῖο Κωνσταντινουπόλεως κατὰ τὴν Τουρκοκρατία», στό: Γ. Καλατζόπουλος (ἐπιμ.), Ἡ Ἱστορία τοῦ Ἑλληνικοῦ Γάλακτος καὶ τῶν προϊόντων του. Ι΄ Τριήμερο Ἐργασίας (Ξάνθη, 7-9 Ὀκτωβρίου 2005), Ἀθήνα 2008, σσ. 261-266 (στὸ ἑξῆς: Παΐζη- Ἀποστολόπούλου, «Δοσίματα»)· Β. Κ. Μᾶρκος, Τὸ νομικὸ καθεστὼς τῶν Πατριαρχικῶν καὶ Σταυροπηγιακῶν Μονῶν στὴν ἑλληνικὴ ἐπικράτεια, ἐκδ. Σάκκουλα, Ἀθήνα- Θεσσαλονίκη 2012, σσ. 356-357 (στὸ ἑξῆς: Μᾶρκος, Νομικὸ Καθεστώς). 16. Γιὰ τὴν καταβολὴ τοῦ κανονικοῦ ἢ ἐτησίου σὲ εἶδος βλ. Παΐζη-Ἀποστολόπούλου, «Δοσίματα», σσ. 261-266. 17. Παΐζη-Ἀποστολόπούλου, «Δοσίματα», σσ. 264-265. 18. Γιὰ τὸν βίο καὶ τὴν πολιτεία τοῦ Πέτρου τοῦ Πελοποννησίου βλ. Γρ. Θ. Στάθης, «Πέτρος Λαμπαδάριος ὁ Πελοποννήσιος ὁ ἀπὸ Λακεδαίμονος. Ἡ ζωὴ καὶ τὸ ἔργο του (†1778)», Λακωνικαὶ Σπουδαὶ 7 (1983), σσ. 108-125 (στὸ ἑξῆς: Στάθης, «Πέτρος ὁ Πελοποννήσιος»). 256 ΠΑΤΡΙΑΡΧΙΚΟΙ ΟΦΦΙΚΙΑΛΙΟΙ ΚΑΙ ΣΤΑΥΡΟΠΗΓΙΑΚΑ ΜΟΝΑΣΤΗΡΙΑ ΣΕ ΑΛΛΗΛΕΞΑΡΤΗΣΗ μεταξὺ τῶν κορυφαίων καὶ ὁπωσδήποτε γνωστότερων ἐκπροσώπων τῆς ἐκκλησιαστικῆς μουσικῆς κατὰ τὴ διάρκεια τῆς περιόδου μετὰ ἀπὸ τὴν Ἅλωση19. Αὐτὸ ὀφείλεται ὄχι μόνο στὸ ἰδιαίτερο φωνητικό του τάλαντο, ἀλλὰ κυρίως στὴν ἤδη ἀπὸ τὴν ἐποχή του ἐγνωσμένη καταγραφικὴ καὶ μελουργική του δεινότητα, χάρις στὶς ὁποῖες συνέθεσε τὴ σπονδυλικὴ στήλη τῆς σημερινῆς ἀσματολογίας τῆς Ἐκκλησίας μας20. Ἂν καὶ γενικὰ τὰ διαθέσιμα στοιχεῖα σχετικὰ μὲ τὸν βίο καὶ τὴ σταδιοδρομία τοῦ Πέτρου εἶναι περιορισμένα, εἶναι γνωστὸ ὅτι ὑπηρέ- τησε ὡς δομέστικος τοῦ ἀριστεροῦ χοροῦ τῆς Μεγάλης τοῦ Χριστοῦ Ἐκκλησίας, προτοῦ ἀναδειχθεῖ σὲ λαμπαδάριό της21. Ἡ πληροφορία αὐτὴ ἀπορρέει τόσο ἀπὸ ἱστορικὰ τεκμήρια ὅσο καὶ ἀπὸ τὴ χειρόγραφη παράδοση ὁρισμένων ἐκ τῶν ἔργων του, τὰ ὁποῖα ἀναφέρονται σαφῶς ὡς ἔργα Πέτρου δομεστίκου22. Δὲν εἶναι ὅμως γνωστὸ πότε ὁ 19. Γιὰ τὸν προσδιορισμὸ τοῦ ἔτους θανάτου τοῦ Πέτρου τοῦ Πελοποννησίου βλ. Στάθης, «Πέτρος ὁ Πελοποννήσιος», σσ. 121-122. 20. Γιὰ τὸ μουσικό του ἔργο καὶ τὴν ἐν γένει προσφορά του στὸν χῶρο τῆς ἐκκλησιαστικῆς ἀλλὰ καὶ τῆς ὀθωμανικῆς μουσικῆς ὑπάρχει ἀρκετὰ ἐκτεταμένη καὶ διαρκῶς αὐξανόμενη βιβλιογραφία. Στὴν παροῦσα ἐργασία θὰ περιορισθοῦμε στὴν ἐνδεικτικὴ μνημόνευση μόνο τῶν ἀκόλουθων ἐργασιῶν: E. Giannopoulos, “Tracing the sources of the enormous oeuvre of the famous ecclesiastical musician Petros the Peloponnesian (ca. 1735-1778)”, Muzica n.s. 3-4 (2015), σσ. 121-142· Ol. Gerlach, “Petros Peloponnesios. About authorship in Ottoman music and the heritage of Byzantine Music”, Porphyra 25 (2016), σσ. 145-184. 21. Χρ. Πατρινέλλης, «Πρωτοψάλται, Λαμπαδάριοι καὶ Δομέστικοι τῆς Μεγάλης Ἐκκλησίας (1453-1821)», Μνημοσύνη 2 (1969), σ. 89 (στὸ ἑξῆς: Πατρινέλλης, «Πρωτοψάλται»)· Στάθης, «Πέτρος ὁ Πελοποννήσιος», σσ. 112-113. Γιὰ τὸ ἀξίωμα τοῦ δομεστίκου βλ. Κ. Ράλλης, «Περὶ τοῦ ἐκκλησιαστικοῦ ἀξιώματος τῶν δομεστίκων», Πρακτικὰ Ἀκαδημίας Ἀθηνῶν 12 (1937), σσ. 294-296· Κ. Χαραλαμπίδης, «Δομέστικος», Θρησκευτικὴ καὶ Ἠθικὴ Ἐγκυκλοπαιδεία 5 (1964), στ. 155· Ἰακ. Πιλίλης, Τίτλοι, ὀφφίκια καὶ ἀξιώματα ἐν τῇ Βυζαντινῇ Αὐτοκρατορίᾳ καὶ τῇ Χριστιανικῇ Ὀρθοδόξῳ Ἐκκλησία, ἐκδ. Ἀστήρ, Ἀθῆναι 1985, σσ. 112-115· Β. Λεονταρίτου, Ἐκκλησιαστικὰ ἀξιώματα καὶ ὑπηρεσίες στὴν πρώιμη καὶ μέση Βυζαντινὴ περίοδο, Forschungen zur byzantinbnischen Rechtsgeschichte, Athener Reihe, ἐκδ. Σάκκουλα, Ἀθήνα-Κομοτηνή 1996, σσ. 183-189· Εὐ. Σπυράκου, «Τὰ ὀφφίκια τοῦ πρωτοψάλτου καὶ τοῦ δομεστίκου μέσα ἀπὸ τοὺς χειρόγραφους κώδικες τοῦ παπαδικοῦ γένους», στό: Γρ. Θ. Στάθης (ἐκδ.), Θεωρία καὶ Πράξη τῆς Ψαλτικῆς Τέχνης. Τὰ Γένη καὶ τὰ Εἴδη τῆς Βυζαντινῆς Ψαλτικῆς Μελοποιΐας. Πρακτικὰ Β΄ Διεθνοῦς Συνεδρίου Μουσικολογικοῦ καὶ Ψαλτικοῦ (Ἀθήνα, 15-19 Ὀκτωβρίου 2003), Ἀθήνα 2006, σσ. 195 κ.ἑ. 22. Στάθης, «Πέτρος ὁ Πελοποννήσιος», σσ. 112-113. 257 Δ. Βαχαβιώλου Θεολογία 2/2020 Πέτρος κατέλαβε τὸ ὀφφίκιο αὐτό23. Παρ’ ὅλα αὐτά, εἶναι βέβαιο ὅτι ὑπηρετοῦσε ἤδη ὡς δομέστικος τοῦ ἀριστεροῦ χοροῦ τῆς Μεγάλης τοῦ Χριστοῦ Ἐκκλησίας κατὰ τὴ διάρκεια τοῦ 1764, ἀφοῦ μνημονεύεται ὡς κάτοχος τοῦ ὀφφικίου αὐτοῦ σὲ λανθάνον σήμερα καὶ γι’ αὐτὸν ἀκριβῶς τὸν λόγο ἀμφιβόλου ἀξίας ἀρχειακὸ τεκμήριο ἀπὸ τὸ Πατριαρχικὸ Ἀρχειοφυλάκειο τῆς Κωνσταντινουπόλεως24. Ὡς ἐκ τούτου, ἡ μαρτυρία τοῦ ὑπὸ ἐξέταση τεκμηρίου ἐπιβεβαιοῖ τὴν πληροφορία τοῦ λανθάνοντος τεκμηρίου, παρέχοντας ἔτσι ἕναν ἀσφαλῆ πλέον terminus ante quem γιὰ τὸ πότε ὁ Πέτρος ἀνέλαβε τὸ ὀφφίκιο αὐτὸ τῆς Μεγάλης τοῦ Χριστοῦ Ἐκκλησίας. Ἡ ἐκχώρηση τοῦ προβλεπομένου ἐτησίου τοῦ μονυδρίου στὸν Πέτρο τὸν Πελοποννήσιο γίνεται μὲ σκοπό, ὅπως ἄλλωστε δηλώνεται στὸ ὑπὸ ἐξέταση πατριαρχικὸ ἔγγραφο, τὴν μερικὴ ἀνταμοιβὴ τοῦ εὐεργετούμενου ὀφφικιαλίου γιὰ τὶς ἱεροψαλτικὲς ὑπηρεσίες ποὺ προσέφερε στὸν πατριαρχικὸ ναό (στ. 8-10). Αὐτὸ ἑπομένως συνεπάγεται ὅτι τὰ εἴκοσι γρόσια ποὺ ὁ Πέτρος ὁ Πελοποννήσιος θὰ λάμβανε κάθε ἔτος ἀπὸ τὸ μονύδριο τοῦ Τιμίου Προδρόμου ἀποτελοῦσαν μία ἐπιπρόσθετη ἀμοιβὴ ποὺ συμπλήρωνε τὴν τακτικὴ μισθοδοσία του ὡς δομέστικου τοῦ ἀριστεροῦ χοροῦ τῆς Μεγάλης τοῦ Χριστοῦ Ἐκκλησίας. Ἂν οἱ ἐτήσιες ἀπολαβὲς τοῦ Πέτρου ἀνέρχονταν πράγματι σὲ ἑκατὸ γρόσια στὰ 1764, ὅπως ὑποστηρίζεται ἀπὸ τὸν Μανουὴλ Γεδεὼν μὲ βάση λανθάνον σήμερα ἀρχειακὸ τεκμήριο τοῦ Πατριαρχικοῦ Ἀρχειοφυλακείου25, τότε οἱ ἀποδοχὲς τοῦ συγκεκριμένου ὀφφικιαλίου δὲν ἀπεῖχαν πολὺ ἀπὸ τὶς ἀντίστοιχες ἐτήσιες ἀμοιβὲς ἑνὸς σύγχρονου δασκάλου ἐπαρχιακοῦ ἐκπαιδευτικοῦ ἱδρύματος26. Ἐπρόκειτο γιὰ ἀπολαβὲς σχεδὸν ὑπερδιπλάσιες σὲ σχέση μὲ αὐτὲς τῶν ἱεροψαλτῶν ποὺ ὑπηρετοῦσαν στοὺς περισσότερους ἀπὸ τοὺς ἐνοριακοὺς ναοὺς τῆς Κωνσταντινουπόλεως περὶ τὰ μέσα τοῦ 18ου 23. Πατρινέλλης, «Πρωτοψάλται», σ. 89 · Στάθης, «Πέτρος ὁ Πελοποννήσιος», σ. 112. 24. Μ. Γεδεών, «Ἡ παρ’ ἡμῖν διδασκαλία τῆς Ἐκκλησιαστικῆς μουσικῆς», Ἐκκλησιαστικὴ Ἀλήθεια 8 (1887), σ. 36. Πρβλ., ἐπίσης, Πατρινέλλης, «Πρωτοψάλται», σ. 89· Στάθης, «Πέτρος ὁ Πελοποννήσιος», σ. 112. 25. Γεδεών, ὅ.π., σ. 36. 26. Γιὰ τοὺς μισθοὺς τῶν δασκάλων κατὰ τὴ διάρκεια τοῦ 18ου αἰῶνα βλ. Δ. Τρ. Παπαζήσης, «Μισθοὶ διδασκάλων ἐπὶ Τουρκοκρατίας», Ἠπειρωτικὴ Ἑστία 21 (1972), σσ. 414-418. 258 ΠΑΤΡΙΑΡΧΙΚΟΙ ΟΦΦΙΚΙΑΛΙΟΙ ΚΑΙ ΣΤΑΥΡΟΠΗΓΙΑΚΑ ΜΟΝΑΣΤΗΡΙΑ ΣΕ ΑΛΛΗΛΕΞΑΡΤΗΣΗ αἰῶνα27· ὡστόσο ἦσαν ἀρκετὰ πενιχρὲς σὲ σχέση πρὸς αὐτὲς ἄλλων ὀφφικιαλίων τοῦ Οἰκουμενικοῦ Πατριαρχείου κατὰ τὴν ἴδια περίοδο28. Γι’ αὐτὸν τὸν λόγο, προφανῶς εἶχαν καθιερωθεῖ κάποιες ἐπιπρόσθετες ἔκτακτες ἀμοιβὲς ποὺ εἶχαν ὁπωσδήποτε ἐθιμικὸ χαρακτήρα καὶ ἐνίσχυαν σημαντικὰ τὰ εἰσοδήματα τῶν ἱεροψαλτῶν, μαζὶ μὲ τὰ συνήθη ἀκόμη καὶ σήμερα περιστασιακὰ φιλοδωρήματα29. Κάτω ἀπὸ τὸ πρῖσμα αὐτό, ἡ ἐκχώρηση τοῦ ἐτησίου τοῦ μονυδρίου τοῦ Τιμίου Προδρόμου στὸν Πέτρο μπορεῖ νὰ ἑρμηνευθεῖ ἁπλῶς ὡς μία τακτικὴ οἰκονομικὴ ἐνίσχυση ἐτήσιου χαρακτῆρα ἐκ μέρους τοῦ Οἰκουμενικοῦ Πατριάρχου πρὸς ἕναν χαμηλόβαθμο πατριαρχικὸ ὀφφικιάλιο30. Πράγματι, ὁ Οἰκουμενικὸς Πατριάρχης συνήθιζε νὰ εὐεργετεῖ κάποια πρόσωπα, ἐκχωρώντας τους ἐφ’ ὅρου ζωῆς τὰ ἐκκλησιαστικὰ εἰσοδήματα μιᾶς πατριαρχικῆς ἐξαρχίας ἢ τὸ ἐτήσιον ἑνὸς σταυροπηγιακοῦ μοναστηριοῦ. Ἡ ἐκχώρηση τῶν εἰσοδημάτων αὐτῶν ἀποτελοῦσε τὴν ἀνταμοιβὴ τοῦ εὐεργετούμενου προσώπου γιὰ τὶς ὑπηρεσίες ποὺ προσέφερε εἴτε προσωπικὰ πρὸς τὸν Οἰκουμενικὸ Πατριάρχη εἴτε",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/19949980/Taphonomy_and_burial_context_of_the_Roman_post_Roman_funerary_areas_2nd_to_6th_centuries_AD_of_A_Lanzada_NW_Spain_2015_O_L%C3%B3pez_Costas_Estudos_do_Quatern%C3%A1rio_Quaternary_Studies_12_APEQ_55_67",
+          "url": "https://www.academia.edu/19949980/Taphonomy_and_burial_context_of_the_Roman_post_Roman_funerary_areas_2nd_to_6th_centuries_AD_of_A_Lanzada_NW_Spain_2015_O_L%C3%B3pez_Costas_Estudos_do_Quatern%C3%A1rio_Quaternary_Studies_12_APEQ_55_67",
+          "title": "Taphonomy and burial context of the Roman/post-Roman funerary areas (2nd to 6th centuries AD) of A Lanzada, NW Spain. 2015. O López-Costas. Estudos do Quaternário Quaternary Studies , 12, APEQ: 55-67",
+          "description": "alterations, of burials from A Lanzada necropolis. This is one of the few sites in NW Spain where two different funerary phases, Roman and post ... Late Antiquity funerary area: grave orientation changed to W-E (it was S",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" history",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Πέτρο Λάντζα\\\" history\", \"providers\": [{\"provider\": \"google\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"FIRST_PAGE_ONLY\", \"returned_records\": 10, \"service\": \"SerpAPI / Google organic results\", \"more_results_available\": true}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 10, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 10, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\"",
+      "records": [
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/69588182/Helen_Sullivan_The_Communal_Mind_and_the_Master_Artifice_Atenas_Stochastis_2009_pp_722",
+          "url": "https://www.academia.edu/69588182/Helen_Sullivan_The_Communal_Mind_and_the_Master_Artifice_Atenas_Stochastis_2009_pp_722",
+          "title": "(PDF) Helen Sullivan, The Communal Mind and the Master ...",
+          "description": "Iσπανία και ο ισπανικός πολιτισμός στη νοτιοανατολική Ευρώπη: Τέσσερις αιώνες διπλωματικών διλημμάτων Εξετάζεται συνοπτικά η πολιτική που άσκησε η ισπανική μοναρχία στη νοτιοανατολική Ευρώπη και ιδιαίτερα στις ελληνικές χώρες από την εποχή των Καθολικών Βασιλέων ως τα τέλη του 18ου αιώνα. Επισημαίνονται επιγραμματικά οι κυριότερες φάσεις και οι βασικοί παράγοντες (εξωτερικοί και εσωτερικοί) που επηρέασαν κατά περιόδους την πολιτική εκείνη. Το τελικό συμπέρασμα που προκύπτει από την επιτροχάδην αυτή διαδρομή σε μια περίοδο τεσσάρων αιώνων είναι ότι η Ισπανία αντιμετώπιζε, σε σχέση με την Νοτιοανατολική Ευρώπη και τη Μεσόγειο, συνεχή διπλωματικά και κυρίως γεωπολιτικά διλήμματα, τα οποία βέβαια δημιουργούσαν οι αυξανόμενες υποχρεώσεις της στη δυτική Ευρώπη και τις υπερπόντιες κτήσεις. * Publicado por prinera vez en: España y la cultura hispánica en el ... ste europeo. H Iσπανία και ο ισπανικός πολιτισμός στη νοτιοανατολική Eυρώπη, ed. Juan González-Barba, Atenas 2000, pp. 36-48. El carácter general, así como el amplio marco cronológico de ... presente ponencia, hacía ... tanto difíciles las citas bibliográficas a pie de ... . Por ello, he preferido adjuntar un esbozo ... ográfico de ... general, acompañado al final con un apéndice con un también breve cuadro bibliográfico.\n\n...\n\n1. Ciorănescu, Al. Documente privitoare la istoria rom nilor culese dîn archivele dîn Simancas, Bucuresti 1940.\n2. Conrotte, M. España y los países musulmanes durante el ministerio de Floridablanca, Madrid 1909. Corral Castanedo, A. \"Unas conspiraciones contra el sultan turco en tiempo de Felipe III\", Simancas. Estudios de Historia Moderna, 1 (1950), 383-415.\n3. Doussinague, J. M. La política internacional de Fernando el Católico, Madrid 1944.\n4. Doussinague, J. M. La política internacional de Fernando el Católico, Madrid 1944. ----La política exterior de España en el siglo XVI, Madrid 1949. Fernández Duro, C. El gran duque de Osuna y su marina. Jornadas contra turcos y venecianos (1602-1624), Madrid 1885.\n5. Floristán Imízcoz, J.-M. Documentos neogriegos en el Archivo de Simancas, Madrid 1987 (= Fuentes para la política oriental de los Austrias. La documentación griega del Archivo de Simancas, 1571-1621, Univ. de León, 1988).\n6. Floristán Imízcoz, J.-M. \"Felipe II y la empresa de Grecia tras Lepanto (1571-1578)\", Erytheia, 15 (1994), 155-190.\n7. Garrigues, E. Un desliz diplomático. La paz hispano-turca, Madrid 1962.\n8. Gil, Luis -Gil, Juan \"Ficciόn y realidad en el 'Viaje de Turquía'. Glosas y comentarios al recorrido por Grecia\", Revista de Filologia Española, 45 (1962), 89-160.\n9. Gil, Luis \"De la 'Sancta empresa de Grecia contra Turcos' \", Erytheia, 16 (1995), 97-115.\n10. ----\"Griegos en España (siglos XV-XVII), Erytheia, 18 (1997), 111-132.\n11. González Palencia, A. \"Los turcos en el conocimiento de los españoles\", Conferencias sobre Lepanto, fasc. I, Madrid 1947, 51-79.\n12. Hassiotis, I. K. \"Fuentes de la historia griega moderna en archivos y bibliotecas españoles\", Hispania, 29/111 (1969), 133-164.\n13. ----Σχέσεις Eλλήνων και Iσπανών στα χρόνια της Tουρκοκρατίας (Relaciones greco-españolas durante la época de la dominación otomana), Tesalónica 1969. ----Oι Έλληνες στις παραμονές της ναυμαχίας της Nαυπάκτου, 1568-1571 (Los griegos en la víspera de la batalla naval de Lepanto, 1568-1571), Tesalónica 1970. ----Iσπανικά έγγραφα της κυπριακής ιστορίας, IΣT΄-IZ' αι. (Documentos españoles de la historia chipriota, siglos XVI-XVII), Nicosia 1972.\n14. ----\"H Kρήτη και οι Iσπανοί στα χρόνια της Bενετοκρατίας\" (Creta y los españoles en la época de la dominación veneciana), Actas del III Congreso Cretológico, vol. 2, Atenas 1974, 342-370.\n15. ----\"Venezia e i dominî veneziani tramite di informazioni sui Turchi per gli Spagnoli nel sec.\n16. XVI\", Venezia centro di mediazione tra Oriente e Occidente (secoli XV-XVI), (A. Pertusi ed.), vol. 1, Florecia, 1977, 117-142.\n17. ----\"Spanish Policy towards the Greek Insurrectionary Movements in the Early Seventeenth Century\", Actes du IIe Congrès Intern. des Etudes du Sud-est Européen, vol. 3, Atenas 1978, 313- 329. ----\"Juan, José Eliodoro Bouligny και Lorenzo Mabili de Bouligny: Oι πρόγονοι του Mαβίλη και η διπλωματική τους αλληλογραφία, τέλη IH'-αρχές IΘ' αιώνα\" (Juan, José Eliodoro Bouligny y Lorenzo Mabili de Bouligny: Los antepasados del poeta griego Mavilis y su correspondencia diplomática, finales del siglo XVIII y comienzos del XIX)\", Mnemon, 7 (1979), 99-117. Cf. su versión castellana en: Erytheia, 7/2 (1986), 279-301.\n18. ----\"H Πελοπόννησος στο πλαίσιο της μεσογειακής πολιτικής του Kαρόλου E΄\" (El Peloponeso en el marco de la política mediterranea de Carlos V), Peloponnesiaká, 15 (1984), 187-244 (cf. versión castellana en: Erytheia, 19, 1998, 79-115).\n19. ----\"Oι Aλεξιανοί της Mινόρκας. Συμβολή στην ιστορία των ελληνικών αποδημιών κατά τον IH' αιώνα\" (Los Alexianos de Menorca: Contribución a la historia de las emigraciones griegas en el siglo XVIII), Rodoniá: Homenaje a M. I. Manúsacas, Atenas-Retimno 1994, 649-660.\n20. ----Πηγές της κυπριακής ιστορίας από το ισπανικό αρχείο Simancas. Aπό τη μικροϊστορία της κυπριακής διασποράς κατά τον IΣT' και IZ' αιώνα (Fuentes de la historia chipriota sacadas del archivo español de Simancas. De la microhistoria de la diáspora chipriota en los siglos XVI-XVII), Nicosia 2000.\n21. ----\"Hacia una re-evaluación de Lepanto\", Volver a Cervantes: Actas del IV Congreso Internacional de la Asociación de Carvantistas, Antonio Bernat Vistarini ed., vol. 1, Palma (de Mallorca) 2001, 37-45.\n22. ----\"El mundo neohelénico en la literatura española del Siglo de Oro\", Cultura Neogriega. Tradición y modernidad -Gaurko Greziaren Kultura. Tradizioa eta modernitatea -Νεοελληνικός Πολιτισμός. Παράδοση και Νεωτερικότητα, Javier Alonso Aldama -Olga Omatos Saenz eds., Vitoria- Gasteiz 2006, σ. 289-308.\n23. Ibañez de Ibero, C. (marqués de Mulhacen) Carlos V y su política mediterránea, Madrid 1962. (Ibañez de Ibero, C.) marqués de Mulhacén, Política mediterránea de España, 1704-1951, Madrid 1952. Laiglesia, F. de Estudios históricos, Madrid 1908.\n24. Láscaris, M. \" Πέτρος Λάντζας, διοικητής της Πάργας (1573) και όργανον των Iσπανών εν\n25. Hπείρω, 1596-1608\" (Pedro Lantsas, gobernador de Parga en 1573 y agente de ls españoles en el Epiro, 1596-1608), Homanaje a Epiro, en memoria de Chr. Sulis, Atenas 1956, 103-118, 237-253.\n26. Láscaris, M. \"Eκκλήσεις του επισκόπου Mάνης Nεοφύτου προς τους Iσπανούς (1612-1613) διά την απελευθέρωσιν της Πελοποννήσου\" (Peticiones de socorro del vescovo de Mani Neofito a los españoles para la liberación del Peloponeso, 1612-1613), Helleniká, 15 (1957), 293-310.\n27. \\ Martín Corrales, E. \"Relaciones de España con el Imperio Otomano en los siglos XVIII y XIX\", en Martín Asuero, P. (ed.) España-Turquía. Del enfrentamiento al análisis mutuo, Constantinopla 2003, 253-270.\n28. Mas, A. Les Turcs dans la littérature espagnole du siècle d'or. Recherches sur l'évolution d'un thème litteraire, vols. 1-2, París 1967.\n29. Merle, A. Le miroir ottoman: Une image politique des hommes dans la littérature géographique espagnole et française (XVIe-XVIIe siècles), París 2003. Moral, J. M. del El virrey de Nápoles don Pedro de Toledo y la guerra contra el Turco, Madrid 1966. Morales Lezcano, V. Africanismo y orientalismo español en el siglo XIX, Madrid 1988. Morales Lezcano, V. España y la Cuestion de Oriente, Madrid 1992.\n30. Ochoa Brun, M.-Á \"Los comienzos de la Legación de España en Atenas\", Cuadernos de la\n31. Escuela Diplomática, no. 4 (Junio 1990), 57-94. Cf. su versión ampliada y bilingüe: Διπλωματικά ισπανο-ελληνικά γεγονότα κατά τον 19ο αιώνα /Episodios diplomáticos hispano-griegos en el siglo XIX, Atenas 1998. ----Historia de la Diplomacia Española, vols. 1-6, Madrid 1990-2000.\n32. ----España y las islas griegas. Una visión histórica, Madrid 2001.\n33. Pradells Nadal, J. Diplomacia y comercio. La expansión consular españona en el siglo XVIII, Alicante 1992.\n34. Randa, Al. Pro Republica Christiana: Die Walachei im \"langen\" Türkenkrieg der katholischen Universalmächte (1593-1606), Munich 1964.\n35. Salvá, J. La Orden de Malta y las acciones navales españolas contra turcos y berberiscos en los siglos XVI y XVII, Madrid 1944.\n36. Sánchez Montes, J. Franceses, protestantes, turcos: Los españoles ante la política internacional de Carlos V, Pamplona 1951.\n37. Sánchez Ortega, M.-E. \"Las relaciones hispano-turcas en el siglo XVIII\", Hispania, 49/171 (1989), 151-195.\n38. Sola, E. -de la Peña, J. F. Cervantes y la Berbería (Cervantes, mundo turco-berberisco y servicios secretos en la época de Felipe II), México 1995.\n39. Spremić, M. Dubrovnik i Aragontsi, 1442-1495, Belgrado 1971 (versión italiana: Dubrovnik e gli Aragonesi, 1442-1495, Palermo 1986).\n40. Tadić, J. Spanija i Dubrovnik u XVI veku (España y Dubrovnik en el siglo XVI), Belgrado 1932.\n41. Tamborra, A. Gli stati italiani, l'Europa e il problema turco dopo Lepanto, Florencia 1961.\n42. Tovar Llorente, A. \"Una petición de socorro de los griegos de Maina a Felipe II en 1584-1585\", Boletín de la Real Academia de la Historia, 142 (1958), 343-363.\nView morearrow_downward",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/13133937/The_Last_Multi_Cultural_Encounter_in_Medieval_Sicily_A_Dominican_Scholar_an_Arabic_Inscription_and_a_Jewish_Legend",
+          "url": "https://www.academia.edu/13133937/The_Last_Multi_Cultural_Encounter_in_Medieval_Sicily_A_Dominican_Scholar_an_Arabic_Inscription_and_a_Jewish_Legend",
+          "title": "(PDF) The Last Multi-Cultural Encounter in Medieval Sicily: A Dominican Scholar, an Arabic Inscription, and a Jewish Legend",
+          "description": "... Mediterranean Historical Review Vol. ... In his book Historians and Historiography in the Italian Renaissance, Eric Cochrane ... Ranzano ... at the universities of Padua, Bologna, Siena, and Pavia and served the duke of Milan before joining Alfonso's",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/17719475/%CE%A3%CF%85%CE%BC%CE%B2%CE%BF%CE%BB%CE%AE_%CF%83%CF%84%CE%B7%CE%BD_%CE%B9%CF%83%CF%84%CE%BF%CF%81%CE%AF%CE%B1_%CF%84%CE%BF%CF%85_%CE%B2%CE%BF%CF%81%CE%B5%CE%B9%CE%BF%CE%B7%CF%80%CE%B5%CE%B9%CF%81%CF%89%CF%84%CE%B9%CE%BA%CE%BF%CF%8D_%CE%B5%CE%BB%CE%BB%CE%B7%CE%BD%CE%B9%CF%83%CE%BC%CE%BF%CF%8D_%CF%84%CE%B1_%CF%84%CE%AD%CE%BB%CE%B7_%CF%84%CE%BF%CF%85_16%CE%BF%CF%85_%CE%B1%CE%B9%CF%8E%CE%BD%CE%B1_%CE%9C%CE%B1%CF%84%CE%B8%CE%B1%CE%AF%CE%BF%CF%82_%CE%A0%CE%B1%CF%80%CE%B1%CE%B3%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82_A_contribution_to_the_history_of_the_Nothern_Epirus_Hellenism_Mathiew_Papagiannis_",
+          "url": "https://www.academia.edu/17719475/%CE%A3%CF%85%CE%BC%CE%B2%CE%BF%CE%BB%CE%AE_%CF%83%CF%84%CE%B7%CE%BD_%CE%B9%CF%83%CF%84%CE%BF%CF%81%CE%AF%CE%B1_%CF%84%CE%BF%CF%85_%CE%B2%CE%BF%CF%81%CE%B5%CE%B9%CE%BF%CE%B7%CF%80%CE%B5%CE%B9%CF%81%CF%89%CF%84%CE%B9%CE%BA%CE%BF%CF%8D_%CE%B5%CE%BB%CE%BB%CE%B7%CE%BD%CE%B9%CF%83%CE%BC%CE%BF%CF%8D_%CF%84%CE%B1_%CF%84%CE%AD%CE%BB%CE%B7_%CF%84%CE%BF%CF%85_16%CE%BF%CF%85_%CE%B1%CE%B9%CF%8E%CE%BD%CE%B1_%CE%9C%CE%B1%CF%84%CE%B8%CE%B1%CE%AF%CE%BF%CF%82_%CE%A0%CE%B1%CF%80%CE%B1%CE%B3%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82_A_contribution_to_the_history_of_the_Nothern_Epirus_Hellenism_Mathiew_Papagiannis_",
+          "title": "Συμβολή στην ιστορία του βορειοηπειρωτικού ελληνισμού ...",
+          "description": "Με αφορμή νέα στοιχεία που εντοπίστηκαν για δύο επιφανείς βορειοηπειρώτες, τους Ματθαίο Παπαγιάννη και Πάνο Στόλικο, ... να συμβάλουμε στη συνολική εικόνα της ευρύτερης περιοχής Αργυροκάστρου τον 16ο αιώνα και ιδίως για την πολιτική δραστηριότητα του",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/44124252/Hommage_%C3%A0_Pierre_Lantz_1931_2019_",
+          "url": "https://www.academia.edu/44124252/Hommage_%C3%A0_Pierre_Lantz_1931_2019_",
+          "title": "Hommage à Pierre Lantz (1931-2019)",
+          "description": "# Hommage à Pierre Lantz (1931-2019)\n\nPierre Bras\n\n2019, L'Homme et la Société\n\n...\n\nmage\n\n...\n\nHommage à Pierre Lantz (1931-2019) Pierre BRAS A vant toute chose, je vais vous lire un message de Sophie Wahnich qui se trouve retenue en ce moment à Princeton : Dans la tradition juive européenne on appelle “Mensh” un homme accompli, un homme profondément humain et ayant réfléchi à cette condition humaine, et l’on se demande souvent si une personne s’est comportée en Mensh, si sa manière d’être au monde était digne de cette appellation. Une femme rabbin à Princeton peut ainsi interroger : Jonas se comporte-t-il en Mensh ? Quelqu’un dans l’assistance peut répondre non, à quoi la rabbi renchérira en disant qu’il était profondément humain dans ses manières de se défiler et puis d’être rattrapé par la tâche. Pour Pierre Lantz il n’y aura pas de doute possible, oui sa générosité, son amour de la vie, son intelligence vive, son goût de l’expérimentation intellectuelle et sociale, sa joie de ressentir le plaisir d’être avec les autres, en foule au moment de la coupe du monde de football en 1998, ou en petite compagnie dans des comités de rédaction, faisaient de lui un Mensh. Il aurait dit que non et sa modestie aurait encore permis de dire que oui. Voilà, les Mensh ne sont pas nombreux et ils manquent profondément. Je représente ici la revue L’Homme et la Société, que je dirige avec Judith Hayem et à laquelle Pierre a appartenu de 1967 à sa mort, c’est-à-dire pendant plus de 50 ans. En 2016, Pierre était revenu en détail sur sa relation à L’Homme et la Société dans un entretien réalisé à l’occasion du cinquantenaire de la revue1. 1 Pierre LANTZ & Gaëtan FLOCCO, « Associer science et politique », L’Homme et la Société, 201-202, 2016/3-4, p. 29-50. L’Homme & la Société, no 209 (1), janvier-avril 2019 16 Pierre BRAS Je parle après les fils de Pierre. Cela a-t-il un sens ? Cela a un sens parce que Pierre m’a souvent parlé de ses fils. Il évoquait aussi très souvent ses petits-enfants, et bien sûr, Ariane, sa femme, dont il citait les opinions et les jugements. C’est rare, à L’Homme et la Société, que nous parlions de nos familles. Pierre parlait de la sienne en Comité de rédaction, mais surtout dans les cafés où j’échouais souvent avec lui après les réunions avec Michel Kail et Louis Moreau de Bellaing. Alors, comment Pierre parlait-il de ses enfants ? C’étaient leurs expériences et leurs opinions qu’il évoquait. Expérience de sa petite-fille aux États-Unis, qui travaillait pour un grand groupe ; opinion de ses fils, notamment sur l’actualité politique, comme par exemple en 2017, quand se posait la question de voter ou non au second tour des élections présidentielles. En somme, Pierre parlait ainsi de valeurs, de valeurs partagées, et de comment s’expriment en pratique ces valeurs. C’est ici que l’on trouve Pierre : s’intéresser aux idées, mais aux idées nourries par le réel. On reconnaissait bien le philosophe devenu sociologue. Il restait fidèle à son parti pris : le discours philosophique a besoin de se nourrir d’objets du réel. Ce point de vue a guidé Pierre dans l’écriture de ses livres : Valeur et Richesse, en 1977 ; L’Argent, la Mort, en 1988 ; L’Investissement symbolique, en 1996. Pierre est resté fidèle à sa conception du travail intellectuel dans son long compagnonnage avec L’Homme et la Société. On peut dire qu’il a décidé de cette fidélité à la revue à travers les évolutions de L’Homme et la Société qui auraient pu l’éloigner d’elle. Dans cette revue, Pierre occupait une place unique. En effet, il y a publié un article dès l’origine, en 1967, et a été très vite associé à L’Homme et la Société, dont il est devenu membre du Comité de rédaction, puis codirecteur avec Nicole Beaurain de 1997 à 2001. Pierre a ainsi eu raison de suivre les conseils de son maître Henri Lefebvre, qui lui avait suggéré d’envoyer son article à un inconnu, Serge Jonas, qui venait de fonder la revue. Cet article, dont il était très fier, s’intitulait : « Le temps des sociologues et la sociologie du temps ». Je me suis rappelé que le dernier article que Pierre a publié à L’Homme et la Société, en 2016 – 50 ans après le premier – s’intitulait : « Temporalité humaine : une invention oubliée. » On est ici chez Proust, qui commence et termine le grand roman de sa vie par l’évocation du temps, ce temps qu’il évoque en conclusion de son Hommage à Pierre Lantz … 17 roman : « Si [la force] m’était laissée assez longtemps pour accomplir mon œuvre, n’y manquerais-je pas d’y décrire les hommes, cela dût-il les faire ressembler à des êtres monstrueux. » Je ne sais pas si la recherche sociologique déforme la perception que l’on a des hommes, mais il est sûr que Pierre attachait une importance primordiale à cette description des questions et des problèmes qui sont ceux des femmes et des hommes. C’est-à-dire que dans sa conduite de L’Homme et la Société, suivant en cela ce qu’avait initié René Gallissot, il insistait : L’Homme et la Société ne doit pas dresser des tombeaux aux grandes figures du passé, telles que Marx ou Freud. La revue doit certes rester marxiste, mais s’intéresser d’abord aux objets du réel, objets observés avec des outils intellectuels dont nombreux sont légués par les grands auteurs du passé, mais que l’on doit toujours soumettre à la critique. Ainsi, Pierre rejetait le dogmatisme ; il récusait les positions doctrinaires. Et dans son activité de directeur, il ne pratiquait pas l’autoritarisme : toutes les grandes décisions étaient prises par un vote du Comité de rédaction. En somme, il appliquait l’élément éternel qui fait la ligne de L’Homme et la Société : une revue qui vise l’émancipation, et plus sûrement, l’autoémancipation. Mais aussi, une revue qui souhaite avoir des répercussions concrètes en alliant sociologie et politique. Pierre souhaitait ainsi que le Comité de rédaction soit composé de chercheurs qui ne soient pas apolitiques. Il souhaitait des gens qui soient capables d’envisager l’avenir des sociétés humaines. C’était encore sa préoccupation pour le temps : le futur comptait. Quant au passé, il l’évoquait aussi. Et je reviens ici à sa famille et à l’importance de son père. En effet, je me souviens avoir été très fier de dire à Pierre qu’aux États-Unis, j’incitais mes étudiants à utiliser, dans leurs devoirs en français, le terme de shoah et non celui d’holocauste, terme religieux évoquant un sacrifice. Pierre a remarqué : « Ce mot ne plairait pas à mon père – qui n’était pas religieux – puisque shoah est aussi un terme religieux. On dirait plutôt : le génocide des juifs. » Leçon de Pierre, et de son père, que j’enseigne désormais à mes étudiants américains. Je termine ici en évoquant l’humour et le sens de la dérision dont Pierre faisait preuve. La première fois que je l’ai rencontré, je rendais visite au Comité de rédaction de L’Homme et la Société pour défendre un projet sur Simone de 18 Pierre BRAS Beauvoir et la psychanalyse. J’ai eu le malheur d’évoquer les maîtresses de Simone de Beauvoir. Quelqu’un m’a interrompu sèchement : « on ne dit pas “maîtresses” mais “amantes” ! » Plus tard, dans la même séance, je parlais d’une femme maître de conférences. La même voix m’a rétorqué : « on ne dit pas “maître de conférences” mais “maîtresse de conférences” ! ». Alors, Pierre est intervenu, l’index levé : « Amante de conférences ! », a- t-il dit. Moi qui étais sur la sellette, j’ai eu l’impression qu’il me portait secours. La dernière fois que j’ai vu Pierre, c’était à l’enterrement de Claudie ... ill, cet automne. Il m’y a raconté en s’amusant qu’il venait d’acheter un emplacement au Père-Lachaise. Je lui disais que j’aimais bien le carré napoléonien. « Justement, c’est là ! » m’a-t-il répondu. Nous y sommes déjà. Si tôt. Pour ne pas lui dire Adieu, mais à jamais, ou pour toujours, pour longtemps. Lu au cimetière du Père-Lachaise, le 25 janvier 2019",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/34806794/_%CE%97_%CF%83%CF%84%CF%81%CE%B1%CF%84%CE%B9%CF%89%CF%84%CE%B9%CE%BA%CE%AE_%CE%B4%CF%81%CE%AC%CF%83%CE%B7_%CF%84%CF%89%CE%BD_%CE%A6%CE%B9%CE%BB%CE%B5%CE%BB%CE%BB%CE%AE%CE%BD%CF%89%CE%BD_%CF%83%CF%84%CE%B7_%CE%BC%CE%AC%CF%87%CE%B7_%CF%84%CE%BF%CF%85_%CE%A0%CE%AD%CF%84%CE%B1_%CE%9E%CE%B1%CE%BD%CE%B1%CE%B4%CE%B9%CE%B1%CE%B2%CE%AC%CE%B6%CE%BF%CE%BD%CF%84%CE%B1%CF%82_%CF%84%CE%BF%CE%BD_Daniel_Johann_Elster_%CE%BA%CE%B1%CE%B9_%CF%84%CE%B9%CF%82_%CE%AC%CE%BB%CE%BB%CE%B5%CF%82_%CF%80%CE%B7%CE%B3%CE%AD%CF%82_",
+          "url": "https://www.academia.edu/34806794/_%CE%97_%CF%83%CF%84%CF%81%CE%B1%CF%84%CE%B9%CF%89%CF%84%CE%B9%CE%BA%CE%AE_%CE%B4%CF%81%CE%AC%CF%83%CE%B7_%CF%84%CF%89%CE%BD_%CE%A6%CE%B9%CE%BB%CE%B5%CE%BB%CE%BB%CE%AE%CE%BD%CF%89%CE%BD_%CF%83%CF%84%CE%B7_%CE%BC%CE%AC%CF%87%CE%B7_%CF%84%CE%BF%CF%85_%CE%A0%CE%AD%CF%84%CE%B1_%CE%9E%CE%B1%CE%BD%CE%B1%CE%B4%CE%B9%CE%B1%CE%B2%CE%AC%CE%B6%CE%BF%CE%BD%CF%84%CE%B1%CF%82_%CF%84%CE%BF%CE%BD_Daniel_Johann_Elster_%CE%BA%CE%B1%CE%B9_%CF%84%CE%B9%CF%82_%CE%AC%CE%BB%CE%BB%CE%B5%CF%82_%CF%80%CE%B7%CE%B3%CE%AD%CF%82_",
+          "title": "(PDF) «Η στρατιωτική δράση των Φιλελλήνων στη μάχη του Πέτα. Ξαναδιαβάζοντας τον Daniel-Johann Elster και τις άλλες πηγές»",
+          "description": "τάγμα Φιλελλήνων, που ακολούθησε -τον Ιούνιο του 1822- τον Αλέξανδρο ... του στην Ήπειρο προς ενίσχυση των Σουλιωτών. Στις 4 Ιουλίου 1822 το εν λόγω τάγμα συγκρούστηκε στο χωριό Πέτα με υπέρτερες ... . Στη μάχη που ακολούθησε οι περισσότεροι",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/34426252/%CE%97_%CE%BF%CF%87%CF%8D%CF%81%CF%89%CF%83%CE%B7_%CF%84%CE%BF%CF%85_%CE%B5%CE%BE%CF%89%CF%84%CE%B5%CF%81%CE%B9%CE%BA%CE%BF%CF%8D_%CF%80%CE%B5%CF%81%CE%B9%CE%B2%CF%8C%CE%BB%CE%BF%CF%85_%CF%84%CE%BF%CF%85_%CE%BA%CE%AC%CF%83%CF%84%CF%81%CE%BF%CF%85_%CF%84%CE%BF%CF%85_%CE%B1%CE%B3%CE%AF%CE%BF%CF%85_%CE%91%CE%BD%CF%84%CF%81%CE%AD%CE%B1_%CF%84%CE%B7%CF%82_%CE%A0%CF%81%CE%AD%CE%B2%CE%B5%CE%B6%CE%B1%CF%82_%CE%BA%CE%B1%CE%B9_%CF%84%CE%B1_%CE%B5%CE%BD%CF%84%CE%B5%CE%B9%CF%87%CE%B9%CF%83%CE%BC%CE%AD%CE%BD%CE%B1_%CF%83%CE%B5_%CE%B1%CF%85%CF%84%CE%AE_%CE%BB%CE%AF%CE%B8%CE%B9%CE%BD%CE%B1_%CE%B1%CE%BD%CE%AC%CE%B3%CE%BB%CF%85%CF%86%CE%B1_The_defensive_town_wall_of_St_Andrew_s_castle_in_Preveza_Greece_in_Greek_with_English_abstract_",
+          "url": "https://www.academia.edu/34426252/%CE%97_%CE%BF%CF%87%CF%8D%CF%81%CF%89%CF%83%CE%B7_%CF%84%CE%BF%CF%85_%CE%B5%CE%BE%CF%89%CF%84%CE%B5%CF%81%CE%B9%CE%BA%CE%BF%CF%8D_%CF%80%CE%B5%CF%81%CE%B9%CE%B2%CF%8C%CE%BB%CE%BF%CF%85_%CF%84%CE%BF%CF%85_%CE%BA%CE%AC%CF%83%CF%84%CF%81%CE%BF%CF%85_%CF%84%CE%BF%CF%85_%CE%B1%CE%B3%CE%AF%CE%BF%CF%85_%CE%91%CE%BD%CF%84%CF%81%CE%AD%CE%B1_%CF%84%CE%B7%CF%82_%CE%A0%CF%81%CE%AD%CE%B2%CE%B5%CE%B6%CE%B1%CF%82_%CE%BA%CE%B1%CE%B9_%CF%84%CE%B1_%CE%B5%CE%BD%CF%84%CE%B5%CE%B9%CF%87%CE%B9%CF%83%CE%BC%CE%AD%CE%BD%CE%B1_%CF%83%CE%B5_%CE%B1%CF%85%CF%84%CE%AE_%CE%BB%CE%AF%CE%B8%CE%B9%CE%BD%CE%B1_%CE%B1%CE%BD%CE%AC%CE%B3%CE%BB%CF%85%CF%86%CE%B1_The_defensive_town_wall_of_St_Andrew_s_castle_in_Preveza_Greece_in_Greek_with_English_abstract_",
+          "title": "Η οχύρωση του εξωτερικού περιβόλου του κάστρου του αγίου Αντρέα της Πρέβεζας και τα εντειχισμένα σε αυτή λίθινα ανάγλυφα / The defensive town wall of St Andrew’s castle in Preveza, Greece [in Greek, with English abstract]",
+          "description": ", during the first years of their second occupation of the town (1718-1797), reduced the size of the castle by half and improved its defensive capability. After Ali Pasha of Ioannina captured Preveza for the",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://ionio.academia.edu/PetrosPizanias",
+          "url": "https://ionio.academia.edu/PetrosPizanias",
+          "title": "Petros Pizanias - Ionian University",
+          "description": "# Petros Pizanias\n\nIonian University, History, Emeritus\n\nPetros Th. Pizanias is Emeritus Professor of History, Department of History, Ionian University. He studied history at École des Hautes Études en Sciences Sociales and has worked as a Visiting Professor in several French universities. He directed the Post-Graduate Studies program, Department of History, and held the UNESCO chair for the training on teaching and researching history in the Balkans. He has published extensively in journals, such as Annales ESC, and Ta Istorika, he has organized international conferences, and has published nine books in the field of Modern and Contemporary Greek History. His most recent books include The Greek Revolutionof 1821: A European Event, Isis publications, and the proposed book published in Greek by Hestia Publications. He was also the chairman of the scientific committee of the Institute of Strategic and Development Studies – A. Papandreou, and advisor to the Minister of National Education (1997-1999). Since 2001, he has been the Principal Investigator of a historical research titled \"The Hermes of Modern Greeks\" a digital database with prosopographical parameters of selected social groups which played an important role in the 1821 Greek revolution. He is currently completing a book on the general history of the 1821 Greek revolution.Curriculum Vitae: https://en.wikipedia.org/wiki/Petros_PizaniasE-mail: [email protected] Address: Abati 5, 11741 Athens, Greece",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/44220372/%CE%A3%CF%85%CE%BD%CE%AD%CE%BD%CF%84%CE%B5%CF%85%CE%BE%CE%B7_%CE%BC%CE%B5_%CF%84%CE%BF%CE%BD_%CF%83%CF%85%CE%B3%CE%B3%CF%81%CE%B1%CF%86%CE%AD%CE%B1_%CE%B1%CE%BD%CE%B1%CE%BB%CF%85%CF%84%CE%AE_%CE%A0%CE%AD%CF%84%CF%81%CE%BF_%CE%91%CF%81%CE%B3%CF%85%CF%81%CE%AF%CE%BF%CF%85_Interview_with_Petros_Argyriou_Author_Political_analyst_Greece_",
+          "url": "https://www.academia.edu/44220372/%CE%A3%CF%85%CE%BD%CE%AD%CE%BD%CF%84%CE%B5%CF%85%CE%BE%CE%B7_%CE%BC%CE%B5_%CF%84%CE%BF%CE%BD_%CF%83%CF%85%CE%B3%CE%B3%CF%81%CE%B1%CF%86%CE%AD%CE%B1_%CE%B1%CE%BD%CE%B1%CE%BB%CF%85%CF%84%CE%AE_%CE%A0%CE%AD%CF%84%CF%81%CE%BF_%CE%91%CF%81%CE%B3%CF%85%CF%81%CE%AF%CE%BF%CF%85_Interview_with_Petros_Argyriou_Author_Political_analyst_Greece_",
+          "title": "(PDF) Συνέντευξη με τον συγγραφέα-αναλυτή Πέτρο Αργυρίου | Interview with Petros Argyriou, Author-Political analyst (Greece)",
+          "description": "# Συνέντευξη με τον συγγραφέα-αναλυτή Πέτρο Αργυρίου | Interview with Petros Argyriou, Author-Political analyst (Greece)\n\nVasiliki V. Pappas\n\n2013, by Vasiliki V. Pappa\n\n17 pages\n...\nμεγάλο αριθμό επιμορφωτικών σεμιναρίων της",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/42739412/%CE%9F_%CE%A4%CE%B5%CE%BA%CF%84%CE%BF%CE%BD%CE%B9%CE%BA%CF%8C%CF%82_%CE%A4%CF%8D%CF%80%CE%BF%CF%82_%CE%9C%CE%B5%CE%BB%CE%B9%CF%83%CF%83%CE%B7%CE%BD%CE%BF%CF%8D_%CE%99%CF%80%CF%80%CE%BF%CF%84%CE%B9%CE%BA%CF%8C%CF%82_%CE%A4%CE%B5%CE%BA%CF%84%CE%BF%CE%BD%CE%B9%CF%83%CE%BC%CF%8C%CF%82_%CE%91%CE%BB%CF%87%CE%B7%CE%BC%CE%B5%CE%AF%CE%B1_%CE%BA%CE%B1%CE%B9_%CE%99%CE%BB%CE%BF%CF%85%CE%BC%CE%B9%CE%BD%CE%B9%CF%83%CF%84%CE%B9%CE%BA%CE%AD%CF%82_%CE%B5%CF%80%CE%B9%CE%B4%CF%81%CE%AC%CF%83%CE%B5%CE%B9%CF%82_%CF%83%CF%84%CE%B7_%CE%A1%CF%89%CF%83%CE%AF%CE%B1_%CF%84%CE%BF%CF%85_18%CE%BF%CF%85_%CE%B1%CE%B9%CF%8E%CE%BD%CE%B1",
+          "url": "https://www.academia.edu/42739412/%CE%9F_%CE%A4%CE%B5%CE%BA%CF%84%CE%BF%CE%BD%CE%B9%CE%BA%CF%8C%CF%82_%CE%A4%CF%8D%CF%80%CE%BF%CF%82_%CE%9C%CE%B5%CE%BB%CE%B9%CF%83%CF%83%CE%B7%CE%BD%CE%BF%CF%8D_%CE%99%CF%80%CF%80%CE%BF%CF%84%CE%B9%CE%BA%CF%8C%CF%82_%CE%A4%CE%B5%CE%BA%CF%84%CE%BF%CE%BD%CE%B9%CF%83%CE%BC%CF%8C%CF%82_%CE%91%CE%BB%CF%87%CE%B7%CE%BC%CE%B5%CE%AF%CE%B1_%CE%BA%CE%B1%CE%B9_%CE%99%CE%BB%CE%BF%CF%85%CE%BC%CE%B9%CE%BD%CE%B9%CF%83%CF%84%CE%B9%CE%BA%CE%AD%CF%82_%CE%B5%CF%80%CE%B9%CE%B4%CF%81%CE%AC%CF%83%CE%B5%CE%B9%CF%82_%CF%83%CF%84%CE%B7_%CE%A1%CF%89%CF%83%CE%AF%CE%B1_%CF%84%CE%BF%CF%85_18%CE%BF%CF%85_%CE%B1%CE%B9%CF%8E%CE%BD%CE%B1",
+          "title": "(PDF) Ο Τεκτονικός Τύπος Μελισσηνού, Ιπποτικός Τεκτονισμός, Αλχημεία και Ιλουμινιστικές επιδράσεις στη Ρωσία του 18ου αιώνα",
+          "description": "λίγα γνωρίζαμε μέχρι πρόσφατα για τον Πέτρο Μελισσηνό και την ... . Ελάχιστες ήταν οι βιβλιογραφικές ... οι γνώσεις μας για την προσωπικότητα του Μελισσηνού και την τεκτονική του δραστηριότητα",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Πέτρο Λάντζα\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"FIRST_PAGE_ONLY\", \"returned_records\": 10, \"service\": \"SerpAPI / Google organic results\", \"more_results_available\": true}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 10, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 9, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"Πέτρο Λάντζα\"",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22 ; HTTPError: HTTP Error 429: Too Many Requests",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22 ; HTTPError: HTTP Error 429: Too Many Requests"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"Πέτρο Λάντζα\" disputed",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22+disputed ; HTTPError: HTTP Error 429: Too Many Requests",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22+disputed ; HTTPError: HTTP Error 429: Too Many Requests"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"Πέτρο Λάντζα\" history",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22+history ; HTTPError: HTTP Error 429: Too Many Requests",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22+history ; HTTPError: HTTP Error 429: Too Many Requests"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\" disputed",
+      "records": [
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/69588182/Helen_Sullivan_The_Communal_Mind_and_the_Master_Artifice_Atenas_Stochastis_2009_pp_722",
+          "url": "https://www.academia.edu/69588182/Helen_Sullivan_The_Communal_Mind_and_the_Master_Artifice_Atenas_Stochastis_2009_pp_722",
+          "title": "(PDF) Helen Sullivan, The Communal Mind and the Master ...",
+          "description": "... disputed areas of the Pacific. The larger part of this exact ... Gregorio de Andrés, El helenismo ραίο Πέτρο Λάντζα (capitán Pietro Lanzi).44 ...",
+          "date": [],
+          "search_providers": [
+            "google",
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" disputed",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 1,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/13133937/The_Last_Multi_Cultural_Encounter_in_Medieval_Sicily_A_Dominican_Scholar_an_Arabic_Inscription_and_a_Jewish_Legend",
+          "url": "https://www.academia.edu/13133937/The_Last_Multi_Cultural_Encounter_in_Medieval_Sicily_A_Dominican_Scholar_an_Arabic_Inscription_and_a_Jewish_Legend",
+          "title": "(PDF) The Last Multi-Cultural Encounter in Medieval Sicily: A Dominican Scholar, an Arabic Inscription, and a Jewish Legend",
+          "description": "1. Renaissance Hebraism in Sicily intertwined with Christian anti-Jewish polemics, influencing scholarly discourse.\n2. Pietro Ranzano's interactions with Jewish scholars reflect attempts at historical validation amid conversionist pressures.\n3. In 1474, accusations against Sicilian Jews sparked riots, revealing tensions in Christian-Jewish relations.\n4. The 'abominable book' controversy likely involved polemical texts challenging Christian doctrines, possibly including the Talmud.\n5. The article critiques how Sicilian Christian humanists engaged with Jewish culture, often with",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" disputed",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 1,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/44611448/_%CE%97_%CE%BA%CF%81%CE%AF%CF%83%CE%B7_%CF%84%CE%BF%CF%85_%CE%BA%CE%BF%CE%B9%CE%BD%CE%BF%CE%B2%CE%BF%CF%85%CE%BB%CE%B5%CF%85%CF%84%CE%B9%CF%83%CE%BC%CE%BF%CF%8D_%CF%83%CF%84%CE%B7%CE%BD_%CE%B5%CE%BB%CE%BB%CE%B7%CE%BD%CE%B9%CE%BA%CE%AE_%CE%BB%CE%BF%CE%B3%CE%BF%CF%84%CE%B5%CF%87%CE%BD%CE%AF%CE%B1_%CF%84%CE%BF%CF%85_%CE%BC%CE%B5%CF%83%CE%BF%CF%80%CE%BF%CE%BB%CE%AD%CE%BC%CE%BF%CF%85_",
+          "url": "https://www.academia.edu/44611448/_%CE%97_%CE%BA%CF%81%CE%AF%CF%83%CE%B7_%CF%84%CE%BF%CF%85_%CE%BA%CE%BF%CE%B9%CE%BD%CE%BF%CE%B2%CE%BF%CF%85%CE%BB%CE%B5%CF%85%CF%84%CE%B9%CF%83%CE%BC%CE%BF%CF%8D_%CF%83%CF%84%CE%B7%CE%BD_%CE%B5%CE%BB%CE%BB%CE%B7%CE%BD%CE%B9%CE%BA%CE%AE_%CE%BB%CE%BF%CE%B3%CE%BF%CF%84%CE%B5%CF%87%CE%BD%CE%AF%CE%B1_%CF%84%CE%BF%CF%85_%CE%BC%CE%B5%CF%83%CE%BF%CF%80%CE%BF%CE%BB%CE%AD%CE%BC%CE%BF%CF%85_",
+          "title": "\"Η κρίση του κοινοβουλευτισμού στην ελληνική λογοτεχνία του μεσοπολέμου\"",
+          "description": "Δύο μυθιστορήματα απεικονίζουν εύγλωττα την κρίση του κοινοβουλευτισμού στον ελληνικό μεσοπόλεμο: το \"Σταυροδρόμι\" του Θανάση Πετσάλη (1934) και η \"Αργώ\" του Θεοτοκά (1933, 1936). Το πρώτο περιγράφει ένα επιτυχημένο πραξικόπημα κατά της κοινοβουλευτικής δημοκρατίας και το δεύτερο ένα αποτυχημένο. Ανάλογες είναι και οι τάσεις των δυο δημιουργών τη συγκεκριμένη εποχή, οι οποίοι, μολονότι ξεκινούν και οι δύο από τη φιλελεύθερη βενιζελική παράταξη, εξελίσσονται διαφορετικά. Ο Πετσάλης αναπτύσσει μέσω του ήρωά του Αλέκου Πάρνη έναν προβληματισμό ενάντια στο κοινοβουλευτικό σύστημα, προκρίνοντας μια διαφορετικού τύπου οργάνωση της κοινωνίας, με βάση τις επαγγελματικές ενώσεις, η επιβολή της οποίας δεν μπορεί παρά να γίνει με χρήση βίας∙ το φασιστικό πρότυπο δηλώνεται ρητά στο έργο. Ο Γιώργος Θεοτοκάς, από την άλλη, μολονότι αναγνωρίζει πλεονεκτήματα στη γειτονική Ιταλία, εντέλει αποτάσσεται τα αντικοινοβουλευτικά μοντέλα διακυβέρνησης, προκρίνοντας σαφώς τη δημοκρατία. Στην \"Αργώ\" προβάλλει θετικά την καταστολή ενός πραξικοπήματος με χρήση ένοπλης βίας, συντονιζόμενος πιθανώς με την πρόταση του Βενιζέλου το 1932 για την εισαγωγή στο ελληνικό σύνταγμα άρθρου ανάλογου με το 48 του συντάγματος της Βαϊμάρης. Και τα δύο έργα παρουσιάζουν έναν τύπο χαρισματικού ηγέτη. Ο Πετσάλης όμως υπονοεί ομοιότητες του ήρωά του με τον Ιησού και το αφήγημα της θυσίας του, καθιστώντας το μυθιστόρημά του ένα συμβολιστικό μυστικιστικό έργο. Αντίθετα ο Θεοτοκάς δεν χρησιμοποιεί ιερές αναγωγές παρά προβάλλει τον χριστιανισμό ως ένα εγκόσμιο σύστημα ηθικών αξιών που κατατείνουν στη συγχώρηση και στην ψυχική γαλήνη. Από τη μία, ο μυστικισμός και η «πολιτική θρησκεία» του ολοκληρωτισμού, από την άλλη ο ορθολογισμός, ο χριστιανισμός (ως ηθική) και η δημοκρατία. Η αμφισβήτηση του κοινοβουλευτισμού στον συγκεκριμένο χώρο του φιλελεύθερου κέντρου έχει ωστόσο βραχεία διάρκεια. Ήδη το 1935 ο Πετσάλης έμμεσα αποκηρύσσει τη φιλοδικτατορική τάση του έργου του, ενώ μετά τον πόλεμο, το 1947, θα βαλθεί να αναθεωρεί εκ βάθρων το \"Σταυροδρόμι\", προσπαθώντας πλέον να υπονομεύσει τον άλλοτε λαμπρό ήρωα και τις αντικοινοβουλευτικές του ιδέες.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" disputed",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 1,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/79038702/Unsettling_grounds_historiography_and_archaeology_in_Greek_colonization",
+          "url": "https://www.academia.edu/79038702/Unsettling_grounds_historiography_and_archaeology_in_Greek_colonization",
+          "title": "(PDF) Unsettling grounds historiography and archaeology in Greek 'colonization",
+          "description": "The present research responds to the long discussion about the nature of Greek colonization which ... characterized by an uninspiring progress in international scholarship, and remarkable divergences in national scholarships",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" disputed",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 1,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/40341195/%CE%97_%CE%95%CE%BE%CF%89%CF%84%CE%B5%CF%81%CE%B9%CE%BA%CE%AE_%CE%A0%CE%BF%CE%BB%CE%B9%CF%84%CE%B9%CE%BA%CE%AE_%CE%95%CF%81%CE%BD%CF%84%CE%BF%CE%B3%CE%AC%CE%BD_To_%CE%94%CE%B9%CF%80%CE%BB%CF%8C_%CE%9C%CE%AD%CF%84%CF%89%CF%80%CE%BF_%CE%91%CE%BC%CF%86%CE%B9%CF%83%CE%B2%CE%AE%CF%84%CE%B7%CF%83%CE%B7%CF%82_%CF%84%CE%B7%CF%82_%CE%A3%CF%85%CE%BD%CE%B8%CE%AE%CE%BA%CE%B7%CF%82_%CF%84%CE%B7%CF%82_%CE%9B%CF%89%CE%B6%CE%AC%CE%BD%CE%B7%CF%82_Erdogans_Foreign_Policy_Disputing_the_Lausanne_Treaty_on_two_Fronts_",
+          "url": "https://www.academia.edu/40341195/%CE%97_%CE%95%CE%BE%CF%89%CF%84%CE%B5%CF%81%CE%B9%CE%BA%CE%AE_%CE%A0%CE%BF%CE%BB%CE%B9%CF%84%CE%B9%CE%BA%CE%AE_%CE%95%CF%81%CE%BD%CF%84%CE%BF%CE%B3%CE%AC%CE%BD_To_%CE%94%CE%B9%CF%80%CE%BB%CF%8C_%CE%9C%CE%AD%CF%84%CF%89%CF%80%CE%BF_%CE%91%CE%BC%CF%86%CE%B9%CF%83%CE%B2%CE%AE%CF%84%CE%B7%CF%83%CE%B7%CF%82_%CF%84%CE%B7%CF%82_%CE%A3%CF%85%CE%BD%CE%B8%CE%AE%CE%BA%CE%B7%CF%82_%CF%84%CE%B7%CF%82_%CE%9B%CF%89%CE%B6%CE%AC%CE%BD%CE%B7%CF%82_Erdogans_Foreign_Policy_Disputing_the_Lausanne_Treaty_on_two_Fronts_",
+          "title": "(PDF) Η Εξωτερική Πολιτική Ερντογάν: To Διπλό Μέτωπο Αμφισβήτησης της Συνθήκης της Λωζάνης [Erdogan's Foreign Policy: Disputing the Lausanne Treaty on two Fronts]",
+          "description": "Tziarras, Zenonas. “Η Εξωτερική Πολιτική Ερντογάν: To Διπλό Μέτωπο Αμφισβήτησης Της Συνθήκης Της Λωζάνης [Erdogan's Foreign Policy: Disputing the Lausanne Treaty on Two Fronts].” Περιοδικό ΕΠΙΚΑΙΡΑ, 2019, pp. 42–45.\n...\nκαι τη «Γαλάζια Πατρίδα»",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" disputed",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 1,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/34806794/_%CE%97_%CF%83%CF%84%CF%81%CE%B1%CF%84%CE%B9%CF%89%CF%84%CE%B9%CE%BA%CE%AE_%CE%B4%CF%81%CE%AC%CF%83%CE%B7_%CF%84%CF%89%CE%BD_%CE%A6%CE%B9%CE%BB%CE%B5%CE%BB%CE%BB%CE%AE%CE%BD%CF%89%CE%BD_%CF%83%CF%84%CE%B7_%CE%BC%CE%AC%CF%87%CE%B7_%CF%84%CE%BF%CF%85_%CE%A0%CE%AD%CF%84%CE%B1_%CE%9E%CE%B1%CE%BD%CE%B1%CE%B4%CE%B9%CE%B1%CE%B2%CE%AC%CE%B6%CE%BF%CE%BD%CF%84%CE%B1%CF%82_%CF%84%CE%BF%CE%BD_Daniel_Johann_Elster_%CE%BA%CE%B1%CE%B9_%CF%84%CE%B9%CF%82_%CE%AC%CE%BB%CE%BB%CE%B5%CF%82_%CF%80%CE%B7%CE%B3%CE%AD%CF%82_",
+          "url": "https://www.academia.edu/34806794/_%CE%97_%CF%83%CF%84%CF%81%CE%B1%CF%84%CE%B9%CF%89%CF%84%CE%B9%CE%BA%CE%AE_%CE%B4%CF%81%CE%AC%CF%83%CE%B7_%CF%84%CF%89%CE%BD_%CE%A6%CE%B9%CE%BB%CE%B5%CE%BB%CE%BB%CE%AE%CE%BD%CF%89%CE%BD_%CF%83%CF%84%CE%B7_%CE%BC%CE%AC%CF%87%CE%B7_%CF%84%CE%BF%CF%85_%CE%A0%CE%AD%CF%84%CE%B1_%CE%9E%CE%B1%CE%BD%CE%B1%CE%B4%CE%B9%CE%B1%CE%B2%CE%AC%CE%B6%CE%BF%CE%BD%CF%84%CE%B1%CF%82_%CF%84%CE%BF%CE%BD_Daniel_Johann_Elster_%CE%BA%CE%B1%CE%B9_%CF%84%CE%B9%CF%82_%CE%AC%CE%BB%CE%BB%CE%B5%CF%82_%CF%80%CE%B7%CE%B3%CE%AD%CF%82_",
+          "title": "(PDF) «Η στρατιωτική δράση των Φιλελλήνων στη μάχη του Πέτα. Ξαναδιαβάζοντας τον Daniel-Johann Elster και τις άλλες πηγές»",
+          "description": "Την εντονότερη έκφραση του Φιλελληνισμού, που αναπτύχθηκε κατά τη διάρκεια του αγώνα των Ελλήνων για την απελευθέρωσή τους από τους Οθωμανούς, απετέλεσε η πολεμική δράση που ανέπτυξαν Ευρωπαίοι εθελοντές -κυρίως αξιωματικοί- στο πλευρό των επαναστατών. Στο πλαίσιο της δράσης αυτής συγκροτήθηκε τάγμα Φιλελλήνων, που ακολούθησε -τον Ιούνιο του 1822- τον Αλέξανδρο Μαυροκορδάτο στην εκστρατεία του στην Ήπειρο προς ενίσχυση των Σουλιωτών. Στις 4 Ιουλίου 1822 το εν λόγω τάγμα συγκρούστηκε στο χωριό Πέτα με υπέρτερες αριθμητικά εχθρικές δυνάμεις. Στη μάχη που ακολούθησε οι περισσότεροι από τους Φιλέλληνες περικυκλώθηκαν από τους Οθωμανούς με αποτέλεσμα να φονευθούν όλοι πλην ενός. Η παρούσα ανακοίνωση σκοπό έχει να αναλύσει τη στρατιωτική επιχείρηση των Φιλελλήνων στη μάχη του Πέτα, μέσα από τα στοιχεία που παραθέτει στο ημερολόγιό του ένας από τους ελάχιστους επιζώντες Φιλέλληνες, ο ιατρός του τάγματος Daniel–Johann Elster. Παράλληλα συγκρίνονται οι πληροφορίες του Elster με ό,τι αναφέρουν για τη συγκεκριμένη μάχη οι ελληνικές πηγές (π.χ. απομνημονεύματα), προκειμένου να ελεγχθεί η αξιοπιστία τους. Με βάση τέλος τις πηγές αποτιμώνται εκ νέου τόσο οι συνθήκες της εκστρατείας στην Ήπειρο και η πολιτική που ακολούθησε η ελληνική ηγεσία, όσο και οι συνθήκες που οδήγησαν τους Φιλέλληνες στην ήττα.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" disputed",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 1,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/19840170/El_papel_de_los_actores_pol%C3%ADticos_en_el_conflicto_por_los_bienes_de_La_Franja_seg%C3%BAn_la_prensa_aragonesa_y_catalana",
+          "url": "https://www.academia.edu/19840170/El_papel_de_los_actores_pol%C3%ADticos_en_el_conflicto_por_los_bienes_de_La_Franja_seg%C3%BAn_la_prensa_aragonesa_y_catalana",
+          "title": "(PDF) El papel de los actores políticos en el conflicto por los bienes de La Franja según la prensa aragonesa y catalana",
+          "description": "# El papel de los actores políticos en el conflicto por los bienes de La Franja según la prensa aragones\n\n...\n\nEsta investigación analiza la presencia en la prensa aragonesa y catalana de los actores políticos implicados en el conflicto por los conocidos como “bienes de la Franja”, un litigio por el patrimonio histórico-artístico.que enfrenta desde el 15 de junio de 1995 a las diócesis de Barbastro-Monzón y Lérida. La metodología empleada es un análisis de contenido cuantitativo aplicado a la cobertura de seis periódicos considerados representativos de ambas Comunidades Autónomas: Heraldo de Aragón, El Periódico de Aragón, Diario del Altoaragón, La Vanguardia, El Periódico de Catalunya y Segre. Esta técnica cuantitativa se completa con una perspectiva cualitativa, la de las entrevistas en profundidad realizadas a los directores y periodistas de los rotativos analizados.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" disputed",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 1,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/25826698/A_new_Olympichos_inscription_from_Labraunda_I_LABRAUNDA_137",
+          "url": "https://www.academia.edu/25826698/A_new_Olympichos_inscription_from_Labraunda_I_LABRAUNDA_137",
+          "title": "A new Olympichos inscription from Labraunda: I. LABRAUNDA 137",
+          "description": "A new inscription was discovered at Labraunda in 2014 by Olivier Henry during the excavations of Andron A. The text, labelled I. Labraunda 137 , is an important addition to the dossier of inscriptions already known from the sanctuary that was published by J. Crampa in 1969. This series records a dispute between the priests of Labraunda and the people of Mylasa over the rights to the sanctuary and the surrounding territory in the second half of the third century BC. The figure of Olympichos plays a pivotal part in these affairs: he originally appears as the strategos of Seleukos II after the liberation of the city c. 246 BC; he subsequently remained in the region and is found acting as a local intermediary with Philip V when the dispute was reignited c. 220 BC. During this period, covering at least a quarter of a century, Olympichos is variously found acting as an advocate of the Mylasans to the kings, or defending his conduct against their complaints ; our knowledge of his activities is now supplemented by the new text, which again sees Olympichos taking a central role in local affairs.\n\n...\n\n- It is interesting to note that I. Labraunda 4, the letter of Olympichos to Mylasa regarding the Petra near Labraunda, was inscribed on Andron A; while roughly contemporary with the texts inscribed on Andron B, it was not grouped with them.\n- Before 2014, six marble blocks had been attributed to the antae of the temple: three carrying inscriptions (AB 1, AB 2 (two joining blocks with I. Labraunda 3) and AB 3 (I. Labraunda 1)) 49 ; two anta capitals (AC 1 and AC 2) 50 ; and an uninscribed block (M50).\n- 'The things written by the king' refers to the concessions made to Mylasa by Seleukos II at the time of the city's liberation; it is known that the king sent a letter to his strategos Olympichos (I. Labraunda 3, ll.\n- ]; I restored together with the rest of the land also Labraunda, and concerning this I swore to the people to preserve for the Mylasans their freedom and autonomy for all time and the sanctuaries inviolable that belong to them in their territory and in Larysynia, and (the sanctuary) of Zeus Labraundos and all others, and also the territory by Labraunda and the other land which adjoined Mylasa and all other items which had been granted to them; as to the fortress of Petra in the territory of Olymos, (I said that) I would occupy it until I recovered for the king the money owed for the crown; later, that I restored to the people also this fortress and that having done these things, I will preserve for the city these ancestral rights; the things written by the king, and moreover the oath I swore to the people ...'\n- The text shares many characteristics with other inscriptions from Labraunda that belong to the Olympichos corpus, including I. Labraunda 3 (letter of Olympichos to the Mylasans c. 242/1 BC), which was also inscribed on an anta of the temple, and those inscribed on the antae of Andron A (I. Labraunda 4) and B (I. Labraunda 5, 6, 7), which all relate to the episode involving Philip V in c. 220 BC.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" disputed",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 1,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/128898049/Iconographic_Disputes_in_the_Representation_of_Vices_and_Virtues_The_Series_of_Engravings_The_Seven_Deadly_Sins_and_The_Seven_Virtues_by_Pieter_Bruegel_Pieter_van_der_Heyden_Phillip_Galle_Hieronymus_Cock_and_the_Process_of_Confessionalization_in_the_Habsburg_Netherlands_1550_1560_",
+          "url": "https://www.academia.edu/128898049/Iconographic_Disputes_in_the_Representation_of_Vices_and_Virtues_The_Series_of_Engravings_The_Seven_Deadly_Sins_and_The_Seven_Virtues_by_Pieter_Bruegel_Pieter_van_der_Heyden_Phillip_Galle_Hieronymus_Cock_and_the_Process_of_Confessionalization_in_the_Habsburg_Netherlands_1550_1560_",
+          "title": "(PDF) Iconographic Disputes in the  Representation of Vices and Virtues: The Series of Engravings  The Seven Deadly Sins and The Seven Virtues by Pieter  Bruegel, Pieter van der Heyden, Phillip Galle, Hieronymus  Cock, and the Process of Confessionalization in the Habsburg  Netherlands (1550–1560)",
+          "description": "This dissertation examines the series of engravings The Seven Deadly Sins and The Seven Virtues, published between 1556 and 1560 by Hieronymus Cock's Aux Quatre Vents publishing house in Antwerp. Produced from drawings by Pieter Bruegel and engraved by Pieter van der Heyden and Phillip Galle, the engravings represent the seven deadly sins—Avarice, Gluttony, Pride, Lust, Envy, Sloth, and Wrath—and the seven theological and cardinal virtues—Charity, Faith, Hope, Prudence, Justice, Fortitude, and Temperance. The aim of this research is to analyse the production of these series in the context of the dynamics of Confessionalization and social discipline in the Netherlands during the 1550s and 1560s. Through an iconographic and textual analysis, we explore the differences and similarities between the representations of vices and virtues, reflecting on what these images indicate about confessional conflicts and their multiple spaces of dispute and reception in the political-religious debate. In the context of these political and religious disputes, we propose that these prints had a rhetorical-visual function, intended to reinforce precepts of Christian morality, liberal education, and an active and sanctified life, with the aim of at the restoration of internal peace and concord. We also situate these engravings and the craft of these printers in an environment of humanist scholarship. Concerned with confessional divisions and religious wars, we argue that these engravings functioned as visual pedagogical examples, whose purpose was to educate and discipline Christian behaviour, but above all to defend the unity of the respublica christiana amid confessional tensions.\n\n...\n\npaís. Pesquisa acadêmica é trabalho, e todo trabalho merece reconhecimento e remuneração adequada. 6 RESUMO Esta dissertação examina as séries de gravuras Os Sete Pecados Capitais e As Sete Virtudes, publicadas entre 1556 e 1560 pela oficina editorial Aux Quatre Vents, de Hieronymus Cock e Volcxken Diercx, em Antuérpia. Produzidas a partir dos desenhos de Pieter Bruegel e gravadas por Pieter van der Heyden e Phillip Galle, as gravuras representam os sete pecados capitais — Avareza, Gula, Soberba, Luxúria, Inveja, Preguiça e Ira — e as sete virtudes, teológicas e cardeais — Caridade, Fé, Esperança, Prudência, Justiça, Fortaleza e Temperança. O objetivo desta ... .4cm. The Metropolitan Museum, Nova York. ..................................................... 142 Figura 32 - Fides, terceira de sete gravuras de virtude. Desenho por Pieter Bruegel, placa por Phillip Galle e impressão por Hieronymus Cock. Fólio 24,2 cm x 30,2 cm e placa 22,3cm x 28,7 cm. The Metropolitan Museum, Nova York. ....................................... 149 Figura 33 - Fede Cattolica. In.: Della Novissima Iconologia. Cesare Ripa. Pádua,1624. . ...................................................................................................................................... 152 Figura 34 - Representação alegórica dos santos sacramentos como a Árvore da Cruz. Xilogravura de: Walenty Kuczborski, Catecismo Católico de Michael Helding, Cracóvia 1568. ............................................................................................................................. 153 Figura 35 - Cristo crucificado como fonte dos sacramentos. Gravura em metal. Luca Bertelli, 1569. Cracóvia, Jagiellonian Library. ........................................................... 154 Figura 36 - Typus Ecclesiae Catholicae. Tomasz Treter (inv.), Luca Bertelli (ed.), gravura em cobre, 1574, Cracóvia, Biblioteca Jaguelônica, coleção Jan Ponętowski, portfólio 149, sinal. 9041..................................................................................................................... 155 11 Figura 37 - Figura 37 – Iustitia (1559), quinta de sete gravuras de virtude. Desenho por Pieter Bruegel, placa por Phillip Galle e impressão por Hieronymus Cock. Folha 26 cm x 33,5 cm e placa 22,5cm x 29cm. The Metropolitan Museum, Nova York. ................. 157 Figura 38 - Ira (1558). Desenho por Pieter Bruegel, placa por Phillip Galle e impressão por Hieronymus Cock. Fólio 26 cm x 33,7 cm e placa 22,3cm x 29,2cm. The Metropolitan Museum, Nova York.. .................................................................................................. 164 Figura 39 - Detalhe do folio 167r. In.: Chronica Majora, Mateus de Paris. Fonte: Corpus Christi College, Cambridge. ......................................................................................... 167 Figura 40 - Underweisung und ußlegunge Der Cartha Marina oder die mercarten, Lorenz Fries. Titelseite, 1530. .................................................................................................. 168 Figura 41 - Kunstmann II Portolan. Vinheta de canibalismo na América do Sul, anônimo, atribuído a Américo Vespúcio, 1502-1506. Barry Lawrence Ruderman. .................... 169 Figura 42 – A bruxa e seus espíritos familiares, tirada de uma publicação que tratava dos julgamentos de bruxas de Elizabeth Stile, Madre Dutten, Madre Devell e Madre Margaret em Windsor, Xilogravura, 1579. .................................................................................. 172 Figura 43 - Fortitudo (1560). Desenho por Pieter Bruegel, placa por Phillip Galle e impressão por Hieronymus Cock. Folha 26 cm x 33,7 cm e placa 26,1cm x 33,6cm. The Metropolitan Museum, Nova York. ............................................................................. 174 12 Sumário INTRODUÇÃO .......................................................................................................................... 14 CAPÍTULO 1 Representações e disputas em torno dos vícios e virtudes cristãs ............................................... 30 1.1. Fundamentos, figuras e representações dos vícios e virtudes cristãs ........................... 31 1.2. A religiosidade cotidiana na iconografia dos vícios e virtudes: um olhar para o norte da Europa, sécs. XV e XVI ............................................................................................. 49 CAPÍTULO 2 Paixões e vita activa no ideal do ‘bom cristão’. A pedagogia cristã das séries Os sete pecados capitais e As sete virtudes ........................................................................................................... 64 2.1. Ordenando as paixões .......................................................................................... 69 2.2. Em defesa de uma “santidade atarefada” ................................................................ 91 CAPÍTULO 3 Os sete pecados capitais e As sete virtudes na tensão dos processos confessionais, décadas de 1550 e 1560 ............................................................................................................................... 119 3.1. Historiografia e os processos de Confessionalização nos Países Baixos Habsburgos .. 120 3.2. O pecado destrói a respublica christiana ............................................................... 128 3.3. Entre a ortodoxia católica, a heresia e o infiel ....................................................... 145 CONCLUSÃO .......................................................................................................................... 179 REFERÊNCIAS ........................................................................................................................ 181 13 INTRODUÇÃO Entre 1556 e 1560, Pieter Bruegel (c.1525-1569), o velho, Pieter van der Heyden (c.1530-1572), Phillip Galle (1537-1612) e Hieronymus Cock (c.1518-1570) produziram e publicaram duas séries de gravuras, posteriormente intituladas Os sete pecados capitais e As sete virtudes. Essas composições fazem parte de um conjunto de representações sobre temas religiosos, morais e do cotidiano, criadas por esse grupo no contexto confessional neerlandês do século XVI. Ambas as séries foram impressas pela conhecida casa editora Aux quatre vents, sediada em Antuérpia e de propriedade de Hieronymus Cock e sua esposa, Volcxken Diercx (c.1525-1600). Através de uma análise iconográfica e textual dessas séries, esta pesquisa busca investigar as disputas subjacentes às noções de pecado e virtude no contexto dos conflitos político-religiosos que marcaram os Países Baixos nas décadas de 1550 e 1560. Nosso objetivo é refletir sobre as diferenças visuais e textuais entre essas séries, avaliando se elas indicam uma proposta de educação cívica e devocional suficientemente capaz de posicioná-las dentro de uma disputa mais ampla nas querelas confessionais quinhentistas. Um foco primordial da análise recai sobre as diferenças entre os programas iconográficos e textuais apresentados nessas gravuras. Enquanto a série dos pecados explorava os vícios da Soberba, Avareza, Preguiça, Gula, Luxúria, Inveja e Ira, utilizando monstros e fantasia num estilo reminiscente ao de Hieronymus Bosch (c.1450-1516), a série das virtudes apresentava Caridade, Esperança, Fé, Prudência, Justiça, Fortaleza e Temperança, inseridas em ações concretas de uma vida cotidiana e devota. Argumentamos que essas diferenças indicam um possível momento de inflexão nas representações iconográficas quinhentistas nos Países Baixos Habsburgo, cujas variações estavam ligadas não apenas às transições entre as culturas tardo-medieval e moderna, mas, sobretudo, ao modo como os processos confessionais geraram disputas nas práticas religiosas e nas esferas política e sagrada. Nesse ambiente de disputas, os conceitos de vícios e virtudes, e a dimensão moral e teológica inerente a esses conceitos, tornaram-se ferramentas de demarcação confessional entre protestantes e católicos, atravessando as fronteiras da Europa cristã e permeando as fragmentadas regiões dos Países Baixos, que, naquela época, estavam sob administração da monarquia Habsburga. As décadas de 1550 e 1560 foram particularmente tumultuosas naquela região, destacadas pela historiografia como um 14 momento crucial nas tensões político-religiosas. Os conflitos da metade do século XVI intensificaram as atividades inquisitoriais em toda Europa e o enrijecimento confessional da ortodoxia católica sob Carlos V e Filipe II nos Países Baixos. Essas disputas ameaçavam a existência da Cristandade como um espaço de unidade coletiva para o exercício cívico e religioso do cristianismo. 2 No contexto dessas tensões políticas e religiosas, argumentamos que essas gravuras funcionavam como exemplares retórico-visuais destinados a ensinar e disciplinar as pessoas dentro dos preceitos da moral cristã, da educação liberal e de uma vida santificada e ativa, promovendo uma possível restauração da paz e da concórdia interna. Além disso, situamos essas gravuras, assim como o ofício dos impressores envolvidos na produção dessas séries, em um ambiente de erudição e estudos humanistas. Esses estudiosos estavam particularmente preocupados com as divisões confessionais e as guerras religiosas, que ameaçavam o cumprimento de uma educação moral e cívica verdadeiramente cristã, assim como a própria integridade da Cristandade. Nesse sentido, o título Disputas iconográficas na representação dos vícios e virtudes se justifica pela compreensão de que esses impressos foram pensados e publicados com o objetivo de disputar as práticas religiosas e políticas dos cristãos, utilizando-se, para isso, de um recurso pedagógico fundamentado na moral e no tradicional oposto-complementar vício e virtude. Argumentamos que essas gravuras se inserem nos debates que permeavam o humanismo cristão nos Países Baixos, particularmente no contexto católico, que buscava uma ortodoxia mais flexível, apesar da crescente pressão dogmática de meados do século XVI. Desse modo, defendemos que essa documentação seja particularmente rica para compreendermos as disputas nas posturas confessionais cristãs quinhentista. As gravuras publicadas por Hieronymus Cock, a partir das gravações de Pieter van der Heyden e Phillip Galle, e das criações de Pieter Bruegel, foram amplamente estudadas nos últimos anos. No entanto, não encontramos trabalhos que se concentrem especificamente nas séries dos pecados e virtudes. Quando essas séries são mencionadas, o são apenas de maneira fragmentada, e as análises mais detalhadas costumam se limitar a gravuras específicas dentro dessas coleções. Além disso, em alguns casos, a interpretação dessas gravuras foi mediada por uma visão estereotipada sobre as WOLTJER, Juliaan. “Public Opinion and the Persecution of Heretics in the Netherlands, 1550–59”. In: Judith Pollman e Andrew Spicer (org.), Public Opinion and Changing Identities in the Early Modern Netherlands. Brill: Leiden e Boston, 2007. p.88. 2 15 inclinações político-religiosas desse círculo de impressores, especialmente de Bruegel, que frequentemente emerge na bibliografia como o gênio criador desses desenhos. O primeiro conjunto de estudos, produzido entre 1910 e 1920, analisou as produções gráficas desse círculo de impressores como fruto da genialidade de Bruegel e exemplares de uma arte popular e folclórica flamenga. Autores como Wilhelm Hausenstein (1910) e Max J. Friedländer (1921) concentraram-se nas paisagens e nas cenas em que Bruegel representou camponeses, situando suas composições dentro de um conjunto de obras que capturavam a natureza e a vida rural, definindo-as como expressões de uma arte popular e camponesa. 3 Essa primeira geração de pesquisas incorporava esse conjunto de composições à narrativa de uma história nacional belga e holandesa. Conforme destaca Margareth Sullivan, nesse conjunto bibliográfico, a arte de Bruegel foi compreendida como expressão do “verdadeiro caráter do povo flamengo”, negando qualquer tipo de estrangeirismo, sobretudo de uma arte renascentista italiana. 4 Nas décadas de 1920 e 1930, a noção de “arte popular” e “camponesa” foi reexaminada por gerações de estudiosos da Escola de História da Arte de Viena. Ao se afastarem da visão “popular” atribuída a Bruegel, esses acadêmicos",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" disputed",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 1,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/93833470/_%CE%97_%CF%83%CF%84%CF%81%CE%B1%CF%84%CE%B5%CF%85%CE%BC%CE%AD%CE%BD%CE%B7_%CE%B9%CF%83%CF%84%CE%BF%CF%81%CE%B9%CE%BF%CE%B3%CF%81%CE%B1%CF%86%CE%AF%CE%B1_%CE%BA%CE%B1%CE%B9_%CE%BF_%CE%96%CE%AD%CF%81%CE%B2%CE%B1%CF%82_%CE%9C%CF%8D%CE%B8%CE%BF%CE%B9_%CE%B1%CE%BD%CE%B1%CE%BA%CF%81%CE%AF%CE%B2%CE%B5%CE%B9%CE%B5%CF%82_%CE%BA%CE%B1%CE%B9_%CF%88%CE%B5%CF%8D%CE%B4%CE%B7_%CE%B3%CE%B9%CE%B1_%CF%84%CE%BF%CE%BD_%CE%B7%CE%B3%CE%AD%CF%84%CE%B7_%CF%84%CE%BF%CF%85_%CE%95%CE%94%CE%95%CE%A3_%CE%B5%CE%BA%CE%B4%CF%8C%CF%83%CE%B5%CE%B9%CF%82_%CE%A0%CE%B5%CE%BB%CE%B1%CF%83%CE%B3%CF%8C%CF%82_%CE%91%CE%B8%CE%AE%CE%BD%CE%B1_2022",
+          "url": "https://www.academia.edu/93833470/_%CE%97_%CF%83%CF%84%CF%81%CE%B1%CF%84%CE%B5%CF%85%CE%BC%CE%AD%CE%BD%CE%B7_%CE%B9%CF%83%CF%84%CE%BF%CF%81%CE%B9%CE%BF%CE%B3%CF%81%CE%B1%CF%86%CE%AF%CE%B1_%CE%BA%CE%B1%CE%B9_%CE%BF_%CE%96%CE%AD%CF%81%CE%B2%CE%B1%CF%82_%CE%9C%CF%8D%CE%B8%CE%BF%CE%B9_%CE%B1%CE%BD%CE%B1%CE%BA%CF%81%CE%AF%CE%B2%CE%B5%CE%B9%CE%B5%CF%82_%CE%BA%CE%B1%CE%B9_%CF%88%CE%B5%CF%8D%CE%B4%CE%B7_%CE%B3%CE%B9%CE%B1_%CF%84%CE%BF%CE%BD_%CE%B7%CE%B3%CE%AD%CF%84%CE%B7_%CF%84%CE%BF%CF%85_%CE%95%CE%94%CE%95%CE%A3_%CE%B5%CE%BA%CE%B4%CF%8C%CF%83%CE%B5%CE%B9%CF%82_%CE%A0%CE%B5%CE%BB%CE%B1%CF%83%CE%B3%CF%8C%CF%82_%CE%91%CE%B8%CE%AE%CE%BD%CE%B1_2022",
+          "title": "«Η στρατευμένη ιστοριογραφία και ο Ζέρβας. Μύθοι, ανακρίβειες και ψεύδη για τον ηγέτη του ΕΔΕΣ», εκδόσεις Πελασγός, Αθήνα 2022.",
+          "description": "την κατασυκοφάντηση των αντιπάλων του, αποστολή που ... Μισές αλήθειες και ολόκληρα ψέματα, εντυπωσιακοί επιθετικοί προσδιορισμοί ... των αντιπάλων του, αλλά ουσία μηδέν. Την προσπάθεια αυτή συνέχισε η",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρο Λάντζα\" disputed",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 1,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Πέτρο Λάντζα\\\" disputed\", \"providers\": [{\"provider\": \"google\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"FIRST_PAGE_ONLY\", \"returned_records\": 1, \"service\": \"SerpAPI / Google organic results\", \"more_results_available\": null}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 10, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 10, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\" history",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/freddie-mercurys-naturalisation-certificate/",
+          "title": "Freddie Mercury’s naturalisation certificate",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/freddie-mercurys-naturalisation-certificate/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/adrienne-de-lafayettes-letter-to-marquis-de-lafayette/",
+          "title": "Adrienne de Lafayette’s letter to her husband, Marquis de Lafayette",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/adrienne-de-lafayettes-letter-to-marquis-de-lafayette/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/the-battle-of-cable-street/",
+          "title": "The Battle of Cable Street",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/the-battle-of-cable-street/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/ivf-and-reproductive-technology-in-the-archive/",
+          "title": "IVF and reproductive technology in the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/ivf-and-reproductive-technology-in-the-archive/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/the-american-privateer-and-the-secret-copy-of-the-declaration-of-independence/",
+          "title": "The American privateer and the secret copy of the Declaration of Independence",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/the-american-privateer-and-the-secret-copy-of-the-declaration-of-independence/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/april-ashley/",
+          "title": "April Ashley: 'being myself’",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/april-ashley/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/james-stagg-the-weatherman-who-turned-the-tide-of-d-day/",
+          "title": "James Stagg: The weatherman who turned the tide of D-Day",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/james-stagg-the-weatherman-who-turned-the-tide-of-d-day/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/katherine-howards-letter-to-thomas-culpeper/",
+          "title": "Katherine Howard's letter to Thomas Culpeper",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/katherine-howards-letter-to-thomas-culpeper/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/the-general-strike/",
+          "title": "The General Strike",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/the-general-strike/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/following-the-colonial-movements-of-cloves/",
+          "title": "Letters from the curator of St Vincent Botanic Gardens",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/following-the-colonial-movements-of-cloves/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/ann-nevil-the-most-notorious-malafactor-imaginable/",
+          "title": "Ann Nevil: 'The most Notorious Malafactor Imaginable'",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/ann-nevil-the-most-notorious-malafactor-imaginable/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/plea-roll-for-the-court-of-kings-bench/",
+          "title": "Plea roll for the Court of King’s Bench, with a portrait of Henry VIII",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/plea-roll-for-the-court-of-kings-bench/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/queer-classified-adverts-and-love-letters-in-the-1920s/",
+          "title": "Queer classified adverts and love letters in the 1920s",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/queer-classified-adverts-and-love-letters-in-the-1920s/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/affidavit-describing-the-uprising-of-enslaved-people-onboard-the-bedford/",
+          "title": "Affidavit describing the uprising of enslaved people onboard the Bedford",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/affidavit-describing-the-uprising-of-enslaved-people-onboard-the-bedford/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/henry-savage-sweetman-the-man-who-uncovered-irelands-medieval-history/",
+          "title": "Henry Savage Sweetman: The man who uncovered Ireland’s medieval history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/henry-savage-sweetman-the-man-who-uncovered-irelands-medieval-history/",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22+history ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\" disputed",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/mary-iis-love-letters-to-william-iii/",
+          "title": "Mary II’s love letters to William III",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/mary-iis-love-letters-to-william-iii/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "research guide",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/three-wooden-models-of-railway-carriage-wheels/",
+          "title": "Three wooden wheel models used as court exhibits",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/three-wooden-models-of-railway-carriage-wheels/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22+disputed ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22 ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "result_count": 58,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
