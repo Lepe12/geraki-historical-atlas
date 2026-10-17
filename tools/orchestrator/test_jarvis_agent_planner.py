@@ -46,6 +46,12 @@ class AgentPlannerTests(unittest.TestCase):
         self.assertEqual(len(plan["selected_agents"]),11)
         self.assertEqual(plan["confidence"],"LOW")
 
+    def test_input_script_does_not_assign_geography(self):
+        for target in ('Πέτρος λαντζας','Χένρι Μόργκαν','Pedro Lanza'):
+            plan=plan_agents({'target':target,'purpose':'Find archival sources'},self.policy())
+            self.assertEqual(len(plan['selected_agents']),11,target)
+            self.assertIn('spanish_simancas',plan['selected_agents'])
+
     def test_explicit_comprehensive_request_expands_to_all_agents(self):
         plan=plan_agents({
             "target":"Petros Lantzas",
