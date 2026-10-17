@@ -24,7 +24,8 @@
     document.body.classList.toggle('deck-nav-closed',!open);
     navPanel.inert=!open;
     navBtn.setAttribute('aria-expanded',String(open));
-    navBtn.textContent=open?'◧ ΚΛΕΙΣΙΜΟ ΤΟΜΕΩΝ':'◧ ΤΟΜΕΙΣ';
+    navBtn.textContent='Προβολή χάρτη';
+    if(!open){navPanel.querySelectorAll('details[open]').forEach(el=>el.open=false);if(navPanel.contains(document.activeElement))navBtn.focus({preventScroll:true});}
   }
   function setActivity(open){
     activity.classList.toggle('deck-expanded',open);
@@ -38,12 +39,12 @@
     if(except!=='detail' && inspector && !inspector.classList.contains('hidden')) $('closeDetail')?.click();
   }
 
-  const navBtn=button('◧ NAVIGATION','deckNav',true,()=>setNav(document.body.classList.contains('deck-nav-closed')));
+  const navBtn=button('Προβολή χάρτη','deckNav',false,()=>setNav(document.body.classList.contains('deck-nav-closed')));
   const activityBtn=button('◷ ΠΟΡΕΙΑ','deckActivity',false,()=>setActivity(!activity.classList.contains('deck-expanded')));
   button('⌖ ΕΠΑΝΑΦΟΡΑ ΧΑΡΤΗ','deckReset',false,()=>$('resetView')?.click());
   app.appendChild(controls);
 
-  setNav(!window.matchMedia('(max-width:900px)').matches);
+  setNav(false);
 
   const activityHead=activity.querySelector('.activity-head');
   if(activityHead){
@@ -70,7 +71,8 @@
   }
 
   document.querySelectorAll('.section-btn').forEach(el=>el.addEventListener('click',()=>{
-    if(window.matchMedia('(max-width:900px)').matches)setNav(false);
+    document.querySelectorAll('.section-btn').forEach(button=>button.setAttribute('aria-pressed',String(button===el)));
+    setNav(false);navBtn.focus({preventScroll:true});
   }));
 
   const panels=[results,learning,inspector].filter(Boolean);
@@ -93,17 +95,18 @@
   const viewRail=document.querySelector('.exp-rail');
   if(viewRail){
     const heading=document.createElement('div');heading.className='view-rail-label label';heading.textContent='ΠΡΟΒΟΛΗ';viewRail.prepend(heading);
-    navPanel.querySelector('.nav-sections').after(viewRail);
+    const options=$('mapViewOptions');if(options)options.append(viewRail);else navPanel.querySelector('.nav-sections').after(viewRail);
   }
   document.addEventListener('keydown',e=>{
 
     if(e.key==='Escape'){
       closeRightPanels();
       if(activity.classList.contains('deck-expanded'))setActivity(false);
-      if(window.matchMedia('(max-width:900px)').matches)setNav(false);
+      setNav(false);
     }
   });
 
   const mq=window.matchMedia('(max-width:900px)');
-  mq.addEventListener?.('change',e=>setNav(!e.matches));
+  mq.addEventListener?.('change',()=>setNav(false));
+  document.addEventListener('pointerdown',e=>{if(!navPanel.contains(e.target)&&!navBtn.contains(e.target))setNav(false);});
 })();

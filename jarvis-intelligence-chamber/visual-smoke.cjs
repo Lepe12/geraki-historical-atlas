@@ -15,6 +15,7 @@ const result=await page.evaluate(()=>({canvasWidth:document.querySelector("#univ
 report.screens.push({name,...result});
 await page.waitForFunction(()=>document.body.dataset.researchFeed==='LIVE'&&document.body.dataset.currentResearchRun,{timeout:20000});
 report.transport={url:page.url(),mode:await page.evaluate(()=>document.body.dataset.researchFeed),run:await page.evaluate(()=>document.body.dataset.currentResearchRun)};
+assert.equal(await page.locator("#deckNav").getAttribute("aria-expanded"),"false","Map View must start closed on desktop and mobile");
 await page.screenshot({path:out+"/"+name+".png",fullPage:true});
 assert.ok(result.canvasWidth>100,"Renderer must own visible canvas");
 assert.match(result.fps,/^[0-9]+ FPS$/,"Frame loop must advance");
@@ -30,12 +31,17 @@ if(name==="desktop"){
  await page.locator("#zoomIn").click();await page.waitForTimeout(900);
  const after=await page.evaluate(()=>{const n=[...document.querySelectorAll(".node-label")].find(x=>x.textContent.includes("Greece"));const r=n.getBoundingClientRect();return Math.hypot(r.left+r.width/2-innerWidth*.5,r.top+r.height/2-innerHeight*.5)});
  assert.ok(after>before+8,"Zoom-in must visibly increase projected node distance");
+ await page.locator("#deckNav").click();
+ assert.equal(await page.locator("#deckNav").getAttribute("aria-expanded"),"true","Map View opens on demand");
  await page.locator('[data-view="archives"]').click();
+ assert.equal(await page.locator("#deckNav").getAttribute("aria-expanded"),"false","Selecting map focus closes the menu");
  await page.waitForFunction(()=>!document.querySelector('#detailPanel').classList.contains('hidden'));
  assert.equal((await page.locator('#detailTitle').innerText()).trim(),'Spain','Archive navigation must open the current Spain sector');
  const liveDetail=page.locator('#detailLive');
  if(await liveDetail.count())assert.match(await liveDetail.innerText(),/RUN/,'When the selected agent exists in the current run, its recorded run detail must render');
  else assert.ok((await page.locator('#detailState').innerText()).trim().length>0,'Sector detail state must render even when that agent is absent from the current live run');
+ await page.locator("#deckNav").click();
+ await page.locator("#mapViewOptions summary").click();
  await page.locator('[data-mode="contradictions"]').click();
  assert.ok(!(await page.locator('#resultsList').innerText()).includes('ΕΜΠΟΔΙΟ ·'),'Contradictions must not display access blockers');
  await page.locator('#closeResults').click();
