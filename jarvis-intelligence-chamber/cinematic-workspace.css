@@ -1,5 +1,5 @@
 /* Cinematic navigation over existing navy/ice/cyan color tokens. */
-.nx-workspace .nabou-rail,.nx-workspace .deck-controls,.nx-workspace .left-panel{display:none!important}
+.nx-workspace .nabou-rail,.nx-workspace .deck-controls,.nx-workspace .left-panel,.nx-workspace .results-toggle,.nx-workspace .learning-toggle{display:none!important}
 .nx-ui{position:absolute;inset:0;z-index:19;pointer-events:none}
 .nx-dock{pointer-events:auto;position:absolute;left:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:4px;padding:16px 7px;background:linear-gradient(90deg,rgba(2,10,20,.92),rgba(3,14,27,.55));border-left:1px solid var(--line);box-shadow:15px 0 65px rgba(0,0,0,.20);backdrop-filter:blur(18px)}
 .nx-dock button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:68px;min-height:64px;background:transparent;border:0;border-left:2px solid transparent;color:var(--faint);cursor:pointer;transition:background .24s,border-color .24s,color .24s}
@@ -20,3 +20,14 @@
 @media(max-width:900px){.nx-dock{left:2px;gap:0;padding:5px 3px}.nx-dock button{width:48px;min-height:47px}.nx-dock button>span{font-size:21px}.nx-dock button>small{font-size:7px}.nx-drawer{left:56px;top:100px;bottom:110px;width:calc(100vw - 65px);padding:16px}.nx-drawer h2{font-size:28px}.nx-agent-grid{grid-template-columns:1fr 1fr}.nx-agent{font-size:10px}}
 @media(max-height:600px){.nx-dock button{min-height:40px}.nx-dock button>span{font-size:19px}}
 @media(prefers-reduced-motion:reduce){.nx-drawer,.nx-dock button{transition:none}}
+
+
+/* Unified panel ownership: the Photon dock is the only visible primary navigation. */
+.nx-workspace .activity-strip{transition:opacity .2s,transform .2s,background .2s,border-color .2s}
+.nx-workspace .activity-strip:not(.nx-activity-open) .activity-lines{max-height:22px;overflow:hidden}
+.nx-workspace .activity-strip.nx-activity-open{
+  background:rgba(3,14,26,.95)!important;
+  border:1px solid rgba(81,224,237,.18)!important;
+  box-shadow:0 18px 60px #000a!important
+}
+.nx-workspace .nx-dock button[aria-current="page"]>span{color:var(--white)}
