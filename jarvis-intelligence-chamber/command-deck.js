@@ -97,6 +97,58 @@
     const heading=document.createElement('div');heading.className='view-rail-label label';heading.textContent='ΠΡΟΒΟΛΗ';viewRail.prepend(heading);
     const options=$('mapViewOptions');if(options)options.append(viewRail);else navPanel.querySelector('.nav-sections').after(viewRail);
   }
+
+  // Photon-inspired compact workspace rail. All actions route through existing
+  // controls; this does not replace or simulate any research subsystem.
+  const rail=document.createElement('nav');
+  rail.className='nabou-rail';
+  rail.setAttribute('aria-label','Βασικές λειτουργίες NABOU//X');
+  const items=[
+    ['map','◈','Χάρτης'],
+    ['agents','⌘','Agents'],
+    ['sources','⊞','Πηγές'],
+    ['findings','⌕','Ευρήματα'],
+    ['learning','▤','Μνήμη PDF'],
+    ['history','◷','Ιστορικό']
+  ];
+  const railButtons=new Map();
+  function choose(id){
+    for(const [key,el] of railButtons)el.setAttribute('aria-current',key===id?'page':'false');
+  }
+  for(const [id,glyph,label] of items){
+    const b=document.createElement('button');b.type='button';
+    b.className='nabou-rail-item';b.dataset.section=id;
+    b.setAttribute('aria-label',label);b.title=label;
+    const mark=document.createElement('span');mark.className='nabou-rail-glyph';mark.setAttribute('aria-hidden','true');mark.textContent=glyph;
+    const caption=document.createElement('span');caption.className='nabou-rail-caption';caption.textContent=label;
+    b.append(mark,caption);rail.append(b);railButtons.set(id,b);
+    b.addEventListener('click',()=>{
+      choose(id);
+      if(id==='map'){$('resetView')?.click();closeRightPanels();setNav(false);}
+      if(id==='agents'){closeRightPanels();setNav(true);}
+      if(id==='sources'||id==='findings'||id==='history'){
+        if(results?.classList.contains('hidden'))$('resultsToggle')?.click();
+        if(id==='history'){
+          const options=results?.querySelector('.result-options');if(options)options.open=true;
+          $('researchRunId')?.focus({preventScroll:true});
+        }else if(id==='sources'){
+          $('resultSearch')?.focus({preventScroll:true});
+        }
+      }
+      if(id==='learning'&&learning?.classList.contains('hidden'))$('learningToggle')?.click();
+    });
+  }
+  choose('map');app.appendChild(rail);
+  // Original deck controls remain available as a single map-options control.
+  controls.classList.add('nabou-deck-secondary');
+  document.querySelector('#deckReset')?.setAttribute('title','Επαναφορά χάρτη');
+  const railSync=new MutationObserver(()=>{
+    if(!learning?.classList.contains('hidden'))choose('learning');
+    else if(!results?.classList.contains('hidden')&&!['sources','history'].includes(rail.querySelector('[aria-current="page"]')?.dataset.section))choose('findings');
+  });
+  if(results)railSync.observe(results,{attributes:true,attributeFilter:['class']});
+  if(learning)railSync.observe(learning,{attributes:true,attributeFilter:['class']});
+
   document.addEventListener('keydown',e=>{
 
     if(e.key==='Escape'){
