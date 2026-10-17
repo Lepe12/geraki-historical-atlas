@@ -58,7 +58,7 @@ class ResearchFocusTests(unittest.TestCase):
         from connectors.repository_connectors import dispatch
         with patch('connectors.repository_connectors._get') as remote:
             status,rows,detail=dispatch('Public Web Source Discovery','"Pedro Lanza"','travellers')
-        self.assertEqual(status,'UNAVAILABLE')
+        self.assertEqual(status,'API_KEY_REQUIRED')
         self.assertEqual(rows,[])
         self.assertIn('WEB_SEARCH_PROVIDER_NOT_CONFIGURED',detail)
         remote.assert_not_called()
@@ -144,9 +144,9 @@ class ResearchFocusTests(unittest.TestCase):
         from connectors.repository_connectors import _public_site_index
         with patch('connectors.repository_connectors._get') as remote:
             status,rows,detail=_public_site_index('name','greek','Repository','example.org')
-        self.assertEqual(status,'UNAVAILABLE')
+        self.assertEqual(status,'API_KEY_REQUIRED')
         self.assertEqual(rows,[])
-        self.assertIn('search was not executed',detail)
+        self.assertIn('WEB_SEARCH_PROVIDER_NOT_CONFIGURED',detail)
         remote.assert_not_called()
 
 if __name__=='__main__':unittest.main()

@@ -144,6 +144,9 @@ jobs:
   specialist-research:
     needs: prepare
     uses: ./.github/workflows/jarvis-specialist-research.yml
+    secrets:
+      SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
     with:
       request_id: ${{ inputs.request_id }}
       target: ${{ needs.prepare.outputs.target }}
@@ -167,6 +170,8 @@ jobs:
       PCT_RESEARCH_JOB_ID: ${{ needs.prepare.outputs.research_job_id }}
       PCT_RESEARCH_LANE: ${{ matrix.lane }}
       SEARCHCULTURE_API_KEY: ${{ secrets.SEARCHCULTURE_API_KEY }}
+      SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
+      BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -425,4 +430,5 @@ jobs:
           git diff --cached --quiet && exit 0
           git commit -m "JARVIS state board $PCT_RUN_ID"
           bash tools/push_with_retry.sh
+
 

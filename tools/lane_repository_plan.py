@@ -25,10 +25,9 @@ cfg={
 }
 langs={"greek":["Greek","Katharevousa","English","French","Italian","Latin"],"spanish_simancas":["Spanish","Latin"],"venetian":["Italian","Venetian","Latin"],"french":["French"],"british":["English"],"dutch":["Dutch"],"german":["German","Latin"],"italian_states":["Italian","Latin"],"ottoman":["Ottoman Turkish","Turkish"],"north_african":["Arabic","Ottoman Turkish","French","Spanish","Italian"],"travellers":["French","Italian","English","Dutch","German","Spanish","Latin","Greek"]}
 if lane not in cfg: raise SystemExit("Unknown PCT_RESEARCH_LANE: "+lane)
-# Retain the open-web coverage target as explicitly unavailable until a
-# replacement provider is configured. Do not silently substitute a provider.
+# Google results via SerpAPI plus Brave; missing keys remain explicit blockers.
 if lane=='travellers':
-    cfg[lane].insert(0,("Public Web Source Discovery",""))
+    cfg[lane].insert(0,("Public Web Source Discovery","https://serpapi.com/search.json"))
 terms=[ctx["target"]]+ctx["aliases"]
 ident=identity(req,ctx)
 specialists=specialist_plan(ctx["target"],ctx["purpose"],ctx["date_range"],ctx["aliases"],ident["type"] if ident["type"] in ("place","person","event") else "all")
