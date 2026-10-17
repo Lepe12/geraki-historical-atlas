@@ -10,7 +10,7 @@ const target=process.env.JARVIS_TEST_URL||"http://127.0.0.1:4179/jarvis-intellig
 // Public URL checks use the server's real CORS headers without this adapter.
 if(new URL(target).hostname==='127.0.0.1')await page.route('https://pct-live.piratecartography.com/pct-api/live/status/**',async route=>{const response=await route.fetch();assert.equal(response.status(),200);await route.fulfill({response,headers:{...response.headers(),'access-control-allow-origin':new URL(target).origin}})});
 await page.goto(target,{waitUntil:"networkidle",timeout:60000});
-await page.waitForFunction(()=>/^[0-9]+ FPS$/.test(document.querySelector("#fps")?.textContent||""),{timeout:30000});
+try{await page.waitForFunction(()=>/^[0-9]+ FPS$/.test(document.querySelector("#fps")?.textContent||""),{timeout:30000});}catch(err){console.error("FPS DIAGNOSTIC",JSON.stringify(await page.evaluate(()=>({fps:document.querySelector("#fps")?.textContent,canvas:!!document.querySelector("#universe"),map:document.querySelector("#nxMediterranean")?.dataset.mapError,hasMap:!!document.querySelector("#nxMediterranean"),body:document.body.className}))),report.errors);throw err;}
 const result=await page.evaluate(()=>({canvasWidth:document.querySelector("#universe")?.width,labels:document.querySelectorAll(".node-label").length,bodyWidth:document.body.scrollWidth,viewport:innerWidth,detailHidden:document.querySelector("#detailPanel")?.classList.contains("hidden"),fps:document.querySelector("#fps")?.textContent,hasGreek:[...document.querySelectorAll(".node-label")].some(n=>n.textContent.includes("Greece")),hasMasthead:!!document.querySelector(".masthead"),hasSidebar:!!document.querySelector(".left-panel"),hasCentralHud:!!document.querySelector(".central-hud")}));
 report.screens.push({name,...result});
 await page.waitForFunction(()=>document.body.dataset.researchFeed==='LIVE'&&document.body.dataset.currentResearchRun,{timeout:20000});
@@ -18,6 +18,9 @@ report.transport={url:page.url(),mode:await page.evaluate(()=>document.body.data
 assert.equal(await page.locator("#nxDrawer").getAttribute("aria-hidden"),"true","Cinematic agent drawer must start closed");
 assert.equal(await page.locator(".nx-dock [data-nx]").count(),7,"All workspace navigation destinations must exist");
 await page.screenshot({path:out+"/"+name+".png",fullPage:true});
+assert.equal(await page.locator("#nxMediterranean").count(),1,"Geographic Mediterranean layer must be mounted");
+assert.equal(await page.locator(".nx-ops").count(),1,"Agent inspector must contain live telemetry");
+assert.equal(await page.locator(".nx-dock [data-nx]").count(),7,"Cinematic menu destinations must be available");
 assert.ok(result.canvasWidth>100,"Renderer must own visible canvas");
 assert.match(result.fps,/^[0-9]+ FPS$/,"Frame loop must advance");
 assert.equal(result.labels,17,"17 research nodes including Greek Archives must exist");
