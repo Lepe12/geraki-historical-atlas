@@ -1,4 +1,4 @@
-"""Bounded Google (SerpAPI) and Brave web discovery; never historical verification."""
+"""Bounded Google (SerpAPI) and Exa web discovery; never historical verification."""
 from concurrent.futures import ThreadPoolExecutor
 import json
 import os
@@ -7,11 +7,12 @@ import urllib.parse
 import urllib.request
 
 
-PROVIDERS=(('google','SERPAPI_API_KEY'),('brave','BRAVE_SEARCH_API_KEY'))
+PROVIDERS=(('google','SERPAPI_API_KEY'),('exa','EXA_API_KEY'))
 
 
-def _request_json(url,headers):
-    req=urllib.request.Request(url,headers={'User-Agent':'Piratecartography-Research/3.0',
+def _request_json(url,headers,payload=None):
+    body=json.dumps(payload).encode('utf-8') if payload is not None else None
+    req=urllib.request.Request(url,data=body,headers={'User-Agent':'Piratecartography-Research/3.0',
                                           'Accept':'application/json',**headers})
     with urllib.request.urlopen(req,timeout=18) as response:
         return json.loads(response.read(4_000_001).decode('utf-8'))
@@ -28,7 +29,7 @@ def _url(value,domain=None):
     return urllib.parse.urlunsplit((p.scheme,p.netloc,p.path,p.query,''))
 
 
-def _provider_search(provider,key,query):
+def _provider_search(provider,key,query,domain=None):
     """One request per provider/query. Diagnostics never include keys or raw errors."""
     attempt={'provider':provider,'status':'API_KEY_REQUIRED','request_performed':False,
              'pagination':'NOT_EXECUTED','returned_records':0}
@@ -36,6 +37,7 @@ def _provider_search(provider,key,query):
     attempt['request_performed']=True
     try:
         if provider=='google':
+            query=('site:'+domain+' ' if domain else '')+query
             url='https://serpapi.com/search.json?'+urllib.parse.urlencode(
                 {'engine':'google','q':query,'api_key':key,'start':0})
             data=_request_json(url,{})
@@ -54,18 +56,20 @@ def _provider_search(provider,key,query):
                   for x in items if isinstance(x,dict)]
             attempt['service']='SerpAPI / Google organic results'
         else:
-            url='https://api.search.brave.com/res/v1/web/search?'+urllib.parse.urlencode(
-                {'q':query,'count':10,'offset':0})
-            data=_request_json(url,{'X-Subscription-Token':key})
+            payload={'query':query,'type':'auto','numResults':10,
+                     'contents':{'highlights':True}}
+            if domain:payload['includeDomains']=[domain]
+            data=_request_json('https://api.exa.ai/search',
+                               {'x-api-key':key,'Content-Type':'application/json'},payload)
             if not isinstance(data,dict) or data.get('error'):raise ValueError('PROVIDER_ERROR')
-            items=(data.get('web') or {}).get('results')
-            # An absent web block isn't proof that a web search completed empty.
+            items=data.get('results')
             if not isinstance(items,list):raise ValueError('UNRECOGNIZED_RESULTS')
-            more=(data.get('query') or {}).get('more_results_available')
-            rows=[{'url':x.get('url'),'title':x.get('title'),'snippet':x.get('description')}
+            more=None
+            rows=[{'url':x.get('url'),'title':x.get('title'),
+                   'snippet':'\n'.join(h for h in x.get('highlights',[]) if isinstance(h,str))}
                   for x in items if isinstance(x,dict)]
-            attempt['service']='Brave Search API'
-        attempt.update(status='EXECUTED',pagination='FIRST_PAGE_ONLY',
+            attempt['service']='Exa Search API'
+        attempt.update(status='EXECUTED',pagination='FIRST_PAGE_ONLY' if provider=='google' else 'TOP_K_ONLY',
                        more_results_available=more,returned_records=len(rows))
         return attempt,rows
     except urllib.error.HTTPError as exc:
@@ -80,7 +84,7 @@ def search(q,lane,repository,domain=None,max_records=20):
     """Query both configured providers and retain provider-level coverage failures."""
     query=('site:'+domain+' ' if domain else '')+str(q)
     with ThreadPoolExecutor(max_workers=2) as pool:
-        outputs=list(pool.map(lambda p:_provider_search(p[0],os.getenv(p[1],''),query),PROVIDERS))
+        outputs=list(pool.map(lambda p:_provider_search(p[0],os.getenv(p[1],''),str(q),domain),PROVIDERS))
     attempts=[attempt for attempt,_ in outputs]
     by_url={}
     for attempt,items in outputs:
@@ -102,7 +106,7 @@ def search(q,lane,repository,domain=None,max_records=20):
             }
     rows=list(by_url.values())
     diagnostic={'schema':'pct-web-search-coverage-v1','query':query,'providers':attempts,
-                'coverage':'BOUNDED_FIRST_PAGE_ONLY','unique_records':len(rows),
+                'coverage':'BOUNDED_TOP_RESULTS_ONLY','unique_records':len(rows),
                 'truncated_records':max(0,len(rows)-max_records),
                 'source_independence':'PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION'}
     for row in rows:row['search_provider_attempts']=attempts
