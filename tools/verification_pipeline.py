@@ -4,6 +4,7 @@ import json,os,pathlib,datetime,hashlib,sys
 sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from request_context import load_request
 from evidence_model import normalize_date,toponym_identity
+from research_focus import decompose
 from research_relevance import candidate_research_value,evidence_confidence,retention_contract
 from exact_page_mapping import pages_for_hit
 from claim_evidence_matrix import build_lane as build_claim_evidence_matrix
@@ -72,17 +73,29 @@ write("source_genealogy/genealogy_queue.json",{
 page_by_source={}
 for p in pages:page_by_source.setdefault(str(p.get("source_file","")),[]).append(p)
 candidates=[]
+def pdf_matches(file,line):
+    found=[]
+    for record in acq:
+        document=record.get('web_acquisition') or {}
+        if not any(pathlib.Path(f).name==file for f in document.get('files',[]) if str(f).endswith('.txt')):continue
+        for page in document.get('pages',[]):
+            if page.get('start_line',0)<=int(line or 0)<=page.get('end_line',-1):
+                found.append({'identifier':record.get('identifier'),'source_file':file,'printed_page':None,
+                              'scan_index_0_based':page['scan_index_0_based'],'pdf_file':document.get('pdf_file'),
+                              'mapping_basis':'PDF_TEXT_PAGE_BOUNDARY','original_inspected':False})
+    return found
 
 for i,h in enumerate(events,1):
-    src=h.get("file");related=pages_for_hit(pages,src,i-1,h.get("line"))
-    topo=toponym_identity(h.get("place_match"),ctx["target"],ctx["aliases"])
+    src=h.get("file");related=pages_for_hit(pages,src,i-1,h.get("line"))+pdf_matches(src,h.get("line"))
+    topo=(toponym_identity(h.get("place_match"),ctx["target"],ctx["aliases"])
+          if decompose(ctx['target'],ctx['aliases'])['kind']!='person' else None)
     dnorm=normalize_date(" / ".join(str(y) for y in h.get("years_in_scope",[])), h.get("date_role","UNRESOLVED"))
     candidate={
       "candidate_id":f"{LANE}-event-{i:04d}","lane":LANE,"source_file":src,
       "source_type":"OCR_CONTEXT","evidence_state":"ACQUIRED" if related else "LOCATED",
-      "place":topo,"date":dnorm,"event_terms":h.get("event_terms",[]),
+      "place":topo,"target_entity":{"kind":decompose(ctx["target"],ctx["aliases"])["kind"],"observed_name":h.get("place_match"),"identity_status":"UNVERIFIED"},"date":dnorm,"event_terms":h.get("event_terms",[]),
       "event_type":"UNKNOWN","actor":"UNKNOWN","context_excerpt":h.get("context_excerpt"),
-      "exact_page_candidates":[{"identifier":p.get("identifier"),"printed_page":p.get("printed_page"),"leaf":p.get("leaf"),"image_file":p.get("image_file")} for p in related],
+      "exact_page_candidates":[{"identifier":p.get("identifier"),"printed_page":p.get("printed_page"),"leaf":p.get("leaf"),"image_file":p.get("image_file"),"pdf_file":p.get("pdf_file"),"scan_index_0_based":p.get("scan_index_0_based")} for p in related],
       "original_quote":None,"controlled_transcription":None,"translation":None,
       "source_says":None,"researcher_inference":None,"original_inspected":False,
       "extracted":False,"corroborated":False,"machine_status":"NOT_ORIGINAL_VERIFIED",
@@ -95,13 +108,14 @@ for i,h in enumerate(events,1):
 
 for j,h in enumerate(catalogue_leads,1):
     if h.get("status")!="CATALOGUE_METADATA_LEAD":continue
-    topo=toponym_identity(h.get("place_match"),ctx["target"],ctx["aliases"])
+    topo=(toponym_identity(h.get("place_match"),ctx["target"],ctx["aliases"])
+          if decompose(ctx['target'],ctx['aliases'])['kind']!='person' else None)
     dnorm=normalize_date(" / ".join(str(y) for y in h.get("years_in_scope",[])), h.get("date_role","UNRESOLVED"))
     candidate={
       "candidate_id":f"{LANE}-catalogue-{j:04d}","lane":LANE,
       "source_file":None,"source_type":"CATALOGUE_METADATA",
       "repository":h.get("repository"),"identifier":h.get("identifier"),"url":h.get("url"),"title":h.get("title"),
-      "evidence_state":"LOCATED","place":topo,"date":dnorm,"event_terms":h.get("event_terms",[]),
+      "evidence_state":"LOCATED","place":topo,"target_entity":{"kind":decompose(ctx["target"],ctx["aliases"])["kind"],"observed_name":h.get("place_match"),"identity_status":"UNVERIFIED"},"date":dnorm,"event_terms":h.get("event_terms",[]),
       "event_type":"UNKNOWN","actor":"UNKNOWN","context_excerpt":h.get("context_excerpt"),"exact_page_candidates":[],
       "original_quote":None,"controlled_transcription":None,"translation":None,
       "source_says":None,"researcher_inference":None,"original_inspected":False,
@@ -113,6 +127,14 @@ for j,h in enumerate(catalogue_leads,1):
     candidate["evidence_confidence"]=evidence_confidence(candidate)
     candidate["retention"]=retention_contract("REVIEW_REQUIRED")
     candidates.append(candidate)
+
+for candidate in candidates:
+    for locator in candidate.get('exact_page_candidates',[]):
+        if locator.get('pdf_file'):
+            inspection.append({'lane':LANE,'source_id':locator.get('identifier'),
+                               'pdf_file':locator['pdf_file'],'scan_index_0_based':locator['scan_index_0_based'],
+                               'printed_page':None,'evidence_state':'ACQUIRED','status':'NEEDS_ORIGINAL_INSPECTION','original_inspected':False})
+write('original_inspection/inspection_queue.json',{'schema':'pct-original-inspection-queue-v2','generated_utc':NOW,'lane':LANE,'items':inspection,'gate':'Acquisition is not original inspection.'})
 
 write("structured_output/candidate_events.json",{
  "schema":"pct-structured-candidates-v4","generated_utc":NOW,"lane":LANE,

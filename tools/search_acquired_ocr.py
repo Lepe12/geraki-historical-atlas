@@ -3,6 +3,7 @@
 import json,pathlib,re,datetime,unicodedata,sys
 sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from request_context import load_request
+from research_focus import decompose
 rf,req,ctx=load_request()
 root=pathlib.Path("library_acquisition");out=pathlib.Path("citation_chase_hits");out.mkdir(exist_ok=True)
 
@@ -21,7 +22,8 @@ def norm(s):
     return re.sub(r"[ \t]+"," ",s)
 def line_no(text,pos):return text.count("\n",0,pos)+1
 hits=[]
-terms=[("PLACE",t) for t in place]+[("REQUEST_LEAD",t) for t in lead_values]
+target_group="PLACE" if decompose(ctx["target"],ctx["aliases"])["kind"]=="place" else "TARGET_ENTITY"
+terms=[(target_group,t) for t in place]+[("REQUEST_LEAD",t) for t in lead_values]
 for p in sorted(root.glob("*")):
     if not p.is_file() or p.name=="acquisition_report.json" or p.suffix.lower() not in (".txt",".xml",".html",".htm"):continue
     try:raw=p.read_text(encoding="utf-8",errors="ignore")
@@ -34,6 +36,6 @@ for p in sorted(root.glob("*")):
             hits.append({"file":p.name,"group":group,"term":term,"matched":m.group(0),"line":line_no(text,m.start()),"context":text[a:b].replace("\n"," ")})
 report={"schema":"pct-ocr-citation-hit-v2","generated_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),"request_file":rf.name,"target":ctx["target"],"aliases":ctx["aliases"],"terms":terms,"hit_count":len(hits),"hits":hits,"warning":"OCR hits are discovery leads, not verified quotations or page citations. Exact-page original inspection remains required."}
 (out/"ocr_hits.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
-priority=[h for h in hits if h["group"]=="PLACE"]
+priority=[h for h in hits if h["group"] in ("PLACE","TARGET_ENTITY")]
 (out/"priority_hits.json").write_text(json.dumps({"count":len(priority),"hits":priority,"next_stage":"EVENT_FIRST_AND_EXACT_PAGE_MAPPING"},ensure_ascii=False,indent=2),encoding="utf-8")
 print("OCR hits",len(hits),"place priority",len(priority))
