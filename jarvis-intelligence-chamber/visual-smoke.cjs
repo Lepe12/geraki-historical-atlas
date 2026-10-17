@@ -18,7 +18,7 @@ report.transport={url:page.url(),mode:await page.evaluate(()=>document.body.data
 assert.equal(await page.locator("#nxDrawer").getAttribute("aria-hidden"),"true","Cinematic agent drawer must start closed");
 assert.equal(await page.locator(".nx-dock [data-nx]").count(),7,"All workspace navigation destinations must exist");
 await page.screenshot({path:out+"/"+name+".png",fullPage:true});
-assert.equal(await page.locator("#nxMediterranean").count(),1,"Geographic Mediterranean layer must be mounted");
+assert.equal(await page.locator("#nxMediterranean").count(),0,"Original 3D network must not be obscured by geographic overlay");
 assert.equal(await page.locator(".nx-ops").count(),1,"Agent inspector must contain live telemetry");
 assert.equal(await page.locator(".nx-dock [data-nx]").count(),7,"Cinematic menu destinations must be available");
 assert.equal(await page.locator(".photon-titlebar").count(),4,"Photon window chrome must exist");
