@@ -12,7 +12,7 @@ from html import unescape
 from html.parser import HTMLParser
 from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, urlopen
-from research_focus import decompose, fold
+from research_focus import decompose, fold, retrieval_names
 
 IA_FTS='https://be-api.us.archive.org/ia-pub-fts-api'
 GREEK=dict(zip('αβγδεζηθικλμνξοπρστυφχψω',
@@ -72,6 +72,20 @@ def role_terms(focus):
                              if norm(role).startswith(key) for t in terms))
 
 
+def ia_queries(focus, limit=8):
+    """Search complete supplied names before surname/OCR recovery hypotheses."""
+    queries=[]
+    if focus['kind']=='person':
+        for name in retrieval_names(focus):
+            queries.append('"'+name.replace('"','')+'"')
+    places=context_terms(focus)
+    for term in search_terms(focus):
+        q='"'+term.replace('"','')+'"'
+        if places:q+=' AND ('+' OR '.join('"'+p.replace('"','')+'"' for p in places[:4])+')'
+        queries.append(q)
+    return list(dict.fromkeys(queries))[:limit]
+
+
 def text_match(record,focus):
     """Match independent source text; never count the query as source evidence."""
     # Separate highlights can be from different pages. They are never joined
@@ -81,6 +95,17 @@ def text_match(record,focus):
         for i,char in enumerate(segment):
             for c in norm(char):surface.append(c);offsets.append(i)
         text=''.join(surface)
+        if focus['kind']=='person':
+            for name in retrieval_names(focus):
+                parts=name.split()
+                if len(parts)<2:continue
+                pattern=r'[\s,.-]{1,8}'.join(re.escape(norm(p)) for p in parts)
+                hit=re.search(r'(?<!\w)'+pattern+r'(?!\w)',text)
+                if hit:
+                    return {'category':'POSSIBLE_TARGET','reason':'FULLTEXT_COMPLETE_NAME_REQUIRES_REVIEW',
+                            'matched_name':name,'places':[],'roles':[],
+                            'matched_excerpt':segment[max(0,offsets[hit.start()]-120):offsets[hit.end()-1]+451],
+                            'identity_verified':False,'query_hypothesis':True}
         for term in search_terms(focus):
             for hit in re.finditer(r'(?<!\w)'+re.escape(norm(term))+r'(?!\w)',text):
                 if not segment[offsets[hit.start()]].isupper():continue
@@ -281,11 +306,7 @@ def run(root,request,ctx,lane='travellers',ia_enabled=True):
         (out/'report.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2))
     # IA searches the corpus directly, including names absent from catalogue fields.
     if ia_enabled:
-        queries=[]
-        for term in terms[:4]:
-            q='"'+term.replace('"','')+'"'
-            if places:q+=' AND ('+' OR '.join('"'+p.replace('"','')+'"' for p in places[:4])+')'
-            queries.append(q)
+        queries=ia_queries(focus)
         def ia_one(q):
             try:return q,'EXECUTED',ia_search(q),None
             except Exception as exc:return q,'REMOTE_ERROR',[],type(exc).__name__+': '+str(exc)

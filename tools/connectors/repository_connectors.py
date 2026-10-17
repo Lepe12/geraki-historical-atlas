@@ -583,7 +583,9 @@ def _public_site_index(q,lane,repository,domain,max_records=20):
     # Never translate failed coverage into a false zero-result statement.
     if any(marker in raw.casefold() for marker in ('anomaly.js','challenge-form','bots use duckduckgo too')):
         return "REMOTE_ACCESS_BLOCKED",[],url+" ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
-    parser=_WebResultParser(); parser.feed(raw)
+    # Domain-scoped discovery supports both linked titles and URL anchors;
+    # unrestricted web discovery must accept result-title anchors only.
+    parser=_LinkParser() if domain else _WebResultParser(); parser.feed(raw)
     rows=[]; seen=set()
     for href,title in parser.links:
         u=href
