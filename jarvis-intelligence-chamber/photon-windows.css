@@ -1,0 +1,38 @@
+/* Photon / Neocom-inspired window architecture; palette uses existing NABOU//X tokens. */
+.nx-workspace .nx-dock{left:0!important;top:0!important;bottom:0!important;transform:none!important;width:61px!important;gap:0!important;padding:65px 3px 8px!important;background:linear-gradient(90deg,rgba(2,10,20,.96),rgba(5,18,33,.92))!important;border-left:0!important;border-right:1px solid rgba(81,224,237,.25)!important;border-radius:0;box-shadow:10px 0 28px #0008!important;overflow:auto;scrollbar-width:none}
+.nx-workspace .nx-dock::-webkit-scrollbar{display:none}
+.nx-workspace .nx-dock:before{position:absolute;top:12px;left:16px;height:36px;width:28px;content:"N/X";background:transparent!important;color:var(--cyan);font:16px/36px var(--mono);letter-spacing:-.08em;text-shadow:0 0 15px rgba(81,224,237,.4);text-align:center;margin:0!important;opacity:1}
+.nx-workspace .nx-dock button{width:53px!important;min-height:52px!important;gap:0!important;border-left:2px solid transparent!important;flex-shrink:0}
+.nx-workspace .nx-dock button>span{font-size:24px!important}
+.nx-workspace .nx-dock button>small{display:none!important}
+.nx-workspace .nx-dock button:hover,.nx-workspace .nx-dock button[aria-current="page"]{background:rgba(81,224,237,.11)!important;border-left-color:var(--cyan)!important}
+.photon-tooltip{pointer-events:none;position:absolute;left:66px;z-index:35;opacity:0;padding:7px 12px;background:rgba(4,17,29,.96);border:1px solid rgba(81,224,237,.28);color:var(--white);font:10px var(--mono);letter-spacing:.08em;white-space:nowrap;transform:translateX(-6px);transition:opacity .15s,transform .15s}
+.photon-tooltip.is-visible{opacity:1;transform:translateX(0)}
+.nx-workspace .photon-window{--ph-x:0px;--ph-y:0px;--ph-opacity:.94;border:1px solid rgba(99,151,169,.32)!important;border-top:1px solid rgba(81,224,237,.35)!important;border-radius:2px!important;box-shadow:0 14px 38px #000a!important;background:rgba(4,15,26,var(--ph-opacity))!important;clip-path:none!important;backdrop-filter:blur(15px)!important}
+.nx-workspace .nx-drawer.photon-window{left:73px!important;top:110px!important;bottom:auto!important;height:min(70dvh,660px)!important;width:min(410px,calc(100vw - 90px))!important;min-height:320px;transform:translate(var(--ph-x),var(--ph-y))!important;opacity:0}
+.nx-workspace .nx-drawer.photon-window.nx-open{opacity:1}
+.nx-workspace .results-drawer.photon-window:not(.hidden),.nx-workspace .learning-panel.photon-window:not(.hidden),.nx-workspace .detail-panel.photon-window:not(.hidden){transform:translate(var(--ph-x),var(--ph-y))!important;animation:none!important;opacity:1!important}
+.nx-workspace .photon-window.photon-compact .photon-titlebar{height:24px;padding:2px 8px}
+.nx-workspace .photon-window.photon-compact .photon-name{font-size:9px}
+.nx-workspace .photon-window.photon-compact .photon-tabs{min-height:25px}
+.nx-workspace .photon-window.photon-compact h2,.nx-workspace .photon-window.photon-compact p:not(.result-item p){margin-top:4px;margin-bottom:5px}
+.photon-titlebar{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;height:34px;min-height:24px;margin:-10px -8px 10px;padding:5px 11px;background:linear-gradient(90deg,rgba(81,224,237,.09),rgba(8,21,35,.6));border-bottom:1px solid rgba(81,224,237,.18);cursor:move;touch-action:none;user-select:none}
+.nx-drawer .photon-titlebar{margin:-15px -14px 13px}
+.photon-name{color:var(--white);font:10px var(--mono);letter-spacing:.13em}
+.photon-window-controls{display:flex;gap:2px;align-items:center}
+.photon-window-controls>button{border:0;background:transparent;color:var(--white);cursor:pointer;min-width:26px;min-height:24px}
+.photon-window-controls>button:hover,.photon-window-controls>button:focus-visible{color:var(--cyan);background:rgba(81,224,237,.12)}
+.photon-options{position:absolute;z-index:60;top:29px;right:4px;min-width:198px;padding:6px;background:rgba(4,15,26,.98);border:1px solid rgba(81,224,237,.34);box-shadow:0 16px 40px #000c}
+.photon-options[hidden]{display:none!important}
+.photon-options>button,.photon-options>label{display:block;width:100%;border:0;background:transparent;color:var(--white);font:11px var(--mono);text-align:left;padding:10px 8px;cursor:pointer}
+.photon-options>button:hover{background:rgba(81,224,237,.14)}
+.photon-options input{display:block;width:100%;accent-color:var(--cyan);margin:8px 0}
+.photon-tabs{display:flex;align-items:center;gap:2px;min-height:31px;margin:0 0 12px;border-bottom:1px solid rgba(81,224,237,.2);overflow-x:auto;scrollbar-width:thin}
+.photon-tabs button{border:0;border-bottom:2px solid transparent;padding:8px 10px;background:transparent;color:var(--faint);font:9px var(--mono);letter-spacing:.02em;cursor:pointer;white-space:nowrap}
+.photon-tabs button:hover,.photon-tabs button[aria-selected="true"]{color:var(--white);border-bottom-color:var(--cyan)}
+.nx-agent[hidden]{display:none!important}
+.nx-workspace .nx-agent-grid{grid-template-columns:1fr!important;gap:0!important}
+.nx-workspace .nx-agent{min-height:34px!important;border-left:0!important;border-bottom:1px solid rgba(81,224,237,.08)!important;padding:7px 14px!important}
+.nx-workspace .nx-agent:hover{transform:none!important;background:rgba(81,224,237,.12)!important}
+@media(max-width:900px){.nx-workspace .nx-dock{width:49px!important;padding-top:46px!important}.nx-workspace .nx-dock:before{left:9px;top:5px}.nx-workspace .nx-dock button{width:41px!important;min-height:47px!important}.nx-workspace .nx-drawer.photon-window{left:55px!important;top:95px!important;width:calc(100vw - 62px)!important;max-height:calc(100dvh - 175px)!important}.photon-titlebar{touch-action:none}.photon-tabs button{font-size:8px;padding:7px}}
+@media(prefers-reduced-motion:reduce){.photon-tooltip{transition:none}}
