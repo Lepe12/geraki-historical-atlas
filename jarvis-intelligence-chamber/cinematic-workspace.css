@@ -1,207 +1,90 @@
-/* NABOU//X — isolated EVE/Photon shell.
-   Owns navigation + work panels only. Never changes the 3D renderer/camera. */
+/* NABOU//X Photon shell — single source of truth for navigation and panel presentation only.
+   Never changes #universe, canvas geometry, camera, renderer, node positions or 3D overlays. */
 
-.nx-workspace .nabou-rail,
-.nx-workspace .deck-controls,
 .nx-workspace .left-panel,
 .nx-workspace .results-toggle,
-.nx-workspace .learning-toggle{display:none!important}
+.nx-workspace .learning-toggle,
+.nx-workspace .deck-controls,
+.nx-workspace .nabou-rail,
+.nx-workspace .exp-ui,
+.nx-workspace .exp-restore{display:none!important}
 
-/* Hard safety: the deprecated geographic overlay can never cover the 3D core. */
-#nxMediterranean{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
-body.nx-map-active{--nx-map-disabled:1}
-body.nx-map-active #universe{display:block!important;visibility:visible!important;opacity:1!important}
-
-/* ---------- NEOCOM ---------- */
 .nx-ui{position:absolute;inset:0;z-index:26;pointer-events:none}
-.nx-dock{
-  pointer-events:auto;position:absolute;left:0;top:0;bottom:0;width:56px;
-  display:flex;flex-direction:column;align-items:stretch;padding:58px 0 10px;gap:1px;
-  background:linear-gradient(90deg,rgba(2,7,14,.985),rgba(3,13,23,.93));
-  border-right:1px solid rgba(108,199,216,.20);
-  box-shadow:12px 0 36px rgba(0,0,0,.42);backdrop-filter:blur(16px)
-}
-.nx-dock::before{
-  content:"N/X";position:absolute;top:12px;left:0;width:56px;height:32px;
-  display:grid;place-items:center;color:#d9fbff;
-  font:600 12px/1 var(--mono);letter-spacing:.08em;
-  text-shadow:0 0 14px rgba(82,220,239,.55)
-}
-.nx-dock button{
-  position:relative;width:56px;height:47px;min-height:47px;padding:0;
-  display:grid;place-items:center;border:0;border-left:2px solid transparent;
-  background:transparent;color:#7596a2;cursor:pointer;
-  transition:background .15s,border-color .15s,color .15s
-}
-.nx-dock button>span{display:grid;place-items:center;width:24px;height:24px}
-.nx-dock button svg{
-  width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.45;
-  stroke-linecap:round;stroke-linejoin:round
-}
-.nx-dock button>small{display:none}
-.nx-dock button:hover,
-.nx-dock button[aria-current="page"]{
-  color:#e9fdff;background:linear-gradient(90deg,rgba(79,211,231,.15),rgba(79,211,231,.018));
-  border-left-color:#68dce8
-}
-.nx-dock button[aria-current="page"]::before{
-  content:"";position:absolute;left:3px;top:12px;bottom:12px;width:1px;
-  background:#baf8ff;box-shadow:0 0 9px #65dce9
-}
-.nx-dock button::after{
-  content:attr(aria-label);position:absolute;left:64px;top:50%;
-  transform:translate(6px,-50%);opacity:0;pointer-events:none;z-index:80;
-  white-space:nowrap;padding:7px 10px;
-  background:rgba(3,14,25,.985);border:1px solid rgba(85,198,217,.27);
-  color:#dff7fb;font:9px/1 var(--mono);letter-spacing:.08em;
-  box-shadow:0 12px 32px rgba(0,0,0,.55);transition:.13s
-}
-.nx-dock button:hover::after{opacity:1;transform:translate(0,-50%)}
-.nx-dock .nx-break{margin-top:10px}
-.nx-dock .nx-break::after{margin-top:0}
-.nx-dock .nx-break::marker{display:none}
-.nx-dock .nx-break-line{
-  pointer-events:none;height:1px;min-height:1px;margin:5px 11px;
-  background:rgba(117,181,194,.13);border:0
-}
 
-/* ---------- PHOTON WINDOWS ---------- */
-.nx-window{
-  pointer-events:none;opacity:0;position:absolute;z-index:34;
-  transform:translateY(7px) scale(.995);
-  transition:opacity .16s ease,transform .16s ease;
-  border:1px solid rgba(95,183,200,.24);
-  border-top-color:rgba(113,218,234,.36);
-  background:linear-gradient(145deg,rgba(5,18,31,.975),rgba(3,11,22,.955));
-  box-shadow:0 18px 62px rgba(0,0,0,.55);
-  backdrop-filter:blur(18px)
-}
-.nx-window.nx-open{pointer-events:auto;opacity:1;transform:translateY(0) scale(1)}
-.nx-window-title{
-  height:38px;display:flex;align-items:center;justify-content:space-between;
-  padding:0 10px;border-bottom:1px solid rgba(85,202,220,.15);
-  background:linear-gradient(90deg,rgba(78,207,227,.08),rgba(6,17,28,.45));
-  color:#b8dce4;font:9px/1 var(--mono);letter-spacing:.11em;
-  cursor:move;user-select:none
-}
-.nx-window-title strong{font-weight:500;color:#e7f9fc}
-.nx-window-actions{display:flex;align-items:center;gap:2px}
-.nx-window-actions button{
-  width:26px;height:26px;border:0;background:transparent;color:#96b9c1;
-  cursor:pointer;font:16px/1 var(--display)
-}
-.nx-window-actions button:hover{background:rgba(79,211,231,.10);color:#efffff}
+/* Neocom rail */
+.nx-dock{pointer-events:auto;position:absolute;left:0;top:0;bottom:0;width:46px;display:flex;flex-direction:column;align-items:stretch;padding:54px 0 10px;gap:1px;background:linear-gradient(90deg,rgba(1,7,13,.985),rgba(4,14,24,.91));border-right:1px solid rgba(113,211,226,.19);box-shadow:10px 0 30px rgba(0,0,0,.42);backdrop-filter:blur(16px)}
+.nx-dock:before{content:"N/X";position:absolute;top:14px;left:0;width:46px;text-align:center;color:#dafbff;font:600 10px/1 var(--mono);letter-spacing:.08em;text-shadow:0 0 12px rgba(82,220,239,.55)}
+.nx-dock button{position:relative;width:46px;height:43px;min-height:43px;padding:0;display:grid;place-items:center;border:0;border-left:1px solid transparent;background:transparent;color:#6f909c;cursor:pointer;transition:background .14s,color .14s,border-color .14s}
+.nx-dock button span{width:21px;height:21px;display:grid;place-items:center}
+.nx-dock svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
+.nx-dock button:hover,.nx-dock button[aria-current="page"]{color:#e8fdff;background:linear-gradient(90deg,rgba(80,215,234,.13),rgba(80,215,234,.018));border-left-color:#92eef7}
+.nx-dock button[aria-current="page"]:before{content:"";position:absolute;left:3px;top:10px;bottom:10px;width:1px;background:#c9fbff;box-shadow:0 0 8px #65dce9}
+.nx-dock button:after{content:attr(aria-label);position:absolute;left:54px;top:50%;z-index:90;transform:translate(6px,-50%);opacity:0;pointer-events:none;white-space:nowrap;padding:7px 10px;background:rgba(3,13,23,.985);border:1px solid rgba(95,201,218,.28);color:#dff8fb;font:9px/1 var(--mono);letter-spacing:.08em;box-shadow:0 12px 28px #0009;transition:.13s}
+.nx-dock button:hover:after{opacity:1;transform:translate(0,-50%)}
+.nx-dock-divider{height:1px;margin:5px 10px;background:rgba(115,191,203,.13)}
 
-/* agent browser window */
-.nx-drawer{
-  left:72px;top:88px;width:365px;height:min(650px,calc(100vh - 130px));
-  padding:0;overflow:hidden
-}
-.nx-drawer .nx-window-body{padding:16px;height:calc(100% - 38px);box-sizing:border-box}
-.nx-drawer h2{
-  margin:0 0 5px;color:#f0fcff;font:400 24px/1.08 var(--display);letter-spacing:.09em
-}
-.nx-drawer p{margin:0 0 14px;color:#789ba9;font:9px/1.5 var(--mono)}
-.nx-agent-tabs{
-  display:flex;gap:2px;margin:0 -2px 9px;padding-bottom:7px;
-  border-bottom:1px solid rgba(82,202,221,.13)
-}
-.nx-agent-tabs button{
-  border:0;border-bottom:1px solid transparent;background:transparent;color:#698b98;
-  padding:6px 8px;font:8px/1 var(--mono);letter-spacing:.08em;cursor:pointer
-}
-.nx-agent-tabs button.active{color:#dffaff;border-bottom-color:#61d7e4}
-.nx-agent-grid{height:calc(100% - 93px);overflow:auto;scrollbar-width:thin;scrollbar-color:rgba(80,205,224,.24) transparent}
-.nx-agent{
-  position:relative;width:100%;min-height:38px;padding:8px 12px 8px 21px;
-  text-align:left;border:0;border-bottom:1px solid rgba(80,205,224,.065);
-  background:transparent;color:#bad0d6;font:10px/1.35 var(--mono);cursor:pointer
-}
-.nx-agent::before{
-  content:"";position:absolute;left:8px;top:15px;width:4px;height:4px;border-radius:50%;
-  background:#5ecbd8;box-shadow:0 0 7px rgba(82,220,239,.45)
-}
-.nx-agent:hover{background:rgba(79,211,231,.075);color:#efffff}
-.nx-agent[data-activity="active"]::before{background:#ff6868;box-shadow:0 0 12px #ff6868}
-
-/* existing work panels become the same Photon window family */
+/* Shared Photon window language */
+.nx-photon-window,
 .nx-workspace .results-drawer,
 .nx-workspace .learning-panel,
-.nx-workspace .detail-panel{
-  box-sizing:border-box!important;border:1px solid rgba(95,183,200,.24)!important;
-  border-top-color:rgba(113,218,234,.36)!important;border-radius:0!important;
-  background:linear-gradient(145deg,rgba(5,18,31,.975),rgba(3,11,22,.955))!important;
-  box-shadow:0 18px 62px rgba(0,0,0,.55)!important;
-  backdrop-filter:blur(18px)!important;clip-path:none!important
-}
-.nx-workspace .results-drawer:not(.hidden),
-.nx-workspace .learning-panel:not(.hidden){
-  top:88px!important;left:72px!important;right:auto!important;bottom:auto!important;
-  width:min(590px,calc(100vw - 120px))!important;height:min(720px,calc(100vh - 130px))!important;
-  max-height:none!important;padding:50px 18px 18px!important;overflow:auto!important
-}
-.nx-workspace .detail-panel:not(.hidden){
-  top:88px!important;right:24px!important;left:auto!important;bottom:auto!important;
-  width:350px!important;min-height:410px!important;max-height:calc(100vh - 130px)!important;
-  padding:50px 18px 18px!important;overflow:auto!important
-}
+.nx-workspace .detail-panel,
+.nx-workspace .activity-strip.nx-activity-window{box-sizing:border-box!important;border:1px solid rgba(100,190,207,.25)!important;border-top-color:rgba(126,225,238,.38)!important;border-radius:1px!important;background:linear-gradient(145deg,rgba(5,18,31,.965),rgba(3,10,20,.945))!important;box-shadow:0 18px 58px rgba(0,0,0,.58),inset 0 1px rgba(220,252,255,.025)!important;backdrop-filter:blur(18px)!important;clip-path:none!important}
+
+.nx-titlebar,
 .nx-workspace .results-head,
 .nx-workspace .learning-head,
-.nx-workspace .detail-head{
-  position:absolute!important;left:0!important;right:0!important;top:0!important;height:38px!important;
-  min-height:38px!important;margin:0!important;padding:0 10px!important;
-  display:flex!important;align-items:center!important;justify-content:space-between!important;
-  background:linear-gradient(90deg,rgba(78,207,227,.08),rgba(6,17,28,.45))!important;
-  border-bottom:1px solid rgba(85,202,220,.15)!important;color:#b8dce4!important;
-  cursor:move!important;user-select:none!important
-}
-.nx-workspace .results-head button,
-.nx-workspace .learning-head button,
-.nx-workspace .detail-head button{
-  width:26px!important;height:26px!important;border:0!important;background:transparent!important;
-  color:#9fc4cc!important;cursor:pointer!important
-}
-.nx-workspace .results-head button:hover,
-.nx-workspace .learning-head button:hover,
-.nx-workspace .detail-head button:hover{background:rgba(79,211,231,.10)!important;color:#efffff!important}
-.nx-workspace .detail-panel h2{font-size:29px!important;line-height:1.08!important;margin:7px 0 13px!important}
-.nx-workspace .detail-panel p{font-size:11px!important;line-height:1.72!important}
-.nx-workspace .detail-meta{gap:9px!important}
-.nx-workspace .detail-meta>div{
-  padding:10px!important;border-left:1px solid rgba(80,205,224,.14)!important;
-  background:linear-gradient(90deg,rgba(80,205,224,.045),transparent)!important
-}
+.nx-workspace .detail-head{height:34px!important;min-height:34px!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:space-between!important;margin:0!important;padding:0 9px!important;background:linear-gradient(90deg,rgba(80,211,231,.085),rgba(7,18,29,.52))!important;border-bottom:1px solid rgba(90,204,221,.15)!important;color:#bedce3!important;cursor:move!important;user-select:none!important}
+.nx-titlebar>div{display:flex;align-items:baseline;gap:8px}
+.nx-titlebar small{color:#648793;font:7px var(--mono);letter-spacing:.12em}
+.nx-titlebar strong{color:#e7fbfd;font:500 9px var(--mono);letter-spacing:.13em}
+.nx-titlebar button,.nx-workspace .results-head button,.nx-workspace .learning-head button,.nx-workspace .detail-head button,.nx-activity-close{width:25px!important;height:25px!important;min-width:25px!important;min-height:25px!important;padding:0!important;border:0!important;background:transparent!important;color:#8eb3bc!important;font:17px/1 var(--display)!important;cursor:pointer!important}
+.nx-titlebar button:hover,.nx-workspace .results-head button:hover,.nx-workspace .learning-head button:hover,.nx-workspace .detail-head button:hover,.nx-activity-close:hover{background:rgba(79,211,231,.10)!important;color:#f1ffff!important}
 
-/* activity opens as a small Photon telemetry window instead of expanding across the map */
-.nx-workspace .activity-strip{
-  transition:opacity .16s,transform .16s!important
-}
-.nx-workspace .activity-strip.nx-activity-window{
-  left:72px!important;right:auto!important;top:88px!important;bottom:auto!important;
-  width:390px!important;max-height:340px!important;padding:14px!important;
-  background:linear-gradient(145deg,rgba(5,18,31,.975),rgba(3,11,22,.955))!important;
-  border:1px solid rgba(95,183,200,.24)!important;box-shadow:0 18px 62px rgba(0,0,0,.55)!important;
-  backdrop-filter:blur(18px)!important;z-index:34!important
-}
-.nx-workspace .activity-strip:not(.nx-activity-window) .activity-lines{max-height:22px;overflow:hidden}
+/* Agents */
+.nx-agent-window{pointer-events:none;opacity:0;position:absolute;left:58px;top:84px;width:340px;height:min(610px,calc(100vh - 118px));overflow:hidden;transform:translateY(6px);transition:opacity .15s,transform .15s}
+.nx-agent-window.nx-open{pointer-events:auto;opacity:1;transform:none}
+.nx-agent-tabs{display:flex;gap:2px;padding:10px 10px 7px;border-bottom:1px solid rgba(81,202,220,.12)}
+.nx-agent-tabs button{border:0;border-bottom:1px solid transparent;background:transparent;color:#6d909b;padding:6px 8px;font:8px/1 var(--mono);letter-spacing:.09em;cursor:pointer}
+.nx-agent-tabs button.active{color:#e5fbfd;border-bottom-color:#73dde8}
+#nxAgentGroups{height:calc(100% - 80px);overflow:auto;padding:5px 10px 12px;scrollbar-width:thin;scrollbar-color:rgba(80,205,224,.22) transparent}
+.nx-agent-group[hidden]{display:none}
+.nx-agent-group header{display:flex;align-items:center;justify-content:space-between;padding:11px 6px 7px;color:#769ba6;font:8px var(--mono);letter-spacing:.11em}
+.nx-agent-group header small{color:#456772}
+.nx-agent{width:100%;min-height:34px;display:grid;grid-template-columns:10px 1fr auto;align-items:center;gap:7px;padding:7px 7px;border:0;border-bottom:1px solid rgba(80,205,224,.055);background:transparent;color:#bad2d7;font:9px/1.3 var(--mono);text-align:left}
+.nx-agent i{width:4px;height:4px;border-radius:50%;background:#55727a;box-shadow:0 0 5px rgba(100,150,160,.25)}
+.nx-agent small{color:#547680;font:7px var(--mono);letter-spacing:.08em}
+.nx-agent[data-activity="active"] i{background:#83eef5;box-shadow:0 0 9px #62dce7}
+.nx-agent[data-activity="active"] small{color:#aef6fb}
+.nx-agent:hover{background:rgba(80,211,231,.055);color:#f0ffff}
 
-/* keep query at its established central position; do not reshape the 3D scene */
+/* Existing DOM panels, restyled in place */
+.nx-workspace .results-drawer:not(.hidden),
+.nx-workspace .learning-panel:not(.hidden){top:84px!important;left:58px!important;right:auto!important;bottom:auto!important;width:min(560px,calc(100vw - 92px))!important;height:min(700px,calc(100vh - 118px))!important;max-height:none!important;padding:45px 15px 15px!important;overflow:auto!important}
+.nx-workspace .detail-panel:not(.hidden){top:84px!important;right:20px!important;left:auto!important;bottom:auto!important;width:330px!important;min-height:380px!important;max-height:calc(100vh - 118px)!important;padding:45px 15px 15px!important;overflow:auto!important}
+.nx-workspace .results-head,.nx-workspace .learning-head,.nx-workspace .detail-head{position:absolute!important;left:0!important;right:0!important;top:0!important}
+.nx-workspace .results-summary{font-size:10px!important}
+.nx-workspace .results-tools{max-height:180px!important}
+.nx-workspace #resultTabs button,.nx-workspace #exportResults,.nx-workspace .run-picker button{font-size:9px!important;padding:7px!important}
+.nx-workspace .learning-head strong{font-size:17px!important}
+.nx-workspace .learning-source,.nx-workspace .learning-items,.nx-workspace .learning-footer{font-size:10px!important}
+.nx-workspace .detail-panel h2{font-size:27px!important;line-height:1.08!important;margin:7px 0 12px!important}
+.nx-workspace .detail-panel p{font-size:10px!important;line-height:1.7!important}
+.nx-workspace .detail-meta>div{padding:9px!important;background:linear-gradient(90deg,rgba(80,205,224,.04),transparent)!important;border-left:1px solid rgba(80,205,224,.13)!important}
+
+/* Activity is hidden until opened from Neocom, then becomes compact telemetry window */
+.nx-workspace .activity-strip{opacity:0!important;pointer-events:none!important}
+.nx-workspace .activity-strip.nx-activity-window{opacity:1!important;pointer-events:auto!important;left:58px!important;right:auto!important;top:84px!important;bottom:auto!important;transform:none!important;width:360px!important;height:auto!important;max-height:300px!important;padding:0 11px 11px!important;overflow:auto!important}
+.nx-workspace .activity-strip.nx-activity-window .activity-head{position:sticky;top:0;display:flex!important;align-items:center;gap:8px;min-height:34px;margin:0 -11px 8px;padding:0 9px;background:linear-gradient(90deg,rgba(80,211,231,.085),rgba(7,18,29,.52));border-bottom:1px solid rgba(90,204,221,.15);cursor:move}
+.nx-workspace .activity-strip.nx-activity-window .activity-head strong{margin-left:auto}
+.nx-workspace .activity-strip.nx-activity-window .activity-lines{max-height:235px!important;overflow:auto!important;font-size:9px!important;line-height:1.55!important}
+
+/* Query and 3D remain untouched */
 .nx-workspace .operator-command{z-index:8!important}
 
 @media(max-width:900px){
- .nx-dock{width:48px;padding-top:50px}
- .nx-dock::before{width:48px;top:9px;font-size:10px}
- .nx-dock button{width:48px;height:43px;min-height:43px}
- .nx-dock button::after{display:none}
- .nx-drawer{left:54px;top:70px;width:calc(100vw - 61px);height:calc(100vh - 92px)}
- .nx-workspace .results-drawer:not(.hidden),
- .nx-workspace .learning-panel:not(.hidden),
- .nx-workspace .detail-panel:not(.hidden){
-   left:54px!important;right:7px!important;top:70px!important;bottom:8px!important;
-   width:auto!important;height:auto!important;max-height:none!important
- }
- .nx-workspace .activity-strip.nx-activity-window{left:54px!important;top:70px!important;width:calc(100vw - 61px)!important}
+ .nx-dock{width:42px;padding-top:50px}.nx-dock:before{width:42px;font-size:9px}.nx-dock button{width:42px;height:40px;min-height:40px}.nx-dock button:after{display:none}
+ .nx-agent-window{left:48px;top:66px;width:calc(100vw - 55px);height:calc(100vh - 74px)}
+ .nx-workspace .results-drawer:not(.hidden),.nx-workspace .learning-panel:not(.hidden),.nx-workspace .detail-panel:not(.hidden){left:48px!important;right:6px!important;top:66px!important;bottom:7px!important;width:auto!important;height:auto!important;max-height:none!important}
+ .nx-workspace .activity-strip.nx-activity-window{left:48px!important;top:66px!important;width:calc(100vw - 55px)!important}
 }
-@media(prefers-reduced-motion:reduce){
- .nx-window,.nx-dock button,.nx-dock button::after{transition:none}
-}
+@media(prefers-reduced-motion:reduce){.nx-dock button,.nx-dock button:after,.nx-agent-window{transition:none}}
