@@ -143,6 +143,7 @@ def build(repo:Path,run_id:str):
     request=research_request(run_root)
     claims=candidate_claims(run_root)
     answers=[{'lane':lane,**answer} for lane in LANE_LABELS if (answer:=read(run_root/lane/'research_dossier/answer.json',{}))]
+    semantic_answer=read(run_root/'research_answer/answer.json',{})
     discoveries,coverage=discovery_results(run_root,request)
     request_id=request_id_for(run_root)
     try:from .jarvis_state_board import lane_state
@@ -221,7 +222,7 @@ def build(repo:Path,run_id:str):
       },
       "agents":agents,
       "claims":claims[:500],
-      "research_answer":{'status':'PROVISIONAL_SOURCE_FINDINGS' if any(a.get('findings') for a in answers) else 'INSUFFICIENT_ACQUIRED_EVIDENCE',
+      "research_answer":semantic_answer or {'status':'PROVISIONAL_SOURCE_FINDINGS' if any(a.get('findings') for a in answers) else 'INSUFFICIENT_ACQUIRED_EVIDENCE',
                          'lanes':answers,'verified_claims':0,'rule':'Source-attributed findings are not verified historical conclusions.'},
       "discoveries":discoveries,
       "coverage":coverage,
