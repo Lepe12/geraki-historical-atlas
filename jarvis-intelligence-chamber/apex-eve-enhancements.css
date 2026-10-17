@@ -1,0 +1,30 @@
+
+/* APEX x EVE workspace enhancement. The original cyan/ice palette is inherited. */
+.nx-workspace .nx-dock{left:18px;gap:2px;padding:13px 6px;border-left:1px solid var(--cyan);box-shadow:14px 0 66px #0009,inset 1px 0 rgba(81,224,237,.06)}
+.nx-workspace .nx-dock:before{content:"";height:32px;width:1px;margin:0 auto 10px;background:linear-gradient(transparent,var(--cyan));opacity:.68}
+.nx-workspace .nx-dock button{width:72px;min-height:61px;position:relative;overflow:hidden}
+.nx-workspace .nx-dock button:after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 20%,rgba(81,224,237,.16) 45%,transparent 70%);transform:translateX(-110%);transition:transform .55s}
+.nx-workspace .nx-dock button:hover:after,.nx-workspace .nx-dock button[aria-current="page"]:after{transform:translateX(115%)}
+.nx-workspace .nx-dock button>span{transition:transform .3s,text-shadow .3s}
+.nx-workspace .nx-dock button:hover>span{transform:scale(1.16);text-shadow:0 0 24px var(--cyan)}
+.nx-workspace .nx-drawer{width:min(445px,calc(100vw - 134px));border-top:1px solid rgba(81,224,237,.24);box-shadow:25px 25px 95px #000c, inset 0 1px rgba(220,236,240,.06);overflow:hidden}
+.nx-workspace .nx-drawer:before{content:"";position:absolute;left:0;top:0;width:46%;height:2px;background:linear-gradient(90deg,var(--cyan),transparent);box-shadow:0 0 20px var(--cyan)}
+.nx-agent{transition:background .24s,border-color .24s,transform .24s}
+.nx-agent:hover{transform:translateX(3px)}
+.nx-workspace .detail-panel:not(.hidden),.nx-workspace .results-drawer:not(.hidden),.nx-workspace .learning-panel:not(.hidden){border-left:1px solid rgba(81,224,237,.43)!important;box-shadow:-27px 26px 100px #000c!important;animation:nxPanelArrival .38s cubic-bezier(.2,.8,.2,1)}
+@keyframes nxPanelArrival{from{opacity:.3;filter:blur(5px);transform:translateX(23px)}to{opacity:1;filter:blur(0);transform:translateX(0)}}
+.nx-workspace .detail-panel:after,.nx-workspace .results-drawer:after,.nx-workspace .learning-panel:after{content:"";position:absolute;top:0;right:0;width:95px;height:1px;background:linear-gradient(90deg,transparent,var(--cyan));opacity:.62;pointer-events:none}
+.nx-workspace .detail-panel h2{font-size:39px!important;line-height:1.1!important}
+.nx-workspace .detail-meta{grid-template-columns:1fr 1fr!important;gap:18px!important}
+.nx-workspace .detail-meta>div{padding:13px 6px 13px 13px;border-left:1px solid rgba(81,224,237,.20);background:linear-gradient(90deg,rgba(81,224,237,.055),transparent)}
+.nx-ops{margin-top:19px;padding-top:14px;border-top:1px solid rgba(81,224,237,.20);font:11px/1.5 var(--mono)}
+.nx-ops-title{letter-spacing:.16em;color:var(--cyan);margin-bottom:12px;font-size:10px}
+.nx-ops-line{display:flex;justify-content:space-between;gap:15px;padding:7px 0;border-bottom:1px solid rgba(81,224,237,.07)}
+.nx-ops-line b{color:var(--white);font-weight:400}.nx-ops-line span{color:#91b0bd}
+.nx-status-light{width:7px;height:7px;display:inline-block;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+.nx-workspace .operator-command{border-top:1px solid rgba(81,224,237,.42)!important;box-shadow:0 16px 66px #000a,0 -12px 30px rgba(81,224,237,.025)!important}
+.nx-workspace .activity-strip.deck-expanded{border-left:1px solid rgba(81,224,237,.35)!important}
+.nx-workspace .nx-agent[data-activity="active"]{border-left-color:#ff6262;background:linear-gradient(90deg,rgba(255,98,98,.12),transparent)}
+.nx-workspace .nx-agent[data-activity="active"]:before{background:#ff6262;box-shadow:0 0 14px #ff6262}
+@media(max-width:900px){.nx-workspace .nx-dock{left:3px;padding:4px 2px}.nx-workspace .nx-dock:before{display:none}.nx-workspace .nx-dock button{width:48px;min-height:45px}.nx-workspace .nx-drawer{left:54px;top:89px;bottom:95px;width:calc(100vw - 62px)}.nx-workspace .detail-panel:not(.hidden),.nx-workspace .results-drawer:not(.hidden),.nx-workspace .learning-panel:not(.hidden){left:58px!important;right:7px!important;width:auto!important}}
+@media(prefers-reduced-motion:reduce){.nx-workspace .detail-panel:not(.hidden),.nx-workspace .results-drawer:not(.hidden),.nx-workspace .learning-panel:not(.hidden){animation:none}.nx-agent{transition:none}}
