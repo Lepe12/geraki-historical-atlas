@@ -16,7 +16,7 @@ async function load(){try{
  function ring(ids){let pts=[];for(const i of ids)pts.push(...getArc(i));return pts.filter(p=>p[0]>=-22&&p[0]<=56&&p[1]>=22&&p[1]<=53);}
  function collect(g){if(g.type==="Polygon")g.arcs.forEach(a=>{const p=ring(a);if(p.length>1)lines.push(p)});else if(g.type==="MultiPolygon")g.arcs.forEach(x=>x.forEach(a=>{const p=ring(a);if(p.length>1)lines.push(p)}));else if(g.type==="GeometryCollection")g.geometries.forEach(collect);}
  collect(topo.objects.land);loaded=true;
- }catch(e){canvas.dataset.mapError="Geographic map unavailable";console.warn("[NABOU//X] Natural Earth data unavailable",e);}
+ }catch(e){canvas.dataset.mapError="Geographic map unavailable";enable(false);mapButton.title="Geographic map data unavailable — 3D network retained";console.warn("[NABOU//X] Natural Earth data unavailable",e);}
 }
 function enable(v){enabled=v;document.body.classList.toggle("nx-map-active",v);canvas.style.pointerEvents=v?"auto":"none";}
 mapButton.addEventListener("click",()=>enable(true));
