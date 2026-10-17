@@ -291,50 +291,6 @@ def tna_public_content(q,lane):
         if toks and all(t in body for t in toks):
             rows.append(r)
 
-    # Public web-index fallback for TNA pages that are machine-reachable
-    # but omitted from TNA's own search/index HTML. This is discovery only.
-    try:
-        ddg_q="site:nationalarchives.gov.uk "+str(q)
-        ddg_url="https://html.duckduckgo.com/html/?"+urllib.parse.urlencode({"q":ddg_q})
-        raw=_get(ddg_url,timeout=20).decode("utf-8","replace")
-        pp=_LinkParser();pp.feed(raw)
-        web_rows=[]
-        for href,title in pp.links:
-            u=href
-            if "uddg=" in u:
-                try:
-                    qs=urllib.parse.parse_qs(urllib.parse.urlsplit(u).query)
-                    u=urllib.parse.unquote(qs.get("uddg",[u])[0])
-                except Exception:
-                    pass
-            if u.startswith("//"):u="https:"+u
-            try:
-                pu=urllib.parse.urlsplit(u)
-            except Exception:
-                continue
-            if pu.netloc.casefold().replace("www.","")!="nationalarchives.gov.uk":continue
-            if not keep(u,title):continue
-            web_rows.append({
-              "discovery_repository":"The National Archives Public Content",
-              "discovery_lane":lane,"connector_status":"EXECUTED",
-              "identifier":u,"title":title,"date":[],"url":u,
-              "discovery_route":"PUBLIC_WEB_INDEX_FALLBACK"
-            })
-            if len(web_rows)>=20:break
-        if web_rows:
-            with ThreadPoolExecutor(max_workers=8) as ex:
-                futs=[ex.submit(_tna_fetch_page,r) for r in web_rows]
-                for fut in as_completed(futs):
-                    try:
-                        rr=fut.result()
-                        body=_norm_search_text((rr.get("title") or "")+" "+(rr.get("metadata_text") or ""))
-                        if toks and all(t in body for t in toks):
-                            rows.append(rr)
-                    except Exception:
-                        pass
-    except Exception:
-        pass
-
     # Enrich direct site-search results too.
     direct=[]
     with ThreadPoolExecutor(max_workers=8) as ex:
@@ -556,78 +512,15 @@ def pares_simancas(q,lane):
     except Exception as exc:
         return "ACCESS_BLOCKED",[],url+" ; "+type(exc).__name__+": "+str(exc)
 
-class _WebResultParser(_LinkParser):
-    """Only search-result titles, excluding navigation and advertising links."""
-    def handle_starttag(self,tag,attrs):
-        if tag.lower()=='a':
-            data=dict(attrs)
-            if 'result__a' not in data.get('class','').split():
-                self._href=None;self._buf=[]
-                return
-        super().handle_starttag(tag,attrs)
-
-
 def _public_site_index(q,lane,repository,domain,max_records=20):
-    """Bounded public-web discovery for repositories without a stable anonymous API.
+    """Retain the coverage target without issuing an unconfigured web search.
 
-    This discovers public landing pages only. It does not bypass login, paywalls,
-    download controls, robots restrictions, or prove the historical claim.
+    No external search provider is currently configured. An unavailable route
+    is not an executed zero-result search and does not verify any source.
     """
-    query=(("site:"+domain+" ") if domain else "")+str(q)
-    url="https://html.duckduckgo.com/html/?"+urllib.parse.urlencode({"q":query})
-    try:
-        raw=_get(url,timeout=20).decode("utf-8","replace")
-    except Exception as exc:
-        return "REMOTE_ACCESS_BLOCKED",[],url+" ; "+type(exc).__name__+": "+str(exc)
-    # A 200 response can be an anti-bot challenge, not a completed search.
-    # Never translate failed coverage into a false zero-result statement.
-    if any(marker in raw.casefold() for marker in ('anomaly.js','challenge-form','bots use duckduckgo too')):
-        return "REMOTE_ACCESS_BLOCKED",[],url+" ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
-    # Domain-scoped discovery supports both linked titles and URL anchors;
-    # unrestricted web discovery must accept result-title anchors only.
-    parser=_LinkParser() if domain else _WebResultParser(); parser.feed(raw)
-    rows=[]; seen=set()
-    for href,title in parser.links:
-        u=href
-        if "uddg=" in u:
-            try:
-                qs=urllib.parse.parse_qs(urllib.parse.urlsplit(u).query)
-                u=urllib.parse.unquote(qs.get("uddg",[u])[0])
-            except Exception:
-                pass
-        if u.startswith("//"): u="https:"+u
-        try:
-            host=urllib.parse.urlsplit(u).netloc.casefold()
-        except Exception:
-            continue
-        if not host or urllib.parse.urlsplit(u).scheme not in ('http','https'):
-            continue
-        if domain and not (host==domain.casefold() or host.endswith("."+domain.casefold())):
-            continue
-        if not domain and (host=='duckduckgo.com' or host.endswith('.duckduckgo.com')):
-            continue
-        if not title or len(title.strip())<4:
-            continue
-        key=u.split("#",1)[0]
-        if key in seen: continue
-        seen.add(key)
-        rows.append({
-          "discovery_repository":repository,
-          "discovery_lane":lane,
-          "connector_status":"EXECUTED",
-          "identifier":key,
-          "title":" ".join(title.split()),
-          "date":[],
-          "url":key,
-          "evidence_level":"SECONDARY_DISCOVERY_ONLY" if "Academia.edu" in repository else "PUBLIC_REPOSITORY_DISCOVERY_ONLY",
-          "verification_status":"UNVERIFIED_DISCOVERY",
-          "acquisition_policy":"PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
-          "discovery_route":"PUBLIC_WEB_INDEX",
-        })
-        if len(rows)>=max_records: break
-    if not rows and not any(marker in raw.casefold() for marker in ('no-results','no results found')):
-        return "REMOTE_ACCESS_BLOCKED",[],url+" ; PUBLIC_WEB_INDEX_UNRECOGNIZED_RESPONSE: no readable result list or explicit empty result"
-    return "EXECUTED",rows,url
+    scope=(" for "+domain) if domain else ""
+    return "UNAVAILABLE",[],"WEB_SEARCH_PROVIDER_NOT_CONFIGURED"+scope+"; search was not executed"
+
 
 def _abstract_from_index(index):
     """Reconstruct source word positions without inventing text across gaps."""
@@ -817,3 +710,4 @@ def dispatch(repository,q,lane):
     if repository=="British Library":
         return unsupported(repository,"British Library target retained; public catalogue record pages exist but no stable anonymous search API configured.")
     return "CITATION_CHASE_WEB_OR_API_CONNECTOR_REQUIRED",[],"Repository target known; connector not configured."
+
