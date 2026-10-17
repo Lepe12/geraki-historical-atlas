@@ -25,10 +25,10 @@ cfg={
 }
 langs={"greek":["Greek","Katharevousa","English","French","Italian","Latin"],"spanish_simancas":["Spanish","Latin"],"venetian":["Italian","Venetian","Latin"],"french":["French"],"british":["English"],"dutch":["Dutch"],"german":["German","Latin"],"italian_states":["Italian","Latin"],"ottoman":["Ottoman Turkish","Turkish"],"north_african":["Arabic","Ottoman Turkish","French","Spanish","Italian"],"travellers":["French","Italian","English","Dutch","German","Spanish","Latin","Greek"]}
 if lane not in cfg: raise SystemExit("Unknown PCT_RESEARCH_LANE: "+lane)
-# Run open-web discovery before slow catalogues; external results are leads,
-# never inspected primary evidence. Keep it in one lane to avoid duplicate load.
+# Retain the open-web coverage target as explicitly unavailable until a
+# replacement provider is configured. Do not silently substitute a provider.
 if lane=='travellers':
-    cfg[lane].insert(0,("Public Web Source Discovery","https://html.duckduckgo.com/html/"))
+    cfg[lane].insert(0,("Public Web Source Discovery",""))
 terms=[ctx["target"]]+ctx["aliases"]
 ident=identity(req,ctx)
 specialists=specialist_plan(ctx["target"],ctx["purpose"],ctx["date_range"],ctx["aliases"],ident["type"] if ident["type"] in ("place","person","event") else "all")
@@ -41,3 +41,4 @@ for name,base in cfg[lane]:
 out=pathlib.Path("repository_plans");out.mkdir(exist_ok=True)
 (out/f"{lane}.json").write_text(json.dumps(plan,ensure_ascii=False,indent=2),encoding="utf-8")
 print("LANE",lane,"request",rf.name,"repositories",len(plan["repositories"]),"languages",",".join(plan["languages"]))
+

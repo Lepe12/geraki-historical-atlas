@@ -54,18 +54,14 @@ class ResearchFocusTests(unittest.TestCase):
         self.assertTrue(mechanical['query_hypothesis'])
         self.assertEqual(topical_match({'title':'Petros somebody else'},focus)['category'],'UNMATCHED')
 
-    def test_open_web_discovers_external_sources_without_navigation(self):
+    def test_open_web_requires_configured_provider_without_network_calls(self):
         from connectors.repository_connectors import dispatch
-        body=b'''<a href="https://duckduckgo.com/about">About search</a>
-        <a class="result__a" href="https://university.example/papers/lanza.pdf">Historical research on Pedro Lanza</a>
-        <a class="result__a" href="javascript:alert(1)">Invalid result</a>'''
-        with patch('connectors.repository_connectors._get',return_value=body) as remote:
+        with patch('connectors.repository_connectors._get') as remote:
             status,rows,detail=dispatch('Public Web Source Discovery','"Pedro Lanza"','travellers')
-        self.assertEqual(status,'EXECUTED')
-        self.assertEqual(len(rows),1)
-        self.assertEqual(rows[0]['url'],'https://university.example/papers/lanza.pdf')
-        self.assertEqual(rows[0]['verification_status'],'UNVERIFIED_DISCOVERY')
-        self.assertNotIn('site%3A',remote.call_args.args[0])
+        self.assertEqual(status,'UNAVAILABLE')
+        self.assertEqual(rows,[])
+        self.assertIn('WEB_SEARCH_PROVIDER_NOT_CONFIGURED',detail)
+        remote.assert_not_called()
 
     def test_ranking_and_retention(self):
         req={'target':self.target,'aliases':[],'purpose':'historical research'}
@@ -144,16 +140,14 @@ class ResearchFocusTests(unittest.TestCase):
         self.assertEqual(saved['attempts'][0]['status'],'IN_PROGRESS')
         self.assertEqual(saved['attempts'][1]['status'],'UNEXECUTED')
 
-    def test_public_search_challenge_is_not_a_zero_result_search(self):
+    def test_unconfigured_site_search_is_not_an_executed_empty_search(self):
         from connectors.repository_connectors import _public_site_index
-        for body in [b'<form id="challenge-form" action="/anomaly.js">',b'<html>unexpected upstream page</html>']:
-            with patch('connectors.repository_connectors._get',return_value=body):
-                status,rows,detail=_public_site_index('name','greek','Repository','example.org')
-            self.assertEqual(status,'REMOTE_ACCESS_BLOCKED')
-            self.assertEqual(rows,[])
-            self.assertIn('PUBLIC_WEB_INDEX_',detail)
-        with patch('connectors.repository_connectors._get',return_value=b'<div class="no-results">No results found</div>'):
-            self.assertEqual(_public_site_index('name','greek','Repository','example.org')[0],'EXECUTED')
-
+        with patch('connectors.repository_connectors._get') as remote:
+            status,rows,detail=_public_site_index('name','greek','Repository','example.org')
+        self.assertEqual(status,'UNAVAILABLE')
+        self.assertEqual(rows,[])
+        self.assertIn('search was not executed',detail)
+        remote.assert_not_called()
 
 if __name__=='__main__':unittest.main()
+
