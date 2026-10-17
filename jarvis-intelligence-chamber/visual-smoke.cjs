@@ -21,6 +21,8 @@ await page.screenshot({path:out+"/"+name+".png",fullPage:true});
 assert.equal(await page.locator("#nxMediterranean").count(),1,"Geographic Mediterranean layer must be mounted");
 assert.equal(await page.locator(".nx-ops").count(),1,"Agent inspector must contain live telemetry");
 assert.equal(await page.locator(".nx-dock [data-nx]").count(),7,"Cinematic menu destinations must be available");
+assert.equal(await page.locator(".photon-titlebar").count(),4,"Photon window chrome must exist");
+assert.equal(await page.locator(".nx-dock [data-nx=\"agents\"]").count(),1,"Neocom agent launcher exists");
 assert.ok(result.canvasWidth>100,"Renderer must own visible canvas");
 assert.match(result.fps,/^[0-9]+ FPS$/,"Frame loop must advance");
 assert.equal(result.labels,17,"17 research nodes including Greek Archives must exist");
