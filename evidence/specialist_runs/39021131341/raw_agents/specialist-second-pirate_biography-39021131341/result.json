@@ -1,0 +1,196 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "pirate_biography",
+  "label": "Pirate Biography Agent",
+  "assignment_id": "pirate_biography:wave2",
+  "assignment_wave": 2,
+  "requested_outputs": [
+    "identity",
+    "aliases",
+    "chronology",
+    "ships",
+    "associates",
+    "bases",
+    "operations",
+    "death",
+    "uncertainties"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "912b13134a0bccad9f23145e4a94439d10d5f8a179bd5550d4cf6ba29cf37cb2",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "pirate_biography",
+    "assignment_id": "pirate_biography:wave2",
+    "assignment_wave": 2,
+    "route_ids": [
+      "repo:OpenAlex Scholarly Works",
+      "repo:OpenArchives.gr / EKT"
+    ],
+    "queries": [
+      "\"Πέτρος λαντζας\"",
+      "\"Πέτρος λαντζας\" history"
+    ],
+    "operation": "search",
+    "search_budget": 4,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "result_aware_fallback_v1",
+    "routes": [
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 90,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Crossref Scholarly Metadata",
+        "route_type": "repository_dispatch",
+        "repository": "Crossref Scholarly Metadata",
+        "connector_id": null,
+        "score": 86,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 2,
+    "total_search_budget": 4,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Πέτρος λαντζας\" history",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aopenarchives.gr+%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%BB%CE%B1%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22+history ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "https://html.duckduckgo.com/html/?q=site%3Aopenarchives.gr+%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%BB%CE%B1%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22+history ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Πέτρος λαντζας\"",
+      "records": [],
+      "diagnostic": "https://html.duckduckgo.com/html/?q=site%3Aopenarchives.gr+%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%BB%CE%B1%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "https://html.duckduckgo.com/html/?q=site%3Aopenarchives.gr+%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%BB%CE%B1%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22 ; PUBLIC_WEB_INDEX_CHALLENGE: search results unavailable"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:OpenAlex Scholarly Works",
+      "repository": "OpenAlex Scholarly Works",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος λαντζας\"",
+      "records": [],
+      "diagnostic": "https://api.openalex.org/works?search=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%BB%CE%B1%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&per_page=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:OpenAlex Scholarly Works",
+      "repository": "OpenAlex Scholarly Works",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος λαντζας\" history",
+      "records": [],
+      "diagnostic": "https://api.openalex.org/works?search=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%BB%CE%B1%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22+history&per_page=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave2",
+      "assignment_wave": 2
+    }
+  ],
+  "result_count": 0,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
