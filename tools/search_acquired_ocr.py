@@ -4,11 +4,12 @@ import json,pathlib,re,datetime,unicodedata,sys
 sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from request_context import load_request
 from research_focus import decompose
+from candidate_context import variants
 rf,req,ctx=load_request()
 root=pathlib.Path("library_acquisition");out=pathlib.Path("citation_chase_hits");out.mkdir(exist_ok=True)
 
 place=[]
-for t in [ctx["target"]]+ctx["aliases"]:
+for t in variants(ctx["target"],ctx["aliases"]):
     t=str(t).strip()
     if t and t.casefold() not in [x.casefold() for x in place]:place.append(t)
 lead_values=[]

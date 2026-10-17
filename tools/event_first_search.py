@@ -3,10 +3,12 @@
 import json, pathlib, os, re, unicodedata
 from request_context import load_request
 from urllib.parse import urlsplit
+from research_focus import decompose
 from candidate_context import assess, catalogue_assess, variants, POLICY
 
 rf, req, ctx = load_request()
 terms=variants(ctx['target'],ctx['aliases'])
+target_kind=decompose(ctx['target'],ctx['aliases'])['kind']
 years=[int(y) for y in re.findall(r'\b(?:1[0-9]{3}|20[0-9]{2})\b',ctx['date_range'])]
 lo,hi=(min(years),max(years)) if years else (0,9999)
 hits=[]; context_leads=[]; catalogue_leads=[]
@@ -14,7 +16,7 @@ root=pathlib.Path('library_acquisition')
 for file in sorted(root.glob('*')):
     if not file.is_file() or file.suffix.lower() not in ('.txt','.xml','.html','.htm'): continue
     text=unicodedata.normalize('NFKC',file.read_text(encoding='utf-8',errors='replace'))
-    for hit in assess(text,terms,lo,hi):
+    for hit in assess(text,terms,lo,hi,target_kind=target_kind):
         hit.update(file=file.name,lead_type='OCR_CONTEXT')
         if hit['decision']=='RETAIN_CANDIDATE': hits.append(hit)
         else:
@@ -25,7 +27,7 @@ if path.exists():
     for record in json.loads(path.read_text(encoding='utf-8')).get('results',[]):
         host=(urlsplit(str(record.get('url') or '')).hostname or '').lower()
         social=any(host==h or host.endswith('.'+h) for h in ('instagram.com','facebook.com','tiktok.com','youtube.com','linkedin.com'))
-        for hit in catalogue_assess(record,terms,lo,hi):
+        for hit in catalogue_assess(record,terms,lo,hi,target_kind=target_kind):
             if social:
                 hit['decision']='HOLD_FOR_REVIEW'
                 hit['reason']='SOCIAL_POST_DISCOVERY_ONLY' 

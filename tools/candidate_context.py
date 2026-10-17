@@ -1,8 +1,10 @@
 """Conservative candidate routing. Decisions are machine review, never verification."""
 import json
 import re
+from itertools import product
+from research_focus import decompose,fold
 
-POLICY = 'pct-event-context-v1'
+POLICY = 'pct-event-context-v2'
 STRONG = re.compile(r'(?<!\w)(?:corsair\w*|corsaire\w*|corsar\w*|pirat\w*|forban\w*|privateer\w*|zeerover\w*|seer[aä]uber\w*|κουρσάρ\w*|πειρατ\w*|ransom\w*|ran[cç]on\w*|riscatt\w*|fidye\w*|captiv\w*|esclav\w*|schiav\w*|slaves?|slavery|αιχμαλωσ\w*|λύτρ\w*|pillage\w*|plunder\w*|λεηλασ\w*)(?!\w)', re.I)
 ACTION = re.compile(r'(?<!\w)(?:attack\w*|attaqu\w*|attacc\w*|angriff\w*|ataque\w*|raid\w*|incursion\w*|assaut\w*|aanval\w*|captur\w*|cattur\w*|bombard\w*|burn\w*|br[uû]l\w*|incendi\w*|επιδρομ\w*)(?!\w)', re.I)
 MARITIME = re.compile(r'(?<!\w)(?:ships?|vessels?|galleys?|gal[eè]r\w*|galera\w*|navir\w*|vaisseau\w*|navi|nave|schiff\w*|πλοί\w*|γαλέ\w*)(?!\w)', re.I)
@@ -12,10 +14,25 @@ ROLE = re.compile(r'\b(?:born|birth|died|published|publication|edition|né|née|
 
 
 def variants(target, aliases):
-    return list(dict.fromkeys(str(x).strip() for x in [target, *aliases] if str(x).strip()))
+    names=list(dict.fromkeys(str(x).strip() for x in [target,*aliases] if str(x).strip()))
+    output=list(names)
+    for name in names:
+        if decompose(name)['kind']!='person':continue
+        words=name.split()
+        if len(words)!=2 or not all(re.fullmatch(r'[α-ω]+',fold(w)) for w in words):continue
+        forms=[]
+        for word in words:
+            base=word[:-1] if word.endswith('ς') else word
+            options=[word,base]
+            if base.endswith(('ο','α','η')):options.append(base+'ς')
+            if base.endswith('ο'):options.append(base+'υ')
+            if base.endswith('η'):options.append(base[:-1]+'ου')
+            forms.append(list(dict.fromkeys(options)))
+        output.extend(' '.join(pair) for pair in product(*forms))
+    return list(dict.fromkeys(output))
 
 
-def assess(text, terms, lo=0, hi=9999):
+def assess(text, terms, lo=0, hi=9999, target_kind="place"):
     """Keep place/action/year linked locally, preserving unresolved leads."""
     output = []
     for term in terms:
@@ -34,7 +51,7 @@ def assess(text, terms, lo=0, hi=9999):
             years = []
             if CULTURAL.search(context):
                 decision, reason = 'REJECT_CONTEXT', 'CULTURAL_OR_NONHISTORICAL_NAME_CONTEXT'
-            elif not GEOGRAPHY.search(local):
+            elif target_kind!="person" and not GEOGRAPHY.search(local):
                 reason = 'NAME_IDENTITY_UNRESOLVED'
             elif events:
                 for year in re.finditer(r'\b(1[0-9]{3}|20[0-9]{2})\b', context):
@@ -59,13 +76,13 @@ def strings(value):
     return []
 
 
-def catalogue_assess(record, terms, lo, hi):
+def catalogue_assess(record, terms, lo, hi, target_kind="place"):
     # Never search serialized raw JSON: contributors' lifespans, IDs and URLs
     # are not event evidence. Do not splice unrelated metadata fields together.
     output=[]
     for field in ('title','description'):
         for text in strings(record.get(field)):
-            for hit in assess(text,terms,lo,hi):
+            for hit in assess(text,terms,lo,hi,target_kind=target_kind):
                 hit['source_field']=field
                 output.append(hit)
     return output
