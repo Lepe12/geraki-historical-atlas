@@ -2,7 +2,7 @@
 import json,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch
-from fulltext_discovery import decompose,ia_search,iiif_search,manifest_pool,search_terms,context_terms,text_match,merge_findings
+from fulltext_discovery import decompose,ia_search,ia_queries,iiif_search,manifest_pool,search_terms,context_terms,text_match,merge_findings
 from research_relevance import identity,assess
 
 
@@ -14,6 +14,15 @@ class FulltextTests(unittest.TestCase):
         self.assertIn('milo',context_terms(self.focus))
         self.assertNotIn('Jean',search_terms(self.focus))
         self.assertNotIn('capsi',search_terms(decompose('Henry Morgan governor of Jamaica')))
+
+    def test_bare_person_queries_search_full_name_before_surname(self):
+        focus=decompose('Pedro Lanza')
+        self.assertEqual(ia_queries(focus)[:2],['"Pedro Lanza"','"lanza"'])
+        hit=text_match({'context_excerpt':'Correspondence concerning Pedro Lanza, 1580.'},focus)
+        self.assertEqual(hit['category'],'POSSIBLE_TARGET')
+        self.assertFalse(hit['identity_verified'])
+        self.assertIsNone(text_match({'fulltext_contexts':['Pedro wrote a letter.','Lanza appears on another page.']},focus))
+        self.assertIsNone(text_match({'context_excerpt':'Pedro Lanzares wrote a letter.'},focus))
 
     def test_same_passage_required_and_hypothesis_never_verifies_identity(self):
         positive={'fulltext_hit':True,'context_excerpt':'Jean Capſi, Grec de Milo. Son règne dura trois ans.'}

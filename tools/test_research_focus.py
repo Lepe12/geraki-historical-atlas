@@ -118,6 +118,32 @@ class ResearchFocusTests(unittest.TestCase):
         self.assertNotIn('πειρατές',calls)
         self.assertNotIn('αιχμαλωσία',calls)
 
+    def test_interrupted_repository_preserves_hits_and_unexecuted_coverage(self):
+        req={'target':'Pedro Lanza','aliases':[],'purpose':'Research this person'}
+        plan={**req,'target_identity':identity(req,req),'repositories':[
+            {'name':'First archive','base_url':'https://example.org'},
+            {'name':'Later archive','base_url':'https://later.example.org'}]}
+        calls=[]
+        def execute(name,q,lane):
+            calls.append(q)
+            if len(calls)>1:raise SystemExit('simulated runner interruption')
+            return 'EXECUTED',[{'identifier':'lead-1','title':'Pedro Lanza correspondence'}],'source result'
+        with tempfile.TemporaryDirectory() as td:
+            previous=os.getcwd()
+            try:
+                os.chdir(td);Path('repository_plans').mkdir()
+                Path('repository_plans/travellers.json').write_text(json.dumps(plan))
+                with patch.dict(os.environ,{'PCT_RESEARCH_LANE':'travellers'}),patch('connectors.repository_connectors.dispatch',side_effect=execute):
+                    with self.assertRaisesRegex(SystemExit,'simulated runner interruption'):
+                        runpy.run_path(str(TOOLS/'lane_repository_discovery.py'))
+                saved=json.loads(Path('lane_discovery/travellers.json').read_text())
+            finally:os.chdir(previous)
+        self.assertTrue(saved['partial'])
+        self.assertEqual(saved['results'][0]['identifier'],'lead-1')
+        self.assertEqual(saved['attempts'][0]['queries'][0]['status'],'EXECUTED')
+        self.assertEqual(saved['attempts'][0]['status'],'IN_PROGRESS')
+        self.assertEqual(saved['attempts'][1]['status'],'UNEXECUTED')
+
     def test_public_search_challenge_is_not_a_zero_result_search(self):
         from connectors.repository_connectors import _public_site_index
         for body in [b'<form id="challenge-form" action="/anomaly.js">',b'<html>unexpected upstream page</html>']:

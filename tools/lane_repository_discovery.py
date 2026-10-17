@@ -47,8 +47,13 @@ if not terms:
     terms=[str(plan.get("target","")).strip()]
 limit=int(os.getenv("PCT_REPOSITORY_QUERY_LIMIT","0"))
 if limit>0: terms=terms[:limit]
-results=[];attempts=[]
-for r in plan["repositories"]:
+results=[]
+attempts=[{"repository":r['name'],"status":"UNEXECUTED","hits":0,"queries":[],"base_url":r['base_url']} for r in plan['repositories']]
+def save_partial(active_records=()):
+    checkpoint={"schema":"pct-lane-discovery-v3","lane":lane,"request_file":plan.get("request_file"),"target":plan.get("target"),"aliases":plan.get("aliases",[]),"date_range":plan.get("date_range"),"attempts":attempts,"results":results+list(active_records),"partial":True,"gate":"Partial discovery metadata is not evidence."}
+    (out/f"{lane}.json").write_text(json.dumps(checkpoint,ensure_ascii=False,indent=2),encoding="utf-8")
+save_partial()
+for repo_index,r in enumerate(plan["repositories"]):
     name=r["name"]; repo_records=[]; statuses=[]; diagnostics=[]
     repo_terms=list(terms)
     if name=="Public Web Source Discovery":
@@ -149,6 +154,8 @@ for r in plan["repositories"]:
         # Generic English qualifiers previously replaced every archive's plan.
         repo_terms=focused_queries(focus,EVENT_TERMS.get(lane,()),include_hypotheses=name!="SearchCulture.gr / EKT")[:min(cap,16)]
     for q in repo_terms:
+        attempts[repo_index].update(status='IN_PROGRESS',active_query=q,hits=len(repo_records),queries=diagnostics)
+        save_partial(repo_records)
         try:
             if name=="Internet Archive":
                 x=ia(q);status="EXECUTED";diag="public advanced-search API"
@@ -160,10 +167,13 @@ for r in plan["repositories"]:
                 status,x,diag=dispatch(name,q,lane)
             statuses.append(status);diagnostics.append({"query":q,"status":status,"detail":diag,"hits":len(x)})
             repo_records.extend(x)
+            attempts[repo_index].update(hits=len(repo_records))
+            save_partial(repo_records)
             # auth/key/browser blockers do not benefit from alias retries
             if status not in ("EXECUTED","ERROR"):break
         except Exception as e:
             statuses.append("ERROR");diagnostics.append({"query":q,"status":"ERROR","detail":f"{type(e).__name__}: {e}","hits":0})
+            save_partial(repo_records)
     ded=[];seen=set()
     for x in repo_records:
         k=str(x.get("identifier") or x.get("url") or x.get("title") or json.dumps(x,sort_keys=True,default=str))
@@ -175,10 +185,9 @@ for r in plan["repositories"]:
     elif "AUTH_OR_BROWSER_REQUIRED" in statuses: overall="AUTH_OR_BROWSER_REQUIRED"
     elif statuses and all(s=="ERROR" for s in statuses):overall="ERROR"
     else:overall=statuses[0] if statuses else "CITATION_CHASE_WEB_OR_API_CONNECTOR_REQUIRED"
-    attempts.append({"repository":name,"status":overall,"hits":len(ded),"queries":diagnostics,"base_url":r["base_url"]})
+    attempts[repo_index]={"repository":name,"status":overall,"hits":len(ded),"queries":diagnostics,"base_url":r["base_url"]}
     # Persist partial progress before the next remote repository can time out.
-    checkpoint={"schema":"pct-lane-discovery-v3","lane":lane,"request_file":plan.get("request_file"),"target":plan.get("target"),"aliases":plan.get("aliases",[]),"date_range":plan.get("date_range"),"attempts":attempts,"results":results,"partial":True,"gate":"Partial discovery metadata is not evidence."}
-    (out/f"{lane}.json").write_text(json.dumps(checkpoint,ensure_ascii=False,indent=2),encoding="utf-8")
+    save_partial()
 payload={"schema":"pct-lane-discovery-v3","lane":lane,"request_file":plan.get("request_file"),"target":plan.get("target"),"aliases":plan.get("aliases",[]),"date_range":plan.get("date_range"),"attempts":attempts,"results":results,"gate":"Discovery metadata is not historical evidence. EXECUTED means a real remote query completed; auth/key/browser targets remain explicit blockers and are never claimed as searched."}
 (out/f"{lane}.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding="utf-8")
 print("LANE DISCOVERY",lane,"executed",sum(a["status"]=="EXECUTED" for a in attempts),"blocked",sum(a["status"] in ("AUTH_OR_BROWSER_REQUIRED","API_KEY_REQUIRED") for a in attempts),"errors",sum(a["status"]=="ERROR" for a in attempts),"hits",len(results))
