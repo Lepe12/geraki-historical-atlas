@@ -116,6 +116,22 @@ def _token_match(text,name):
 
 
 def topical_match(record, focus):
+    # Independent metadata fields/list entries cannot form a person's name.
+    # Prefer a complete match even if an earlier field contains only a surname.
+    fields=('title','description','subject','context_excerpt','metadata_text','text','snippet')
+    segments=[]
+    for key in fields:
+        value=record.get(key)
+        for item in value if isinstance(value,list) else [value]:
+            if item:
+                segments.append((key,str(item)))
+    order={'TARGET_MATCH':0,'POSSIBLE_TARGET':1,'CONTEXT_ONLY':2,'UNMATCHED':3}
+    matches=[{**_topical_match_segment({'text':value},focus),'matched_field':key}
+             for key,value in segments]
+    return min(matches,key=lambda m:order[m['category']]) if matches else _topical_match_segment({},focus)
+
+
+def _topical_match_segment(record, focus):
     # Query text, repository names and source_lead flags are intentionally absent:
     # what was searched cannot establish what the source is about.
     text=fold(' '.join(str(record.get(k) or '') for k in

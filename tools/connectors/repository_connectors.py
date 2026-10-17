@@ -629,6 +629,40 @@ def _public_site_index(q,lane,repository,domain,max_records=20):
         return "REMOTE_ACCESS_BLOCKED",[],url+" ; PUBLIC_WEB_INDEX_UNRECOGNIZED_RESPONSE: no readable result list or explicit empty result"
     return "EXECUTED",rows,url
 
+def _abstract_from_index(index):
+    """Reconstruct source word positions without inventing text across gaps."""
+    if not isinstance(index,dict):return ""
+    words={}
+    for word,positions in index.items():
+        if not isinstance(word,str) or not isinstance(positions,list):continue
+        for position in positions:
+            if type(position) is int and position>=0:
+                words[position]=word if position not in words or words[position]==word else '[ambiguous]'
+    parts=[];previous=-1
+    for position,word in sorted(words.items()):
+        if position>previous+1:parts.append('[...]')
+        parts.append(word);previous=position
+    return ' '.join(parts)
+
+
+class _MetadataTextParser(HTMLParser):
+    def __init__(self):super().__init__();self.parts=[]
+    def handle_data(self,data):self.parts.append(data)
+
+
+def _abstract_text(value):
+    if not isinstance(value,str):return ''
+    parser=_MetadataTextParser();parser.feed(value)
+    return ' '.join(' '.join(parser.parts).split())
+
+
+def _public_metadata_url(value):
+    if not isinstance(value,str):return None
+    try:parsed=urllib.parse.urlsplit(value)
+    except ValueError:return None
+    return value if parsed.scheme in ('http','https') and parsed.hostname else None
+
+
 def openalex_works(q,lane):
     """Search scholarly works metadata via the public OpenAlex API.
 
@@ -650,6 +684,14 @@ def openalex_works(q,lane):
                 authors.append(name)
         loc=x.get("primary_location") or {}
         landing=loc.get("landing_page_url") or x.get("doi") or x.get("id")
+        locations=[x.get('best_oa_location') or {},loc,*(x.get('locations') or [])]
+        pdf_links=[]
+        for location in locations:
+            if not isinstance(location,dict):continue
+            pdf=_public_metadata_url(location.get('pdf_url'))
+            if pdf and not any(link['url']==pdf for link in pdf_links):
+                pdf_links.append({'url':pdf,'is_oa':location.get('is_oa') is True,
+                                  'license':location.get('license'),'version':location.get('version')})
         out.append({
           "discovery_repository":"OpenAlex Scholarly Works",
           "discovery_lane":lane,
@@ -662,6 +704,10 @@ def openalex_works(q,lane):
           "doi":x.get("doi"),
           "type":x.get("type"),
           "cited_by_count":x.get("cited_by_count"),
+          "description":_abstract_from_index(x.get('abstract_inverted_index')),
+          "description_provenance":"OPENALEX_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links":pdf_links,
+          "digital_url":next((link['url'] for link in pdf_links if link['is_oa']),None),
           "evidence_level":"SECONDARY_DISCOVERY_ONLY",
           "verification_status":"UNVERIFIED_DISCOVERY",
           "acquisition_policy":"METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
@@ -709,6 +755,12 @@ def crossref_works(q,lane):
           "type":x.get("type"),
           "publisher":x.get("publisher"),
           "container_title":x.get("container-title") or [],
+          "description":_abstract_text(x.get('abstract')),
+          "description_provenance":"CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links":[{'url':link['URL'],'content_type':link.get('content-type'),
+                             'intended_application':link.get('intended-application'),
+                             'access_status':'UNVERIFIED'}
+                            for link in (x.get('link') or []) if isinstance(link,dict) and _public_metadata_url(link.get('URL'))],
           "evidence_level":"SECONDARY_DISCOVERY_ONLY",
           "verification_status":"UNVERIFIED_DISCOVERY",
           "acquisition_policy":"METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
