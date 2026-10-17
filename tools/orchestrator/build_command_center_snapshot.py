@@ -143,6 +143,8 @@ def build(repo:Path,run_id:str):
     claims=candidate_claims(run_root)
     discoveries,coverage=discovery_results(run_root,request)
     request_id=request_id_for(run_root)
+    try:from .jarvis_state_board import lane_state
+    except ImportError:from jarvis_state_board import lane_state
     agents=[]
     events=specialist_events(repo,run_id)
     blockers=[]
@@ -150,11 +152,12 @@ def build(repo:Path,run_id:str):
     for row in board.get("lanes",[]) or []:
         lane=row.get("lane")
         if row.get("status")=="NOT_SELECTED":continue
+        execution_status=row.get("execution_status") or lane_state(run_root,lane)["execution_status"]
         b=row.get("blockers",[]) or []
         blockers.extend({"agent_id":lane,**x} for x in b if isinstance(x,dict))
         agents.append({
           "id":lane,"label":LANE_LABELS.get(lane,lane),
-          "kind":"research_lane","status":row.get("execution_status","COMPLETED"),
+          "kind":"research_lane","status":execution_status,
           "phase":row.get("status") or row.get("verification_status") or "complete",
           "percent":100,"candidate_events":int(row.get("candidate_events",0) or 0),
           "verified_events":int(row.get("verified_events",0) or 0),
@@ -163,8 +166,8 @@ def build(repo:Path,run_id:str):
         events.append({
           "schema":"pct-command-center-derived-event-v1",
           "event_id":f"{run_id}:{lane}:final","created_utc":board.get("generated_utc"),
-          "project":"piratecartography","run_id":run_id,"request_id":request_id,"event_type":"agent_completed" if row.get("execution_status","COMPLETED")=="COMPLETED" else "agent_failed",
-          "agent_id":lane,"phase":row.get("status"),"percent":100,"status":row.get("execution_status","COMPLETED"),
+          "project":"piratecartography","run_id":run_id,"request_id":request_id,"event_type":"agent_completed" if execution_status=="COMPLETED" else "agent_failed",
+          "agent_id":lane,"phase":row.get("status"),"percent":100,"status":execution_status,
           "warnings":[str(x.get("status")) for x in b[:5] if isinstance(x,dict)],
           "detail":f"{row.get('candidate_events',0)} candidate events; {len(b)} blockers"
         })
