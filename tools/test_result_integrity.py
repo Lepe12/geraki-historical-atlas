@@ -64,6 +64,8 @@ class ResultIntegrityTests(unittest.TestCase):
         row={'identifier':'https://openalex.org/W1','title':'Historical letters',
              'description':'Historical correspondence of Pedro Lanza',
              'description_provenance':'OPENALEX_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT',
+             'search_providers':['google','brave'],
+             'search_provider_attempts':[{'provider':'google','status':'EXECUTED'}],
              'fulltext_links':[{'url':'https://university.example/article.pdf','is_oa':True}],
              'digital_url':'https://university.example/article.pdf',
              'discovery_repository':'OpenAlex Scholarly Works'}
@@ -81,6 +83,8 @@ class ResultIntegrityTests(unittest.TestCase):
                     self.assertEqual(value['fulltext_links'],row['fulltext_links'])
                     self.assertEqual(value['description_provenance'],row['description_provenance'])
                     self.assertEqual(value['digital_url'],row['digital_url'])
+                    self.assertEqual(value['search_providers'],row['search_providers'])
+                    self.assertEqual(value['search_provider_attempts'],row['search_provider_attempts'])
                 self.assertFalse(saved['relevance_assessment']['verified'])
             finally:os.chdir(previous)
 

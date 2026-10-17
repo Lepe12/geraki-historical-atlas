@@ -513,13 +513,11 @@ def pares_simancas(q,lane):
         return "ACCESS_BLOCKED",[],url+" ; "+type(exc).__name__+": "+str(exc)
 
 def _public_site_index(q,lane,repository,domain,max_records=20):
-    """Retain the coverage target without issuing an unconfigured web search.
-
-    No external search provider is currently configured. An unavailable route
-    is not an executed zero-result search and does not verify any source.
-    """
-    scope=(" for "+domain) if domain else ""
-    return "UNAVAILABLE",[],"WEB_SEARCH_PROVIDER_NOT_CONFIGURED"+scope+"; search was not executed"
+    """Use configured Google/Brave APIs; missing access remains explicit."""
+    # Both package import forms are used by existing lane and specialist runners.
+    try:from .web_search import search
+    except ImportError:from web_search import search
+    return search(q,lane,repository,domain,max_records)
 
 
 def _abstract_from_index(index):

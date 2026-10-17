@@ -11,7 +11,7 @@ class PublicWebProviderRemovalTests(unittest.TestCase):
                      'Anemi / University of Crete', 'Public Web Source Discovery'):
             with self.subTest(repository=name):
                 status,rows,detail=rc.dispatch(name,'Pedro Lanza','greek')
-                self.assertEqual(status,'UNAVAILABLE')
+                self.assertEqual(status,'API_KEY_REQUIRED')
                 self.assertEqual(rows,[])
                 self.assertIn('WEB_SEARCH_PROVIDER_NOT_CONFIGURED',detail)
         remote.assert_not_called()

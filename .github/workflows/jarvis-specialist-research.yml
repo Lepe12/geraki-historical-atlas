@@ -2,6 +2,11 @@ name: JARVIS Specialist Historical Research
 
 on:
   workflow_call:
+    secrets:
+      SERPAPI_API_KEY:
+        required: false
+      BRAVE_SEARCH_API_KEY:
+        required: false
     inputs:
       request_id:
         default: ""
@@ -55,6 +60,8 @@ permissions:
 env:
   PCT_UI_REQUEST_ID: ${{ inputs.request_id }}
   PCT_COMMAND_CENTER_URL: https://pct-live.piratecartography.com/pct-api/live
+  SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
+  BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
 
 jobs:
   prepare:
@@ -333,3 +340,4 @@ jobs:
           done
           echo "WARNING: specialist aggregate commit failed after retries; Actions artifact remains available for recovery."
           exit 1
+
