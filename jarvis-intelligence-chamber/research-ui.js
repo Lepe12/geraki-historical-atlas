@@ -7,6 +7,13 @@ const sortRecords=rows=>{const key=$('resultSort').value;return [...rows].sort((
 const map={'Spain':'spanish_simancas','Venice':'venetian','France':'french','Britain':'british','Netherlands':'dutch','German States':'german','Italian States':'italian_states','Greece':'greek','Ottoman Empire':'ottoman','North Africa':'north_african','Travellers & Narratives':'travellers','Source Genealogy':'source_genealogy','Identity Resolution':'identity_resolution','Contradictions':'contradiction','Relationship Networks':'relationship_network','Chronology':'timeline','Pirate Bases':'pirate_base','Pirate Biography':'pirate_biography'};
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function sourceLink(record){try{const u=new URL(record.url);return ['http:','https:'].includes(u.protocol)?'<a href="'+esc(u.href)+'" target="_blank" rel="noopener noreferrer">ΑΝΟΙΓΜΑ ΠΗΓΗΣ ↗</a>':'';}catch(_){return '';}}
+function semanticAnswer(data){
+ if(data?.schema!=='pct-semantic-answer-v1')return '';
+ if(data.status!=='MODEL_ANSWER_PENDING_HUMAN_REVIEW')return '<section class="result-item"><b>ΑΠΑΝΤΗΣΗ ΕΡΕΥΝΑΣ</b><p>'+esc(data.status==='BLOCKED_CONFIGURATION'?'Δεν έχει συνδεθεί ακόμη μοντέλο για τη σύνθεση απάντησης. Τα ευρήματα και οι πηγές παραμένουν διαθέσιμα παρακάτω.':data.status==='INSUFFICIENT_ACQUIRED_EVIDENCE'?'Δεν έχει αποκτηθεί αρκετό κείμενο πηγών για τεκμηριωμένη απάντηση.':'Η σύνθεση απάντησης δεν ολοκληρώθηκε. Τα ευρήματα διατηρήθηκαν για έλεγχο.')+'</p></section>';
+ const claims=new Map((data.claims||[]).map(c=>[c.claim_id,c]));
+ const sections=(data.answer_sections||[]).filter(s=>s.claim_ids?.length&&s.claim_ids.every(id=>claims.has(id))).map(s=>'<p>'+esc(s.text)+'</p><details><summary>Πηγές και αποσπάσματα</summary>'+s.claim_ids.map(id=>{const c=claims.get(id),source=c.source_occurrences?.[0]||{},loc=source.locator||{};return '<p>'+esc(c.quote)+'</p><small>'+esc(source.title||'Πηγή')+(loc.start_line?' · Γραμμές '+esc(loc.start_line)+'–'+esc(loc.end_line):'')+'</small>'+sourceLink(source);}).join('')+'</details>').join('');
+ return '<section class="result-item"><b>ΑΠΑΝΤΗΣΗ ΜΕ ΠΑΡΑΠΟΜΠΕΣ · ΠΡΟΣ ΕΛΕΓΧΟ</b><small>Σύνθεση μοντέλου από τις διαθέσιμες πηγές. Εκκρεμεί ιστορική επαλήθευση.</small>'+sections+(Array.isArray(data.unknowns)&&data.unknowns.length?'<details><summary>Τι παραμένει άγνωστο</summary>'+data.unknowns.map(x=>'<p>'+esc(x)+'</p>').join('')+'</details>':'')+'</section>';
+}
 function renderActivity(){const src=events.slice(-30).reverse();activity.innerHTML=src.length?src.map(e=>'<div><b>'+esc(e.agent_id||'JARVIS')+'</b> → '+esc(e.detail||e.phase||e.status||e.event_type)+'</div>').join(''):'<div>No recorded activity for this run.</div>';}
 function applySearch(){resultPage=0;renderResults();}
 $('resultSearch').addEventListener('input',applySearch);
@@ -38,7 +45,7 @@ function renderResults(){
  const focus=snapshot?.mission?.research_focus;
  const facets=focus?[['Στόχος',focus.entity],['Τόπος',(focus.places||[]).join(', ')],['Ρόλος',(focus.roles||[]).join(', ')]].filter(x=>x[1]).map(([k,v])=>'<small>'+esc(k+': '+v)+'</small>').join(''):'';
  const context=snapshot?'<details class="result-context"><summary>'+esc(snapshot.mission?.target||'Στοιχεία έρευνας')+'</summary><small>'+esc(snapshot.mission?.date_range||'')+' · '+esc(missionState(snapshot))+'</small>'+facets+(snapshot.evidence_url?sourceLink({url:snapshot.evidence_url}):'')+'</details>':'';
- list.innerHTML=context+(items.join('')||'<div class="result-empty">'+(resultFilter==='contradictions'?'No recorded contradictions. Access blockers are listed separately.':requestedId&&!snapshot?'Request accepted. Waiting for results from this request; previous results are not shown.':'No recorded items for this run and filter. Zero claims does not prove absence of historical evidence.')+'</div>');
+ list.innerHTML=context+(resultFilter==='all'&&!q&&!resultPage?semanticAnswer(snapshot?.research_answer):'')+(items.join('')||'<div class="result-empty">'+(resultFilter==='contradictions'?'No recorded contradictions. Access blockers are listed separately.':requestedId&&!snapshot?'Request accepted. Waiting for results from this request; previous results are not shown.':'No recorded items for this run and filter. Zero claims does not prove absence of historical evidence.')+'</div>');
  if(q&&!total)list.innerHTML=context+'<div class="result-empty">Δεν υπάρχουν ευρήματα που να ταιριάζουν στην αναζήτηση.</div>';
  $('resultsList').scrollTop=0;
 }

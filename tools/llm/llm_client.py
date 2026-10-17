@@ -5,6 +5,7 @@ Disabled by default. Secrets are read only at call time and are never returned.
 """
 from __future__ import annotations
 import json,os,urllib.request,urllib.error
+from urllib.parse import urlsplit
 from llm_router import route
 
 def call(role:str,prompt:str)->dict:
@@ -32,6 +33,10 @@ def call(role:str,prompt:str)->dict:
           "verified_promotion_allowed":False
         }
 
+    parsed=urlsplit(base)
+    if parsed.scheme!='https' or not parsed.hostname or parsed.username or parsed.password or parsed.query or parsed.fragment:
+        return {"status":"FALLBACK_REQUIRED","role":role,"fallback":r.fallback,
+                "provider":r.provider,"model":r.model,"error":"INVALID_LLM_BASE_URL","verified_promotion_allowed":False}
     body=json.dumps({
       "model":r.model,
       "messages":[{"role":"user","content":prompt}],
@@ -54,6 +59,6 @@ def call(role:str,prompt:str)->dict:
         return {
           "status":"FALLBACK_REQUIRED","role":role,"fallback":r.fallback,
           "provider":r.provider,"model":r.model,
-          "error":type(exc).__name__+":"+str(exc)[:500],
+          "error":type(exc).__name__,
           "verified_promotion_allowed":False
         }

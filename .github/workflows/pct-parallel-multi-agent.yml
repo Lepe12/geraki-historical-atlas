@@ -97,6 +97,7 @@ jobs:
       - name: Run core scientific benchmark
         run: |
           PYTHONPATH=tools:tools/orchestrator python3 -m unittest tools/test_research_focus.py tools/test_fulltext_discovery.py tools/test_research_pipeline_repairs.py tools/test_section_extraction.py -q
+          PYTHONPATH=tools:tools/llm python3 -m unittest tools/test_semantic_research_answer.py -q
           python3 tools/scientific_benchmark.py
           python3 tools/adversarial_scientific_benchmark.py
       - name: Build and validate eleven lane payloads
@@ -418,12 +419,20 @@ jobs:
       - name: Refresh durable evidence
         run: git pull --rebase origin main
       - name: Build JARVIS situation board
+        timeout-minutes: 15
         env:
           PCT_RUN_ID: ${{ github.run_id }}
+          PCT_LLM_PROVIDER: ${{ vars.PCT_LLM_PROVIDER || 'openai_compatible' }}
+          PCT_LLM_BASE_URL: ${{ vars.PCT_LLM_BASE_URL }}
+          PCT_LLM_API_KEY: ${{ secrets.PCT_LLM_API_KEY }}
+          PCT_LLM_EXTRACTOR_MODEL: ${{ vars.PCT_LLM_EXTRACTOR_MODEL || vars.PCT_LLM_MODEL }}
+          PCT_LLM_SYNTHESIS_MODEL: ${{ vars.PCT_LLM_SYNTHESIS_MODEL || vars.PCT_LLM_MODEL }}
+          PCT_LLM_ADVERSARIAL_MODEL: ${{ vars.PCT_LLM_ADVERSARIAL_MODEL || vars.PCT_LLM_MODEL }}
         run: |
           python3 tools/orchestrator/jarvis_state_board.py \
             --run-id "$PCT_RUN_ID" \
             --output "evidence/runs/$PCT_RUN_ID/JARVIS_STATE_BOARD.json"
+          python3 tools/semantic_research_answer.py --run-id "$PCT_RUN_ID"
           python3 tools/orchestrator/build_command_center_snapshot.py \
             --run-id "$PCT_RUN_ID" \
             --output "command-center/live/runs/$PCT_RUN_ID.json" \
@@ -434,7 +443,7 @@ jobs:
         run: |
           git config user.name "jarvis-orchestrator[bot]"
           git config user.email "jarvis-orchestrator@users.noreply.github.com"
-          git add "evidence/runs/$PCT_RUN_ID/JARVIS_STATE_BOARD.json" command-center/live/
+          git add "evidence/runs/$PCT_RUN_ID/JARVIS_STATE_BOARD.json" "evidence/runs/$PCT_RUN_ID/research_answer/" command-center/live/
           git diff --cached --quiet && exit 0
           git commit -m "JARVIS state board $PCT_RUN_ID"
           bash tools/push_with_retry.sh
