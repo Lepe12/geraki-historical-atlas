@@ -40,6 +40,8 @@ d={
  "acquisition_summary":{"results":len(acq.get("results",[]))},
  "research_discovery":discovery_inventory,
  "event_first_discovery":event_first,
+ "research_answer":read('research_dossier/answer.json'),
+ "extracted_findings":read('structured_output/extracted_findings.json'),
  "candidate_events":events.get("events",[]),
  "claim_evidence_matrix":claim_matrix,
  "source_genealogy":gene.get("sources",[]),

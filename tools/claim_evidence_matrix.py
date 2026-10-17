@@ -64,6 +64,13 @@ def build_lane(base: Path, lane: str):
                 "text": c.get("source_says") or c.get("controlled_transcription") or c.get("original_quote"),
                 "original_inspected": bool(c.get("original_inspected")),
             })
+        elif c.get('acquired_text_excerpt') and c.get('text_locator'):
+            support_items.append({
+                'evidence_kind':'ACQUIRED_TEXT_EXCERPT','source_key':skey,
+                'source_type':c.get('source_type'),'text':c['acquired_text_excerpt'],
+                'locator_status':'ACQUIRED_TEXT_RANGE','text_locator':c['text_locator'],
+                'original_inspected':False,'warning':'Acquired-text extraction; not a controlled original transcription.'
+            })
         elif c.get("context_excerpt"):
             support_items.append({
                 "evidence_kind": "DISCOVERY_CONTEXT_ONLY",
@@ -99,6 +106,8 @@ def build_lane(base: Path, lane: str):
             "retention": c.get("retention"),
             "claim_trail": claim_trail,
             "researcher_inference": c.get("researcher_inference"),
+            'extraction_method':c.get('extraction_method'),
+            'extraction_uncertainties':c.get('extraction_uncertainties',[]),
             "claim_scope": {
                 "event_type": c.get("event_type"),
                 "actor": c.get("actor"),
