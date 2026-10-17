@@ -1,13 +1,13 @@
-# Web search: Google and Brave
+# Web search: Google and Exa
 
-Google organic search is accessed through **SerpAPI**; the independent second index is **Brave Search API**. This is not Google's discontinued Custom Search JSON API. Google's official documentation says that API is closed to new customers, with existing customers transitioning by 2027-01-01.
+Google organic search is accessed through **SerpAPI**; the second search provider is **Exa Search API**. This is not Google's discontinued Custom Search JSON API. Google's official documentation says that API is closed to new customers, with existing customers transitioning by 2027-01-01.
 
 ## Activation
 
 Add the following repository Actions secrets in `Lepe12/geraki-historical-atlas` through GitHub's protected settings UI:
 
 - `SERPAPI_API_KEY`: a key for the user's SerpAPI account, for Google search results.
-- `BRAVE_SEARCH_API_KEY`: a key for the user's Brave Search API subscription.
+- `EXA_API_KEY`: a key for the user's Exa account.
 
 Do not put keys in chat, code, browser storage, or research requests. No account, subscription or billing arrangement is created by this implementation. Both are optional at workflow-definition time: missing keys produce `API_KEY_REQUIRED`, not fake zero-hit success. One configured provider can operate independently while the other is reported missing. Merely merging code does not activate paid services or prove a successful search.
 
@@ -16,10 +16,10 @@ Both ordinary research lanes and the reusable specialist workflow receive only t
 ## Behavior and limits
 
 - Both configured providers are queried concurrently, at most one request per provider per query, with an 18-second timeout each. Existing per-lane query budgets still apply. Each query can consume two API searches; actual usage/charges depend on the account plan. No automatic pagination or indefinite retries.
-- Google consumes `organic_results` only; Brave consumes `web.results`. AI summaries, answer boxes and ads are not evidence inputs.
+- Google consumes `organic_results` only; Exa consumes `results` URLs, titles and highlights. AI summaries, answer boxes and ads are not evidence inputs.
 - Every output records source URL, snippet, provider(s), search query and provider-level execution diagnostics. Duplicate URLs merge provider provenance; this does not establish independent corroboration.
-- Repository-scoped searches preserve `site:` constraints and validate the returned hostname, including legitimate subdomains.
-- First-page coverage and truncation are explicit. No claim is made that the web or a catalogue was exhausted. An unrecognized response or remote failure is not an executed empty search.
+- Repository-scoped searches use `site:` for Google and `includeDomains` for Exa; both validate returned hostnames, including legitimate subdomains. Exa uses a bounded POST `/search` with `type=auto`, ten results and highlights.
+- First-page (Google) / top-k (Exa) coverage and truncation are explicit. No claim is made that the web or a catalogue was exhausted. An unrecognized response or remote failure is not an executed empty search.
 - PDF links are retained as discovery pointers. This change does not itself implement general PDF download, correct multi-file IA acquisition, original inspection or historical identity verification.
 - Query terms are provenance, not source text. Search snippets remain `UNVERIFIED_DISCOVERY`; there is no automatic VERIFIED promotion.
 - API keys and raw provider error bodies/URLs are omitted from evidence diagnostics.
@@ -36,5 +36,10 @@ Official/provider references checked 2026-10-17:
 - https://developers.google.com/custom-search/v1/overview
 - https://serpapi.com/search-api
 - https://serpapi.com/organic-results
-- https://api-dashboard.search.brave.com/api-reference/web/search/get
-- https://api-dashboard.search.brave.com/documentation/guides/authentication
+- https://exa.ai/docs/reference/search
+- https://exa.ai/pricing
+
+
+## Activation status — 2026-10-17
+
+Google executed in run `39064296102`: the durable travellers report retained 27 general web leads with Google provenance, including relevant and off-target results. This establishes API connectivity, not historical correctness. Exa replaces the unactivated Brave adapter. Exa remains **UNEXECUTED** until `EXA_API_KEY` is saved and a credentialed run records successful provider attempts. The Starter plan advertised no payment method required when checked; no paid upgrade or automatic billing is configured by this code.
