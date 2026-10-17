@@ -36,18 +36,21 @@ def decompose(target, aliases=(), purpose='', kind='unknown', regions=()):
         roles=[target[offsets[match.start(1)]:offsets[match.end(1)-1]+1]]
         places.append(target[offsets[match.start(2)]:].strip(' .;,:?'))
         kind='person'
-    # Operators commonly submit a natural-language instruction instead of a bare
-    # target. Remove only known leading instruction phrases, not internal words.
-    # Otherwise an exact-match archive query becomes \"βρες πληροφορίες για ...\".
+    # Remove a leading operator instruction only after the role/place split.
+    # The role and location remain search constraints, not historical assertions.
     if kind == 'person':
-        person=re.sub(
-            r'^(?:(?:βρες|ψαξε|αναζητησε)\\s+(?:(?:μου|μας)\\s+)?'
-            r'(?:(?:πληροφοριες|πηγες|τεκμηρια|στοιχεια)\\s+)?'
-            r'(?:για\\s+)?|(?:find|search)\\s+(?:(?:sources|information)\\s+)?'
-            r'(?:about\\s+|for\\s+)?)(?:(?:τον|την|το|the)\\s+)?',
-            '', fold(person), count=1
-        ) if re.match(r'^(?:βρες|ψαξε|αναζητησε|find|search)\\b',fold(person)) else person
-        # Keep the original orthography of names where no instruction is present.
+        command = re.match(
+            r'^(?:(?:βρες|ψαξε|αναζητησε)\s+(?:(?:μου|μας)\s+)?'
+            r'(?:(?:πληροφοριες|πηγες|τεκμηρια|στοιχεια)\s+)?'
+            r'(?:για\s+)?|(?:find|search)\s+(?:(?:sources|information)\s+)?'
+            r'(?:about\s+|for\s+)?)(?:(?:τον|την|το|the)\s+)?',
+            fold(person)
+        )
+        if command:
+            # Slice the original string by matching folded-character offsets.
+            folded_offsets = [i for i, c in enumerate(person) for _ in fold(c)]
+            if command.end() < len(folded_offsets):
+                person = person[folded_offsets[command.end()]:].strip()
     words=_words(person)
     # A bare two/three-word name is only a retrieval hypothesis. Avoid treating
     # arbitrary prose as a person. Explicit place/event types always win.
