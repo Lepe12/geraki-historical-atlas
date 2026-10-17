@@ -118,5 +118,17 @@ class FulltextTests(unittest.TestCase):
         self.assertEqual(rows[0]['topical_match']['category'],'POSSIBLE_TARGET')
         self.assertFalse(rows[0]['verified'])
 
+    def test_repeated_bibliographic_record_preserves_all_lanes_once(self):
+        from orchestrator.build_command_center_snapshot import discovery_results
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            for lane,repo in [('travellers','Biblioteca Digital Hispánica'),('spanish_simancas','Biblioteca Nacional de España SRU')]:
+                folder=root/lane/'lane_discovery';folder.mkdir(parents=True)
+                (folder/(lane+'.json')).write_text(json.dumps({'results':[{'identifier':'(OCoLC)123456','title':'A source','discovery_repository':repo}]}))
+            rows,_=discovery_results(root)
+        self.assertEqual(len(rows),1)
+        self.assertEqual(set(rows[0]['contributing_lanes']),{'travellers','spanish_simancas'})
+        self.assertEqual(len(rows[0]['repositories']),2)
+
 
 if __name__=='__main__':unittest.main()

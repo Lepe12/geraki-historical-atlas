@@ -99,7 +99,25 @@ def discovery_results(run_root:Path,request=None):
                 "status":attempt.get("status"),"hits":attempt.get("hits",0),
                 "queries":[{"query":q.get("query"),"status":q.get("status"),"hits":q.get("hits",0),"detail":q.get("detail")} for q in attempt.get("queries",[])],
                 "url":attempt.get("base_url")})
-    return discoveries,coverage
+    # One bibliographic source can be discovered by several lanes. Keep its
+    # provenance without counting the same record/page/passage repeatedly.
+    grouped={};unique=[]
+    for row in discoveries:
+        ident=str(row.get('identifier') or '')
+        url=row.get('url')
+        namespace='GLOBAL_OCLC' if ident.startswith('(OCoLC)') else row.get('repository')
+        key=(namespace,ident,row.get('canvas_id'),row.get('printed_page'),row.get('context_excerpt')) if ident else ('URL',url,row.get('canvas_id'),row.get('printed_page'),row.get('context_excerpt')) if url else None
+        if key is None:
+            unique.append(row);continue
+        if key in grouped:
+            prior=grouped[key]
+            if row['lane'] not in prior['contributing_lanes']:prior['contributing_lanes'].append(row['lane'])
+            if row.get('repository') not in prior['repositories']:prior['repositories'].append(row.get('repository'))
+            continue
+        row['contributing_lanes']=[row['lane']]
+        row['repositories']=[row.get('repository')]
+        grouped[key]=row;unique.append(row)
+    return unique,coverage
 
 def request_id_for(run_root:Path):
     for lane in LANE_LABELS:
