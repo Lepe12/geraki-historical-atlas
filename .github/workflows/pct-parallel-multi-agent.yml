@@ -96,7 +96,7 @@ jobs:
         run: python3 -m compileall -q tools
       - name: Run core scientific benchmark
         run: |
-          PYTHONPATH=tools:tools/orchestrator python3 -m unittest tools/test_research_focus.py tools/test_fulltext_discovery.py -q
+          PYTHONPATH=tools:tools/orchestrator python3 -m unittest tools/test_research_focus.py tools/test_fulltext_discovery.py tools/test_research_pipeline_repairs.py -q
           python3 tools/scientific_benchmark.py
           python3 tools/adversarial_scientific_benchmark.py
       - name: Build and validate eleven lane payloads
@@ -194,13 +194,18 @@ jobs:
       - name: Build lane-specific repository plan
         run: |
           python3 tools/lane_repository_plan.py
-          timeout 300s python3 tools/lane_repository_discovery.py || { code=$?; echo "LANE DISCOVERY FAILED exit=$code"; exit "$code"; }
+          for discovery_pass in 1 2 3 4 5 6; do
+            timeout 300s python3 tools/lane_repository_discovery.py || { code=$?; echo "LANE DISCOVERY FAILED exit=$code"; exit "$code"; }
+            python3 -c 'import json,os,sys; sys.exit(0 if json.load(open("lane_discovery/"+os.environ["PCT_RESEARCH_LANE"]+".json")).get("partial") else 1)' || break
+          done
           python3 tools/merge_specialist_candidates.py
           if [ "$PCT_RESEARCH_LANE" = "travellers" ]; then timeout 210s python3 tools/fulltext_discovery.py; fi
           python3 tools/merge_repository_candidates.py
           python3 tools/orchestrator/jarvis_event_bus.py --run-id "$GITHUB_RUN_ID" --event-type agent_progress --agent-id "$PCT_RESEARCH_LANE" --phase "repository discovery complete" --percent 35 --status RUNNING --detail "Repository discovery and candidate merge complete"
           if [ "$PCT_RESEARCH_LANE" = "german" ]; then PCT_BSB_POSITIVE_CONTROL=1 python3 tools/bsb_iiif_route.py; fi
           if [ "$PCT_RESEARCH_LANE" = "travellers" ]; then python3 tools/bsb_iiif_route.py; fi
+      - name: Install PDF text extraction
+        run: command -v pdftotext >/dev/null || { sudo apt-get update -qq; sudo apt-get install -y poppler-utils; }
       - name: Run lane research pipeline
         env:
           PCT_RESEARCH_LANE: ${{ matrix.lane }}
@@ -212,6 +217,7 @@ jobs:
               python3 tools/route_library_candidates.py || exit $?
             fi
             python3 tools/acquire_library_candidate.py &&
+            python3 tools/merge_repository_candidates.py &&
             python3 tools/search_acquired_ocr.py &&
             python3 tools/event_first_search.py &&
             python3 tools/research_recovery.py &&
@@ -227,6 +233,8 @@ jobs:
           PCT_RESEARCH_LANE: ${{ matrix.lane }}
           PCT_RUN_ID: ${{ github.run_id }}
         run: |
+          mkdir -p system_health
+          printf '%s\n' '{"execution_status":"${{ job.status }}"}' > system_health/workflow_execution.json
           python3 tools/preserve_run_evidence.py --run-id "$PCT_RUN_ID" --lane "$PCT_RESEARCH_LANE"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Execute lane-specific archive/library discovery and emit normalized provenance."""
-import os,json,pathlib,urllib.parse,urllib.request,sys
+import os,json,pathlib,urllib.parse,urllib.request,sys,time
+from concurrent.futures import ThreadPoolExecutor
 sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from connectors.bsb_sru import search_bsb
 from connectors.repository_connectors import dispatch
@@ -52,7 +53,15 @@ attempts=[{"repository":r['name'],"status":"UNEXECUTED","hits":0,"queries":[],"b
 def save_partial(active_records=()):
     checkpoint={"schema":"pct-lane-discovery-v3","lane":lane,"request_file":plan.get("request_file"),"target":plan.get("target"),"aliases":plan.get("aliases",[]),"date_range":plan.get("date_range"),"attempts":attempts,"results":results+list(active_records),"partial":True,"gate":"Partial discovery metadata is not evidence."}
     (out/f"{lane}.json").write_text(json.dumps(checkpoint,ensure_ascii=False,indent=2),encoding="utf-8")
+previous=json.loads((out/f"{lane}.json").read_text()) if (out/f"{lane}.json").exists() else {}
+if previous and (previous.get('target'),previous.get('date_range'),previous.get('aliases',[])) != (plan.get('target'),plan.get('date_range'),plan.get('aliases',[])):
+    raise SystemExit('DISCOVERY_REQUEST_MISMATCH')
+if previous:
+    results=previous.get('results',[])
+    old={a['repository']:a for a in previous.get('attempts',[])}
+    attempts=[old.get(a['repository'],a) for a in attempts]
 save_partial()
+repo_specs=[]
 for repo_index,r in enumerate(plan["repositories"]):
     name=r["name"]; repo_records=[]; statuses=[]; diagnostics=[]
     repo_terms=list(terms)
@@ -153,42 +162,61 @@ for repo_index,r in enumerate(plan["repositories"]):
         # Keep the lane's language and alternate names within bounded budgets.
         # Generic English qualifiers previously replaced every archive's plan.
         repo_terms=focused_queries(focus,EVENT_TERMS.get(lane,()),include_hypotheses=name!="SearchCulture.gr / EKT")[:min(cap,16)]
-    for q in repo_terms:
-        attempts[repo_index].update(status='IN_PROGRESS',active_query=q,hits=len(repo_records),queries=diagnostics)
-        save_partial(repo_records)
-        try:
-            if name=="Internet Archive":
-                x=ia(q);status="EXECUTED";diag="public advanced-search API"
-            elif name=="The National Archives Discovery":
-                x=tna(q);status="EXECUTED";diag="public Discovery API"
-            elif name=="BSB":
-                x=bsb(q);status="EXECUTED";diag="official Alma SRU"
-            else:
-                status,x,diag=dispatch(name,q,lane)
-            statuses.append(status);diagnostics.append({"query":q,"status":status,"detail":diag,"hits":len(x)})
-            repo_records.extend(x)
-            attempts[repo_index].update(hits=len(repo_records))
-            save_partial(repo_records)
-            # auth/key/browser blockers do not benefit from alias retries
-            if status not in ("EXECUTED","ERROR"):break
-        except Exception as e:
-            statuses.append("ERROR");diagnostics.append({"query":q,"status":"ERROR","detail":f"{type(e).__name__}: {e}","hits":0})
-            save_partial(repo_records)
-    ded=[];seen=set()
-    for x in repo_records:
-        k=str(x.get("identifier") or x.get("url") or x.get("title") or json.dumps(x,sort_keys=True,default=str))
-        if k in seen:continue
-        seen.add(k);ded.append(x)
-    results.extend(ded)
-    if "EXECUTED" in statuses: overall="EXECUTED"
-    elif "API_KEY_REQUIRED" in statuses: overall="API_KEY_REQUIRED"
-    elif "AUTH_OR_BROWSER_REQUIRED" in statuses: overall="AUTH_OR_BROWSER_REQUIRED"
-    elif statuses and all(s=="ERROR" for s in statuses):overall="ERROR"
-    else:overall=statuses[0] if statuses else "CITATION_CHASE_WEB_OR_API_CONNECTOR_REQUIRED"
-    attempts[repo_index]={"repository":name,"status":overall,"hits":len(ded),"queries":diagnostics,"base_url":r["base_url"]}
-    # Persist partial progress before the next remote repository can time out.
-    save_partial()
-payload={"schema":"pct-lane-discovery-v3","lane":lane,"request_file":plan.get("request_file"),"target":plan.get("target"),"aliases":plan.get("aliases",[]),"date_range":plan.get("date_range"),"attempts":attempts,"results":results,"gate":"Discovery metadata is not historical evidence. EXECUTED means a real remote query completed; auth/key/browser targets remain explicit blockers and are never claimed as searched."}
-(out/f"{lane}.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding="utf-8")
-print("LANE DISCOVERY",lane,"executed",sum(a["status"]=="EXECUTED" for a in attempts),"blocked",sum(a["status"] in ("AUTH_OR_BROWSER_REQUIRED","API_KEY_REQUIRED") for a in attempts),"errors",sum(a["status"]=="ERROR" for a in attempts),"hits",len(results))
-for a in attempts:print("REPOSITORY RESULT",a["repository"],a["status"],a["hits"])
+    completed={a['query'] for a in attempts[repo_index].get('queries',[])}
+    pending=[q for q in repo_terms if q not in completed]
+    if attempts[repo_index].get('status') in ('API_KEY_REQUIRED','AUTH_OR_BROWSER_REQUIRED','ACCESS_BLOCKED','REMOTE_ACCESS_BLOCKED','REMOTE_RATE_LIMITED'):pending=[]
+    repo_specs.append((repo_index,r,pending))
+
+# Each round gives every repository one query before a second query is issued.
+# Checkpoints are written only on the coordinator thread. Subsequent invocations
+# continue the saved queue rather than restarting successful queries.
+started=time.monotonic()
+budget=float(os.getenv('PCT_DISCOVERY_BUDGET_SECONDS','220'))
+quantum=max(1,int(os.getenv('PCT_DISCOVERY_ROUNDS_PER_PASS','3')))
+def execute(job):
+    index,r,q=job
+    try:
+        if r['name']=='Internet Archive':x=ia(q);status='EXECUTED';diag='public advanced-search API'
+        elif r['name']=='The National Archives Discovery':x=tna(q);status='EXECUTED';diag='public Discovery API'
+        elif r['name']=='BSB':x=bsb(q);status='EXECUTED';diag='official Alma SRU'
+        else:status,x,diag=dispatch(r['name'],q,lane)
+    except Exception as e:
+        status,x,diag='ERROR',[],type(e).__name__
+    return index,q,status,x,diag
+blocked=set()
+for round_number in range(quantum):
+    if time.monotonic()-started>=budget:break
+    jobs=[(i,r,queue[0]) for i,r,queue in repo_specs if queue and i not in blocked]
+    if not jobs:break
+    interrupted=[]
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        from concurrent.futures import as_completed
+        for future in as_completed([pool.submit(execute,j) for j in jobs]):
+            try:i,q,status,records,diag=future.result()
+            except BaseException as exc:interrupted.append(exc);continue
+            attempt=attempts[i]
+            attempt.setdefault('queries',[]).append({'query':q,'status':status,'detail':diag,'hits':len(records)})
+            attempt['status']='EXECUTED' if any(v['status']=='EXECUTED' for v in attempt['queries']) else status
+            keys={(v.get('discovery_repository'),str(v.get('identifier') or v.get('url') or v.get('title'))) for v in results}
+            for row in records:
+                key=(row.get('discovery_repository'),str(row.get('identifier') or row.get('url') or row.get('title')))
+                if key not in keys:results.append(row);keys.add(key)
+            attempt['hits']=sum(v.get('discovery_repository')==attempt['repository'] for v in results)
+            repo_specs[i][2].pop(0)
+            if status not in ('EXECUTED','ERROR'):
+                blocked.add(i)
+                attempt['remaining_queries_not_retried']=list(repo_specs[i][2])
+                repo_specs[i][2].clear()
+            if repo_specs[i][2]:attempt['status']='IN_PROGRESS'
+            save_partial()
+    if interrupted:raise interrupted[0]
+remaining={r['name']:queue for i,r,queue in repo_specs if queue}
+for i,r,queue in repo_specs:
+    attempts[i]['deferred_queries']=queue
+    if queue:attempts[i]['status']='PARTIAL'
+payload={'schema':'pct-lane-discovery-v3','lane':lane,'request_file':plan.get('request_file'),
+         'target':plan.get('target'),'aliases':plan.get('aliases',[]),'date_range':plan.get('date_range'),
+         'attempts':attempts,'results':results,'partial':bool(remaining),'deferred_queries':remaining,
+         'gate':'Bounded discovery only. Deferred queries are not searched; acquisition is not verification.'}
+(out/f'{lane}.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
+print('LANE DISCOVERY',lane,'records',len(results),'remaining repositories',len(remaining))

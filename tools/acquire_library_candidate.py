@@ -6,6 +6,8 @@ LOCATED rather than being misreported as acquired or verified.
 """
 import json,pathlib,urllib.request,urllib.parse,datetime,re,os,time
 from request_context import load_request
+from web_acquisition import acquire as acquire_web
+from connectors.web_search import search as search_web
 from research_relevance import identity, rank, request_digest
 rf,req,ctx=load_request()
 request_sha=request_digest(req,ctx)
@@ -37,7 +39,7 @@ if previous and previous.get('request_sha256')!=request_sha:
 results=previous.get('results',[])
 def key(x):
     return (str(x.get('discovery_repository') or x.get('repository')),str(x.get('identifier') or x.get('url') or x.get('title')))
-completed={key(x) for x in results if x.get('status') not in ('ACQUISITION_ERROR',)}
+completed={key(x) for x in results if x.get('status')!='ACQUISITION_ERROR' and (x.get('status')!='LOCATED_CITATION_CHASE' or x.get('web_acquisition_attempted') or not (x.get('url') or x.get('digital_url')))}
 pending=[x for x in items if key(x) not in completed]
 max_items=max(1,int(os.getenv('PCT_MAX_ACQUISITION_CANDIDATES','100')))
 max_batches=max(1,int(os.getenv('PCT_ACQUISITION_BATCHES','3')))
@@ -52,6 +54,9 @@ def checkpoint(remaining):
     report_path.write_text(json.dumps(report,ensure_ascii=False,indent=2))
 checkpoint(pending)
 items=selected
+citation_history=OUT/'citation_chase_report.json'
+citation_searches=json.loads(citation_history.read_text()).get('searches',[]) if citation_history.exists() else []
+citation_queries_seen={x['query'] for x in citation_searches}
 
 def safe_name(s):
     return re.sub(r"[^A-Za-z0-9_.-]+","_",str(s))[:180]
@@ -75,7 +80,15 @@ for position,x in enumerate(items):
         if is_ia and ident:
             with urllib.request.urlopen("https://archive.org/metadata/"+urllib.parse.quote(str(ident)),timeout=25) as f:meta=json.load(f)
             names=[str(a.get("name","")) for a in meta.get("files",[])]
-            preferred=[n for n in names if n.lower().endswith(("_djvu.txt","_searchtext.txt",".txt"))]
+            preferred=[n for n in names if n.lower().endswith(("_djvu.txt","_searchtext.txt"))]
+            # Use the exact file identified by full-text discovery where available.
+            expected=rec.get('fulltext_hit',{}).get('filename') if isinstance(rec.get('fulltext_hit'),dict) else None
+            if expected:
+                preferred=sorted(preferred,key=lambda n:0 if n==expected else 1)
+            if len(preferred)>1 and not expected:
+                rec['status']='AMBIGUOUS_TEXT_FILE'
+                rec['errors']=['Multiple OCR files; a matched issue/file is required.']
+                preferred=[]
             rec["available_text_files"]=preferred[:20]
             for n in preferred[:1]:
                 try:
@@ -83,7 +96,7 @@ for position,x in enumerate(items):
                     data,_=fetch(url)
                     dest=OUT/safe_name(str(ident)+"_"+pathlib.Path(n).name);dest.write_bytes(data);rec["files"].append(str(dest))
                 except Exception as e:rec.setdefault("errors",[]).append(f"IA_TEXT {type(e).__name__}: {e}")
-            rec["status"]="TEXT_ACQUIRED" if rec["files"] else "METADATA_ONLY"
+            rec["status"]="TEXT_ACQUIRED" if rec["files"] else rec.get("status","METADATA_ONLY")
         else:
             # Manifest acquisition is safe and bounded; image/page acquisition occurs later.
             manifests=rec.get("iiif_manifest_candidates") or []
@@ -101,6 +114,39 @@ for position,x in enumerate(items):
                     dest=OUT/(safe_name(ident or repo+"_direct")+ext);dest.write_bytes(data);rec["files"].append(str(dest))
                 except Exception as e:rec.setdefault("errors",[]).append(f"DIRECT {type(e).__name__}: {e}")
             rec["status"]="DIGITAL_METADATA_ACQUIRED" if rec["files"] else "LOCATED_CITATION_CHASE"
+            if not manifests:
+                url=rec.get('digital_url') or rec.get('url')
+                if url:
+                    rec['web_acquisition_attempted']=True
+                    try:
+                        acquired=acquire_web(url,OUT)
+                        rec['web_acquisition']=acquired
+                        rec['files'].extend(acquired['files'])
+                        rec['status']=acquired['status']
+                        rec['acquired_source_url']=acquired['url']
+                        for query in acquired.get('bibliographic_queries',[]):
+                            if query in citation_queries_seen or len(citation_queries_seen)>=3 or time.monotonic()-started>=budget:continue
+                            citation_queries_seen.add(query)
+                            status,leads,diagnostic=search_web('"'+query+'"',os.getenv('PCT_RESEARCH_LANE','travellers'),'Citation Chase')
+                            for lead in leads:
+                                lead.update(parent_source_url=acquired['url'],citation_query=query,source_lead=True)
+                            citation_searches.append({'query':query,'parent_source_url':acquired['url'],'status':status,'diagnostic':diagnostic,'results':leads})
+                            for lead in [v for v in leads if v.get('digital_url')][:2]:
+                                try:
+                                    cited=acquire_web(lead['digital_url'],OUT,follow=False)
+                                    results.append({**lead,'files':cited['files'],'web_acquisition':cited,'status':cited['status'],'original_inspected':False,'verification_status':'NEEDS_EVIDENCE'})
+                                except Exception as exc:
+                                    citation_searches[-1].setdefault('acquisition_failures',[]).append({'url':lead['digital_url'],'code':type(exc).__name__})
+                        for child in acquired.get('linked_documents',[]):
+                            linked={**rec,'identifier':child['url'],'url':child['url'],
+                                    'title':'Linked document: '+child['url'],'files':child['files'],
+                                    'web_acquisition':child,'status':child['status'],
+                                    'parent_source_url':acquired['url'],'source_genealogy':'CITED_DOCUMENT_NOT_INDEPENDENCE_PROOF'}
+                            results[:]=[old for old in results if key(old)!=key(linked)]
+                            results.append(linked)
+                    except Exception as e:
+                        rec.setdefault('errors',[]).append('WEB_ACQUISITION '+type(e).__name__)
+
     except Exception as e:
         rec["status"]="ACQUISITION_ERROR";rec["error"]=f"{type(e).__name__}: {e}"
     results[:]=[old for old in results if key(old)!=key(rec)]
@@ -108,3 +154,13 @@ for position,x in enumerate(items):
     checkpoint(items[position+1:]+deferred)
 checkpoint(deferred)
 print("ACQUISITION",len(results),"acquired",sum(x.get('status') in ('TEXT_ACQUIRED','DIGITAL_METADATA_ACQUIRED') for x in results),"deferred",len(deferred),"held",len(held))
+
+(OUT/'citation_chase_report.json').write_text(json.dumps({'searches':citation_searches,'verification_status':'UNVERIFIED_DISCOVERY','bounded_queries':3},ensure_ascii=False,indent=2))
+lane_path=pathlib.Path('lane_discovery')/(os.getenv('PCT_RESEARCH_LANE','travellers')+'.json')
+if citation_searches and lane_path.exists():
+    discovery=json.loads(lane_path.read_text())
+    existing={v.get('url') for v in discovery.get('results',[])}
+    for search in citation_searches:
+        for row in search['results']:
+            if row.get('url') not in existing:discovery.setdefault('results',[]).append(row);existing.add(row.get('url'))
+    lane_path.write_text(json.dumps(discovery,ensure_ascii=False,indent=2))

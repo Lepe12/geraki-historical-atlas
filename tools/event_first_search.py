@@ -2,6 +2,7 @@
 """Request-driven contextual event discovery; raw metadata never supplies dates."""
 import json, pathlib, os, re, unicodedata
 from request_context import load_request
+from urllib.parse import urlsplit
 from candidate_context import assess, catalogue_assess, variants, POLICY
 
 rf, req, ctx = load_request()
@@ -22,7 +23,12 @@ for file in sorted(root.glob('*')):
 path=pathlib.Path('lane_discovery')/(os.getenv('PCT_RESEARCH_LANE','travellers')+'.json')
 if path.exists():
     for record in json.loads(path.read_text(encoding='utf-8')).get('results',[]):
+        host=(urlsplit(str(record.get('url') or '')).hostname or '').lower()
+        social=any(host==h or host.endswith('.'+h) for h in ('instagram.com','facebook.com','tiktok.com','youtube.com','linkedin.com'))
         for hit in catalogue_assess(record,terms,lo,hi):
+            if social:
+                hit['decision']='HOLD_FOR_REVIEW'
+                hit['reason']='SOCIAL_POST_DISCOVERY_ONLY' 
             hit.update(repository=record.get('discovery_repository'),identifier=record.get('identifier'),
                        url=record.get('url'),title=record.get('title'),lead_type='CATALOGUE_METADATA',
                        verification_status='NOT_ORIGINAL_VERIFIED',

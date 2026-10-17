@@ -154,7 +154,7 @@ def build(repo:Path,run_id:str):
         blockers.extend({"agent_id":lane,**x} for x in b if isinstance(x,dict))
         agents.append({
           "id":lane,"label":LANE_LABELS.get(lane,lane),
-          "kind":"research_lane","status":"COMPLETED",
+          "kind":"research_lane","status":row.get("execution_status","COMPLETED"),
           "phase":row.get("status") or row.get("verification_status") or "complete",
           "percent":100,"candidate_events":int(row.get("candidate_events",0) or 0),
           "verified_events":int(row.get("verified_events",0) or 0),
@@ -163,8 +163,8 @@ def build(repo:Path,run_id:str):
         events.append({
           "schema":"pct-command-center-derived-event-v1",
           "event_id":f"{run_id}:{lane}:final","created_utc":board.get("generated_utc"),
-          "project":"piratecartography","run_id":run_id,"request_id":request_id,"event_type":"agent_completed",
-          "agent_id":lane,"phase":row.get("status"),"percent":100,"status":"COMPLETED",
+          "project":"piratecartography","run_id":run_id,"request_id":request_id,"event_type":"agent_completed" if row.get("execution_status","COMPLETED")=="COMPLETED" else "agent_failed",
+          "agent_id":lane,"phase":row.get("status"),"percent":100,"status":row.get("execution_status","COMPLETED"),
           "warnings":[str(x.get("status")) for x in b[:5] if isinstance(x,dict)],
           "detail":f"{row.get('candidate_events',0)} candidate events; {len(b)} blockers"
         })
@@ -186,6 +186,8 @@ def build(repo:Path,run_id:str):
 
     events.sort(key=lambda x:str(x.get("created_utc") or ""))
     summary=board.get("summary") or {}
+    lane_statuses=[a['status'] for a in agents if a['kind']=='research_lane']
+    mission_status=('UNKNOWN' if not lane_statuses else 'FAILED' if all(v=='FAILED' for v in lane_statuses) else 'PARTIAL' if any(v!='COMPLETED' for v in lane_statuses) else 'COMPLETED')
     return {
       "schema":"pct-command-center-live-v1",
       "project":"piratecartography","run_id":run_id,"request_id":request_id,
@@ -198,7 +200,7 @@ def build(repo:Path,run_id:str):
         "date_range":request.get("date_range") or "",
         "purpose":request.get("purpose") or "Historical research operation",
         "research_focus":identity(request,request)['focus'] if request.get('target') else None,
-        "status":"COMPLETED",
+        "status":mission_status,
         "selected_lanes":int(summary.get("selected_lanes",len([a for a in agents if a["kind"]=="research_lane"])) or 0)
       },
       "metrics":{

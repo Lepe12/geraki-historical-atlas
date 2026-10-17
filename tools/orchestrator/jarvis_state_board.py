@@ -26,6 +26,13 @@ def lane_state(run,lane):
         for r in d.get("repositories_attempted",[]):
             if r.get("status") not in {"EXECUTED","OPERATIONAL","SUCCESS"}:
                 out["blockers"].append({"repository":r.get("repository"),"status":r.get("status")})
+    execution=base/'system_health'/'workflow_execution.json'
+    discovery=base/'lane_discovery'/f'{lane}.json'
+    workflow=read(execution).get('execution_status') if execution.is_file() else None
+    partial=discovery.is_file() and read(discovery).get('partial',False)
+    out['execution_status']='FAILED' if workflow in ('failure','cancelled') else 'PARTIAL' if partial or not qa.is_file() else 'COMPLETED'
+    if out['execution_status']!='COMPLETED':
+        out['blockers'].append({'repository':lane,'status':out['execution_status']})
     return out
 
 def build(run):
