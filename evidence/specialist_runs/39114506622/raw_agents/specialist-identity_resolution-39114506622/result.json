@@ -1,0 +1,2878 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "identity_resolution",
+  "label": "Identity Resolution Agent",
+  "assignment_id": "identity_resolution:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "entity_candidates",
+    "variant_names",
+    "same_entity_assessment",
+    "collision_warnings"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "3183b78209f6810a48975c4b8a23101905f39ec0b4a5455fdd66938e97893259",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "identity_resolution",
+    "assignment_id": "identity_resolution:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:SearchCulture.gr / EKT",
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:OpenArchives.gr / EKT"
+    ],
+    "queries": [
+      "\"Πέτρος Λάντζας\"",
+      "\"Petros Lantzas\"",
+      "\"Pietro Lanza\"",
+      "\"Petros Lanza\"",
+      "\"Lantzas, Petros\""
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 130,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 102,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "\"Petros Lantzas\"",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "\"Pietro Lanza\"",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "\"Lantzas, Petros\"",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "\"Petros Lanza\"",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lanza\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Petros+Lanza+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lantzas\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Petros+Lantzas+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Lantzas, Petros\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Lantzas%2C+Petros+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "FAILED",
+      "query": "\"Lantzas, Petros\"",
+      "records": [],
+      "diagnostic": "HTTPError: HTTP Error 403: Forbidden",
+      "blockers": [
+        {
+          "code": "EXECUTION_FAILED",
+          "detail": "HTTPError: HTTP Error 403: Forbidden"
+        }
+      ],
+      "warnings": [
+        "Repository connector raised an exception."
+      ],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lantzas\"",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Petros+Lantzas%22&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lanza\"",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Petros+Lanza%22&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pietro Lanza\"",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Pietro+Lanza%22&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/portal/search",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/portal/search",
+          "title": "OpenArchives.gr | Ο συσσωρευτής ψηφιακού περιεχομένου έρευνας, επιστήμης και εκπαίδευσης του ΕΚΤ",
+          "description": "Ανθρωπιστικές Επιστήμες και Τέχνες (100.273)\n\nΆλλες\n...\nΙστορία και Αρχαιολογία (40.711)\n...\nΣυντήρηση και Προστασία αρχαιοτήτων & έργων τέχνης (619)\n...\nΓεωλογία (9.943)\n\nΓεωφυσική (354)\n\nΓεωχημεία και Πετρολογία (282)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρος Λάντζας\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15123?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15123?language=en",
+          "title": "openarchives.gr | Το δοξαστικό των αποστίχων της Μ.Τετάρτης \"Κύριε η εν πολλαις αμαρτίαις...\": από τον Πέτρο Λαμπαδάριο στον Κωνσταντίνο Πρίγγο.",
+          "description": "openarchives.gr | Το δοξαστικό των αποστίχων της Μ.Τετάρτης \"Κύριε η εν πολλαις αμαρτίαις...\": από τον Πέτρο Λαμπαδάριο στον Κωνσταντίνο Πρίγγο.\n\n...\n\n> # Το δοξαστικό των αποστίχων της Μ.Τετάρτης \"Κύριε η εν πολλαις αμαρτίαις...\": από τον Πέτρο Λαμπαδάριο στον Κωνσταντίνο Πρίγγο.\n> \n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15123 RDF/XML JSON-LD \n> \n> \n\nTitle\n\n Το δοξαστικό των αποστίχων της Μ.Τετάρτης \"Κύριε η εν πολλαις αμαρτίαις...\": από τον Πέτρο Λαμπαδάριο στον Κωνσταντίνο Πρίγγο. (EL) \n\nCreator\n\n Μαλάκος, Ιωάννης (EL) \n\nContributor\n\n Πάρης, Νεκτάριος (EL) Ρεντζεπέρη, Άννα-Μαρία (EL) \n\nType\n\n Bachelor's Degree Paper (EN)\n\n...\n\nText (EN)\n\n...\n\n2 ... 1 ... 08 ... T1 ... : ... 1 ... (EL)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρος Λάντζας\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pasithee/000038-_5193",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pasithee/000038-_5193",
+          "title": "openarchives.gr | Two dirges from Central Greece",
+          "description": "Τίτλος\n\n Two dirges from Central Greece (EL) \n\nΔημιουργός\n\n Constantine, Peter \n\nΤύπος\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\n \n\n Τμήμα έκδοσης Δημοσίευση σε περιοδικό (EL) \n\nΗμερομηνία\n\n 2024-11-13 \n\nΧρονολογία",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρος Λάντζας\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/kypseli/000054-11128_889",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/kypseli/000054-11128_889",
+          "title": "openarchives.gr | Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα)",
+          "description": "openarchives.gr | Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα)\n\n Το τεκμήριο παρέχεται από τον φορέα : Ανοικτό Πανεπιστήμιο Κύπρου \n\n Αποθετήριο : Ψηφιακό Αποθετήριο Κυψέλη \n\nΤίτλος\n\n Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα) \n\nΣυντελεστής\n\n Spanos, Leonidas \n\n Ματθοπούλου, Ευαγγελία \n\n Μητρόπολη Κιτίου \n\n Εκκλησιαστική Επιτροπή Ιεράς Μονής Αγίου Γεωργίου Κοντού \n\n Σπανός, Λεωνίδας \n\nΤύπος\n\n Ψηφιακή εικόνα \n\n \n\nΗμερομηνία έκδοσης\n\n 2012-10-23 2006 2006-09-10 2012-10-23T10:17:19Z \n\nΧρονολογία\n\n 2006 - 2012 (EL) \n\nΕπιστημονικό πεδίο\n\n Ανθρωπιστικές Επιστήμες και Τέχνες Τέχνες (Τέχνες, Ιστορία της Τέχνης, Ερμηνευτικές Τέχνες, Μουσική) (EL) \n\nΘέμα\n\n Λάρνακα \n\n Δήμος Λάρνακας \n\n Εκκλησία \n\n Πατριάρχης Αλεξανδρείας Πέτρος Ζ' \n\nΔικαιώματα\n\nΠάροχος\n\n Ανοικτό Πανεπιστήμιο Κύπρου \n\nΑποθετήριο / συλλογή\n\nΕπιμέρους συλλογή\n\n Κύπρος: τόποι μνήμης – χώροι τέχνης",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρος Λάντζας\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_10144",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_10144",
+          "title": "openarchives.gr | Η ΣΥΜΒΟΛΗ ΤΗΣ ΒΙΟΣΥΝΘΕΣΕΩΣ ΤΗΣ ΑΙΜΟΣΦΑΙΡΙΝΗΣ IN VITRO ΣΤΗ ΔΙΑΓΝΩΣΗ ΚΑΙ ΚΑΤΑΤΑΞΗΤΩΝ ΕΤΕΡΟΖΥΓΩΝ ΜΟΡΦΩΝ ΤΗΣ ΜΕΣΟΓΕΙΑΚΗΣ ΑΝΑΙΜΙΑΣ",
+          "description": "> # Η ΣΥΜΒΟΛΗ ΤΗΣ ΒΙΟΣΥΝΘΕΣΕΩΣ ΤΗΣ ΑΙΜΟΣΦΑΙΡΙΝΗΣ IN VITRO ΣΤΗ ΔΙΑΓΝΩΣΗ ΚΑΙ ΚΑΤΑΤΑΞΗΤΩΝ ΕΤΕΡΟΖΥΓΩΝ ΜΟΡΦΩΝ ΤΗΣ ΜΕΣΟΓΕΙΑΚΗΣ ΑΝΑΙΜΙΑΣ\n> \n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_10144 RDF/XML JSON-LD \n> \n> \n\n Το τεκμήριο παρέχεται από τον φορέα : Εθνικό Κέντρο Τεκμηρίωσης και Ηλεκτρονικού Περιεχομένου (ΕΚΤ) \n\n Αποθετήριο : Εθνικό Αρχείο Διδακτορικών Διατριβών | ΕΚΤ ΕΑΔΔ \n\nΤίτλος\n\nΔημιουργός\n\n Χατζηνικολάου, Πέτρος \n\nΤύπος\n\n PhD Thesis \n\nΗμερομηνία\n\n 1978 \n\nΕπιστημονικό πεδίο\n\n Κλινική Ιατρική \n\n Ιατρική και Επιστήμες Υγείας \n\n Ελληνική γλώσσα \n\nΕκδότης\n\n National and Kapodistrian University of Athens \n\n Εθνικό και Καποδιστριακό Πανεπιστήμιο Αθηνών (ΕΚΠΑ) \n\nΣχολή/Τμήμα/Ινστιτούτο\n\n Εθνικό και Καποδιστριακό Πανεπιστήμιο Αθηνών (ΕΚΠΑ). Σχολή Επιστημών Υγείας. Τμήμα Ιατρικής. Τομέας Παθολογίας. Κλινική Α' Παθολογική Περιφερειακού Γενικού Νοσοκομείου Αθηνών ΛΑΪΚΟ\n\n...\n\nΕθν ... πο ... κό Παν ... ιστή ... ιο Α ... ών ▶ Σ ... ή ... πισ ... ▶ Τ ... ατρικής ▶ ... Παθολογίας Ά Παθολογική ... ινική ... ϊκό",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρος Λάντζας\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_7270?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_7270?language=en",
+          "title": "openarchives.gr | Ο Ζωγράφος Γεώργιος Κλοντζάς (1530-1608): η τέχνη των εικόνων του",
+          "description": "Title\n\n Ο Ζωγράφος Γεώργιος Κλοντζάς (1530-1608): η τέχνη των εικόνων του (EL) \n\nCreator\n\n Κουτσοτόλη, Χρυσοβαλάντω (EL) \n\nContributor\n\n Κουτσοτόλη, Χρυσοβαλάντω (EL) Σταυροπούλου, Αγγελική (EL) - \n\nType",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρος Λάντζας\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_46635",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_46635",
+          "title": "openarchives.gr | Unix - Linux: kernels, distributions and security",
+          "description": "openarchives.gr | Unix - Linux: kernels, distributions and security\n\n Το τεκμήριο παρέχεται από τον φορέα : Πανεπιστήμιο Θεσσαλίας \n\n Αποθετήριο : Ιδρυματικό Αποθετήριο Πανεπιστημίου Θεσσαλίας \n\nΤίτλος\n\n Unix - Linux: kernels, distributions and security (EN) \n\nΔημιουργός\n\n Μάντζιος, Παναγιώτης (EL) \n\nΣυντελεστής\n\n Πανεπιστήμιο Θεσσαλίας - Βιβλιοθήκη και Κέντρο Πληροφόρησης (EL) \n\n Λάμψας, Πέτρος (EL) \n\nΤύπος\n\n masterThesis (EN) \n\n Διπλωματική εργασία Μεταπτυχιακή εργασία (EL) \n\nΗμερομηνία έκδοσης\n\n 2016 2017-07-17T06:55:09Z \n\nΧρονολογία\n\n 2016 (EL) \n\n LINUX ΠΡΟΓΡΑΜΜΑΤΑ ΟΔΗΓΗΣΗΣ ΣΥΣΚΕΥΩΝ(ΠΡΟΓΡΑΜΜΑΤΑ ΥΠΟΛΟΓΙΣΤΩΝ) (EL) \n\n ΛΕΙΤΟΥΡΓΙΚΑ ΣΥΣΤΗΜΑΤΑ(ΥΠΟΛΟΓΙΣΤΕΣ) (EL) \n\n ΑΣΦΑΛΕΙΑ ΥΠΟΛΟΓΙΣΤΩΝ (EL) \n\n UNIX ΠΡΟΓΡΑΜΜΑΤΑ ΟΔΗΓΗΣΗΣ ΣΥΣΚΕΥΩΝ(ΠΡΟΓΡΑΜΜΑΤΑ ΥΠΟΛΟΓΙΣΤΩΝ) (EL)\n\n...\n\nΣχολή/Τμήμα/Ινστιτούτο\n\n Πανεπιστήμιο Θεσσαλίας. Σχολή Θετικών Επιστημών. Τμήμα Πληροφορικής. (EL) \n\n Πανεπιστήμιο Θεσσαλίας ▶ Σχολή Θετικών Επιστημών Τμήμα Πληροφορικής και Τηλεπικοινωνιών",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρος Λάντζας\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/portal/ekt-types/openarchives-item-types/Educational-material?language=el",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/portal/ekt-types/openarchives-item-types/Educational-material?language=el",
+          "title": "OpenArchives.gr | Εκπαιδευτικό υλικό",
+          "description": "##### Χωρίς τίτλο\n\nΔημιουργός: Αξαόπουλος, Πέτρος Ι., Κυρίτσης, Σπύρος, Πιτσιλής, Γεώργιος, Παναγάκης, Παναγιώτης\n\nΤύπος τεκμηρίου: Εκπαιδευτικό υλικό\n\nΕπιστημονικό πεδίο: Μηχανική ενέργειας\n\nΧρονολογία : 2014\n\nΦορέας: ΤΕΙ Αθήνας\n\nΣυλλογή: Υπατία - Ιδρυματικό Αποθετήριο\n\n...\n\n##### Renewable energy source\n\n...\n\nΔημιουργός: Αξαόπουλος, Πέτρος Ι.\n\nΤύπος τεκμηρίου: Εκπαιδευτικό υλικό\n\n...\n\nπισ ... μον ... δ ... : ... ηχανική εν ... ειας\n\n...\n\nΧρονολογία : ... 0\n\n...\n\n##### Βιομηχανικό μάρκετινγκ\n\n...\n\nΔημιουργός: Τομάρας, Πέτρος\n\nΤύπος τεκμηρίου: Εκπαιδευτικό υλικό\n\n...\n\nπιστημονικό ... δίο: Μέ ... επικοινωνίας\n\n...\n\nΧρονολογία : 2\n\n...\n\nΦ ... ΤΕΙ Αθήνας\n\n...\n\nΣ ... Υ ... δ ... μα",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρος Λάντζας\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/portal/collections/kallipos",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/portal/collections/kallipos",
+          "title": "OpenArchives.gr | Αποθετήριο «Κάλλιπος»",
+          "description": "Παρα ... και Α\n\n...\n\n##### Ατμοσφαιρικό Οριακό Στρώμα Atmospheric Boundary Layer \n\n Δημιουργός: Varlas, Georgios, Κατσαφάδος, Πέτρος, Mavromatidis, Elias, Μαυροματίδης, Ηλίας, Katsafados, Petros, Βάρλας, Γεώργιος \n\n Χρονολογία : 2023\n\n...\n\n##### Κινηματική της Ατμόσφαιρας Atmospheric Kinematics \n\n Δημιουργός: Varlas, Georgios, Κατσαφάδος, Πέτρος, Mavromatidis, Elias, Μαυροματίδης, Ηλίας, Katsafados, Petros, Βάρλας, Γεώργιος \n\n Χρονολογία : 2023\n\n...\n\n##### Αριθμητική Πρόγνωση Καιρού και Μοντελοποίηση Numerical Weather Prediction and Modeling \n\n Δημιουργός: Varlas, Georgios, Κατσαφάδος, Πέτρος, Mavromatidis, Elias, Μαυροματίδης, Ηλίας, Katsafados, Petros, Βάρλας, Γεώργιος \n\n Τύπος τεκμηρίου: Κεφάλαιο \n\n Επιστημονικό πεδίο: Επιστήμη πληροφόρησης \n\n Χρονολογία : 2023 \n\n Φορέας: Σύνδεσμος Ελληνικών Ακαδημαϊκων Βιβλιοθηκών \n\n Συλλογή: Αποθετήριο «Κάλλιπος»\n\n...\n\n##### Εισαγωγή στο Γήινο Ατμοσφαιρικό Περιβάλλον Introduction to the Earth Atmospheric Environment \n\n Δημιουργός: Varlas, Georgios, Κατσαφάδος, Πέτρος, Mavromatidis, Elias, Μαυροματίδης, Ηλίας, Katsafados, Petros, Βάρλας, Γεώργιος \n\n Τύπος τεκμηρίου: Κεφάλαιο \n\n Επιστημονικό πεδίο: Επιστήμη πληροφόρησης \n\n Χρονολογία : 2023 \n\n Φορέας: Σύνδεσμος Ελληνικών Ακαδημαϊκων Βιβλιοθηκών \n\n Συλλογή: Αποθετήριο «Κάλλιπος»",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρος Λάντζας\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/theatrepolis/000166-30782?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/theatrepolis/000166-30782?language=en",
+          "title": "openarchives.gr | Angelos’ Film (2000) by Péter Forgács: from home movies to the History of the Future",
+          "description": "openarchives.gr | Angelos’ Film (2000) by Péter Forgács: from home movies to the History of the Future\n\n This item is provided by the institution : Department of Theatre Studies, University of Peloponnese \n\nTitle\n\n Angelos’ Film (2000) του Péter Forgács: από τις home movies στην Ιστορία του μέλλοντος (EL) \n\n Angelos’ Film (2000) by Péter Forgács: from home movies to the History of the Future (EN) \n\nCreator\n\n Βασιλείου, Θανάσης \n\nType\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\nDate\n\n 2022-07-11 \n\nYear\n\nDescription\n\n Ο Péter Forgács είναι ένας σύγχρονος ρακοσυλλέκτης home movies. Αλλά όπως και ο ρακοσυλλέκτης του Μποντλέρ, είναι αυτός που θα δώσει μια νέα ζωή και μία νέα θέση στα κινηματογραφικά ρετάλια των ευκατάστατων οικογενειών της Ευρώπης, των δεκαετιών του 1930 και του 1940. Επαναχρησιμοποιώντας εικόνες που δεν γυρίστηκαν ποτέ για αυτόν τον σκοπό, προτείνει μία νέα κινηματογραφική ιστορική γραφή, συναντώντας τις αρχές της μικρο-ιστορίας όπου το ιστορικά αδιάφορο συναντά και αναμετράται με το ιστορικά καθοριστικό. Στο Angelos’ Film (2000) ο Forgács βρίσκει είκοσι-έξι λεπτά που διασώθηκαν από το υλικό του Έλληνα επιχειρηματία, Άγγελου Παπαναστασίου, πριν και κατά τη διάρκεια της κατοχής. Οι ευχάριστες και ακίνδυνες λήψεις της οικογένειας εναλλάσσονται -και ουσιαστικά προστατεύουν μέσα στην ίδια μπομπίνα- με τις «άλλες» για τις οποίες ο Παπαναστασίου έθεσε σε κίνδυνο τη ζωή του και αφορούν στη φρίκη του πολέμου. Ο Forgács, επεμβαίνοντας στο υλικό με κάθε δυνατό τρόπο, θα προσπαθήσει να διακρίνει –όπως σχεδόν σε όλο του το έργο- αυτό που μπορεί να κρύψει, μπροστά στα μάτια του θεατή, η πιο αδιάφορη εικόνα. (EL)\n\n...\n\nForgacs is a ... ragpicker ... scavenger ... home ... . ... ’ ... ragpicker, ... , he is the one who breathes new life into ... finds a new place ... the cinematic ... by the affluent European families of the 1930s and the 1940s. By reusing images which were ... made for this ... , Forgacs ... a new form of cinematic historical ... , one that merges with the principles ... micro-history ... the ... , the historically incon ... , ... itself ... significance ... Angelos’ Film (2000), ... g ... finds ... the ... the family alternate with ... the ... for which ... risked his life ... them ... within ... the ... way ... Forg ... attempts ... he ... throughout his ... to discern that which even ... can hide right before ... viewer ... . (EN",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Πέτρος Λάντζας\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:openarchives.gr \\\"Πέτρος Λάντζας\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"FIRST_PAGE_ONLY\", \"returned_records\": 10, \"service\": \"SerpAPI / Google organic results\", \"more_results_available\": true}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 10, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 10, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lantzas\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/portal/search",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/portal/search",
+          "title": "OpenArchives.gr | Ο συσσωρευτής ψηφιακού περιεχομένου έρευνας, επιστήμης και εκπαίδευσης του ΕΚΤ",
+          "description": "Ανθρωπιστικές Επιστήμες και Τέχνες (100.273)\n\nΆλλες Ανθρωπιστικές Επιστήμες (4.833)\n\nΑσιατικές σπουδές (258)\n\nΛαϊκός πολιτισμός\n...\n(1.887)\n\nΓλώσσα και Λογοτεχνία (24.394)\n\nΑμερικανική λογοτεχνία (3)\n\nΓλώσσα και\n...\nΙστορία και Αρχαιολογία (40.711)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/sygkrisi/000091-39946",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/sygkrisi/000091-39946",
+          "title": "openarchives.gr | Petros Marazopoulos, The “Balkans” in Modern Greek Culture: Negotiating a term. Foreword by Dimitris Kargiotis, Thessaloniki: Epikentro pubs, 2023",
+          "description": "openarchives.gr | Petros Marazopoulos, The “Balkans” in Modern Greek Culture: Negotiating a term. Foreword by Dimitris Kargiotis, Thessaloniki: Epikentro pubs, 2023\n\n> # Petros Marazopoulos, The “Balkans” in Modern Greek Culture: Negotiating a term. Foreword by Dimitris Kargiotis, Thessaloniki: Epikentro pubs, 2023\n> \n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/sygkrisi/000091-39946 RDF/XML JSON-LD \n> \n> \n\n Το τεκμήριο παρέχεται από τον φορέα : Ελληνική Εταιρεία Γενικής και Συγκριτικής Γραμματολογίας \n\n Αποθετήριο : Σύγκριση | ΕΚΤ e Journals \n\nΤίτλος\n\n Petros Marazopoulos, The “Balkans” in Modern Greek Culture: Negotiating a term. Foreword by Dimitris Kargiotis, Thessaloniki: Epikentro pubs, 2023 (EL) \n\n Petros Marazopoulos, The “Balkans” in Modern Greek Culture: Negotiating a term. Foreword by Dimitris Kargiotis, Thessaloniki: Epikentro pubs, 2023 (EN) \n\nΔημιουργός\n\n Katsigianni, Anna \n\nΤ ... πος\n\n...\n\narticle",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/portal?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/portal?language=en",
+          "title": "openarchives.gr | Search for Greek scientific and research content",
+          "description": "to OpenArchives.gr\n> \n> OpenArchives.gr is the public portal that offers access to ... from all over Greece - universities, research institutions and scientific societies \n> \n> ... , books, conference proceedings and archives\n> \n> OpenArchives.gr",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/elocus/000018-dlib_9_d_5_metadata-dlib-2003samartzis.tkl?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/elocus/000018-dlib_9_d_5_metadata-dlib-2003samartzis.tkl?language=en",
+          "title": "openarchives.gr | Μελέτες δυναμικής για φωτοδιάσπαση και αντιδράσεις αλογονούχων μορίων",
+          "description": "openarchives ... gr ... Μελέτες δυνα ... ικής για φωτοδιά ... πα ... και αντι ... ρά ... α ... ονού ... ων ... ρίων\n\n...\n\nTitle\n\n Studies of photodissociation and reaction dynamics of halogenated modecules \n\n Μελέτες δυναμικής για φωτοδιάσπαση και αντιδράσεις αλογονούχων μορίων \n\nCreator\n\n Samartzis, Petros Ch Σαμαρτζής, Πέτρος Χ \n\nContributor\n\n Κιτσόπουλος, Θεοφάνης Ν. \n\nType\n\n Τύπος Εργασίας--Διδακτορικές διατριβές \n\n text \n\nDate\n\n 2003-07-16 \n\nYear\n\n 2003 (EN)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4803?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4803?language=en",
+          "title": "openarchives.gr | L’ icône de Jugement Dernier de Drniš en Dalmatie. Oeuvre de Georges Klontzas",
+          "description": "openarchives.gr | L’ icône de Jugement Dernier de Drniš en Dalmatie. Oeuvre de Georges Klontzas\n\n This item is provided by the institution : Christian Archaeological Society \n\nTitle\n\n Η εικόνα της Δευτέρας Παρουσίας στο Drniš στη Δαλματία, έργο του Γεωργίου Κλόντζα (EL) \n\n L’ icône de Jugement Dernier de Drniš en Dalmatie. Oeuvre de Georges Klontzas (EN) \n\nCreator\n\n SKOVRAN, Anika \n\nType\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\nDate\n\n 1999-01-11 \n\nYear\n\nDescription\n\n Στο άρθρο αυτό εξετάζεται η εικόνα της Δευτέρας Παρουσίας του Γεωργίου Κλόντζα που βρίσκεται στην ορθόδοξη εκκλησία της Κοίμησης της Θεοτόκου στο Drniš της Δαλματίας, της οποίας η εξίτηλη επιγραφή έχει διασώσει μόνο το έτος δημιουργίας της, 19 Ιουνίου 1591. Η εικονογραφική της ανάλυση και η διάκριση των επτά ζωνών της, καθώς και η τεχνοτροπική της σύγκριση με άλλα έργα του Κλόντζα φανερώνει ότι είναι πρωιμότερη από δύο έργα της συλλογής εικόνων του Αγίου Γεωργίου της Βενετίας. Άλλες επιμέρους παρατηρήσεις στην εικονογραφία της εικόνας αφορούν την εφευρετικότητα της καλλιτεχνικής προσωπικότητας του Γεωργίου Κλόντζα. (EL)\n\n...\n\nThe Icon οf The Last Judgement By Klontzas at Drniš of DalmatiaIn this article is discussed the portable icon of the Last Judgement painted by Georgios Klontzas which is located in the orthodox church of the Dormition of the Virgin at Drniš of Dalmatia. The icon had a faded inscription from which only the date has survived, 19 June 1591. The iconography and the descriptions of its seven zones, along with its stylistic analysis, showcases that the icon under discussion is the earlier out of the two works that are held at the collection of the church of St. George of the Greeks in Venice. Furthermore, other observations on the iconography of the icon hint to the creativity of the artistic personality of Georgios Klontzas. (EN)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_41298",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_41298",
+          "title": "openarchives.gr | Economomic evaluation of substance abuse treatment programs: the case of KETHEA's therapeutic communities",
+          "description": "θετή ... θν ... ρχ ... Δ ... τρι ... ών\n\n...\n\nΤίτλος\n\n Οικονομική αξιολόγηση των υπηρεσιών απεξάρτησης από ναρκωτικές ουσίες: η περίπτωση των θεραπευτικών κοινοτήτων του ΚΕΘΕΑ \n\n Economomic evaluation of substance abuse treatment programs: the case of KETHEA's therapeutic communities \n\nΔημιουργός\n\n Triantos, Petros Τρίαντος, Πέτρος \n\nΤύπος\n\n PhD Thesis \n\n Διπλωματική εργασία Διδακτορική διατριβή (EL) \n\nΗμερομηνία\n\n 2017 \n\nΧρονολογία\n\n 2017 (EL)\n\n...\n\nThe core aim of this study is the presentation and implementation of the methodology of evaluation in general and economic evaluation of substance abuse treatment programmes in Greece in particular. Based of the social problem theory, the social dimension of substance abuse is highlighted, along with the organized response of society to this problem through public substance abuse treatment programmes. In our research we apply the cost-benefit methodology on this type of services and more specifically, on the therapeutic communities of the Therapy Center for Dependent Individuals (KETHEA). An assessed research tool (Drug Abuse Treatment Cost Analysis Program-DATCAP) is used for cost analysis, while the European adaption of Addiction Severity Index (EuropASI) is used (N=243) for benefit analysis. The data for the qualitative analysis were collected through focus groups with ex addicts (N=65). Finally, an online survey was conducted in order to identify the views, attitudes and beliefs of the general population regarding many issues explored in the study.This study is a first attempt for the implementation of an economic evaluation based on a specific well documented methodology. Economic cost and social benefit analysis along with the comparative analysis of the main two types of therapeutic communities (residential and outpatient) led to the selection of the best cost-benefit alternative taking into consideration other important parameters, as well. Finally, recommendations for further research in this field are proposed, based on the one hand on the findings of this study and on the other on its limitations and restrictions",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/kypseli/000054-11128_889",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/kypseli/000054-11128_889",
+          "title": "openarchives.gr | Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα)",
+          "description": "openarchives.gr | Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα)\n\n Το τεκμήριο παρέχεται από τον φορέα : Ανοικτό Πανεπιστήμιο Κύπρου \n\n Αποθετήριο : Ψηφιακό Αποθετήριο Κυψέλη \n\nΤίτλος\n\n Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα) \n\nΣυντελεστής\n\n Spanos, Leonidas \n\n Ματθοπούλου, Ευαγγελία \n\n Μητρόπολη Κιτίου \n\n Εκκλησιαστική Επιτροπή Ιεράς Μονής Αγίου Γεωργίου Κοντού \n\n Σπανός, Λεωνίδας \n\nΤύπος\n\n Ψηφιακή εικόνα \n\n \n\nΗμερομηνία έκδοσης\n\n 2012-10-23 2006 2006-09-10 2012-10-23T10:17:19Z \n\nΧρονολογία\n\n 2006 - 2012 (EL) \n\nΕπιστημονικό πεδίο\n\n Ανθρωπιστικές Επιστήμες και Τέχνες Τέχνες (Τέχνες, Ιστορία της Τέχνης, Ερμηνευτικές Τέχνες, Μουσική) (EL) \n\nΘέμα\n\n Λάρνακα \n\n Δήμος Λάρνακας \n\n Εκκλησία \n\n Πατριάρχης Αλεξανδρείας Πέτρος Ζ'\n\n...\n\nΔικαιώματα\n\nΠάροχος\n\n Ανοικτό Πανεπιστήμιο Κύπρου\n\n...\n\nποθετήριο\n\n...\n\nρους\n\n...\n\nρος ... νης",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-342317",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-342317",
+          "title": "openarchives.gr | An industry in transition: independent cinema and the future of film in the digital era",
+          "description": "ριο ... χεται ... φο ... α ... ρισ ... τέλει ... επιστή ... λον ... ης\n\n...\n\nΑποθετήριο : Ιδρυματικό Καταθετήριο Επιστημονικών Εργασιών ΑΠΘ \n\nΤίτλος\n\n An industry in transition: independent cinema and the future of film in the digital era \n\nΔημιουργός\n\n Koligiannis, Petros Pavlos \n\nΤύπος\n\n info:eu-repo/semantics/bachelorThesis \n\n Graduate Thesis / Πτυχιακή Εργασία \n\n Διπλωματική εργασία Πτυχιακή εργασία (EL) \n\nΗμερομηνία\n\n 2022-10-07T09:36:54Z 2022 \n\n Αγγλική γλώσσα\n\n...\n\nΕκδότης\n\n Αριστοτέλειο Πανεπιστήμιο Θεσσαλονίκης, Φιλοσοφική Σχολή, Τμήμα Αγγλικής Γλώσσας και Φιλολογίας",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_17944",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_17944",
+          "title": "openarchives.gr | Μελέτη οστεοενσωμάτωσης οστικών εμφυτευμάτων",
+          "description": "ποθετή ... θν ... ρχ ... Διδ ... Διατρι ... Δ\n\n...\n\nΤίτλος\n\n Study of the osseointegration of bone implants \n\n Μελέτη οστεοενσωμάτωσης οστικών εμφυτευμάτων \n\nΔημιουργός\n\n Kokkinos, Petros Κόκκινος, Πέτρος \n\nΤύπος\n\n PhD Thesis \n\n \n\n Διπλωματική εργασία Διδακτορική διατριβή (EL)\n\n...\n\nΤο ερευνητικό πεδίο της παρούσας διδακτορικής διατριβής ήταν η οστεοενσωμάτωση οστικών εμφυτευμάτων. Οι βασικοί στόχοι της έρευνας αφορούσαν την κατανόηση του ρόλου τριών βασικών ρυθμιστικών παραγόντων της διαδικασίας οστεοενσωμάτωσης, δηλαδή της μηχανικής φόρτισης, της επιφανειακής τοπογραφίας και της επιφανειακής (βιο)χημείας, καθώς και τη μελέτη του βασικότερου λόγου αστοχίας των ορθοπεδικών εμφυτευμάτων, της παραγωγής μικροσωματιδίων προϊόντων φθοράς τους. [...]",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_14011",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_14011",
+          "title": "openarchives.gr | Application of nanoidentation for the assessment of mechanical properties of the trabeculae from the 4th human vertebra: experimental study with cadavers vertebrae",
+          "description": "Application ... identation for the assessment ... mechanical properties of ... trabec ... from the ... 4th ... vertebra: experimental study with cadavers vertebrae\n\n...\n\n>\n\n...\n\n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_14011 RDF/XML JSON-LD \n> \n>\n\n...\n\nΤο τεκμήριο παρέχεται από τον φορέα : Εθνικό Κέντρο Τεκμηρίωσης και Ηλεκτρονικού Περιεχομένου (ΕΚΤ\n\n...\n\nΑποθετήριο : Εθνικό Αρχείο Διδακτορικών Διατριβών | ΕΚΤ ΕΑΔΔ \n\nΤίτλος\n\n Η εφαρμογή της νανοδιείσδυσης στην εκτίμηση των μηχανικών ιδιοτήτων της οστικής δοκίδος του Ο_4 σπονδύλου: πειραματική μελέτη σε πτωματικούς σπονδύλους \n\n Application of nanoidentation for the assessment of mechanical properties of the trabeculae from the 4th human vertebra: experimental study with cadavers vertebrae \n\nΔημιουργός\n\n Antonarakos, Petros Αντωναράκος, Πέτρος \n\nΤύπος\n\n PhD Thesis \n\nΗμερομηνία\n\n 2004 \n\n Ιατρική και Επιστήμες Υγείας ➨ Βασική Ιατρική \n\n Μηχανικές ιδιότητες \n\n Basic Medicine \n\n Lumbar sping \n\n Medical and Health Sciences \n\n Γεν ... ευμένη σκληρότητα \n\n Nanoindentation \n\n Trabeculace \n\n Int ... mechanical\n\n...\n\nulus\n\n...\n\nness\n\n...\n\n' ... modulus \n\n Σ ... γγ ... δες οστο\n\n...\n\nΜέτρο ελαστικότητας\n\n...\n\nσφυϊκή μοίρα\n\n...\n\nασ ... Ι ... τρ\n\n...\n\nΝ ... δυ",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:openarchives.gr \\\"Petros Lantzas\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"PROVIDER_ERROR\"}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 10, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 10, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pietro Lanza\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEEF/000104-425",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEEF/000104-425",
+          "title": "openarchives.gr | Το πρόβλημα των «ομειομερειών» του Αναξαγόρα και η ιστορία του",
+          "description": ".gr ... ξ\n\n...\n\nΤο τεκμήριο παρέχεται από τον φορέα : Ακαδημία Αθηνών \n\n Αποθετήριο : Κέντρον Ερεύνης Ελληνικής Φιλοσοφίας (ΚΕΕΦ)\n\n...\n\nΤίτλος\n\n Το πρόβλημα των «ομειομερειών» του Αναξαγόρα και η ιστορία του \n\nΔημιουργός\n\n Δραγώνα - Μονάχου , Μυρτώ \n\nΤύπος\n\n Επετηρίδα \n\n \n\n Τμήμα έκδοσης Δημοσίευση σε περιοδικό (EL) \n\nΗμερομηνία\n\n 1977 \n\nΧρονολογία\n\n 1977 (EL)\n\n...\n\nΠ\n\n...\n\nThe investigation of the much discussed problem of the «homoeomeries» of Anaxagoras was initially stimulated by the need to meet a «practical» problem: should the word ομοιομέρειαι, often presumed to be a technical term of Anaxagoras, be an entry in the «Lexicon of the philosophical and scientific terms of the Presocratics» now in the preparation by the «Research Center for Greek Philosophy» at the Academy of Athens? The word does not occur in Anaxagoras’ extant fragments. However, among the many instances of its application to Anaxagorean physics in the testimonia, one explicit attribution by Simplicius (59 A 45 DK) is exceptionally important and should be taken into serious consideration, since Simplicius is our main authority for Anaxagoras’ physical fragments. Actually Diels (though not Lanza) spaces the term in this instance; and this conventional indication of its authenticity commits us to making an entry of it in the lexicon, unless we are convince by close research that it is spurious. And, although most modern scholars, contrary to the ancient tradition, consider this a single lapsus calami on the part of the otherwise reliable Simplicius, and hold the term to be a later development, some others still believe that Anaxagoras must have used it, while the minority take no sides on the question. The disagreement, moreover, concerning the meaning of the word, both as a substantive and an adjective (consistently fathered on Anaxagoras by Aristotle in the latter form) is still greater and no unanimity has been attained as to what term, if any, in the extant fragments was referred to by ομοιμέρειαι. One possible interpretation of Simplicius’ reference containing the presumed term, which might terminate but not solve the problem, could be to regard Aristotle and Anaxagoras as the grammatical subject of the parenthetical clause άπερ ομοιομερείας καλεί, although the former never used the term in its substantive form, but he said that Anaxagoras considered τα ομοιομερή as elements (59 A 46). This is not completely improbable, given Simplicius’ abstruse style and the subordinate construction of the long complicated period in which the clause occurs. Yet the assumption seems quite unorthodox syntactically and cannot be seriously defended. On other hand, since most of the evidence makes it to father the term of Anaxagoras, in spite of the almost unanimous consensus of the Peripatetic and Atomist doxographical tradition, the only solution that appears to be open is to dispute the trustworthiness of Simplicius in this particular case and to do away with the term as far as the lexicon is concerned. But even if we deny the authenticity of the term, a problem still remains concerning the clarification of other words most unanimously accepted as technical terms of Anaxagoras’ physics, such as χρήματα, σπέρματα, μοίραι, εναντία etc., so long as it is not made quite clear which word of the fragments renders Anaxagoras’ ultimate material realities, whether these may be considered as «elements» or not. The consideration of the testimonia is indispensable for an answer to this question, which brings again to therefore the problem of the homoeomerous (things or bodies) or of the homoeomeries. Since complete disagreement prevails about many issues of Anaxagoras’ physical philosophy and all sorts of reconciliations have been tried between the Anaxagoras of the fragments and the Anaxagoras of the tradition, an exhaustive survey of the available bibliography was judged indispensable as a prerequisite both for the clarification of Anaxagoras’ physical terminology and the justification of the theses advanced in this paper. Thus, before attempting an inquiry into some pre-aristotelian texts, a sample analysis of Aristotle’s critique of Anaxagoras’ physics in comparison with the related commentaries of the Commentators and in particular Simplicius’ and a brief exposition of Lucretius’ full reference to Anaxagoras’ homoeomerian rerum, I presented the main theses on the usage, the meaning and the equivalence of the term advanced by Tannery, Zeller, Burnet, Bailey, Cornford, Vlastos, Lanza Raven, Veicos, Muggler, Boussoulas, Stokes, Strang, Schwabe, Cherniss, Cleve, Zafiropulo, Sambursky, Reesor, Gershenson – Greenberg, and Schofield. Peck’s, Leon’s, Guthrie’s, Mathewson’s, Kerferd’s and Furley’s views weer very helpful to my approach and particular theses, but my conclusions, reached through another method, are different in many details. In my effort to answer the central questions of Anaxagoras’ physics I tried to find out what Plato considered to be Anaxagoras’ material substances as distinct from the νούς. As a matter of fact Plato referring to Anaxagoras speaks of no other material principles than «all things» (πάντα τα πράγματα) set in order by the νους. This expression corresponds to what the testimonia describe as «νουν αποκρίνοντα τας ομοιομερείας». In Protagoras 329d-333d and 349c however we find reference to things having similar and dissimilar parts, which anticipates the Aristotelian distinction (with the same examples); but the term is not used and there is no mention of Anaxagoras. Protagoras, in any case, a near contemporary of Anaxagoras, has also spoken of χρήματα, and this is important, Nor is the term met in the Hippocratic treatise Περί διαίτης which betrays close imitation of Anaxagoras’ wording and style; and the same is true of the echoes of Anaxagoras in some published lines of the Derveni papyrus. Actually the term in question as an adjective together with similar compound words does not occur before Aristotle. But how did it occur to Aristotle to say that Anaxagoras’ «elements» were τα ομοιομερή ? And on what grounds did the Commentators and especially Simplicius – who either had the Περί Φύσεως itself or some epitome of it – unquestionably accept Aristotle’s rendering as automatically applying to Anaxagoras, alternating it with the corresponding substantive ομοιομέρειαι, (perhaps from atomist assumptions), even though in all probability Anaxagoras had not used the word? Was Aristotle so unreliable as to read into Anaxagoras an idea which at first sight contradicts the basic principles of the latter’s physics (i.e. if the homoeomereity is taken to imply homogeneity), and did the Commentators follow him slavishly? I order to answer this question I discussed Aristotle’s method of «articulating» Anaxagoras’ «vague» and «incomplete» thought described in Metaphysics 989 a 30ff., (with Alexander of Aphrodisias’ commentaries) and his critique of Anaxagoras in Physics A4 together with the Commentators’ (especially Simplicius’) commentaries on the chapter. Thus, apart from the innovation of considering Anaxagoras’ «elements» as τα ομοιομερή, both the positive and destructive account of Anaxagoras’ physics given by Aristotle does complete justice to our philosopher, and all other theses attributed to him are in full agreement with what we read in fragments. It should be mentioned that these fragments are nothing else than Anaxagorean quotations cited by Simplicius for corroboration and clarification of Aristotle’s account. And, granted this «genetic» dependence of the actual quotations on Aristotle’s account, it is surprising that some scholars are so eager to reject the Aristotelian evidence as incompatible with theses advanced in the fragments. Though not following Aristotle’s interpretation unquestionably, and not citing any quotation containing the term in question – which also claims that the term was not used by Anaxagoras himself – Simplicius does not seem to deny the authorship of the term, he uses it himself as a noun or adjective either as if it was coined by Anaxagoras or fully described his primary elements. This means that the term was unanimously held to render the structure of the Anaxagorean elementary substances very satisfactorily, and, since Aristotle did not engage in doxography but in interpretation, he seemed to have successfully «articulated» Anaxagoras’ vague language and thought. Which word of Anaxagoras, however, did Aristotle read as ομοιομερή? The ultimate material realities are in Anaxagoras’ fragments denoted as χρήματα in the original mixture, as αποκρινόμενα and διακρινόμενα, when separated off and distinguished by the νούς, and as πάντα in reference το their structure. Among them there were elements (γη), opposites, and numberless seeds (σπέρματα) of all kinds (fr. 4), Since σπέρματα and ενάντια were well established physical terms, Aristotle had no reason to substitute in their place the term ομοιομερή. The χρήματα were the novelty of Anaxagoras, too vague a word to denote elementary substances. These are said by Anaxagoras to contain portions of all things. On the other hand, Aristotle was facilitated in the rendering because the ομοιομερή had already a place in his own system, denoting natural substances, intermediate between the elements and the organic parts. And, since he did not find in Anaxagoras any substances more elementary than his own ομοιομερή, because for Anaxagoras all things, qualitatively differentiated, were equally real, he was fully entitled to specify as ομοιομερή the Anaxagorean χρήματα conceived of infinitesimal magnitude and in seminal form and having the opposites as their ingredients. Although Simplicius in his Commentary on the De caelo (603, 17-19) says that Anaxagoras called τα ομοιομερή σπέρματα (a testimony inexcusably missing from the editors because, if taken at its face value, would reinforce the current consideration of the σπέρματα aw Anaxagoras’ primary elements), the term σπέρματα does not seem to cover all that was real for Anaxagoras nor to the emphasized by him as his own original technical term. It was early considered to apply to the atomist physics. As to the meaning of the ομοιομερή, I believe that the definition given in Physics 203a 23 (μίγμα ομοίως τω παντί) renders best the structure of the term as Anaxagorean and not as Aristotelian, although I see no inconsistency to this sense in the connotation met in Gen. et Corr. 314a 18 (ως έκαστου συνώνυμον το μέρος) nor in Aetius’ definition of the ομοιμέρειαι in 59 A 46 DK. The great advantage of the term might have appeared to Aristotle to be its susceptibility to having many meanings. For it would thus best describe the vague Anaxaogrean χρήματα which expresses most of the basic principles of Anaxagoras’ physics. A thing is homoeomeorus both with all things present in the original mixture (in virtue of the principle of universal mixture) and with the specific whole of which it is a part (in virtue of the principle of the predominance of the similar parts), while due to its seminal form it is homoeomerous dynamically with the thing which will develop out of it. Indicative of the many senses of the term is also Lucretius’ whole account of Anaxagoras’ homoeomoria (De rerum natura I, 836-930). Its alternative use with the χρήματα is shown in Sextus Empiricus’ reference (IX 6) and Michael Psellos’ commentary on Aristotle’s Physics (ad locum). Anyway, I do not see any decisive inconsistency between the Anaxagoras of the fragments and that of the doxographical and scholarly tradition apart from terminological matters. In no case do the principles of homoeomereity imply any homogeneity of Anaxagoras’ material realities. Only νους is explicitly said to be alike, i.e. homogeneous. The principle of homoeomereity (similarity of the parts with the Whole, with the specific whole and with one another) does not contradict the principles of universal mixture and of predominance, but it should be understood as combination of both. In Anaxagoras’ molecular theory of matter there are no other material realities more elementary than the «things» themselves in their variety. Yet these things in their function as primary elements should be considered in infinitesimal magnitude and in seminal form, somewhat like the material «forms» of all the things that exist and are equally real. These things, when separated off by the νους from the original mixture, in which everything was present, could be regarded as homoemerous or as homoeomeries in order to constitute the διακόσμησις according to the decrees of νους. Therefore, with regard to the main questions of my inquiry I conclude that the term was not used by Anaxagoras and thus no entry of it should be made in the lexicon of the Presocratics; that it has many meanings depending on the aspect from which it is seen to function as descriptive of the constituents of the material reality; and that the corresponding term in the extant fragments was in all probability the χρήματα, which occurs about twelve times in the actual quotations and is implied in the crucial phrase «εν παντί παντός μοίρα ενέστι», which might have given rise to the much discussed term. It could be possible to father the term on the «Anaxagoreans» if we had more information about them. For a proper account of Anaxagoras’ physical theory it is necessary to read again all the secondary evidence and particularly Simplicius.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEEF/000104-425?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEEF/000104-425?language=en",
+          "title": "openarchives.gr | Το πρόβλημα των «ομειομερειών» του Αναξαγόρα και η ιστορία του",
+          "description": "Το πρόβλημα των «ομειομερειών» του Αναξαγόρα και η ιστορία του \n\nCreator\n\n Δραγώνα - Μονάχου , Μυρτώ \n\nType\n\n Επετηρίδα \n\nDate\n\n 1977 \n\nYear\n\n...\n\nThe investigation of the much discussed problem of the «homoeomeries» of Anaxagoras was initially stimulated by the need to meet a «practical» problem: should the word ομοιομέρειαι, often presumed to be a technical term of Anaxagoras, be an entry in the «Lexicon of the philosophical and scientific terms of the Presocratics» now in the preparation by the «Research Center for Greek Philosophy» at the Academy of Athens? The word does not occur in Anaxagoras’ extant fragments. However, among the many instances of its application to Anaxagorean physics in the testimonia, one explicit attribution by Simplicius (59 A 45 DK) is exceptionally important and should be taken into serious consideration, since Simplicius is our main authority for Anaxagoras’ physical fragments. Actually Diels (though not Lanza) spaces the term in this instance; and this conventional indication of its authenticity commits us to making an entry of it in the lexicon, unless we are convince by close research that it is spurious. And, although most modern scholars, contrary to the ancient tradition, consider this a single lapsus calami on the part of the otherwise reliable Simplicius, and hold the term to be a later development, some others still believe that Anaxagoras must have used it, while the minority take no sides on the question. The disagreement, moreover, concerning the meaning of the word, both as a substantive and an adjective (consistently fathered on Anaxagoras by Aristotle in the latter form) is still greater and no unanimity has been attained as to what term, if any, in the extant fragments was referred to by ομοιμέρειαι. One possible interpretation of Simplicius’ reference containing the presumed term, which might terminate but not solve the problem, could be to regard Aristotle and Anaxagoras as the grammatical subject of the parenthetical clause άπερ ομοιομερείας καλεί, although the former never used the term in its substantive form, but he said that Anaxagoras considered τα ομοιομερή as elements (59 A 46). This is not completely improbable, given Simplicius’ abstruse style and the subordinate construction of the long complicated period in which the clause occurs. Yet the assumption seems quite unorthodox syntactically and cannot be seriously defended. On other hand, since most of the evidence makes it to father the term of Anaxagoras, in spite of the almost unanimous consensus of the Peripatetic and Atomist doxographical tradition, the only solution that appears to be open is to dispute the trustworthiness of Simplicius in this particular case and to do away with the term as far as the lexicon is concerned. But even if we deny the authenticity of the term, a problem still remains concerning the clarification of other words most unanimously accepted as technical terms of Anaxagoras’ physics, such as χρήματα, σπέρματα, μοίραι, εναντία etc., so long as it is not made quite clear which word of the fragments renders Anaxagoras’ ultimate material realities, whether these may be considered as «elements» or not. The consideration of the testimonia is indispensable for an answer to this question, which brings again to therefore the problem of the homoeomerous (things or bodies) or of the homoeomeries. Since complete disagreement prevails about many issues of Anaxagoras’ physical philosophy and all sorts of reconciliations have been tried between the Anaxagoras of the fragments and the Anaxagoras of the tradition, an exhaustive survey of the available bibliography was judged indispensable as a prerequisite both for the clarification of Anaxagoras’ physical terminology and the justification of the theses advanced in this paper. Thus, before attempting an inquiry into some pre-aristotelian texts, a sample analysis of Aristotle’s critique of Anaxagoras’ physics in comparison with the related commentaries of the Commentators and in particular Simplicius’ and a brief exposition of Lucretius’ full reference to Anaxagoras’ homoeomerian rerum, I presented the main theses on the usage, the meaning and the equivalence of the term advanced by Tannery, Zeller, Burnet, Bailey, Cornford, Vlastos, Lanza Raven, Veicos, Muggler, Boussoulas, Stokes, Strang, Schwabe, Cherniss, Cleve, Zafiropulo, Sambursky, Reesor, Gershenson – Greenberg, and Schofield. Peck’s, Leon’s, Guthrie’s, Mathewson’s, Kerferd’s and Furley’s views weer very helpful to my approach and particular theses, but my conclusions, reached through another method, are different in many details. In my effort to answer the central questions of Anaxagoras’ physics I tried to find out what Plato considered to be Anaxagoras’ material substances as distinct from the νούς. As a matter of fact Plato referring to Anaxagoras speaks of no other material principles than «all things» (πάντα τα πράγματα) set in order by the νους. This expression corresponds to what the testimonia describe as «νουν αποκρίνοντα τας ομοιομερείας». In Protagoras 329d-333d and 349c however we find reference to things having similar and dissimilar parts, which anticipates the Aristotelian distinction (with the same examples); but the term is not used and there is no mention of Anaxagoras. Protagoras, in any case, a near contemporary of Anaxagoras, has also spoken of χρήματα, and this is important, Nor is the term met in the Hippocratic treatise Περί διαίτης which betrays close imitation of Anaxagoras’ wording and style; and the same is true of the echoes of Anaxagoras in some published lines of the Derveni papyrus. Actually the term in question as an adjective together with similar compound words does not occur before Aristotle. But how did it occur to Aristotle to say that Anaxagoras’ «elements» were τα ομοιομερή ? And on what grounds did the Commentators and especially Simplicius – who either had the Περί Φύσεως itself or some epitome of it – unquestionably accept Aristotle’s rendering as automatically applying to Anaxagoras, alternating it with the corresponding substantive ομοιομέρειαι, (perhaps from atomist assumptions), even though in all probability Anaxagoras had not used the word? Was Aristotle so unreliable as to read into Anaxagoras an idea which at first sight contradicts the basic principles of the latter’s physics (i.e. if the homoeomereity is taken to imply homogeneity), and did the Commentators follow him slavishly? I order to answer this question I discussed Aristotle’s method of «articulating» Anaxagoras’ «vague» and «incomplete» thought described in Metaphysics 989 a 30ff., (with Alexander of Aphrodisias’ commentaries) and his critique of Anaxagoras in Physics A4 together with the Commentators’ (especially Simplicius’) commentaries on the chapter. Thus, apart from the innovation of considering Anaxagoras’ «elements» as τα ομοιομερή, both the positive and destructive account of Anaxagoras’ physics given by Aristotle does complete justice to our philosopher, and all other theses attributed to him are in full agreement with what we read in fragments. It should be mentioned that these fragments are nothing else than Anaxagorean quotations cited by Simplicius for corroboration and clarification of Aristotle’s account. And, granted this «genetic» dependence of the actual quotations on Aristotle’s account, it is surprising that some scholars are so eager to reject the Aristotelian evidence as incompatible with theses advanced in the fragments. Though not following Aristotle’s interpretation unquestionably, and not citing any quotation containing the term in question – which also claims that the term was not used by Anaxagoras himself – Simplicius does not seem to deny the authorship of the term, he uses it himself as a noun or adjective either as if it was coined by Anaxagoras or fully described his primary elements. This means that the term was unanimously held to render the structure of the Anaxagorean elementary substances very satisfactorily, and, since Aristotle did not engage in doxography but in interpretation, he seemed to have successfully «articulated» Anaxagoras’ vague language and thought. Which word of Anaxagoras, however, did Aristotle read as ομοιομερή? The ultimate material realities are in Anaxagoras’ fragments denoted as χρήματα in the original mixture, as αποκρινόμενα and διακρινόμενα, when separated off and distinguished by the νούς, and as πάντα in reference το their structure. Among them there were elements (γη), opposites, and numberless seeds (σπέρματα) of all kinds (fr. 4), Since σπέρματα and ενάντια were well established physical terms, Aristotle had no reason to substitute in their place the term ομοιομερή. The χρήματα were the novelty of Anaxagoras, too vague a word to denote elementary substances. These are said by Anaxagoras to contain portions of all things. On the other hand, Aristotle was facilitated in the rendering because the ομοιομερή had already a place in his own system, denoting natural substances, intermediate between the elements and the organic parts. And, since he did not find in Anaxagoras any substances more elementary than his own ομοιομερή, because for Anaxagoras all things, qualitatively differentiated, were equally real, he was fully entitled to specify as ομοιομερή the Anaxagorean χρήματα conceived of infinitesimal magnitude and in seminal form and having the opposites as their ingredients. Although Simplicius in his Commentary on the De caelo (603, 17-19) says that Anaxagoras called τα ομοιομερή σπέρματα (a testimony inexcusably missing from the editors because, if taken at its face value, would reinforce the current consideration of the σπέρματα aw Anaxagoras’ primary elements), the term σπέρματα does not seem to cover all that was real for Anaxagoras nor to the emphasized by him as his own original technical term. It was early considered to apply to the atomist physics. As to the meaning of the ομοιομερή, I believe that the definition given in Physics 203a 23 (μίγμα ομοίως τω παντί) renders best the structure of the term as Anaxagorean and not as Aristotelian, although I see no inconsistency to this sense in the connotation met in Gen. et Corr. 314a 18 (ως έκαστου συνώνυμον το μέρος) nor in Aetius’ definition of the ομοιμέρειαι in 59 A 46 DK. The great advantage of the term might have appeared to Aristotle to be its susceptibility to having many meanings. For it would thus best describe the vague Anaxaogrean χρήματα which expresses most of the basic principles of Anaxagoras’ physics. A thing is homoeomeorus both with all things present in the original mixture (in virtue of the principle of universal mixture) and with the specific whole of which it is a part (in virtue of the principle of the predominance of the similar parts), while due to its seminal form it is homoeomerous dynamically with the thing which will develop out of it. Indicative of the many senses of the term is also Lucretius’ whole account of Anaxagoras’ homoeomoria (De rerum natura I, 836-930). Its alternative use with the χρήματα is shown in Sextus Empiricus’ reference (IX 6) and Michael Psellos’ commentary on Aristotle’s Physics (ad locum). Anyway, I do not see any decisive inconsistency between the Anaxagoras of the fragments and that of the doxographical and scholarly tradition apart from terminological matters. In no case do the principles of homoeomereity imply any homogeneity of Anaxagoras’ material realities. Only νους is explicitly said to be alike, i.e. homogeneous. The principle of homoeomereity (similarity of the parts with the Whole, with the specific whole and with one another) does not contradict the principles of universal mixture and of predominance, but it should be understood as combination of both. In Anaxagoras’ molecular theory of matter there are no other material realities more elementary than the «things» themselves in their variety. Yet these things in their function as primary elements should be considered in infinitesimal magnitude and in seminal form, somewhat like the material «forms» of all the things that exist and are equally real. These things, when separated off by the νους from the original mixture, in which everything was present, could be regarded as homoemerous or as homoeomeries in order to constitute the διακόσμησις according to the decrees of νους. Therefore, with regard to the main questions of my inquiry I conclude that the term was not used by Anaxagoras and thus no entry of it should be made in the lexicon of the Presocratics; that it has many meanings depending on the aspect from which it is seen to function as descriptive of the constituents of the material reality; and that the corresponding term in the extant fragments was in all probability the χρήματα, which occurs about twelve times in the actual quotations and is implied in the crucial phrase «εν παντί παντός μοίρα ενέστι», which might have given rise to the much discussed term. It could be possible to father the term on the «Anaxagoreans» if we had more information about them. For a proper account of Anaxagoras’ physical theory it is necessary to read again all the secondary evidence and particularly Simplicius.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/portal?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/portal?language=en",
+          "title": "openarchives.gr | Search for Greek scientific and research content",
+          "description": "OpenArchives.gr\n> \n> OpenArchives.gr is the public portal that offers access to ... from all over Greece - universities, research institutions and scientific societies \n> \n> ... , research articles, books, conference proceedings and archives\n> \n>",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/kypseli/000054-11128_889",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/kypseli/000054-11128_889",
+          "title": "openarchives.gr | Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα)",
+          "description": "openarchives.gr | Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα)\n\n Το τεκμήριο παρέχεται από τον φορέα : Ανοικτό Πανεπιστήμιο Κύπρου \n\n Αποθετήριο : Ψηφιακό Αποθετήριο Κυψέλη \n\nΤίτλος\n\n Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα) \n\nΣυντελεστής\n\n Spanos, Leonidas \n\n Ματθοπούλου, Ευαγγελία \n\n Μητρόπολη Κιτίου \n\n Εκκλησιαστική Επιτροπή Ιεράς Μονής Αγίου Γεωργίου Κοντού \n\n Σπανός, Λεωνίδας \n\nΤύπος\n\n Ψηφιακή εικόνα \n\n \n\nΗμερομηνία έκδοσης\n\n 2012-10-23 2006 2006-09-10 2012-10-23T10:17:19Z \n\nΧρονολογία\n\n 2006 - 2012 (EL) \n\nΕπιστημονικό πεδίο\n\n Ανθρωπιστικές Επιστήμες και Τέχνες Τέχνες (Τέχνες, Ιστορία της Τέχνης, Ερμηνευτικές Τέχνες, Μουσική) (EL) \n\nΘέμα\n\n Λάρνακα \n\n Δήμος Λάρνακας \n\n Εκκλησία \n\n Πατριάρχης Αλεξανδρείας Πέτρος Ζ' \n\nΔικαιώματα\n\nΠάροχος\n\n Ανοικτό Πανεπιστήμιο Κύπρου \n\nΑποθετήριο / συλλογή\n\nΕπιμέρους συλλογή\n\n Κύπρος: τόποι μνήμης – χώροι τέχνης",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15123?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15123?language=en",
+          "title": "openarchives.gr | Το δοξαστικό των αποστίχων της Μ.Τετάρτης \"Κύριε η εν πολλαις αμαρτίαις...\": από τον Πέτρο Λαμπαδάριο στον Κωνσταντίνο Πρίγγο.",
+          "description": "Title\n\n Το δοξαστικό των αποστίχων της Μ.Τετάρτης \"Κύριε η εν πολλαις αμαρτίαις...\": από τον Πέτρο Λαμπαδάριο στον Κωνσταντίνο Πρίγγο. (EL) \n\nCreator\n\n Μαλάκος, Ιωάννης (EL) \n\nContributor\n\n Πάρης, Νεκτάριος (EL) Ρεντζεπέρη, Άννα-Μαρία (EL)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-143022?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-143022?language=en",
+          "title": "openarchives.gr | Liber XX. 1341-1342. Fo 76r, No 653. Εκλέγονται πέντε σοφοί πρός μελέτην της καταστάσεως εν Κρήτη καί της αλληλογραφίας του εν Κωνσταντινουπόλει πρεσβευτού Πέτρου Ντά Κανάλη. Εξελέγησαν : Σέρ Μάρκος Λορεδάνος επίτροπος, Σέρ Μάρκος Ιουστινιάνης επίτροπος, Σέρ Φράγκος Κουϊρίνος, Σέρ Νικόλαος Γραδόνικος υιός Δόγη, Σέρ Μάρκος Ρουτζίνης. 1342, Αυγούστου 24, αριθ. εγγράφου 20 (σε περίληψη)",
+          "description": ": Σέρ Μάρκος Λορεδάνος επίτροπος, Σέρ Μάρκος ... Φράγκος Κουϊρίνος, Σέρ Νικόλαος Γραδόνικος υιός Δόγη, Σέρ Μάρκος Ρουτζίνης.\n...\nCreator\n\n Θεοτόκης , Σπυρίδων Μ. \n\nType\n\n Διοικητικά έγγραφα \n\nDate\n\n 1936 \n\nYear\n\n 1936 (EN)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_17869",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_17869",
+          "title": "openarchives.gr | Prevalence and loads of torquetenovirus in the european MARK-AGE study population",
+          "description": "Δημιουργός\n\n Spezia, Pietro Giorgio \n\n Hurme, Mikko \n\n Grubeck-Loebenstein, Beatrix \n\n Provinciali, Mauro \n\n Moreno-Villanueva, María \n\n Slagboom, Eline \n\n Bürkle, Alexander \n\n Janiszewska, Dorota \n\n Giacconi, Robertina\n\n...\n\nPistello, Mauro\n\n...\n\nDebacq-Chainiaux, Florence\n\n...\n\nκό ... , ... υσ ... θ\n\n...\n\n, Andrea\n\n...\n\nDollé, Mart ... E T\n\n...\n\n,\n\n...\n\nAntti\n\n...\n\nBre\n\n...\n\nBern",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/portal/collections/pleias",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/portal/collections/pleias",
+          "title": "OpenArchives.gr | Πλειάς",
+          "description": "Φορέας : Πανεπιστήμιο Πατρών \n\n Πάροχος υπηρεσίας : Βιβλιοθήκη και Κέντρο Πληροφόρησης Πανεπιστημίου Πατρών\n\n...\n\nΗ Πλειάς αποτελεί σήμερα τη βασική Ψηφιακή Συλλογή ιστορικών ελληνικών περιοδικών της Βιβλιοθήκης και Κέντρου Πληροφόρησης του Πανεπιστημίου Πατρών (ΒΚΠ) από τον 19ο αιώνα μέχρι την εποχή του μεσοπολέμου (δεκαετίες 1920, 1930). Αποτελεί μια συνεχή και ζωντανή προσπάθεια συστηματικής ψηφιοποίησης ή/και ευρετηρίασης σημαντικών νεο-ελληνικών περιοδικών (κυρίως φιλολογικών και λογοτεχνικών τίτλων) που κυκλοφόρησαν στο ελληνικό κράτος, αλλά και στον ευρύτερο ελλαδικό χώρο (Κωνσταντινούπολη, Σμύρνη κλπ).",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/portal/collections/nemertes?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/portal/collections/nemertes?language=en",
+          "title": "OpenArchives.gr | Nemertes",
+          "description": "Nemertes is the institutional repository of University of Patras, which aims to accommodate all the intellectual output of the institution. Currently Nemertes serves as\n...\nlinear two-level system \n\n Creator: Μεσσήνης, Χρήστος",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pnyx/000157-32640",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pnyx/000157-32640",
+          "title": "openarchives.gr | Villerías’ Latin Translation of Alessandra Scala’s Greek Epigram to Poliziano and the Translation Wars in Mexico",
+          "description": "Latin and Greek works of a New Spanish poet, José de Villerías y Roelas (1695-1728). It is undoubtedly the most important document known to us, written in Greek and produced in New Spain during the colonial period. To date, no other New Spanish materials",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:openarchives.gr \\\"Pietro Lanza\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"PROVIDER_ERROR\"}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 10, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 10, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lanza\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_41298",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_41298",
+          "title": "openarchives.gr | Economomic evaluation of substance abuse treatment programs: the case of KETHEA's therapeutic communities",
+          "description": "θν ... έν\n\n...\n\nποθετήριο : ... θνικό Αρχείο Διδ ... ρικών Διατρι ... ών | ... Τ ... ΔΔ\n\n...\n\nΤίτλος\n\n Οικονομική αξιολόγηση των υπηρεσιών απεξάρτησης από ναρκωτικές ουσίες: η περίπτωση των θεραπευτικών κοινοτήτων του ΚΕΘΕΑ \n\n Economomic evaluation of substance abuse treatment programs: the case of KETHEA's therapeutic communities \n\nΔημιουργός\n\n Triantos, Petros Τρίαντος, Πέτρος \n\nΤύπος\n\n PhD Thesis \n\n Διπλωματική εργασία Διδακτορική διατριβή (EL) \n\nΗμερομηνία\n\n 2017 \n\nΧρονολογία\n\n 2017 (EL)\n\n...\n\nThe core aim of this study is the presentation and implementation of the methodology of evaluation in general and economic evaluation of substance abuse treatment programmes in Greece in particular. Based of the social problem theory, the social dimension of substance abuse is highlighted, along with the organized response of society to this problem through public substance abuse treatment programmes. In our research we apply the cost-benefit methodology on this type of services and more specifically, on the therapeutic communities of the Therapy Center for Dependent Individuals (KETHEA). An assessed research tool (Drug Abuse Treatment Cost Analysis Program-DATCAP) is used for cost analysis, while the European adaption of Addiction Severity Index (EuropASI) is used (N=243) for benefit analysis. The data for the qualitative analysis were collected through focus groups with ex addicts (N=65). Finally, an online survey was conducted in order to identify the views, attitudes and beliefs of the general population regarding many issues explored in the study.This study is a first attempt for the implementation of an economic evaluation based on a specific well documented methodology. Economic cost and social benefit analysis along with the comparative analysis of the main two types of therapeutic communities (residential and outpatient) led to the selection of the best cost-benefit alternative taking into consideration other important parameters, as well. Finally, recommendations for further research in this field are proposed, based on the one hand on the findings of this study and on the other on its limitations and restrictions",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 6,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/AFIMEC/000110-35366",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/AFIMEC/000110-35366",
+          "title": "openarchives.gr | english",
+          "description": "Αποθετήριο : Animation, Film, Διαδραστικά Μέσα στην Εκπαίδευση και τον Πολιτισμό | ΕΚΤ e Journals \n\nΤίτλος\n\n english (EL) \n\n The increase of International Audiovisual Productions in Greece - Impact on Tourism and the Greek Economy (EN) \n\nΔημιουργός\n\n Vasileiou, Magdalini Zenelis, Petros \n\nΤύπος\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\n Peer-reviewed Article (EN) \n\n Τμήμα έκδοσης Δημοσίευση σε περιοδικό (EL) \n\nΗμερομηνία\n\n 2024-07-07\n\n...\n\nΠεριγραφή\n\n Στην παρούσα εργασία εξετάζεται η ανάπτυξη των διεθνών οπτικοακουστικών παραγωγών που υλοποιούνται εν μέρει ή εξ ολοκλήρου στην Ελλάδα και ο κεντρικός ρόλος των ελληνικών δημοσίων αρχών στην υποστήριξη του εν λόγω τομέα, που αποτελεί αιτία προσέλκυσης τουριστικών ροών, να αναπτυχθεί ακόμη περισσότερο. Αυτή η μελέτη προσπαθεί να εντοπίσει τα πιο συνηθισμένα εμπόδια που αντιμετωπίζει η βιομηχανία οπτικοακουστικών μέσων όταν αποφασίζει να επιλέξει την Ελλάδα ως τόπο για την υλοποίηση ενός οπτικοακουστικού έργου. Οι βιώσιμες πρακτικές που προτείνονται στοχεύουν στην περαιτέρω προσέλκυση και ανάπτυξη ανάλογων πρωτοβουλιών στην ελληνική επικράτεια. Επισημαίνονται μερικά από τα σημαντικότερα οφέλη από την υλοποίηση τέτοιων έργων για τις τοπικές κοινωνίες όπως η αύξηση του εισοδήματος, η δημιουργία νέων θέσεων εργασίας και η γενικότερη τόνωση της τοπικής οικονομίας. Ο αντίκτυπος των οπτικοακουστικών παραγωγών στον τουρισμό σχετίζεται επίσης με το «κινηματογραφικό αποτέλεσμα» και τον σημαντικό ρόλο των οπτικοακουστικών παραγωγών στην προώθηση των αξιοθέατων μιας περιοχής. Η παρούσα εργασία εστιάζει στην επέκταση του κλάδου των διεθνών οπτικοακουστικών παραγωγών με έμφαση στις θετικές επιπτώσεις που έχουν οι πολιτιστικές-οικονομικές οπτικοακουστικές παραγωγές στην ενίσχυση τόσο των τοπικών οικονομιών όσο και του ελληνικού οπτικοακουστικού τομέα. (EL)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 6,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_13742",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_13742",
+          "title": "openarchives.gr | Neuropharmacology and hepatic biochemistry of the pharmaceutical intolerance to ethyl alcohol. Investigation of the mechanisms involved in the so called \" disulfiram type reaction\"",
+          "description": "> # Neuropharmacology and hepatic biochemistry of the pharmaceutical intolerance to ethyl alcohol. Investigation of the mechanisms involved in the so called \" disulfiram type reaction\"\n> \n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_13742 RDF/XML JSON-LD \n> \n>\n\n...\n\nΤο τεκμήριο παρέχεται από τον φορέα : Εθνικό Κέντρο Τεκμηρίωσης και Ηλεκτρονικού Περιεχομένου (ΕΚΤ) \n\n Αποθετήριο : Εθνικό Αρχείο Διδακτορικών Διατριβών | ΕΚΤ ΕΑΔΔ \n\nΤίτλος\n\n Νευροφαρμακολογία και ηπατική βιοχημεία της φαρμακευτικής δυσανεξίας στην αιθυλική αλκοόλη. Διερεύνηση των μηχανισμών της καλούμενης \" αντίδρασης τύπου δισουλφιράμης\" \n\n Neuropharmacology and hepatic biochemistry of the pharmaceutical intolerance to ethyl alcohol. Investigation of the mechanisms involved in the so called \" disulfiram type reaction\" \n\nΔημιουργός\n\n Karamanakos, Petros Καραμανάκος, Πέτρος \n\nΤύπος\n\n PhD Thesis \n\nΕκδότης\n\n Πανεπιστήμιο Ιωαννίνων University of Ioannina \n\n Πανεπιστήμιο Ιωαννίνων. Σχολή Ιατρικής. Τμήμα Ιατρικής. Τομέας Λειτουργικός - Κλινικοεργαστηριακός. Εργαστήριο Φαρμακολογίας \n\nΠάροχος\n\n Εθνικό Κέντρο Τεκμηρίωσης και Ηλεκτρονικού Περιεχομένου (ΕΚΤ)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 6,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_19445?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_19445?language=en",
+          "title": "openarchives.gr | Στατιστική ανάλυση δεδομένων από επιχειρήσεις-εφαρμογή",
+          "description": "Title\n\n Στατιστική ανάλυση δεδομένων από επιχειρήσεις-εφαρμογή (EL) \n\nCreator\n\n Περαντάκος, Πέτρος Χατζηδημητρίου, Μιχαέλα Αλεξανδροπούλου, Παναγιώτα \n\nContributor\n\n Καρυώτη, Βασιλική \n\nType\n\n Πτυχιακή Εργασία (EL) \n\n Thesis Bachelor thesis (EN) \n\nIssued\n\n 2021-10-30 2021-09-22T09:10:17Z \n\nYear\n\n 2021 (EN)\n\n...\n\nΗ ανάλυση επιχειρησιακών δεδομένων, θεωρείται ο βασικός στόχος για την επίτευξη των απαιτούμενων επιχειρηματικών και αναπτυξιακών ερωτημάτων. Η επεξεργασία των δεδομένων επιτυγχάνεται με τη συλλογή, την επεξεργασία και την επεξήγηση των συμπερασμάτων που προέκυψαν, έτσι ώστε να είναι όσο το δυνατό πιο ορθή η λήψη των αποφάσεων από τις επιχειρήσεις σύμφωνα με τα δεδομένα που έχουν στη βάση τους. Σκοπός της παρούσας εργασίας είναι αφενός η βιβλιογραφική ανασκόπηση της επιστήμης της στατιστικής, στο πεδίο ανάλυσης των δεδομένων από επιχειρήσεις και αφετέρου η πρακτική εφαρμογή της ανάλυσης ενός σετ επιχειρησιακών δεδομένων με σκοπό την εξαγωγή χρήσιμων συμπερασμάτων. Μέσω της πρακτικής εφαρμογής της στατιστικής ανάλυσης των επιχειρησιακών δεδομένων, επιχειρείται να αναδειχθεί η χρησιμότητά της από όλες τις επιχειρήσεις που διαθέτουν σαφείς αναπτυξιακούς στόχους και να υποδειχθούν οι ενδεχόμενοι περιορισμοί που μπορεί να προκύψουν, όταν η στατιστική ανάλυση εκτελείται με ένα ευρέως διατιθέμενο στατιστικό πακέτο όπως το SPSS και από μη εξειδικευμένους στατιστικούς αναλυτές. (EL)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 6,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-342317",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-342317",
+          "title": "openarchives.gr | An industry in transition: independent cinema and the future of film in the digital era",
+          "description": "archives\n\n...\n\nΤο τεκμήριο παρέχεται από τον φορέα ... Αριστοτέλειο Πανεπιστήμιο Θεσσαλονίκης \n\n Αποθετήριο : Ιδρυματικό Καταθετήριο Επιστημονικών Εργασιών ΑΠΘ \n\nΤίτλος\n\n An industry in transition: independent cinema and the future of film in the digital era \n\nΔημιουργός\n\n Koligiannis, Petros Pavlos \n\nΤύπος\n\n info:eu-repo/semantics/bachelorThesis \n\n Graduate Thesis / Πτυχιακή Εργασία \n\n Διπλωματική εργασία Πτυχιακή εργασία (EL) \n\nΗμερομηνία\n\n 2022-10-07T09:36:54Z 2022 \n\n Αγγλική γλώσσα \n\nΕκδότης\n\n Αριστοτέλειο Πανεπιστήμιο Θεσσαλονίκης, Φιλοσοφική Σχολή, Τμήμα Αγγλικής Γλώσσας και Φιλολογίας",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 6,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/portal/search",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/portal/search",
+          "title": "OpenArchives.gr | Ο συσσωρευτής ψηφιακού περιεχομένου έρευνας, επιστήμης και εκπαίδευσης του ΕΚΤ",
+          "description": "Ανθρωπιστικές Επιστήμες και Τέχνες (100.273)\n\nΆλλες Ανθρωπιστικές Επιστήμες (4.833)\n\nΑσιατικές σπουδές (258)\n\nΛαϊκός πολιτισμός (\n...\n1.887)\n\nΓλώσσα και Λογοτεχνία (24.394)\n\nΑμερικανική λογοτεχνία (3)\n\nΓλώσσα και Γλωσσολογία (12.492)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 6,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/kypseli/000054-11128_889",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/kypseli/000054-11128_889",
+          "title": "openarchives.gr | Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα)",
+          "description": "openarchives.gr | Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα)\n\n Το τεκμήριο παρέχεται από τον φορέα : Ανοικτό Πανεπιστήμιο Κύπρου \n\n Αποθετήριο : Ψηφιακό Αποθετήριο Κυψέλη \n\nΤίτλος\n\n Ανδριάντας Πατριάρχη Αλεξανδρείας Πέτρου Ζ' (Λάρνακα) \n\nΣυντελεστής\n\n Spanos, Leonidas \n\n Ματθοπούλου, Ευαγγελία \n\n Μητρόπολη Κιτίου \n\n Εκκλησιαστική Επιτροπή Ιεράς Μονής Αγίου Γεωργίου Κοντού \n\n Σπανός, Λεωνίδας \n\nΤύπος\n\n Ψηφιακή εικόνα \n\n \n\nΗμερομηνία έκδοσης\n\n 2012-10-23 2006 2006-09-10 2012-10-23T10:17:19Z \n\nΧρονολογία\n\n 2006 - 2012 (EL) \n\nΕπιστημονικό πεδίο\n\n Ανθρωπιστικές Επιστήμες και Τέχνες Τέχνες (Τέχνες, Ιστορία της Τέχνης, Ερμηνευτικές Τέχνες, Μουσική) (EL) \n\nΘέμα\n\n Λάρνακα \n\n Δήμος Λάρνακας \n\n Εκκλησία \n\n Πατριάρχης Αλεξανδρείας Πέτρος Ζ'\n\n...\n\nΔικαιώ\n\n...\n\nά ... χος\n\n Ανοικτό Πανεπιστήμιο Κ ... πρου",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 6,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/elocus/000018-dlib_6_f_4_metadata-dlib-244fb69c87a64670ef4de3733367131d_1258955478.tkl",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/elocus/000018-dlib_6_f_4_metadata-dlib-244fb69c87a64670ef4de3733367131d_1258955478.tkl",
+          "title": "openarchives.gr | Isolation and characterisation of protein complexes that mediate interchromosomal interactions of cytokine genetic loci",
+          "description": "openarchives.gr | Isolation and characterisation of protein complexes that mediate interchromosomal interactions of cytokine genetic loci\n\n Το τεκμήριο παρέχεται από τον φορέα : Πανεπιστήμιο Κρήτης \n\n Αποθετήριο : E-Locus Ιδρυματικό Καταθετήριο \n\nΤίτλος\n\n Απομόνωση και χαρακτηρισμός πρωτεϊνικών συμπλοκών που συμμετέχουν στις διαχρωμοσωμικές αλληλεπιδράσεις γενετικών τόπων κυτοκινών \n\n Isolation and characterisation of protein complexes that mediate interchromosomal interactions of cytokine genetic loci \n\nΔημιουργός\n\n Τζέρπος, Πέτρος \n\nΣυντελεστής\n\n Παπαματθαιάκης, Ιωσήφ \n\nΤύπος\n\n text \n\n Τύπος Εργασίας--Μεταπτυχιακές εργασίες ειδίκευσης \n\n Διπλωματική εργασία Μεταπτυχιακή εργασία (EL) \n\nΗμερομηνία\n\n 2009-11-20\n\n...\n\nΗ πολυεπίπεδη οργάνωση του γονιδιώματος και ανώτερες δομές της χρωματίνης είναι καίρια χαρακτηριστικά του πυρήνα ανώτερων οργανισμών. Πρόσφατες μελέτες καταδεικνύουν ότι η υποπυρηνική τοποθέτηση γενετικών τόπων και χρωμοσωμικές αλληλεπιδράσεις (cis & trans) μες στον πυρήνα φαίνεται να παίζουν σημαντικό ρόλο στην γονιδιακή έκφραση. Αν και η ρύθμιση της μεταγραφής από cis ρυθμιστικά στοιχεία (υποκινητές, ενισχυτές, LCRs κά.) έχει αναλυθεί σε βάθος κατά το παρελθόν, μόλις πρόσφατα έχει διαφανεί πιθανός ρόλος στη μεταγραφική ρύθμιση των trans αλληλεπιδράσεων μεταξύ διαφορετικών χρωμοσωμάτων. Επειδή μηχανιστικές λεπτομέρειες πως δημιουργούνται οι διαχρωμοσωμικές αλληλεπιδράσεις δεν είναι γνωστές, ο κύριος στόχος αυτής της μεταπτυχιακής μελέτης ήταν η συμβολή στη διαλεύκανση του μηχανισμού των διαχρωμοσωμικών αλληλεπιδράσεων και ειδικότερα, ο χαρακτηρισμός πρωτεϊνικών συμπλόκων που επάγουν ή/και σταθεροποιούν διαχρωμοσωμικές αλληλεπιδράσεις σε CD4+ κύτταρα ποντικού. Για το σκοπό αυτό, χρησιμοποιήσαμε τη τεχνική DNase I footprinting για τον χαρακτηρισμό πρωτεϊνικών συμπλόκων που προσδένονται σε ρυθμιστικά στοιχεία του γενετικού τόπου Th2 που συμμετέχουν σε διαχρωμοσωμικές αλληλεπιδράσεις σε CD4+ κύτταρα ποντικού. (EL)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 6,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_10144",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_10144",
+          "title": "openarchives.gr | Η ΣΥΜΒΟΛΗ ΤΗΣ ΒΙΟΣΥΝΘΕΣΕΩΣ ΤΗΣ ΑΙΜΟΣΦΑΙΡΙΝΗΣ IN VITRO ΣΤΗ ΔΙΑΓΝΩΣΗ ΚΑΙ ΚΑΤΑΤΑΞΗΤΩΝ ΕΤΕΡΟΖΥΓΩΝ ΜΟΡΦΩΝ ΤΗΣ ΜΕΣΟΓΕΙΑΚΗΣ ΑΝΑΙΜΙΑΣ",
+          "description": "> # Η ΣΥΜΒΟΛΗ ΤΗΣ ΒΙΟΣΥΝΘΕΣΕΩΣ ΤΗΣ ΑΙΜΟΣΦΑΙΡΙΝΗΣ IN VITRO ΣΤΗ ΔΙΑΓΝΩΣΗ ΚΑΙ ΚΑΤΑΤΑΞΗΤΩΝ ΕΤΕΡΟΖΥΓΩΝ ΜΟΡΦΩΝ ΤΗΣ ΜΕΣΟΓΕΙΑΚΗΣ ΑΝΑΙΜΙΑΣ\n> \n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_10144 RDF/XML JSON-LD \n> \n>\n\n...\n\nΤο τεκμήριο παρέχεται από τον φορέα : Εθνικό Κέντρο Τεκμηρίωσης και Ηλεκτρονικού Περιεχομένου (ΕΚΤ) \n\n Αποθετήριο : Εθνικό Αρχείο Διδακτορικών Διατριβών | ΕΚΤ ΕΑΔΔ \n\nΤίτλος\n\nΔημιουργός\n\n Χατζηνικολάου, Πέτρος \n\nΤύπος\n\n PhD Thesis \n\nΗμερομηνία\n\n 1978 \n\nΕπιστημονικό πεδίο\n\n Κλινική Ιατρική \n\n Ιατρική και Επιστήμες Υγείας \n\n Ελληνική γλώσσα \n\nΕκδότης\n\n National and Kapodistrian University of Athens \n\n Εθνικό και Καποδιστριακό Πανεπιστήμιο Αθηνών (ΕΚΠΑ)\n\n...\n\nΣ ... ή ... μήμα/ ... στιτού\n\n...\n\nτρ",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 6,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/portal/collections/kallipos",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/portal/collections/kallipos",
+          "title": "OpenArchives.gr | Αποθετήριο «Κάλλιπος»",
+          "description": "##### Ατμοσφαιρικό Οριακό Στρώμα Atmospheric Boundary Layer \n\n Δημιουργός: Varlas, Georgios, Κατσαφάδος, Πέτρος, Mavromatidis, Elias, Μαυροματίδης, Ηλίας, Katsafados, Petros, Βάρλας, Γεώργιος \n\n Χρονολογία : 2023\n\n...\n\n##### Κινηματική της Ατμόσφαιρας Atmospheric Kinematics \n\n Δημιουργός: Varlas, Georgios, Κατσαφάδος, Πέτρος, Mavromatidis, Elias, Μαυροματίδης, Ηλίας, Katsafados, Petros, Βάρλας, Γεώργιος \n\n Χρονολογία : 2023\n\n...\n\n##### Αριθμητική Πρόγνωση Καιρού και Μοντελοποίηση Numerical Weather Prediction and Modeling \n\n Δημιουργός: Varlas, Georgios, Κατσαφάδος, Πέτρος, Mavromatidis, Elias, Μαυροματίδης, Ηλίας, Katsafados, Petros, Βάρλας, Γεώργιος \n\n Τύπος τεκμηρίου: Κεφάλαιο \n\n Επιστημονικό πεδίο: Επιστήμη πληροφόρησης \n\n Χρονολογία : 2023 \n\n Φορέας: Σύνδεσμος Ελληνικών Ακαδημαϊκων Βιβλιοθηκών \n\n Συλλογή: Αποθετήριο «Κάλλιπος»\n\n...\n\n##### Εισαγωγή στο Γήινο Ατμοσφαιρικό Περιβάλλον Introduction to the Earth Atmospheric Environment \n\n Δημιουργός: Varlas, Georgios, Κατσαφάδος, Πέτρος, Mavromatidis, Elias, Μαυροματίδης, Ηλίας, Katsafados, Petros, Βάρλας, Γεώργιος \n\n Τύπος τεκμηρίου: Κεφάλαιο \n\n Επιστημονικό πεδίο: Επιστήμη πληροφόρησης \n\n Χρονολογία : 2023 \n\n Φορέας: Σύνδεσμος Ελληνικών Ακαδημαϊκων Βιβλιοθηκών \n\n Συλλογή: Αποθετήριο «Κάλλιπος»",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Petros Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 6,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:openarchives.gr \\\"Petros Lanza\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"FIRST_PAGE_ONLY\", \"returned_records\": 6, \"service\": \"SerpAPI / Google organic results\", \"more_results_available\": null}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 10, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 10, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pietro Lanza\"",
+      "records": [
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737750c",
+          "title": "Lezione accademica sugli asili infantili, di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1840"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737750c",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737750c"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb45043757m",
+          "title": "Sagittario in amore : poesie postume / Pietro Cimatti ; note critiche e cura di Davide Argnani e Stefania Porrino ; prefazione di Ludovico Griguoli Lanza",
+          "creator": [
+            "Cimatti, Pietro (1929-1991). Auteur du texte"
+          ],
+          "date": [
+            "2015"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb45043757m",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb45043757m",
+            "ISBN 9788897726753"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737754r",
+          "title": "Donne e gioielli in Sicilia nel medio evo e nel rinascimento... / Pietro Lanza di Scalea",
+          "creator": [
+            "Lanza di Scalea, Pietro. Auteur du texte"
+          ],
+          "date": [
+            "1892"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737754r",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737754r"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737747g",
+          "title": "Degli Arabi e del loro soggiorno in Sicilia, memoria di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1832"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737747g",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737747g"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737751q",
+          "title": "Dello Spirito di associazione nella Inghilterra in particolare, saggïo politico ed economico, di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1842"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737751q",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737751q"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb307377553",
+          "title": "Enrico Rosso e la confisca de' suoi mobili in Castiglione, ricerche storiche del secolo XIV / Pietro Lanza di Scalea",
+          "creator": [
+            "Lanza di Scalea, Pietro. Auteur du texte"
+          ],
+          "date": [
+            "1890"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb307377553",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb307377553"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737748t",
+          "title": "Dell' Arte drammatica in Sicilia, epitome di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1834"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737748t",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737748t"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb47022743j",
+          "title": "24/5/31, Exposition coloniale, le prince Di Sclalea [i.e. Di Scalea] : [photographie de presse] / [Agence Rol]",
+          "creator": [
+            "Agence Rol. Agence photographique (commanditaire)"
+          ],
+          "date": [
+            "1931"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb47022743j",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb47022743j"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30132553m",
+          "title": "In Morte di Maddalena Caracciolo, principessa di Scalea, cantico di Giuseppe Borghi, preceduta da un cenno necrologico (da Pietro Lanza, principe di Scordia)",
+          "creator": [
+            "Borghi, Giuseppe (1790-1847). Auteur du texte",
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1838"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30132553m",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30132553m"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb307377495",
+          "title": "Considerazioni sulla storia di Sicilia dal 1532 al 1789, da servir d'aggiunte e di chiose al Botta, di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1836"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb307377495",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb307377495"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb31550875h",
+          "title": "Italia e Francia, 1870, secondo narrazioni di G. Lanza, Q. Sella, E. Ollivier e d'un uomo politico italiano",
+          "creator": [
+            "Vayra, Pietro (1836-1898). Auteur du texte"
+          ],
+          "date": [
+            "1895"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb31550875h",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb31550875h"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30961712b",
+          "title": "Pietro Lanza e Stella, principe di Trabia, e l'agricoltura in Sicilia nel 1786 e nel 1896, per Carlo Crispo Moncada",
+          "creator": [
+            "Moncada, Carlo Crispo. Auteur du texte"
+          ],
+          "date": [
+            "1897"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30961712b",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30961712b"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb46889466j",
+          "title": "The Immortal Voice of Mario Lanza: A Centennial Celebration / Mario Lanza",
+          "creator": [
+            "Lanza, Mario (1921-1959). Interprète",
+            "Mascagni, Pietro (1863-1945). Compositeur",
+            "Romberg, Sigmund (1887-1951). Compositeur",
+            "Rodgers, Richard (1902-1979). Compositeur"
+          ],
+          "date": [
+            "2021"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb46889466j",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb46889466j"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb376873058",
+          "title": "Le proposte di un principe : Pietro Lanza e la \"ricchezza del Regno\" / Giacomo Dentici",
+          "creator": [
+            "Dentici, Giacomo (1940-....). Auteur du texte"
+          ],
+          "date": [
+            "1999"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb376873058",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb376873058",
+            "ISBN 8881280892"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb38632566x",
+          "title": "Cavalleria rusticana. Addio alla madre / Mascagni, comp. ; Mario Lanza, T ; RCA Victor Orchestra ; Constantine Callinicos, dir.. La forza del destino. O tu che in seno agli angeli / Verdi, comp. ; Mario Lanza, T ; RCA Victor Orchestra ; Constantine Callinicos, dir.",
+          "creator": [
+            "Mascagni, Pietro (1863-1945). Compositeur",
+            "Verdi, Giuseppe (1813-1901). Compositeur",
+            "Lanza, Mario (1921-1959). Ténor",
+            "Callinicos, Constantine (1913-1986). Direction d'orchestre"
+          ],
+          "date": [
+            "195."
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb38632566x",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb38632566x"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb37894554v",
+          "title": "Cavalleria rusticana. Mamma que vino e generoso / Pietro Mascagni. L'Africana. Mi batte il core : récit. L'Africana. Aria de l'acte 4, O Paradiso ! / Meyerbeer, comp. ; Mario Lanza, T ; RCA Victor orchestra ; Constantine Callinicos, dir.",
+          "creator": [
+            "Lanza, Mario (1921-1959). Ténor",
+            "Callinicos, Constantine (1913-1986). Direction d'orchestre"
+          ],
+          "date": [
+            "194."
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb37894554v",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb37894554v"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+          "title": "Peter of Auvergne : university master of the 13th century / edited by Christoph Flüeler, Lidia Lanza, Marco Toste",
+          "creator": [],
+          "date": [
+            "2015"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+            "ISBN 3110228483"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb38297620n",
+          "title": "José Carreras : a tribute to Mario Lanza / Declan Lowney, réal. ; José Carreras, T ; English concert chorus ; BBC Concert orchestra ; Enrique Ricci, dir.",
+          "creator": [
+            "Lowney, Declan (1960-....). Réalisateur"
+          ],
+          "date": [
+            "1994"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb38297620n",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb38297620n"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb46741746t",
+          "title": "Scriptum super III-VIII libros Politicorum Aristotelis : edizione, introduzione e note / Petrus de Alvernia ; a cura di Lidia Lanza",
+          "creator": [
+            "Pierre d'Auvergne (124.?-1304). Auteur du texte"
+          ],
+          "date": [
+            "2021"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb46741746t",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb46741746t",
+            "ISBN 9783954902781"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb381836987",
+          "title": "Stabat Mater / Pergolesi. Concerti grossi n ° III à V / Alessandro Scarlatti ; Mirella Freni, S ; Teresa Berganza, A ; Solisti dell'orchestra Scarlatti Napoli ; Ettore Gracis, dir",
+          "creator": [
+            "Pergolesi, Giovanni Battista (1710-1736). Compositeur",
+            "Scarlatti, Alessandro (1660-1725). Compositeur",
+            "Gracis, Ettore (1915-1992). Direction d'orchestre",
+            "Freni, Mirella (1935-2020). Soprano"
+          ],
+          "date": [
+            "1989"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb381836987",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb381836987"
+          ]
+        }
+      ],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pietro+Lanza+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Lantzas, Petros\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_14011",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_14011",
+          "title": "openarchives.gr | Application of nanoidentation for the assessment of mechanical properties of the trabeculae from the 4th human vertebra: experimental study with cadavers vertebrae",
+          "description": "> # Application of nanoidentation for the assessment of mechanical properties of the trabeculae from the 4th human vertebra: experimental study with cadavers vertebrae\n> \n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_14011 RDF/XML JSON-LD \n> \n>\n\n...\n\nΤο τεκμήριο παρέχεται από τον φορέα : Εθνικό Κέντρο Τεκμηρίωσης και Ηλεκτρονικού Περιεχομένου (ΕΚΤ) \n\n Αποθετήριο : Εθνικό Αρχείο Διδακτορικών Διατριβών | ΕΚΤ ΕΑΔΔ \n\nΤίτλος\n\n Η εφαρμογή της νανοδιείσδυσης στην εκτίμηση των μηχανικών ιδιοτήτων της οστικής δοκίδος του Ο_4 σπονδύλου: πειραματική μελέτη σε πτωματικούς σπονδύλους \n\n Application of nanoidentation for the assessment of mechanical properties of the trabeculae from the 4th human vertebra: experimental study with cadavers vertebrae \n\nΔημιουργός\n\n Antonarakos, Petros Αντωναράκος, Πέτρος \n\nΤύπος\n\n PhD Thesis \n\nΗμερομηνία\n\n 2004 \n\n Ιατρική και Επιστήμες Υγείας ➨ Βασική Ιατρική \n\n Μηχανικές ιδιότητες \n\n Basic Medicine \n\n Lumbar sping \n\n Medical and Health Sciences \n\n Γενικευμένη σκληρότητα \n\n Nanoindentation \n\n Trabeculace\n\n...\n\nrinsic mechanical properties\n\n...\n\nulus ... elasticity \n\n Hardness \n\n Young's modulus \n\n Σπογγώδες οστούν \n\n Μέτρο ελαστικότητας \n\n Οσφυϊ ... μοίρα\n\n...\n\nασική Ιατρική \n\n Νανοδιεί ... δυση\n\n...\n\nπισ",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Lantzas, Petros\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_28833",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_28833",
+          "title": "openarchives.gr | The myth of the entities: the common sense realism and the non-conceptual content of perception",
+          "description": "ριο ... φο ... θν ... Κέν ... εκ\n\n...\n\nΑποθετήριο : Εθνικό Αρχείο Διδακτορικών Διατριβών ... ΕΚΤ ΕΑΔΔ\n\n...\n\nΤίτλος\n\n Ο μύθος των οντοτήτων: ο ρεαλισμός του κοινού νου και το μη εννοιολογικό περιεχόμενο της αντίληψης \n\n The myth of the entities: the common sense realism and the non-conceptual content of perception \n\nΔημιουργός\n\n Damianos, Petros Δαμιανός, Πέτρος \n\nΤύπος\n\n PhD Thesis \n\n Διπλωματική εργασία Διδακτορική διατριβή (EL) \n\nΗμερομηνία\n\n 2010\n\n...\n\nεργασία αυτή ασ ... ολείται με τη διαμάχη μεταξύ αντιρεαλισμού και ρεαλισμού, και ειδικότερα με τη διαμάχη του κατασκευαστικού εμπειρισμού με τους αντιπάλους του ρεαλιστές. Στο πρώτο μέρος της αναπτύσσεται το πρόβλημα που θέλει να λύσει και είναι το εξής: Ο κατασκευαστικός εμπειρισμός, τηρεί μία αγνωστικιστική στάση για τις μη παρατηρήσιμες οντότητες και μία δογματική, μη τεκμηριωμένη, ρεαλιστική στάση για τις παρατηρήσιμες οντότητες. Το εν λόγω θεωρητικό του πρόβλημα περί της τεκμηρίωσης της ύπαρξης των παρατηρήσιμων οντοτήτων προσπαθεί, κατά μία ανάγνωσή της, να επιλύσει η παρούσα εργασία. Στο δεύτερο μέρος της. με τίτλο «τα εργαλεία», παρουσιάζονται προσεγγίσεις από τη γνωσιακή επιστήμη και την ψυχολογία της αντίληψης, που ισχυρίζονται ότι ένας μέρος της ανθρώπινης αντίληψης δεν διαμεσολαβείται από έννοιες. Στο τρίτο μέρος της εργασίας παρουσιάζεται η απάντηση του προβλήματος που ετέθη στο πρώτο μέρος, δηλαδή βάση των προηγούμενων προσεγγίσεων διαφοροποιούνται οι παρατηρήσιμες από τις μη παρατηρήσιμες οντότητες, δείχνοντας ότι οι πρώτες είναι αμόλυντες από την εννοιολογική σχετικότητα που διέπει τις δεύτερες. Στο τελευταίο κεφάλαιο διατυπώνεται και απαντάται ένα ρεαλιστικό αντεπιχείρημα στην προηγούμενη θέση βάση του τελικού συμπεράσματος της εργασίας το οποίο είναι ότι: Ακόμα και τα παρατηρήσιμα δεν είναι κάποιες «Αντικειμενικές οντότητες» της κατά ρεαλιστή βαθιάς δομής του κόσμου. Θέση που απαιτεί μια επανερμηνεία της έννοιας της «ύπαρξης» και υποστηρίζει ένα ρεαλισμό σε σχέση με βιολογικά είδη ο οποίος, όμως δεν αναφέρεται σε κάποια έσχατη Αντικειμενικότητα.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Lantzas, Petros\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/elocus/000018-dlib_9_d_5_metadata-dlib-2003samartzis.tkl?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/elocus/000018-dlib_9_d_5_metadata-dlib-2003samartzis.tkl?language=en",
+          "title": "openarchives.gr | Μελέτες δυναμικής για φωτοδιάσπαση και αντιδράσεις αλογονούχων μορίων",
+          "description": "openarchives.gr | Μελέτες δυναμικής για φωτοδιάσπαση και αντιδράσεις αλογονούχων μορίων\n\n...\n\nTitle\n\n Studies of photodissociation and reaction dynamics of halogenated modecules \n\n Μελέτες δυναμικής για φωτοδιάσπαση και αντιδράσεις αλογονούχων μορίων \n\nCreator\n\n Samartzis, Petros Ch Σαμαρτζής, Πέτρος Χ \n\nContributor\n\n Κιτσόπουλος, Θεοφάνης Ν. \n\nType\n\n Τύπος Εργασίας--Διδακτορικές διατριβές \n\n text \n\nDate\n\n 2003-07-16 \n\nYear\n\n 2003 (EN)\n\n...\n\nγια ... χα μόρια και ... ει ... Το ... 1 ... ν ... το ... του ... γωνια ... ές ... ενεργειακές κατα ... μές των φωτοθραυσμάτων υπολογί ... ει ... ρές ... ερμένων ... στάσεων ... απο ... ρόφησης ... ρωση ... στα ... ρα ... ματα ... Σ ... αιο ... περι ... της ... ικής ... του ... Μ ... των ενεργ ... νομ ... λεκ ... στά ... μετά ... ση ... καταγρά ... Τ ... παρου ... εφαρμο ... της ... αρ ... γράφ ... χύτητας ... μέτρηση ... με ... ενεργ ... διατομής σε ... ρά ... αντίδρασης του Cl με το C2H ... για ... ενέργ ... κ ... σης ... 0.3 ... eV ... (EL",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Lantzas, Petros\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/sygkrisi/000091-39946",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/sygkrisi/000091-39946",
+          "title": "openarchives.gr | Petros Marazopoulos, The “Balkans” in Modern Greek Culture: Negotiating a term. Foreword by Dimitris Kargiotis, Thessaloniki: Epikentro pubs, 2023",
+          "description": "openarchives.gr | Petros Marazopoulos, The “Balkans” in Modern Greek Culture: Negotiating a term. Foreword by Dimitris Kargiotis, Thessaloniki: Epikentro pubs, 2023\n\n> # Petros Marazopoulos, The “Balkans” in Modern Greek Culture: Negotiating a term. Foreword by Dimitris Kargiotis, Thessaloniki: Epikentro pubs, 2023\n> \n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/sygkrisi/000091-39946 RDF/XML JSON-LD \n> \n> \n\n Το τεκμήριο παρέχεται από τον φορέα : Ελληνική Εταιρεία Γενικής και Συγκριτικής Γραμματολογίας \n\n Αποθετήριο : Σύγκριση | ΕΚΤ e Journals \n\nΤίτλος\n\n Petros Marazopoulos, The “Balkans” in Modern Greek Culture: Negotiating a term. Foreword by Dimitris Kargiotis, Thessaloniki: Epikentro pubs, 2023 (EL) \n\n Petros Marazopoulos, The “Balkans” in Modern Greek Culture: Negotiating a term. Foreword by Dimitris Kargiotis, Thessaloniki: Epikentro pubs, 2023 (EN) \n\nΔημιουργός\n\n Katsigianni, Anna \n\nΤύπος\n\n info:eu-repo/semantics/article\n\n...\n\nΕ ... δότης\n\n...\n\nκαι Συ ... τικής Γρα ... λογ ... ) ... )",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Lantzas, Petros\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_41298",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_41298",
+          "title": "openarchives.gr | Economomic evaluation of substance abuse treatment programs: the case of KETHEA's therapeutic communities",
+          "description": "θετή ... θν ... ρχ ... τρι ... ών\n\n...\n\nΤίτλος\n\n Οικονομική αξιολόγηση των υπηρεσιών απεξάρτησης από ναρκωτικές ουσίες: η περίπτωση των θεραπευτικών κοινοτήτων του ΚΕΘΕΑ \n\n Economomic evaluation of substance abuse treatment programs: the case of KETHEA's therapeutic communities \n\nΔημιουργός\n\n Triantos, Petros Τρίαντος, Πέτρος \n\nΤύπος\n\n PhD Thesis \n\n Διπλωματική εργασία Διδακτορική διατριβή (EL) \n\nΗμερομηνία\n\n 2017 \n\nΧρονολογία\n\n 2017 (EL)\n\n...\n\nThe core aim of this study is the presentation and implementation of the methodology of evaluation in general and economic evaluation of substance abuse treatment programmes in Greece in particular. Based of the social problem theory, the social dimension of substance abuse is highlighted, along with the organized response of society to this problem through public substance abuse treatment programmes. In our research we apply the cost-benefit methodology on this type of services and more specifically, on the therapeutic communities of the Therapy Center for Dependent Individuals (KETHEA). An assessed research tool (Drug Abuse Treatment Cost Analysis Program-DATCAP) is used for cost analysis, while the European adaption of Addiction Severity Index (EuropASI) is used (N=243) for benefit analysis. The data for the qualitative analysis were collected through focus groups with ex addicts (N=65). Finally, an online survey was conducted in order to identify the views, attitudes and beliefs of the general population regarding many issues explored in the study.This study is a first attempt for the implementation of an economic evaluation based on a specific well documented methodology. Economic cost and social benefit analysis along with the comparative analysis of the main two types of therapeutic communities (residential and outpatient) led to the selection of the best cost-benefit alternative taking into consideration other important parameters, as well. Finally, recommendations for further research in this field are proposed, based on the one hand on the findings of this study and on the other on its limitations and restrictions",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Lantzas, Petros\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/portal/search",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/portal/search",
+          "title": "OpenArchives.gr | Ο συσσωρευτής ψηφιακού περιεχομένου έρευνας, επιστήμης και εκπαίδευσης του ΕΚΤ",
+          "description": "Ανθρωπιστικές Επιστήμες και Τέχνες (100.273)\n\nΆλλες ... Επιστήμες (4.833)\n\nΑσιατικές σπουδές (258)\n\nΛαϊκός πολιτισμός\n...\n(3)\n\nΓλώσσα και Γλωσσολογία (12.492)\n\nΕλληνική\n...\nΙστορία και Αρχαιολογία (40.711)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Lantzas, Petros\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_13742",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_13742",
+          "title": "openarchives.gr | Neuropharmacology and hepatic biochemistry of the pharmaceutical intolerance to ethyl alcohol. Investigation of the mechanisms involved in the so called \" disulfiram type reaction\"",
+          "description": "> # Neuropharmacology and hepatic biochemistry of the pharmaceutical intolerance to ethyl alcohol. Investigation of the mechanisms involved in the so called \" disulfiram type reaction\"\n> \n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_13742 RDF/XML JSON-LD \n> \n>\n\n...\n\nΤο τεκμήριο παρέχεται από τον φορέα : Εθνικό Κέντρο Τεκμηρίωσης και Ηλεκτρονικού Περιεχομένου (ΕΚΤ) \n\n Αποθετήριο : Εθνικό Αρχείο Διδακτορικών Διατριβών | ΕΚΤ ΕΑΔΔ \n\nΤίτλος\n\n Νευροφαρμακολογία και ηπατική βιοχημεία της φαρμακευτικής δυσανεξίας στην αιθυλική αλκοόλη. Διερεύνηση των μηχανισμών της καλούμενης \" αντίδρασης τύπου δισουλφιράμης\" \n\n Neuropharmacology and hepatic biochemistry of the pharmaceutical intolerance to ethyl alcohol. Investigation of the mechanisms involved in the so called \" disulfiram type reaction\" \n\nΔημιουργός\n\n Karamanakos, Petros Καραμανάκος, Πέτρος \n\nΤύπος\n\n PhD Thesis \n\nΕκδότης\n\n Πανεπιστήμιο Ιωαννίνων University of Ioannina \n\n Πανεπιστήμιο Ιωαννίνων. Σχολή Ιατρικής. Τμήμα Ιατρικής. Τομέας Λειτουργικός - Κλινικοεργαστηριακός. Εργαστήριο Φαρμακολογίας \n\nΠάροχος\n\n Εθνικό Κέντρο Τεκμηρίωσης και Ηλεκτρονικού Περιεχομένου (ΕΚΤ)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Lantzas, Petros\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hypatia/000061-11400_1587",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hypatia/000061-11400_1587",
+          "title": "openarchives.gr | Κάτοψη υπογείου",
+          "description": "Αποθετήριο : Υπατία - Ιδρυματικό Αποθετήριο \n\nΤίτλος\n\n Κάτοψη υπογείου (EL) \n\nΔημιουργός\n\n Αθανασόπουλος, Πέτρος (EL) \n\nΤύπος\n\n plan \n\n \n\n Σχέδιο (EL) \n\nΗμερομηνία\n\n 2014-07-23T22:22:34Z 2014-07-24 \n\nΗμερομηνία δημιουργίας\n\n 1984-12",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Lantzas, Petros\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/AFIMEC/000110-35366",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/AFIMEC/000110-35366",
+          "title": "openarchives.gr | english",
+          "description": "Αποθετήριο : Animation, Film, Διαδραστικά Μέσα στην Εκπαίδευση και τον Πολιτισμό | ΕΚΤ e Journals\n\n...\n\nΤίτλος\n\n english (EL) \n\n The increase of International Audiovisual Productions in Greece - Impact on Tourism and the Greek Economy (EN) \n\nΔημιουργός\n\n Vasileiou, Magdalini Zenelis, Petros \n\nΤύπος\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\n Peer-reviewed Article (EN) \n\n Τμήμα έκδοσης Δημοσίευση σε περιοδικό (EL) \n\nΗμερομηνία\n\n 2024-07-07\n\n...\n\nΠ\n\n...\n\nΣτην παρούσα εργασία εξετάζεται η ανάπτυξη των διεθνών οπτικοακουστικών παραγωγών που υλοποιούνται εν μέρει ή εξ ολοκλήρου στην Ελλάδα και ο κεντρικός ρόλος των ελληνικών δημοσίων αρχών στην υποστήριξη του εν λόγω τομέα, που αποτελεί αιτία προσέλκυσης τουριστικών ροών, να αναπτυχθεί ακόμη περισσότερο. Αυτή η μελέτη προσπαθεί να εντοπίσει τα πιο συνηθισμένα εμπόδια που αντιμετωπίζει η βιομηχανία οπτικοακουστικών μέσων όταν αποφασίζει να επιλέξει την Ελλάδα ως τόπο για την υλοποίηση ενός οπτικοακουστικού έργου. Οι βιώσιμες πρακτικές που προτείνονται στοχεύουν στην περαιτέρω προσέλκυση και ανάπτυξη ανάλογων πρωτοβουλιών στην ελληνική επικράτεια. Επισημαίνονται μερικά από τα σημαντικότερα οφέλη από την υλοποίηση τέτοιων έργων για τις τοπικές κοινωνίες όπως η αύξηση του εισοδήματος, η δημιουργία νέων θέσεων εργασίας και η γενικότερη τόνωση της τοπικής οικονομίας. Ο αντίκτυπος των οπτικοακουστικών παραγωγών στον τουρισμό σχετίζεται επίσης με το «κινηματογραφικό αποτέλεσμα» και τον σημαντικό ρόλο των οπτικοακουστικών παραγωγών στην προώθηση των αξιοθέατων μιας περιοχής. Η παρούσα εργασία εστιάζει στην επέκταση του κλάδου των διεθνών οπτικοακουστικών παραγωγών με έμφαση στις θετικές επιπτώσεις που έχουν οι πολιτιστικές-οικονομικές οπτικοακουστικές παραγωγές στην ενίσχυση τόσο των τοπικών οικονομιών όσο και του ελληνικού οπτικοακουστικού τομέα. (EL)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Lantzas, Petros\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/portal/collections/kallipos",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/portal/collections/kallipos",
+          "title": "OpenArchives.gr | Αποθετήριο «Κάλλιπος»",
+          "description": "##### Ατμοσφαιρικό Οριακό Στρώμα Atmospheric Boundary Layer \n\n Δημιουργός: Varlas, Georgios, Κατσαφάδος, Πέτρος, Mavromatidis, Elias, Μαυροματίδης, Ηλίας, Katsafados, Petros, Βάρλας, Γεώργιος \n\n Χρονολογία : 2023\n\n...\n\n##### Κινηματική της Ατμόσφαιρας Atmospheric Kinematics \n\n Δημιουργός: Varlas, Georgios, Κατσαφάδος, Πέτρος, Mavromatidis, Elias, Μαυροματίδης, Ηλίας, Katsafados, Petros, Βάρλας, Γεώργιος \n\n Χρονολογία : 2023\n\n...\n\n##### Αριθμητική Πρόγνωση Καιρού και Μοντελοποίηση Numerical Weather Prediction and Modeling \n\n Δημιουργός: Varlas, Georgios, Κατσαφάδος, Πέτρος, Mavromatidis, Elias, Μαυροματίδης, Ηλίας, Katsafados, Petros, Βάρλας, Γεώργιος \n\n Τύπος τεκμηρίου: Κεφάλαιο \n\n Επιστημονικό πεδίο: Επιστήμη πληροφόρησης \n\n Χρονολογία : 2023 \n\n Φορέας: Σύνδεσμος Ελληνικών Ακαδημαϊκων Βιβλιοθηκών \n\n Συλλογή: Αποθετήριο «Κάλλιπος»\n\n...\n\n##### Εισαγωγή στο Γήινο Ατμοσφαιρικό Περιβάλλον Introduction to the Earth Atmospheric Environment \n\n Δημιουργός: Varlas, Georgios, Κατσαφάδος, Πέτρος, Mavromatidis, Elias, Μαυροματίδης, Ηλίας, Katsafados, Petros, Βάρλας, Γεώργιος \n\n Τύπος τεκμηρίου: Κεφάλαιο \n\n Επιστημονικό πεδίο: Επιστήμη πληροφόρησης \n\n Χρονολογία : 2023 \n\n Φορέας: Σύνδεσμος Ελληνικών Ακαδημαϊκων Βιβλιοθηκών \n\n Συλλογή: Αποθετήριο «Κάλλιπος»",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Lantzas, Petros\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:openarchives.gr \\\"Lantzas, Petros\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"PROVIDER_ERROR\"}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 10, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 10, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "result_count": 70,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
