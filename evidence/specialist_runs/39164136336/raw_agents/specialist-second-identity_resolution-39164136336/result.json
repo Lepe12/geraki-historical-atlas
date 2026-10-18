@@ -1,0 +1,496 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "identity_resolution",
+  "label": "Identity Resolution Agent",
+  "assignment_id": "identity_resolution:wave2",
+  "assignment_wave": 2,
+  "requested_outputs": [
+    "entity_candidates",
+    "variant_names",
+    "same_entity_assessment",
+    "collision_warnings"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "0a9a897a6f0622ed339bacf19f737a5e4e4a27f5fe36687115cd7d64e03f78c7",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "identity_resolution",
+    "assignment_id": "identity_resolution:wave2",
+    "assignment_wave": 2,
+    "route_ids": [
+      "repo:Nationaal Archief",
+      "repo:Delpher"
+    ],
+    "queries": [
+      "\"Research a narrowly defined historical claim and return a scientifically useful negative result if no direct evidence is found: repositories checked, queries/variants, coverage limits and remaining uncertainty.\" variant spelling",
+      "\"Research a narrowly defined historical claim and return a scientifically useful negative result if no direct evidence is found: repositories checked, queries/variants, coverage limits and remaining uncertainty.\" alias OR aliases",
+      "\"Research a narrowly defined historical claim and return a scientifically useful negative result if no direct evidence is found: repositories checked, queries/variants, coverage limits and remaining uncertainty.\" historical name",
+      "\"Research a narrowly defined historical claim and return a scientifically useful negative result if no direct evidence is found: repositories checked, queries/variants, coverage limits and remaining uncertainty.\" transliteration"
+    ],
+    "operation": "search",
+    "search_budget": 8,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "result_aware_fallback_v1",
+    "routes": [
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Delpher",
+        "route_type": "repository_dispatch",
+        "repository": "Delpher",
+        "connector_id": null,
+        "score": 80,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 76,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 72,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 4,
+    "total_search_budget": 8,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Delpher",
+      "repository": "Delpher",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Research a narrowly defined historical claim and return a scientifically useful negative result if no direct evidence is found: repositories checked, queries/variants, coverage limits and remaining uncertainty.\" variant spelling",
+      "records": [],
+      "diagnostic": "https://jsru.kb.nl/sru/sru?version=1.2&operation=searchRetrieve&query=%22Research+a+narrowly+defined+historical+claim+and+return+a+scientifically+useful+negative+result+if+no+direct+evidence+is+found%3A+repositories+checked%2C+queries%2Fvariants%2C+coverage+limits+and+remaining+uncertainty.%22+variant+spelling&startRecord=1&maximumRecords=20&recordSchema=ddd&x-collection=DDD_artikel&x-fields=OaiPmhIdentifier%2CdateString%2Czones%2Ctitle",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Delpher",
+      "repository": "Delpher",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Research a narrowly defined historical claim and return a scientifically useful negative result if no direct evidence is found: repositories checked, queries/variants, coverage limits and remaining uncertainty.\" alias OR aliases",
+      "records": [],
+      "diagnostic": "https://jsru.kb.nl/sru/sru?version=1.2&operation=searchRetrieve&query=%22Research+a+narrowly+defined+historical+claim+and+return+a+scientifically+useful+negative+result+if+no+direct+evidence+is+found%3A+repositories+checked%2C+queries%2Fvariants%2C+coverage+limits+and+remaining+uncertainty.%22+alias+OR+aliases&startRecord=1&maximumRecords=20&recordSchema=ddd&x-collection=DDD_artikel&x-fields=OaiPmhIdentifier%2CdateString%2Czones%2Ctitle",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Delpher",
+      "repository": "Delpher",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Research a narrowly defined historical claim and return a scientifically useful negative result if no direct evidence is found: repositories checked, queries/variants, coverage limits and remaining uncertainty.\" historical name",
+      "records": [],
+      "diagnostic": "https://jsru.kb.nl/sru/sru?version=1.2&operation=searchRetrieve&query=%22Research+a+narrowly+defined+historical+claim+and+return+a+scientifically+useful+negative+result+if+no+direct+evidence+is+found%3A+repositories+checked%2C+queries%2Fvariants%2C+coverage+limits+and+remaining+uncertainty.%22+historical+name&startRecord=1&maximumRecords=20&recordSchema=ddd&x-collection=DDD_artikel&x-fields=OaiPmhIdentifier%2CdateString%2Czones%2Ctitle",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Delpher",
+      "repository": "Delpher",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Research a narrowly defined historical claim and return a scientifically useful negative result if no direct evidence is found: repositories checked, queries/variants, coverage limits and remaining uncertainty.\" transliteration",
+      "records": [],
+      "diagnostic": "https://jsru.kb.nl/sru/sru?version=1.2&operation=searchRetrieve&query=%22Research+a+narrowly+defined+historical+claim+and+return+a+scientifically+useful+negative+result+if+no+direct+evidence+is+found%3A+repositories+checked%2C+queries%2Fvariants%2C+coverage+limits+and+remaining+uncertainty.%22+transliteration&startRecord=1&maximumRecords=20&recordSchema=ddd&x-collection=DDD_artikel&x-fields=OaiPmhIdentifier%2CdateString%2Czones%2Ctitle",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Nationaal Archief",
+      "repository": "Nationaal Archief",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Research a narrowly defined historical claim and return a scientifically useful negative result if no direct evidence is found: repositories checked, queries/variants, coverage limits and remaining uncertainty.\" alias OR aliases",
+      "records": [
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/contact-publiek",
+          "title": "Contact",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/contact-publiek"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/zoekhulpen",
+          "title": "Zoekhulpen",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/zoekhulpen"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/archieven",
+          "title": "Archieven",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/archieven"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/fotos",
+          "title": "Foto's",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/fotos"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/open-data",
+          "title": "Open data",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/open-data"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/kwetsend-taalgebruik-en-terminologie",
+          "title": "Taalgebruik",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/kwetsend-taalgebruik-en-terminologie"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/contact-publiek",
+          "title": "070 - 3315400",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/contact-publiek"
+        }
+      ],
+      "diagnostic": "https://www.nationaalarchief.nl/onderzoeken/zoeken?searchTerm=%22Research+a+narrowly+defined+historical+claim+and+return+a+scientifically+useful+negative+result+if+no+direct+evidence+is+found%3A+repositories+checked%2C+queries%2Fvariants%2C+coverage+limits+and+remaining+uncertainty.%22+alias+OR+aliases",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Nationaal Archief",
+      "repository": "Nationaal Archief",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Research a narrowly defined historical claim and return a scientifically useful negative result if no direct evidence is found: repositories checked, queries/variants, coverage limits and remaining uncertainty.\" variant spelling",
+      "records": [
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/contact-publiek",
+          "title": "Contact",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/contact-publiek"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/zoekhulpen",
+          "title": "Zoekhulpen",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/zoekhulpen"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/archieven",
+          "title": "Archieven",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/archieven"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/fotos",
+          "title": "Foto's",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/fotos"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/open-data",
+          "title": "Open data",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/open-data"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/kwetsend-taalgebruik-en-terminologie",
+          "title": "Taalgebruik",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/kwetsend-taalgebruik-en-terminologie"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/contact-publiek",
+          "title": "070 - 3315400",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/contact-publiek"
+        }
+      ],
+      "diagnostic": "https://www.nationaalarchief.nl/onderzoeken/zoeken?searchTerm=%22Research+a+narrowly+defined+historical+claim+and+return+a+scientifically+useful+negative+result+if+no+direct+evidence+is+found%3A+repositories+checked%2C+queries%2Fvariants%2C+coverage+limits+and+remaining+uncertainty.%22+variant+spelling",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Nationaal Archief",
+      "repository": "Nationaal Archief",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Research a narrowly defined historical claim and return a scientifically useful negative result if no direct evidence is found: repositories checked, queries/variants, coverage limits and remaining uncertainty.\" transliteration",
+      "records": [
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/contact-publiek",
+          "title": "Contact",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/contact-publiek"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/zoekhulpen",
+          "title": "Zoekhulpen",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/zoekhulpen"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/archieven",
+          "title": "Archieven",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/archieven"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/fotos",
+          "title": "Foto's",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/fotos"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/open-data",
+          "title": "Open data",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/open-data"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/kwetsend-taalgebruik-en-terminologie",
+          "title": "Taalgebruik",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/kwetsend-taalgebruik-en-terminologie"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/contact-publiek",
+          "title": "070 - 3315400",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/contact-publiek"
+        }
+      ],
+      "diagnostic": "https://www.nationaalarchief.nl/onderzoeken/zoeken?searchTerm=%22Research+a+narrowly+defined+historical+claim+and+return+a+scientifically+useful+negative+result+if+no+direct+evidence+is+found%3A+repositories+checked%2C+queries%2Fvariants%2C+coverage+limits+and+remaining+uncertainty.%22+transliteration",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Nationaal Archief",
+      "repository": "Nationaal Archief",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Research a narrowly defined historical claim and return a scientifically useful negative result if no direct evidence is found: repositories checked, queries/variants, coverage limits and remaining uncertainty.\" historical name",
+      "records": [
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/contact-publiek",
+          "title": "Contact",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/contact-publiek"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/zoekhulpen",
+          "title": "Zoekhulpen",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/zoekhulpen"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/archieven",
+          "title": "Archieven",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/archieven"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/fotos",
+          "title": "Foto's",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/fotos"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/open-data",
+          "title": "Open data",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/open-data"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/kwetsend-taalgebruik-en-terminologie",
+          "title": "Taalgebruik",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/kwetsend-taalgebruik-en-terminologie"
+        },
+        {
+          "discovery_repository": "Nationaal Archief",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationaalarchief.nl/onderzoeken/contact-publiek",
+          "title": "070 - 3315400",
+          "date": [],
+          "url": "https://www.nationaalarchief.nl/onderzoeken/contact-publiek"
+        }
+      ],
+      "diagnostic": "https://www.nationaalarchief.nl/onderzoeken/zoeken?searchTerm=%22Research+a+narrowly+defined+historical+claim+and+return+a+scientifically+useful+negative+result+if+no+direct+evidence+is+found%3A+repositories+checked%2C+queries%2Fvariants%2C+coverage+limits+and+remaining+uncertainty.%22+historical+name",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave2",
+      "assignment_wave": 2
+    }
+  ],
+  "result_count": 28,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
