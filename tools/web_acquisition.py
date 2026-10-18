@@ -103,7 +103,8 @@ def bibliographic_queries(text):
         return ''.join(c for c in unicodedata.normalize('NFD',value) if not unicodedata.combining(c)).casefold()
     def add(value):
         title=' '.join(value.split()).strip(' «»“”".,;')
-        if not 20<=len(title)<=300 or len(title.split())<4:return
+        if not 20<=len(title)<=240 or len(title.split())<4:return
+        if '...' in title or '…' in title:return
         # ISBNs and page locators are not part of a title query.
         title=re.split(r'\s+ISBN\b|,\s*(?:τομ|τόμ|σελ|vol\b|pp\.)',title,flags=re.I)[0].strip(' .,;')
         key=re.sub(r'[^\w]+','',fold(title))

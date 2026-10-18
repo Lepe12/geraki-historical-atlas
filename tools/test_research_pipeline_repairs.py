@@ -13,6 +13,7 @@ class PipelineRepairs(unittest.TestCase):
         queries=bibliographic_queries(text)
         self.assertTrue(any('Γαληνοτάτη' in q for q in queries))
         self.assertIn('Espionage in the 16th Century Mediterranean: Secret Diplomacy and Rivalry',queries)
+        self.assertEqual(bibliographic_queries('References: «With the outbreak of the war, ... within the Greek territory»'),[])
         self.assertEqual(bibliographic_queries('He said "This is just an unrelated narrative quotation".'),[])
 
     def setUp(self):

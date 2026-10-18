@@ -58,6 +58,10 @@ citation_history=OUT/'citation_chase_report.json'
 citation_searches=json.loads(citation_history.read_text()).get('searches',[]) if citation_history.exists() else []
 citation_queries_seen={x['query'] for x in citation_searches}
 citation_limit=max(1,min(12,int(os.getenv('PCT_CITATION_QUERY_LIMIT','6'))))
+citation_source_limit=2
+citation_source_counts={}
+for prior in citation_searches:
+    parent=prior.get('parent_source_url');citation_source_counts[parent]=citation_source_counts.get(parent,0)+1
 
 def safe_name(s):
     return re.sub(r"[^A-Za-z0-9_.-]+","_",str(s))[:180]
@@ -126,8 +130,9 @@ for position,x in enumerate(items):
                         rec['status']=acquired['status']
                         rec['acquired_source_url']=acquired['url']
                         for query in acquired.get('bibliographic_queries',[]):
-                            if query in citation_queries_seen or len(citation_queries_seen)>=citation_limit or time.monotonic()-started>=budget:continue
+                            if query in citation_queries_seen or len(citation_queries_seen)>=citation_limit or citation_source_counts.get(acquired['url'],0)>=citation_source_limit or time.monotonic()-started>=budget:continue
                             citation_queries_seen.add(query)
+                            citation_source_counts[acquired['url']]=citation_source_counts.get(acquired['url'],0)+1
                             status,leads,diagnostic=search_web('"'+query+'"',os.getenv('PCT_RESEARCH_LANE','travellers'),'Citation Chase')
                             for lead in leads:
                                 lead.update(parent_source_url=acquired['url'],citation_query=query,source_lead=True)
@@ -156,7 +161,7 @@ for position,x in enumerate(items):
 checkpoint(deferred)
 print("ACQUISITION",len(results),"acquired",sum(x.get('status') in ('TEXT_ACQUIRED','DIGITAL_METADATA_ACQUIRED') for x in results),"deferred",len(deferred),"held",len(held))
 
-(OUT/'citation_chase_report.json').write_text(json.dumps({'searches':citation_searches,'verification_status':'UNVERIFIED_DISCOVERY','bounded_queries':citation_limit},ensure_ascii=False,indent=2))
+(OUT/'citation_chase_report.json').write_text(json.dumps({'searches':citation_searches,'verification_status':'UNVERIFIED_DISCOVERY','bounded_queries':citation_limit,'per_source_query_limit':citation_source_limit},ensure_ascii=False,indent=2))
 lane_path=pathlib.Path('lane_discovery')/(os.getenv('PCT_RESEARCH_LANE','travellers')+'.json')
 if citation_searches and lane_path.exists():
     discovery=json.loads(lane_path.read_text())

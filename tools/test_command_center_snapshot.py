@@ -50,6 +50,11 @@ def main():
         assert refs[0]['text_locator']['scan_indexes_0_based']==[8]
         assert refs[0]['topical_match']['category']=='POSSIBLE_TARGET'
         assert refs[0]['verified'] is False and not out['claims']
+        (base/'travellers/library_acquisition').mkdir()
+        (base/'travellers/library_acquisition/acquisition_report.json').write_text(json.dumps({'results':[{'url':reference['url'],'source_lead':True}]}))
+        out=build(r,run)
+        assert out['discoveries'][0]['request_source_lead'] is True
+        assert not out['claims']
         latest=r/"latest.json";latest.write_text('{"run_id":"200"}')
         assert not publish_latest(latest,{"run_id":"123"},'{"run_id":"123"}')
         assert json.loads(latest.read_text())["run_id"]=="200"

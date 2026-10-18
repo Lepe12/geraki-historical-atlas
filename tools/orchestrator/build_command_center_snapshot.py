@@ -97,6 +97,8 @@ def discovery_results(run_root:Path,request=None):
             })
         # A named passage is a source reference even when its action/date is
         # unresolved. Publish it as a provisional discovery, never as a claim.
+        acquired=read(root/'library_acquisition/acquisition_report.json',{})
+        requested_sources={r.get('url') for r in acquired.get('results',[]) if r.get('source_lead') and r.get('url')}
         extracted=read(root/'structured_output/extracted_findings.json',{})
         for finding in extracted.get('findings',[]):
             entity=finding.get('target_entity') or {}
@@ -111,6 +113,7 @@ def discovery_results(run_root:Path,request=None):
                 'url':finding.get('url'),'context_excerpt':excerpt,
                 'text_locator':finding.get('locator') or {},'source_type':finding.get('source_type'),
                 'reference_kind':'ACQUIRED_TEXT_REFERENCE','finding_id':finding.get('finding_id'),
+                'request_source_lead':finding.get('url') in requested_sources,
                 'evidence_state':'ACQUIRED','triage_status':'REVIEW_REQUIRED',
                 'triage_reasons':list(uncertainty),
                 'topical_match':{'category':'POSSIBLE_TARGET','reason':'ACQUIRED_TEXT_MENTION_NOT_EVENT',
@@ -140,7 +143,7 @@ def discovery_results(run_root:Path,request=None):
         row['contributing_lanes']=[row['lane']]
         row['repositories']=[row.get('repository')]
         grouped[key]=row;unique.append(row)
-    unique.sort(key=lambda r:r.get('reference_kind')!='ACQUIRED_TEXT_REFERENCE')
+    unique.sort(key=lambda r:(r.get('reference_kind')!='ACQUIRED_TEXT_REFERENCE',not r.get('request_source_lead',False)))
     return unique,coverage
 
 def request_id_for(run_root:Path):
