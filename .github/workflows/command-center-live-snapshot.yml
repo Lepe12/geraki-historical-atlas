@@ -7,6 +7,7 @@ on:
     paths:
       - 'evidence/runs/*/JARVIS_STATE_BOARD.json'
       - 'tools/orchestrator/build_command_center_snapshot.py'
+      - 'tools/orchestrator/build_research_history.py'
       - 'tools/research_focus.py'
       - 'tools/research_relevance.py'
       - 'tools/test_command_center_snapshot.py'
@@ -32,6 +33,7 @@ jobs:
         run: |
           python3 -m compileall -q tools/orchestrator/build_command_center_snapshot.py tools/test_command_center_snapshot.py
           python3 tools/test_command_center_snapshot.py
+          python3 tools/test_research_history.py
 
       - id: run
         name: Resolve latest durable JARVIS run

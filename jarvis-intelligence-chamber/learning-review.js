@@ -16,25 +16,25 @@
   const batchSize=50;
   const reader=document.createElement("section");
   reader.className="learning-source";
-  reader.innerHTML='<label>PDF PAGE <input type="number" min="1" value="1" aria-label="PDF page number" style="width:80px"></label><small class="coverage"></small><pre style="white-space:pre-wrap;max-height:240px;overflow:auto;user-select:text"></pre>';
+  reader.innerHTML='<label>Σελίδα PDF <input type="number" min="1" value="1" aria-label="Αριθμός σελίδας PDF" style="width:80px"></label><small class="coverage"></small><pre style="white-space:pre-wrap;max-height:240px;overflow:auto;user-select:text"></pre>';
   list.before(reader);
   const pageInput=reader.querySelector("input"),pageText=reader.querySelector("pre"),coverage=reader.querySelector(".coverage");
   function showPage(){
     const n=Math.max(1,Math.min(current.pages.length,Number(pageInput.value)||1));
     pageInput.value=n;pageInput.max=current.pages.length||1;
-    pageText.textContent=current.pages[n-1]?.text||"No extracted text on this page. Image-only pages require OCR.";
+    pageText.textContent=current.pages[n-1]?.text||"Δεν βρέθηκε κείμενο σε αυτή τη σελίδα. Οι σαρωμένες σελίδες απαιτούν OCR.";
   }
   pageInput.addEventListener("change",showPage);
   const pager=document.createElement("div");pager.className="learning-actions";
   const previous=document.createElement("button"),next=document.createElement("button"),position=document.createElement("span");
-  previous.type=next.type="button";previous.textContent="PREVIOUS 50";next.textContent="NEXT 50";
+  previous.type=next.type="button";previous.textContent="Προηγούμενες 50";next.textContent="Επόμενες 50";
   pager.append(previous,position,next);list.after(pager);
   previous.addEventListener("click",()=>{reviewPage=Math.max(0,reviewPage-1);render();});
   next.addEventListener("click",()=>{reviewPage++;render();});
   function render(){
     reader.hidden=!current.pages.length;
     const readable=current.pages.filter(p=>p.text.trim().length>=40).length;
-    coverage.textContent=current.pages.length?`${current.pages.length} / ${current.pages.length} pages read · ${readable} with text · ${current.pages.length-readable} blank or requiring OCR. PDF page numbers; printed pagination unverified.`:"";
+    coverage.textContent=current.pages.length?`${current.pages.length} / ${current.pages.length} pages read · ${readable} with text · ${current.pages.length-readable} blank or requiring OCR. Αριθμός σελίδας PDFs; printed pagination unverified.`:"";
     showPage();
     reviewPage=Math.min(reviewPage,Math.max(0,Math.ceil(current.items.length/batchSize)-1));
     const offset=reviewPage*batchSize;
@@ -44,8 +44,8 @@
     const accepted=current.items.filter(x=>x.status==="accepted").length;
     const rejected=current.items.filter(x=>x.status==="rejected").length;
     const pending=current.items.length-accepted-rejected;
-    summary.textContent=current.items.length?accepted+" accepted · "+rejected+" rejected · "+pending+" pending":"Δεν υπάρχουν ακόμη στοιχεία προς έλεγχο.";
-    list.innerHTML=current.items.length?current.items.slice(offset,offset+batchSize).map((x,j)=>'<article class="learning-item" data-i="'+(offset+j)+'" data-status="'+esc(x.status)+'"><div class="learning-item-head"><span>'+esc(x.saved?"ΑΠΟΘΗΚΕΥΜΕΝΟ":x.extraction_kind==="excerpt"?"EXCERPT — UNVERIFIED":x.type.toUpperCase())+'</span><small>PAGE '+esc(x.page||"—")+' · '+(x.confidence==null?'CONFIDENCE UNASSESSED':Math.round(x.confidence*100)+'%')+'</small></div><div class="learning-item-text" contenteditable="'+(x.editing?"true":"false")+'">'+esc(x.text)+'</div><div class="learning-actions"><button data-act="accept">ΕΓΚΡΙΣΗ</button><button data-act="reject">ΑΠΟΡΡΙΨΗ</button><button data-act="edit">'+(x.editing?"ΤΕΛΟΣ ΕΠΕΞΕΡΓΑΣΙΑΣ":"ΕΠΕΞΕΡΓΑΣΙΑ")+'</button></div></article>').join(""):'<div class="learning-empty">Επιλέξτε PDF και πατήστε Ανάλυση. Εδώ θα εμφανιστούν τα στοιχεία για έλεγχο.</div>';
+    summary.textContent=current.items.length?accepted+" εγκεκριμένα · "+rejected+" απορριφθέντα · "+pending+" προς έλεγχο":"Δεν υπάρχουν ακόμη στοιχεία προς έλεγχο.";
+    list.innerHTML=current.items.length?current.items.slice(offset,offset+batchSize).map((x,j)=>'<article class="learning-item" data-i="'+(offset+j)+'" data-status="'+esc(x.status)+'"><div class="learning-item-head"><span>'+esc(x.saved?"ΑΠΟΘΗΚΕΥΜΕΝΟ":x.extraction_kind==="excerpt"?"ΑΠΟΣΠΑΣΜΑ — ΑΝΕΠΙΒΕΒΑΙΩΤΟ":x.type.toUpperCase())+'</span><small>PAGE '+esc(x.page||"—")+' · '+(x.confidence==null?'ΧΩΡΙΣ ΕΚΤΙΜΗΣΗ ΒΕΒΑΙΟΤΗΤΑΣ':Math.round(x.confidence*100)+'%')+'</small></div><div class="learning-item-text" contenteditable="'+(x.editing?"true":"false")+'">'+esc(x.text)+'</div><div class="learning-actions"><button data-act="accept">ΕΓΚΡΙΣΗ</button><button data-act="reject">ΑΠΟΡΡΙΨΗ</button><button data-act="edit">'+(x.editing?"ΤΕΛΟΣ ΕΠΕΞΕΡΓΑΣΙΑΣ":"ΕΠΕΞΕΡΓΑΣΙΑ")+'</button></div></article>').join(""):'<div class="learning-empty">Επιλέξτε PDF και πατήστε Ανάλυση. Εδώ θα εμφανιστούν τα στοιχεία για έλεγχο.</div>';
     save.disabled=saving||!current.items.some(x=>x.status==="accepted"&&!x.saved);
   }
 
@@ -136,14 +136,14 @@
         current.items=[];
         setState("NO TEXT LAYER — OCR REQUIRED","error");
         summary.textContent="The PDF appears scanned or image-only. OCR is required before knowledge extraction.";
-        list.innerHTML='<div class="learning-empty">No usable text layer was found in this PDF. NABOU//X did not invent knowledge from an unreadable source.</div>';
+        list.innerHTML='<div class="learning-empty">Δεν βρέθηκε αναγνώσιμο κείμενο στο PDF. Απαιτείται OCR πριν εξαχθούν προτάσεις.</div>';
         return;
       }
       setState("BUILDING REVIEW","working");
       current.items=proposals(current.pages);
       setState(current.items.length?"Ελέγξτε τα στοιχεία πριν την αποθήκευση":"TEXT FOUND — EXTRACTION NEEDS REVIEW",current.items.length?"ready":"error");
       render();
-      summary.textContent+=" · Automatic candidates and verbatim excerpts; OCR and historical verification pending.";
+      summary.textContent+=" · Αυτόματες προτάσεις και αποσπάσματα· απαιτείται έλεγχος OCR και ιστορική επαλήθευση.";
     }catch(e){
       setState("Αποτυχία ανάγνωσης — δοκιμάστε ξανά ή επιλέξτε άλλο PDF","error");
     }finally{

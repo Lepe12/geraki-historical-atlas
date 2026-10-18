@@ -15,6 +15,7 @@ on:
       - "data.json"
       - "icons/**"
       - "generate_diorama_assets.py"
+      - "tools/orchestrator/build_research_history.py"
       - ".github/workflows/atlas-pages.yml"
   workflow_dispatch:
 
@@ -40,6 +41,7 @@ jobs:
 
       - name: Stage atlas
         run: |
+          python3 tools/orchestrator/build_research_history.py
           mkdir -p _site/icons
           rsync -a --exclude '.git' --exclude '.github' --exclude '_site' ./ _site/
 

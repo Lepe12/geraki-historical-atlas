@@ -13,8 +13,8 @@ test('results panel follows run change and does not call blockers contradictions
  const scope={document:{getElementById:el,querySelectorAll:()=>[],body:{dataset:{}},createElement:()=>({})},window:{addEventListener:(n,f)=>listeners.set(n,f),dispatchEvent(){}},CustomEvent:class{},MutationObserver:class{observe(){}},connectResearchFeed:x=>callbacks=x,missionState,selectResearchRun(){},waitForResearchRequest(){},URL,URLSearchParams,globalThis:{},console};
  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'research-ui.js'),'utf8').replace(/^import[^\n]*\n/,''),scope);
  callbacks.onSnapshot({...snapshot('100'),claims:[{title:'previous claim'}],blockers:[{repository:'access blocker'}]});callbacks.onSnapshot({...snapshot('200'),agents:[{id:'greek',status:'RUNNING'}],mission:{status:'RUNNING'}});
- assert.equal(el('resultsRun').textContent,'RUN 200');assert.ok(!el('resultsList').innerHTML.includes('previous claim'));
- listeners.get('jarvis:results-filter')({detail:{filter:'contradictions'}});assert.match(el('resultsList').innerHTML,/No recorded contradictions/);assert.ok(!el('resultsList').innerHTML.includes('access blocker'));
+ assert.equal(el('resultsRun').textContent,'Έρευνα 200');assert.ok(!el('resultsList').innerHTML.includes('previous claim'));
+ listeners.get('jarvis:results-filter')({detail:{filter:'contradictions'}});assert.match(el('resultsList').innerHTML,/Δεν έχουν καταγραφεί αντιφάσεις/);assert.ok(!el('resultsList').innerHTML.includes('access blocker'));
  callbacks.onSnapshot({...snapshot('200'),agents:[{id:'greek',status:'COMPLETED'}]});assert.equal(el('missionState').textContent,'COMPLETED');
  listeners.get('jarvis:results-filter')({detail:{filter:'all'}});
  callbacks.onSnapshot({...snapshot('200'),discoveries:[{title:'Unresolved lead',triage_status:'REVIEW_REQUIRED',verified:false}],coverage:[{repository:'Blocked catalogue',status:'REMOTE_RATE_LIMITED',queries:[{query:'test query',status:'REMOTE_RATE_LIMITED',hits:0}]}]});
@@ -29,9 +29,9 @@ test('results panel follows run change and does not call blockers contradictions
  assert.ok(el('resultsList').innerHTML.indexOf('Ιωάννης Καψής')<el('resultsList').innerHTML.indexOf('Ιωάννης Παπαδόπουλος'));
  listeners.get('jarvis:dispatch-accepted')({detail:{request_id:'ui-new'}});
  callbacks.onSnapshot({...snapshot('300'),request_id:'unrelated',claims:[{title:'wrong query'}]});
- assert.equal(el('resultsRun').textContent,'WAITING FOR YOUR RUN');assert.ok(!el('resultsList').innerHTML.includes('wrong query'));assert.ok(!el('resultsList').innerHTML.includes('Unresolved lead'));
+ assert.equal(el('resultsRun').textContent,'Αναμονή νέας έρευνας');assert.ok(!el('resultsList').innerHTML.includes('wrong query'));assert.ok(!el('resultsList').innerHTML.includes('Unresolved lead'));
  callbacks.onSnapshot({...snapshot('301'),request_id:'ui-new',discoveries:[{title:'Own result'}]});
- assert.equal(el('resultsRun').textContent,'RUN 301');assert.match(el('resultsList').innerHTML,/Own result/);
+ assert.equal(el('resultsRun').textContent,'Έρευνα 301');assert.match(el('resultsList').innerHTML,/Own result/);
  callbacks.onSnapshot({...snapshot('301'),research_answer:{schema:'pct-semantic-answer-v1',status:'BLOCKED_CONFIGURATION',answer_sections:[],claims:[]}});
  assert.match(el('resultsList').innerHTML,/Δεν έχει συνδεθεί ακόμη μοντέλο/);
  callbacks.onSnapshot({...snapshot('301'),research_answer:{schema:'pct-semantic-answer-v1',status:'MODEL_ANSWER_PENDING_HUMAN_REVIEW',

@@ -32,25 +32,28 @@ for(const group of ["archive","analysis"]){
   section.className="nxs-agent-group";
   section.dataset.group=group;
   const members=agentDefs.filter(x=>x[2]===group);
-  section.innerHTML='<header><strong>'+(group==="archive"?"ARCHIVE AGENTS":"ANALYSIS AGENTS")+'</strong><span>'+members.length+' NODES</span></header><div class="nxs-agent-list"></div>';
+  section.innerHTML='<header><strong>'+(group==="archive"?"Αρχειακοί ερευνητές":"Ερευνητές ανάλυσης")+'</strong><span>'+members.length+' μέλη</span></header><div class="nxs-agent-list"></div>';
   const list=section.querySelector(".nxs-agent-list");
   for(const [id,name] of members){
-    const row=document.createElement("div");
+    const row=document.createElement("button");
+    row.type="button";
+    row.addEventListener("click",()=>{openUniverse();window.dispatchEvent(new CustomEvent("jarvis:focus-agent",{detail:{agent_id:id}}));});
     row.className="nxs-agent nx-agent";
     row.dataset.agent=id;
     row.dataset.activity="idle";
-    row.innerHTML='<span class="nxs-agent-signal"></span><span class="nxs-agent-name"></span><small class="nxs-agent-state">STANDBY</small>';
+    row.innerHTML='<span class="nxs-agent-signal"></span><span class="nxs-agent-name"></span><small class="nxs-agent-state">Σε αναμονή</small>';
     row.querySelector(".nxs-agent-name").textContent=name;
+    row.setAttribute("aria-label","Προβολή ερευνητή: "+name);
     list.append(row);
   }
   agentGroups.append(section);
 }
 
 const titles={
-  universe:"Universe",
-  agents:"Agents",
+  universe:"Επισκόπηση",
+  agents:"Ερευνητές",
   sources:"Sources",
-  findings:"Findings",
+  findings:"Η έρευνά μου",
   pdf:"PDF Review",
   history:"History",
   activity:"Activity"
@@ -86,6 +89,8 @@ function configureResults(mode){
   const head=results.querySelector(".results-head span");
   const summary=results.querySelector(".results-summary");
   results.dataset.nxsMode=mode;
+  results.scrollTop=0;
+  $("discoveryDetail").hidden=true;
   if(head)head.textContent=titles[mode]||"Findings";
   if(summary)summary.dataset.mode=mode;
   if(mode==="history"){
@@ -167,10 +172,11 @@ new MutationObserver(()=>{
 }).observe(learning,{attributes:true,attributeFilter:["class"]});
 
 document.addEventListener("keydown",event=>{
-  if(event.key==="Escape"&&!detail?.contains(document.activeElement))openUniverse();
+  if(event.key==="Escape"){openUniverse();nav.find(button=>button.dataset.nxsView==="universe")?.focus();}
 });
 
 connectResearchFeed({
+  onState:mode=>{const el=document.querySelector(".nxs-status small");if(el)el.textContent=({LIVE:"Ζωντανή σύνδεση",SNAPSHOT:"Αποθηκευμένα δεδομένα",OFFLINE:"Χωρίς σύνδεση",CONNECTING:"Σύνδεση…"})[mode]||"Σύνδεση: "+mode;},
   onSnapshot:snapshot=>{
     const agents=snapshot?.agents||[];
     document.querySelectorAll(".nxs-agent").forEach(row=>{
@@ -178,17 +184,17 @@ connectResearchFeed({
       const status=String(agent?.status||agent?.phase||"STANDBY").toUpperCase();
       const active=!!agent?.status&&!isTerminal(agent.status);
       row.dataset.activity=active?"active":"idle";
-      row.querySelector(".nxs-agent-state").textContent=status;
+      row.querySelector(".nxs-agent-state").textContent=({STANDBY:"Σε αναμονή",IDLE:"Ανενεργός",RUNNING:"Σε εξέλιξη",COMPLETED:"Ολοκληρώθηκε",BLOCKED:"Εμπόδιο",FAILED:"Αποτυχία"})[status]||status;
     });
   },
   onReset:()=>{
     document.querySelectorAll(".nxs-agent").forEach(row=>{
       row.dataset.activity="idle";
-      row.querySelector(".nxs-agent-state").textContent="STANDBY";
+      row.querySelector(".nxs-agent-state").textContent="Σε αναμονή";
     });
   }
 });
 
-activeNav("universe");
+if(!results.classList.contains("hidden"))activeNav("findings");else activeNav("universe");
 hideAgents();
 hideActivity();

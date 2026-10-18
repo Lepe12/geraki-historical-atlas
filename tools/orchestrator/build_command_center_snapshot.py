@@ -250,4 +250,7 @@ if __name__=="__main__":
     payload=json.dumps(data,ensure_ascii=False,indent=2)+"\n";out.write_text(payload,encoding="utf-8")
     if a.latest:
         publish_latest(repo/a.latest,data,payload)
+    from build_research_history import build_history
+    if out.parent.name == "runs":
+        (out.parent.parent/"index.json").write_text(json.dumps(build_history(out.parent.parent),ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print("COMMAND CENTER SNAPSHOT",data["run_id"],"agents",data["metrics"]["agents"],"claims",data["metrics"]["candidate_claims"],"specialist records",data["metrics"]["specialist_discovery_records"])
