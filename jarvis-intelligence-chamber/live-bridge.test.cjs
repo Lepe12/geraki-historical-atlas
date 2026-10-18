@@ -16,6 +16,9 @@ test('results panel follows run change and does not call blockers contradictions
  callbacks.onSnapshot({...snapshot('100'),claims:[{title:'previous claim'}],blockers:[{repository:'access blocker'}]});callbacks.onSnapshot({...snapshot('200'),agents:[{id:'greek',status:'RUNNING'}],mission:{status:'RUNNING'}});
  assert.equal(el('resultsRun').textContent,'Έρευνα 200');assert.ok(!el('resultsList').innerHTML.includes('previous claim'));
  listeners.get('jarvis:results-filter')({detail:{filter:'contradictions'}});assert.match(el('resultsList').innerHTML,/Δεν έχουν καταγραφεί αντιφάσεις/);assert.ok(!el('resultsList').innerHTML.includes('access blocker'));
+ callbacks.onSnapshot({...snapshot('201'),contradictions:{records:[{title:'Dates differ',status:'MODEL_FLAGGED_NOT_ADJUDICATED',claims:[{kind:'source_statement',statement:'Source A reports a date',quote:'<unsafe>',source_occurrences:[{title:'Source A',url:'https://example.org/a'}]},{kind:'hypothesis',statement:'A possible explanation',quote:'Source B excerpt',source_occurrences:[{url:'javascript:alert(1)'}]}]}]}});
+ assert.match(el('resultsList').innerHTML,/Πιθανή αντίφαση/);assert.match(el('resultsList').innerHTML,/Η πηγή δηλώνει/);assert.match(el('resultsList').innerHTML,/Υπόθεση μοντέλου/);assert.match(el('resultsList').innerHTML,/&lt;unsafe&gt;/);assert.ok(!el('resultsList').innerHTML.includes('href="javascript:'));
+
  callbacks.onSnapshot({...snapshot('200'),agents:[{id:'greek',status:'COMPLETED'}]});assert.equal(el('missionState').textContent,'COMPLETED');
  listeners.get('jarvis:results-filter')({detail:{filter:'all'}});
  callbacks.onSnapshot({...snapshot('200'),discoveries:[{title:'Unresolved lead',triage_status:'REVIEW_REQUIRED',verified:false}],coverage:[{repository:'Blocked catalogue',status:'REMOTE_RATE_LIMITED',queries:[{query:'test query',status:'REMOTE_RATE_LIMITED',hits:0}]}]});

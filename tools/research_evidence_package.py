@@ -97,6 +97,12 @@ def build(root, request=None):
             item['bibliography']=bibliography(row);item['classification']=source_classification(row)
         elif not item['bibliography'].get('creators'):
             item['bibliography']['creators']=bibliography(row)['creators']
+        incoming=bibliography(row)
+        for field,value in incoming.items():
+            if value and not item['bibliography'].get(field):item['bibliography'][field]=value
+        classification=source_classification(row)
+        if item['classification']['category']=='UNCLASSIFIED' and classification['category']!='UNCLASSIFIED':
+            item['classification']=classification
         if row.get('status') and row['status'] not in item['acquisition_statuses']:item['acquisition_statuses'].append(row['status'])
         return sid
     for lane_root in sorted(root.iterdir()):

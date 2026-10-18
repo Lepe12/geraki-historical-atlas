@@ -39,6 +39,18 @@ class EvidencePackage(unittest.TestCase):
         self.assertEqual(source_classification({'source_type':'PDF_TEXT'})['category'],'UNCLASSIFIED')
         self.assertEqual(source_classification({'url':'https://en.wikipedia.org/wiki/A'})['category'],'UNVERIFIED_WEB_REFERENCE')
 
+    def test_acquisition_can_enrich_sparse_catalogue_without_confirming_classification(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td);lane=root/'travellers'
+            (lane/'lane_discovery').mkdir(parents=True);(lane/'library_acquisition').mkdir()
+            (lane/'lane_discovery/travellers.json').write_text(json.dumps({'results':[{'url':'https://example.org/source','title':'Letters'}]}))
+            (lane/'library_acquisition/acquisition_report.json').write_text(json.dumps({'results':[{'url':'https://example.org/source','title':'Letters','source_type':'PRIMARY_FACSIMILE','year':1621,'creator':['Reported Author']}]}))
+            source=build(root)['sources'][0]
+            self.assertEqual(source['classification']['category'],'PRIMARY_SOURCE_REPORTED')
+            self.assertFalse(source['classification']['confirmed'])
+            self.assertEqual(source['bibliography']['publication_date'],1621)
+            self.assertEqual(source['bibliography']['creators'],['Reported Author'])
+
     def test_evaluation_does_not_claim_independence_or_undefined_perfection(self):
         self.assertIsNone(metrics([True],[False])['precision'])
         self.assertEqual(metrics([True],[False])['recall'],0)
