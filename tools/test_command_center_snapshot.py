@@ -53,7 +53,8 @@ def main():
         (base/'travellers/library_acquisition').mkdir()
         (base/'travellers/library_acquisition/acquisition_report.json').write_text(json.dumps({'results':[{'url':reference['url'],'source_lead':True}]}))
         out=build(r,run)
-        assert out['discoveries'][0]['request_source_lead'] is True
+        assert out['discoveries'][0]['request_source_lead'] is False
+        assert out['evidence_package']['quality']['verified_promotions']==0
         assert not out['claims']
         latest=r/"latest.json";latest.write_text('{"run_id":"200"}')
         assert not publish_latest(latest,{"run_id":"123"},'{"run_id":"123"}')

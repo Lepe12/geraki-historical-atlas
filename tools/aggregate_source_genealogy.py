@@ -20,7 +20,7 @@ def norm_url(v):
         u=urllib.parse.urlsplit(str(v))
         host=u.netloc.casefold().replace("www.","")
         path=re.sub(r"/+$","",u.path)
-        return host+path
+        return host+path+('?' + u.query if u.query else '')
     except Exception:
         return str(v).strip().casefold()
 
@@ -30,7 +30,8 @@ def stable_id(rec):
         s=str(ident).strip()
         if s.startswith(("http://","https://")):
             return ("url",norm_url(s))
-        return ("identifier",s.casefold())
+        namespace='GLOBAL' if s.startswith(('(OCoLC)','10.')) else str(rec.get('discovery_repository') or rec.get('repository') or '')
+        return ("identifier",namespace+'|'+s.casefold())
     url=rec.get("url")
     if url:return ("url",norm_url(url))
     return None

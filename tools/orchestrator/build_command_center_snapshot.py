@@ -5,6 +5,7 @@ import argparse,datetime,json,sys
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parent.parent))
 from research_relevance import identity, assess
+from research_evidence_package import build as build_evidence_package
 
 LANE_LABELS={
  "greek":"Greek","travellers":"Travellers","spanish_simancas":"Simancas","venetian":"Venetian","french":"French",
@@ -59,7 +60,8 @@ def research_request(run_root:Path):
         if req:
             return {
               "target":req.get("target"),"aliases":req.get("aliases") or [],
-              "date_range":req.get("date_range"),"purpose":req.get("purpose")
+              "date_range":req.get("date_range"),"purpose":req.get("purpose"),
+              "source_leads":req.get("source_leads") or []
             }
     return {}
 
@@ -98,7 +100,7 @@ def discovery_results(run_root:Path,request=None):
         # A named passage is a source reference even when its action/date is
         # unresolved. Publish it as a provisional discovery, never as a claim.
         acquired=read(root/'library_acquisition/acquisition_report.json',{})
-        requested_sources={r.get('url') for r in acquired.get('results',[]) if r.get('source_lead') and r.get('url')}
+        requested_sources={r.get('url') if isinstance(r,dict) else r for r in (request or {}).get('source_leads',[])}
         extracted=read(root/'structured_output/extracted_findings.json',{})
         for finding in extracted.get('findings',[]):
             entity=finding.get('target_entity') or {}
@@ -107,6 +109,7 @@ def discovery_results(run_root:Path,request=None):
             if uncertainty & {'FICTION_OR_BOOK_REVIEW_CONTEXT','CONFLICTING_GIVEN_NAME','DATE_OUTSIDE_SCOPE'}:continue
             excerpt=finding.get('context_excerpt') or finding.get('evidence_excerpt')
             if not excerpt:continue
+            identity_hold=bool(uncertainty & {'EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW','SURNAME_IDENTITY_UNRESOLVED'})
             discoveries.append({
                 'lane':lane,'identifier':finding.get('identifier') or finding.get('url'),
                 'title':finding.get('title'),'repository':finding.get('repository'),
@@ -116,7 +119,8 @@ def discovery_results(run_root:Path,request=None):
                 'request_source_lead':finding.get('url') in requested_sources,
                 'evidence_state':'ACQUIRED','triage_status':'REVIEW_REQUIRED',
                 'triage_reasons':list(uncertainty),
-                'topical_match':{'category':'POSSIBLE_TARGET','reason':'ACQUIRED_TEXT_MENTION_NOT_EVENT',
+                'topical_match':{'category':'CONTEXT_ONLY' if identity_hold else 'POSSIBLE_TARGET',
+                                  'reason':'IDENTITY_UNRESOLVED' if identity_hold else 'ACQUIRED_TEXT_MENTION_NOT_EVENT',
                                   'matched_name':entity['observed_names'][0],'identity_verified':False},
                 'verified':False,
             })
@@ -220,6 +224,15 @@ def build(repo:Path,run_id:str):
     summary=board.get("summary") or {}
     lane_statuses=[a['status'] for a in agents if a['kind']=='research_lane']
     mission_status=('UNKNOWN' if not lane_statuses else 'FAILED' if all(v=='FAILED' for v in lane_statuses) else 'PARTIAL' if any(v!='COMPLETED' for v in lane_statuses) else 'COMPLETED')
+    package=build_evidence_package(run_root,request)
+    passage_lookup={p['passage_id']:p for p in package['passages']}
+    source_lookup={s['source_id']:s for s in package['sources']}
+    for row in discoveries:
+        passage=passage_lookup.get(row.get('lane','')+':'+str(row.get('finding_id')))
+        if passage:
+            row['evidence_record']={k:v for k,v in passage.items() if k!='acquired_text_excerpt'}
+            row['bibliography']=source_lookup.get(passage['source_id'],{}).get('bibliography')
+            row['source_classification']=source_lookup.get(passage['source_id'],{}).get('classification')
     return {
       "schema":"pct-command-center-live-v1",
       "project":"piratecartography","run_id":run_id,"request_id":request_id,
@@ -252,6 +265,7 @@ def build(repo:Path,run_id:str):
                          'lanes':answers,'verified_claims':0,'rule':'Source-attributed findings are not verified historical conclusions.'},
       "discoveries":discoveries,
       "coverage":coverage,
+      "evidence_package":package,
       "evidence_url":f"https://github.com/Lepe12/geraki-historical-atlas/tree/main/evidence/runs/{run_id}",
       "contradictions":{
         "status":"SEARCH_OUTPUT_NOT_ADJUDICATED",

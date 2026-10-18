@@ -63,6 +63,17 @@ class ResearchFocusTests(unittest.TestCase):
         row['description']='Letters concerning Pietro Lanza, the corsair.'
         self.assertEqual(topical_match(row,focus)['category'],'TARGET_MATCH')
 
+    def test_biographical_subject_without_generic_history_keyword_is_acquired(self):
+        req={'target':'Πέτρος Λάντζας','aliases':['Pietro Lanza']}
+        for title in ['Από τη Γαληνοτάτη στον Καθολικότατο: Οι φουρτούνες του Καπετάν-Πέτρου Λάντζα',
+                      'ΛΑΣΚΑΡΙΣ ΜΙΧΑΗΛ, Πέτρος Λάντζας: διοικητής της Πάργας']:
+            result=assess({'title':title},identity(req,req))
+            self.assertEqual(result['status'],'PRIORITY')
+            self.assertFalse(result['verified'])
+        self.assertEqual(assess({'title':'Pietro Lanza di Scalea'},identity(req,req))['status'],'REVIEW_REQUIRED')
+        other={'target':'William Rook','aliases':[]}
+        self.assertEqual(assess({'title':'Letters of William Rook'},identity(other,other))['status'],'PRIORITY')
+
     def test_query_or_flag_is_not_source_content(self):
         row={'title':'Γενική ναυτική ιστορία','query':self.target,'source_lead':True,'url':'https://example/Ιωάννη-Καψή'}
         self.assertEqual(topical_match(row,self.focus)['category'],'UNMATCHED')

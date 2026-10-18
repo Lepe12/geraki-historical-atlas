@@ -8,6 +8,13 @@ from orchestrator.build_command_center_snapshot import build
 TOOLS=pathlib.Path(__file__).parent.resolve()
 
 class PipelineRepairs(unittest.TestCase):
+    def test_citation_search_requires_matching_work_not_just_a_pdf(self):
+        from web_acquisition import citation_title_match
+        query='Los contactos de la Chimarra con el reino de Nápoles durante el siglo XVI'
+        self.assertTrue(citation_title_match(query,{'title':query}))
+        self.assertFalse(citation_title_match(query,{'title':'Codice Etico Gruppo Havant','digital_url':'https://example.org/file.pdf'}))
+        self.assertFalse(citation_title_match(query,{'title':'Pietro Lanza company history'}))
+
     def test_reference_sections_include_unquoted_academic_titles(self):
         text='Παραπομπές\n↑ «Από τη Γαληνοτάτη στον Καθολικότατο: Οι φουρτούνες του Καπετάν-Πέτρου Λάντζα»\nΠηγές[Επεξεργασία]\nGürkan, Emrah Safa (2012). Espionage in the 16th Century Mediterranean: Secret Diplomacy and Rivalry. Washington: University.\n'
         queries=bibliographic_queries(text)

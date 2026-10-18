@@ -35,6 +35,7 @@ HISTORY = re.compile(r'(?<!\w)(?:voyag|travel|reise|viaggio|relation\b|itinerar|
 GEO = re.compile(r'\bisland\b|\bisle\b|\bisola\b|\binsel\b|νησ|cyclad|aegean|egee|archipel|greece|grece|grecia|ελλα|harbour|harbor')
 OFF_TOPIC = re.compile(r'(?<!\w)(?:respirat|toxicolog|epidemiolog|mortality|morbidity|hadronic|butterflies|moths|soundtrack|milkshake schedule|cia reading room|proceedings of.*physics)')
 NOISE = re.compile(r'quintet|symphon|zeitschrift.{0,12}musik|musical|coleoptera|scolytinae|favorites$|\bpodcast\b|\blivestream\b|\btv\b|\byoutube\b')
+MODERN_DOCUMENT = re.compile(r'curriculum\s+vitae|codice\s+etico|code\s+of\s+ethics|general.part.model|statistical\s+bulletin|στατιστικ\w*\s+δελτι')
 
 
 def _clamp(value):
@@ -167,7 +168,8 @@ def assess(record, ident):
     elif ident.get('type') == 'place':
         if (name_match or regional) and geographic and history: status='PRIORITY'
         else: status='REVIEW_REQUIRED';reasons.append('PLACE_IDENTITY_UNRESOLVED')
-    elif name_match and history: status='PRIORITY'
+    elif name_match and (history or (focus['kind']=='person' and topical.get('matched_field') in ('title','description','subject'))):
+        status='PRIORITY';reasons.append('EXPLICIT_SUBJECT_NAME_ACQUISITION_NOT_VERIFICATION')
     else: status='REVIEW_REQUIRED';reasons.append('CONTEXT_UNRESOLVED')
 
     research_score=5 if (record.get('title') or record.get('identifier') or record.get('url')) else 0
@@ -190,12 +192,21 @@ def assess(record, ident):
             reasons.append('NO_TARGET_IDENTITY_MATCH')
     if fulltext_match:
         missing_context=fulltext_match['reason']=='FULLTEXT_NAME_WITHOUT_REQUEST_CONTEXT'
-        if missing_context and topical['category']!='TARGET_MATCH':
+        if fulltext_match['reason']=='FULLTEXT_EXTENDED_NAME_REQUIRES_REVIEW' and topical['category']!='TARGET_MATCH':
+            status='REVIEW_REQUIRED';research_score=min(research_score,65)
+            reasons.append('EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW')
+        elif missing_context and topical['category']!='TARGET_MATCH':
             status='REVIEW_REQUIRED';research_score=min(research_score,65)
             reasons.append('FULLTEXT_NAME_WITHOUT_REQUEST_CONTEXT')
         elif not OFF_TOPIC.search(title) and not (NOISE.search(title) and not (geographic and history)):
             status='PRIORITY';research_score=max(research_score,70)
             reasons.append('FULLTEXT_CONTEXT_REQUIRES_IDENTITY_REVIEW')
+
+    # A search-index hit or generic "history" token cannot make corporate,
+    # statistical or CV material a priority biography. Keep the lead visible.
+    if MODERN_DOCUMENT.search(title) and not name_match:
+        status='EXCLUDE_FROM_ACQUISITION';research_score=min(research_score,20)
+        reasons.append('UNRELATED_MODERN_DOCUMENT')
 
     return {
         'status':status,'score':score,'reasons':reasons,

@@ -160,7 +160,7 @@ def _topical_match_segment(record, focus):
               ('title','description','subject','context_excerpt','metadata_text','text','snippet')))
     places=[p for p in focus.get('places',[]) if _token_match(text,p)]
     roles=[r for r in focus.get('roles',[]) if _token_match(text,r)]
-    for name in focus['names']:
+    for name in sorted(focus['names'],key=len,reverse=True):
         words=_words(name)
         if focus['kind']=='person' and len(words)>=2:
             # Surname AND at least one given-name token; a matching given name
@@ -171,6 +171,10 @@ def _topical_match_segment(record, focus):
             pattern=name_pattern(words)
             name_hit=re.search(pattern,text)
             if name_hit:
+                suffix=text[name_hit.end():name_hit.end()+90]
+                if re.match(r'\s+(?:di|de|da|von|van)\s+[^\W\d_]+',suffix):
+                    return {'category':'POSSIBLE_TARGET','reason':'EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW',
+                            'matched_name':name,'places':places,'roles':roles}
                 local=text[max(0,name_hit.start()-180):name_hit.end()+180]
                 places=[p for p in focus.get('places',[]) if _token_match(local,p)]
                 roles=[r for r in focus.get('roles',[]) if _token_match(local,r)]

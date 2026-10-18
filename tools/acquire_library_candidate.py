@@ -6,7 +6,7 @@ LOCATED rather than being misreported as acquired or verified.
 """
 import json,pathlib,urllib.request,urllib.parse,datetime,re,os,time
 from request_context import load_request
-from web_acquisition import acquire as acquire_web
+from web_acquisition import acquire as acquire_web, citation_title_match
 from connectors.web_search import search as search_web
 from research_relevance import identity, rank, request_digest
 rf,req,ctx=load_request()
@@ -135,14 +135,16 @@ for position,x in enumerate(items):
                             citation_source_counts[acquired['url']]=citation_source_counts.get(acquired['url'],0)+1
                             status,leads,diagnostic=search_web('"'+query+'"',os.getenv('PCT_RESEARCH_LANE','travellers'),'Citation Chase')
                             for lead in leads:
-                                lead.update(parent_source_url=acquired['url'],citation_query=query,source_lead=True)
+                                lead.update(parent_source_url=acquired['url'],citation_query=query,
+                                            citation_discovered=True,source_origin='CITATION_CHASE',
+                                            citation_title_match=citation_title_match(query,lead))
                             citation_searches.append({'query':query,'parent_source_url':acquired['url'],'status':status,'diagnostic':diagnostic,'results':leads})
-                            for lead in [v for v in leads if v.get('digital_url')][:2]:
+                            for lead in [v for v in leads if v.get('citation_title_match') and (v.get('digital_url') or v.get('url'))][:2]:
                                 try:
-                                    cited=acquire_web(lead['digital_url'],OUT,follow=False)
+                                    cited=acquire_web(lead.get('digital_url') or lead['url'],OUT,follow=False)
                                     results.append({**lead,'files':cited['files'],'web_acquisition':cited,'status':cited['status'],'original_inspected':False,'verification_status':'NEEDS_EVIDENCE'})
                                 except Exception as exc:
-                                    citation_searches[-1].setdefault('acquisition_failures',[]).append({'url':lead['digital_url'],'code':type(exc).__name__})
+                                    citation_searches[-1].setdefault('acquisition_failures',[]).append({'url':lead.get('digital_url') or lead.get('url'),'code':type(exc).__name__})
                         for child in acquired.get('linked_documents',[]):
                             linked={**rec,'identifier':child['url'],'url':child['url'],
                                     'title':'Linked document: '+child['url'],'files':child['files'],

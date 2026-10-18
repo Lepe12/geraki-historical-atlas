@@ -46,6 +46,26 @@ class SectionExtraction(unittest.TestCase):
         self.assertEqual(row['decision'],'REVIEW_CONTEXT')
         self.assertIn('CONFLICTING_GIVEN_NAME',row['uncertainties'])
 
+    def test_hyphenated_other_name_and_extended_identity_are_held(self):
+        ctx={'target':'Pietro Lanza','aliases':['Pedro Lantzas'],'date_range':''}
+        source={'title':'Società e cultura in Sicilia','url':'https://example.org/book'}
+        rows=self.extract('Pietro Lanza was appointed in 1578.\n\nGiu-\nseppe Lanza was appointed in 1925.',ctx=ctx,source=source)
+        self.assertIn('CONFLICTING_GIVEN_NAME',rows[1]['uncertainties'])
+        self.assertEqual(rows[1]['decision'],'REVIEW_CONTEXT')
+        rows=self.extract('Pietro Lanza di Scalea was appointed in 1925.',ctx=ctx,source=source)
+        self.assertIn('EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW',rows[0]['uncertainties'])
+        self.assertEqual(rows[0]['decision'],'REVIEW_CONTEXT')
+        self.assertFalse(answer_report({'findings':rows})['findings'])
+        source['title']='Pietro Lanza biography'
+        rows=self.extract('Pedro Lantzas was appointed in 1578.',ctx=ctx,source=source)
+        self.assertEqual(rows[0]['decision'],'RETAIN_CANDIDATE')
+
+    def test_surname_does_not_inherit_identity_across_unbounded_document(self):
+        ctx={'target':'Pietro Lanza','aliases':[],'date_range':''}
+        source={'title':'A collection','url':'https://example.org/book'}
+        rows=self.extract('Pietro Lanza was appointed in 1578.\n\n'+('Unrelated text. '*150)+'\n\nLanza was appointed in 1925.',ctx=ctx,source=source)
+        self.assertEqual(len(rows),1)
+
     def test_fiction_not_promoted_and_date_unknown_preserved(self):
         row=self.extract('Στο μυθιστόρημα ο Νίκος Δέλτας αιχμαλώτισε πλοίο το 1578.')[0]
         self.assertEqual(row['decision'],'REVIEW_CONTEXT')

@@ -107,6 +107,7 @@ def text_match(record,focus):
                 if len(parts)<2:continue
                 pattern=name_pattern(parts)
                 for hit in re.finditer(r'(?<!\w)'+pattern+r'(?!\w)',text):
+                    extended=bool(re.match(r'\s+(?:di|de|da|von|van)\s+[^\W\d_]+',text[hit.end():hit.end()+90]))
                     local=text[max(0,hit.start()-240):hit.end()+240]
                     places=[p for p in focus.get('places',[]) if any(
                         re.search(r'(?<!\w)'+re.escape(norm(t))+r'(?!\w)',local)
@@ -115,7 +116,7 @@ def text_match(record,focus):
                     context_ok=bool(places) if focus.get('places') else bool(roles)
                     context_missing=bool(focus.get('places') or focus.get('roles')) and not context_ok
                     candidates.append({'category':'POSSIBLE_TARGET',
-                            'reason':'FULLTEXT_NAME_WITHOUT_REQUEST_CONTEXT' if context_missing else 'FULLTEXT_COMPLETE_NAME_REQUIRES_REVIEW',
+                            'reason':'FULLTEXT_EXTENDED_NAME_REQUIRES_REVIEW' if extended else 'FULLTEXT_NAME_WITHOUT_REQUEST_CONTEXT' if context_missing else 'FULLTEXT_COMPLETE_NAME_REQUIRES_REVIEW',
                             'matched_name':name,'places':places,'roles':roles,
                             'matched_excerpt':segment[max(0,offsets[hit.start()]-120):offsets[hit.end()-1]+451],
                             'identity_verified':False,'query_hypothesis':True})
@@ -134,7 +135,9 @@ def text_match(record,focus):
                             'matched_name':term,'places':places,'roles':roles,
                             'matched_excerpt':segment[max(0,offsets[hit.start()]-120):offsets[hit.end()-1]+451],
                             'identity_verified':False,'query_hypothesis':True})
-    return min(candidates,key=lambda x:x['reason']=='FULLTEXT_NAME_WITHOUT_REQUEST_CONTEXT') if candidates else None
+    order={'FULLTEXT_NAME_AND_CONTEXT_HYPOTHESIS':0,'FULLTEXT_COMPLETE_NAME_REQUIRES_REVIEW':0,
+           'FULLTEXT_NAME_WITHOUT_REQUEST_CONTEXT':1,'FULLTEXT_EXTENDED_NAME_REQUIRES_REVIEW':2}
+    return min(candidates,key=lambda x:order[x['reason']]) if candidates else None
 
 
 def merge_findings(records,focus):

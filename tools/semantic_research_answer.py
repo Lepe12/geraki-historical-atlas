@@ -6,6 +6,7 @@ review. Every accepted item must point to an actual supplied text quotation.
 """
 from __future__ import annotations
 import argparse
+import datetime
 import hashlib
 import json
 import os
@@ -16,7 +17,7 @@ import unicodedata
 
 sys.path.insert(0,str(Path(__file__).resolve().parent/'llm'))
 from llm_client import call
-from llm_router import route
+from llm_router import route, routing_summary
 
 VERSION='pct-semantic-answer-v1'
 ROLES=('evidence_extractor','adversarial_reviewer','synthesis')
@@ -46,7 +47,8 @@ def collect(run_root):
     groups={};seen=[];excluded=[]
     for p in sorted(Path(run_root).glob('*/structured_output/extracted_findings.json')):
         for f in read(p).get('findings',[]):
-            if {'FICTION_OR_BOOK_REVIEW_CONTEXT','CONFLICTING_GIVEN_NAME','DATE_OUTSIDE_SCOPE'} & set(f.get('uncertainties',[])):
+            if {'FICTION_OR_BOOK_REVIEW_CONTEXT','CONFLICTING_GIVEN_NAME','DATE_OUTSIDE_SCOPE',
+                'EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW','SURNAME_IDENTITY_UNRESOLVED'} & set(f.get('uncertainties',[])):
                 excluded.append({'finding_id':f.get('finding_id'),'reason':'UNSUITABLE_FOR_AUTOMATIC_SYNTHESIS'});continue
             raw=f.get('evidence_excerpt') or ''
             loc=f.get('locator') or {}
@@ -151,6 +153,8 @@ def execute(run_root, question, caller=call, config=None):
     selected=[r for b in grouped for r in b]
     conf=configuration() if config is None else config
     out={'schema':VERSION,'question':question,'evidence_hash':digest(all_records),'status':'BLOCKED_CONFIGURATION',
+         'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+         'model_configuration':routing_summary(),
          'configuration':conf,'model_used':False,'claims':[],'answer_sections':[],
          'coverage':{'unique_passages':len(all_records),'selected_passages':len(selected),
                      'repeated_occurrences':sum(len(r['occurrences'])-1 for r in all_records),'deferred':deferred,'excluded':excluded},
@@ -163,7 +167,10 @@ def execute(run_root, question, caller=call, config=None):
     def invoke(role,prompt):
         result=caller(role,prompt)
         out['calls'].append({'role':role,'status':result.get('status'),'provider':result.get('provider'),
-                             'model':result.get('model'),'error':result.get('error')})
+                             'model':result.get('model'),'error':result.get('error'),
+                             'prompt_sha256':hashlib.sha256(prompt.encode()).hexdigest(),
+                             'response_sha256':digest(result),'prompt_version':route(role).prompt_version,
+                             'completed_utc':datetime.datetime.now(datetime.timezone.utc).isoformat()})
         if result.get('status')=='COMPLETED':out['model_used']=True
         return parse(result)
     for group in grouped:
