@@ -180,8 +180,9 @@ def main() -> None:
         raise ValueError("INVALID_RUN_ID")
 
     policy = load_json(POLICY_PATH)
-    payload = validate(load_json(args.request), policy)
-    audit = build_audit(args.request, payload, args.run_id,args.request_id)
+    request = load_json(args.request)
+    payload = validate(request, policy)
+    audit = build_audit(args.request, payload, args.run_id,args.request_id or request.get('request_id',''))
     if duplicate_submission(audit,args.audit_root):
         raise ValueError("DUPLICATE_DISPATCH_REQUEST")
 
@@ -192,6 +193,7 @@ def main() -> None:
         with args.github_output.open("a", encoding="utf-8") as fh:
             fh.write("matrix=%s\n" % matrix)
             fh.write("request_fingerprint=%s\n" % audit["request_fingerprint"])
+            fh.write("request_id=%s\n" % (audit['request_id'] or ''))
             fh.write("target=%s\n" % one_line(payload["target"]))
             fh.write("aliases=%s\n" % one_line("|".join(payload["aliases"])))
             fh.write("date_range=%s\n" % one_line(payload["date_range"]))
