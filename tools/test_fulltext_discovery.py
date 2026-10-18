@@ -59,6 +59,14 @@ class FulltextTests(unittest.TestCase):
         self.assertIn('Jamaica',hit['matched_excerpt'])
         self.assertIn('Jamaica',hit['places'])
 
+    def test_inflected_greek_full_name_is_retained_from_ocr(self):
+        req={'target':'Πέτρος Λάντζας','aliases':[],'purpose':'history'}
+        result=assess({'title':'Ιστορική αλληλογραφία','fulltext_hit':True,
+                       'context_excerpt':'Επιστολή του Πέτρου Λάντζα το 1580.'},identity(req,req))
+        self.assertEqual(result['topical_match']['category'],'POSSIBLE_TARGET')
+        self.assertEqual(result['status'],'PRIORITY')
+        self.assertFalse(result['verified'])
+
     def test_fulltext_highlights_cannot_manufacture_a_catalogue_match(self):
         req={'target':'Pedro Lanza','aliases':[],'purpose':'history'}
         result=assess({'title':'History of correspondence','fulltext_hit':True,

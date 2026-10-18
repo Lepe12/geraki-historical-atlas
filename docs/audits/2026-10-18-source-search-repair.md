@@ -8,7 +8,7 @@ The application source filter now searches recorded content and citations rather
 
 Validation:
 
-- 59 Python tests passed across full-text discovery, research focus, reliability, discovery retention, pipeline repairs and semantic answers.
+- 60 Python tests passed across full-text discovery, research focus, reliability, discovery retention, pipeline repairs and semantic answers.
 - 21 JavaScript tests passed, including source search normalization, exclusion of query provenance, citation search and existing research lifecycle behavior.
 - Offline reassessment of the existing run 39107988812 exercised 708 retained discovery rows, including 57 OCR rows. No records were deleted or promoted to VERIFIED; no existing classifications changed in this particular dataset. This was replay of archived data, not a newly executed external search.
 - Browser layout/navigation tests cover desktop and mobile. Added filter checks for accent-free Greek input and a false hit present only in query provenance.

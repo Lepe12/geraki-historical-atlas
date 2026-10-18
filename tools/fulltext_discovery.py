@@ -12,7 +12,7 @@ from html import unescape
 from html.parser import HTMLParser
 from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, urlopen
-from research_focus import decompose, fold, retrieval_names
+from research_focus import decompose, fold, retrieval_names, _token_pattern
 
 IA_FTS='https://be-api.us.archive.org/ia-pub-fts-api'
 GREEK=dict(zip('αβγδεζηθικλμνξοπρστυφχψω',
@@ -100,7 +100,7 @@ def text_match(record,focus):
             for name in retrieval_names(focus):
                 parts=name.split()
                 if len(parts)<2:continue
-                pattern=r'[\s,.-]{1,8}'.join(re.escape(norm(p)) for p in parts)
+                pattern=r'[\s,.-]{1,8}'.join(_token_pattern(p) for p in parts)
                 for hit in re.finditer(r'(?<!\w)'+pattern+r'(?!\w)',text):
                     local=text[max(0,hit.start()-240):hit.end()+240]
                     places=[p for p in focus.get('places',[]) if any(
