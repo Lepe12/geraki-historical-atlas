@@ -10,7 +10,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  const shotDir=process.env.NABOU_SCREENSHOT_DIR;if(shotDir)fs.mkdirSync(shotDir,{recursive:true});
  for(const [width,height] of [[1440,900],[1024,768],[390,844],[360,740]]){
   const page=await browser.newPage({viewport:{width,height},reducedMotion:'reduce'});const errors=[];page.on('pageerror',e=>errors.push(e.message));
-  const snapshot={schema:'pct-command-center-live-v1',run_id:'100',mission:{target:'Δοκιμή διεπαφής',status:'COMPLETED'},agents:[{id:'greek',status:'COMPLETED'}],claims:[],blockers:[{description:'Δοκιμαστικό εμπόδιο πρόσβασης'}],discoveries:[{title:'Δοκιμαστική ιστορική πηγή',lane:'greek',url:'https://example.org/source',topical_match:{category:'TARGET_MATCH'}}],events:[],safety:{automatic_verified:false}};
+  const snapshot={schema:'pct-command-center-live-v1',run_id:'100',mission:{target:'Δοκιμή διεπαφής',status:'COMPLETED'},agents:[{id:'greek',status:'COMPLETED'}],claims:[],blockers:[{description:'Δοκιμαστικό εμπόδιο πρόσβασης'}],discoveries:[{title:'Δοκιμαστική ιστορική πηγή',query:'Ανύπαρκτο',lane:'greek',url:'https://example.org/source',topical_match:{category:'TARGET_MATCH'}}],events:[],safety:{automatic_verified:false}};
   let dispatched=false;
   await page.route('**/*',r=>{if(!r.request().url().startsWith('https://'))return r.continue();const u=r.request().url();if(u.endsWith('/dispatch')){dispatched=true;return r.fulfill({status:503,json:{error:'test_unavailable'}});}if(u.includes('raw.githubusercontent.com'))return r.fulfill({json:snapshot});if(u.includes('/status/'))return r.fulfill({json:{snapshot,events:[]}});return r.abort();});
   await page.routeWebSocket(/.*/,()=>{});
@@ -43,6 +43,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
    }
    if(view==='findings'){
     await page.locator('#resultSearch').fill('Ανύπαρκτο');assert.match(await page.locator('#resultsList').innerText(),/Δεν υπάρχουν/);
+    await page.locator('#resultSearch').fill('ιστορικη δοκιμαστικη');assert.match(await page.locator('#resultsList').innerText(),/Δοκιμαστική ιστορική πηγή/);
     await page.locator('#resultSearch').fill('');assert.match(await page.locator('#resultsList').innerText(),/Δοκιμαστική ιστορική πηγή/);
     await page.locator('[data-result-filter="blockers"]').click();assert.match(await page.locator('#resultsList').innerText(),/εμπόδιο πρόσβασης/);
     await page.locator('[data-result-filter="all"]').click();

@@ -90,6 +90,7 @@ def text_match(record,focus):
     """Match independent source text; never count the query as source evidence."""
     # Separate highlights can be from different pages. They are never joined
     # to manufacture name/place co-occurrence.
+    candidates=[]
     for segment in record.get('fulltext_contexts') or [record.get('context_excerpt') or '']:
         surface=[];offsets=[]
         for i,char in enumerate(segment):
@@ -100,12 +101,18 @@ def text_match(record,focus):
                 parts=name.split()
                 if len(parts)<2:continue
                 pattern=r'[\s,.-]{1,8}'.join(re.escape(norm(p)) for p in parts)
-                hit=re.search(r'(?<!\w)'+pattern+r'(?!\w)',text)
-                if hit:
-                    return {'category':'POSSIBLE_TARGET','reason':'FULLTEXT_COMPLETE_NAME_REQUIRES_REVIEW',
-                            'matched_name':name,'places':[],'roles':[],
+                for hit in re.finditer(r'(?<!\w)'+pattern+r'(?!\w)',text):
+                    local=text[max(0,hit.start()-240):hit.end()+240]
+                    places=[p for p in focus.get('places',[]) if any(
+                        re.search(r'(?<!\w)'+re.escape(norm(t))+r'(?!\w)',local)
+                        for t in spelling_hypotheses(p,True))]
+                    roles=[t for t in role_terms(focus) if re.search(r'(?<!\w)'+re.escape(t),local)]
+                    context_missing=bool(focus.get('places') or focus.get('roles')) and not (places or roles)
+                    candidates.append({'category':'POSSIBLE_TARGET',
+                            'reason':'FULLTEXT_NAME_WITHOUT_REQUEST_CONTEXT' if context_missing else 'FULLTEXT_COMPLETE_NAME_REQUIRES_REVIEW',
+                            'matched_name':name,'places':places,'roles':roles,
                             'matched_excerpt':segment[max(0,offsets[hit.start()]-120):offsets[hit.end()-1]+451],
-                            'identity_verified':False,'query_hypothesis':True}
+                            'identity_verified':False,'query_hypothesis':True})
         for term in search_terms(focus):
             for hit in re.finditer(r'(?<!\w)'+re.escape(norm(term))+r'(?!\w)',text):
                 if not segment[offsets[hit.start()]].isupper():continue
@@ -117,11 +124,11 @@ def text_match(record,focus):
                 role_context=text[max(0,hit.start()-700):hit.end()+700]
                 roles=[t for t in requested_roles if re.search(r'(?<!\w)'+re.escape(t),role_context)]
                 if (places or focus['kind']=='place') and (not requested_roles or roles):
-                    return {'category':'POSSIBLE_TARGET','reason':'FULLTEXT_NAME_AND_CONTEXT_HYPOTHESIS',
+                    candidates.append({'category':'POSSIBLE_TARGET','reason':'FULLTEXT_NAME_AND_CONTEXT_HYPOTHESIS',
                             'matched_name':term,'places':places,'roles':roles,
                             'matched_excerpt':segment[max(0,offsets[hit.start()]-120):offsets[hit.end()-1]+451],
-                            'identity_verified':False,'query_hypothesis':True}
-    return None
+                            'identity_verified':False,'query_hypothesis':True})
+    return min(candidates,key=lambda x:x['reason']=='FULLTEXT_NAME_WITHOUT_REQUEST_CONTEXT') if candidates else None
 
 
 def merge_findings(records,focus):
@@ -287,6 +294,8 @@ def iiif_search(source,terms,out,deadline=None):
                     'printed_page':int(page.group(1)) if page else None,'page_label':printed,
                     'context_excerpt':excerpt,'fulltext_contexts':[page_text or excerpt],'matched_terms':[],
                     'original_inspected':False,'verified':False})
+                passage=page_text or excerpt
+                if passage not in row['fulltext_contexts']:row['fulltext_contexts'].append(passage)
                 if term not in row['matched_terms']:row['matched_terms'].append(term)
     return list(rows.values()),attempts
 

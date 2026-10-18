@@ -139,9 +139,11 @@ def assess(record, ident):
     context = ' '.join(norm(record.get(k)) for k in ('title','description','subject','context_excerpt'))
     names = [ident['target'], *ident.get('aliases', [])]
     focus=ident.get('focus') or decompose(ident['target'],ident.get('aliases',[]),kind=ident.get('type','unknown'),regions=ident.get('region_terms',[]))
-    topical=topical_match(record,focus)
+    metadata_record={k:record[k] for k in ('title','description','subject') if k in record} if record.get('fulltext_hit') else record
+    topical=topical_match(metadata_record,focus)
     fulltext_match=text_match(record,focus) if record.get('fulltext_hit') else None
-    if fulltext_match:topical=fulltext_match
+    # A provisional OCR hit cannot weaken an independently matching catalogue entry.
+    if fulltext_match and topical['category']!='TARGET_MATCH':topical=fulltext_match
     name_match = topical['category']=='TARGET_MATCH'
     regional = any(contains(context, n) for n in ident.get('region_terms', []) if n)
     history = bool(HISTORY.search(context))
@@ -187,8 +189,13 @@ def assess(record, ident):
             status='EXCLUDE_FROM_ACQUISITION';research_score=min(research_score,20)
             reasons.append('NO_TARGET_IDENTITY_MATCH')
     if fulltext_match:
-        status='PRIORITY';research_score=max(research_score,70)
-        reasons.append('FULLTEXT_CONTEXT_REQUIRES_IDENTITY_REVIEW')
+        missing_context=fulltext_match['reason']=='FULLTEXT_NAME_WITHOUT_REQUEST_CONTEXT'
+        if missing_context and topical['category']!='TARGET_MATCH':
+            status='REVIEW_REQUIRED';research_score=min(research_score,65)
+            reasons.append('FULLTEXT_NAME_WITHOUT_REQUEST_CONTEXT')
+        elif not OFF_TOPIC.search(title) and not (NOISE.search(title) and not (geographic and history)):
+            status='PRIORITY';research_score=max(research_score,70)
+            reasons.append('FULLTEXT_CONTEXT_REQUIRES_IDENTITY_REVIEW')
 
     return {
         'status':status,'score':score,'reasons':reasons,

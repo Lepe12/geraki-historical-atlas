@@ -41,6 +41,57 @@ class FulltextTests(unittest.TestCase):
         self.assertFalse(a['verified'])
         self.assertEqual(a['topical_match']['category'],'POSSIBLE_TARGET')
 
+    def test_complete_name_without_requested_context_is_not_prioritized(self):
+        req={'target':'Henry Morgan governor of Jamaica','aliases':[],'purpose':'historical research'}
+        row={'title':'History of modern medicine','fulltext_hit':True,
+             'context_excerpt':'Henry Morgan, a physician in London.'}
+        result=assess(row,identity(req,req))
+        self.assertEqual(result['status'],'REVIEW_REQUIRED')
+        self.assertLessEqual(result['research_value']['score'],65)
+        self.assertEqual(result['topical_match']['reason'],'FULLTEXT_NAME_WITHOUT_REQUEST_CONTEXT')
+        self.assertFalse(result['verified'])
+
+    def test_later_contextual_passage_beats_earlier_namesake(self):
+        focus=decompose('Henry Morgan governor of Jamaica')
+        row={'fulltext_contexts':['Henry Morgan, physician in London.',
+                                  'Henry Morgan was governor of Jamaica.']}
+        hit=text_match(row,focus)
+        self.assertIn('Jamaica',hit['matched_excerpt'])
+        self.assertIn('Jamaica',hit['places'])
+
+    def test_fulltext_highlights_cannot_manufacture_a_catalogue_match(self):
+        req={'target':'Pedro Lanza','aliases':[],'purpose':'history'}
+        result=assess({'title':'History of correspondence','fulltext_hit':True,
+                       'context_excerpt':'Pedro … Lanza',
+                       'fulltext_contexts':['Pedro','Lanza']},identity(req,req))
+        self.assertEqual(result['topical_match']['category'],'UNMATCHED')
+        self.assertNotEqual(result['status'],'PRIORITY')
+
+    def test_later_occurrence_in_same_page_can_supply_context(self):
+        focus=decompose('Henry Morgan governor of Jamaica')
+        passage='Henry Morgan, physician. '+('Other unrelated text. '*40)+'Henry Morgan, governor of Jamaica.'
+        hit=text_match({'context_excerpt':passage},focus)
+        self.assertIn('Jamaica',hit['matched_excerpt'])
+
+    def test_fulltext_does_not_downgrade_independent_metadata_match(self):
+        req={'target':'Pedro Lanza','aliases':[],'purpose':'history'}
+        result=assess({'title':'History of Pedro Lanza','fulltext_hit':True,
+                       'context_excerpt':'Pedro Lanza appears in this letter.'},identity(req,req))
+        self.assertEqual(result['topical_match']['category'],'TARGET_MATCH')
+
+    def test_iiif_preserves_later_passages_on_same_page(self):
+        canvas='https://example.org/canvas/42'
+        manifest={'label':'Book','service':{'@id':'https://example.org/search','profile':'http://iiif.io/api/search/1/search'},
+                  'items':[{'id':canvas,'label':'42'}]}
+        result={'resources':[{'@id':'a','on':canvas}], 'hits':[
+            {'annotations':['a'],'match':'Unrelated passage.'},
+            {'annotations':['a'],'match':'King Capsi of Milo.'}]}
+        with tempfile.TemporaryDirectory() as td,patch('fulltext_discovery.get_json',side_effect=[manifest,result]):
+            rows,_=iiif_search({'url':'https://example.org/manifest','provenance':'test'},['Capsi'],Path(td))
+        self.assertEqual(len(rows),1)
+        self.assertEqual(len(rows[0]['fulltext_contexts']),2)
+        self.assertIsNotNone(text_match(rows[0],self.focus))
+
     def test_native_ia_fulltext_fields_and_highlights_are_preserved(self):
         response={'hits':{'hits':[{'fields':{'identifier':['book-with-no-name-in-title'],'meta_title':['Voyage'],'meta_year':[1690],'page_num':[[47]]},'highlight':{'text':['Story of {{{Capsi}}} of {{{Milo}}}.']}}]}}
         with patch('fulltext_discovery.get_json',return_value=response) as fetch:rows=ia_search('"Capsi" AND "Milo"')
