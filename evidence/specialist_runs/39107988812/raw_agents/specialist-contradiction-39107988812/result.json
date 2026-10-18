@@ -1,0 +1,3107 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "contradiction",
+  "label": "Contradiction / Adversarial Agent",
+  "assignment_id": "contradiction:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "contradicting_evidence",
+    "alternative_explanations",
+    "uncertainties",
+    "falsification_leads"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "479d6b1395c3a887943a070a1caabb9198f4709b2f7c33e838b04e9efbec9a49",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "contradiction",
+    "assignment_id": "contradiction:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:Gallica/BnF",
+      "repo:The National Archives Public Content",
+      "repo:Academia.edu Public Research",
+      "repo:PARES / Archivo General de Simancas"
+    ],
+    "queries": [
+      "\"Πέτρος Λάντζας\"",
+      "\"Petros Lantzas\"",
+      "\"Pietro Lanza\"",
+      "\"Petros Lanza\"",
+      "\"Petros Lanza\" disputed"
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 108,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:PARES / Archivo General de Simancas",
+        "route_type": "repository_dispatch",
+        "repository": "PARES / Archivo General de Simancas",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:İSAM Kütüphanesi",
+        "route_type": "repository_dispatch",
+        "repository": "İSAM Kütüphanesi",
+        "connector_id": null,
+        "score": 90,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Archives diplomatiques France",
+        "route_type": "repository_dispatch",
+        "repository": "Archives diplomatiques France",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Crossref Scholarly Metadata",
+        "route_type": "repository_dispatch",
+        "repository": "Crossref Scholarly Metadata",
+        "connector_id": null,
+        "score": 86,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lantzas\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Petros+Lantzas+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lanza\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Petros+Lanza+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lanza\" disputed",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Petros+Lanza++disputed%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pietro Lanza\"",
+      "records": [
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737750c",
+          "title": "Lezione accademica sugli asili infantili, di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1840"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737750c",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737750c"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb45043757m",
+          "title": "Sagittario in amore : poesie postume / Pietro Cimatti ; note critiche e cura di Davide Argnani e Stefania Porrino ; prefazione di Ludovico Griguoli Lanza",
+          "creator": [
+            "Cimatti, Pietro (1929-1991). Auteur du texte"
+          ],
+          "date": [
+            "2015"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb45043757m",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb45043757m",
+            "ISBN 9788897726753"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737754r",
+          "title": "Donne e gioielli in Sicilia nel medio evo e nel rinascimento... / Pietro Lanza di Scalea",
+          "creator": [
+            "Lanza di Scalea, Pietro. Auteur du texte"
+          ],
+          "date": [
+            "1892"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737754r",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737754r"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737747g",
+          "title": "Degli Arabi e del loro soggiorno in Sicilia, memoria di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1832"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737747g",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737747g"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737751q",
+          "title": "Dello Spirito di associazione nella Inghilterra in particolare, saggïo politico ed economico, di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1842"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737751q",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737751q"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb307377553",
+          "title": "Enrico Rosso e la confisca de' suoi mobili in Castiglione, ricerche storiche del secolo XIV / Pietro Lanza di Scalea",
+          "creator": [
+            "Lanza di Scalea, Pietro. Auteur du texte"
+          ],
+          "date": [
+            "1890"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb307377553",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb307377553"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737748t",
+          "title": "Dell' Arte drammatica in Sicilia, epitome di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1834"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737748t",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737748t"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb47022743j",
+          "title": "24/5/31, Exposition coloniale, le prince Di Sclalea [i.e. Di Scalea] : [photographie de presse] / [Agence Rol]",
+          "creator": [
+            "Agence Rol. Agence photographique (commanditaire)"
+          ],
+          "date": [
+            "1931"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb47022743j",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb47022743j"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30132553m",
+          "title": "In Morte di Maddalena Caracciolo, principessa di Scalea, cantico di Giuseppe Borghi, preceduta da un cenno necrologico (da Pietro Lanza, principe di Scordia)",
+          "creator": [
+            "Borghi, Giuseppe (1790-1847). Auteur du texte",
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1838"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30132553m",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30132553m"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb307377495",
+          "title": "Considerazioni sulla storia di Sicilia dal 1532 al 1789, da servir d'aggiunte e di chiose al Botta, di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1836"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb307377495",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb307377495"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb31550875h",
+          "title": "Italia e Francia, 1870, secondo narrazioni di G. Lanza, Q. Sella, E. Ollivier e d'un uomo politico italiano",
+          "creator": [
+            "Vayra, Pietro (1836-1898). Auteur du texte"
+          ],
+          "date": [
+            "1895"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb31550875h",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb31550875h"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30961712b",
+          "title": "Pietro Lanza e Stella, principe di Trabia, e l'agricoltura in Sicilia nel 1786 e nel 1896, per Carlo Crispo Moncada",
+          "creator": [
+            "Moncada, Carlo Crispo. Auteur du texte"
+          ],
+          "date": [
+            "1897"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30961712b",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30961712b"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb46889466j",
+          "title": "The Immortal Voice of Mario Lanza: A Centennial Celebration / Mario Lanza",
+          "creator": [
+            "Lanza, Mario (1921-1959). Interprète",
+            "Mascagni, Pietro (1863-1945). Compositeur",
+            "Romberg, Sigmund (1887-1951). Compositeur",
+            "Rodgers, Richard (1902-1979). Compositeur"
+          ],
+          "date": [
+            "2021"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb46889466j",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb46889466j"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb376873058",
+          "title": "Le proposte di un principe : Pietro Lanza e la \"ricchezza del Regno\" / Giacomo Dentici",
+          "creator": [
+            "Dentici, Giacomo (1940-....). Auteur du texte"
+          ],
+          "date": [
+            "1999"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb376873058",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb376873058",
+            "ISBN 8881280892"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb38632566x",
+          "title": "Cavalleria rusticana. Addio alla madre / Mascagni, comp. ; Mario Lanza, T ; RCA Victor Orchestra ; Constantine Callinicos, dir.. La forza del destino. O tu che in seno agli angeli / Verdi, comp. ; Mario Lanza, T ; RCA Victor Orchestra ; Constantine Callinicos, dir.",
+          "creator": [
+            "Mascagni, Pietro (1863-1945). Compositeur",
+            "Verdi, Giuseppe (1813-1901). Compositeur",
+            "Lanza, Mario (1921-1959). Ténor",
+            "Callinicos, Constantine (1913-1986). Direction d'orchestre"
+          ],
+          "date": [
+            "195."
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb38632566x",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb38632566x"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb37894554v",
+          "title": "Cavalleria rusticana. Mamma que vino e generoso / Pietro Mascagni. L'Africana. Mi batte il core : récit. L'Africana. Aria de l'acte 4, O Paradiso ! / Meyerbeer, comp. ; Mario Lanza, T ; RCA Victor orchestra ; Constantine Callinicos, dir.",
+          "creator": [
+            "Lanza, Mario (1921-1959). Ténor",
+            "Callinicos, Constantine (1913-1986). Direction d'orchestre"
+          ],
+          "date": [
+            "194."
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb37894554v",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb37894554v"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+          "title": "Peter of Auvergne : university master of the 13th century / edited by Christoph Flüeler, Lidia Lanza, Marco Toste",
+          "creator": [],
+          "date": [
+            "2015"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+            "ISBN 3110228483"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb38297620n",
+          "title": "José Carreras : a tribute to Mario Lanza / Declan Lowney, réal. ; José Carreras, T ; English concert chorus ; BBC Concert orchestra ; Enrique Ricci, dir.",
+          "creator": [
+            "Lowney, Declan (1960-....). Réalisateur"
+          ],
+          "date": [
+            "1994"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb38297620n",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb38297620n"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb46741746t",
+          "title": "Scriptum super III-VIII libros Politicorum Aristotelis : edizione, introduzione e note / Petrus de Alvernia ; a cura di Lidia Lanza",
+          "creator": [
+            "Pierre d'Auvergne (124.?-1304). Auteur du texte"
+          ],
+          "date": [
+            "2021"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb46741746t",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb46741746t",
+            "ISBN 9783954902781"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb381836987",
+          "title": "Stabat Mater / Pergolesi. Concerti grossi n ° III à V / Alessandro Scarlatti ; Mirella Freni, S ; Teresa Berganza, A ; Solisti dell'orchestra Scarlatti Napoli ; Ettore Gracis, dir",
+          "creator": [
+            "Pergolesi, Giovanni Battista (1710-1736). Compositeur",
+            "Scarlatti, Alessandro (1660-1725). Compositeur",
+            "Gracis, Ettore (1915-1992). Direction d'orchestre",
+            "Freni, Mirella (1935-2020). Soprano"
+          ],
+          "date": [
+            "1989"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb381836987",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb381836987"
+          ]
+        }
+      ],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pietro+Lanza+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/61679644/The_military_elite_as_factor_of_identity",
+          "url": "https://www.academia.edu/61679644/The_military_elite_as_factor_of_identity",
+          "title": "The military elite as factor of identity",
+          "description": "για τη νεώτερη Ιστορία της Λευκάδας,\n...\ncon la Terraferma ancorché le sia vicina per\n...\nwhere the reasons for the decline of the island's navigation are being studied, available at http://thesis. ... .gr/thesisBookReader/id/2438#page/1/mode/2up",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρος Λάντζας\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 3,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/61677231/The_military_elite_as_factor_of_identity_in_the_Ionian_border_between_the_Venetian_and_the_Ottoman_State_Lefkada_1684_1797",
+          "url": "https://www.academia.edu/61677231/The_military_elite_as_factor_of_identity_in_the_Ionian_border_between_the_Venetian_and_the_Ottoman_State_Lefkada_1684_1797",
+          "title": "(PDF) The military elite as factor of identity in the Ionian border between the Venetian and the Ottoman State: Lefkada, 1684-1797",
+          "description": ", \"Μεγανήσι: Οι Χιώτες, τα πριν, τα μετά\", in ... », Athens 2011, pp. 91-108. Some aspects ... Lazari, \"Agrarian practices<\", pp. 304-405. Despina Er. ... 2 (1986) 70-82. According to a godis loans,",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρος Λάντζας\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 3,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/9641051/%CE%88%CE%BB%CE%BB%CE%B7%CE%BD%CE%B5%CF%82_%CF%83%CF%84%CE%BF_%CE%A4%CE%BF%CE%BB%CE%AD%CE%B4%CE%BF_%CF%83%CF%84%CE%B1_%CF%87%CF%81%CF%8C%CE%BD%CE%B9%CE%B1_%CF%84%CE%BF%CF%85_%CE%94%CE%BF%CE%BC%CE%AE%CE%BD%CE%B9%CE%BA%CE%BF%CF%85_%CE%98%CE%B5%CE%BF%CF%84%CE%BF%CE%BA%CE%BF%CF%80%CE%BF%CF%8D%CE%BB%CE%BF%CF%85_Greeks_in_Toledo_during_the_Time_of_Domenicos_Theotokopoulow",
+          "url": "https://www.academia.edu/9641051/%CE%88%CE%BB%CE%BB%CE%B7%CE%BD%CE%B5%CF%82_%CF%83%CF%84%CE%BF_%CE%A4%CE%BF%CE%BB%CE%AD%CE%B4%CE%BF_%CF%83%CF%84%CE%B1_%CF%87%CF%81%CF%8C%CE%BD%CE%B9%CE%B1_%CF%84%CE%BF%CF%85_%CE%94%CE%BF%CE%BC%CE%AE%CE%BD%CE%B9%CE%BA%CE%BF%CF%85_%CE%98%CE%B5%CE%BF%CF%84%CE%BF%CE%BA%CE%BF%CF%80%CE%BF%CF%8D%CE%BB%CE%BF%CF%85_Greeks_in_Toledo_during_the_Time_of_Domenicos_Theotokopoulow",
+          "title": "(PDF) Έλληνες στο Τολέδο στα χρόνια του Δομήνικου ...",
+          "description": "1. AGS-E 1694, χ.α. (18 Φεβρ. 1603)• πρβλ. John Krajcar, S. J., Cardinal Giulio Antonio Santoro and the Christian East. Santoro's Audiences and Consistorial Acts, Pώμη, 1966, σελ. 147, 160.\n2. AGS-E 1599, αριθ. 11, E 1596, αριθ. 419 (Ιούν. 1602), E 1597, αριθ. 252 (Oκτ. 1602), E 1704, χ.α. (= εικ. 2).\n3. AGS-E 1694, χ.χ. (18 Φεβρ. 1603).\n4. AGS-S.P.-N., libro 181, φφ. 76r-77r, 30 Ιαν. 1617.\n5. AGS-E 1596, no. 419, n.p., n.d. (=June 1602);\n6. AGS-E 1694, n.n. (18 February 1603); cf. John Krajcar, S. J., Cardinal Giulio Antonio Santoro and the Christian East. Santoro's Audiences and Consistorial Acts, Rome, 1966, p. 147, p. 160. 25. AGS-E 1599, no. 11; E 1596, no. 419 ( June 1602);\n7. E 1597, no. 252 (October 1602);\n8. AGS-E 1694, n.n. (18 February 1603).\n9. AGS-S.P.-N., libro 181, folios 76r-77r (30 January 1617).\n10. Ioannis Hassiotis, «George Heraclius Basilicos, a Greek Pretender to a Balkan Principality», Balcanica, 13-14, 1982- 1983, σελ. 85-97.\n11. San Román, El Greco, ό.π., σελ. 76, σημ. 1, 188, αριθ. 49. Πρβλ. εικ. 4.\n12. Οι υπηρεσίες του Ιωάννη Πολυχρόνη (γενν. 1543), που μετά την αποτυχία της εξέγερσης κατέφυγε με τους Μελισσηνούς στη Νεάπολη, καταγράφτηκαν σε αρκετά έγγραφα, από τα οποία μερικά ετοιμάστηκαν με φροντίδα του Παραμονάρη· βλ. π.χ. AGS-E 1665, χ.α., E 1670, χ.α. (21 Μαρτ. 1612• εκδ. από τον José Manuel Floristán, «Catedráticos de griego en Salamanca y Alcalá: Diógenes Paramonaris (1617-18)\n13. y Constantino Sofía (1629-31). Notas prosopográficas», Φίλου σκιά. Studia philologiae in honorem Rosae Aguilar, επιμ. A. Bernabé -I. Rodríguez Alfageme, Μαδρίτη, 2007, σελ. 250-\n14. Για το ρόλο των Μελισσηνών στις εξεγέρσεις του 1570- 1572, βλ. Ι. Κ. Χασιώτης, Mακάριος, Θεόδωρος και Νικηφόρος οι Mελισσηνοί (Mελισσουργοί ) (16ος-17ος αι.), Θεσσαλονίκη, 1966, σελ. 27-47, και του ίδιου, Οι Έλληνες στις παραμονές της ναυμαχίας της Ναυπάκτου (1568-1571), Θεσσαλονίκη, 1970, σελ. 103-105, 227, 229.\n15. Ioannis Hassiotis, \"George Heraclius Basilicos, a Greek Pretender to a Balkan Principality\", Balcanica, 13-14, 1982- 1983, pp. 85-97.\n16. San Román, El Greco, op.cit., p. 76, note 1, 188, no. 49. Cfr. fig. 4.\n17. Ο Δομήνικος Θεοτοκόπουλος εξουσιοδοτεί τον Χόρχε Μανουέλ στις 31 Μαρτίου 1614 να συντάξει τη διαθήκη του, σελ. 1 του εγγράφου (Archivo Histórico Provincial de Toledo).\n18. Domenicos Theotokopoulos authorizes Jorge Manuel on the 31st of March 1614 to draw up his will, page 1 of the document (Archivo Histórico Provincial de Toledo).\n19. Ο Δομήνικος Θεοτοκόπουλος εξουσιοδοτεί τον Χόρχε Μανουέλ στις 31 Μαρτίου 1614 να συντάξει τη διαθήκη του, σελ. 2 του εγγράφου (Archivo Histórico Provincial de Toledo).\n20. Domenicos Theotokopoulos authorizes Jorge Manuel on the 31st of March 1614 to draw up his will, page 2 of the document (Archivo Histórico Provincial de Toledo).\n21. Ο Δομήνικος Θεοτοκόπουλος εξουσιοδοτεί τον Χόρχε Μανουέλ στις 31 Μαρτίου 1614 να συντάξει τη διαθήκη του, σελ. 3 του εγγράφου. Κάτω χαμηλά η τρεμουλιαστή υπογραφή του Θεοτοκόπουλου, καθώς και των Διογένη Παραμονάρη και Κωνσταντίνου Φωκά (Archivo Historico Provincial de Toledo).\n22. The services of Ioannis Polychronis (b. 1543), who took refuge with the Melissinoi in Naples following the failure of the insurrection, are recorded in a number of documents, some of them prepared under the care of Para monaris; see for example AGS-E 1665, n.n., E 1670, n.n., (21 March 1612); ed. José Manuel Floristán, \"Catedráticos de griego en Salamanca y Alcalá: Diógenes Paramonaris (1617-18) y Constantino Sofía (1629-31). Notas prosopográficas\", Φίλου σκιά. Studia philologiae in honorem Rosae Aguilar, eds. A. Bernabí -I. Rodríguez Alfageme, Madrid, 2007, pp. 250- 251. On the role of the Melissinoi in the uprisings of 1570- 1572, see I. K. Hassiotis, Μακάριος, Θεόδωρος και Νικηφόρος οι Μελισσηνοί (Μελισσουργοί) (16ος17ος αι.), Thessaloniki, 1966, pp. 27-47, and idem, Οι Έλληνες στις παραμονές της ναυμαχίας της Ναυπάκτου (15681571), Thessaloniki, 1970, pp. 103-105, 227, 229.\n23. Émile Legrand, Bibliographie hellénique, ou description rai sonnée des ouvrages publiés en grec par les Grecs au dixseptième siècle, vol. 5, Paris, 1903, pp. 233-234.\n24. AGS-E 1165, n.n. (= f. 5, 17 June 1611), E 1670, n.n. (21 March 1612);\n25. E 1727, n.n. (24 September 1613).\n26. AGS-E 1634, n.n. (Recommendation by the Council of State of 7 Nov. 1613).\n27. The sole Greek evidence I have found for Dionysios is his signature on a patriarchal sigillium of 1592/93 for the Monastery of the Taxiarchs in the Bishopric of Damala and Pediada: Dion. Zakythinos, \"Ανέκδοτα πατριαρχικά έγγραφα των χρόνων της Τουρκοκρατίας (1593-1798) εκδιδόμενα εκ παρισιακών κωδίκων\", Ελληνικά, 2, 1928, p. 132.\n28. AGS-E 1691, n.n. (9 September 1601) and E 1595, n.n., n.d. A wealth of archival testimony has been preserved on Lant- zas' activity, in both the Spanish and Venetian archives: M. Th. Laskaris, \"Πέτρος Λάντζας, διοικητής της Πάργας (1573) και όργανον των Iσπανών εν Hπείρω (1596-1608)\", Αφιέρωμα εις την Ήπειρον εις μνήμην Χρ. Σούλη, Athens, 1956, pp. 103- 118, 237-253; cf. Pan. K. Ioannou, \"Από τη Γαληνότατη στον Καθολικότατο: Οι φουρτούνες του καπετάν Πέτρου Λάντζα\", Θησαυρίσματα, 30, 2000, pp. 277-299.\n29. AGS-E 1596, no. 16 (n.d., 1602).\n30. Peter Bartl, Der Westbalkan zwischen spanischer Monarchie und osmanischem Reich. Zur Türkenkriegsproblematik an der Wende vom 16. zum 17. Jahrhundert, Wiesbaden, 1974, p. 43 ff. The impact of this war in the West is analysed by Géraud Poumarède, Pour en finir con la Croisade: Mythes et réalités de la lutte contre les Turcs aux XVIe et XVII siècle, Paris, 2004, pp. 247-253, 280-288.\n31. τόσο σε ισπανικά όσο και σε βενετικά αρχεία: Μ. Θ. Λάσκα- ρις, «Πέτρος Λάντζας, διοικητής της Πάργας (1573) και όργα- νον των Ισπανών εν Hπείρω (1596-1608)\n32. », Αφιέρωμα εις την Ήπει ρον εις μνήμην Χρ. Σούλη, Aθήνα 1956, σελ. 103-118, 237-253• πρβλ. Παν. Κ. Ιωάννου, «Από τη Γαληνότατη στον Καθολικότατο: Οι φουρτούνες του καπετάν Πέτρου Λάντζα», Θησαυρίσματα, 30, 2000, σελ. 277-299.\n33. AGS-E 1596, αριθ. 16 (χ.η., 1602).\n34. Peter Bartl, Der Westbalkan zwischen spanischer Monarchie und osmanischem Reich. Zur Türkenkriegsproblematik an der Wende vom. 16. zum 17. Jahrhundert, Βισμπάντεν, 1974, σελ.\n35. κ.ε. Την απήχηση του πολέμου στη Δύση αναλύει ο Géraud Poumarède, Pour en finir avec la Croisade. mythes et réalités de la lutte contre les Turcs au XVI et XVII siècles, Παρίσι, 2004, σελ. 247-253, 280-288.\n36. AGS-E 1595, χ.α., χ.χ. [Ιαν. 1601/1602\n37. E 1691, χ.α.\n38. 9 Σεπτ. 1601). Πρβλ. Juan Gil, «Griegos en España en el Siglo de Oro», Habis, 21, 1990, σελ. 166-167 (απόφαση του τοπικού «cabildo» της 22ας Νοεμβρ. 1602, για τον «obispo de Acto [=Aeto] y Angelo Castro». Πηγές του Βατικανού μας πληροφορούν για την καταγωγή του Διονυσίου από τη Θήβα, την ηλικία του (44 ετών στα 1596) και κυρίως για τη διαδικασία της ομολογίας του στην Καθολική Εκκλησία· τις χρησιμοποιεί ο J. M. Flori stán, «(Arz)obispos griegos en Roma y España (1596- 1602)\n39. », Erytheia, 26, 2005, σελ. 189-194. Για τη φυλάκιση του Λάντζα, τον Ιούνιο του 1591 και τον Μάρτιο του 1594 (αλλά και για άλλες ανάλογες περιπέτειές του αργότερα), βλ. Ιωάννου, ό.π., σελ. 292, σημ. 87.\n40. John Krajcar, S. J., Cardinal Giulio Antonio Santoro and the Christian East. Santoro's Audiences and Consistorial Acts, Pώμη, 1966, σελ. 147.\n41. AGS-E 1595, αριθ. 444, χ.η. (1602= E 1602, χ.α., χ.τ.χ.). Στο κλείσιμο του αιώνα (1599;) εμφανίζεται ως επίσκοπος Αετού και Αγγελοκάστρου ο Ιωάσαφ (Τ. Φ. Χριστόπουλος, «Αετού επισκοπή», Αιτωλοακαρνανική και Ευρυτανική Εγκυκλο παιδεία, τόμ. 1, Αθήνα, 1965, σελ. 251), και στις αρχές του 17ου αιώνα ο Μάρκος (Ε. Ι. Κωνσταντινίδης «Αγγελόκαστρο, έδρα επισκοπής», ό.π., σελ. 26).\n42. Juan Gil, «Griegos en España», ό.π., σελ. 167.\n43. AGS-E 1596, αριθ. 156/159 (Ιαν. 1602), E 1602, χ.α. (=E 1595, αριθ. 444, 445).\n44. AGS-E 1595, χ.α., χ.χ., E 1691, χ.α. (9 Σεπτ. 1601), AGS-E 1602, χ.α., χ.τ.χ. (Mάρτιος 1602).\n45. AGS-E 1595, n.d. [= January 1601/1602];\n46. E 1691, n.n. (9 September 1601). Cf. Juan Gil, \"Griegos en España en el Siglo de Oro\", Habis, 21, 1990, pp. 166-167 (decision by the local \"cabildo\" on 22 Nov. 1602, for the \"obispo de Acto [=Aeto] y Angelo Castro\". Sources in the Vatican inform us that Diony- sios came from Thebes, of his age (44 in 1596), and especially about the process of his confession to the Catholic Church; these are employed by J. M. Floristán, \"(Arz)obispos griegos en Roma y España (1596-1602)\", Erytheia, 26, 2005, pp. 189- 194. On Lantzas' imprisonment in June 1591 and March 1594 (and other comparable vicissitudes he later suffered), see Ioannou, op.cit., p. 292, note 87.\n47. John Krajcar, S. J., Cardinal Giulio Antonio Santoro and the Christian East. Santoro's Audiences and Consistorial Acts, Rome, 1966, p. 147.\n48. AGS-E 1595, no. 444, n.d. (1602= E 1602, n.n., n.p., n.d.). As the century came to an end (1599?), Ioasaph ( Jo- sephat) appears as the Bishop of Aetos and Angelokastron (T. F.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Πέτρος Λάντζας\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 3,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Πέτρος Λάντζας\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"PROVIDER_ERROR\"}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 3, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 3, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lantzas\"",
+      "records": [
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/9641051/%CE%88%CE%BB%CE%BB%CE%B7%CE%BD%CE%B5%CF%82_%CF%83%CF%84%CE%BF_%CE%A4%CE%BF%CE%BB%CE%AD%CE%B4%CE%BF_%CF%83%CF%84%CE%B1_%CF%87%CF%81%CF%8C%CE%BD%CE%B9%CE%B1_%CF%84%CE%BF%CF%85_%CE%94%CE%BF%CE%BC%CE%AE%CE%BD%CE%B9%CE%BA%CE%BF%CF%85_%CE%98%CE%B5%CE%BF%CF%84%CE%BF%CE%BA%CE%BF%CF%80%CE%BF%CF%8D%CE%BB%CE%BF%CF%85_Greeks_in_Toledo_during_the_Time_of_Domenicos_Theotokopoulow",
+          "url": "https://www.academia.edu/9641051/%CE%88%CE%BB%CE%BB%CE%B7%CE%BD%CE%B5%CF%82_%CF%83%CF%84%CE%BF_%CE%A4%CE%BF%CE%BB%CE%AD%CE%B4%CE%BF_%CF%83%CF%84%CE%B1_%CF%87%CF%81%CF%8C%CE%BD%CE%B9%CE%B1_%CF%84%CE%BF%CF%85_%CE%94%CE%BF%CE%BC%CE%AE%CE%BD%CE%B9%CE%BA%CE%BF%CF%85_%CE%98%CE%B5%CE%BF%CF%84%CE%BF%CE%BA%CE%BF%CF%80%CE%BF%CF%8D%CE%BB%CE%BF%CF%85_Greeks_in_Toledo_during_the_Time_of_Domenicos_Theotokopoulow",
+          "title": "(PDF) Έλληνες στο Τολέδο στα χρόνια του Δομήνικου ...",
+          "description": "... Petros Lantzas σαν μυστική συνεννόηση με τους Ισπανούς.45 Όλα (capitán Pietro Lanzi).44 The Albanian regional gov- αυτά θα πρέπει μάλλον να αποδοθούν στον ...",
+          "date": [],
+          "search_providers": [
+            "google",
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 3,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/28286120/_Les_%C3%A9lites_eccl%C3%A9siastiques_orthodoxes_et_le_politique_en_Thrace_grecque_en_deuxi%C3%A8me_moiti%C3%A9_du_XXe_si%C3%A8cle_autorit%C3%A9_traditionnelle_rationnelle_l%C3%A9gale_et_charismatique_en_espace_limitrophe_et_multiconfessionnel_p_303_316_in_Actes_du_colloque_Elites_grecques_XVIII_XXe_siecle_2015_INALCO",
+          "url": "https://www.academia.edu/28286120/_Les_%C3%A9lites_eccl%C3%A9siastiques_orthodoxes_et_le_politique_en_Thrace_grecque_en_deuxi%C3%A8me_moiti%C3%A9_du_XXe_si%C3%A8cle_autorit%C3%A9_traditionnelle_rationnelle_l%C3%A9gale_et_charismatique_en_espace_limitrophe_et_multiconfessionnel_p_303_316_in_Actes_du_colloque_Elites_grecques_XVIII_XXe_siecle_2015_INALCO",
+          "title": "\"Les élites ecclésiastiques orthodoxes et le politique en ...",
+          "description": "Lascaris, « Petros Lantzas » 1956, 103-118, ibid. 237-253. Laskaris ... Pétros Lantzas, gouverneur de Parga (1596-1608) et instrument des Espagnols ...",
+          "date": [],
+          "search_providers": [
+            "google",
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 3,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/69588182/Helen_Sullivan_The_Communal_Mind_and_the_Master_Artifice_Atenas_Stochastis_2009_pp_722",
+          "url": "https://www.academia.edu/69588182/Helen_Sullivan_The_Communal_Mind_and_the_Master_Artifice_Atenas_Stochastis_2009_pp_722",
+          "title": "(PDF) Helen Sullivan, The Communal Mind and the Master ...",
+          "description": "... Petros Lantzas σαν μυστική συνεννόηση με τους Ισπανούς.45 Όλα (capitán Pietro Lanzi).44 The Albanian regional gov- αυτά θα πρέπει μάλλον να αποδοθούν στον ...",
+          "date": [],
+          "search_providers": [
+            "google",
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 3,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://ionio.academia.edu/PetrosPizanias",
+          "url": "https://ionio.academia.edu/PetrosPizanias",
+          "title": "Petros Pizanias - Ionian University",
+          "description": "# Petros Pizanias\n\nIonian University, History, Emeritus\n\nPetros Th. Pizanias is Emeritus Professor of History, Department of History, Ionian University. He studied history at École des Hautes Études en Sciences Sociales and has worked as a Visiting Professor in several French universities. He directed the Post-Graduate Studies program, Department of History, and held the UNESCO chair for the training on teaching and researching history in the Balkans. He has published extensively in journals, such as Annales ESC, and Ta Istorika, he has organized international conferences, and has published nine books in the field of Modern and Contemporary Greek History. His most recent books include The Greek Revolutionof 1821: A European Event, Isis publications, and the proposed book published in Greek by Hestia Publications. He was also the chairman of the scientific committee of the Institute of Strategic and Development Studies – A. Papandreou, and advisor to the Minister of National Education (1997-1999). Since 2001, he has been the Principal Investigator of a historical research titled \"The Hermes of Modern Greeks\" a digital database with prosopographical parameters of selected social groups which played an important role in the 1821 Greek revolution. He is currently completing a book on the general history of the 1821 Greek revolution.Curriculum Vitae: https://en.wikipedia.org/wiki/Petros_PizaniasE-mail: [email protected] Address: Abati 5, 11741 Athens, Greece",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 3,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://uoa.academia.edu/PetrosBourasVallianatos",
+          "url": "https://uoa.academia.edu/PetrosBourasVallianatos",
+          "title": "Petros Bouras-Vallianatos - National & Kapodistrian University of Athens",
+          "description": "# Petros Bouras-Vallianatos\n\nNational & Kapodistrian University of Athens, History and Philosophy of Science, Faculty Member\n\nUniversity of Edinburgh, School of History, Classics and Archaeology, Honorary Fellow",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 3,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://uowm.academia.edu/PetrosPapasarantopoulos",
+          "url": "https://uowm.academia.edu/PetrosPapasarantopoulos",
+          "title": "Petros Papasarantopoulos - University of Western Macedonia (UOWM)",
+          "description": "Petros Papasarantopoulos - University of Western Macedonia (UOWM)\n\n# Petros Papasarantopoulos\n\nUniversity of Western Macedonia (UOWM), Department of Balkan Studies, Alumnus\n\n547\n\nFollowing\n\n498\n\nCo-author\n\n### Papers by Petros Papasarantopoulos",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 3,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/10052817/Myths_of_the_other_in_the_Balkans_eds_by_Fotini_Tsibiridou_and_Nikitas_Palantzas",
+          "url": "https://www.academia.edu/10052817/Myths_of_the_other_in_the_Balkans_eds_by_Fotini_Tsibiridou_and_Nikitas_Palantzas",
+          "title": "(PDF) Myths of the other in the Balkans / (eds) by Fotini Tsibiridou & Nikitas Palantzas",
+          "description": "# Myths of the other in the Balkans / (eds) by Fotini Tsibiridou & Nikitas Palantzas\n\nΑριστείδης Σγατζός Marica Rombou-Levidi Anna Apostolidou Aimilia Voulvouli lambros ... Fotini Tsibiridou Panos Hatziprokopiou Brunilda Zenelaga Maria",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 3,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://independent.academia.edu/PetrosValtazanos",
+          "url": "https://independent.academia.edu/PetrosValtazanos",
+          "title": "Petros Valtazanos - Independent Researcher",
+          "description": "Researcher\n\n# Petros Valtazanos\n\n### Papers by Petros Valtazanos\n\nThe (H2o)2-Star Cluster at a Geometry of Intramolecular Charge-Transfer\n\nJournal URL: http://www.sciencedirect.com/science/journal/0166128\n\nLocal Minima of Ground Hypersurfaces - the Cases",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 3,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/video/kOWLJk",
+          "url": "https://www.academia.edu/video/kOWLJk",
+          "title": "Online Talk about my recent book 'Innovation in Byzantine Medicine: The Writings of John Zacharias Aktouarios (c.1275-c.1330)', Oxford University Press, 2020 | Petros Bouras-Vallianatos - Academia.edu",
+          "description": "Online Talk about my recent book 'Innovation in Byzantine Medicine: The Writings of John Zacharias Aktouarios (c.1275-c.1330)', Oxford University Press, 2020 | Petros Bouras-Vallianatos - Academia.edu",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 3,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://unic.academia.edu/PetrosLapithis",
+          "url": "https://unic.academia.edu/PetrosLapithis",
+          "title": "Petros Lapithis - Architecture, University of Nicosia",
+          "description": "# Petros Lapithis\n\nUniversity of Nicosia, Architecture, Professor, Coordinator Sustainable Design Unit\n...\nDr Petros Lapithis holds the position of Professor and coordinator of the Sustainable Design ... , University of Nicosia, Cyprus. Lapithis holds a",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lantzas\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 3,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": null
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Petros Lantzas\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"FIRST_PAGE_ONLY\", \"returned_records\": 3, \"service\": \"SerpAPI / Google organic results\", \"more_results_available\": null}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 10, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 10, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pietro Lanza\"",
+      "records": [
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/36901907/Pietro_Lanza_Principe_di_Scordia_Degli_Arabi_e_del_loro_soggiorno_in_Sicilia_Palermo_1832_",
+          "url": "https://www.academia.edu/36901907/Pietro_Lanza_Principe_di_Scordia_Degli_Arabi_e_del_loro_soggiorno_in_Sicilia_Palermo_1832_",
+          "title": "Pietro Lanza, Principe di Scordia. Degli Arabi e del loro ...",
+          "description": "Pietro Lanza, Principe di Scordia. Degli Arabi e del loro soggiorno in Sicilia ( Palermo; 1832)",
+          "date": [],
+          "search_providers": [
+            "google"
+          ],
+          "search_query": "site:academia.edu \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/27339654/I_nostri_saracini_Writing_the_history_of_the_Arabs_of_Sicily",
+          "url": "https://www.academia.edu/27339654/I_nostri_saracini_Writing_the_history_of_the_Arabs_of_Sicily",
+          "title": "(PDF) I nostri saracini, Writing the history of the Arabs of Sicily",
+          "description": "This essay examines the lives and scholarship of three nineteenth-century Sicilian Orientalists – Pietro Lanza, Vincenzo Mortillaro, and Michele Amari – who ...",
+          "date": [],
+          "search_providers": [
+            "google"
+          ],
+          "search_query": "site:academia.edu \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/44478483/_Dalla_Serenissima_al_Cattolicissimo_Le_fortune_di_capitan_Pietro_Lanza_%CE%91%CF%80%CF%8C_%CF%84%CE%B7_%CE%93%CE%B1%CE%BB%CE%B7%CE%BD%CE%BF%CF%84%CE%AC%CF%84%CE%B7_%CF%83%CF%84%CE%BF%CE%BD_%CE%9A%CE%B1%CE%B8%CE%BF%CE%BB%CE%B9%CE%BA%CF%8C%CF%84%CE%B1%CF%84%CE%BF_%CE%9F%CE%B9_%CF%86%CE%BF%CF%85%CF%81%CF%84%CE%BF%CF%8D%CE%BD%CE%B5%CF%82_%CF%84%CE%BF%CF%85_%CE%9A%CE%B1%CF%80%CE%B5%CF%84%CE%AC%CE%BD_%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%85_%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1_Thesaurismata_%CE%98%CE%B7%CF%83%CE%B1%CF%85%CF%81%CE%AF%CF%83%CE%BC%CE%B1%CF%84%CE%B1_30_2000_277_299",
+          "url": "https://www.academia.edu/44478483/_Dalla_Serenissima_al_Cattolicissimo_Le_fortune_di_capitan_Pietro_Lanza_%CE%91%CF%80%CF%8C_%CF%84%CE%B7_%CE%93%CE%B1%CE%BB%CE%B7%CE%BD%CE%BF%CF%84%CE%AC%CF%84%CE%B7_%CF%83%CF%84%CE%BF%CE%BD_%CE%9A%CE%B1%CE%B8%CE%BF%CE%BB%CE%B9%CE%BA%CF%8C%CF%84%CE%B1%CF%84%CE%BF_%CE%9F%CE%B9_%CF%86%CE%BF%CF%85%CF%81%CF%84%CE%BF%CF%8D%CE%BD%CE%B5%CF%82_%CF%84%CE%BF%CF%85_%CE%9A%CE%B1%CF%80%CE%B5%CF%84%CE%AC%CE%BD_%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%85_%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1_Thesaurismata_%CE%98%CE%B7%CF%83%CE%B1%CF%85%CF%81%CE%AF%CF%83%CE%BC%CE%B1%CF%84%CE%B1_30_2000_277_299",
+          "title": "\"Dalla Serenissima al Cattolicissimo: Le fortune di capitan Pietro ...",
+          "description": "\"Dalla Serenissima al Cattolicissimo: Le fortune di capitan Pietro Lanza\" («Από τη Γαληνοτάτη στον Καθολικότατο: Οι φουρτούνες του Καπετάν-Πέτρου Λάντζα»), ...",
+          "date": [],
+          "search_providers": [
+            "google"
+          ],
+          "search_query": "site:academia.edu \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/11088883/THE_TREASURE_OF_MUSSOMELI_AND_ITS_ORIGINS_OF_PLACE_NAME",
+          "url": "https://www.academia.edu/11088883/THE_TREASURE_OF_MUSSOMELI_AND_ITS_ORIGINS_OF_PLACE_NAME",
+          "title": "the treasure of mussomeli and its origins of place name",
+          "description": "This Essay, could be reconnect-me on the thousand-year-old History of Mussomeli and its area where during the early '20 was found an Arabian Treasure that ...",
+          "date": [],
+          "search_providers": [
+            "google"
+          ],
+          "search_query": "site:academia.edu \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/14206013/Les_Arabes_et_la_Campanie_au_IXe_si%C3%A8cle_strat%C3%A9gies_politiques_et_militaires",
+          "url": "https://www.academia.edu/14206013/Les_Arabes_et_la_Campanie_au_IXe_si%C3%A8cle_strat%C3%A9gies_politiques_et_militaires",
+          "title": "Les Arabes et la Campanie au IXe siècle: stratégies politiques ...",
+          "description": "An overview on the Islamic presence in Campania (Italy) during the 9th century examined within the Euro-Mediterranean geopolitcal context.",
+          "date": [],
+          "search_providers": [
+            "google"
+          ],
+          "search_query": "site:academia.edu \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/31528130/Sicily_al_Andalus_and_the_Maghreb_Writing_in_Times_of_Turmoil_CONFERENCE_PROGRAM",
+          "url": "https://www.academia.edu/31528130/Sicily_al_Andalus_and_the_Maghreb_Writing_in_Times_of_Turmoil_CONFERENCE_PROGRAM",
+          "title": "(PDF) Sicily, al-Andalus and the Maghreb: Writing in Times ...",
+          "description": "His work explores the rich world of Arabic poetry and poetics in the Islamic West, focusing on how languages, cultures, and literary traditions intertwined in ...",
+          "date": [],
+          "search_providers": [
+            "google"
+          ],
+          "search_query": "site:academia.edu \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/144572290/Transforming_Cefal%C3%B9_in_Mogadishu_The_Arabo_Normanna_Cathedral_of_Italian_Somalia_and_the_Fa%C3%A7ade_of_Peaceful_Conquest_",
+          "url": "https://www.academia.edu/144572290/Transforming_Cefal%C3%B9_in_Mogadishu_The_Arabo_Normanna_Cathedral_of_Italian_Somalia_and_the_Fa%C3%A7ade_of_Peaceful_Conquest_",
+          "title": "Transforming Cefalù in Mogadishu: The Arabo-Normanna ...",
+          "description": "... Pietro Lanza di Scalea on 24 July 1923 suggests that they were authorized to proceed with construction around the same time: vol. I, posiz. 89/15, fasc. 58 ...",
+          "date": [],
+          "search_providers": [
+            "google"
+          ],
+          "search_query": "site:academia.edu \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/23699118/EBREI_CATALANI_NEL_REGNO_DI_SICILIA",
+          "url": "https://www.academia.edu/23699118/EBREI_CATALANI_NEL_REGNO_DI_SICILIA",
+          "title": "(DOC) EBREI CATALANI NEL REGNO DI SICILIA",
+          "description": "Catalonia's ties facilitated significant Jewish immigration to Sicily from the Iberian Peninsula. documents reveal ongoing Catalan Jewish immigration and ...",
+          "date": [],
+          "search_providers": [
+            "google"
+          ],
+          "search_query": "site:academia.edu \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://crete.academia.edu/pioannou",
+          "url": "https://crete.academia.edu/pioannou",
+          "title": "Panayotis Ioannou - University of Crete - Academia.edu",
+          "description": "... Pietro Lanza · \"Dalla Serenissima al Cattolicissimo: Le fortune di capitan Pietro Lanza\" («Από τη Γαληνοτάτη στον Καθολικότατο: Οι φουρτούνες του Καπετάν ...",
+          "date": [],
+          "search_providers": [
+            "google"
+          ],
+          "search_query": "site:academia.edu \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/55661617/Celestino_Schiaparelli_s_Papers_at_the_Library_of_the_Italian_Institute_of_Oriental_Studies_A_First_Survey",
+          "url": "https://www.academia.edu/55661617/Celestino_Schiaparelli_s_Papers_at_the_Library_of_the_Italian_Institute_of_Oriental_Studies_A_First_Survey",
+          "title": "Celestino Schiaparelli's Papers at the Library of the Italian ...",
+          "description": "Schiaparelli's papers illuminate 19th-century Sicilian Arabism and Arabic poetry studies. · The collection includes unpublished works, notably an Arabic ...",
+          "date": [],
+          "search_providers": [
+            "google"
+          ],
+          "search_query": "site:academia.edu \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/90368548/The_End_of_Muslim_Sicily_a_Poetics_of_Fitna",
+          "url": "https://www.academia.edu/90368548/The_End_of_Muslim_Sicily_a_Poetics_of_Fitna",
+          "title": "(PDF) The End of Muslim Sicily: a Poetics of Fitna",
+          "description": "I nostri saracini, Writing the history of the Arabs of Sicily\n\nKarla Mallette\n\n...\n\nDuring the nineteenth century, Sicilian Orientalists wrote the story of Sicily’s domination by the Arabs and the Arabic-language culture of the Normans – centuries of eventful history that had been lost to the West because European historians could not read Arabic documents. In their histories, Sicilians identified an alternate origin for European modernity: the vibrant Arab culture of the medieval Mediterranean transmitted to the continent through borderland states like the Kingdom of Sicily. This essay examines the lives and scholarship of three nineteenth-century Sicilian Orientalists – Pietro Lanza, Vincenzo Mortillaro, and Michele Amari – who worked to articulate a Mediterranean origin for European modernity.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/3105962/Al-Hadra_ar-Rujjariyya._Arabismo_e_propaganda_politica_alla_corte_di_Ruggero_II_di_Sicilia",
+          "url": "https://www.academia.edu/3105962/Al-Hadra_ar-Rujjariyya._Arabismo_e_propaganda_politica_alla_corte_di_Ruggero_II_di_Sicilia",
+          "title": "Al-Ḥaḍra ar-Rujjāriyya. Arabismo e propaganda politica alla corte di Ruggero II di Sicilia",
+          "description": "al-Qāhira e Palermo. Diplomazia e comunicazione politica tra\n...\nPietro Lanza, Principe di Scordia. Degli Arabi e del loro soggiorno in Sicilia ( Palermo; 1832)\n\nعبد القادر المختار Abdelkader El-Mokhtar بوطالب Boutaleb\n\nDownload Free PDF View PDF",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/30503467/The%5FSicilian%5FQuestions",
+          "url": "https://www.academia.edu/30503467/The%5FSicilian%5FQuestions",
+          "title": "(PDF) The Sicilian Questions",
+          "description": "saracini, Writing ... history of the Arabs of Sicily\n\n...\n\nDuring the nineteenth century, Sicilian Orientalists wrote the story of Sicily’s domination by the Arabs and the Arabic-language culture of the Normans – centuries of eventful history that had been lost to the West because European historians could not read Arabic documents. In their histories, Sicilians identified an alternate origin for European modernity: the vibrant Arab culture of the medieval Mediterranean transmitted to the continent through borderland states like the Kingdom of Sicily. This essay examines the lives and scholarship of three nineteenth-century Sicilian Orientalists – Pietro Lanza, Vincenzo Mortillaro, and Michele Amari – who worked to articulate a Mediterranean origin for European modernity.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/82382145/La_Ruota_della_fortuna_Africani_neri_alle_corti_dei_re_di_Sicilia_secoli_XII_XIV_",
+          "url": "https://www.academia.edu/82382145/La_Ruota_della_fortuna_Africani_neri_alle_corti_dei_re_di_Sicilia_secoli_XII_XIV_",
+          "title": "La Ruota della fortuna. Africani neri alle corti dei re di Sicilia (secoli XII-XIV)",
+          "description": "\"L'aureo libro moral\". Circolazione e fortuna del 'Principe' prima della stampa (1516-1531)\n...\nPietro Lanza, Principe di Scordia. Degli Arabi e del loro soggiorno in Sicilia ( Palermo; 1832)\n\nعبد القادر المختار Abdelkader El-Mokhtar بوطالب Boutaleb",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/24300050/Christians_in_Arab_Malta_5_The_Latin_conquest_of_Muslim_Sicily_started_from_Christian_Malta",
+          "url": "https://www.academia.edu/24300050/Christians_in_Arab_Malta_5_The_Latin_conquest_of_Muslim_Sicily_started_from_Christian_Malta",
+          "title": "Christians in Arab Malta (5): The Latin conquest of Muslim Sicily started from Christian Malta",
+          "description": "During the nineteenth century, Sicilian Orientalists wrote the story of Sicily’s domination by the Arabs and the Arabic-language culture of the Normans – centuries of eventful history that had been lost to the West because European historians could not read Arabic documents. In their histories, Sicilians identified an alternate origin for European modernity: the vibrant Arab culture of the medieval Mediterranean transmitted to the continent through borderland states like the Kingdom of Sicily ... examines the lives and scholarship of three nineteenth-century Sicilian Orientalists – Pietro Lanza, Vincenzo Mortillaro, and Michele Amari – who worked to articulate a Mediterranean origin for European modernity.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/7814334/Interview_with_Gaetano_Cipolla",
+          "url": "https://www.academia.edu/7814334/Interview_with_Gaetano_Cipolla",
+          "title": "Interview with Gaetano Cipolla",
+          "description": "I nostri saracini, Writing the history of the Arabs of Sicily\n\nKarla Mallette\n\n...\n\nDuring the nineteenth century, Sicilian Orientalists wrote the story of Sicily’s domination by the Arabs and the Arabic-language culture of the Normans – centuries of eventful history that had been lost to the West because European historians could not read Arabic documents. In their histories, Sicilians identified an alternate origin for European modernity: the vibrant Arab culture of the medieval Mediterranean transmitted to the continent through borderland states like the Kingdom of Sicily. This essay examines the lives and scholarship of three nineteenth-century Sicilian Orientalists – Pietro Lanza, Vincenzo Mortillaro, and Michele Amari – who worked to articulate a Mediterranean origin for European modernity.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/1190888/Malta_and_the_Arabs",
+          "url": "https://www.academia.edu/1190888/Malta_and_the_Arabs",
+          "title": "(PDF) Malta and the Arabs",
+          "description": "I nostri saracini, Writing the history of the Arabs of Sicily\n\nKarla Mallette\n\nDuring the nineteenth century, Sicilian Orientalists wrote the story of Sicily’s domination by the Arabs and the Arabic-language culture of the Normans – centuries of eventful history that had been lost to the West because European historians could not read Arabic documents. In their histories, Sicilians identified an alternate origin for European modernity: the vibrant Arab culture of the medieval Mediterranean transmitted to the continent through borderland states like the Kingdom of Sicily. This essay examines the lives and scholarship of three nineteenth-century Sicilian Orientalists – Pietro Lanza, Vincenzo Mortillaro, and Michele Amari – who worked to articulate a Mediterranean origin for European modernity.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/36912679/The_Sicilian_Translators_of_the_Twelfth_Century_and_the_first_Latin_version_of_Ptolemys_Almagest_Charles_H_Haskins_and_Dean_P_Lockwood_1910_",
+          "url": "https://www.academia.edu/36912679/The_Sicilian_Translators_of_the_Twelfth_Century_and_the_first_Latin_version_of_Ptolemys_Almagest_Charles_H_Haskins_and_Dean_P_Lockwood_1910_",
+          "title": "The Sicilian Translators of the Twelfth Century and the first Latin version of Ptolemy's Almagest (Charles H. Haskins and Dean P. Lockwood; 1910)",
+          "description": "Arabs\n\n...\n\nDuring the nineteenth century, Sicilian Orientalists wrote the story of Sicily’s domination by the Arabs and the Arabic-language culture of the Normans – centuries of eventful history that had been lost to the West because European historians could not read Arabic documents. In their histories, Sicilians identified an alternate origin for European modernity: the vibrant Arab culture of the medieval Mediterranean transmitted to the continent through borderland states like the Kingdom of Sicily. This essay examines the lives and scholarship of three nineteenth-century Sicilian Orientalists – Pietro Lanza, Vincenzo Mortillaro, and Michele Amari – who worked to articulate a Mediterranean origin for European modernity.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/1190888",
+          "url": "https://www.academia.edu/1190888",
+          "title": "Malta and the Arabs",
+          "description": "I nostri saracini, Writing the history of the Arabs of Sicily\n\nKarla Mallette\n\nDuring the nineteenth century, Sicilian Orientalists wrote the story of Sicily’s domination by the Arabs and the Arabic-language culture of the Normans – centuries of eventful history that had been lost to the West because European historians could not read Arabic documents. In their histories, Sicilians identified an alternate origin for European modernity: the vibrant Arab culture of the medieval Mediterranean transmitted to the continent through borderland states like the Kingdom of Sicily. This essay examines the lives and scholarship of three nineteenth-century Sicilian Orientalists – Pietro Lanza, Vincenzo Mortillaro, and Michele Amari – who worked to articulate a Mediterranean origin for European modernity.\n\n...\n\nDownload",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Pietro Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "FIRST_PAGE_ONLY",
+              "returned_records": 10,
+              "service": "SerpAPI / Google organic results",
+              "more_results_available": true
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Pietro Lanza\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"FIRST_PAGE_ONLY\", \"returned_records\": 10, \"service\": \"SerpAPI / Google organic results\", \"more_results_available\": true}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 10, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 19, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lanza\"",
+      "records": [
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://conservatoriovivaldi.academia.edu/SergioLanza",
+          "url": "https://conservatoriovivaldi.academia.edu/SergioLanza",
+          "title": "Sergio Lanza - Conservatorio di Musica \"A. Vivaldi\", Alessandria",
+          "description": "# Sergio Lanza\n\nConservatorio di Musica \"A. Vivaldi\", Alessandria, Chief of the “Theory, Analysis and Composition Department”, member of the Academic Board., Faculty Member\n\n### Papers by Sergio Lanza\n\nThe Footprint Left by Sergio Lanza\n\nThoughts on the",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://independent.academia.edu/AntoninoLanza2",
+          "url": "https://independent.academia.edu/AntoninoLanza2",
+          "title": "Antonino Lanza - Research Profile - 53 Papers",
+          "description": "# Antonino Lanza\n\n### Papers by Antonino Lanza\n\nNeutral Iron Emission Lines from the Dayside of KELT-9b: The GAPS Program with HARPS-N at TNG XX\n\nThe Astrophysical Journal\n...\nthe first detection of atomic emission lines from the atmosphere of an",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://unisa.academia.edu/MicheleambrogioLanza",
+          "url": "https://unisa.academia.edu/MicheleambrogioLanza",
+          "title": "Michele Ambrogio Lanza - Università degli Studi di Salerno",
+          "description": "# Michele Ambrogio Lanza\n\nUniversità degli Studi di Salerno, Ramus PhD program, Alumnus\n...\nLanza\n\nRecensione a \"La seconda Polis\" di B. Centrone\n\nRevista Archai\n\nMotto popolare o ricezione (pseudo) paolina? Paolo nella Costituzione Sovietica del ‘36",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/143935040/Fine_Ware_Classical_Hellenistic",
+          "url": "https://www.academia.edu/143935040/Fine_Ware_Classical_Hellenistic",
+          "title": "(PDF) Fine Ware: Classical--Hellenistic",
+          "description": "LANZA CATTI et al. 2011. Archaic and Black-Gloss Fine Ware, in Carter and Prieto 2011, The Chora of Metaponto\n\nElisa Lanza\n\n...\n\nLanza Catti, E. 2014. \"Archaic and Black-gloss Fine Wares.\" In LANZA CATTI, E., and K. SWIFT 2014. The Chora of Metaponto 5: A Greek Farmhouse at Ponte Fabrizio. J.C. Carter ed., 173-223. Austin: Institute of Classical Archaeology. The University of Texas at Austin. UT Press.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://uth-tgu.academia.edu/MarcosLanza",
+          "url": "https://uth-tgu.academia.edu/MarcosLanza",
+          "title": "Marcos Lanza - Universidad Tecnológica de Honduras (UTH)",
+          "description": "Marcos Lanza - Universidad Tecnológica de Honduras (UTH)\n\n# Marcos Lanza\n\nUniversidad Tecnológica de Honduras (UTH), Cortes, Department Member\n\n### Papers by Marcos Lanza\n...\nda degradação do diclofenaco sódico utilizando H2O2/fenton em reator",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://sheffield.academia.edu/PetrosLameras",
+          "url": "https://sheffield.academia.edu/PetrosLameras",
+          "title": "Petros Lameras",
+          "description": "# Petros Lameras\n\nThe University of Sheffield, The Information School, Alumnus\n\n...\n\n### Papers by Petros Lameras\n\nCreative Thinking Experimentations for Entrepreneurship with A Disruptive, Personalised and Mobile Game-based Learning Ecosystem\n\nby Petros Lameras, Fotis Liarokapis, Thrasyvoulos Tsiatsos, Dimitris Tolis, and Despina Anastasiadou\n\nProc of the 9th Int'l Conference on Interactive Mobile and Communication Technologies and Learning 2015 (IMCL 2015), Special Session: Mobile Serious Games for Creativity, Cognition and Innovation in Education",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/63669354/Entre_Castilla_y_Francia_Comercio_y_comerciantes_en_Bilbao_a_mediados_del_siglo_XVI",
+          "url": "https://www.academia.edu/63669354/Entre_Castilla_y_Francia_Comercio_y_comerciantes_en_Bilbao_a_mediados_del_siglo_XVI",
+          "title": "(PDF) Entre Castilla y Francia: Comercio y comerciantes en Bilbao a mediados del siglo XVI",
+          "description": "Castilla y Francia: Comercio y comerciantes en Bilbao a mediados del siglo XVI\n\nRamón Lanza García\n\ndescriptionSee full PDFdownloadDownload PDF\n\nbookmarkSave to LibraryshareShare\n\n2009, Revista de Historia Económica ( …\n\nvisibility\n\n…\n\ndescription\n\n38",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://uoa.academia.edu/PetrosBourasVallianatos",
+          "url": "https://uoa.academia.edu/PetrosBourasVallianatos",
+          "title": "Petros Bouras-Vallianatos - National & Kapodistrian University of Athens",
+          "description": "# Petros Bouras-Vallianatos\n\nNational & Kapodistrian University of Athens, History and Philosophy of Science, Faculty Member\n\nUniversity of Edinburgh, School of History, Classics and Archaeology, Honorary Fellow",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/12950617/Gorhams_disease_of_the_mandible_mimicking_periodontal_disease_on_radiograph",
+          "url": "https://www.academia.edu/12950617/Gorhams_disease_of_the_mandible_mimicking_periodontal_disease_on_radiograph",
+          "title": "Gorham's disease of the mandible mimicking periodontal disease on radiograph",
+          "description": "# Gorham's disease of the mandible mimicking periodontal disease on radiograph\n\nStefano Fedele Alessandro Lanza\n\n2005, Journal of Clinical Periodontology\n\nhttps://doi.org/10.1111/J.1600-051X.2005.00745.X\n\n...\n\nleading ... oste ... , ... radiographic findings ... diagn ... with ... disease despite exhibiting ... bone ... . ... emphasizes ... importance ... including ... in ... diagnoses for ... advanced progression ... disease",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lanza\"",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Petros Lanza\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"PROVIDER_ERROR\"}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 10, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 9, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lanza\" disputed",
+      "records": [
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/9871756/Full_Text_With_M_Krzyzanowska_Early_Twentieth_Century_Theological_Controversies_in_Ethiopia_The_Letter_of_Coptic_Metropolitan_Petros_of_1904",
+          "url": "https://www.academia.edu/9871756/Full_Text_With_M_Krzyzanowska_Early_Twentieth_Century_Theological_Controversies_in_Ethiopia_The_Letter_of_Coptic_Metropolitan_Petros_of_1904",
+          "title": "Full Text [With M. Krzyzanowska] Early Twentieth Century Theological Controversies in Ethiopia: The Letter of Coptic Metropolitan Petros of 1904",
+          "description": "Full Text [With M. Krzyzanowska] Early Twentieth Century Theological Controversies in Ethiopia: The Letter of Coptic Metropolitan Petros of 1904\n\n...\n\n# Full Text [With M. Krzyzanowska] Early Twentieth Century Theological Controversies in Ethiopia: The Letter of Coptic Metropolitan Petros of 1904\n\nStephane Ancel\n\n2014, Aethiopica, International Journal for Ethiopian and Eritrean Studies, vol. 17",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lanza\" disputed",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/44013993/Colonial_Rewriting_of_African_History_Misinterpretations_and_Distortions_in_Belcher_and_Kleiner_s_Life_and_Struggles_of_Walatta_Petros",
+          "url": "https://www.academia.edu/44013993/Colonial_Rewriting_of_African_History_Misinterpretations_and_Distortions_in_Belcher_and_Kleiner_s_Life_and_Struggles_of_Walatta_Petros",
+          "title": "Colonial Rewriting of African History: Misinterpretations and Distortions in Belcher and Kleiner’s Life and Struggles of Walatta Petros",
+          "description": "## Abstract\n\nThe Hagiography of Ethiopian Saint Woletta Petros was recently translated from Ge’ez into English by Wendy Belcher and Michael Kleiner. Belcher has no knowledge of Ge’ez and simple errors in the translation suggest that Kleiner lacks the fluency required to accurately interpret the language. A western lens with a deliberate distortion of the facts has been applied to the text, using contemporary western understandings of marriage and monastic life to interpret a 17th century Ethiopian nun. Contemporary ethnic politics have been inserted into the interpretation in a way that reproduces negative racial binaries, and relies heavily on the colonial racialization of African identities and western color prejudice that does not exist in Ethiopia. This has resulted in a colonial rewrite of one of Ethiopia’s most holy books. Belcher represents Woletta Petros as a violent, diseased and lustful nun, reproducing racist stereotypes about black women. Sexual scenes and a same-sex partnership between nuns have been inserted into the text where they do not exist in the Ge’ez original. This article will detail the most significant misinterpretations in Belcher and Kleiner’s translation. It will also offer an Ethiopian interpretation of Woletta Petros, considering her legacy within context and drawing on the testimony of the local scholars. The article will show that the translation, as well as Belcher’s subsequent publications around Woletta Petros, constitute colonial scholarship, where a foreigner who cannot understand the language is elevated to the status of expert at the expense of the local people who can not only read and write the language, but also have decadeslong training in the interpretation of these important holy texts. The article will demonstrate that the colonial practice of taking African intellectual resources and using them to rewrite African history is not a relic of the past, but an ongoing and supported practice within universities. Major universities, as important sites of knowledge production, should not contribute to racial prejudices and distortions of African history by supporting projects that are carried out by scholars who deliberately exclude or distort the voices and experiences of local people. This article seeks to prompt a change in the writing of African history, where the agency of black people to narrate their own histories and experiences is respected and supported.\n\n...\n\nThe earliest known book-length biography about an African woman, written in 1672 in the Gəˁəz language, The Life and Struggles of Our Mother Wälättä P̣eṭros, features a life-long partnership between two women and same-sex sexuality among nuns. Revered Ethiopian Orthodox Täwaḥədo Church leader Wälättä P̣eṭros (1592-1642) and another nun, Ǝḫətä Krəstos, “lived together in mutual love, like soul and body” until death. Other nuns are depicted as “being lustful” with each other. Interpreting the women’s relationships in this Ethiopian text requires different reading protocols, merging surface and symptomatic reading as well as attending to Ethiopian authorial and interpretive practices, protocols for which queer theory provides useful warnings and tools. This is the first scholarly article proffering a queer reading of pre-twentieth-century sub-Saharan African literature. By foregrounding a text in an African language, this article alerts us to the dimensions of and possibilities for queer experiences outside of the arena of twentieth-century Europhone African literatures.\n\n...\n\n: ... on the Gädlä Wälättä P̣ eṭros, the Short History of Walatta Petros's Community, Susənyos's royal chronicle, and the seventeenth-century Jesuits' accounts. dates in bold represent dates confirmed by these other seventeenth-century sources or stated directly in the Gädlä Wälättä P̣ eṭros. See \"calendar\" in ... glossary regarding issues of dating in the ethiopian calendar. Jesuits arrive in ethiopia. 1591 a monk predicts Walatta Petros's parents will have a holy daughter. Walatta Petros is born. 1601 Ǝḫətä Krəstos is born no later than this year; probably five to ten years earlier. Jesuit missionary Pedro Páez arrives. 1606 Walatta Petros's previous husband, if he existed, is killed by King yaˁqob (r. 1597-1603, 1604-6) by this date. Susənyos becomes king. 1608 Walatta Petros is sixteen; at approximately this age she marries Mälkəˀa Krəstos. Mälkəˀa Krəstos accompanies King Susənyos on a military campaign for the first time, according to Susənyos's royal chronicle. Páez privately converts King Susənyos and his brother, Ras Śəˁəlä Krəstos to catholicism. 1615 Walatta Petros is twenty-three; at approximately this age, after having three children die in infancy, she first tries to leave her husband and take up the religious life. Ǝḫətä Krəstos leaves her husband and becomes a nun. Mälkəˀa Krəstos takes part in the battle against yolyos, an anti-catholic rebel, on 11 May, and returns home with the garments of the murdered Abunä Səmˁon. Walatta Petros successfully leaves her husband, meets Ǝḫətä Krəstos, and becomes a nun at the age of twenty-five. King Susənyos forbids the teaching of ethiopian Orthodoxy and publicly professes roman catholicism. Pedro Páez dies. 1622 Walatta Petros is first called up before King Susənyos and his court. 1622 Ras Śəˁəlä Krəstos, the king's brother, persecutes Walatta Petros. 1622 Walatta Petros goes to Waldəbba where she receives her holy commission from christ and begins preaching. 1622 Walatta Petros leaves Waldəbba and goes to Ṣällämt to preach for approximately three years. Mälkəˀa Krəstos refuses to assist Ras Śəˁəlä Krəstos, Walatta Petros's nemesis, and thus angers King Susənyos, according to his chronicle. 1625 Walatta Petros is again called up before the court in May.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lanza\" disputed",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/33676150/Review_The_Life_and_Struggles_of_Our_Mother_Walatta_Petros_A_Seventeenth_Century_African_Biography_of_an_Ethiopian_Woman_By_Galawdewos_Translated_and_edited_by_Wendy_Laura_Belcher_and_Michael_Kleiner",
+          "url": "https://www.academia.edu/33676150/Review_The_Life_and_Struggles_of_Our_Mother_Walatta_Petros_A_Seventeenth_Century_African_Biography_of_an_Ethiopian_Woman_By_Galawdewos_Translated_and_edited_by_Wendy_Laura_Belcher_and_Michael_Kleiner",
+          "title": "Review: The Life and Struggles of Our Mother Walatta Petros: A Seventeenth-Century African Biography of an Ethiopian Woman. By Galawdewos . Translated and edited by Wendy Laura Belcher and Michael Kleiner",
+          "description": "# Review: The Life and Struggles of Our Mother Walatta Petros: A Seventeenth-Century African Biography of an Ethiopian Woman. By Galawdewos . Translated and edited by Wendy Laura Belcher and Michael Kleiner",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lanza\" disputed",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/49269262/Lo_stolto_e_lintelligenza_artificiale",
+          "url": "https://www.academia.edu/49269262/Lo_stolto_e_lintelligenza_artificiale",
+          "title": "Lo stolto e l'intelligenza artificiale (PDF) | Academia",
+          "description": "## Abstract\n\nWhat is intelligence and what is stupidity? Why do we laugh at those who are stupid and why do we make fun of wise people? These are the fundamental questions in Diego Lanza’s book, Lo stolto. Di Socrate, Eulenspiegel, Pinocchio e altri trasgressori del senso comune, which appeared in 1997 and has just been republished by Petite Plaisance. The purpose of this article is to re-read the questions raised by Lanza’s book in the light of the current concepts of ‘intelligence’ and ‘artificial intelligence’.\n\n...\n\ndi Estetica -N. ... 8.1: 2 ... 2 ... Pagina ... 5\n\n...\n\n. BODEN ... Margaret ... Creative ... .\n\n...\n\n. KEHLMANN ... Alg ... . ... Zukunfts ... , ... - ... 2 ... .\n\n...\n\n. KO ... EN ... , Alexander, ... rtens ... der ... 0 ... .\n\n...\n\n. ... ZA, Diego, ... rogare il passato. Lo studio dell'antico tra Otto e Novecento, Carocci, Roma 2013\n\n...\n\n. -, ... stolto. Di Socrate, ... enspiegel, Pinocchio e altri trasgressori del senso comune, Petite ... aisance, Pistoia 2020.\n\n...\n\n. -, Tempo senza tempo. La riflessione sul mito dal Settecento a oggi, Carocci, ... 2017;\n\n...\n\n. ... ZA Diego e UGOLINI Gherardo (a ... di), Storia della filologia classica, Carocci, ... 20 ... 2 .\n9. UGOLINI, Gherardo, ... ann ... ideologia\" ... Diego Lanza, ... Diego Lanza, ... tir ... il suo ... , ... , Pistoia 20 ... ; Nota biografica Sotera Fornaro insegna ... atura greca ... Letter ... comparate all'Università di Sassari. Le sue ricerche vertono sulla letteratura greca, da Omero all'età ... iale, sulla ... zione della letteratura classica nelle ... ature ... e contemporanee, sulla storia degli studi classici. Autrice di numerosi contributi ... tedesca ... trad ... trice ... , da ultimo ha fondato la ... ista ... - ... «Archivi delle emozioni» (http ... ozioni. ... / ... . ... /rivista). ... il ... e di ... i di ... - ... . ... . ... : 20 ... , Pagina 15\n\n...\n\n1 ... . ricerca « ... tragico ... La tragedia scena sulla scena del XXI secolo» (https://www.visionideltragico.it/blog/index.php) e il relativo OJS.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lanza\" disputed",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/26777896/Petros_S_Berga_What_Happened_to_the_Original_Christian_Unity_in_Ethiopia_Towards_the_Restoration_of_Our_Original_Unity_in_Christ",
+          "url": "https://www.academia.edu/26777896/Petros_S_Berga_What_Happened_to_the_Original_Christian_Unity_in_Ethiopia_Towards_the_Restoration_of_Our_Original_Unity_in_Christ",
+          "title": "Petros S. Berga: What Happened to the Original Christian Unity in Ethiopia? Towards the Restoration of Our Original Unity in Christ",
+          "description": "# Petros S. Berga: What Happened to the Original Christian Unity in Ethiopia? Towards the Restoration of Our Original Unity in Christ\n\nMersha Alehegne\n\n2012, Aethiopica\n...\nText [With M. Krzyzanowska] Early Twentieth Century Theological Controversies in",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lanza\" disputed",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/31397720/Er%C3%B3tica_y_destierro_Inspiraci%C3%B3n_po%C3%A9tica_y_filosof%C3%ADa_en_Plat%C3%B3n",
+          "url": "https://www.academia.edu/31397720/Er%C3%B3tica_y_destierro_Inspiraci%C3%B3n_po%C3%A9tica_y_filosof%C3%ADa_en_Plat%C3%B3n",
+          "title": "(PDF) Erótica y destierro. Inspiración poética y filosofía en Platón.",
+          "description": "# Erótica y destierro. Inspiración poética y filosofía en Platón.\n\nHenar Lanza González\n\n2017, Eidos\n\n...\n\n## Abstract\n\nReseña del libro \"Erótica y destierro. Inspiración poética y filosofía en Platón\". Los principales temas analizados en este libro son la inspiración poética, la relación de la poesía con la filosofía en el proceso de ascensión desde lo sensible hasta lo inteligible, el papel de la mímesis en la educación y en el arte, los aspectos ontológicos, epistemológicos y estéticos de la poesía tal y como la presenta, la analiza y la critica Platón, la belleza y su relación con el bien y con el ansia de inmortalidad, el amor y su carácter intermedio e intermediario, y el deseo racional y el deseo irracional en relación con la estructura tripartita del alma tal y como la presenta Platón en la República, entre otros diálogos.\n\n...\n\nInvestigadora independiente (julio 2025). Profesora investigadora del departamento de Filosofía y Humanidades de la Universidad del Norte (2016-2025), editora de Eidos, revista de filosofía, docente de planta del programa de Filosofía de la Universidad del Atlántico (2012-2016), profesora invitada del máster Crítica y argumentación filosófica de la Universidad Autónoma de Madrid (2010-2011), doctora en filosofía por la Universidad Autónoma de Madrid (2009), licenciada en Filosofía por la Universidad de Salamanca (1999). Mi primera línea de investigación fue el papel de la matemática en la obra de Platón, eso me llevó a seguir explorando la relación entre filosofía y ciencia en la Antigüedad (geometría y fisiología), en la Edad Moderna (astronomía), en el siglo XX (física) y en el XXI (biología y ecología). Y de aquí a los estudios aobre el Antropoceno, empezando por quién es ese ánthropos. Los problemas que guían mi investigación son: ¿cómo podemos universalizar la actitud filosófica? y ¿cómo podemos salvar el abismo entre ciencias y humanidades señalado por C. P. Snow en The two cultures (1959) y agudizado en el presente por la progresiva especialización y fragmentación de los saberes que dividen el mundo en letras y ciencias, emisores y receptores, especialistas y legos?",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lanza\" disputed",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/150273501/_Hasta_et_Lancea_La_Lanza_de_Antioquia_en_la_Cr%C3%B3nica_de_Raimon_dAguilers",
+          "url": "https://www.academia.edu/150273501/_Hasta_et_Lancea_La_Lanza_de_Antioquia_en_la_Cr%C3%B3nica_de_Raimon_dAguilers",
+          "title": "(PDF) \"Hasta et Lancea\": La Lanza de Antioquia en la Crónica de Raimon d'Aguilers | Academia",
+          "description": "# \"Hasta et Lancea\": La Lanza de Antioquia en la Crónica de Raimon d'Aguilers\n\nJordi Teixidó Escobar\n\n2026, La Lanza de Antioquía en la Crónica de Raimon d'Aguilers\n\n40 pages\n\n...\n\n## Abstract\n\nEl presente estudio es una de las disertaciones monográficas que acompañan a la traducción al castellano de la Crónica de la 1a Cruzada de Raimon de Aguilers, como parte de la Tesis Doctoral del autor. La lanza de Longinos es un tema central en la Crónica, independientemente de las dudas sobre su autenticidad que aparecen ya desde el mismo momento de su hallazgo. Todas las fuentes antiguas y modernas coinciden en que su descubrimiento en Antioquía, derivado de la visión sobrenatural de Pedro Bartolomé, representó un aspecto esencial en la superación de las múltiples dificultades que los cruzados afrontaron en esa ciudad, y fue especialmente importante como factor de motivación de las tropas cristianas ante su enfrentamiento, decisivo para toda la empresa cruzada, con el líder turco Kerbojah.\n\n...\n\n1. Otros escépticos sobre la reliquia son los cronistas árabes, entre ellos Ibn al-Athir, quien afirma que fue todo un montaje de Pedro Bartolomé: de Wallis Budge): \"Y Baimond (Bohemundo), uno de los condes que estaban con ellos, gobernó sobre ella (es decir, la ciudad). Y los francos permanecieron en ella durante trece días sin encontrar nada que comer, y muchos se comieron sus caballos. Y cuando el sultán Turkyaruk oyó [esto], envió contra los turcos. Y Dios dio la victoria a los francos y ellos cubrieron el suelo con los muertos.\" 45 ¿Los clavos de la Cruz, o un hierro? Conmena: \"Tras algunos días, movido por una voz divina, el obispo mandó buscar a los principales condes y les indicó que excavasen a la derecha del altar, y que allí encontrarían el Santo Clavo. ….A partir de entonces, durante las batallas, confiaron el venerable y divino Clavo a Isangeles, por ser el más puro de todos\" 46\n2. Es difícilmente compatible un \"clavo\" con lo que en cualquier época se entiende como \"Lanza\". Como recoge Runciman, otra palabra usada para el hallazgo, recogiendo fue 47 Texto completo de la Alexiada en griego en wikisource: Αλεξιάς/Βιβλίο 11 -Βικιθήκη 46\n3. Ana Conmena \"La Alexíada\" Traducción de Emilio Diaz Rolando, Atico de los Libros, Barcelona 2020, Libro XI, cap. 6 , p 440\n4. Ernest A. Wallis Budge The Chronography Of Gregory Abu'l-Faraj 1225-1286 The Son Of Aaron, The Hebrew Physician Commonly Known As Bar Hebraeus, p, 235\n5. 44 ver RHC, Historiens orientaux, Tome II, 1ª parte (Paris, 1887), p. 195 https://archive.org/details/recueildeshistor01acad/page/194/mode/2up?utm_source=chatgpt.com&q= Kamel-Altevarykh\n6. Runciman, S. The Holy Lance found at Antioch, Analecta Bollandiana ,Volume 68 > DOI: 10.1484/J.ABOL.4.01033",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lanza\" disputed",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/121040320/Uncle_Petros_and_Goldbachs_Conjecture",
+          "url": "https://www.academia.edu/121040320/Uncle_Petros_and_Goldbachs_Conjecture",
+          "title": "(PDF) Uncle Petros and Goldbach's Conjecture",
+          "description": "This review compares two novels, \"Uncle Petros and Goldbach's Conjecture\" and \"The Wild Numbers\", both centered around the theme of mathematicians and their obsession with complex mathematical problems. It highlights how each book portrays the challenges faced by their protagonists, with the former relating to a real mathematical conjecture while the latter is entirely fictional. Both novels aim to emphasize the creative and captivating nature of mathematics, although they differ in storytelling approaches and character development.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lanza\" disputed",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "Academia.edu Public Research",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.academia.edu/9015083/El_Tio_Petros_y_la_Conjetura_de_Goldbach",
+          "url": "https://www.academia.edu/9015083/El_Tio_Petros_y_la_Conjetura_de_Goldbach",
+          "title": "(PDF) El Tio Petros y la Conjetura de Goldbach",
+          "description": "Anargyros, se aseguraron de que mis primos y yo hered´aramos sin cuestionar la opini´on que ten´ ... de ´el. —El in´util de mi hermano Petros es uno de los fiascos de ... su humor. Sin embargo, debo reconocerles algo: en el aspecto econ´",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:academia.edu \"Petros Lanza\" disputed",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "FAILED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "PROVIDER_ERROR"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Petros Lanza\\\" disputed\", \"providers\": [{\"provider\": \"google\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"PROVIDER_ERROR\"}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 10, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 9, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22 ; HTTPError: HTTP Error 429: Too Many Requests",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22 ; HTTPError: HTTP Error 429: Too Many Requests"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"Petros Lantzas\"",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Petros+Lantzas%22 ; HTTPError: HTTP Error 429: Too Many Requests",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Petros+Lantzas%22 ; HTTPError: HTTP Error 429: Too Many Requests"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"Pietro Lanza\"",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Pietro+Lanza%22 ; HTTPError: HTTP Error 429: Too Many Requests",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Pietro+Lanza%22 ; HTTPError: HTTP Error 429: Too Many Requests"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"Petros Lanza\"",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Petros+Lanza%22 ; HTTPError: HTTP Error 429: Too Many Requests",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Petros+Lanza%22 ; HTTPError: HTTP Error 429: Too Many Requests"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"Petros Lanza\" disputed",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Petros+Lanza%22+disputed ; HTTPError: HTTP Error 429: Too Many Requests",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Petros+Lanza%22+disputed ; HTTPError: HTTP Error 429: Too Many Requests"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pietro Lanza\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Pietro+Lanza%22 ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22 ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lanza\" disputed",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "research guide",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Petros+Lanza%22+disputed ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lantzas\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Petros+Lantzas%22 ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lanza\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "research guide",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Petros+Lanza%22 ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "result_count": 90,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
