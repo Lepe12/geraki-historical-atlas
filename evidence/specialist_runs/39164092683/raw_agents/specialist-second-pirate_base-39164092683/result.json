@@ -1,0 +1,271 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "pirate_base",
+  "label": "Pirate Base / Anchorage Agent",
+  "assignment_id": "pirate_base:wave2",
+  "assignment_wave": 2,
+  "requested_outputs": [
+    "base_classification",
+    "use_frequency",
+    "logistics",
+    "actors",
+    "date_ranges",
+    "evidence_gaps"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "35d4545734ba9d541413346da6f55bbb2f798a4cf38797186e917a7b787a941b",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "pirate_base",
+    "assignment_id": "pirate_base:wave2",
+    "assignment_wave": 2,
+    "route_ids": [
+      "repo:Gallica/BnF",
+      "repo:PARES / Archivo General de Simancas"
+    ],
+    "queries": [
+      "Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence. pirate base corsair base anchorage harbour refuge",
+      "Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence. pirates corsairs provisioning repairs captives ransom",
+      "Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence. historical harbour anchorage fort cave island piracy",
+      "Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence. pirates corsairs"
+    ],
+    "operation": "search",
+    "search_budget": 8,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "result_aware_fallback_v1",
+    "routes": [
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:PARES / Archivo General de Simancas",
+        "route_type": "repository_dispatch",
+        "repository": "PARES / Archivo General de Simancas",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 81,
+        "reason": [
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 75,
+        "reason": [
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 4,
+    "total_search_budget": 8,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "INVALID_QUERY",
+      "query": "Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence. pirate base corsair base anchorage harbour refuge",
+      "records": [],
+      "diagnostic": "Expected short catalogue search text",
+      "blockers": [
+        {
+          "code": "INVALID_QUERY",
+          "detail": "Expected short catalogue search text"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "INVALID_QUERY",
+      "query": "Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence. pirates corsairs provisioning repairs captives ransom",
+      "records": [],
+      "diagnostic": "Expected short catalogue search text",
+      "blockers": [
+        {
+          "code": "INVALID_QUERY",
+          "detail": "Expected short catalogue search text"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "INVALID_QUERY",
+      "query": "Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence. historical harbour anchorage fort cave island piracy",
+      "records": [],
+      "diagnostic": "Expected short catalogue search text",
+      "blockers": [
+        {
+          "code": "INVALID_QUERY",
+          "detail": "Expected short catalogue search text"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "INVALID_QUERY",
+      "query": "Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence. pirates corsairs",
+      "records": [],
+      "diagnostic": "Expected short catalogue search text",
+      "blockers": [
+        {
+          "code": "INVALID_QUERY",
+          "detail": "Expected short catalogue search text"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence. historical harbour anchorage fort cave island piracy",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Investigate+Ioannis%2FJohn+Kapsis+%28%CE%9A%CE%B1%CF%88%CE%AE%CF%82%2F%CE%9A%CE%B1%CF%88%CE%AE%CF%82+variants%29%2C+associated+with+Milos+in+the+seventeenth+century.+Establish+identity%2C+chronology%2C+titles%2C+primary+references+and+competing+interpretations.+Do+not+merge+names+without+evidence.+historical+harbour+anchorage+fort+cave+island+piracy%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence. pirates corsairs provisioning repairs captives ransom",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Investigate+Ioannis%2FJohn+Kapsis+%28%CE%9A%CE%B1%CF%88%CE%AE%CF%82%2F%CE%9A%CE%B1%CF%88%CE%AE%CF%82+variants%29%2C+associated+with+Milos+in+the+seventeenth+century.+Establish+identity%2C+chronology%2C+titles%2C+primary+references+and+competing+interpretations.+Do+not+merge+names+without+evidence.+pirates+corsairs+provisioning+repairs+captives+ransom%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence. pirate base corsair base anchorage harbour refuge",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Investigate+Ioannis%2FJohn+Kapsis+%28%CE%9A%CE%B1%CF%88%CE%AE%CF%82%2F%CE%9A%CE%B1%CF%88%CE%AE%CF%82+variants%29%2C+associated+with+Milos+in+the+seventeenth+century.+Establish+identity%2C+chronology%2C+titles%2C+primary+references+and+competing+interpretations.+Do+not+merge+names+without+evidence.+pirate+base+corsair+base+anchorage+harbour+refuge%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence. pirates corsairs",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Investigate+Ioannis%2FJohn+Kapsis+%28%CE%9A%CE%B1%CF%88%CE%AE%CF%82%2F%CE%9A%CE%B1%CF%88%CE%AE%CF%82+variants%29%2C+associated+with+Milos+in+the+seventeenth+century.+Establish+identity%2C+chronology%2C+titles%2C+primary+references+and+competing+interpretations.+Do+not+merge+names+without+evidence.+pirates+corsairs%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    }
+  ],
+  "result_count": 0,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
