@@ -33,15 +33,18 @@ jobs:
         run: |
           npm install --no-save playwright@1.56.1
           npx playwright install --with-deps chromium
-      - name: Start static server
-        run: |
-          python3 -m http.server 4179 --bind 127.0.0.1 > /tmp/jarvis-server.log 2>&1 &
-      - name: Browser visual verification
-        run: node jarvis-intelligence-chamber/visual-smoke.cjs
+      # The current four-destination workspace replaces the legacy cinematic and voice shell.
+      # Each browser suite starts its own isolated server and never dispatches production work.
+      - name: Verify renderer, workspace navigation and responsive layout
+        env:
+          NABOU_SCREENSHOT_DIR: jarvis-intelligence-chamber/screenshots
+        run: node jarvis-intelligence-chamber/workspace-layout.test.cjs
+      - name: Verify research dossier, dispatch correlation and history recovery
+        env:
+          NABOU_SCREENSHOT_DIR: jarvis-intelligence-chamber/screenshots
+        run: node jarvis-intelligence-chamber/research-flow.test.cjs
       - name: Verify immediate startup feedback and real agent preparation
         run: node jarvis-intelligence-chamber/startup-feedback.test.cjs
-      - name: Verify voice controls and compatibility fallback
-        run: node jarvis-intelligence-chamber/voice-controls.test.cjs
       - name: Upload visual evidence
         if: always()
         uses: actions/upload-artifact@v4

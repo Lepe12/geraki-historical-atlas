@@ -16,6 +16,9 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
   await page.routeWebSocket('wss://**',()=>{});
   await page.goto('http://127.0.0.1:'+server.address().port+'/jarvis-intelligence-chamber/');
   await page.waitForFunction(()=>document.body.dataset.currentResearchRun==='100').catch(async e=>{console.error('BROWSER DIAGNOSTICS',errors,await page.locator('body').evaluate(e=>({...e.dataset})));throw e;});
+  await page.waitForFunction(()=>/^[0-9]+ FPS$/.test(document.querySelector('#fps')?.textContent||''));
+  assert.ok(await page.locator('#universe').evaluate(canvas=>canvas.width>100&&canvas.height>100),'The original renderer must own a real canvas');
+  assert.equal(await page.locator('#nodeLabels .node-label').count(),17,'All original research nodes must be rendered');
   assert.equal(await page.locator('.nxs-dock button').count(),4);
   async function layout(panel){
    const data=await page.evaluate(selector=>{const rect=s=>document.querySelector(s).getBoundingClientRect();const nav=rect('.nxs-dock'),composer=rect('#operatorCommand'),panel=selector?rect(selector):null;const overlap=(a,b)=>Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left))*Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));return {overflow:document.documentElement.scrollWidth>innerWidth,navComposer:overlap(nav,composer),panelComposer:panel?overlap(panel,composer):0,panelNav:panel?overlap(panel,nav):0,inputSize:parseFloat(getComputedStyle(document.querySelector('#operatorQuery')).fontSize)};},panel);

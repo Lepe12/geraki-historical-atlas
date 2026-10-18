@@ -1,3 +1,4 @@
+// Legacy cinematic-shell audit. Current workspace CI uses workspace-layout.test.cjs and research-flow.test.cjs.
 const {chromium}=require("playwright");
 const fs=require("node:fs"),assert=require("node:assert/strict");
 (async()=>{const browser=await chromium.launch({headless:true,args:["--no-sandbox","--use-gl=angle","--use-angle=swiftshader","--enable-webgl","--enable-unsafe-swiftshader"]});
