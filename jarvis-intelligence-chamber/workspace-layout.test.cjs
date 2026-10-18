@@ -13,7 +13,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
   const snapshot={schema:'pct-command-center-live-v1',run_id:'100',mission:{target:'Δοκιμή διεπαφής',status:'COMPLETED'},agents:[{id:'greek',status:'COMPLETED'}],claims:[],blockers:[{description:'Δοκιμαστικό εμπόδιο πρόσβασης'}],discoveries:[{title:'Δοκιμαστική ιστορική πηγή',lane:'greek',url:'https://example.org/source',topical_match:{category:'TARGET_MATCH'}}],events:[],safety:{automatic_verified:false}};
   let dispatched=false;
   await page.route('**/*',r=>{if(!r.request().url().startsWith('https://'))return r.continue();const u=r.request().url();if(u.endsWith('/dispatch')){dispatched=true;return r.fulfill({status:503,json:{error:'test_unavailable'}});}if(u.includes('raw.githubusercontent.com'))return r.fulfill({json:snapshot});if(u.includes('/status/'))return r.fulfill({json:{snapshot,events:[]}});return r.abort();});
-  await page.routeWebSocket('wss://**',()=>{});
+  await page.routeWebSocket(/.*/,()=>{});
   await page.goto('http://127.0.0.1:'+server.address().port+'/jarvis-intelligence-chamber/');
   await page.waitForFunction(()=>document.body.dataset.currentResearchRun==='100').catch(async e=>{console.error('BROWSER DIAGNOSTICS',errors,await page.locator('body').evaluate(e=>({...e.dataset})));throw e;});
   await page.waitForFunction(()=>/^[0-9]+ FPS$/.test(document.querySelector('#fps')?.textContent||''));
@@ -50,4 +50,4 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
   assert.deepEqual(errors,[]);console.log('PASS',width+'×'+height,'navigation, panels, search, filters, agent focus, PDF empty state, dispatch error, no overlaps');await page.close();
  }
  }finally{await browser?.close();server.close();}
-})().catch(e=>{console.error(e);process.exitCode=1});
+})().catch(e=>{console.error(e);console.error('::error title=NABOU workspace browser test::'+String(e.stack||e).replace(/%/g,'%25').replace(/\r/g,'%0D').replace(/\n/g,'%0A'));process.exitCode=1});
