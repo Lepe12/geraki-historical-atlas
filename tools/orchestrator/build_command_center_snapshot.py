@@ -225,6 +225,14 @@ def build(repo:Path,run_id:str):
     lane_statuses=[a['status'] for a in agents if a['kind']=='research_lane']
     mission_status=('UNKNOWN' if not lane_statuses else 'FAILED' if all(v=='FAILED' for v in lane_statuses) else 'PARTIAL' if any(v!='COMPLETED' for v in lane_statuses) else 'COMPLETED')
     package=build_evidence_package(run_root,request)
+    semantic_claims={c['claim_id']:c for c in semantic_answer.get('claims',[]) if c.get('claim_id')}
+    contradiction_records=[]
+    for index,conflict in enumerate((semantic_answer.get('review') or {}).get('contradictions') or []):
+        ids=list(dict.fromkeys(conflict.get('claim_ids') or []))
+        if len(ids)<2 or any(cid not in semantic_claims for cid in ids):continue
+        contradiction_records.append({'identifier':f'{run_id}:conflict:{index}',
+                                      'title':conflict.get('explanation'),'status':'MODEL_FLAGGED_NOT_ADJUDICATED',
+                                      'claims':[semantic_claims[cid] for cid in ids],'verified':False})
     passage_lookup={p['passage_id']:p for p in package['passages']}
     source_lookup={s['source_id']:s for s in package['sources']}
     for row in discoveries:
@@ -268,7 +276,8 @@ def build(repo:Path,run_id:str):
       "evidence_package":package,
       "evidence_url":f"https://github.com/Lepe12/geraki-historical-atlas/tree/main/evidence/runs/{run_id}",
       "contradictions":{
-        "status":"SEARCH_OUTPUT_NOT_ADJUDICATED",
+        "status":"MODEL_REVIEW_PENDING" if contradiction_records else "SEARCH_OUTPUT_NOT_ADJUDICATED",
+        "records":contradiction_records,
         "search_records":contradiction_leads,
         "note":"Contradiction specialist records are research leads, not verified contradictions."
       },

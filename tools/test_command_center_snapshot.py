@@ -56,6 +56,13 @@ def main():
         assert out['discoveries'][0]['request_source_lead'] is False
         assert out['evidence_package']['quality']['verified_promotions']==0
         assert not out['claims']
+        (base/'research_answer').mkdir()
+        (base/'research_answer/answer.json').write_text(json.dumps({'claims':[{'claim_id':'a','quote':'First passage'},{'claim_id':'b','quote':'Different passage'}],
+            'review':{'contradictions':[{'claim_ids':['a','b'],'explanation':'Different reported dates'},{'claim_ids':['a'],'explanation':'Invalid self conflict'}]}}))
+        out=build(r,run)
+        assert len(out['contradictions']['records'])==1
+        assert len(out['contradictions']['records'][0]['claims'])==2
+        assert out['contradictions']['records'][0]['verified'] is False
         latest=r/"latest.json";latest.write_text('{"run_id":"200"}')
         assert not publish_latest(latest,{"run_id":"123"},'{"run_id":"123"}')
         assert json.loads(latest.read_text())["run_id"]=="200"
