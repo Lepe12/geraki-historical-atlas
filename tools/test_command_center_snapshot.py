@@ -36,6 +36,20 @@ def main():
         (base/"travellers/structured_output/candidate_events.json").write_text('{"events":[]}')
         out=build(r,run)
         assert not out["claims"] and len(out["discoveries"])==1 and len(out["coverage"])==1
+        reference={'finding_id':'ref-1','title':'Letters','url':'https://example.org/book.pdf',
+                   'context_excerpt':'A letter mentions the requested historical person.',
+                   'target_entity':{'observed_names':['Requested Person'],'association_basis':'EXPLICIT_NAME'},
+                   'locator':{'pdf_file':'book.pdf','scan_indexes_0_based':[8]},
+                   'decision':'REVIEW_CONTEXT','uncertainties':['ACTION_UNRESOLVED','EVENT_DATE_UNRESOLVED']}
+        adjacent={**reference,'finding_id':'adjacent','target_entity':{'observed_names':[],'association_basis':'ADJACENT_TOPIC_UNRESOLVED'}}
+        conflict={**reference,'finding_id':'conflict','uncertainties':['CONFLICTING_GIVEN_NAME']}
+        (base/'travellers/structured_output/extracted_findings.json').write_text(json.dumps({'findings':[reference,adjacent,conflict]}))
+        out=build(r,run)
+        refs=[d for d in out['discoveries'] if d.get('reference_kind')=='ACQUIRED_TEXT_REFERENCE']
+        assert len(refs)==1 and refs[0]['finding_id']=='ref-1'
+        assert refs[0]['text_locator']['scan_indexes_0_based']==[8]
+        assert refs[0]['topical_match']['category']=='POSSIBLE_TARGET'
+        assert refs[0]['verified'] is False and not out['claims']
         latest=r/"latest.json";latest.write_text('{"run_id":"200"}')
         assert not publish_latest(latest,{"run_id":"123"},'{"run_id":"123"}')
         assert json.loads(latest.read_text())["run_id"]=="200"

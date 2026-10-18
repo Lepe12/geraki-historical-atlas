@@ -95,6 +95,28 @@ def discovery_results(run_root:Path,request=None):
                 "fallback_for":row.get("fallback_for"),"fallback_reason":row.get("fallback_reason"),
                 "verified":False,
             })
+        # A named passage is a source reference even when its action/date is
+        # unresolved. Publish it as a provisional discovery, never as a claim.
+        extracted=read(root/'structured_output/extracted_findings.json',{})
+        for finding in extracted.get('findings',[]):
+            entity=finding.get('target_entity') or {}
+            uncertainty=set(finding.get('uncertainties') or [])
+            if not entity.get('observed_names') or entity.get('association_basis')=='ADJACENT_TOPIC_UNRESOLVED':continue
+            if uncertainty & {'FICTION_OR_BOOK_REVIEW_CONTEXT','CONFLICTING_GIVEN_NAME','DATE_OUTSIDE_SCOPE'}:continue
+            excerpt=finding.get('context_excerpt') or finding.get('evidence_excerpt')
+            if not excerpt:continue
+            discoveries.append({
+                'lane':lane,'identifier':finding.get('identifier') or finding.get('url'),
+                'title':finding.get('title'),'repository':finding.get('repository'),
+                'url':finding.get('url'),'context_excerpt':excerpt,
+                'text_locator':finding.get('locator') or {},'source_type':finding.get('source_type'),
+                'reference_kind':'ACQUIRED_TEXT_REFERENCE','finding_id':finding.get('finding_id'),
+                'evidence_state':'ACQUIRED','triage_status':'REVIEW_REQUIRED',
+                'triage_reasons':list(uncertainty),
+                'topical_match':{'category':'POSSIBLE_TARGET','reason':'ACQUIRED_TEXT_MENTION_NOT_EVENT',
+                                  'matched_name':entity['observed_names'][0],'identity_verified':False},
+                'verified':False,
+            })
         for attempt in raw.get("attempts",[]):
             coverage.append({"lane":lane,"repository":attempt.get("repository"),
                 "status":attempt.get("status"),"hits":attempt.get("hits",0),
@@ -118,6 +140,7 @@ def discovery_results(run_root:Path,request=None):
         row['contributing_lanes']=[row['lane']]
         row['repositories']=[row.get('repository')]
         grouped[key]=row;unique.append(row)
+    unique.sort(key=lambda r:r.get('reference_kind')!='ACQUIRED_TEXT_REFERENCE')
     return unique,coverage
 
 def request_id_for(run_root:Path):
