@@ -41,15 +41,15 @@ For each conclusion, use one of:
 Never modify permanent NABOU memory. This experiment produces proposals and evaluations only.
 `,
   evolution: {
-    enabled: true,
+    // Deliberately OFF by default. The first stage is frozen offline evaluation.
+    // Do not enable online mutation until the NABOU baseline has been reviewed.
+    enabled: false,
     evaluator: 'multi-critic',
     useGepa: true,
     paretoGate: true,
-    requireApproval: true,
-    approvalTimeoutDays: 7,
     safety: {
       requireConfidence: true,
-      confidenceMethod: 'eb'
+      confidenceMethod: 'msprt'
     }
   }
 });
