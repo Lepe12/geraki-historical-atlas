@@ -12,7 +12,7 @@ from html import unescape
 from html.parser import HTMLParser
 from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, urlopen
-from research_focus import decompose, fold, retrieval_names, _token_pattern
+from research_focus import decompose, fold, retrieval_names, name_pattern
 
 IA_FTS='https://be-api.us.archive.org/ia-pub-fts-api'
 GREEK=dict(zip('αβγδεζηθικλμνξοπρστυφχψω',
@@ -76,13 +76,18 @@ def ia_queries(focus, limit=8):
     """Search complete supplied names before surname/OCR recovery hypotheses."""
     queries=[]
     if focus['kind']=='person':
-        for name in retrieval_names(focus):
+        names=retrieval_names(focus)
+        for name in names:
             queries.append('"'+name.replace('"','')+'"')
     places=context_terms(focus)
     for term in search_terms(focus):
         q='"'+term.replace('"','')+'"'
         if places:q+=' AND ('+' OR '.join('"'+p.replace('"','')+'"' for p in places[:4])+')'
         queries.append(q)
+        if focus['kind']=='person' and term==search_terms(focus)[0]:
+            for name in retrieval_names(focus):
+                words=name.split()
+                if len(words)>=2:queries.append('"'+words[-1]+', '+' '.join(words[:-1])+'"')
     return list(dict.fromkeys(queries))[:limit]
 
 
@@ -100,14 +105,15 @@ def text_match(record,focus):
             for name in retrieval_names(focus):
                 parts=name.split()
                 if len(parts)<2:continue
-                pattern=r'[\s,.-]{1,8}'.join(_token_pattern(p) for p in parts)
+                pattern=name_pattern(parts)
                 for hit in re.finditer(r'(?<!\w)'+pattern+r'(?!\w)',text):
                     local=text[max(0,hit.start()-240):hit.end()+240]
                     places=[p for p in focus.get('places',[]) if any(
                         re.search(r'(?<!\w)'+re.escape(norm(t))+r'(?!\w)',local)
                         for t in spelling_hypotheses(p,True))]
                     roles=[t for t in role_terms(focus) if re.search(r'(?<!\w)'+re.escape(t),local)]
-                    context_missing=bool(focus.get('places') or focus.get('roles')) and not (places or roles)
+                    context_ok=bool(places) if focus.get('places') else bool(roles)
+                    context_missing=bool(focus.get('places') or focus.get('roles')) and not context_ok
                     candidates.append({'category':'POSSIBLE_TARGET',
                             'reason':'FULLTEXT_NAME_WITHOUT_REQUEST_CONTEXT' if context_missing else 'FULLTEXT_COMPLETE_NAME_REQUIRES_REVIEW',
                             'matched_name':name,'places':places,'roles':roles,
@@ -325,6 +331,9 @@ def run(root,request,ctx,lane='travellers',ia_enabled=True):
                     'base_url':IA_FTS,'queries':[{'query':q,'status':status,'hits':len(rows),'detail':error or IA_FTS}]})
                 records.extend(rows);checkpoint()
     pool=manifest_pool(root,request,discovery)
+    if not pool:
+        attempts.append({'repository':'IIIF Full Text','status':'FULLTEXT_TARGETS_UNAVAILABLE','hits':0,
+                         'detail':'No declared IIIF manifests were available in this lane; full-text coverage is not established.'})
     for source in pool:
         if time.monotonic()-started>150:break
         try:
@@ -347,4 +356,5 @@ def run(root,request,ctx,lane='travellers',ia_enabled=True):
 if __name__=='__main__':
     from request_context import load_request
     _,req,ctx=load_request()
-    run(Path('.'),req,ctx,os.getenv('PCT_RESEARCH_LANE','travellers'))
+    lane=os.getenv('PCT_RESEARCH_LANE','travellers')
+    run(Path('.'),req,ctx,lane,ia_enabled=lane=='travellers')

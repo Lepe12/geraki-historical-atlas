@@ -77,6 +77,8 @@ def focused_queries(focus, qualifiers=(), include_hypotheses=False):
         for context in contexts:
             queries.append(q+' "'+context.replace('"','')+'"')
             if nq: queries.append(nq+' "'+context.replace('"','')+'"')
+        if focus['kind']=='person' and len(words)>=2:
+            queries.append('"'+words[-1]+', '+' '.join(words[:-1])+'"')
         for qualifier in qualifiers:
             if str(qualifier).strip(): queries.append(q+' '+str(qualifier).strip())
         batches.append(queries)
@@ -109,6 +111,14 @@ def _token_pattern(name):
         if len(n)>=3:
             return r'(?<!\w)'+re.escape(n)+r'(?:ησ|η|οσ|ου|ασ|α|εσ|ε|ο|ων|ουσ)?(?!\w)'
     return r'(?<!\w)'+re.escape(fold(name))+r'(?!\w)'
+
+
+def name_pattern(parts):
+    """Forward names or explicit surname-comma-given catalogue notation."""
+    gap=r'[\s,.-]{1,8}(?:[^\W\d_]\.[\s]{0,4})?'
+    forward=gap.join(_token_pattern(w) for w in parts)
+    reversed_name=_token_pattern(parts[-1])+r'\s*,\s*'+gap.join(_token_pattern(w) for w in parts[:-1])
+    return '(?:'+forward+'|'+reversed_name+')'
 
 
 def _token_match(text,name):
@@ -146,15 +156,16 @@ def _topical_match_segment(record, focus):
             # Name parts must occur together, not anywhere in a long catalogue
             # description (e.g. one author called Ioannis and another Kapsis).
             gap=r'[\s,.-]{1,8}(?:[^\W\d_]\.[\s]{0,4})?'
-            pattern=gap.join(_token_pattern(w) for w in words)
+            pattern=name_pattern(words)
             name_hit=re.search(pattern,text)
             if name_hit:
                 local=text[max(0,name_hit.start()-180):name_hit.end()+180]
                 places=[p for p in focus.get('places',[]) if _token_match(local,p)]
                 roles=[r for r in focus.get('roles',[]) if _token_match(local,r)]
                 constrained=bool(focus.get('places') or focus.get('roles'))
-                return {'category':'POSSIBLE_TARGET' if constrained and not (places or roles) else 'TARGET_MATCH',
-                        'reason':'NAME_WITHOUT_REQUEST_CONTEXT' if constrained and not (places or roles) else 'NAME_TOKENS_IN_SOURCE',
+                context_ok=bool(places) if focus.get('places') else bool(roles)
+                return {'category':'POSSIBLE_TARGET' if constrained and not context_ok else 'TARGET_MATCH',
+                        'reason':'NAME_WITHOUT_REQUEST_CONTEXT' if constrained and not context_ok else 'NAME_TOKENS_IN_SOURCE',
                         'matched_name':name,'places':places,'roles':roles}
             for hit in re.finditer(_token_pattern(words[-1]),text):
                 local=text[max(0,hit.start()-180):hit.end()+180]
@@ -171,7 +182,7 @@ def _topical_match_segment(record, focus):
             if name in focus['names']:continue
             words=_words(name)
             if len(words)<2:continue
-            pattern=r'[\s,.-]{1,8}'.join(_token_pattern(w) for w in words)
+            pattern=name_pattern(words)
             if re.search(pattern,text):
                 return {'category':'POSSIBLE_TARGET','reason':'TRANSLITERATION_REQUIRES_IDENTITY_REVIEW',
                         'matched_name':name,'places':places,'roles':roles,'query_hypothesis':True}

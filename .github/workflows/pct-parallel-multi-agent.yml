@@ -96,7 +96,7 @@ jobs:
         run: python3 -m compileall -q tools
       - name: Run core scientific benchmark
         run: |
-          PYTHONPATH=tools:tools/orchestrator python3 -m unittest tools/test_research_focus.py tools/test_fulltext_discovery.py tools/test_research_pipeline_repairs.py tools/test_section_extraction.py -q
+          PYTHONPATH=tools:tools/orchestrator python3 -m unittest tools/orchestrator/test_research_query.py tools/test_research_focus.py tools/test_fulltext_discovery.py tools/test_research_pipeline_repairs.py tools/test_section_extraction.py -q
           PYTHONPATH=tools:tools/llm python3 -m unittest tools/test_semantic_research_answer.py -q
           python3 tools/scientific_benchmark.py
           python3 tools/adversarial_scientific_benchmark.py
@@ -200,7 +200,8 @@ jobs:
             python3 -c 'import json,os,sys; sys.exit(0 if json.load(open("lane_discovery/"+os.environ["PCT_RESEARCH_LANE"]+".json")).get("partial") else 1)' || break
           done
           python3 tools/merge_specialist_candidates.py
-          if [ "$PCT_RESEARCH_LANE" = "travellers" ]; then timeout 210s python3 tools/fulltext_discovery.py; fi
+          # Each lane searches its discovered IIIF books; corpus-wide IA runs once in travellers.
+          timeout 210s python3 tools/fulltext_discovery.py
           python3 tools/merge_repository_candidates.py
           python3 tools/orchestrator/jarvis_event_bus.py --run-id "$GITHUB_RUN_ID" --event-type agent_progress --agent-id "$PCT_RESEARCH_LANE" --phase "repository discovery complete" --percent 35 --status RUNNING --detail "Repository discovery and candidate merge complete"
           if [ "$PCT_RESEARCH_LANE" = "german" ]; then PCT_BSB_POSITIVE_CONTROL=1 python3 tools/bsb_iiif_route.py; fi

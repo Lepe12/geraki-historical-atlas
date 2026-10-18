@@ -7,9 +7,9 @@ import re
 import unicodedata
 
 COMMAND = re.compile(
-    r"^(?:(?:βρες|βρειτε|ψαξε|ψαξτε|αναζητησε|αναζητηστε)\s+(?:μου\s+)?(?:(?:πηγες|τεκμηρια|πληροφοριες)\s+)?"
-    r"(?:για|σχετικα\s+με)|(?:find|search\s+for|look\s+for)\s+(?:sources|evidence|information)\s+"
-    r"(?:about|for|on))(?:\s+|$)(?:(?:τον|την|το|τους|τις|τη|τα|the)\s+)?", re.I)
+    r"^(?:(?:βρες|βρεις|βρειτε|ψαξε|ψαξεις|ψαξτε|αναζητησε|αναζητησεις|αναζητηστε)\s+(?:μου\s+)?(?:(?:πηγες|τεκμηρια|πληροφοριες|αναφορες)\s+)?"
+    r"(?:για|σχετικα\s+με)|(?:find|search\s+for|look\s+for)\s+(?:sources|evidence|information|references)\s+"
+    r"(?:about|for|on|to))(?:\s+|$)(?:(?:τον|την|το|τους|τις|τη|τα|the)\s+)?", re.I)
 DATES = re.compile(r"(?<!\d)(\d{3,4})\s*[-–—]\s*(\d{3,4})(?!\d)")
 PERIOD = re.compile(r"\s+(?:(?:την|τη|στην|στη)\s+)?(?:περιοδο|μεταξυ|κατα|between|during|from)\s*$", re.I)
 
@@ -25,10 +25,20 @@ def command_text(value):
 def split_research_query(target, date_range="", purpose=""):
     original = str(target).strip()
     folded,offsets = command_text(original)
-    match = COMMAND.match(folded)
+    preamble = re.match(r"^(?:θελω\s+να|θα\s+ηθελα\s+να|μπορεις\s+να)\s+",folded,re.I)
+    command_start=preamble.end() if preamble else 0
+    match = COMMAND.match(folded[command_start:])
     if not match:
-        return original, str(date_range).strip(), str(purpose).strip()
-    value = original[offsets[match.end()-1]+1:].strip()
+        # A short explicit name followed by a range is unambiguous; arbitrary
+        # prose remains intact rather than guessing its entity.
+        dates=DATES.search(original)
+        head=original[:dates.start()].strip() if dates else ''
+        words=re.findall(r'[^\W\d_]+',head,re.UNICODE)
+        if not (dates and not original[dates.end():].strip(' .;,:?') and 1<=len(words)<=4 and all(w[0].isupper() for w in words)):
+            return original, str(date_range).strip(), str(purpose).strip()
+        value=original
+    else:
+        value = original[offsets[command_start+match.end()-1]+1:].strip()
     dates = DATES.search(value)
     # Only strip a trailing explicit date range. Interior dates may be a title.
     if dates and not value[dates.end():].strip(" .;,:?"):

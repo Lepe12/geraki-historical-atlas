@@ -39,6 +39,18 @@ class ResearchFocusTests(unittest.TestCase):
         self.assertEqual(topical_match({'title':'Καψής της Μήλου'},self.focus)['category'],'POSSIBLE_TARGET')
         self.assertEqual(topical_match({'title':'Καψής, σύγχρονος δημοσιογράφος'},self.focus)['category'],'UNMATCHED')
 
+    def test_catalogue_surname_first_requires_explicit_name_not_unrelated_authors(self):
+        focus=decompose('Pietro Lanza')
+        self.assertEqual(topical_match({'title':'Lanza, Pietro: diplomatic letters'},focus)['category'],'TARGET_MATCH')
+        self.assertEqual(topical_match({'title':'Lanza wrote a book. Pietro edited another.'},focus)['category'],'UNMATCHED')
+        self.assertIn('"Lanza, Pietro"',focused_queries(focus,('history',)))
+
+    def test_generic_role_does_not_override_requested_place(self):
+        focus=decompose('Henry Morgan governor of Jamaica')
+        result=topical_match({'title':'Henry Morgan governor of Canada'},focus)
+        self.assertEqual(result['category'],'POSSIBLE_TARGET')
+        self.assertEqual(result['reason'],'NAME_WITHOUT_REQUEST_CONTEXT')
+
     def test_query_or_flag_is_not_source_content(self):
         row={'title':'Γενική ναυτική ιστορία','query':self.target,'source_lead':True,'url':'https://example/Ιωάννη-Καψή'}
         self.assertEqual(topical_match(row,self.focus)['category'],'UNMATCHED')

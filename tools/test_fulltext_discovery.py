@@ -2,7 +2,7 @@
 import json,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch
-from fulltext_discovery import decompose,ia_search,ia_queries,iiif_search,manifest_pool,search_terms,context_terms,text_match,merge_findings
+from fulltext_discovery import decompose,ia_search,ia_queries,iiif_search,manifest_pool,search_terms,context_terms,text_match,merge_findings,run
 from research_relevance import identity,assess
 
 
@@ -23,6 +23,43 @@ class FulltextTests(unittest.TestCase):
         self.assertFalse(hit['identity_verified'])
         self.assertIsNone(text_match({'fulltext_contexts':['Pedro wrote a letter.','Lanza appears on another page.']},focus))
         self.assertIsNone(text_match({'context_excerpt':'Pedro Lanzares wrote a letter.'},focus))
+
+    def test_surname_first_ocr_and_queries(self):
+        focus=decompose('Pietro Lanza')
+        self.assertIn('"Lanza, Pietro"',ia_queries(focus))
+        self.assertEqual(text_match({'context_excerpt':'Lanza, Pietro, letter of 1580.'},focus)['category'],'POSSIBLE_TARGET')
+        self.assertIsNone(text_match({'context_excerpt':'Lanza mentioned a different author called Pietro.'},focus))
+
+    def test_generic_role_in_wrong_place_does_not_prioritize_namesake(self):
+        req={'target':'Henry Morgan governor of Jamaica','aliases':[],'purpose':'history'}
+        result=assess({'title':'Historical biographies','fulltext_hit':True,
+                       'context_excerpt':'Henry Morgan was governor of Canada.'},identity(req,req))
+        self.assertEqual(result['status'],'REVIEW_REQUIRED')
+        self.assertEqual(result['topical_match']['reason'],'FULLTEXT_NAME_WITHOUT_REQUEST_CONTEXT')
+
+    def test_non_travellers_lane_searches_its_own_manifest_without_duplicate_ia(self):
+        req={'target':'Pietro Lanza','aliases':[],'purpose':'history'}
+        manifest_url='https://example.org/book/manifest'
+        canvas='https://example.org/canvas/9'
+        manifest={'label':'Letters','service':{'@id':'https://example.org/search','profile':'http://iiif.io/api/search/1/search'},
+                  'items':[{'id':canvas,'label':'9'}]}
+        reply={'resources':[{'@id':'a','on':canvas}],
+               'hits':[{'annotations':['a'],'match':'Lanza, Pietro, letter.'}]}
+        with tempfile.TemporaryDirectory() as td,patch('fulltext_discovery.ia_search') as ia,patch('fulltext_discovery.get_json',side_effect=lambda url:manifest if url==manifest_url else reply):
+            root=Path(td);(root/'lane_discovery').mkdir()
+            (root/'lane_discovery/venetian.json').write_text(json.dumps({'results':[{'iiif_manifest_candidates':[manifest_url]}]}))
+            rows,attempts=run(root,req,req,'venetian',ia_enabled=False)
+            self.assertEqual(rows[0]['discovery_lane'],'venetian')
+            self.assertEqual(rows[0]['printed_page'],9)
+            ia.assert_not_called()
+            self.assertTrue(all(a['status']=='EXECUTED' for a in attempts))
+
+    def test_missing_manifest_reports_unavailable_coverage(self):
+        req={'target':'Pietro Lanza','aliases':[]}
+        with tempfile.TemporaryDirectory() as td:
+            rows,attempts=run(Path(td),req,req,'greek',ia_enabled=False)
+        self.assertEqual(rows,[])
+        self.assertEqual(attempts[0]['status'],'FULLTEXT_TARGETS_UNAVAILABLE')
 
     def test_same_passage_required_and_hypothesis_never_verifies_identity(self):
         positive={'fulltext_hit':True,'context_excerpt':'Jean Capſi, Grec de Milo. Son règne dura trois ans.'}
