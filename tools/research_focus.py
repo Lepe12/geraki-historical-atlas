@@ -138,6 +138,18 @@ def topical_match(record, focus):
     order={'TARGET_MATCH':0,'POSSIBLE_TARGET':1,'CONTEXT_ONLY':2,'UNMATCHED':3}
     matches=[{**_topical_match_segment({'text':value},focus),'matched_field':key}
              for key,value in segments]
+    # A name in an authorship clause is not evidence that the book is about
+    # that person. Retain it provisionally unless another field supports subject relevance.
+    creator=record.get('creator') or record.get('author')
+    if creator and focus['kind']=='person':
+        creator_hit=_topical_match_segment({'text':str(creator)},focus)
+        if creator_hit.get('matched_name'):
+            for match in matches:
+                words=_words(match.get('matched_name') or '')
+                if match.get('matched_field')=='title' and len(words)>=2:
+                    attribution=r'(?<!\w)(?:by|di|par|por|von|του|τησ)\s+'+name_pattern(words)
+                    if re.search(attribution,fold(record.get('title',''))):
+                        match.update(category='POSSIBLE_TARGET',reason='AUTHORSHIP_NOT_SUBJECT_EVIDENCE')
     return min(matches,key=lambda m:order[m['category']]) if matches else _topical_match_segment({},focus)
 
 

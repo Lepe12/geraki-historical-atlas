@@ -27,3 +27,5 @@ The UI now displays a recorded zero-based PDF scan index as its one-based PDF pa
 - Broad reference request: `library_discovery_requests/lantzas-reference-validation-20261018.json`; research run **39114506622**. Has no date restriction and includes the already acquired Floristán PDF as an explicit source lead. Search forms Pedro Lanza / Pedro Lantzas are provisional identity hypotheses derived from recorded source text, not proof that every namesake is the target.
 
 The user did not impose a date restriction, so the broad request is the relevant completion check. Workflow completion, archival import and UI rendering must be reported only after observation. No historical VERIFIED promotion is authorized by this test.
+
+A second concrete false positive was reproduced on the archived 1836 Sicilia book credited to Pietro Lanza, principe di Scordia. Authorship-clause matches now remain provisional unless another metadata field supports subject relevance. The discovery is retained and an independent description can still establish topical relevance. This classification is recalculated by the existing snapshot builder; it does not establish historical identity.

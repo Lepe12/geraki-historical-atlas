@@ -51,6 +51,18 @@ class ResearchFocusTests(unittest.TestCase):
         self.assertEqual(result['category'],'POSSIBLE_TARGET')
         self.assertEqual(result['reason'],'NAME_WITHOUT_REQUEST_CONTEXT')
 
+    def test_author_namesake_is_not_subject_evidence(self):
+        focus=decompose('Πέτρος Λάντζας',['Pietro Lanza'])
+        row={'title':'Considerazioni sulla storia di Sicilia, di Pietro Lanza',
+             'creator':'Lanza, Pietro, principe di Scordia','year':1836}
+        result=topical_match(row,focus)
+        self.assertEqual(result['category'],'POSSIBLE_TARGET')
+        self.assertEqual(result['reason'],'AUTHORSHIP_NOT_SUBJECT_EVIDENCE')
+        req={'target':'Πέτρος Λάντζας','aliases':['Pietro Lanza']}
+        self.assertNotEqual(assess(row,identity(req,req))['status'],'PRIORITY')
+        row['description']='Letters concerning Pietro Lanza, the corsair.'
+        self.assertEqual(topical_match(row,focus)['category'],'TARGET_MATCH')
+
     def test_query_or_flag_is_not_source_content(self):
         row={'title':'Γενική ναυτική ιστορία','query':self.target,'source_lead':True,'url':'https://example/Ιωάννη-Καψή'}
         self.assertEqual(topical_match(row,self.focus)['category'],'UNMATCHED')
