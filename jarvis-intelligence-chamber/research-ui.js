@@ -17,7 +17,8 @@ function semanticAnswer(data){
 }
 function recordEvidence(record){
  const printed=record.printed_page??record.text_locator?.printed_page;
- const pdf=record.pdf_page??record.text_locator?.pdf_page;
+ const scan=record.text_locator?.scan_indexes_0_based?.[0];
+ const pdf=record.pdf_page??record.text_locator?.pdf_page??(record.text_locator?.pdf_file&&Number.isInteger(scan)&&scan>=0?scan+1:null);
  const excerpt=record.context_excerpt||record.acquired_text_excerpt||record.source_excerpt;
  return '<div class="record-evidence"><dl><div><dt>Πηγή</dt><dd>'+esc(record.repository||'Δεν καταγράφηκε ονομασία πηγής')+'</dd></div><div><dt>Σελίδα</dt><dd>'+esc(printed!=null?'Έντυπη '+printed:pdf!=null?'PDF '+pdf+' · έντυπη σελίδα μη επιβεβαιωμένη':'Δεν έχει καταγραφεί ακριβής σελίδα')+'</dd></div></dl>'+(excerpt?'<details><summary>Καταγεγραμμένο απόσπασμα</summary><blockquote>'+esc(excerpt)+'</blockquote></details>':'<p>Δεν έχει καταγραφεί απόσπασμα από την πηγή.</p>')+'</div>';
 }
