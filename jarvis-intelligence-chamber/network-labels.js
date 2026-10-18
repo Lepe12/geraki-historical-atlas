@@ -29,3 +29,5 @@ addEventListener('resize',()=>{last=0;schedule();});schedule();
 // Opening/closing a workspace changes which controls occupy the scene even when
 // the renderer's node coordinates have not changed.
 new MutationObserver(()=>{last=0;schedule();}).observe(document.body,{attributes:true,attributeFilter:['data-nxs-view']});
+
+new ResizeObserver(()=>{last=0;schedule();}).observe(document.getElementById("operatorCommand"));

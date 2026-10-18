@@ -25,6 +25,13 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
    assert.equal(data.overflow,false);assert.equal(data.navComposer,0);assert.equal(data.panelComposer,0);assert.equal(data.panelNav,0);assert.ok(data.inputSize>=15);
   }
   await layout();
+  const initialHeight=await page.locator('#operatorQuery').evaluate(e=>e.offsetHeight);
+  await page.locator('#operatorQuery').fill('Πρόσωπο και ιστορική περίοδος\nΠηγές για τη δράση του\nΣχετικά αρχεία και μαρτυρίες\nΑκριβείς σελίδες και ημερομηνίες\nΠεριορισμοί της έρευνας');
+  await page.waitForTimeout(150);
+  assert.ok(await page.locator('#operatorQuery').evaluate(e=>e.offsetHeight)>initialHeight,'A longer question must expand visibly');
+  await page.locator('button[data-nxs-view="findings"]').click();await layout('#resultsDrawer');
+  await page.locator('button[data-nxs-view="universe"]').click();
+  await page.locator('#operatorQuery').fill('');await page.waitForTimeout(150);
   if(shotDir)await page.screenshot({path:path.join(shotDir,width+'-overview.png'),animations:'disabled'});
   for(const [view,panel] of [['agents','#nxsAgentsPage'],['findings','#resultsDrawer'],['pdf','#learningPanel']]){
    await page.locator('button[data-nxs-view="'+view+'"]').click();await page.locator(panel).waitFor({state:'visible'});await layout(panel);

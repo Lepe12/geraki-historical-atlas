@@ -56,7 +56,7 @@ function renderResults(){
  $('resultsList').scrollTop=0;
 }
 function updateDetail(){
- const id=map[$('detailTitle')?.textContent?.trim()],a=snapshot?.agents?.find(x=>x.id===id);let box=$('detailLive');
+ const id=$('detailPanel')?.dataset?.agentId||map[$('detailTitle')?.textContent?.trim()],a=snapshot?.agents?.find(x=>x.id===id);let box=$('detailLive');
  if(!a){if(box)box.remove();if($('detailTitle')?.textContent==='JARVIS'){$('detailDescription').textContent='Research orchestration and recorded evidence. Connection status is independent of historical verification.';$('detailState').textContent=document.body.dataset.researchUi||'RECORDED';}return;}
  const latest=[...events].reverse().find(e=>e.agent_id===id),bs=(snapshot.blockers||[]).filter(b=>b.agent_id===id);if(!box){box=document.createElement('div');box.id='detailLive';box.className='detail-live agent-overview';$('detailPanel').insertBefore(box,$('focusButton'));}
  $('detailState').textContent=(document.body.dataset.researchUi||'RECORDED')+' · '+(a.status||'UNKNOWN');

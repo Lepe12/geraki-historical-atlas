@@ -198,3 +198,15 @@ connectResearchFeed({
 if(!results.classList.contains("hidden"))activeNav("findings");else activeNav("universe");
 hideAgents();
 hideActivity();
+
+// Reserve the composer’s actual height so longer questions never cover a panel.
+const queryField=$("operatorQuery"),composer=$("operatorCommand");
+function sizeQuestion(){
+ queryField.style.height="auto";
+ queryField.style.height=Math.min(112,Math.max(44,queryField.scrollHeight))+"px";
+}
+queryField.addEventListener("input",sizeQuestion);
+window.addEventListener("jarvis:reuse-query",sizeQuestion);
+addEventListener("resize",sizeQuestion);
+new ResizeObserver(()=>body.style.setProperty("--composer-height",composer.getBoundingClientRect().height+"px")).observe(composer);
+sizeQuestion();
