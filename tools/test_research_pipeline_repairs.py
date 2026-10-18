@@ -8,6 +8,13 @@ from orchestrator.build_command_center_snapshot import build
 TOOLS=pathlib.Path(__file__).parent.resolve()
 
 class PipelineRepairs(unittest.TestCase):
+    def test_reference_sections_include_unquoted_academic_titles(self):
+        text='Παραπομπές\n↑ «Από τη Γαληνοτάτη στον Καθολικότατο: Οι φουρτούνες του Καπετάν-Πέτρου Λάντζα»\nΠηγές[Επεξεργασία]\nGürkan, Emrah Safa (2012). Espionage in the 16th Century Mediterranean: Secret Diplomacy and Rivalry. Washington: University.\n'
+        queries=bibliographic_queries(text)
+        self.assertTrue(any('Γαληνοτάτη' in q for q in queries))
+        self.assertIn('Espionage in the 16th Century Mediterranean: Secret Diplomacy and Rivalry',queries)
+        self.assertEqual(bibliographic_queries('He said "This is just an unrelated narrative quotation".'),[])
+
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.root=pathlib.Path(self.tmp.name)
         self.addCleanup(self.tmp.cleanup)

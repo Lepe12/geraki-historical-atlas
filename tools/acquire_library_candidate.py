@@ -57,6 +57,7 @@ items=selected
 citation_history=OUT/'citation_chase_report.json'
 citation_searches=json.loads(citation_history.read_text()).get('searches',[]) if citation_history.exists() else []
 citation_queries_seen={x['query'] for x in citation_searches}
+citation_limit=max(1,min(12,int(os.getenv('PCT_CITATION_QUERY_LIMIT','6'))))
 
 def safe_name(s):
     return re.sub(r"[^A-Za-z0-9_.-]+","_",str(s))[:180]
@@ -125,7 +126,7 @@ for position,x in enumerate(items):
                         rec['status']=acquired['status']
                         rec['acquired_source_url']=acquired['url']
                         for query in acquired.get('bibliographic_queries',[]):
-                            if query in citation_queries_seen or len(citation_queries_seen)>=3 or time.monotonic()-started>=budget:continue
+                            if query in citation_queries_seen or len(citation_queries_seen)>=citation_limit or time.monotonic()-started>=budget:continue
                             citation_queries_seen.add(query)
                             status,leads,diagnostic=search_web('"'+query+'"',os.getenv('PCT_RESEARCH_LANE','travellers'),'Citation Chase')
                             for lead in leads:
@@ -155,7 +156,7 @@ for position,x in enumerate(items):
 checkpoint(deferred)
 print("ACQUISITION",len(results),"acquired",sum(x.get('status') in ('TEXT_ACQUIRED','DIGITAL_METADATA_ACQUIRED') for x in results),"deferred",len(deferred),"held",len(held))
 
-(OUT/'citation_chase_report.json').write_text(json.dumps({'searches':citation_searches,'verification_status':'UNVERIFIED_DISCOVERY','bounded_queries':3},ensure_ascii=False,indent=2))
+(OUT/'citation_chase_report.json').write_text(json.dumps({'searches':citation_searches,'verification_status':'UNVERIFIED_DISCOVERY','bounded_queries':citation_limit},ensure_ascii=False,indent=2))
 lane_path=pathlib.Path('lane_discovery')/(os.getenv('PCT_RESEARCH_LANE','travellers')+'.json')
 if citation_searches and lane_path.exists():
     discovery=json.loads(lane_path.read_text())

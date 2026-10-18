@@ -97,11 +97,36 @@ def acquire(url,out,fetcher=fetch,follow=True):
 
 
 def bibliographic_queries(text):
+    """Extract bounded citation titles; prose quotes alone are not references."""
     queries=[]
-    for match in re.finditer(r'(?:«|<<|“)([^»”<>]{20,240}?)(?:»|>>|”)',text):
-        before=text[max(0,match.start()-300):match.start()]
-        folded=''.join(c for c in unicodedata.normalize('NFD',before) if not unicodedata.combining(c)).casefold()
-        if not re.search(r'δημοσιευ|βιβλιογραφ|publication|bibliograph|references|πηγ',folded):continue
-        title=' '.join(match.group(1).split())
-        if len(title.split())>=4 and title not in queries:queries.append(title)
-    return queries[:2]
+    def fold(value):
+        return ''.join(c for c in unicodedata.normalize('NFD',value) if not unicodedata.combining(c)).casefold()
+    def add(value):
+        title=' '.join(value.split()).strip(' «»“”".,;')
+        if not 20<=len(title)<=300 or len(title.split())<4:return
+        # ISBNs and page locators are not part of a title query.
+        title=re.split(r'\s+ISBN\b|,\s*(?:τομ|τόμ|σελ|vol\b|pp\.)',title,flags=re.I)[0].strip(' .,;')
+        key=re.sub(r'[^\w]+','',fold(title))
+        for index,old in enumerate(queries):
+            oldkey=re.sub(r'[^\w]+','',fold(old))
+            if key==oldkey or (min(len(key),len(oldkey))>=30 and (key in oldkey or oldkey in key)):
+                if len(key)<len(oldkey):queries[index]=title
+                return
+        queries.append(title)
+    for match in re.finditer(r'(?:«|<<|“|")([^»”<>"\n]{20,300}?)(?:»|>>|”|")',text):
+        before=fold(text[max(0,match.start()-1000):match.start()])
+        if re.search(r'δημοσιευ|βιβλιογραφ|publication|bibliograph|references|πηγ|παραπομπ',before):add(match.group(1))
+    in_references=False
+    for line in text.splitlines():
+        plain=line.strip()
+        heading=fold(re.sub(r'\[[^]]*\]','',plain)).strip(' :')
+        if heading in ('πηγεσ','βιβλιογραφια','παραπομπεσ','references','bibliography','sources','further reading'):
+            in_references=True;continue
+        if heading in ('καθιερωμενοι οροι','εξωτερικοι συνδεσμοι','external links','authority control','categories'):
+            in_references=False
+        if not in_references:continue
+        citation=re.search(r'\((?:1\d{3}|20\d{2})\)\.\s+(.+)',plain)
+        if citation:
+            title=re.split(r'\.\s+|,\s+[^,:]{2,60}:',citation.group(1),maxsplit=1)[0]
+            add(title)
+    return queries[:8]
