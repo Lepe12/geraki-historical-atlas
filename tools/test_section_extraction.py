@@ -56,6 +56,9 @@ class SectionExtraction(unittest.TestCase):
         self.assertIn('EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW',rows[0]['uncertainties'])
         self.assertEqual(rows[0]['decision'],'REVIEW_CONTEXT')
         self.assertFalse(answer_report({'findings':rows})['findings'])
+        compound=self.extract('Pietro Lanza e Stella was appointed in 1896.',ctx=ctx,source=source)[0]
+        self.assertIn('EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW',compound['uncertainties'])
+        self.assertEqual(compound['decision'],'REVIEW_CONTEXT')
         source['title']='Pietro Lanza biography'
         rows=self.extract('Pedro Lantzas was appointed in 1578.',ctx=ctx,source=source)
         self.assertEqual(rows[0]['decision'],'RETAIN_CANDIDATE')

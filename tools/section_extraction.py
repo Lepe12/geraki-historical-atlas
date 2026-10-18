@@ -11,13 +11,13 @@ import re
 from pathlib import Path
 from urllib.parse import urlsplit
 from candidate_context import variants, STRONG, ACTION
-from research_focus import decompose, fold, name_pattern
+from research_focus import decompose, fold, name_pattern, extended_name_after
 
 YEAR = re.compile(r'(?<!\d)(1\d{3}|20\d{2})(?!\d)')
 # Historical predicates beyond piracy: administrative and diplomatic actions
 # are relevant to a person research question too. All remain provisional.
 PREDICATE = re.compile(r'\b(?:αιχμαλωτ\w*|συλλαμβ\w*|συλληψ\w*|επιτεθ\w*|επιτιθ\w*|επιδρομ\w*|λεηλατ\w*|φυλακ\w*|αποφυλακ\w*|διαμαρτυρ\w*|υπομνημα\w*|αποστελλ\w*|εστειλ\w*|αναλαμβ\w*|διορι\w*|συνεργαζ\w*|αναφερ\w*|βρισκεται|διαταγ\w*|απορριπτ\w*|αρχηγια|attacked|captured|imprisoned|appointed|reported|sent|petitioned|sailed|commanded|assal\w*|cattur\w*|nomm\w*|emprisonn\w*)\b')
-FICTION = re.compile(r'\b(?:μυθιστορημα\w*|μυθοπλασ\w*|novel|fictional|libretto)\b')
+FICTION = re.compile(r'\b(?:μυθιστορημα\w*|μυθοπλασ\w*|novel|novela|romanzo|fictional|libretto)\b')
 SOCIAL = ('instagram.com','facebook.com','tiktok.com','youtube.com','linkedin.com')
 
 def read(path, default=None):
@@ -84,8 +84,7 @@ def extract_document(text, source, file, ctx):
             # A longer explicitly qualified name may identify a namesake. Do
             # not infer that e.g. "Name Surname di Otherplace" is the target.
             for hit in re.finditer(name_pattern(name.split()),fold(normalized_body)):
-                tail=normalized_body[hit.end():hit.end()+90]
-                if re.match(r'\s+(?:di|de|da|von|van)\s+[A-ZÀ-ÖØ-Þ][^\W\d_]+',tail):
+                if extended_name_after(normalized_body,hit.end()):
                     extended_name=True
         if direct:topic={'text':raw,'locator':locator(text,start,end,source,file)}
         # Pronouns alone do not establish a person. They remain a section-context

@@ -125,6 +125,21 @@ def _token_match(text,name):
     return bool(re.search(_token_pattern(name),text))
 
 
+def extended_name_after(original, folded_end):
+    """Detect a qualified/compound name without mistaking 'e la storia' for it.
+
+    Map folded positions to original characters so the surname's capital is
+    available. Names supplied in full are matched before their shorter aliases.
+    """
+    length=0;end=0
+    for end,char in enumerate(original,1):
+        length+=len(fold(char))
+        if length>=folded_end:break
+    tail=original[end:end+100]
+    extension=re.match(r'(?:\s*,?\s+(?:di|de|da|von|van|e)\s+|[-–])([^\W\d_]+)',tail)
+    return bool(extension and extension.group(1)[0].isupper())
+
+
 def topical_match(record, focus):
     # Independent metadata fields/list entries cannot form a person's name.
     # Prefer a complete match even if an earlier field contains only a surname.
@@ -156,8 +171,9 @@ def topical_match(record, focus):
 def _topical_match_segment(record, focus):
     # Query text, repository names and source_lead flags are intentionally absent:
     # what was searched cannot establish what the source is about.
-    text=fold(' '.join(str(record.get(k) or '') for k in
-              ('title','description','subject','context_excerpt','metadata_text','text','snippet')))
+    original=' '.join(str(record.get(k) or '') for k in
+              ('title','description','subject','context_excerpt','metadata_text','text','snippet'))
+    text=fold(original)
     places=[p for p in focus.get('places',[]) if _token_match(text,p)]
     roles=[r for r in focus.get('roles',[]) if _token_match(text,r)]
     for name in sorted(focus['names'],key=len,reverse=True):
@@ -171,8 +187,7 @@ def _topical_match_segment(record, focus):
             pattern=name_pattern(words)
             name_hit=re.search(pattern,text)
             if name_hit:
-                suffix=text[name_hit.end():name_hit.end()+90]
-                if re.match(r'\s+(?:di|de|da|von|van)\s+[^\W\d_]+',suffix):
+                if extended_name_after(original,name_hit.end()):
                     return {'category':'POSSIBLE_TARGET','reason':'EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW',
                             'matched_name':name,'places':places,'roles':roles}
                 local=text[max(0,name_hit.start()-180):name_hit.end()+180]

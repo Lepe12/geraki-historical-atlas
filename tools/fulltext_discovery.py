@@ -12,7 +12,7 @@ from html import unescape
 from html.parser import HTMLParser
 from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, urlopen
-from research_focus import decompose, fold, retrieval_names, name_pattern
+from research_focus import decompose, fold, retrieval_names, name_pattern, extended_name_after
 
 IA_FTS='https://be-api.us.archive.org/ia-pub-fts-api'
 GREEK=dict(zip('αβγδεζηθικλμνξοπρστυφχψω',
@@ -107,7 +107,7 @@ def text_match(record,focus):
                 if len(parts)<2:continue
                 pattern=name_pattern(parts)
                 for hit in re.finditer(r'(?<!\w)'+pattern+r'(?!\w)',text):
-                    extended=bool(re.match(r'\s+(?:di|de|da|von|van)\s+[^\W\d_]+',text[hit.end():hit.end()+90]))
+                    extended=extended_name_after(segment,hit.end())
                     local=text[max(0,hit.start()-240):hit.end()+240]
                     places=[p for p in focus.get('places',[]) if any(
                         re.search(r'(?<!\w)'+re.escape(norm(t))+r'(?!\w)',local)

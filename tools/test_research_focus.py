@@ -71,6 +71,8 @@ class ResearchFocusTests(unittest.TestCase):
             self.assertEqual(result['status'],'PRIORITY')
             self.assertFalse(result['verified'])
         self.assertEqual(assess({'title':'Pietro Lanza di Scalea'},identity(req,req))['status'],'REVIEW_REQUIRED')
+        self.assertEqual(assess({'title':'Pietro Lanza e Stella'},identity(req,req))['status'],'REVIEW_REQUIRED')
+        self.assertEqual(assess({'title':'Pietro Lanza e la sua storia'},identity(req,req))['status'],'PRIORITY')
         other={'target':'William Rook','aliases':[]}
         self.assertEqual(assess({'title':'Letters of William Rook'},identity(other,other))['status'],'PRIORITY')
 
