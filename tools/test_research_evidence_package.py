@@ -1,7 +1,7 @@
 """Traceability controls use synthetic text; not a historical gold standard."""
 import hashlib,json,tempfile,unittest
 from pathlib import Path
-from research_evidence_package import build,source_key,source_classification
+from research_evidence_package import build,source_key,source_classification,provider_failures
 from evaluate_research_methods import metrics,evaluate
 
 class EvidencePackage(unittest.TestCase):
@@ -50,6 +50,15 @@ class EvidencePackage(unittest.TestCase):
             self.assertFalse(source['classification']['confirmed'])
             self.assertEqual(source['bibliography']['publication_date'],1621)
             self.assertEqual(source['bibliography']['creators'],['Reported Author'])
+
+    def test_payment_and_rate_limits_are_access_gaps_not_absence_of_sources(self):
+        detail=json.dumps({'schema':'pct-web-search-coverage-v1','providers':[
+            {'provider':'google','status':'REMOTE_RATE_LIMITED','code':'HTTP_429'},
+            {'provider':'exa','status':'FAILED','code':'HTTP_402'}]})
+        gaps=provider_failures(detail)
+        self.assertEqual(gaps[0]['meaning'],'RATE_LIMITED_SEARCH_NOT_COMPLETED')
+        self.assertEqual(gaps[1]['meaning'],'BILLING_OR_QUOTA_REQUIRED')
+        self.assertEqual(provider_failures('not structured JSON'),[])
 
     def test_evaluation_does_not_claim_independence_or_undefined_perfection(self):
         self.assertIsNone(metrics([True],[False])['precision'])

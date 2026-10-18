@@ -15,6 +15,17 @@ SCHEMA='nabou-evidence-package-v1'
 IDENTITY_HOLDS={'CONFLICTING_GIVEN_NAME','EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW','SURNAME_IDENTITY_UNRESOLVED'}
 
 
+def provider_failures(detail):
+    """Expose provider access failures, including older persisted diagnostics."""
+    try:data=json.loads(detail) if isinstance(detail,str) else detail
+    except (ValueError,TypeError):return []
+    if not isinstance(data,dict) or data.get('schema')!='pct-web-search-coverage-v1':return []
+    return [{'provider':p.get('provider'),'status':p.get('status'),'code':p.get('code'),
+             'meaning':'BILLING_OR_QUOTA_REQUIRED' if p.get('code')=='HTTP_402' else
+                       'RATE_LIMITED_SEARCH_NOT_COMPLETED' if p.get('code')=='HTTP_429' else 'PROVIDER_SEARCH_NOT_COMPLETED'}
+            for p in data.get('providers',[]) if p.get('status')!='EXECUTED']
+
+
 def read(path):
     if not path.is_file():return {}
     return json.loads(path.read_text(encoding='utf-8'))
@@ -80,7 +91,7 @@ def replay(root, lane, finding):
 
 
 def build(root, request=None):
-    root=Path(root);sources={};passages=[];coverage=[];manifests=[];inputs=[];acquisition=[];relationships=[]
+    root=Path(root);sources={};passages=[];coverage=[];manifests=[];inputs=[];acquisition=[];relationships=[];access_gaps=[]
     def register(row,lane):
         key=source_key(row)
         if key in ('|',''):return None
@@ -121,6 +132,10 @@ def build(root, request=None):
             coverage.append({'lane':lane,'repository':attempt.get('repository'),'status':attempt.get('status') or 'UNEXECUTED',
                              'queries':attempt.get('queries') or [],'hits':attempt.get('hits'),
                              'interpretation':'EXECUTION_STATUS_NOT_EXHAUSTIVE_ARCHIVE_COVERAGE'})
+            for query in attempt.get('queries') or []:
+                for failure in provider_failures(query.get('detail')):
+                    access_gaps.append({'lane':lane,'repository':attempt.get('repository'),
+                                        'query':query.get('query'),**failure})
         for row in read(lane_root/'library_acquisition/acquisition_report.json').get('results',[]):
             sid=register(row,lane)
             acquisition.append({'source_id':sid,'lane':lane,'status':row.get('status'),
@@ -179,6 +194,7 @@ def build(root, request=None):
     return {'schema':SCHEMA,'run_id':root.name,'request':request or {},'sources':list(sources.values()),
             'passages':passages,'assertions':assertions,'source_relationships':relationships,
             'coverage':coverage,'coverage_summary':dict(status_counts),'acquisition':acquisition,
+            'provider_access_gaps':access_gaps,
             'execution_manifests':manifests,'input_checksums':inputs,
             'analysis_status':semantic.get('status') or 'NOT_EXECUTED',
             'analysis_configuration':semantic.get('configuration') or {},

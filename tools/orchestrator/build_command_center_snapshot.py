@@ -5,7 +5,7 @@ import argparse,datetime,json,sys
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parent.parent))
 from research_relevance import identity, assess
-from research_evidence_package import build as build_evidence_package
+from research_evidence_package import build as build_evidence_package, provider_failures
 
 LANE_LABELS={
  "greek":"Greek","travellers":"Travellers","spanish_simancas":"Simancas","venetian":"Venetian","french":"French",
@@ -225,6 +225,15 @@ def build(repo:Path,run_id:str):
     lane_statuses=[a['status'] for a in agents if a['kind']=='research_lane']
     mission_status=('UNKNOWN' if not lane_statuses else 'FAILED' if all(v=='FAILED' for v in lane_statuses) else 'PARTIAL' if any(v!='COMPLETED' for v in lane_statuses) else 'COMPLETED')
     package=build_evidence_package(run_root,request)
+    for blocker in blockers:
+        failures=provider_failures(blocker.get('detail'))
+        if failures:
+            blocker['provider_failures']=failures
+            labels={'google':'SerpAPI / Google','exa':'Exa'}
+            reasons={'BILLING_OR_QUOTA_REQUIRED':'απαιτείται έλεγχος χρέωσης ή διαθέσιμου ορίου λογαριασμού',
+                     'RATE_LIMITED_SEARCH_NOT_COMPLETED':'περιορισμός αιτημάτων· η αναζήτηση δεν ολοκληρώθηκε',
+                     'PROVIDER_SEARCH_NOT_COMPLETED':'η αναζήτηση δεν ολοκληρώθηκε'}
+            blocker['description']=' · '.join(labels.get(f['provider'],str(f['provider']))+': '+reasons[f['meaning']] for f in failures)
     semantic_claims={c['claim_id']:c for c in semantic_answer.get('claims',[]) if c.get('claim_id')}
     contradiction_records=[]
     for index,conflict in enumerate((semantic_answer.get('review') or {}).get('contradictions') or []):
