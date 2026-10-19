@@ -17,7 +17,7 @@ Save the provider key in the repository **Actions secret** `PCT_LLM_API_KEY`, ne
 | `PCT_LLM_ADVERSARIAL_MODEL` | Optional role-specific override |
 | `PCT_LLM_SYNTHESIS_MODEL` | Optional role-specific override |
 
-All three roles can use `PCT_LLM_MODEL`. Missing configuration produces `BLOCKED_CONFIGURATION`, no model calls, and an explicit UI message. Provider failure or rejected citations never turns into a fabricated successful answer. Setting these variables does not prove model execution; inspect the actual preserved report after a run.
+All three roles can use `PCT_LLM_MODEL`. Missing model configuration produces an extractive source dossier when replayable passages are available, with no model calls; otherwise it reports insufficient acquired evidence. Explicit model-required preflight still reports `BLOCKED_CONFIGURATION`. Provider failure or rejected citations never turns into a fabricated successful answer. Setting these variables does not prove model execution; inspect the actual preserved report after a run.
 
 ## Evidence and validation
 
