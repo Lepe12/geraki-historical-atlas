@@ -15,7 +15,7 @@ REGIONS = {
     'mediterranean': {
         'pattern': r'μεσογει|mediterran|akdeniz',
         'forms': ['Mediterranean', 'Méditerranée', 'Mediterraneo', 'Mediterráneo', 'Akdeniz', 'Μεσόγειος'],
-        'search_scope_hypotheses': ['Archipelago', 'Archipel', 'Arcipelago', 'Aegean', 'Αιγαίο'],
+        'search_scope_hypotheses': ['Archipelago', 'Archipel', 'Arcipelago', 'Aegean', 'Αιγαίο', 'Levant', 'Levante'],
     },
     'caribbean': {'pattern': r'καραιβ|caribb|caribe|caraib', 'forms': ['Caribbean', 'Caribe', 'Caraïbes'], 'search_scope_hypotheses': []},
     'atlantic': {'pattern': r'ατλαντ|atlanti', 'forms': ['Atlantic', 'Atlantique', 'Atlantico'], 'search_scope_hypotheses': []},

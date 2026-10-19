@@ -85,6 +85,7 @@ def collect(run_root):
                 groups[key]['occurrences'].append(provenance);continue
             row={'evidence_id':'e-'+key[:20],'text':raw,'years_in_scope':f.get('years_in_scope',[]),
                  'date_basis':f.get('date_basis'),'date_evidence':f.get('date_evidence'),
+                 'source_bibliography':f.get('source_bibliography'),
                  'uncertainties':f.get('uncertainties',[]),'occurrences':[provenance],
                  'source_independence':'UNKNOWN_NOT_ESTABLISHED'}
             groups[key]=row;seen.append(row)
@@ -93,10 +94,22 @@ def collect(run_root):
     seen.sort(key=lambda x:(not bool(x['years_in_scope']),len(x['text']),x['evidence_id']))
     return seen,excluded
 
+def model_evidence(row):
+    """Keep full replay receipts on disk; avoid repeating them in model context."""
+    value={k:row.get(k) for k in ('evidence_id','text','years_in_scope','date_basis','date_evidence','source_bibliography','uncertainties')}
+    value['consulted_source']={k:(row.get('occurrences') or [{}])[0].get(k) for k in ('title','url')}
+    value['repeated_occurrences']=len(row.get('occurrences',[]))
+    value['source_independence']='UNKNOWN_NOT_ESTABLISHED'
+    return value
+
+def model_claim(claim):
+    return {k:claim.get(k) for k in ('claim_id','statement','kind','quote','actors','places','dates',
+                                    'source_classification','classification_status','usage_type','uncertainty')}
+
 def batches(records,max_batches=3,budget=14000):
     selected=[];deferred=[];group=[];size=0
     for row in records:
-        n=len(json.dumps(row,ensure_ascii=False))
+        n=len(json.dumps(model_evidence(row) if row.get('occurrences') else row,ensure_ascii=False))
         if n>budget:
             deferred.append({'evidence_id':row['evidence_id'],'reason':'PARAGRAPH_EXCEEDS_MODEL_BATCH'});continue
         if group and size+n>budget:
@@ -239,6 +252,7 @@ def execute(run_root, question, caller=call, config=None):
          'verified':False,'human_reviewed':False}
     if not conf['configured']:return documentary_answer(out,all_records,run_root)
     if not selected:out['status']='INSUFFICIENT_ACQUIRED_EVIDENCE';return out
+    out['status']='RUNNING_SEMANTIC_ANALYSIS'
     def invoke(role,prompt):
         result=caller(role,prompt)
         out['calls'].append({'role':role,'status':result.get('status'),'provider':result.get('provider'),
@@ -249,9 +263,15 @@ def execute(run_root, question, caller=call, config=None):
                              'response_sha256':digest(result),'prompt_version':route(role).prompt_version,
                              'completed_utc':datetime.datetime.now(datetime.timezone.utc).isoformat()})
         if result.get('status')=='COMPLETED':out['model_used']=True
+        # Preserve actual calls even if a later role times out or fails.
+        destination=Path(run_root)/'research_answer'
+        destination.mkdir(parents=True,exist_ok=True)
+        responses=destination/'model_responses';responses.mkdir(exist_ok=True)
+        (responses/(str(len(out['calls']))+'-'+role+'.json')).write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+        (destination/'progress.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
         return parse(result)
     for group in grouped:
-        prompt=RULES+'\nROLE: extract evidence-constrained provisional historical information. QUESTION: '+question+'\nReturn {"items":[{"statement":"Greek source-attributed statement","evidence_id":"supplied ID","quote":"exact contiguous source text, at least 20 characters","kind":"source_statement|inference|hypothesis","source_type":"PRIMARY_SOURCE|SECONDARY_SOURCE|UNVERIFIED","actors":[],"places":[],"dates":[],"uncertainty":[]}]}. Extract at most 3 concise claims per batch, focused on named places and their documented use. Include usage_type: BASE, ANCHORAGE, REFUGE, RAID_LOCATION, OTHER or UNRESOLVED. Quote a short exact passage. Entities must occur in the quote; dates may also occur in supplied date_evidence. Missing values stay empty. Source classification is provisional; if authorship and contemporary testimony cannot be established use UNVERIFIED. A raid location is not automatically a corsair base. Resolve pronouns only as explicit inference with uncertainty.\nEVIDENCE_JSON:\n'+json.dumps(group,ensure_ascii=False)
+        prompt=RULES+'\nROLE: extract evidence-constrained provisional historical information. QUESTION: '+question+'\nReturn {"items":[{"statement":"Greek source-attributed statement","evidence_id":"supplied ID","quote":"exact contiguous source text, at least 20 characters","kind":"source_statement|inference|hypothesis","source_type":"PRIMARY_SOURCE|SECONDARY_SOURCE|UNVERIFIED","actors":[],"places":[],"dates":[],"uncertainty":[]}]}. Extract at most 2 concise claims per batch, focused on named places and their documented use. Each statement must be one short clause; each quote must contain 20-50 words. Include usage_type: BASE, ANCHORAGE, REFUGE, RAID_LOCATION, OTHER or UNRESOLVED. Quote a short exact passage. Entities must occur in the quote; dates may also occur in supplied date_evidence. Missing values stay empty. Source classification is provisional; if authorship and contemporary testimony cannot be established use UNVERIFIED. A raid location is not automatically a corsair base. Resolve pronouns only as explicit inference with uncertainty.\nEVIDENCE_JSON:\n'+json.dumps([model_evidence(row) for row in group],ensure_ascii=False)
         payload=invoke('evidence_extractor',prompt)
         items,rejected=validate_items(payload or {},group)
         out['claims'].extend(items);out['rejected'].extend(rejected)
@@ -259,7 +279,7 @@ def execute(run_root, question, caller=call, config=None):
     # Identical model items are grouped by ID, not counted as corroboration.
     out['claims']=list({c['claim_id']:c for c in out['claims']}.values())
     claims=out['claims']
-    review=invoke('adversarial_reviewer',RULES+'\nROLE: challenge every proposed claim against its supplied quotation. Return {"supported_claim_ids":[],"flagged_claims":[{"claim_id":"ID","reason":"reason"}],"contradictions":[{"claim_ids":["IDs"],"explanation":"reason"}],"limitations":[]}. Use only supplied IDs. Supported means model review only, never historical verification. Distinguish actual conflicting source statements from different dates, actors or scope.\nCLAIMS_JSON:\n'+json.dumps(claims,ensure_ascii=False))
+    review=invoke('adversarial_reviewer',RULES+'\nROLE: challenge every proposed claim against its supplied quotation. Flag any alleged corsair base inferred only from a raid, any date outside the question, or an unsupported place identity. Return {"supported_claim_ids":[],"flagged_claims":[{"claim_id":"ID","reason":"reason"}],"contradictions":[{"claim_ids":["IDs"],"explanation":"reason"}],"limitations":[]}. Use only supplied IDs. Supported means model review only, never historical verification. Distinguish actual conflicting source statements from different dates, actors or scope.\nCLAIMS_JSON:\n'+json.dumps([model_claim(c) for c in claims],ensure_ascii=False))
     valid={c['claim_id'] for c in claims}
     if not isinstance(review,dict) or forbidden(review) or not isinstance(review.get('supported_claim_ids'),list) or any(not isinstance(cid,str) or cid not in valid for cid in review['supported_claim_ids']):
         out['status']='REVIEW_FAILED';return out
@@ -270,7 +290,7 @@ def execute(run_root, question, caller=call, config=None):
     supported=set(review['supported_claim_ids'])-{x['claim_id'] for x in flags}
     if not supported:out['status']='NO_MODEL_SUPPORTED_CLAIMS';return out
     synthesis_claims=[c for c in claims if c['claim_id'] in supported]
-    answer=invoke('synthesis',RULES+'\nROLE: answer the research question in clear Greek using only supplied claims. Attribute statements to consulted sources. Group repetitions; do not call repeated text independent. Present conflicts and uncertainty. Return {"answer_sections":[{"text":"one concise paragraph","claim_ids":["supplied claim IDs"]}],"unknowns":["gaps"],"limitations":["limitations"]}. Every answer paragraph must cite supporting claim IDs. No external knowledge. QUESTION: '+question+'\nCLAIMS_AND_REVIEW_JSON:\n'+json.dumps({'claims':synthesis_claims,'review':review},ensure_ascii=False))
+    answer=invoke('synthesis',RULES+'\nROLE: answer the research question in clear Greek using only supplied claims. Attribute statements to consulted sources. Group repetitions; do not call repeated text independent. Present conflicts and uncertainty. Return {"answer_sections":[{"text":"one concise paragraph","claim_ids":["supplied claim IDs"]}],"unknowns":["gaps"],"limitations":["limitations"]}. Every answer paragraph must cite supporting claim IDs. No external knowledge. QUESTION: '+question+'\nCLAIMS_AND_REVIEW_JSON:\n'+json.dumps({'claims':[model_claim(c) for c in synthesis_claims],'review':review},ensure_ascii=False))
     sections=answer.get('answer_sections') if isinstance(answer,dict) else None
     if forbidden(answer) or not isinstance(sections,list) or not sections or any(not isinstance(s,dict) or not isinstance(s.get('text'),str) or not s['text'].strip() or not isinstance(s.get('claim_ids'),list) or not s['claim_ids'] or any(not isinstance(cid,str) or cid not in supported for cid in s['claim_ids']) for s in sections) or any(not isinstance(answer.get(k,[]),list) or any(not isinstance(v,str) for v in answer.get(k,[])) for k in ('unknowns','limitations')):
         out['status']='SYNTHESIS_REJECTED_INVALID_CITATIONS';return out
@@ -315,10 +335,18 @@ def main():
     root=Path(args.repo)/'evidence/runs'/args.run_id
     if not root.is_dir():raise SystemExit('RUN_NOT_FOUND')
     question=None
+    for manifest in sorted(root.glob('*/run_manifest/manifest.json')):
+        request=read(manifest).get('normalized_request') or {}
+        if request.get('target'):
+            question=request['target']+(' ('+request['date_range']+')' if request.get('date_range') else '')
+            break
     for path in sorted(root.glob('*/research_dossier/answer.json')):
+        if question:break
         data=read(path);question=data.get('question') or data.get('target')
         if question:break
     out=execute(root,question or 'Historical research')
+    import subprocess
+    out['software_revision']=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
     dest=root/'research_answer';dest.mkdir(exist_ok=True)
     (dest/'answer.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (dest/'answer.md').write_text(render(out),encoding='utf-8')

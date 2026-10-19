@@ -466,6 +466,12 @@ jobs:
             --run-id "$PCT_RUN_ID" \
             --output "command-center/live/runs/$PCT_RUN_ID.json" \
             --latest "command-center/live/latest.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: research-semantic-answer-${{ github.run_id }}
+          path: evidence/runs/${{ github.run_id }}/research_answer/
+          retention-days: 90
       - name: Commit situation board
         env:
           PCT_RUN_ID: ${{ github.run_id }}

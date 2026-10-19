@@ -179,6 +179,7 @@ def extract_topic_document(text, source, file, ctx, focus):
             candidate=bool(scoped and not fiction and re.search(BASES,fold(quote)))
             findings.append({'finding_id':'section-'+hashlib.sha256((file+str(a)+quote).encode()).hexdigest()[:20],
                 'file':file,'title':source.get('title'),'url':source.get('acquired_source_url') or source.get('url'),
+                'source_bibliography':{key:source.get(key) for key in ('creator','date','source_type','evidence_level','rights')},
                 'source_text_sha256':hashlib.sha256(text.encode()).hexdigest(),
                 'evidence_excerpt':quote,'years_in_scope':scoped,'date_basis':'EXPLICIT_PARAGRAPH' if years else 'UNRESOLVED',
                 'date_evidence':None,'matched_names':[],'name_basis':'THEMATIC_CONCEPT',
