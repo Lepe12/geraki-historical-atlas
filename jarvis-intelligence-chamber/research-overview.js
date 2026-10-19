@@ -1,5 +1,5 @@
 // Counts describe recorded output, never automatic historical verification.
-export const statusLabel=status=>({COMPLETED:'Ολοκληρώθηκε',PARTIAL:'Ολοκληρώθηκε με εκκρεμότητες',RUNNING:'Σε εξέλιξη',FAILED:'Απέτυχε',BLOCKED:'Εμπόδιο',CANCELLED:'Ακυρώθηκε',QUEUED:'Σε αναμονή',PREPARING:'Προετοιμασία',IDLE:'Ανενεργή'})[String(status||'').toUpperCase()]||'Άγνωστη κατάσταση';
+export const statusLabel=status=>({BLOCKED_CONFIGURATION:'Η ανάλυση χρειάζεται ρύθμιση',INSUFFICIENT_EVIDENCE:'Ανεπαρκή τεκμήρια',COMPLETED:'Ολοκληρώθηκε',PARTIAL:'Ολοκληρώθηκε με εκκρεμότητες',RUNNING:'Σε εξέλιξη',FAILED:'Απέτυχε',BLOCKED:'Εμπόδιο',CANCELLED:'Ακυρώθηκε',QUEUED:'Σε αναμονή',PREPARING:'Προετοιμασία',IDLE:'Ανενεργή'})[String(status||'').toUpperCase()]||'Άγνωστη κατάσταση';
 export function overview(snapshot){
  const discoveries=Array.isArray(snapshot?.discoveries)?snapshot.discoveries:[];
  const related=discoveries.filter(d=>['TARGET_MATCH','POSSIBLE_TARGET'].includes(d.topical_match?.category)).length;
@@ -7,7 +7,7 @@ export function overview(snapshot){
  const blockers=Array.isArray(snapshot?.blockers)?snapshot.blockers.length:0;
  const contradictions=Array.isArray(snapshot?.contradictions?.records)?snapshot.contradictions.records.length:0;
  const active=(snapshot?.agents||[]).some(a=>['RUNNING','PREPARING','QUEUED','STARTING'].includes(String(a.status).toUpperCase()));
- const terminal=['COMPLETED','PARTIAL','FAILED','BLOCKED','CANCELLED','CANCELED'].includes(String(snapshot?.mission?.status).toUpperCase());
+ const terminal=['BLOCKED_CONFIGURATION','INSUFFICIENT_EVIDENCE','COMPLETED','PARTIAL','FAILED','BLOCKED','CANCELLED','CANCELED'].includes(String(snapshot?.mission?.status).toUpperCase());
  const title=snapshot?.mission?.target||snapshot?.mission?.purpose||'Έρευνα '+snapshot?.run_id;
  const hasEvidence=related+claims>0;
  return {title,related,claims,blockers,contradictions,

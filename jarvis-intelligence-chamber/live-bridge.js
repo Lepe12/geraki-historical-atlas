@@ -1,8 +1,8 @@
 // One read-only production feed shared by all interface subscribers.
-export const isTerminal=status=>/^(COMPLETED|PARTIAL|FAILED|ERROR|CANCELLED|CANCELED|BLOCKED|SKIPPED|DONE|IDLE|UNAVAILABLE)$/.test(String(status||'').toUpperCase());
+export const isTerminal=status=>/^(BLOCKED_CONFIGURATION|INSUFFICIENT_EVIDENCE|COMPLETED|PARTIAL|FAILED|ERROR|CANCELLED|CANCELED|BLOCKED|SKIPPED|DONE|IDLE|UNAVAILABLE)$/.test(String(status||'').toUpperCase());
 export function missionState(snapshot){
  const status=String(snapshot?.mission?.status||'').toUpperCase();
- if(['PARTIAL','FAILED','ERROR','CANCELLED','CANCELED','BLOCKED'].includes(status))return status;
+ if(['BLOCKED_CONFIGURATION','INSUFFICIENT_EVIDENCE','PARTIAL','FAILED','ERROR','CANCELLED','CANCELED','BLOCKED'].includes(status))return status;
  if((snapshot?.agents||[]).some(a=>a.status&&!isTerminal(a.status)))return 'RESEARCH ACTIVE';
  if(status==='COMPLETED')return 'COMPLETED';
  return status||'READY';
