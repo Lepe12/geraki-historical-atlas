@@ -36,9 +36,41 @@ class SemanticAnswer(unittest.TestCase):
             fixture(tmp)
             def no_call(*args):raise AssertionError('No network when unconfigured')
             out=execute(tmp,'question',caller=no_call)
-            self.assertEqual(out['status'],'BLOCKED_CONFIGURATION')
+            self.assertEqual(out['status'],'SOURCE_DOSSIER_AVAILABLE')
             self.assertFalse(out['model_used']);self.assertFalse(out['verified'])
-            self.assertIn('Δεν παρήχθη',render(out))
+            self.assertEqual(out['calls'],[])
+            self.assertEqual(out['claims'][0]['quote'],TEXT)
+            self.assertIn('χωρίς υπηρεσία μοντέλου',render(out))
+
+    def test_documentary_dossier_groups_repetitions_and_does_not_infer_events(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp);fixture(tmp,'greek','https://example.org/copy')
+            out=execute(tmp,'question',config={'configured':False,'missing':[]})
+            self.assertEqual(len(out['claims']),1)
+            self.assertEqual(len(out['claims'][0]['source_occurrences']),2)
+            self.assertEqual(out['claims'][0]['actors'],[])
+            self.assertFalse(out['claims'][0]['model_analysis'])
+            self.assertEqual(out['documentary_timeline'][0]['meaning'],'DATE_RECORDED_WITH_PASSAGE_NOT_VERIFIED_EVENT')
+
+    def test_documentary_dossier_rejects_tampered_passages(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp);(Path(tmp)/'travellers/library_acquisition/doc.txt').write_text('Changed')
+            out=execute(tmp,'question',config={'configured':False,'missing':[]})
+            self.assertEqual(out['status'],'INSUFFICIENT_ACQUIRED_EVIDENCE')
+            self.assertEqual(out['claims'],[])
+
+    def test_modern_latin_namesake_is_held_when_greek_identity_is_requested(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp)
+            base=Path(tmp)/'travellers'
+            p=base/'structured_output/extracted_findings.json';data=json.loads(p.read_text())
+            data['findings'][0]['title']='Boletín Oficial 1971 Pedro Lanza'
+            p.write_text(json.dumps(data))
+            (base/'run_manifest').mkdir()
+            (base/'run_manifest/manifest.json').write_text(json.dumps({'normalized_request':{'target':'Pedro Lanza','aliases':['Πέτρος Λάντζας']}}))
+            out=execute(tmp,'question',config={'configured':False,'missing':[]})
+            self.assertEqual(out['claims'],[])
+            self.assertEqual(len(out['coverage']['identity_held']),1)
 
     def test_configuration_does_not_leak_key(self):
         env={'PCT_LLM_PROVIDER':'openai_compatible','PCT_LLM_BASE_URL':'https://example.org/v1',

@@ -232,6 +232,8 @@ def build(repo:Path,run_id:str):
     answer_status=semantic_answer.get('status') or 'NOT_EVALUATED'
     if answer_status.startswith('BLOCKED'):
         mission_status=answer_status
+    elif answer_status=='SOURCE_DOSSIER_AVAILABLE':
+        mission_status='PARTIAL'
     elif execution_status=='COMPLETED' and not claims:
         mission_status='INSUFFICIENT_EVIDENCE'
 

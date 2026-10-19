@@ -21,6 +21,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify source dossier interface
+        run: node --test jarvis-intelligence-chamber/source-dossier.test.cjs
       - name: Verify execution isolation and real Git output publication
         env:
           PYTHONDONTWRITEBYTECODE: '1'

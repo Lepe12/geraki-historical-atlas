@@ -147,6 +147,53 @@ def validate_items(payload, records):
             'source_uncertainties':row['uncertainties'],'model_analysis':True,'verified':False})
     return accepted,rejected
 
+def documentary_answer(out, records, run_root):
+    """Build a source dossier by exact extraction, without a model or inference."""
+    # Reuse the recorded request; modern Latin namesakes stay outside the dossier.
+    from research_focus import fold, name_pattern
+    request={}
+    for path in sorted(Path(run_root).glob('*/run_manifest/manifest.json')):
+        request=read(path).get('normalized_request') or {}
+        if request:break
+    greek_names=[n for n in [request.get('target',''),*request.get('aliases',[])] if re.search('[α-ω]',fold(n))]
+    retained=[];held=[]
+    for row in records:
+        text=' '.join([row['text'],*[s.get('title') or '' for s in row['occurrences']]])
+        modern=any(int(y)>=1900 for y in re.findall(r'\b(?:19\d{2}|20\d{2})\b',text))
+        if greek_names and modern and not any(re.search(name_pattern(n.split()),fold(row['text'])) for n in greek_names):
+            held.append({'evidence_id':row['evidence_id'],'reason':'MODERN_NAMESAKE_REQUIRES_IDENTITY_REVIEW'})
+        else:retained.append(row)
+    records=retained
+    out['coverage']['identity_held']=held
+    out.update(status='SOURCE_DOSSIER_AVAILABLE' if records else 'INSUFFICIENT_ACQUIRED_EVIDENCE',
+               answer_mode='EXACT_SOURCE_EXTRACTS',evidence=records)
+    out['coverage']['selected_passages']=len(records)
+    out['coverage']['deferred']=[]
+    out['limitations']=['EXTRACTIVE_DOSSIER_NOT_HISTORICAL_SYNTHESIS',
+                        'IDENTITY_NOT_AUTOMATICALLY_ESTABLISHED','ORIGINAL_INSPECTION_NOT_PERFORMED',
+                        'SOURCE_INDEPENDENCE_NOT_ESTABLISHED','BOUNDED_EVIDENCE_COVERAGE']
+    out['unknowns']=['Η ταύτιση του προσώπου και η ιστορική αλήθεια των αποσπασμάτων χρειάζονται τεκμηρίωση.',
+                     'Οι επαναλήψεις ενός αποσπάσματος δεν υπολογίζονται ως ανεξάρτητες μαρτυρίες.',
+                     'Η απουσία ευρήματος δεν αποδεικνύει απουσία ιστορικής πηγής.']
+    if held:out['unknowns'].append(str(len(held))+' αποσπάσματα κρατήθηκαν χωριστά λόγω εκκρεμούς ταύτισης σύγχρονων συνονόματων. Παραμένουν στα αποθηκευμένα ευρήματα.')
+    out['documentary_timeline']=[]
+    for row in records:
+        cid='extract-'+row['evidence_id']
+        source=row['occurrences'][0]
+        out['claims'].append({'claim_id':cid,'statement':'Απόσπασμα από το αποθηκευμένο κείμενο της πηγής.',
+            'kind':'acquired_excerpt','evidence_id':row['evidence_id'],'quote':row['text'],
+            'quote_offset_in_excerpt':0,'source_occurrences':row['occurrences'],
+            'uncertainty':row['uncertainties'],'source_uncertainties':row['uncertainties'],
+            'model_analysis':False,'verified':False,'actors':[],'places':[],'dates':[]})
+        out['answer_sections'].append({'text':str(source.get('title') or 'Πηγή χωρίς καταγεγραμμένο τίτλο'),
+                                      'claim_ids':[cid]})
+        for year in row.get('years_in_scope') or []:
+            out['documentary_timeline'].append({'year':year,'claim_id':cid,
+                'meaning':'DATE_RECORDED_WITH_PASSAGE_NOT_VERIFIED_EVENT',
+                'date_basis':row.get('date_basis'),'date_evidence':row.get('date_evidence')})
+    out['documentary_timeline'].sort(key=lambda x:str(x['year']))
+    return out
+
 def execute(run_root, question, caller=call, config=None):
     all_records,excluded=collect(run_root)
     grouped,deferred=batches(all_records)
@@ -162,7 +209,7 @@ def execute(run_root, question, caller=call, config=None):
          'limitations':['MODEL_OUTPUT_REQUIRES_REVIEW','ORIGINAL_INSPECTION_NOT_PERFORMED',
                         'SOURCE_INDEPENDENCE_NOT_ESTABLISHED','BOUNDED_EVIDENCE_COVERAGE'],
          'verified':False,'human_reviewed':False}
-    if not conf['configured']:return out
+    if not conf['configured']:return documentary_answer(out,all_records,run_root)
     if not selected:out['status']='INSUFFICIENT_ACQUIRED_EVIDENCE';return out
     def invoke(role,prompt):
         result=caller(role,prompt)
@@ -215,14 +262,19 @@ def render(out):
     else:
         lines.extend(['Δεν παρήχθη σημασιολογική απάντηση από μοντέλο. Τα αποκτημένα αποσπάσματα παραμένουν διαθέσιμα.',''])
         if out['configuration']['missing']:lines.extend(['Λείπουν ρυθμίσεις: '+', '.join(out['configuration']['missing'])+'.',''])
+    if out.get('documentary_timeline'):
+        lines.extend(['## Χρονολογικές ενδείξεις στα αποσπάσματα','', 'Οι ενδείξεις δεν αποτελούν επαληθευμένο χρονολόγιο γεγονότων.',''])
+        for row in out['documentary_timeline']:lines.append('- '+str(row['year'])+' ['+row['claim_id']+']')
+    if out.get('unknowns'):
+        lines.extend(['## Κενά και αβεβαιότητες','',*['- '+x for x in out['unknowns']]])
     if out.get('review',{}).get('contradictions'):
         lines.extend(['## Πιθανές αντιφάσεις υπό έλεγχο',''])
         for c in out['review']['contradictions']:lines.append('- '+str(c.get('explanation'))+' ['+', '.join(c['claim_ids'])+']')
     lines.extend(['','## Περιορισμοί','',
-                  'Η απάντηση είναι ανάλυση μοντέλου που περιμένει ανθρώπινο έλεγχο. Δεν αποτελεί επαλήθευση ιστορικών γεγονότων.',
+                  ('Ο φάκελος συγκεντρώνει ακριβή αποσπάσματα χωρίς υπηρεσία μοντέλου. Δεν παράγει ερμηνεία ή επιβεβαίωση ιστορικών γεγονότων.' if out.get('answer_mode')=='EXACT_SOURCE_EXTRACTS' else 'Η απάντηση είναι ανάλυση μοντέλου που περιμένει ανθρώπινο έλεγχο. Δεν αποτελεί επαλήθευση ιστορικών γεγονότων.'),
                   'Η επιτυχής αντιστοίχιση παραπομπής δεν αποδεικνύει από μόνη της ότι η ερμηνεία του μοντέλου είναι σωστή.',
                   'Η ανεξαρτησία των πηγών και η εξέταση πρωτοτύπων δεν θεωρούνται ολοκληρωμένες.',
-                  f'Κάλυψη: {out["coverage"]["selected_passages"]}/{out["coverage"]["unique_passages"]} μοναδικά αποσπάσματα επιλέχθηκαν εντός ορίου κλήσεων.'])
+                  f'Κάλυψη: {out["coverage"]["selected_passages"]}/{out["coverage"]["unique_passages"]} μοναδικά αποσπάσματα περιλαμβάνονται στην απάντηση.'])
     return '\n'.join(lines)+'\n'
 
 def main():

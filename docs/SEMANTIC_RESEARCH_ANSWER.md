@@ -32,3 +32,23 @@ All three roles can use `PCT_LLM_MODEL`. Missing configuration produces `BLOCKED
 Reports persist under `evidence/runs/<run_id>/research_answer/answer.json` and `answer.md`, and enter the command-center snapshot. The UI displays a pending-review answer with expandable sources, or an explicit unavailable/configuration state. No 3D core or visual style changes are part of this integration.
 
 Tests use simulated model responses and must not be reported as proof of a real provider call. Production acceptance requires a configured provider, successful recorded calls, valid cited output, a preserved report and the live UI result.
+
+## Source dossier without a model
+
+When model configuration is absent, the same runner now produces
+`SOURCE_DOSSIER_AVAILABLE` using only exact passages replayed against acquired
+text and its SHA-256. It makes no model calls and requires no additional model
+subscription or API key. Sections contain source titles, quotations, stored
+locators, links, uncertainties and recorded date indications. Identical passages
+are grouped; repeated occurrences do not establish independent testimony.
+Modern Latin namesakes of a requested Greek identity are held separately when
+modern dates are present and the supplied Greek name is absent. This is a
+conservative review hold, not a final exclusion or historical identity decision.
+
+These entries have `kind=acquired_excerpt`, `model_analysis=false`, and
+`verified=false`; they are not newly inferred historical claims. No suitable
+passages produces `INSUFFICIENT_ACQUIRED_EVIDENCE`. The snapshot reports the
+available dossier as `PARTIAL`, without marking historical research complete.
+Acquired quotations retain original OCR, including mistakes. This mode does not
+translate, establish source independence, infer relationships, or adjudicate
+contradictions. Existing optional model analysis remains available when configured.
