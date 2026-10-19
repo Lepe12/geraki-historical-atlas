@@ -45,7 +45,7 @@ class Attestation:
             raise ValueError("attestation requires entity/predicate/value/citations")
         if self.start_year is not None and self.end_year is not None and self.start_year > self.end_year:
             raise ValueError("invalid date interval")
-        if self.status not in ("UNREVIEWED", "OPERATOR_ACCEPTED", "REJECTED"):
+        if self.status not in ("UNREVIEWED", "OPERATOR_ACCEPTED", "REJECTED", "RETRACTED"):
             raise ValueError("invalid status")
         if self.status != "UNREVIEWED" and not self.reviewer:
             raise ValueError("reviewer required")

@@ -505,7 +505,7 @@ def pares_simancas(q,lane):
         from html import unescape
         plain=unescape(re.sub(r"<[^>]+>"," ",re.sub(r"(?is)<(script|style)[^>]*>.*?</\\1>"," ",raw)))
         plain=" ".join(plain.split())
-        archive_header=re.search(r'(?is)<div\s+id=["\']nombre_archivo["\'][^>]*>(.*?)</div>',raw)
+        archive_header=re.search(r'(?is)<div\b[^>]*\bid\s*=\s*["\']nombre_archivo["\'][^>]*>(.*?)</div>',raw)
         archive_text=' '.join(unescape(re.sub('<[^>]+>',' ',archive_header.group(1))).split()) if archive_header else ''
         if not (re.search(r'Signatura|Reference code|Call number',plain,re.I) and archive_text=='Archivo General de Simancas'):
             return "RECORD_NOT_CONFIRMED",[],url+" did not confirm a Simancas archival description"

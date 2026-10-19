@@ -29,15 +29,16 @@ class HistoricalEvidenceStoreTests(unittest.TestCase):
     def test_operator_review_requires_real_transition(self):
         cur = Mock()
         cur.rowcount = 1
-        review_attestation(cur, "att_x", "historian", "OPERATOR_ACCEPTED")
-        self.assertIn("status='UNREVIEWED'", cur.execute.call_args[0][0])
+        cur.fetchone.return_value = ("UNREVIEWED",)
+        review_attestation(cur, "att_x", "historian", "OPERATOR_ACCEPTED", "Page inspected")
+        self.assertIn("pc_he_review_events", cur.execute.call_args[0][0])
         cur.rowcount = 0
         with self.assertRaises(ValueError):
-            review_attestation(cur, "att_x", "historian", "OPERATOR_ACCEPTED")
+            review_attestation(cur, "att_x", "historian", "OPERATOR_ACCEPTED", "Page inspected")
 
     def test_no_automatic_approval(self):
         with self.assertRaises(ValueError):
-            review_attestation(Mock(), "att_x", "robot", "VERIFIED")
+            review_attestation(Mock(), "att_x", "robot", "VERIFIED", "Invalid auto review")
 
 
 if __name__ == "__main__":

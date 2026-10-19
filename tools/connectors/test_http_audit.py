@@ -43,7 +43,7 @@ class HttpAuditTests(unittest.TestCase):
 
     def test_simancas_header_and_source_title_are_parsed(self):
         raw=b'''<meta property="og:title" content="Letter from d'Amico in 1670"/>
-        <div id="nombre_archivo"><a>Archivo General de Simancas</a></div>
+        <div class="archive" id = "nombre_archivo"><a>Archivo General de Simancas</a></div>
         Reference code: ES.47161.AGS/1. Context. Date of formation: 1670 Level of description: Letter'''
         with patch.object(rc,'_get',return_value=raw):
             status,rows,_=rc.pares_simancas('1234','spanish_simancas')
