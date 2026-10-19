@@ -19,7 +19,7 @@ ENDPOINTS = {
     'moreveneto': ['https://asve.arianna4.cloud/', 'https://moreveneto.archiviodistatovenezia.it/'],
     'sias': ['https://sias-archivi.cultura.gov.it/cgi-bin/pagina.pl?RicVM=ricercasemplice&RicFrmRicSemplice=corsari'],
     'boa': ['https://katalog.devletarsivleri.gov.tr/'],
-    'pares': ['https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=corsarios&archivo=2', 'https://pares.cultura.gob.es/ParesBusquedas20/catalogo/description/6080193'],
+    'pares': ['https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=corsarios&idA=2', 'https://pares.cultura.gob.es/ParesBusquedas20/catalogo/description/4738575'],
     'searchculture': ['https://www.searchculture.gr/aggregator/api/search.json?general_term=%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1&page=1&pageSize=5'],
 }
 
@@ -101,7 +101,7 @@ async def browser_probe(dest):
     rows=[]
     async with async_playwright() as pw:
         browser=await pw.chromium.launch(headless=True)
-        for name,url in [('moreveneto','https://asve.arianna4.cloud/'),('sias','https://sias-archivi.cultura.gov.it/cgi-bin/pagina.pl?RicVM=ricercasemplice&RicFrmRicSemplice=corsari')]:
+        for name,url in [('moreveneto','https://asve.arianna4.cloud/'),('sias','https://sias-archivi.cultura.gov.it/cgi-bin/pagina.pl?RicVM=ricercasemplice&RicFrmRicSemplice=corsari&RicSez=complessi'),('anemi','https://anemi.lib.uoc.gr/')]:
             page=await browser.new_page()
             traffic=[]
             async def capture(response):
@@ -116,6 +116,10 @@ async def browser_probe(dest):
             try:
                 response=await page.goto(url,wait_until='domcontentloaded',timeout=45000)
                 await page.wait_for_timeout(6000)
+                if name=='moreveneto':
+                    await page.locator('input[placeholder="Cerca nei titoli delle schede..."]').fill('corsari')
+                    await page.keyboard.press('Enter')
+                    await page.wait_for_timeout(6000)
                 row.update(http_status=response.status if response else None,final_url=page.url,body_excerpt=(await page.locator('body').inner_text())[:12000],inputs=await page.locator('input').evaluate_all('(els)=>els.map(e=>({name:e.name,type:e.type,placeholder:e.placeholder,ariaLabel:e.getAttribute("aria-label")}))'),links=await page.locator('a[href]').evaluate_all('(els)=>els.slice(0,80).map(e=>({href:e.href,text:e.innerText}))'))
                 file=dest/(name+'.browser.html');file.write_text(scrub(await page.content()));row['response_file']=str(file)
             except Exception as error:row.update(error_type=type(error).__name__,error=scrub(str(error))[:1000])
@@ -133,7 +137,7 @@ def main():
         checks = list(pool.map(lambda item: inspect(*item, dest), ENDPOINTS.items()))
     from connectors.repository_connectors import audited_dispatch
     native=[]
-    for repository,query in [('OpenArchives.gr / EKT','πειρατεία'),('National Library of Greece Digital Collections','χειρόγραφο'),('SIAS / Italian State Archives','corsari'),('Archivio di Stato di Venezia / Moreveneto','corsari'),('PARES / Archivo General de Simancas','corsarios'),('SearchCulture.gr / EKT','πειρατεία')]:
+    for repository,query in [('OpenArchives.gr / EKT','πειρατεία'),('National Library of Greece Digital Collections','χειρόγραφο'),('SIAS / Italian State Archives','corsari'),('Archivio di Stato di Venezia / Moreveneto','corsari'),('Archivio di Stato di Venezia / Moreveneto','Venezia'),('PARES / Archivo General de Simancas','corsarios'),('SearchCulture.gr / EKT','πειρατεία')]:
         status,records,detail=audited_dispatch(repository,query,'live_validation')
         native.append({'repository':repository,'query':query,'status':status,'records':records,'diagnostic':json.loads(detail)})
     import asyncio

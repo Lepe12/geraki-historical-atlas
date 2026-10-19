@@ -683,9 +683,9 @@ def anemi_public(q,lane):
 
 def sias_public(q,lane):
     base='https://sias-archivi.cultura.gov.it'
-    url=base+'/cgi-bin/pagina.pl?'+urllib.parse.urlencode({'RicVM':'ricercasemplice','RicFrmRicSemplice':q,'RicProgetto':'','RicLin':''})
+    url=base+'/cgi-bin/pagina.pl?'+urllib.parse.urlencode({'RicVM':'ricercasemplice','RicFrmRicSemplice':q,'RicSez':'complessi'})
     rows=_html_search(url,'SIAS / Italian State Archives',lane,base,
-                      lambda u,t:'/cgi-bin/pagina.pl?' in u and bool(re.search(r'(?:TipoPag|Chiave|RicVM)=(?:compl|cons|prod|sogg|scheda|istit)',u,re.I)) and len(t)>3)
+                      lambda u,t:'/cgi-bin/pagina.pl?' in u and bool(re.search(r'(?:TipoPag|Chiave)=',u,re.I)) and len(t)>3)
     return 'EXECUTED',rows,url+' ; public descriptive catalogue; not restricted to Venice'
 
 def boa_access(q,lane):

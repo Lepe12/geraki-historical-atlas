@@ -119,7 +119,7 @@ def parse(result):
 def forbidden(value):
     if isinstance(value,dict):
         if any(value.get(k) is True for k in ('verified','original_inspected','human_reviewed','corroborated')):return True
-        if value.get('status')=='VERIFIED':return True
+        if any(value.get(key)=='VERIFIED' for key in ('status','verification_status','evidence_state')):return True
         return any(forbidden(v) for v in value.values())
     if isinstance(value,list):return any(forbidden(v) for v in value)
     return False
@@ -153,7 +153,11 @@ def validate_items(payload, records):
             'statement':statement,'kind':kind,'evidence_id':row['evidence_id'],'quote':quote,
             'quote_offset_in_excerpt':start,**entities,'source_occurrences':row['occurrences'],
             'uncertainty':item.get('uncertainty') if isinstance(item.get('uncertainty'),list) else [],
-            'source_uncertainties':row['uncertainties'],'model_analysis':True,'verified':False})
+            'source_uncertainties':row['uncertainties'],'model_analysis':True,'verified':False,
+            'source_classification':item.get('source_type') if item.get('source_type') in ('PRIMARY_SOURCE','SECONDARY_SOURCE') else 'UNVERIFIED',
+            'classification_status':'MODEL_PROVISIONAL_REQUIRES_SOURCE_CRITICISM',
+            'assertion_class':{'source_statement':'SOURCE_STATEMENT','inference':'INTERPRETATION','hypothesis':'HYPOTHESIS'}[kind],
+            'verification_status':'UNVERIFIED'})
     return accepted,rejected
 
 def documentary_answer(out, records, run_root):
@@ -225,13 +229,15 @@ def execute(run_root, question, caller=call, config=None):
         result=caller(role,prompt)
         out['calls'].append({'role':role,'status':result.get('status'),'provider':result.get('provider'),
                              'model':result.get('model'),'error':result.get('error'),
+                             'model_identity':result.get('model_identity'),'usage':result.get('usage'),
+                             'finish_reason':result.get('finish_reason'),'elapsed_seconds':result.get('elapsed_seconds'),
                              'prompt_sha256':hashlib.sha256(prompt.encode()).hexdigest(),
                              'response_sha256':digest(result),'prompt_version':route(role).prompt_version,
                              'completed_utc':datetime.datetime.now(datetime.timezone.utc).isoformat()})
         if result.get('status')=='COMPLETED':out['model_used']=True
         return parse(result)
     for group in grouped:
-        prompt=RULES+'\nROLE: extract evidence-constrained provisional historical information. QUESTION: '+question+'\nReturn {"items":[{"statement":"Greek source-attributed statement","evidence_id":"supplied ID","quote":"exact contiguous source text, at least 20 characters","kind":"source_statement|inference|hypothesis","actors":[],"places":[],"dates":[],"uncertainty":[]}]}. Entities must occur in the quote; dates may also occur in supplied date_evidence. Missing values stay empty. Resolve pronouns only as explicit inference with uncertainty.\nEVIDENCE_JSON:\n'+json.dumps(group,ensure_ascii=False)
+        prompt=RULES+'\nROLE: extract evidence-constrained provisional historical information. QUESTION: '+question+'\nReturn {"items":[{"statement":"Greek source-attributed statement","evidence_id":"supplied ID","quote":"exact contiguous source text, at least 20 characters","kind":"source_statement|inference|hypothesis","source_type":"PRIMARY_SOURCE|SECONDARY_SOURCE|UNVERIFIED","actors":[],"places":[],"dates":[],"uncertainty":[]}]}. Extract at most 5 concise claims per batch. Quote a short exact passage. Entities must occur in the quote; dates may also occur in supplied date_evidence. Missing values stay empty. Source classification is provisional; if authorship and contemporary testimony cannot be established use UNVERIFIED. A raid location is not automatically a corsair base. Resolve pronouns only as explicit inference with uncertainty.\nEVIDENCE_JSON:\n'+json.dumps(group,ensure_ascii=False)
         payload=invoke('evidence_extractor',prompt)
         items,rejected=validate_items(payload or {},group)
         out['claims'].extend(items);out['rejected'].extend(rejected)

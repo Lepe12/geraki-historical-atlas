@@ -32,7 +32,7 @@ def route(role:str,path:Path=POLICY_PATH)->Route:
     spec=policy.get("roles",{}).get(role)
     if not spec: raise KeyError("UNKNOWN_LLM_ROLE:"+role)
     provider=os.environ.get("PCT_LLM_PROVIDER",policy.get("default_provider","disabled")).strip() or "disabled"
-    model=os.environ.get(spec.get("model_env",""),"").strip() or None
+    model=os.environ.get(spec.get("model_env",""),"").strip() or os.environ.get('PCT_LLM_MODEL','').strip() or None
     fallback=(spec.get("fallbacks") or [None])[0]
     if provider=="disabled" or not model:
         provider="disabled";model=None

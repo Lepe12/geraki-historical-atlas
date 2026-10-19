@@ -71,7 +71,7 @@ def build(target,purpose,date_range="",aliases=None,target_type="auto"):
         except Exception:
             memory=None
             memory_context=[]
-    agent_ids=select_agents(kind)
+    agent_ids=select_agents('place' if kind=='topic' else kind)
     reg=load_registry()["agents"]
     plan={
       "schema":"pct-specialist-agent-plan-v2",
@@ -95,6 +95,11 @@ def build(target,purpose,date_range="",aliases=None,target_type="auto"):
     for aid in agent_ids:
         meta=reg[aid]
         queries=render_queries(aid,target,date_range,aliases)
+        if focus['kind']=='topic':
+            from research_topics import topic_queries
+            agent_lane={'venetian_archive':'venetian','ottoman_archive':'ottoman','spanish_archive':'spanish_simancas',
+                        'greek_sources':'greek','french_sources':'french'}.get(aid,'travellers')
+            queries=topic_queries(focus,agent_lane)[:int(meta.get('max_queries',8))]
         if focus['kind']=='person':
             # Put actual identity/context searches inside the bounded budget;
             # appending 'variant spelling' does not discover name variants.
