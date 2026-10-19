@@ -2,7 +2,7 @@
 
 Page text and PDF scan indexes are acquisition products, never original inspection.
 """
-import hashlib, ipaddress, json, pathlib, re, socket, subprocess, urllib.parse, urllib.request, unicodedata
+import hashlib, ipaddress, json, pathlib, re, socket, subprocess, time, urllib.error, urllib.parse, urllib.request, unicodedata
 from html.parser import HTMLParser
 
 SOCIAL=('facebook.com','instagram.com','tiktok.com','youtube.com','linkedin.com')
@@ -10,6 +10,7 @@ def public_url(url,resolve=True):
     p=urllib.parse.urlsplit(str(url))
     if p.scheme not in ('http','https') or not p.hostname or p.username or p.password or p.port not in (None,80,443):
         raise ValueError('UNSAFE_DOCUMENT_URL')
+    if p.scheme=='http' and p.hostname=='hdl.handle.net':p=p._replace(scheme='https')
     if p.hostname=='localhost' or p.hostname.endswith(('.local','.internal')):raise ValueError('PRIVATE_DOCUMENT_URL')
     try: addresses=[ipaddress.ip_address(p.hostname)]
     except ValueError:
@@ -24,8 +25,14 @@ class Redirects(urllib.request.HTTPRedirectHandler):
 def fetch(url):
     url=public_url(url)
     req=urllib.request.Request(url,headers={'User-Agent':'Piratecartography-Research/3.0','Accept':'text/html,application/pdf,text/plain'})
-    with urllib.request.build_opener(Redirects()).open(req,timeout=12) as response:
-        data=response.read(12_000_001);ctype=response.headers.get('Content-Type','');final=public_url(response.url)
+    for attempt in range(3):
+        try:
+            with urllib.request.build_opener(Redirects()).open(req,timeout=12) as response:
+                data=response.read(12_000_001);ctype=response.headers.get('Content-Type','');final=public_url(response.url)
+            break
+        except urllib.error.HTTPError as error:
+            if error.code not in (502,503,504) or attempt==2:raise
+            time.sleep(attempt+1)
     if len(data)>12_000_000:raise ValueError('DOCUMENT_TOO_LARGE')
     return data,ctype,final
 

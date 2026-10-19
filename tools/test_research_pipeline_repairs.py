@@ -8,6 +8,25 @@ from orchestrator.build_command_center_snapshot import build
 TOOLS=pathlib.Path(__file__).parent.resolve()
 
 class PipelineRepairs(unittest.TestCase):
+    def test_public_document_transient_gateway_errors_are_retried_boundedly(self):
+        from unittest.mock import patch,MagicMock
+        from urllib.error import HTTPError
+        import web_acquisition as web
+        response=MagicMock();response.read.return_value=b'public document';response.headers={'Content-Type':'text/plain'};response.url='https://example.org/doc'
+        opened=MagicMock();opened.__enter__.return_value=response
+        with patch.object(web,'public_url',side_effect=lambda url,**kw:url),patch.object(web.urllib.request,'build_opener') as opener,patch.object(web.time,'sleep') as sleep:
+            opener.return_value.open.side_effect=[HTTPError(response.url,502,'gateway',{},None),opened]
+            self.assertEqual(web.fetch(response.url)[0],b'public document')
+            self.assertEqual(opener.return_value.open.call_count,2);sleep.assert_called_once_with(1)
+        with patch.object(web,'public_url',side_effect=lambda url,**kw:url),patch.object(web.urllib.request,'build_opener') as opener,patch.object(web.time,'sleep') as sleep:
+            opener.return_value.open.side_effect=HTTPError(response.url,403,'denied',{},None)
+            with self.assertRaises(HTTPError):web.fetch(response.url)
+            self.assertEqual(opener.return_value.open.call_count,1);sleep.assert_not_called()
+
+    def test_handle_resolver_uses_its_secure_public_transport(self):
+        from web_acquisition import public_url
+        self.assertEqual(public_url('http://hdl.handle.net/10822/557617',resolve=False),'https://hdl.handle.net/10822/557617')
+
     def test_citation_search_requires_matching_work_not_just_a_pdf(self):
         from web_acquisition import citation_title_match
         query='Los contactos de la Chimarra con el reino de Nápoles durante el siglo XVI'
