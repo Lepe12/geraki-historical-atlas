@@ -5,6 +5,7 @@ import argparse,datetime,json,sys
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parent.parent))
 from research_relevance import identity, assess
+from research_evidence_package import build as build_evidence_package, provider_failures
 
 LANE_LABELS={
  "greek":"Greek","travellers":"Travellers","spanish_simancas":"Simancas","venetian":"Venetian","french":"French",
@@ -59,7 +60,8 @@ def research_request(run_root:Path):
         if req:
             return {
               "target":req.get("target"),"aliases":req.get("aliases") or [],
-              "date_range":req.get("date_range"),"purpose":req.get("purpose")
+              "date_range":req.get("date_range"),"purpose":req.get("purpose"),
+              "source_leads":req.get("source_leads") or []
             }
     return {}
 
@@ -89,6 +91,10 @@ def discovery_results(run_root:Path,request=None):
                 "context_excerpt":str(row.get('context_excerpt') or row.get('description') or row.get('snippet') or '')[:600],
                 "triage_status":assessment.get("status") or "REVIEW_REQUIRED",
                 "triage_reasons":assessment.get("reasons") or [],
+                "evidence_class":assessment.get("evidence_class"),
+                "source_classification":{"category":(assessment.get("evidence_class") or {}).get("category") or "UNCLASSIFIED",
+                                         "confirmed":False,
+                                         "basis":(assessment.get("evidence_class") or {}).get("basis") or "CONTENT_ASSESSMENT_REQUIRED"},
                 "topical_match":assessment.get("topical_match"),
                 "research_value":assessment.get("research_value"),
                 "evidence_confidence":assessment.get("evidence_confidence"),
@@ -98,7 +104,7 @@ def discovery_results(run_root:Path,request=None):
         # A named passage is a source reference even when its action/date is
         # unresolved. Publish it as a provisional discovery, never as a claim.
         acquired=read(root/'library_acquisition/acquisition_report.json',{})
-        requested_sources={r.get('url') for r in acquired.get('results',[]) if r.get('source_lead') and r.get('url')}
+        requested_sources={r.get('url') if isinstance(r,dict) else r for r in (request or {}).get('source_leads',[])}
         extracted=read(root/'structured_output/extracted_findings.json',{})
         for finding in extracted.get('findings',[]):
             entity=finding.get('target_entity') or {}
@@ -107,6 +113,7 @@ def discovery_results(run_root:Path,request=None):
             if uncertainty & {'FICTION_OR_BOOK_REVIEW_CONTEXT','CONFLICTING_GIVEN_NAME','DATE_OUTSIDE_SCOPE'}:continue
             excerpt=finding.get('context_excerpt') or finding.get('evidence_excerpt')
             if not excerpt:continue
+            identity_hold=bool(uncertainty & {'EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW','SURNAME_IDENTITY_UNRESOLVED'})
             discoveries.append({
                 'lane':lane,'identifier':finding.get('identifier') or finding.get('url'),
                 'title':finding.get('title'),'repository':finding.get('repository'),
@@ -116,7 +123,8 @@ def discovery_results(run_root:Path,request=None):
                 'request_source_lead':finding.get('url') in requested_sources,
                 'evidence_state':'ACQUIRED','triage_status':'REVIEW_REQUIRED',
                 'triage_reasons':list(uncertainty),
-                'topical_match':{'category':'POSSIBLE_TARGET','reason':'ACQUIRED_TEXT_MENTION_NOT_EVENT',
+                'topical_match':{'category':'CONTEXT_ONLY' if identity_hold else 'POSSIBLE_TARGET',
+                                  'reason':'IDENTITY_UNRESOLVED' if identity_hold else 'ACQUIRED_TEXT_MENTION_NOT_EVENT',
                                   'matched_name':entity['observed_names'][0],'identity_verified':False},
                 'verified':False,
             })
@@ -220,6 +228,46 @@ def build(repo:Path,run_id:str):
     summary=board.get("summary") or {}
     lane_statuses=[a['status'] for a in agents if a['kind']=='research_lane']
     mission_status=('UNKNOWN' if not lane_statuses else 'FAILED' if all(v=='FAILED' for v in lane_statuses) else 'PARTIAL' if any(v!='COMPLETED' for v in lane_statuses) else 'COMPLETED')
+    execution_status=mission_status
+    answer_status=semantic_answer.get('status') or 'NOT_EVALUATED'
+    if answer_status.startswith('BLOCKED'):
+        mission_status=answer_status
+    elif execution_status=='COMPLETED' and not claims:
+        mission_status='INSUFFICIENT_EVIDENCE'
+
+    package=build_evidence_package(run_root,request)
+    for blocker in blockers:
+        failures=provider_failures(blocker.get('detail'))
+        if failures:
+            blocker['provider_failures']=failures
+            labels={'google':'SerpAPI / Google','exa':'Exa'}
+            reasons={'BILLING_OR_QUOTA_REQUIRED':'απαιτείται έλεγχος χρέωσης ή διαθέσιμου ορίου λογαριασμού',
+                     'RATE_LIMITED_SEARCH_NOT_COMPLETED':'περιορισμός αιτημάτων· η αναζήτηση δεν ολοκληρώθηκε',
+                     'PROVIDER_SEARCH_NOT_COMPLETED':'η αναζήτηση δεν ολοκληρώθηκε'}
+            blocker['description']=' · '.join(labels.get(f['provider'],str(f['provider']))+': '+reasons[f['meaning']] for f in failures)
+    semantic_claims={c['claim_id']:c for c in semantic_answer.get('claims',[]) if c.get('claim_id')}
+    contradiction_records=[]
+    for index,conflict in enumerate((semantic_answer.get('review') or {}).get('contradictions') or []):
+        ids=list(dict.fromkeys(conflict.get('claim_ids') or []))
+        if len(ids)<2 or any(cid not in semantic_claims for cid in ids):continue
+        contradiction_records.append({'identifier':f'{run_id}:conflict:{index}',
+                                      'title':conflict.get('explanation'),'status':'MODEL_FLAGGED_NOT_ADJUDICATED',
+                                      'claims':[semantic_claims[cid] for cid in ids],'verified':False})
+    passage_lookup={p['passage_id']:p for p in package['passages']}
+    source_lookup={s['source_id']:s for s in package['sources']}
+    for row in discoveries:
+        passage=passage_lookup.get(row.get('lane','')+':'+str(row.get('finding_id')))
+        if passage:
+            row['evidence_record']={k:v for k,v in passage.items() if k!='acquired_text_excerpt'}
+            row['bibliography']=source_lookup.get(passage['source_id'],{}).get('bibliography')
+            package_class=source_lookup.get(passage['source_id'],{}).get('classification') or {}
+            current=row.get('source_classification') or {}
+            # A search hypothesis stays visible. An explicit source class still
+            # replaces an unclassified discovery label.
+            if current.get('category')!='SEARCH_HYPOTHESIS' and package_class.get('category') not in (None,'UNCLASSIFIED'):
+                row['source_classification']=package_class
+            elif current.get('category') in (None,'UNCLASSIFIED') and package_class:
+                row['source_classification']=package_class
     return {
       "schema":"pct-command-center-live-v1",
       "project":"piratecartography","run_id":run_id,"request_id":request_id,
@@ -233,6 +281,8 @@ def build(repo:Path,run_id:str):
         "purpose":request.get("purpose") or "Historical research operation",
         "research_focus":identity(request,request)['focus'] if request.get('target') else None,
         "status":mission_status,
+        "execution_status":execution_status,
+        "answer_status":answer_status,
         "selected_lanes":int(summary.get("selected_lanes",len([a for a in agents if a["kind"]=="research_lane"])) or 0)
       },
       "metrics":{
@@ -252,9 +302,11 @@ def build(repo:Path,run_id:str):
                          'lanes':answers,'verified_claims':0,'rule':'Source-attributed findings are not verified historical conclusions.'},
       "discoveries":discoveries,
       "coverage":coverage,
+      "evidence_package":package,
       "evidence_url":f"https://github.com/Lepe12/geraki-historical-atlas/tree/main/evidence/runs/{run_id}",
       "contradictions":{
-        "status":"SEARCH_OUTPUT_NOT_ADJUDICATED",
+        "status":"MODEL_REVIEW_PENDING" if contradiction_records else "SEARCH_OUTPUT_NOT_ADJUDICATED",
+        "records":contradiction_records,
         "search_records":contradiction_leads,
         "note":"Contradiction specialist records are research leads, not verified contradictions."
       },

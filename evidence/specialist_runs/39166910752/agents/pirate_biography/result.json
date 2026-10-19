@@ -1,0 +1,925 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "pirate_biography",
+  "label": "Pirate Biography Agent",
+  "assignment_id": "pirate_biography:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "identity",
+    "aliases",
+    "chronology",
+    "ships",
+    "associates",
+    "bases",
+    "operations",
+    "death",
+    "uncertainties"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "cf628fc0c66668910d14cd68fa152ea5942f643f45165b72931b87dc5ac73ce7",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "pirate_biography",
+    "assignment_id": "pirate_biography:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:PARES / Archivo General de Simancas",
+      "repo:Gallica/BnF",
+      "repo:Biblioteca Digital Hispánica",
+      "repo:Academia.edu Public Research"
+    ],
+    "queries": [
+      "\"Πέτρος Λάντζας\"",
+      "\"Petros Lantzas\"",
+      "\"Pietro Lanza\"",
+      "\"Petros Lanza\"",
+      "\"Lanza, Petros\""
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:PARES / Archivo General de Simancas",
+        "route_type": "repository_dispatch",
+        "repository": "PARES / Archivo General de Simancas",
+        "connector_id": null,
+        "score": 100,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 100,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 90,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Crossref Scholarly Metadata",
+        "route_type": "repository_dispatch",
+        "repository": "Crossref Scholarly Metadata",
+        "connector_id": null,
+        "score": 86,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"Petros Lantzas\"",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Petros+Lantzas%22 ; HTTPError: HTTP Error 429: Too Many Requests",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Petros+Lantzas%22 ; HTTPError: HTTP Error 429: Too Many Requests"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"Pietro Lanza\"",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Pietro+Lanza%22 ; HTTPError: HTTP Error 429: Too Many Requests",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Pietro+Lanza%22 ; HTTPError: HTTP Error 429: Too Many Requests"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22 ; HTTPError: HTTP Error 429: Too Many Requests",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22 ; HTTPError: HTTP Error 429: Too Many Requests"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"Lanza, Petros\"",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Lanza%2C+Petros%22 ; HTTPError: HTTP Error 429: Too Many Requests",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Lanza%2C+Petros%22 ; HTTPError: HTTP Error 429: Too Many Requests"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ACCESS_BLOCKED",
+      "query": "\"Petros Lanza\"",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Petros+Lanza%22 ; HTTPError: HTTP Error 429: Too Many Requests",
+      "blockers": [
+        {
+          "code": "ACCESS_BLOCKED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Petros+Lanza%22 ; HTTPError: HTTP Error 429: Too Many Requests"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lanza\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Petros+Lanza+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lantzas\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Petros+Lantzas+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Lanza, Petros\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Lanza%2C+Petros+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pietro Lanza\"",
+      "records": [
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737750c",
+          "title": "Lezione accademica sugli asili infantili, di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1840"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737750c",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737750c"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb45043757m",
+          "title": "Sagittario in amore : poesie postume / Pietro Cimatti ; note critiche e cura di Davide Argnani e Stefania Porrino ; prefazione di Ludovico Griguoli Lanza",
+          "creator": [
+            "Cimatti, Pietro (1929-1991). Auteur du texte"
+          ],
+          "date": [
+            "2015"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb45043757m",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb45043757m",
+            "ISBN 9788897726753"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737754r",
+          "title": "Donne e gioielli in Sicilia nel medio evo e nel rinascimento... / Pietro Lanza di Scalea",
+          "creator": [
+            "Lanza di Scalea, Pietro. Auteur du texte"
+          ],
+          "date": [
+            "1892"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737754r",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737754r"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737747g",
+          "title": "Degli Arabi e del loro soggiorno in Sicilia, memoria di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1832"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737747g",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737747g"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737751q",
+          "title": "Dello Spirito di associazione nella Inghilterra in particolare, saggïo politico ed economico, di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1842"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737751q",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737751q"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb307377553",
+          "title": "Enrico Rosso e la confisca de' suoi mobili in Castiglione, ricerche storiche del secolo XIV / Pietro Lanza di Scalea",
+          "creator": [
+            "Lanza di Scalea, Pietro. Auteur du texte"
+          ],
+          "date": [
+            "1890"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb307377553",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb307377553"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737748t",
+          "title": "Dell' Arte drammatica in Sicilia, epitome di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1834"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737748t",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737748t"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb47022743j",
+          "title": "24/5/31, Exposition coloniale, le prince Di Sclalea [i.e. Di Scalea] : [photographie de presse] / [Agence Rol]",
+          "creator": [
+            "Agence Rol. Agence photographique (commanditaire)"
+          ],
+          "date": [
+            "1931"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb47022743j",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb47022743j"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30132553m",
+          "title": "In Morte di Maddalena Caracciolo, principessa di Scalea, cantico di Giuseppe Borghi, preceduta da un cenno necrologico (da Pietro Lanza, principe di Scordia)",
+          "creator": [
+            "Borghi, Giuseppe (1790-1847). Auteur du texte",
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1838"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30132553m",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30132553m"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb307377495",
+          "title": "Considerazioni sulla storia di Sicilia dal 1532 al 1789, da servir d'aggiunte e di chiose al Botta, di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1836"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb307377495",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb307377495"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb31550875h",
+          "title": "Italia e Francia, 1870, secondo narrazioni di G. Lanza, Q. Sella, E. Ollivier e d'un uomo politico italiano",
+          "creator": [
+            "Vayra, Pietro (1836-1898). Auteur du texte"
+          ],
+          "date": [
+            "1895"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb31550875h",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb31550875h"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30961712b",
+          "title": "Pietro Lanza e Stella, principe di Trabia, e l'agricoltura in Sicilia nel 1786 e nel 1896, per Carlo Crispo Moncada",
+          "creator": [
+            "Moncada, Carlo Crispo. Auteur du texte"
+          ],
+          "date": [
+            "1897"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30961712b",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30961712b"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb46889466j",
+          "title": "The Immortal Voice of Mario Lanza: A Centennial Celebration / Mario Lanza",
+          "creator": [
+            "Lanza, Mario (1921-1959). Interprète",
+            "Mascagni, Pietro (1863-1945). Compositeur",
+            "Romberg, Sigmund (1887-1951). Compositeur",
+            "Rodgers, Richard (1902-1979). Compositeur"
+          ],
+          "date": [
+            "2021"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb46889466j",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb46889466j"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb376873058",
+          "title": "Le proposte di un principe : Pietro Lanza e la \"ricchezza del Regno\" / Giacomo Dentici",
+          "creator": [
+            "Dentici, Giacomo (1940-....). Auteur du texte"
+          ],
+          "date": [
+            "1999"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb376873058",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb376873058",
+            "ISBN 8881280892"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb38632566x",
+          "title": "Cavalleria rusticana. Addio alla madre / Mascagni, comp. ; Mario Lanza, T ; RCA Victor Orchestra ; Constantine Callinicos, dir.. La forza del destino. O tu che in seno agli angeli / Verdi, comp. ; Mario Lanza, T ; RCA Victor Orchestra ; Constantine Callinicos, dir.",
+          "creator": [
+            "Mascagni, Pietro (1863-1945). Compositeur",
+            "Verdi, Giuseppe (1813-1901). Compositeur",
+            "Lanza, Mario (1921-1959). Ténor",
+            "Callinicos, Constantine (1913-1986). Direction d'orchestre"
+          ],
+          "date": [
+            "195."
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb38632566x",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb38632566x"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb37894554v",
+          "title": "Cavalleria rusticana. Mamma que vino e generoso / Pietro Mascagni. L'Africana. Mi batte il core : récit. L'Africana. Aria de l'acte 4, O Paradiso ! / Meyerbeer, comp. ; Mario Lanza, T ; RCA Victor orchestra ; Constantine Callinicos, dir.",
+          "creator": [
+            "Lanza, Mario (1921-1959). Ténor",
+            "Callinicos, Constantine (1913-1986). Direction d'orchestre"
+          ],
+          "date": [
+            "194."
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb37894554v",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb37894554v"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+          "title": "Peter of Auvergne : university master of the 13th century / edited by Christoph Flüeler, Lidia Lanza, Marco Toste",
+          "creator": [],
+          "date": [
+            "2015"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+            "ISBN 3110228483"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb38297620n",
+          "title": "José Carreras : a tribute to Mario Lanza / Declan Lowney, réal. ; José Carreras, T ; English concert chorus ; BBC Concert orchestra ; Enrique Ricci, dir.",
+          "creator": [
+            "Lowney, Declan (1960-....). Réalisateur"
+          ],
+          "date": [
+            "1994"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb38297620n",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb38297620n"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb46741746t",
+          "title": "Scriptum super III-VIII libros Politicorum Aristotelis : edizione, introduzione e note / Petrus de Alvernia ; a cura di Lidia Lanza",
+          "creator": [
+            "Pierre d'Auvergne (124.?-1304). Auteur du texte"
+          ],
+          "date": [
+            "2021"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb46741746t",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb46741746t",
+            "ISBN 9783954902781"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb381836987",
+          "title": "Stabat Mater / Pergolesi. Concerti grossi n ° III à V / Alessandro Scarlatti ; Mirella Freni, S ; Teresa Berganza, A ; Solisti dell'orchestra Scarlatti Napoli ; Ettore Gracis, dir",
+          "creator": [
+            "Pergolesi, Giovanni Battista (1710-1736). Compositeur",
+            "Scarlatti, Alessandro (1660-1725). Compositeur",
+            "Gracis, Ettore (1915-1992). Direction d'orchestre",
+            "Freni, Mirella (1935-2020). Soprano"
+          ],
+          "date": [
+            "1989"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb381836987",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb381836987"
+          ]
+        }
+      ],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pietro+Lanza+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lantzas\"",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Petros+Lantzas%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Pietro Lanza\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Pietro Lanza\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Pietro Lanza\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Petros Lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Petros Lantzas\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Petros Lantzas\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Πέτρος Λάντζας\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Πέτρος Λάντζας\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Lanza, Petros\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Lanza, Petros\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Lanza, Petros\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Petros Lanza\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Petros Lanza\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Petros Lanza\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Lanza, Petros\"",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Lanza%2C+Petros%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lanza\"",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Petros+Lanza%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pietro Lanza\"",
+      "records": [],
+      "diagnostic": "https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Pietro+Lanza%22&recordSchema=marcxml&startRecord=1&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "result_count": 20,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}

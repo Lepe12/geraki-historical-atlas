@@ -30,11 +30,15 @@ def fetch(url):
     return data,ctype,final
 
 class Document(HTMLParser):
-    def __init__(self):super().__init__();self.parts=[];self.links=[];self.skip=0
+    def __init__(self):super().__init__();self.parts=[];self.links=[];self.skip=0;self.metadata={}
     def handle_starttag(self,tag,attrs):
         attrs=dict(attrs)
         if tag in ('script','style','nav'):self.skip+=1
         if tag=='a' and attrs.get('href'):self.links.append(attrs['href'])
+        if tag=='meta' and attrs.get('content'):
+            name=(attrs.get('name') or attrs.get('property') or '').lower()
+            if name.startswith(('citation_','dc.','dcterms.')):
+                self.metadata.setdefault(name,[]).append(attrs['content'])
         if tag in ('p','br','div','h1','h2','h3','li'):self.parts.append('\n')
     def handle_endtag(self,tag):
         if tag in ('script','style','nav') and self.skip:self.skip-=1
@@ -48,7 +52,7 @@ def acquire(url,out,fetcher=fetch,follow=True):
     if any(host==h or host.endswith('.'+h) for h in SOCIAL):raise ValueError('SOCIAL_DISCOVERY_ONLY')
     data,ctype,final=fetcher(url)
     stem=hashlib.sha256(final.encode()).hexdigest()[:24]
-    files=[];links=[];pages=[];errors=[]
+    files=[];links=[];pages=[];errors=[];metadata={}
     is_pdf=data.startswith(b'%PDF-')
     if re.search(r'\.pdf(?:$|\?)',str(url),re.I) and not is_pdf:raise ValueError('EXPECTED_PDF_NOT_RETURNED')
     if is_pdf:
@@ -70,6 +74,7 @@ def acquire(url,out,fetcher=fetch,follow=True):
         raw=data.decode('utf-8','replace')
         if 'html' in ctype.lower():
             document=Document();document.feed(raw)
+            metadata=document.metadata
             content=''.join(document.parts)
             links=list(dict.fromkeys(urllib.parse.urljoin(final,h) for h in document.links))
         else:content=raw
@@ -79,7 +84,8 @@ def acquire(url,out,fetcher=fetch,follow=True):
         rawfile=rawdir/(stem+'.html');rawfile.write_bytes(data);files.append(str(rawfile))
     record={'url':final,'sha256':hashlib.sha256(data).hexdigest(),'files':files,'pages':pages,
             'status':'TEXT_ACQUIRED' if content.strip() else 'PDF_ACQUIRED_NO_TEXT','original_inspected':False,'verification_status':'NEEDS_EVIDENCE',
-            'pdf_file':str(binary) if is_pdf else None,'source_type':'PDF_TEXT' if is_pdf else 'WEB_PAGE_TEXT','linked_documents':[],'citation_queue':[]}
+            'pdf_file':str(binary) if is_pdf else None,'source_type':'PDF_TEXT' if is_pdf else 'WEB_PAGE_TEXT',
+            'bibliographic_metadata':metadata,'linked_documents':[],'citation_queue':[]}
     pdfs=[]
     for link in links:
         try:link=public_url(link,resolve=False)
@@ -90,7 +96,7 @@ def acquire(url,out,fetcher=fetch,follow=True):
             try:record['linked_documents'].append(acquire(link,out,fetcher,follow=False))
             except Exception as exc:errors.append({'url':link,'code':type(exc).__name__});record['citation_queue'].append(link)
         else:record['citation_queue'].append(link)
-    record['bibliographic_queries']=bibliographic_queries(content) if not is_pdf else []
+    record['bibliographic_queries']=bibliographic_queries(content)
     record['errors']=errors
     record['citation_policy']='Only linked documents fetched; bibliographic references without a located URL remain unresolved.'
     return record
@@ -131,3 +137,18 @@ def bibliographic_queries(text):
             title=re.split(r'\.\s+|,\s+[^,:]{2,60}:',citation.group(1),maxsplit=1)[0]
             add(title)
     return queries[:8]
+
+
+def citation_title_match(query, record):
+    """A cited work need not name the actor, but must match its title query.
+
+    Search ranking, a shared surname and a PDF extension are insufficient.
+    This is acquisition triage, not bibliographic identity verification.
+    """
+    def tokens(value):
+        text=''.join(c for c in unicodedata.normalize('NFD',str(value or '')) if not unicodedata.combining(c)).casefold()
+        return set(re.findall(r'[^\W\d_]{4,}',text))-{'with','from','during','della','delle','degli','para','dans','pour','τους','στην','στον','κατα','μετα','περι','history','historical','download','document'}
+    wanted=tokens(query)
+    found=tokens(str(record.get('title') or '')+' '+str(record.get('description') or ''))
+    overlap=len(wanted & found)
+    return bool(len(wanted)>=3 and overlap>=3 and overlap/len(wanted)>=0.55)

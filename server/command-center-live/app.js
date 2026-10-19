@@ -48,7 +48,7 @@ function getJson(url){
   return new Promise((resolve,reject)=>{
     const request=https.get(url,{headers:{"user-agent":"piratecartography-command-center-live/1"}},r=>{
       let b="";r.setEncoding("utf8");
-      r.on("data",c=>{b+=c;if(b.length>2_000_000){r.destroy();reject(new Error("response_too_large"));}});
+      r.on("data",c=>{b+=c;if(Buffer.byteLength(b)>8_000_000){r.destroy();reject(new Error("response_too_large"));}});
       r.on("end",()=>{if((r.statusCode||500)>=400)return reject(new Error("http_"+r.statusCode));try{resolve(JSON.parse(b))}catch(e){reject(e)}});
     }).on("error",reject);
     request.setTimeout(10000,()=>request.destroy(new Error("upstream_timeout")));

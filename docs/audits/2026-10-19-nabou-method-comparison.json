@@ -1,0 +1,157 @@
+{
+  "schema": "nabou-method-comparison-v1",
+  "dataset": "nabou-retrieval-regressions-v1",
+  "evaluation_type": "DEVELOPMENT_REGRESSION_ONLY",
+  "evaluation_provenance": {
+    "basis": "Observed retrieval regressions plus explicitly synthetic controls. Acquisition desirability labels, not historical fact labels.",
+    "independent_reviewer": null,
+    "frozen_dataset_commit": null,
+    "not_used_for_development": false
+  },
+  "baseline": {
+    "true_positive": 4,
+    "false_positive": 2,
+    "false_negative": 1,
+    "true_negative": 5,
+    "precision": 0.6666666666666666,
+    "recall": 0.8
+  },
+  "production": {
+    "true_positive": 5,
+    "false_positive": 0,
+    "false_negative": 0,
+    "true_negative": 7,
+    "precision": 1.0,
+    "recall": 1.0
+  },
+  "cases": [
+    {
+      "id": "ioannou2000",
+      "expected": true,
+      "baseline": false,
+      "production": true,
+      "reason": [
+        "NAME_IN_SOURCE_METADATA",
+        "EXPLICIT_SUBJECT_NAME_ACQUISITION_NOT_VERIFICATION"
+      ]
+    },
+    {
+      "id": "laskaris1956",
+      "expected": true,
+      "baseline": true,
+      "production": true,
+      "reason": [
+        "NAME_IN_SOURCE_METADATA",
+        "EXPLICIT_SUBJECT_NAME_ACQUISITION_NOT_VERIFICATION"
+      ]
+    },
+    {
+      "id": "longer_namesake",
+      "expected": false,
+      "baseline": true,
+      "production": false,
+      "reason": [
+        "CONTEXT_UNRESOLVED",
+        "SURNAME_CONTEXT_REQUIRES_IDENTITY_REVIEW"
+      ]
+    },
+    {
+      "id": "company",
+      "expected": false,
+      "baseline": false,
+      "production": false,
+      "reason": [
+        "CONTEXT_UNRESOLVED",
+        "NO_TARGET_IDENTITY_MATCH",
+        "UNRELATED_MODERN_DOCUMENT"
+      ]
+    },
+    {
+      "id": "other_given_name",
+      "expected": false,
+      "baseline": false,
+      "production": false,
+      "reason": [
+        "CONTEXT_UNRESOLVED",
+        "NO_TARGET_IDENTITY_MATCH"
+      ]
+    },
+    {
+      "id": "exact_latin",
+      "expected": true,
+      "baseline": true,
+      "production": true,
+      "reason": [
+        "NAME_IN_SOURCE_METADATA",
+        "EXPLICIT_SUBJECT_NAME_ACQUISITION_NOT_VERIFICATION"
+      ]
+    },
+    {
+      "id": "first_name_only",
+      "expected": false,
+      "baseline": false,
+      "production": false,
+      "reason": [
+        "CONTEXT_UNRESOLVED",
+        "NO_TARGET_IDENTITY_MATCH"
+      ]
+    },
+    {
+      "id": "surname_only",
+      "expected": false,
+      "baseline": false,
+      "production": false,
+      "reason": [
+        "CONTEXT_UNRESOLVED",
+        "NO_TARGET_IDENTITY_MATCH"
+      ]
+    },
+    {
+      "id": "author_not_subject",
+      "expected": false,
+      "baseline": true,
+      "production": false,
+      "reason": [
+        "HISTORICAL_OR_DOCUMENTARY_CONTEXT",
+        "CONTEXT_UNRESOLVED",
+        "SURNAME_CONTEXT_REQUIRES_IDENTITY_REVIEW"
+      ]
+    },
+    {
+      "id": "independent_synthetic_person",
+      "expected": true,
+      "baseline": true,
+      "production": true,
+      "reason": [
+        "NAME_IN_SOURCE_METADATA",
+        "EXPLICIT_SUBJECT_NAME_ACQUISITION_NOT_VERIFICATION"
+      ]
+    },
+    {
+      "id": "synthetic_wrong_given_name",
+      "expected": false,
+      "baseline": false,
+      "production": false,
+      "reason": [
+        "HISTORICAL_OR_DOCUMENTARY_CONTEXT",
+        "CONTEXT_UNRESOLVED",
+        "NO_TARGET_IDENTITY_MATCH"
+      ]
+    },
+    {
+      "id": "synthetic_place",
+      "expected": true,
+      "baseline": true,
+      "production": true,
+      "reason": [
+        "NAME_IN_SOURCE_METADATA",
+        "GEOGRAPHIC_CONTEXT",
+        "HISTORICAL_OR_DOCUMENTARY_CONTEXT"
+      ]
+    }
+  ],
+  "historical_claim_accuracy": "NOT_MEASURED_BY_RETRIEVAL_LABELS",
+  "exhaustive_recall": "NOT_ESTABLISHED",
+  "independent_validation_ready": false,
+  "rule": "Acquisition triage labels measure which documents deserve an attempt, not historical truth."
+}

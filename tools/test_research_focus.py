@@ -63,9 +63,58 @@ class ResearchFocusTests(unittest.TestCase):
         row['description']='Letters concerning Pietro Lanza, the corsair.'
         self.assertEqual(topical_match(row,focus)['category'],'TARGET_MATCH')
 
+    def test_biographical_subject_without_generic_history_keyword_is_acquired(self):
+        req={'target':'Πέτρος Λάντζας','aliases':['Pietro Lanza']}
+        for title in ['Από τη Γαληνοτάτη στον Καθολικότατο: Οι φουρτούνες του Καπετάν-Πέτρου Λάντζα',
+                      'ΛΑΣΚΑΡΙΣ ΜΙΧΑΗΛ, Πέτρος Λάντζας: διοικητής της Πάργας']:
+            result=assess({'title':title},identity(req,req))
+            self.assertEqual(result['status'],'PRIORITY')
+            self.assertFalse(result['verified'])
+        self.assertEqual(assess({'title':'Pietro Lanza di Scalea'},identity(req,req))['status'],'REVIEW_REQUIRED')
+        self.assertEqual(assess({'title':'Pietro Lanza e Stella'},identity(req,req))['status'],'REVIEW_REQUIRED')
+        self.assertEqual(assess({'title':'Pietro Lanza e la sua storia'},identity(req,req))['status'],'PRIORITY')
+        other={'target':'William Rook','aliases':[]}
+        self.assertEqual(assess({'title':'Letters of William Rook'},identity(other,other))['status'],'PRIORITY')
+
     def test_query_or_flag_is_not_source_content(self):
         row={'title':'Γενική ναυτική ιστορία','query':self.target,'source_lead':True,'url':'https://example/Ιωάννη-Καψή'}
         self.assertEqual(topical_match(row,self.focus)['category'],'UNMATCHED')
+
+    def test_bilingual_slash_name_is_two_supplied_spellings_not_one_phrase(self):
+        focus=decompose('Pedro Lanza / Πέτρος Λάντζας')
+        self.assertEqual(focus['kind'],'person')
+        self.assertEqual(focus['entity'],'Pedro Lanza')
+        self.assertEqual(focus['names'][:2],['Pedro Lanza','Πέτρος Λάντζας'])
+        self.assertNotIn('/',focus['entity'])
+        for title in ['Pedro Lanza corsair','Πέτρος Λάντζας διοικητής της Πάργας','Lanza, Pedro correspondence']:
+            self.assertIn(topical_match({'title':title},focus)['category'],('TARGET_MATCH','POSSIBLE_TARGET'),title)
+        queries=focused_queries(focus,include_hypotheses=True)
+        self.assertEqual(queries[:2],['"Pedro Lanza"','"Πέτρος Λάντζας"'])
+        self.assertTrue(any('Pietro Lanza' in q for q in queries))
+        self.assertNotIn('Pietro Lanza',focus['names'])
+
+    def test_nominative_kapsis_keeps_role_and_does_not_attest_foreign_spellings(self):
+        focus=decompose('Ιωάννης Καψής, βασιλιάς της Μήλου')
+        self.assertEqual(focus['entity'],'Ιωάννης Καψής')
+        self.assertEqual(focus['roles'],['βασιλιάς'])
+        self.assertEqual(focus['places'],['Μήλου'])
+        self.assertNotIn('Capsi',str(focus))
+        self.assertEqual(topical_match({'title':'Giovanni Capsi, re di Milo'},focus)['reason'],'TRANSLITERATION_REQUIRES_IDENTITY_REVIEW')
+        self.assertEqual(topical_match({'title':'Ιωάννης Καψής, βασιλιάς της Μήλου'},focus)['category'],'TARGET_MATCH')
+
+    def test_later_latin_namesake_is_not_acquired_as_the_greek_person(self):
+        req={'target':'Pedro Lanza / Πέτρος Λάντζας','aliases':[],'purpose':'history'}
+        ident=identity(req,req)
+        namesake=assess({'title':'Il risorgimento italiano','description':'Pietro Lanza a Palermo nel 1837 durante il colera.','year':1860},ident)
+        self.assertEqual(namesake['status'],'REVIEW_REQUIRED')
+        self.assertIn('LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW',namesake['reasons'])
+        letter=assess({'title':'Letters of Pedro Lanza','description':'Pedro Lanza, corsair, 1580.','year':1580,'source_type':'PRIMARY'},ident)
+        self.assertEqual(letter['status'],'PRIORITY')
+        self.assertEqual(letter['evidence_class']['class'],'PRIMARY_SOURCE')
+        study=assess({'title':'Πέτρος Λάντζας: διοικητής της Πάργας','description':'Βιογραφική μελέτη.','year':1990},ident)
+        self.assertEqual(study['status'],'PRIORITY')
+        self.assertEqual(study['evidence_class']['class'],'SECONDARY_STUDY')
+        self.assertFalse(letter['verified'])
 
     def test_small_query_budgets_cover_aliases_before_qualifiers(self):
         focus=decompose('Πέτρος λαντζας',['Pedro Lanza','Pietro Lanza'])
@@ -109,9 +158,10 @@ class ResearchFocusTests(unittest.TestCase):
         for agent in plan['agents']:
             self.assertLessEqual(agent['query_budget']['total'],20)
             for q in agent['assigned_queries']:
-                self.assertIn('Καψ',q)
                 self.assertNotEqual(q.strip('"'),'Ιωάννη')
                 self.assertNotIn('variant spelling',q)
+            self.assertTrue(any('Καψ' in q for q in agent['assigned_queries']),agent['assigned_queries'])
+            self.assertTrue(any('kaps' in q.casefold() for q in agent['assigned_queries']),agent['assigned_queries'])
         self.assertTrue(any('Ιωάννης Καψής' in q for q in focused_queries(self.focus)))
         first=focused_queries(self.focus)[:3]
         self.assertIn('"Ιωάννη Καψή"',first)

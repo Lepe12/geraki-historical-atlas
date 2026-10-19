@@ -11,7 +11,7 @@ from typing import Any
 
 from jarvis_agent_planner import plan_agents
 from jarvis_runtime_guard import validate_runtime_policy
-from research_query import split_research_query
+from research_query import split_research_query, split_supplied_names
 
 POLICY_PATH = Path("tools/orchestrator/jarvis_policy.json")
 
@@ -23,9 +23,18 @@ def load_json(path: Path) -> dict[str, Any]:
 def canonical_request(req: dict[str, Any]) -> dict[str, Any]:
     target = str(req.get("target", "")).strip()
     target, date_range, purpose = split_research_query(target, req.get("date_range", ""), req.get("purpose", ""))
-    aliases = req.get("aliases", [])
-    if isinstance(aliases, str):
-        aliases = [x.strip() for x in aliases.split("|") if x.strip()]
+    supplied_names = split_supplied_names(target)
+    target = supplied_names[0]
+    raw_aliases = req.get("aliases", []) or []
+    if isinstance(raw_aliases, str):
+        raw_aliases = [x.strip() for x in raw_aliases.split("|") if x.strip()]
+    elif not isinstance(raw_aliases, list):
+        raw_aliases = []
+    aliases = []
+    for name in [*supplied_names[1:], *list(raw_aliases)]:
+        value = str(name).strip()
+        if value and value.casefold() not in {item.casefold() for item in aliases}:
+            aliases.append(value)
     selected = req.get("selected_agents", req.get("selected_lanes", []))
     if isinstance(selected, str):
         selected = [x.strip() for x in selected.split(",") if x.strip()]
@@ -180,8 +189,9 @@ def main() -> None:
         raise ValueError("INVALID_RUN_ID")
 
     policy = load_json(POLICY_PATH)
-    payload = validate(load_json(args.request), policy)
-    audit = build_audit(args.request, payload, args.run_id,args.request_id)
+    request = load_json(args.request)
+    payload = validate(request, policy)
+    audit = build_audit(args.request, payload, args.run_id,args.request_id or request.get('request_id',''))
     if duplicate_submission(audit,args.audit_root):
         raise ValueError("DUPLICATE_DISPATCH_REQUEST")
 
@@ -192,6 +202,7 @@ def main() -> None:
         with args.github_output.open("a", encoding="utf-8") as fh:
             fh.write("matrix=%s\n" % matrix)
             fh.write("request_fingerprint=%s\n" % audit["request_fingerprint"])
+            fh.write("request_id=%s\n" % (audit['request_id'] or ''))
             fh.write("target=%s\n" % one_line(payload["target"]))
             fh.write("aliases=%s\n" % one_line("|".join(payload["aliases"])))
             fh.write("date_range=%s\n" % one_line(payload["date_range"]))

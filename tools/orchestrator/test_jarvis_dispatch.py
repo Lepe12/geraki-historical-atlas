@@ -1,4 +1,4 @@
-import unittest,json,tempfile
+import unittest,json,tempfile,subprocess,sys
 from pathlib import Path
 from jarvis_dispatch import validate, fingerprint,build_audit,duplicate_submission
 
@@ -19,6 +19,22 @@ class JarvisDispatchTests(unittest.TestCase):
             self.assertTrue(duplicate_submission(legacy,root))
         with self.assertRaisesRegex(ValueError,'INVALID_REQUEST_ID'):
             build_audit(Path('request.json'),payload,'4','invalid request id')
+
+    def test_explicit_file_submission_id_is_preserved_and_replay_blocked(self):
+        repo=Path(__file__).resolve().parents[2]
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td);request=root/'request.json';output=root/'outputs';audit=root/'audit.json'
+            request.write_text(json.dumps({'request_id':'explicit-retest','target':'William Rook','purpose':'Find sources'}))
+            args=[sys.executable,str(repo/'tools/orchestrator/jarvis_dispatch.py'),'--request',str(request),
+                  '--run-id','123','--audit-root',str(root/'history'),'--github-output',str(output),'--write-audit',str(audit)]
+            first=subprocess.run(args,cwd=repo,capture_output=True,text=True)
+            self.assertEqual(first.returncode,0,first.stderr)
+            self.assertEqual(json.loads(audit.read_text())['request_id'],'explicit-retest')
+            self.assertIn('request_id=explicit-retest',output.read_text())
+            (root/'history').mkdir();(root/'history/123.json').write_text(audit.read_text())
+            second=subprocess.run(args,cwd=repo,capture_output=True,text=True)
+            self.assertNotEqual(second.returncode,0)
+            self.assertIn('DUPLICATE_DISPATCH_REQUEST',second.stderr)
 
     def setUp(self):
         self.policy={

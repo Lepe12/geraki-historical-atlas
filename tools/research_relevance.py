@@ -3,7 +3,7 @@ import hashlib
 import json
 import re
 import unicodedata
-from research_focus import decompose, focused_queries, topical_match
+from research_focus import decompose, focused_queries, fold, name_pattern, topical_match
 from fulltext_discovery import text_match
 
 
@@ -35,6 +35,7 @@ HISTORY = re.compile(r'(?<!\w)(?:voyag|travel|reise|viaggio|relation\b|itinerar|
 GEO = re.compile(r'\bisland\b|\bisle\b|\bisola\b|\binsel\b|νησ|cyclad|aegean|egee|archipel|greece|grece|grecia|ελλα|harbour|harbor')
 OFF_TOPIC = re.compile(r'(?<!\w)(?:respirat|toxicolog|epidemiolog|mortality|morbidity|hadronic|butterflies|moths|soundtrack|milkshake schedule|cia reading room|proceedings of.*physics)')
 NOISE = re.compile(r'quintet|symphon|zeitschrift.{0,12}musik|musical|coleoptera|scolytinae|favorites$|\bpodcast\b|\blivestream\b|\btv\b|\byoutube\b')
+MODERN_DOCUMENT = re.compile(r'curriculum\s+vitae|codice\s+etico|code\s+of\s+ethics|general.part.model|statistical\s+bulletin|στατιστικ\w*\s+δελτι')
 
 
 def _clamp(value):
@@ -134,6 +135,44 @@ def candidate_research_value(record, base=40):
     }
 
 
+def evidence_class(record, topical):
+    """Separate a source report from a search hypothesis. Never confirms it."""
+    reason=str((topical or {}).get('reason') or '')
+    if (topical or {}).get('query_hypothesis') or 'HYPOTHESIS' in reason or reason=='TRANSLITERATION_REQUIRES_IDENTITY_REVIEW':
+        return {'class':'HYPOTHESIS','category':'SEARCH_HYPOTHESIS','confirmed':False,
+                'basis':'MECHANICAL_QUERY_HYPOTHESIS_NOT_ATTESTED_IDENTITY'}
+    source=str(record.get('historical_source_type') or record.get('source_type') or '').upper()
+    if source in ('PRIMARY','PRIMARY_ORIGINAL','PRIMARY_FACSIMILE','CONTEMPORARY_PRINTED'):
+        return {'class':'PRIMARY_SOURCE','category':'PRIMARY_SOURCE_REPORTED','confirmed':False,
+                'basis':'EXPLICIT_UPSTREAM_CLASSIFICATION'}
+    if source in ('SECONDARY','SECONDARY_STUDY'):
+        return {'class':'SECONDARY_STUDY','category':'SECONDARY_STUDY_REPORTED','confirmed':False,
+                'basis':'EXPLICIT_UPSTREAM_CLASSIFICATION'}
+    text=' '.join(norm(record.get(k)) for k in ('title','description','subject','context_excerpt'))
+    if re.search(r'(?<!\w)(?:μελετ\w*|βιογραφ\w*|διατριβ\w*|monograph\w*|biograph\w*|thesis|journal)\b', text):
+        return {'class':'SECONDARY_STUDY','category':'SECONDARY_STUDY_REPORTED','confirmed':False,
+                'basis':'SCHOLARLY_FORM_UNCONFIRMED'}
+    if re.search(r'(?<!\w)(?:επιστολ\w*|αυτογραφ\w*|αρχειακ\w*|dispatch\w*|dispacci|manoscrit\w*|letters?)\b', text):
+        return {'class':'PRIMARY_SOURCE','category':'PRIMARY_SOURCE_REPORTED','confirmed':False,
+                'basis':'DOCUMENTARY_FORM_UNCONFIRMED'}
+    return {'class':'UNCLASSIFIED','category':'UNCLASSIFIED','confirmed':False,
+            'basis':'CONTENT_ASSESSMENT_REQUIRED'}
+
+
+def _later_namesake(text, focus):
+    """A later Latin namesake is not the supplied Greek person without review."""
+    greek=[name for name in focus.get('names',[]) if re.search(r'[α-ω]', fold(name))]
+    if not greek:
+        return False
+    folded=fold(text)
+    for name in greek:
+        words=name.split()
+        if len(words)>=2 and re.search(name_pattern(words), folded):
+            return False
+    years=[int(year) for year in re.findall(r'\b(1\d{3}|20\d{2})\b', str(text))]
+    return bool(years) and any(1750<=year<=1900 for year in years) and not any(year<=1700 for year in years)
+
+
 def assess(record, ident):
     title = norm(record.get('title'))
     context = ' '.join(norm(record.get(k)) for k in ('title','description','subject','context_excerpt'))
@@ -167,7 +206,8 @@ def assess(record, ident):
     elif ident.get('type') == 'place':
         if (name_match or regional) and geographic and history: status='PRIORITY'
         else: status='REVIEW_REQUIRED';reasons.append('PLACE_IDENTITY_UNRESOLVED')
-    elif name_match and history: status='PRIORITY'
+    elif name_match and (history or (focus['kind']=='person' and topical.get('matched_field') in ('title','description','subject'))):
+        status='PRIORITY';reasons.append('EXPLICIT_SUBJECT_NAME_ACQUISITION_NOT_VERIFICATION')
     else: status='REVIEW_REQUIRED';reasons.append('CONTEXT_UNRESOLVED')
 
     research_score=5 if (record.get('title') or record.get('identifier') or record.get('url')) else 0
@@ -190,15 +230,29 @@ def assess(record, ident):
             reasons.append('NO_TARGET_IDENTITY_MATCH')
     if fulltext_match:
         missing_context=fulltext_match['reason']=='FULLTEXT_NAME_WITHOUT_REQUEST_CONTEXT'
-        if missing_context and topical['category']!='TARGET_MATCH':
+        if fulltext_match['reason']=='FULLTEXT_EXTENDED_NAME_REQUIRES_REVIEW' and topical['category']!='TARGET_MATCH':
+            status='REVIEW_REQUIRED';research_score=min(research_score,65)
+            reasons.append('EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW')
+        elif missing_context and topical['category']!='TARGET_MATCH':
             status='REVIEW_REQUIRED';research_score=min(research_score,65)
             reasons.append('FULLTEXT_NAME_WITHOUT_REQUEST_CONTEXT')
         elif not OFF_TOPIC.search(title) and not (NOISE.search(title) and not (geographic and history)):
             status='PRIORITY';research_score=max(research_score,70)
             reasons.append('FULLTEXT_CONTEXT_REQUIRES_IDENTITY_REVIEW')
 
+    # A search-index hit or generic "history" token cannot make corporate,
+    # statistical or CV material a priority biography. Keep the lead visible.
+    if MODERN_DOCUMENT.search(title) and not name_match:
+        status='EXCLUDE_FROM_ACQUISITION';research_score=min(research_score,20)
+        reasons.append('UNRELATED_MODERN_DOCUMENT')
+    if _later_namesake(context, focus):
+        if status=='PRIORITY':
+            status='REVIEW_REQUIRED'
+        reasons.append('LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW')
+
     return {
         'status':status,'score':score,'reasons':reasons,
+        'evidence_class':evidence_class(record, topical),
         'topical_match':topical,
         'identity_status':'POSSIBLE_MATCH' if name_match else 'REGIONAL_CONTEXT' if regional else 'UNRESOLVED',
         'research_value':{

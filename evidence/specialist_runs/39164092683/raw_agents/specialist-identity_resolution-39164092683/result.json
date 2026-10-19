@@ -1,0 +1,2258 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "identity_resolution",
+  "label": "Identity Resolution Agent",
+  "assignment_id": "identity_resolution:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "entity_candidates",
+    "variant_names",
+    "same_entity_assessment",
+    "collision_warnings"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "33dbea002f6f1846d5343bdecf254fdd814fc6f4c9dabffc5ba6cf1ac1419e66",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "identity_resolution",
+    "assignment_id": "identity_resolution:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:SearchCulture.gr / EKT",
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:OpenArchives.gr / EKT"
+    ],
+    "queries": [
+      "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" variant spelling",
+      "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" alias OR aliases",
+      "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" historical name",
+      "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" transliteration"
+    ],
+    "operation": "search",
+    "search_budget": 16,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 130,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 102,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 4,
+    "total_search_budget": 16,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" alias OR aliases",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" variant spelling",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" historical name",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "API_KEY_REQUIRED",
+      "query": "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" transliteration",
+      "records": [],
+      "diagnostic": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute.",
+      "blockers": [
+        {
+          "code": "API_KEY_REQUIRED",
+          "detail": "Official SearchCulture API requires SEARCHCULTURE_API_KEY. Public portal HTML is not accepted as a stable machine-search substitute."
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" variant spelling",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Investigate+Ioannis%2FJohn+Kapsis+%28%CE%9A%CE%B1%CF%88%CE%AE%CF%82%2F%CE%9A%CE%B1%CF%88%CE%AE%CF%82+variants%29%2C+associated+with+Milos+in+the+seventeenth+century.+Establish+identity%2C+chronology%2C+titles%2C+primary+references+and+competing+interpretations.+Do+not+merge+names+without+evidence.%22+variant+spelling&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" historical name",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Investigate+Ioannis%2FJohn+Kapsis+%28%CE%9A%CE%B1%CF%88%CE%AE%CF%82%2F%CE%9A%CE%B1%CF%88%CE%AE%CF%82+variants%29%2C+associated+with+Milos+in+the+seventeenth+century.+Establish+identity%2C+chronology%2C+titles%2C+primary+references+and+competing+interpretations.+Do+not+merge+names+without+evidence.%22+historical+name&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" transliteration",
+      "records": [],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Investigate+Ioannis%2FJohn+Kapsis+%28%CE%9A%CE%B1%CF%88%CE%AE%CF%82%2F%CE%9A%CE%B1%CF%88%CE%AE%CF%82+variants%29%2C+associated+with+Milos+in+the+seventeenth+century.+Establish+identity%2C+chronology%2C+titles%2C+primary+references+and+competing+interpretations.+Do+not+merge+names+without+evidence.%22+transliteration&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" alias OR aliases",
+      "records": [
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/908/thesaurus-di-internet-culturale",
+          "title": "Mappa del thesauro",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/908/thesaurus-di-internet-culturale"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1/home",
+          "title": "Home",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1/home"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/76/itinerari",
+          "title": "Itinerari",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/76/itinerari"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/75/mostre",
+          "title": "Mostre",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/75/mostre"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/938/video",
+          "title": "Video",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/938/video"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1038/biblioteca-digitale-italiana",
+          "title": "la BDI",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1038/biblioteca-digitale-italiana"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1048/guida-alla-consultazione",
+          "title": "Guida alla consultazione",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1048/guida-alla-consultazione"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/41/collezioni-digitali",
+          "title": "Collezioni digitali",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/41/collezioni-digitali"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/64/partner",
+          "title": "Partner",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/64/partner"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1114/repositories",
+          "title": "Repositories",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1114/repositories"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/767/manoscritti",
+          "title": "Manoscritti",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/767/manoscritti"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/773/libri",
+          "title": "Libri",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/773/libri"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/825/spartiti",
+          "title": "Spartiti",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/825/spartiti"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/770/carte-geografiche",
+          "title": "Carte geografiche",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/770/carte-geografiche"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/771/immagini",
+          "title": "Immagini",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/771/immagini"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/772/registrazioni-sonore",
+          "title": "Registrazioni sonore",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/772/registrazioni-sonore"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana",
+          "title": "Emeroteca digitale italiana",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=2&paginate_pageNum=1",
+          "title": "Musica",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=2&paginate_pageNum=1"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=3",
+          "title": "Newspaper",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=3"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/753/remi",
+          "title": "Rete della Musica Italiana",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/753/remi"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1120/chi-siamo",
+          "title": "Chi siamo",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1120/chi-siamo"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/15/termini-d-uso",
+          "title": "Termini d'uso",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/15/termini-d-uso"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1227/i-progetti",
+          "title": "I Progetti",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1227/i-progetti"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1000/statistiche",
+          "title": "Statistiche",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1000/statistiche"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/999/scrivi-a",
+          "title": "Scrivi a",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/999/scrivi-a"
+        }
+      ],
+      "diagnostic": "https://www.internetculturale.it/it/16/search?q=%22Investigate+Ioannis%2FJohn+Kapsis+%28%CE%9A%CE%B1%CF%88%CE%AE%CF%82%2F%CE%9A%CE%B1%CF%88%CE%AE%CF%82+variants%29%2C+associated+with+Milos+in+the+seventeenth+century.+Establish+identity%2C+chronology%2C+titles%2C+primary+references+and+competing+interpretations.+Do+not+merge+names+without+evidence.%22+alias+OR+aliases&instance=magindice&pag=1",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" alias OR aliases",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18086",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18086",
+          "title": "openarchives.gr | Aspects de l’intendance des Vénitiens dans l’Archipel au cours de la guerre de Morée (1684-1699)",
+          "description": "openarchives.gr | Aspects de l’intendance des Vénitiens dans l’Archipel au cours de la guerre de Morée (1684-1699)\n\n Το τεκμήριο παρέχεται από τον φορέα : Εθνικό Ίδρυμα Ερευνών (ΕΙΕ) \n\n Αποθετήριο : Ήλιος - Αποθετήριο Εθνικού Ιδρύματος Ερευνών | αποθετήρια EKT \n\nΤίτλος\n\n Aspects de l’intendance des Vénitiens dans l’Archipel au cours de la guerre de Morée (1684-1699) \n\nΔημιουργός\n\n Κουτζακιώτης, Γιώργος \n\nΣυντελεστής\n\n Μπίρταχας, Στάθης \n\nΤύπος\n\n Κεφάλαιο βιβλίου \n\n \n\n Τμήμα έκδοσης Τμήμα βιβλίου (EL) \n\nΗμερομηνία\n\n 2022 \n\nΧρονολογία\n\n 2022 (EL) \n\nΠεριγραφή\n\n The present study undertakes to shed light on the ways in which the Venetians tried to cover their pressing needs in money and foodstuffs in order to carry out their naval enterprises in the Aegean during the First Morean War. More specifically, it examines the tax collection mechanism implemented in the Archipelago, so that the Venetian fleet could find a secure livelihood there. This mechanism is described as a process, a method that highlights the modifications it has undergone as well as the role played by various characters in its operation over time. The orientation of the analysis requires that this study be divided into two parts: the first concerns the first years of the war (1684–1690), during which the collection of taxes was part of the operations of the Venetian fleet; the second part refers to the 1690s, when tax collection was entrusted to a private businessman. Consequently, this last part focuses on the action of a one particular individual, which allows us however to approach the commercial activities that had developed in the Archipelago due to the war. Moreover, it enables us to examine the kind of domination that the Most Serene Republic had imposed at least in certain islands of the Aegean (with the exception of Tinos), which historiography has not yet set forth.\n\n...\n\nΧρονική κάλυψη\n\n 1684–1699 17ος αι.\n\n...\n\nΠηγή\n\n Venetian-Ottoman Wars",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" alias OR aliases",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl:3081692",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl:3081692",
+          "title": "openarchives.gr | Nature and origin of the Vani manganese deposit, Milos, Greece: an overview (vol 18, pg 181, 2001)",
+          "description": "openarchives.gr | Nature and origin of the Vani manganese deposit, Milos, Greece: an overview (vol 18, pg 181, 2001)\n\n Το τεκμήριο παρέχεται από τον φορέα : Εθνικό και Καποδιστριακό Πανεπιστήμιο Αθηνών \n\n Αποθετήριο : Πέργαμος \n\nΤίτλος\n\nΔημιουργός\n\n Liakopoulos, A Glasby, GP Papavassiliou, CT Boulegue, J \n\nΤύπος\n\n scientific_publication_article \n\n Επιστημονική δημοσίευση - Άρθρο Περιοδικού (EL) \n\n Scientific publication - Journal Article (EN) \n\n Τμήμα έκδοσης Δημοσίευση σε περιοδικό (EL) \n\nΧρονολογία\n\nΠάροχος\n\nΑποθετήριο / συλλογή\n\nΕπιμέρους συλλογή\n\n Άρθρο Περιοδικού (Journal Article)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" alias OR aliases",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098",
+          "title": "openarchives.gr | A GEOPHYSICAL STUDY OF MILOS AND KIMOLOS ISLANDS",
+          "description": "Ε ... Κέν ... Η\n\n...\n\nθε ... ριο : Εθνικό Αρχείο ... βών | ... ΚΤ\n\n...\n\nΤίτλος\n\n ΓΕΩΦΥΣΙΚΗ ΔΙΑΣΚΟΠΗΣΗ ΤΩΝ ΝΗΣΙΩΝ ΜΗΛΟΣ ΚΑΙ ΚΙΜΩΛΟΣ \n\n A GEOPHYSICAL STUDY OF MILOS AND KIMOLOS ISLANDS \n\nΔημιουργός\n\n Τσόκας, Γρηγόριος Tsokas, Grigorios \n\nΤύπος\n\n PhD Thesis \n\n Διπλωματική εργασία Διδακτορική διατριβή (EL) \n\nΗμερομηνία\n\n 1985 \n\nΧρονολογία\n\n 1985 (EL) \n\n THE MAIN AIM OF THIS THESIS IS THE STUDY OF THE TECTONIC FEATURES OF THE METAMORPHIC BASEMENT OF THE ISLANDS MILOS AND KIMOLOS. THE MORPHOLOGY OF THAT CRYSTALLINE BASEMENT IS OF PRIMARY INTEREST DUE TO THE ABNORMAL HEAT FLOW OBSERVED IN BOTH ISLANDS. FURTHERMORE, THE LOCALIZATION OF AREAS SHOWING VERY SMALL RESISTIVITY VALUES SHOULD SERVE AS A DIRECT INDICATION OF CIRCULATION OF GEOTHERMAL FLUIDS. GRAVITY AND ELECTRICAL RESISTIVITY DATA WERE EMPLOYED FOR THE PURPOSE OF THIS DISSERTATION. ALL DATA HAVE BEEN GIVEN TO THE GEOPHYSICAL LABORATORY OF THE UNIVERSITY OF THESSALONIKI BY THE P.P.C. (PUBLIC POWER CORPORATION).THE DATA WERE COMPOSED FROM SEVERAL SETS MEASURED AT DIFFERENT TIMES BY DIFFERENT FIELD CREWS. THE AUTHOR PARTICIPATED TO THE FIELD CREW IN THE ACQUISITIONOF A PART OF THE DATA, BASICALLY FOR KIMOLOS, DURING AUTUMN 1984. (SHORTENED)\n\n...\n\nΗ ΔΙAΤΡΙΒΗ ΑΥΤΗ ΑΠΟΤΕΛΕΙ ΜΕΡΟΣ ΤΗΣ ΕΡΕΥΝΗΤΙΚΗΣ ΠΡΟΣΠΑΘΕΙΑΣ ΤΟΥ ΕΡΓΑΣΤΗΡΙΟΥ ΓΕΩΦΥΣΙΚΗΣ ΤΟΥ ΑΡΙΣΤΟΤΕΛΕΙΟΥ ΠΑΝΕΠΙΣΤΗΜΙΟΥ ΘΕΣΣΑΛΟΝΙΚΗΣ ΓΙΑ ΤΗΝ ΕΦΑΡΜΟΓΗ ΤΩΝ ΓΕΩΦΥΣΙΚΩΝ ΜΕΘΟΔΩΝ ΔΙΑΣΚΟΠΗΣΗΣ ΣΤΗΝ ΕΠΙΛΥΣΗ ΘΕΩΡΗΤΙΚΩΝ ΚΑΙ ΚΥΡΙΩΣ ΠΡΑΚΤΙΚΩΝ ΠΡΟΒΛΗΜΑΤΩΝ (ΕΝΤΟΠΙΣΜΟΣ ΓΕΩΘΕΡΜΙΚΩΝ ΠΕΔΙΩΝ, ΚΛΠ) ΣΤΟΝ ΕΛΛΗΝΙΚΟ ΧΩΡΟ. ΕΠΕΙΔΗ, Η ΔΙΕΞΑΓΩΓΗ ΕΡΕΥΝΩΝ ΜΕΓΑΛΗΣ ΚΛΙΜΑΚΑΣ ΜΕ ΓΕΩΦΥΣΙΚΕΣ ΔΙΑΣΚΟΠΗΣΕΙΣ ΕΙΝΑΙ ΔΑΠΑΝΗΡΗ, ΤΑ ΔΕΔΟΜΕΝΑ ΠΟΥ ΧΡΗΣΙΜΟΠΟΙΗΘΗΚΑΝ, ΧΟΡΗΓΗΘΗΚΑΝ ΑΠΟ ΤΗΝ Δ.Ε.Μ.Ε./Δ.Ε.Η. (ΔΙΕΥΘΥΝΣΗ ΕΝΑΛΛΑΚΤΙΚΩΝ ΜΟΡΦΩΝ ΕΝΕΡΓΕΙΑΣ ΤΗΣ ΔΗΜΟΣΙΑΣ ΕΠΙΧΕΙΡΗΣΗΣ ΗΛΕΚΤΡΙΣΜΟΥ). Η Δ.Ε.Η. ΧΡΗΜΑΤΟΔΟΤΗΣΕ ΤΙΣ ΕΡΕΥΝΕΣ ΣΤΑ ΝΗΣΙΑ ΜΗΛΟΣ ΚΑΙ ΚΙΜΩΛΟΣ ΚΑΙ ΧΟΡΗΓΗΣΕ ΤΑ ΔΕΔΟΜΕΝΑ ΓΙΑ ΠΑΡΑΠΕΡΑ ΕΠΕΞΕΡΓΑΣΙΑ ΣΤΟ ΕΡΓΑΣΤΗΡΙΟ ΓΕΩΦΥΣΙΚΗΣ ΤΟΥ Α.Π.Θ. ΣΤΗ ΛΗΨΗ ΕΝΟΣ ΜΕΡΟΥΣ ΤΩΝ ΔΕΔΟΜΕΝΩΝ ΣΥΜΜΕΤΕΙΧΕ ΣΤΟ ΣΥΝΕΡΓΕΙΟ ΥΠΑΙΘΡΟΥ ΚΑΙ Ο ΣΥΓΓΡΑΦΕΑΣ ΑΥΤΗΣ ΤΗΣ ΔΙΑΤΡΙΒΗΣ. ΣΚΟΠΟΣ ΤΗΣ ΔΙΑΤΡΙΒΗΣ ΑΥΤΗΣ ΕΙΝΑΙ Η ΜΕΛΕΤΗ ΤΩΝ ΤΕΚΤΟΝΙΚΩΝ ΦΑΙΝΟΜΕΝΩΝ ΤΟΥ ΜΕΤΑΜΟΡΦΩΜΕΝΟΥ ΥΠΟΒΑΘΡΟΥ ΤΩΝ ΝΗΣΙΩΝ ΜΗΛΟΣ ΚΑΙ ΚΙΜΩΛΟΣ. Η ΜΟΡΦΟΛΟΓΙΑ ΤΟΥ ΚΡΥΣΤΑΛΛΟΣΧΙΣΤΩΔΟΥΣ, ΣΕ ΣΥΝΔΥΑΣΜΟ ΜΕ ΠΕΡΙΟΧΕΣ ΠΟΥ ΠΑΡΑΤΗΡΗΘΗΚΑΝ ΠΟΛΥ ΜΙΚΡΕΣ ΤΙΜΕΣ ΕΙΔΙΚΩΝ ΗΛΕΚΤΡΙΚΩΝ ΑΝΤΙΣΤΑΣΕΩΝ, ΕΙΝΑΙ ΜΕΓΑΛΗΣ ΣΗΜΑΣΙΑΣ ΓΙΑ ΤΗΝ ΓΕΩΘΕΡΜΙΚΗ ΕΡΕΥΝΑ. (ΠΕΡΙΚΟΠΗ)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" alias OR aliases",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_20903",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_20903",
+          "title": "openarchives.gr | Periphyton and its colonization in marine hydrothermal regions of island Milos (Greece)",
+          "description": "openarchives.gr | Periphyton and its colonization in marine hydrothermal regions of island Milos (Greece)\n\n Το τεκμήριο παρέχεται από τον φορέα : Εθνικό Κέντρο Τεκμηρίωσης και Ηλεκτρονικού Περιεχομένου (ΕΚΤ) \n\n Αποθετήριο : Εθνικό Αρχείο Διδακτορικών Διατριβών | ΕΚΤ ΕΑΔΔ \n\nΤίτλος\n\n Το περίφυτο και ο εποικισμός του σε θαλάσσιες περιοχές της Μήλου με υδροθερμικά φαινόμενα \n\n Periphyton and its colonization in marine hydrothermal regions of island Milos (Greece) \n\nΔημιουργός\n\n Louvrou, Ioanna Λούβρου, Ιωάννα \n\nΤύπος\n\n PhD Thesis \n\nΗμερομηνία\n\n 2007 \n\nΧρονολογία\n\n […] Αντικείμενο και στόχος αυτής της διατριβής είναι η μελέτη από συστηματική άποψη των περιφυτικών διατόμων και της ευενδολιθικής μικροχλωρίδας (κυανοβακτήρια, χλωροφύκη) σε παράκτιους βιοτόπους της νήσου Μήλου με θαλάσσια υδροθερμικά πεδία ή σε γειτνίαση με αυτά. Δίνονται επίσης όλα τα απαραίτητα στοιχεία και μία βιβλιογραφική επισκόπηση της οικολογίας και φυκο-γεωγραφίας των οργανισμών αυτών, απαραίτητη για την ταξινομιική τους. Μελετήθηκε υλικό από τον κόλπο Παλαιοχωρίου, ο οποίος παρουσιάζει έντονη υδροθερμική δραστηριότητα, από την υπερπαράλια ζώνη μέχρι βάθους 115m. Συμπληρωματικά μελετήθηκε η λιμνοθάλασσα της Αχιβαδολίμνης ως βιότοπος που γειτνιάζει με τον κόλπο της Μήλου που παρουσιάζει επίσης υδροθερμιικά φαινόμενα, καθώς και η περιοχή Σαρακίνικο με αποθέσεις θαλασσίων απολιθωμένων ιζημάτων από το Πλειστόκαινο. Συγκεκριμένα από τον κόλπο του Παλαιοχωρίου, έγιναν συλλογές επιψαμμικών διατόμων από τη χαρακτηριστική ζώνωση μεμονωμένων αναβλύσεων καθώς και επιψαμμικών διατόμων σε μεγαλύτερη απόσταση από το κέντρο της ανάβλυσης, επιλιθικών διατόμων από βραχώδεις περιοχές της παράλιας και υπερπαράλιας ζώνης, επιζωικών και επιφυτικών διατόμων της παράλιας ζώνης, καθώς και ευενδολιθικών αναπτύξεων σε οργανικής προέλευσης ασβεστιτικό υλικό. Από την Αχιβαδολίμνη έγιναν συλλογές μαλακίων, μικροβιακού τάπητα και χλωροφυκών και μελετήθηκαν τα επιζωικά διάτομα, τα διάτομα του μικροβιακού τάπητα, τα επιφυτικά διάτομα και οι ευενδολιθικοί μικροοργανισμοί. Από το Σαρακίνικο μελετήθηκαν διατομίτες του Πλειστοκαίνου. Οι μέθοδοι επεξεργασίας και παρατήρησης των διατόμων και των ευενδολιθικών μιικροοργανισμών έγιναν σύμφωνα με τις κλασικές τεχνικές. […]\n\n...\n\n[…] Objective of this thesis is the study - from a systematic point of view - of both periphytic diatoms and endoliths (cyanobacteria, chlorophytes) in island Milos, i.e. at its coastal areas with marine hydrothermal fields or in adjacency with them. Also, all essential data and a bibliographic review of ecology and phytogeography of these organisms are given, as a necessary element for their taxonomy. Material was studied from Palaeochori, i.e. a gulf of island Milos presenting intense hydrothermal activity, and in particular from its supralittoral zone up to depth of 115m. Additionally, the lagoon Ahivadolimni was studied, as a biotope that abuts with the gulf Milos (another gulf of island Milos also presenting hydrothermal activity), as well as Pleistocene marine sediments by Sarakiniko. Specifically, from the gulf Palaeochori, collections of epipsammic diatoms were made from the characteristic zonation (green, yellow, white) of vents as well as epipsammic diatoms in bigger distance than the vents centre, epilithic diatoms from rocky regions of the littoral and supralittoral zones, epizoic and epiphytic diatoms of the littoral zone, as well as endolithic growths from calcareous material of biotic origin. In the lagoon Ahivadolimni, collections of mollusks, microbial mats and chlorophytes were made to study epizoic diatoms, diatoms in microbial mats, epiphytic diatoms, as well as euendolithic cyanobacteria and chlorophytes. By Sarakiniko, fossil material (diatomites) of Pleistocene was studied. Treatment and observation of diatoms and euendoliths were made in accordance with the classic techniques. […]",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" alias OR aliases",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4827",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4827",
+          "title": "openarchives.gr | Η Παναγία Γαλακτοτροφούσα η «Σπηλαιώτισσα» σε έργα Καπεσοβιτών ζωγράφων Ν",
+          "description": "openarchives.gr | Η Παναγία Γαλακτοτροφούσα η «Σπηλαιώτισσα» σε έργα Καπεσοβιτών ζωγράφων Ν\n\n...\n\nαιολογ ... ίας\n\n...\n\nΤίτλος\n\n Η Παναγία Γαλακτοτροφούσα η «Σπηλαιώτισσα» σε έργα Καπεσοβιτών ζωγράφων Ν (EL) \n\n The Virgin Galaktotrophousa the «Spelaiotissa» in works of painters from Kapesovo (EN) \n\nΔημιουργός\n\n ΝΑΝΟΥ, Μαρία \n\nΤύπος\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\n Τμήμα έκδοσης Δημοσίευση σε περιοδικό (EL) \n\nΗμερομηνία\n\nΧρονολογία\n\n Με αφετηρία δύο όμοιες εικόνες της Γαλακτοτροφούσας με την προσωνυμία «η Σπηλαιώτισσα» που συνδέονται με τον Ιωάννη του Αθανασίου από το Καπέσοβο και το γιο του Αναστάσιο Αναγνώστη, διερευνώνται: τα εικονογραφικά πρότυπα της συγκεκριμένης παραλλαγής, η πιθανή σχέση της με χαρακτικό της Μονής του Μεγάλου Σπηλαίου και η απήχηση που βρίσκει σε τοιχογραφίες, εικόνες και σχέδια του καπεσοβίτικου εργαστηρίου στο τελευταίο τέταρτο του 18ου αιώνα (1778-1793). Τα νέα δεδομένα οδηγούν στην ταύτιση του ζωγράφου Ιωάννη που υπογράφει εικόνα της Γαλακτοτροφούσας «της Σπηλαιώτισσας» στη Συλλογή Βελιμέζη με τον Καπεσοβίτη Ιωάννη του Αθανασίου και στην απόδοση δύο σχεδίων με το ίδιο θέμα (Μουσείο Μπενάκη, Συλλογή Γιαννούλη) στον ίδιο ζωγράφο ή στον κύκλο του εργαστηρίου του. (EL) \n\n Starting with the two similar icons of the Galaktotrophousa entitled «i Spelaiotissa», which are associated with Ioannis, son of Athanasios, from Kapesovo and his son Anastasios Anagnostis, the following are examined: the iconographical models of this specific variation, its possible relation to an engraving of the Mega Spelaion Monastery and its impact on wall paintings, icons and drawings of the Kapesovo workshop in the last quarter of the 18th century (1778-1793). The new information leads to identifying the painter Ioannis, who signs the icons of the Galaktotrophousa «the Spelaiotissa» in the Velimezis Collection, with Ioannis of Kapesovo, son of Athanasios, and to attributing two working drawings with the same theme (Benaki Museum, Giannoulis Collection) to the same painter or to the circle of his workshop. (EN)\n\n...\n\nΤελευταίο τέταρτο 18ου αιώνα (EL) \n\n Ιωάννης του Αθανασίου (EL) \n\n Αγίου Νικολάου (Καπέσοβο) (EL) \n\n Καπεσοβίτες ζωγράφοι (EL) \n\n Ζωγραφική (EL) \n\n Αγίου Γεωργίου (Νεγάδες) (EL) \n\n Ήπειρος (EL) \n\n Γαλακτοτροφούσα Παναγία η «Σπηλαιώτισσα» (EL) \n\n Ναοί Αγίου Νικολάου (Μακρίνο) (EL) \n\n Αγίου Νικολάου (Τσεπέλοβο) (EL) \n\n St. Nicholas (Tsepelovo) (EN) \n\n painters of Kapesovo (EN) \n\n St. George (Negades) (EN) \n\n St. Nicholas (Kapesovo) (EN) \n\n Last quarter of 18th century (EN) \n\n Epirus (EN) \n\n Ioannis son of Athanasios (EN) \n\n Churches of St. Nicholas (Makrino) (EN) \n\n Galaktotrophousa Virgin the «Spelaiotissa» (EN) \n\n Painting (EN)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" alias OR aliases",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/portal/ekt-subjects/EKT-voc-classifier/1048745754?language=el",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/portal/ekt-subjects/EKT-voc-classifier/1048745754?language=el",
+          "title": "OpenArchives.gr | Γεωεπιστήμες και Επιστήμες Περιβάλλοντος",
+          "description": "##### The geochemistry of fluids from an active shallow submarine hydrothermal system: Milos island, Hellenic Volcanic Arc\n\nΔημιουργός: Ragnarsdottir, KV, Baltatzis, E, Magganas, A, Valsami-Jones, E, Boyce, AJ, Waldron, S, Alexander, JL, Bailey, EH, Anderson, L\n\nΤύπος τεκμηρίου: Δημοσίευση σε περιοδικό, Επιστημονικό άρθρο\n\nΕπιστημονικό πεδίο: Γεωεπιστήμες και Επιστήμες Περιβάλλοντος\n\nΧρονολογία : 2005\n\nΓλώσσα: Αγγλική γλώσσα\n\nΠεριοδικό : JOURNAL OF VOLCANOLOGY AND GEOTHERMAL RESEARCH\n\nΦορέας: Εθνικό Μετσόβιο Πολυτεχνείο\n\nΣυλλογή: Ψηφιακό Αποθετήριο της Κεντρικής Βιβλιοθήκης του ΕΜΠ | Dspace@NTUA",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" alias OR aliases",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ieim/000108-24819?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ieim/000108-24819?language=en",
+          "title": "openarchives.gr | Ο φιλόσοφος του 17ου αιώνα Ιωάννης Κωττούνιος και η ιδεολογική προσσέγγιση του έργου του",
+          "description": "openarchives.gr | Ο φιλόσοφος του 17ου αιώνα Ιωάννης Κωττούνιος και η ιδεολογική προσσέγγιση του έργου του\n\n This item is provided by the institution : Ionian Society for Historical Studies \n\nTitle\n\n Ο φιλόσοφος του 17ου αιώνα Ιωάννης Κωττούνιος και η ιδεολογική προσσέγγιση του έργου του (EL) \n\nCreator\n\n Μύαρης, Γεώργιος Κ. \n\nType\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\n Peer-reviewed Article (EN) \n\nDate\n\n 2020-09-24 \n\nYear\n\n 2020 (EN) \n\nDescription\n\n Δε διατίθεται περίληψη / no abstract available (EL) \n\nScientific field\n\nJournal\n\nLanguage\n\n Greek \n\nPublisher\n\n Ιόνιος Εταιρεία Ιστορικών Μελετών / Ionian Society for Historical Studies (EN) \n\nSchool / Department / Institute\n\n 2654-198X 1107-1559 \"Περί Ιστορίας\"; Τόμ. 4 (2003); 183-215 (EL) Peri Istorias; Vol. 4 (2003); 183-215 (EN)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" alias OR aliases",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/eranistis/000088-1495",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/eranistis/000088-1495",
+          "title": "openarchives.gr | Στην Πάτμο το δέκατο έκτο αιώνα. Ο καραβοκύρης κι επιχειρηματίας Διάκος της Κρητικής",
+          "description": "ί ... λος\n\n...\n\nΣτην Πάτμο το δέκατο έκτο αιώνα. Ο καραβοκύρης κι επιχειρηματίας Διάκος της Κρητικής (EN) \n\nΔημιουργός\n\n Ζαχαριάδου, Ελισάβετ Α. \n\nΤύπος\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\n Τμήμα έκδοσης Δημοσίευση σε περιοδικό (EL) \n\nΗμερομηνία\n\n 2011-12-30 \n\nΧρονολογία\n\n ΙΝ PATMOS IN THE 16th CENTURY Diakos, Son of Kritikis, Ship-owner and BusinessmanIt is well-established that the island of Patmos was prosperous and thriving by the end of the 16th century. This article examines the case of a successful ship-owner and entrepreneur from Patmos, who can be considered as a representative of this period: with his business connected to the sea, his relations with the Ottoman authorities, his wealth and his attachment to the Greek-Orthodox faith. Although he became somehow an almost legendary figure, his will, preserved in the archive of the Monastery of Patmos, reveals his approach to thought and action.ELISABETH A. ZACHARIADOU (EN) \n\nΘέμα\n\n Diakos son of Kritikis (EN) \n\n monastery of Patmos (EN) \n\n 16th century (EN) \n\n επιχειρηματίας (EN) \n\n 16ος αιώνας (EN) \n\n καραβοκύρης (EN) \n\n Διάκος της Κρητικής (EN) \n\n μονή Αγ. Ιωάννου Θεολόγου Πάτμου (EN) \n\n ship-owner (EN) \n\n entrepreneur (EN)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" alias OR aliases",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/historein/000053-35789",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/historein/000053-35789",
+          "title": "openarchives.gr | Review of Ioannis K. Hassiotis, Ο Οδυσσέας στις θάλασσες του Νότου: Η ελληνική παρουσία στις υπερπόντιες κτήσεις της Ισπανίας (16ος–17ος αι.) [Odysseus in the southern seas: The Greek presence in the Spanish overseas territories (16th–17th century)]",
+          "description": "openarchives.gr | Review of Ioannis K. Hassiotis, Ο Οδυσσέας στις θάλασσες του Νότου: Η ελληνική παρουσία στις υπερπόντιες κτήσεις της Ισπανίας (16ος–17ος αι.) [Odysseus in the southern seas: The Greek presence in the Spanish overseas territories (16th–17th century)]\n\n> # Review of Ioannis K. Hassiotis, Ο Οδυσσέας στις θάλασσες του Νότου: Η ελληνική παρουσία στις υπερπόντιες κτήσεις της Ισπανίας (16ος–17ος αι.) [Odysseus in the southern seas: The Greek presence in the Spanish overseas territories (16th–17th century)]\n> \n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/historein/000053-35789 RDF/XML JSON-LD \n> \n> \n\n Το τεκμήριο παρέχεται από τον φορέα : Εταιρεία Μελέτης της Ιστοριογραφίας και της Θεωρίας της Ιστορίας (ΕΜΙΘΙ) - Ιστορείν \n\n Αποθετήριο : Ιστορείν | ΕΚΤ e Journals \n\nΤίτλος\n\n Review of Ioannis K. Hassiotis, Ο Οδυσσέας στις θάλασσες του Νότου: Η ελληνική παρουσία στις υπερπόντιες κτήσεις της Ισπανίας (16ος–17ος αι.) [Odysseus in the southern seas: The Greek presence in the Spanish overseas territories (16th–17th century)] (EN) \n\n Hassiotis, Ioannis K. ULYSSE DANS LES MERS DU SUD. La présence grecque dans les possessions ultramarines de l'Espagne (XVIe-XVIIe siècles). (FR) \n\nΔημιουργός\n\n Sakkas, Konstantinos \n\nΤύπος\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\n Τμήμα έκδοσης Δημοσίευση σε περιοδικό (EL) \n\n 2024-04-15 \n\n Review of Ioannis K. Hassiotis, Ο Οδυσσέας στις θάλασσες του Νότου: Η ελληνική παρουσία στις υπερπόντιες κτήσεις της Ισπανίας (16ος–17ος αι.). [Odysseus in the southern seas: The Greek presence in the Spanish overseas territories (16th–17th century)]. Thessaloniki: University Studio Press, 2022. 448 pp. (EN) \n\n Cette critique évalue l'œuvre d'Ioannis K. Hassiotis, Ulysse dans les mers du sud. Présence grecque dans les territoires d'outre-mer de l'Espagne (XVIe-XVIIe siècles). Hassiotis explore migration, pratiques socio-économiques, interactions avec la bureaucratie espagnole, hispanisation des noms, rôles des Grecs notables en tant que conquistadors. La monographie examine les défis des distinctions sociales-raciales et de la pureté religieuse, révélant le relativisme religieux des Grecs face à la domination catholique. L'analyse inclut la participation grecque aux institutions administratives et foncières, ainsi que les niveaux d'éducation. La critique met en évidence la fluidité et les biais dans les sources espagnoles, explorant le terme \"levantiscos\" et les défis liés à l'identification ethnique. Elle souligne la complexité des relations entre le rejet et l'utilisation stratégique des compétences grecques par la monarchie espagnole, important pour comprendre le contexte historique mondial et l'influence grecque dans les territoires d'outre-mer espagnols. (FR)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" alias OR aliases",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8556",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8556",
+          "title": "openarchives.gr | Être chrétien et adepte des lumières le XVIIle siècle au sein de l'empire Ottoman",
+          "description": "openarchives.gr | Être chrétien et adepte des lumières le XVIIle siècle au sein de l'empire Ottoman\n\n Το τεκμήριο παρέχεται από τον φορέα : Εθνικό Ίδρυμα Ερευνών (ΕΙΕ) \n\n Αποθετήριο : Ήλιος - Αποθετήριο Εθνικού Ιδρύματος Ερευνών | αποθετήρια EKT \n\nΤίτλος\n\n Être chrétien et adepte des lumières le XVIIle siècle au sein de l'empire Ottoman \n\nΔημιουργός\n\n Αποστολόπουλος, Δημήτρης \n\nΤύπος\n\n Κεφάλαιο βιβλίου \n\n \n\n Τμήμα έκδοσης Τμήμα βιβλίου (EL) \n\nΗμερομηνία\n\n 2009 \n\nΧρονολογία\n\n 2009 (EL) \n\nΕπιστημονικό πεδίο\n\n Ιστορία (EL) \n\n History (EN) \n\n Ανθρωπιστικές Επιστήμες και Τέχνες ▶ Ιστορία και Αρχαιολογία Ιστορία (EL) \n\nΘέμα\n\n Crete Othoman Empire \n\nΓλώσσα\n\n Γαλλική γλώσσα \n\nΕκδότης\n\n Kaireios Library, Andros, 2009 Καΐρειος Βιβλιοθήκη, Ανδρος, 2009 \n\nΣχολή/Τμήμα/Ινστιτούτο\n\nΓεωγραφική κάλυψη\n\n Crete \n\nΧρονική κάλυψη\n\n 18th century \n\nΠηγή\n\n Captain and Scholar. Papers in memory of Demetrios I. Polemis, p.25-34=Καπετάνιος και Λόγιος, Μελέτες στη μνήμη του Δημήτρη Ι. Πολέμη",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" alias OR aliases",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:openarchives.gr \\\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\\\" alias OR aliases\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 10, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 10, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" variant spelling",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18086",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18086",
+          "title": "openarchives.gr | Aspects de l’intendance des Vénitiens dans l’Archipel au cours de la guerre de Morée (1684-1699)",
+          "description": "openarchives.gr | Aspects de l’intendance des Vénitiens dans l’Archipel au cours de la guerre de Morée (1684-1699)\n\n...\n\nΤο τεκμήριο παρέχεται από τον φορέα : Εθνικό Ίδρυμα Ερευνών (ΕΙΕ)\n\n...\n\nΑποθετήριο : Ήλιος - Αποθετήριο Εθνικού Ιδρύματος Ερευνών | αποθετήρια EKT\n\n...\n\nΤίτλος\n\n Aspects de l’intendance des Vénitiens dans l’Archipel au cours de la guerre de Morée (1684-1699) \n\nΔημιουργός\n\n Κουτζακιώτης, Γιώργος \n\nΣυντελεστής\n\n Μπίρταχας, Στάθης \n\nΤύπος\n\n Κεφάλαιο βιβλίου \n\n \n\n Τμήμα έκδοσης Τμήμα βιβλίου (EL) \n\nΗμερομηνία\n\n 2022 \n\nΧρονολογία\n\n 2022 (EL) \n\nΠεριγραφή\n\n The present study undertakes to shed light on the ways in which the Venetians tried to cover their pressing needs in money and foodstuffs in order to carry out their naval enterprises in the Aegean during the First Morean War. More specifically, it examines the tax collection mechanism implemented in the Archipelago, so that the Venetian fleet could find a secure livelihood there. This mechanism is described as a process, a method that highlights the modifications it has undergone as well as the role played by various characters in its operation over time. The orientation of the analysis requires that this study be divided into two parts: the first concerns the first years of the war (1684–1690), during which the collection of taxes was part of the operations of the Venetian fleet; the second part refers to the 1690s, when tax collection was entrusted to a private businessman. Consequently, this last part focuses on the action of a one particular individual, which allows us however to approach the commercial activities that had developed in the Archipelago due to the war. Moreover, it enables us to examine the kind of domination that the Most Serene Republic had imposed at least in certain islands of the Aegean (with the exception of Tinos), which historiography has not yet set forth.\n\n...\n\nΧρονική κάλυψη\n\n 1684–1699 17ος αι.\n\n...\n\nΠηγή\n\n Venetian-Ottoman Wars",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" variant spelling",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098",
+          "title": "openarchives.gr | A GEOPHYSICAL STUDY OF MILOS AND KIMOLOS ISLANDS",
+          "description": "ριο ... από ... ρέα : Εθν ... Κέντρο ... μη ... Ηλεκ ... χομένου (ΕΚΤ)\n\n...\n\nΑποθετήριο : Εθνικό Αρχείο Δ ... ακ ... ρικών Διατριβών | ΕΚΤ ΕΑ ... Δ \n\nΤίτλος\n\n ΓΕΩΦΥΣΙΚΗ ΔΙΑΣΚΟΠΗΣΗ ΤΩΝ ΝΗΣΙΩΝ ΜΗΛΟΣ ΚΑΙ ΚΙΜΩΛΟΣ \n\n A GEOPHYSICAL STUDY OF MILOS AND KIMOLOS ISLANDS \n\nΔημιουργός\n\n Τσόκας, Γρηγόριος Tsokas, Grigorios \n\nΤύπος\n\n PhD Thesis \n\n Διπλωματική εργασία Διδακτορική διατριβή (EL) \n\nΗμερομηνία\n\n 1985 \n\nΧρονολογία\n\n 1985 (EL) \n\n THE MAIN AIM OF THIS THESIS IS THE STUDY OF THE TECTONIC FEATURES OF THE METAMORPHIC BASEMENT OF THE ISLANDS MILOS AND KIMOLOS. THE MORPHOLOGY OF THAT CRYSTALLINE BASEMENT IS OF PRIMARY INTEREST DUE TO THE ABNORMAL HEAT FLOW OBSERVED IN BOTH ISLANDS. FURTHERMORE, THE LOCALIZATION OF AREAS SHOWING VERY SMALL RESISTIVITY VALUES SHOULD SERVE AS A DIRECT INDICATION OF CIRCULATION OF GEOTHERMAL FLUIDS. GRAVITY AND ELECTRICAL RESISTIVITY DATA WERE EMPLOYED FOR THE PURPOSE OF THIS DISSERTATION. ALL DATA HAVE BEEN GIVEN TO THE GEOPHYSICAL LABORATORY OF THE UNIVERSITY OF THESSALONIKI BY THE P.P.C. (PUBLIC POWER CORPORATION).THE DATA WERE COMPOSED FROM SEVERAL SETS MEASURED AT DIFFERENT TIMES BY DIFFERENT FIELD CREWS. THE AUTHOR PARTICIPATED TO THE FIELD CREW IN THE ACQUISITIONOF A PART OF THE DATA, BASICALLY FOR KIMOLOS, DURING AUTUMN 1984. (SHORTENED)\n\n...\n\nΗ ΔΙAΤΡΙΒΗ ΑΥΤΗ ΑΠΟΤΕΛΕΙ ΜΕΡΟΣ ΤΗΣ ΕΡΕΥΝΗΤΙΚΗΣ ΠΡΟΣΠΑΘΕΙΑΣ ΤΟΥ ΕΡΓΑΣΤΗΡΙΟΥ ΓΕΩΦΥΣΙΚΗΣ ΤΟΥ ΑΡΙΣΤΟΤΕΛΕΙΟΥ ΠΑΝΕΠΙΣΤΗΜΙΟΥ ΘΕΣΣΑΛΟΝΙΚΗΣ ΓΙΑ ΤΗΝ ΕΦΑΡΜΟΓΗ ΤΩΝ ΓΕΩΦΥΣΙΚΩΝ ΜΕΘΟΔΩΝ ΔΙΑΣΚΟΠΗΣΗΣ ΣΤΗΝ ΕΠΙΛΥΣΗ ΘΕΩΡΗΤΙΚΩΝ ΚΑΙ ΚΥΡΙΩΣ ΠΡΑΚΤΙΚΩΝ ΠΡΟΒΛΗΜΑΤΩΝ (ΕΝΤΟΠΙΣΜΟΣ ΓΕΩΘΕΡΜΙΚΩΝ ΠΕΔΙΩΝ, ΚΛΠ) ΣΤΟΝ ΕΛΛΗΝΙΚΟ ΧΩΡΟ. ΕΠΕΙΔΗ, Η ΔΙΕΞΑΓΩΓΗ ΕΡΕΥΝΩΝ ΜΕΓΑΛΗΣ ΚΛΙΜΑΚΑΣ ΜΕ ΓΕΩΦΥΣΙΚΕΣ ΔΙΑΣΚΟΠΗΣΕΙΣ ΕΙΝΑΙ ΔΑΠΑΝΗΡΗ, ΤΑ ΔΕΔΟΜΕΝΑ ΠΟΥ ΧΡΗΣΙΜΟΠΟΙΗΘΗΚΑΝ, ΧΟΡΗΓΗΘΗΚΑΝ ΑΠΟ ΤΗΝ Δ.Ε.Μ.Ε./Δ.Ε.Η. (ΔΙΕΥΘΥΝΣΗ ΕΝΑΛΛΑΚΤΙΚΩΝ ΜΟΡΦΩΝ ΕΝΕΡΓΕΙΑΣ ΤΗΣ ΔΗΜΟΣΙΑΣ ΕΠΙΧΕΙΡΗΣΗΣ ΗΛΕΚΤΡΙΣΜΟΥ). Η Δ.Ε.Η. ΧΡΗΜΑΤΟΔΟΤΗΣΕ ΤΙΣ ΕΡΕΥΝΕΣ ΣΤΑ ΝΗΣΙΑ ΜΗΛΟΣ ΚΑΙ ΚΙΜΩΛΟΣ ΚΑΙ ΧΟΡΗΓΗΣΕ ΤΑ ΔΕΔΟΜΕΝΑ ΓΙΑ ΠΑΡΑΠΕΡΑ ΕΠΕΞΕΡΓΑΣΙΑ ΣΤΟ ΕΡΓΑΣΤΗΡΙΟ ΓΕΩΦΥΣΙΚΗΣ ΤΟΥ Α.Π.Θ. ΣΤΗ ΛΗΨΗ ΕΝΟΣ ΜΕΡΟΥΣ ΤΩΝ ΔΕΔΟΜΕΝΩΝ ΣΥΜΜΕΤΕΙΧΕ ΣΤΟ ΣΥΝΕΡΓΕΙΟ ΥΠΑΙΘΡΟΥ ΚΑΙ Ο ΣΥΓΓΡΑΦΕΑΣ ΑΥΤΗΣ ΤΗΣ ΔΙΑΤΡΙΒΗΣ. ΣΚΟΠΟΣ ΤΗΣ ΔΙΑΤΡΙΒΗΣ ΑΥΤΗΣ ΕΙΝΑΙ Η ΜΕΛΕΤΗ ΤΩΝ ΤΕΚΤΟΝΙΚΩΝ ΦΑΙΝΟΜΕΝΩΝ ΤΟΥ ΜΕΤΑΜΟΡΦΩΜΕΝΟΥ ΥΠΟΒΑΘΡΟΥ ΤΩΝ ΝΗΣΙΩΝ ΜΗΛΟΣ ΚΑΙ ΚΙΜΩΛΟΣ. Η ΜΟΡΦΟΛΟΓΙΑ ΤΟΥ ΚΡΥΣΤΑΛΛΟΣΧΙΣΤΩΔΟΥΣ, ΣΕ ΣΥΝΔΥΑΣΜΟ ΜΕ ΠΕΡΙΟΧΕΣ ΠΟΥ ΠΑΡΑΤΗΡΗΘΗΚΑΝ ΠΟΛΥ ΜΙΚΡΕΣ ΤΙΜΕΣ ΕΙΔΙΚΩΝ ΗΛΕΚΤΡΙΚΩΝ ΑΝΤΙΣΤΑΣΕΩΝ, ΕΙΝΑΙ ΜΕΓΑΛΗΣ ΣΗΜΑΣΙΑΣ ΓΙΑ ΤΗΝ ΓΕΩΘΕΡΜΙΚΗ ΕΡΕΥΝΑ. (ΠΕΡΙΚΟΠΗ)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" variant spelling",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_20903",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_20903",
+          "title": "openarchives.gr | Periphyton and its colonization in marine hydrothermal regions of island Milos (Greece)",
+          "description": "openarchives.gr | Periphyton and its colonization in marine hydrothermal regions of island Milos (Greece)\n\n Το τεκμήριο παρέχεται από τον φορέα : Εθνικό Κέντρο Τεκμηρίωσης και Ηλεκτρονικού Περιεχομένου (ΕΚΤ) \n\n Αποθετήριο : Εθνικό Αρχείο Διδακτορικών Διατριβών | ΕΚΤ ΕΑΔΔ \n\nΤίτλος\n\n Το περίφυτο και ο εποικισμός του σε θαλάσσιες περιοχές της Μήλου με υδροθερμικά φαινόμενα \n\n Periphyton and its colonization in marine hydrothermal regions of island Milos (Greece) \n\nΔημιουργός\n\n Louvrou, Ioanna Λούβρου, Ιωάννα \n\nΤύπος\n\n PhD Thesis \n\nΗμερομηνία\n\n 2007 \n\nΧρονολογία\n\n […] Αντικείμενο και στόχος αυτής της διατριβής είναι η μελέτη από συστηματική άποψη των περιφυτικών διατόμων και της ευενδολιθικής μικροχλωρίδας (κυανοβακτήρια, χλωροφύκη) σε παράκτιους βιοτόπους της νήσου Μήλου με θαλάσσια υδροθερμικά πεδία ή σε γειτνίαση με αυτά. Δίνονται επίσης όλα τα απαραίτητα στοιχεία και μία βιβλιογραφική επισκόπηση της οικολογίας και φυκο-γεωγραφίας των οργανισμών αυτών, απαραίτητη για την ταξινομιική τους. Μελετήθηκε υλικό από τον κόλπο Παλαιοχωρίου, ο οποίος παρουσιάζει έντονη υδροθερμική δραστηριότητα, από την υπερπαράλια ζώνη μέχρι βάθους 115m. Συμπληρωματικά μελετήθηκε η λιμνοθάλασσα της Αχιβαδολίμνης ως βιότοπος που γειτνιάζει με τον κόλπο της Μήλου που παρουσιάζει επίσης υδροθερμιικά φαινόμενα, καθώς και η περιοχή Σαρακίνικο με αποθέσεις θαλασσίων απολιθωμένων ιζημάτων από το Πλειστόκαινο. Συγκεκριμένα από τον κόλπο του Παλαιοχωρίου, έγιναν συλλογές επιψαμμικών διατόμων από τη χαρακτηριστική ζώνωση μεμονωμένων αναβλύσεων καθώς και επιψαμμικών διατόμων σε μεγαλύτερη απόσταση από το κέντρο της ανάβλυσης, επιλιθικών διατόμων από βραχώδεις περιοχές της παράλιας και υπερπαράλιας ζώνης, επιζωικών και επιφυτικών διατόμων της παράλιας ζώνης, καθώς και ευενδολιθικών αναπτύξεων σε οργανικής προέλευσης ασβεστιτικό υλικό. Από την Αχιβαδολίμνη έγιναν συλλογές μαλακίων, μικροβιακού τάπητα και χλωροφυκών και μελετήθηκαν τα επιζωικά διάτομα, τα διάτομα του μικροβιακού τάπητα, τα επιφυτικά διάτομα και οι ευενδολιθικοί μικροοργανισμοί. Από το Σαρακίνικο μελετήθηκαν διατομίτες του Πλειστοκαίνου. Οι μέθοδοι επεξεργασίας και παρατήρησης των διατόμων και των ευενδολιθικών μιικροοργανισμών έγιναν σύμφωνα με τις κλασικές τεχνικές. […]\n\n...\n\n[…] Objective of this thesis is the study - from a systematic point of view - of both periphytic diatoms and endoliths (cyanobacteria, chlorophytes) in island Milos, i.e. at its coastal areas with marine hydrothermal fields or in adjacency with them. Also, all essential data and a bibliographic review of ecology and phytogeography of these organisms are given, as a necessary element for their taxonomy. Material was studied from Palaeochori, i.e. a gulf of island Milos presenting intense hydrothermal activity, and in particular from its supralittoral zone up to depth of 115m. Additionally, the lagoon Ahivadolimni was studied, as a biotope that abuts with the gulf Milos (another gulf of island Milos also presenting hydrothermal activity), as well as Pleistocene marine sediments by Sarakiniko. Specifically, from the gulf Palaeochori, collections of epipsammic diatoms were made from the characteristic zonation (green, yellow, white) of vents as well as epipsammic diatoms in bigger distance than the vents centre, epilithic diatoms from rocky regions of the littoral and supralittoral zones, epizoic and epiphytic diatoms of the littoral zone, as well as endolithic growths from calcareous material of biotic origin. In the lagoon Ahivadolimni, collections of mollusks, microbial mats and chlorophytes were made to study epizoic diatoms, diatoms in microbial mats, epiphytic diatoms, as well as euendolithic cyanobacteria and chlorophytes. By Sarakiniko, fossil material (diatomites) of Pleistocene was studied. Treatment and observation of diatoms and euendoliths were made in accordance with the classic techniques. […]",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" variant spelling",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/portal/ekt-subjects/EKT-voc-classifier/1048745754?language=el",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/portal/ekt-subjects/EKT-voc-classifier/1048745754?language=el",
+          "title": "OpenArchives.gr | Γεωεπιστήμες και Επιστήμες Περιβάλλοντος",
+          "description": "##### The geochemistry of fluids from an active shallow submarine hydrothermal system: Milos island, Hellenic Volcanic Arc\n\nΔημιουργός: Ragnarsdottir, KV, Baltatzis, E, Magganas, A, Valsami-Jones, E, Boyce, AJ, Waldron, S, Alexander, JL, Bailey, EH, Anderson, L\n\nΤύπος τεκμηρίου: Δημοσίευση σε περιοδικό, Επιστημονικό άρθρο\n\nΕπιστημονικό πεδίο: Γεωεπιστήμες και Επιστήμες Περιβάλλοντος\n\nΧρονολογία : 2005\n\nΓλώσσα: Αγγλική γλώσσα\n\nΠεριοδικό : JOURNAL OF VOLCANOLOGY AND GEOTHERMAL RESEARCH\n\nΦορέας: Εθνικό Μετσόβιο Πολυτεχνείο\n\nΣυλλογή: Ψηφιακό Αποθετήριο της Κεντρικής Βιβλιοθήκης του ΕΜΠ | Dspace@NTUA\n\nRDF",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" variant spelling",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4827",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4827",
+          "title": "openarchives.gr | Η Παναγία Γαλακτοτροφούσα η «Σπηλαιώτισσα» σε έργα Καπεσοβιτών ζωγράφων Ν",
+          "description": "openarchives.gr | Η Παναγία Γαλακτοτροφούσα η «Σπηλαιώτισσα» σε έργα Καπεσοβιτών ζωγράφων Ν\n\n...\n\nτεκμήριο παρέχεται από τον φορέα : Χριστιανική Αρχαιολογική Εταιρεία\n\n...\n\nΑποθετήριο : Δελτίον Χριστιανικής Αρχαιολογικής Εταιρείας | ΕΚΤ e Journals\n\n...\n\nΤίτλος\n\n Η Παναγία Γαλακτοτροφούσα η «Σπηλαιώτισσα» σε έργα Καπεσοβιτών ζωγράφων Ν (EL) \n\n The Virgin Galaktotrophousa the «Spelaiotissa» in works of painters from Kapesovo (EN) \n\nΔημιουργός\n\n ΝΑΝΟΥ, Μαρία \n\nΤύπος\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\n Τμήμα έκδοσης Δημοσίευση σε περιοδικό (EL) \n\nΗμερομηνία\n\nΧρονολογία\n\n Με αφετηρία δύο όμοιες εικόνες της Γαλακτοτροφούσας με την προσωνυμία «η Σπηλαιώτισσα» που συνδέονται με τον Ιωάννη του Αθανασίου από το Καπέσοβο και το γιο του Αναστάσιο Αναγνώστη, διερευνώνται: τα εικονογραφικά πρότυπα της συγκεκριμένης παραλλαγής, η πιθανή σχέση της με χαρακτικό της Μονής του Μεγάλου Σπηλαίου και η απήχηση που βρίσκει σε τοιχογραφίες, εικόνες και σχέδια του καπεσοβίτικου εργαστηρίου στο τελευταίο τέταρτο του 18ου αιώνα (1778-1793). Τα νέα δεδομένα οδηγούν στην ταύτιση του ζωγράφου Ιωάννη που υπογράφει εικόνα της Γαλακτοτροφούσας «της Σπηλαιώτισσας» στη Συλλογή Βελιμέζη με τον Καπεσοβίτη Ιωάννη του Αθανασίου και στην απόδοση δύο σχεδίων με το ίδιο θέμα (Μουσείο Μπενάκη, Συλλογή Γιαννούλη) στον ίδιο ζωγράφο ή στον κύκλο του εργαστηρίου του. (EL) \n\n Starting with the two similar icons of the Galaktotrophousa entitled «i Spelaiotissa», which are associated with Ioannis, son of Athanasios, from Kapesovo and his son Anastasios Anagnostis, the following are examined: the iconographical models of this specific variation, its possible relation to an engraving of the Mega Spelaion Monastery and its impact on wall paintings, icons and drawings of the Kapesovo workshop in the last quarter of the 18th century (1778-1793). The new information leads to identifying the painter Ioannis, who signs the icons of the Galaktotrophousa «the Spelaiotissa» in the Velimezis Collection, with Ioannis of Kapesovo, son of Athanasios, and to attributing two working drawings with the same theme (Benaki Museum, Giannoulis Collection) to the same painter or to the circle of his workshop. (EN)\n\n...\n\nΤελευταίο τέταρτο 18ου αιώνα (EL) \n\n Ιωάννης του Αθανασίου (EL) \n\n Αγίου Νικολάου (Καπέσοβο) (EL) \n\n Καπεσοβίτες ζωγράφοι (EL) \n\n Ζωγραφική (EL) \n\n Αγίου Γεωργίου (Νεγάδες) (EL) \n\n Ήπειρος (EL) \n\n Γαλακτοτροφούσα Παναγία η «Σπηλαιώτισσα» (EL) \n\n Ναοί Αγίου Νικολάου (Μακρίνο) (EL) \n\n Αγίου Νικολάου (Τσεπέλοβο) (EL) \n\n St. Nicholas (Tsepelovo) (EN) \n\n painters of Kapesovo (EN) \n\n St. George (Negades) (EN) \n\n St. Nicholas (Kapesovo) (EN) \n\n Last quarter of 18th century (EN) \n\n Epirus (EN) \n\n Ioannis son of Athanasios (EN) \n\n Churches of St. Nicholas (Makrino) (EN) \n\n Galaktotrophousa Virgin the «Spelaiotissa» (EN) \n\n Painting (EN)\n\n...\n\nελτίον της Χρισ ... νικής Αρχαιολογικής Εταιρείας; Δελτίον XAE 33 (2012), Περίοδος Δ'. Στη μνήμη του Δημήτρη Κωνστάντιου (1950-2010); 213-228 (EL)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" variant spelling",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ieim/000108-24819?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ieim/000108-24819?language=en",
+          "title": "openarchives.gr | Ο φιλόσοφος του 17ου αιώνα Ιωάννης Κωττούνιος και η ιδεολογική προσσέγγιση του έργου του",
+          "description": "openarchives.gr | Ο φιλόσοφος του 17ου αιώνα Ιωάννης Κωττούνιος και η ιδεολογική προσσέγγιση του έργου του\n\n This item is provided by the institution : Ionian Society for Historical Studies \n\nTitle\n\n Ο φιλόσοφος του 17ου αιώνα Ιωάννης Κωττούνιος και η ιδεολογική προσσέγγιση του έργου του (EL) \n\nCreator\n\n Μύαρης, Γεώργιος Κ. \n\nType\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\n Peer-reviewed Article (EN) \n\nDate\n\n 2020-09-24 \n\nYear\n\n 2020 (EN) \n\nDescription\n\n Δε διατίθεται περίληψη / no abstract available (EL) \n\nScientific field\n\nJournal\n\nLanguage\n\n Greek \n\nPublisher\n\n Ιόνιος Εταιρεία Ιστορικών Μελετών / Ionian Society for Historical Studies (EN) \n\nSchool / Department / Institute\n\n 2654-198X 1107-1559 \"Περί Ιστορίας\"; Τόμ. 4 (2003); 183-215 (EL) Peri Istorias; Vol. 4 (2003); 183-215 (EN)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" variant spelling",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/eranistis/000088-1495",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/eranistis/000088-1495",
+          "title": "openarchives.gr | Στην Πάτμο το δέκατο έκτο αιώνα. Ο καραβοκύρης κι επιχειρηματίας Διάκος της Κρητικής",
+          "description": "Στην Πάτμο το δέκατο έκτο αιώνα. Ο καραβοκύρης κι επιχειρηματίας Διάκος της Κρητικής (EN) \n\nΔημιουργός\n\n Ζαχαριάδου, Ελισάβετ Α. \n\nΤύπος\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\n Τμήμα έκδοσης Δημοσίευση σε περιοδικό (EL) \n\nΗμερομηνία\n\n 2011-12-30 \n\nΧρονολογία\n\n ΙΝ PATMOS IN THE 16th CENTURY Diakos, Son of Kritikis, Ship-owner and BusinessmanIt is well-established that the island of Patmos was prosperous and thriving by the end of the 16th century. This article examines the case of a successful ship-owner and entrepreneur from Patmos, who can be considered as a representative of this period: with his business connected to the sea, his relations with the Ottoman authorities, his wealth and his attachment to the Greek-Orthodox faith. Although he became somehow an almost legendary figure, his will, preserved in the archive of the Monastery of Patmos, reveals his approach to thought and action.ELISABETH A. ZACHARIADOU (EN) \n\nΘέμα\n\n Diakos son of Kritikis (EN) \n\n monastery of Patmos (EN) \n\n 16th century (EN) \n\n επιχειρηματίας (EN) \n\n 16ος αιώνας (EN) \n\n καραβοκύρης (EN) \n\n Διάκος της Κρητικής (EN) \n\n μονή Αγ. Ιωάννου Θεολόγου Πάτμου (EN) \n\n ship-owner (EN) \n\n entrepreneur (EN)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" variant spelling",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_44456",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_44456",
+          "title": "openarchives.gr | Η ταυτότητα της Σαλαμίνας από τα τέλη του 17ου αιώνα έως και τα μέσα του 19ου αιώνα: μια ιστορική και λαογραφική προσέγγιση μέσα από δικαιοπρακτικά έγγραφα αρχείων, προφορικές παραδόσεις, περιηγητικά κείμενα και άλλες πρωτογενείς πηγές",
+          "description": "ίτλος\n\n The identity of Salamis from the late 17th century until the mid-19th century: a historical and laographical approach based on legal documents records, oral traditions, travellers’ writings and further primary sources\n\n...\n\nΗ ταυτότητα της Σαλαμίνας από τα τέλη του 17ου αιώνα έως και τα μέσα του 19ου αιώνα: μια ιστορική και λαογραφική προσέγγιση μέσα από δικαιοπρακτικά έγγραφα αρχείων, προφορικές παραδόσεις, περιηγητικά κείμενα και άλλες πρωτογενείς πηγές\n\n...\n\nΔημιουργός\n\n Veltanissian, Panagiotis Βελτανισιάν, Παναγιώτης\n\n...\n\nΤ ... πος\n\n...\n\nΗ ... ρομηνία\n\n...\n\nThe aim of this thesis is to look into the identity of Salamis from the late 17th century until the mid-19th century based on legal documents deriving from public, private and monastery records, oral traditions, travellers’ writings and further primary sources. These sources provide information for several sections of the private and public ways of life such as the administrative role and the responsibilities of the Demogerontia (Council of Elders), the role of the union of the pine tar manufacturers, the so-called katramitzides, in the economic and social life of the island, the assets management of the Holy Monastery of Faneromeni, the economic life of the people on Salamis, the legacies and the strategies concerning the transfer of family property, the family surnames and the families in general, the place names, the elements of folk speech and the various incidents of everyday life on Salamis during the Greek War of Independence and the first years that followed Independence. The presentation, co-examination and evaluation of these sources reveal several aspects of the everyday life of people on Salamis and more particularly, aspects of customary law that have remained undiscovered until today. At the same time, these sources, also, reveal that Salamis has followed the fate and, in general, the historic and cultural development of Athens. Lastly, a large number of oral traditions have been confirmed through written sources contributing this way to the strengthening of the theoretical foundations of Folklore Studies that focus on historic facts.\n\n...\n\nΑν ... είμενο της παρού ... εργασίας αποτελεί η αναζήτηση της ταυτότητας της Σαλαμίνας από τα τέλη του 17ου αιώνα έως και τα μέσα του 19ου αιώνα αξιοποιώντας δικαιοπρακτικά έγγραφα δημόσιων, ιδιωτικών και μοναστηριακών αρχείων, προφορικές παραδόσεις, περιηγητικά κείμενα και άλλες πρωτογενείς πηγές. Οι τομείς της ιδιωτικής και της δημόσιας ζωής που φωτίζονται από τις παραπάνω πηγές είναι η διοίκηση και οι αρμοδιότητες της Δημογεροντίας, ο ρόλος της συντεχνίας των κατραμιτζήδων στην οικονομία και στην κοινωνία του νησιού, η μοναστηριακή οργάνωση και διαχείριση της περιουσίας της Ιεράς Μονής Φανερωμένης, ο οικονομικός βίος των κατοίκων της Σαλαμίνας, οι κληροδοτικές πρακτικές και οι στρατηγικές μεταβίβασης της οικογενειακής περιουσίας, τα οικογενειακά επίθετα και οι οικογένειες, τα τοπωνύμια, τα στοιχεία λαϊκού λόγου καθώς και διάφορα περιστατικά της καθημερινότητας κατά τους χρόνους της Επανάστασης και τους πρώτους μετεπαναστατικούς χρόνους στη Σαλαμίνα. Η παρουσίαση, συνεξέταση και αξιολόγηση των πηγών αυτών ανέδειξε πτυχές της ζωής των κατοίκων της Σαλαμίνας και κυρίως όψεις του εθιμικού δικαίου, άγνωστες μέχρι σήμερα. Παράλληλα οι πηγές αυτές αποκάλυψαν ότι η Σαλαμίνα ακολουθούσε την τύχη και γενικότερα την ιστορική και πολιτισμική πορεία της Αθήνας. Τέλος, πολλές από τις προφορικές παραδόσεις επιβεβαιώθηκαν μέσα από τις γραπτές πηγές και κατ’ αυτόν τον τρόπο ενισχύθηκε το θεωρητικό υπόβαθρο της Ιστορικής Λαογραφίας.",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" variant spelling",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/historein/000053-35789",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/historein/000053-35789",
+          "title": "openarchives.gr | Review of Ioannis K. Hassiotis, Ο Οδυσσέας στις θάλασσες του Νότου: Η ελληνική παρουσία στις υπερπόντιες κτήσεις της Ισπανίας (16ος–17ος αι.) [Odysseus in the southern seas: The Greek presence in the Spanish overseas territories (16th–17th century)]",
+          "description": "openarchives.gr | Review of Ioannis K. Hassiotis, Ο Οδυσσέας στις θάλασσες του Νότου: Η ελληνική παρουσία στις υπερπόντιες κτήσεις της Ισπανίας (16ος–17ος αι.) [Odysseus in the southern seas: The Greek presence in the Spanish overseas territories (16th–17th century)]\n\n> # Review of Ioannis K. Hassiotis, Ο Οδυσσέας στις θάλασσες του Νότου: Η ελληνική παρουσία στις υπερπόντιες κτήσεις της Ισπανίας (16ος–17ος αι.) [Odysseus in the southern seas: The Greek presence in the Spanish overseas territories (16th–17th century)]\n> \n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/historein/000053-35789 RDF/XML JSON-LD \n> \n> \n\n Το τεκμήριο παρέχεται από τον φορέα : Εταιρεία Μελέτης της Ιστοριογραφίας και της Θεωρίας της Ιστορίας (ΕΜΙΘΙ) - Ιστορείν \n\n Αποθετήριο : Ιστορείν | ΕΚΤ e Journals \n\nΤίτλος\n\n Review of Ioannis K. Hassiotis, Ο Οδυσσέας στις θάλασσες του Νότου: Η ελληνική παρουσία στις υπερπόντιες κτήσεις της Ισπανίας (16ος–17ος αι.) [Odysseus in the southern seas: The Greek presence in the Spanish overseas territories (16th–17th century)] (EN) \n\n Hassiotis, Ioannis K. ULYSSE DANS LES MERS DU SUD. La présence grecque dans les possessions ultramarines de l'Espagne (XVIe-XVIIe siècles). (FR) \n\nΔημιουργός\n\n Sakkas, Konstantinos \n\nΤύπος\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\n Τμήμα έκδοσης Δημοσίευση σε περιοδικό (EL) \n\n 2024-04-15 \n\n Review of Ioannis K. Hassiotis, Ο Οδυσσέας στις θάλασσες του Νότου: Η ελληνική παρουσία στις υπερπόντιες κτήσεις της Ισπανίας (16ος–17ος αι.). [Odysseus in the southern seas: The Greek presence in the Spanish overseas territories (16th–17th century)]. Thessaloniki: University Studio Press, 2022. 448 pp. (EN) \n\n Cette critique évalue l'œuvre d'Ioannis K. Hassiotis, Ulysse dans les mers du sud. Présence grecque dans les territoires d'outre-mer de l'Espagne (XVIe-XVIIe siècles). Hassiotis explore migration, pratiques socio-économiques, interactions avec la bureaucratie espagnole, hispanisation des noms, rôles des Grecs notables en tant que conquistadors. La monographie examine les défis des distinctions sociales-raciales et de la pureté religieuse, révélant le relativisme religieux des Grecs face à la domination catholique. L'analyse inclut la participation grecque aux institutions administratives et foncières, ainsi que les niveaux d'éducation. La critique met en évidence la fluidité et les biais dans les sources espagnoles, explorant le terme \"levantiscos\" et les défis liés à l'identification ethnique. Elle souligne la complexité des relations entre le rejet et l'utilisation stratégique des compétences grecques par la monarchie espagnole, important pour comprendre le contexte historique mondial et l'influence grecque dans les territoires d'outre-mer espagnols. (FR)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" variant spelling",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8556",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8556",
+          "title": "openarchives.gr | Être chrétien et adepte des lumières le XVIIle siècle au sein de l'empire Ottoman",
+          "description": "openarchives.gr | Être chrétien et adepte des lumières le XVIIle siècle au sein de l'empire Ottoman\n\n Το τεκμήριο παρέχεται από τον φορέα : Εθνικό Ίδρυμα Ερευνών (ΕΙΕ) \n\n Αποθετήριο : Ήλιος - Αποθετήριο Εθνικού Ιδρύματος Ερευνών | αποθετήρια EKT \n\nΤίτλος\n\n Être chrétien et adepte des lumières le XVIIle siècle au sein de l'empire Ottoman \n\nΔημιουργός\n\n Αποστολόπουλος, Δημήτρης \n\nΤύπος\n\n Κεφάλαιο βιβλίου \n\n \n\n Τμήμα έκδοσης Τμήμα βιβλίου (EL) \n\nΗμερομηνία\n\n 2009 \n\nΧρονολογία\n\n 2009 (EL) \n\nΕπιστημονικό πεδίο\n\n Ιστορία (EL) \n\n History (EN) \n\n Ανθρωπιστικές Επιστήμες και Τέχνες ▶ Ιστορία και Αρχαιολογία Ιστορία (EL) \n\nΘέμα\n\n Crete Othoman Empire \n\nΓλώσσα\n\n Γαλλική γλώσσα \n\nΕκδότης\n\n Kaireios Library, Andros, 2009 Καΐρειος Βιβλιοθήκη, Ανδρος, 2009 \n\nΣχολή/Τμήμα/Ινστιτούτο\n\nΓεωγραφική κάλυψη\n\n Crete \n\nΧρονική κάλυψη\n\n 18th century \n\nΠηγή\n\n Captain and Scholar. Papers in memory of Demetrios I. Polemis, p.25-34=Καπετάνιος και Λόγιος, Μελέτες στη μνήμη του Δημήτρη Ι. Πολέμη",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" variant spelling",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:openarchives.gr \\\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\\\" variant spelling\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 10, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 10, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" transliteration",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18086",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18086",
+          "title": "openarchives.gr | Aspects de l’intendance des Vénitiens dans l’Archipel au cours de la guerre de Morée (1684-1699)",
+          "description": "openarchives.gr | Aspects de l’intendance des Vénitiens dans l’Archipel au cours de la guerre de Morée (1684-1699)\n\n...\n\nΤο τεκμήριο παρέχεται από τον φορέα : Εθνικό Ίδρυμα Ερευνών (ΕΙΕ) \n\n Αποθετήριο : Ήλιος - Αποθετήριο Εθνικού Ιδρύματος Ερευνών | αποθετήρια EKT \n\nΤίτλος\n\n Aspects de l’intendance des Vénitiens dans l’Archipel au cours de la guerre de Morée (1684-1699) \n\nΔημιουργός\n\n Κουτζακιώτης, Γιώργος \n\nΣυντελεστής\n\n Μπίρταχας, Στάθης \n\nΤύπος\n\n Κεφάλαιο βιβλίου \n\n \n\n Τμήμα έκδοσης Τμήμα βιβλίου (EL) \n\nΗμερομηνία\n\n 2022 \n\nΧρονολογία\n\n 2022 (EL) \n\nΠεριγραφή\n\n The present study undertakes to shed light on the ways in which the Venetians tried to cover their pressing needs in money and foodstuffs in order to carry out their naval enterprises in the Aegean during the First Morean War. More specifically, it examines the tax collection mechanism implemented in the Archipelago, so that the Venetian fleet could find a secure livelihood there. This mechanism is described as a process, a method that highlights the modifications it has undergone as well as the role played by various characters in its operation over time. The orientation of the analysis requires that this study be divided into two parts: the first concerns the first years of the war (1684–1690), during which the collection of taxes was part of the operations of the Venetian fleet; the second part refers to the 1690s, when tax collection was entrusted to a private businessman. Consequently, this last part focuses on the action of a one particular individual, which allows us however to approach the commercial activities that had developed in the Archipelago due to the war. Moreover, it enables us to examine the kind of domination that the Most Serene Republic had imposed at least in certain islands of the Aegean (with the exception of Tinos), which historiography has not yet set forth.\n\n...\n\nΧρονική κάλυψη\n\n 1684–1699 17ος αι.\n\n...\n\nΠηγή\n\n Venetian-Ottoman Wars",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" transliteration",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl:3081692",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl:3081692",
+          "title": "openarchives.gr | Nature and origin of the Vani manganese deposit, Milos, Greece: an overview (vol 18, pg 181, 2001)",
+          "description": "openarchives.gr | Nature and origin of the Vani manganese deposit, Milos, Greece: an overview (vol 18, pg 181, 2001)\n\n Το τεκμήριο παρέχεται από τον φορέα : Εθνικό και Καποδιστριακό Πανεπιστήμιο Αθηνών \n\n Αποθετήριο : Πέργαμος \n\nΤίτλος\n\nΔημιουργός\n\n Liakopoulos, A Glasby, GP Papavassiliou, CT Boulegue, J \n\nΤύπος\n\n scientific_publication_article \n\n Επιστημονική δημοσίευση - Άρθρο Περιοδικού (EL) \n\n Scientific publication - Journal Article (EN) \n\n Τμήμα έκδοσης Δημοσίευση σε περιοδικό (EL) \n\nΧρονολογία\n\nΠάροχος\n\nΑποθετήριο / συλλογή\n\nΕπιμέρους συλλογή\n\n Άρθρο Περιοδικού (Journal Article)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" transliteration",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_20903",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_20903",
+          "title": "openarchives.gr | Periphyton and its colonization in marine hydrothermal regions of island Milos (Greece)",
+          "description": "openarchives.gr | Periphyton and its colonization in marine hydrothermal regions of island Milos (Greece)\n\n Το τεκμήριο παρέχεται από τον φορέα : Εθνικό Κέντρο Τεκμηρίωσης και Ηλεκτρονικού Περιεχομένου (ΕΚΤ) \n\n Αποθετήριο : Εθνικό Αρχείο Διδακτορικών Διατριβών | ΕΚΤ ΕΑΔΔ \n\nΤίτλος\n\n Το περίφυτο και ο εποικισμός του σε θαλάσσιες περιοχές της Μήλου με υδροθερμικά φαινόμενα \n\n Periphyton and its colonization in marine hydrothermal regions of island Milos (Greece) \n\nΔημιουργός\n\n Louvrou, Ioanna Λούβρου, Ιωάννα \n\nΤύπος\n\n PhD Thesis \n\nΗμερομηνία\n\n 2007 \n\nΧρονολογία\n\n […] Αντικείμενο και στόχος αυτής της διατριβής είναι η μελέτη από συστηματική άποψη των περιφυτικών διατόμων και της ευενδολιθικής μικροχλωρίδας (κυανοβακτήρια, χλωροφύκη) σε παράκτιους βιοτόπους της νήσου Μήλου με θαλάσσια υδροθερμικά πεδία ή σε γειτνίαση με αυτά. Δίνονται επίσης όλα τα απαραίτητα στοιχεία και μία βιβλιογραφική επισκόπηση της οικολογίας και φυκο-γεωγραφίας των οργανισμών αυτών, απαραίτητη για την ταξινομιική τους. Μελετήθηκε υλικό από τον κόλπο Παλαιοχωρίου, ο οποίος παρουσιάζει έντονη υδροθερμική δραστηριότητα, από την υπερπαράλια ζώνη μέχρι βάθους 115m. Συμπληρωματικά μελετήθηκε η λιμνοθάλασσα της Αχιβαδολίμνης ως βιότοπος που γειτνιάζει με τον κόλπο της Μήλου που παρουσιάζει επίσης υδροθερμιικά φαινόμενα, καθώς και η περιοχή Σαρακίνικο με αποθέσεις θαλασσίων απολιθωμένων ιζημάτων από το Πλειστόκαινο. Συγκεκριμένα από τον κόλπο του Παλαιοχωρίου, έγιναν συλλογές επιψαμμικών διατόμων από τη χαρακτηριστική ζώνωση μεμονωμένων αναβλύσεων καθώς και επιψαμμικών διατόμων σε μεγαλύτερη απόσταση από το κέντρο της ανάβλυσης, επιλιθικών διατόμων από βραχώδεις περιοχές της παράλιας και υπερπαράλιας ζώνης, επιζωικών και επιφυτικών διατόμων της παράλιας ζώνης, καθώς και ευενδολιθικών αναπτύξεων σε οργανικής προέλευσης ασβεστιτικό υλικό. Από την Αχιβαδολίμνη έγιναν συλλογές μαλακίων, μικροβιακού τάπητα και χλωροφυκών και μελετήθηκαν τα επιζωικά διάτομα, τα διάτομα του μικροβιακού τάπητα, τα επιφυτικά διάτομα και οι ευενδολιθικοί μικροοργανισμοί. Από το Σαρακίνικο μελετήθηκαν διατομίτες του Πλειστοκαίνου. Οι μέθοδοι επεξεργασίας και παρατήρησης των διατόμων και των ευενδολιθικών μιικροοργανισμών έγιναν σύμφωνα με τις κλασικές τεχνικές. […]\n\n...\n\n[…] Objective of this thesis is the study - from a systematic point of view - of both periphytic diatoms and endoliths (cyanobacteria, chlorophytes) in island Milos, i.e. at its coastal areas with marine hydrothermal fields or in adjacency with them. Also, all essential data and a bibliographic review of ecology and phytogeography of these organisms are given, as a necessary element for their taxonomy. Material was studied from Palaeochori, i.e. a gulf of island Milos presenting intense hydrothermal activity, and in particular from its supralittoral zone up to depth of 115m. Additionally, the lagoon Ahivadolimni was studied, as a biotope that abuts with the gulf Milos (another gulf of island Milos also presenting hydrothermal activity), as well as Pleistocene marine sediments by Sarakiniko. Specifically, from the gulf Palaeochori, collections of epipsammic diatoms were made from the characteristic zonation (green, yellow, white) of vents as well as epipsammic diatoms in bigger distance than the vents centre, epilithic diatoms from rocky regions of the littoral and supralittoral zones, epizoic and epiphytic diatoms of the littoral zone, as well as endolithic growths from calcareous material of biotic origin. In the lagoon Ahivadolimni, collections of mollusks, microbial mats and chlorophytes were made to study epizoic diatoms, diatoms in microbial mats, epiphytic diatoms, as well as euendolithic cyanobacteria and chlorophytes. By Sarakiniko, fossil material (diatomites) of Pleistocene was studied. Treatment and observation of diatoms and euendoliths were made in accordance with the classic techniques. […]",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" transliteration",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098",
+          "title": "openarchives.gr | A GEOPHYSICAL STUDY OF MILOS AND KIMOLOS ISLANDS",
+          "description": "ών | ... Τ\n\n...\n\nΤίτλος\n\n ΓΕΩΦΥΣΙΚΗ ΔΙΑΣΚΟΠΗΣΗ ΤΩΝ ΝΗΣΙΩΝ ΜΗΛΟΣ ΚΑΙ ΚΙΜΩΛΟΣ \n\n A GEOPHYSICAL STUDY OF MILOS AND KIMOLOS ISLANDS \n\nΔημιουργός\n\n Τσόκας, Γρηγόριος Tsokas, Grigorios \n\nΤύπος\n\n PhD Thesis \n\n Διπλωματική εργασία Διδακτορική διατριβή (EL) \n\nΗμερομηνία\n\n 1985 \n\nΧρονολογία\n\n 1985 (EL) \n\n THE MAIN AIM OF THIS THESIS IS THE STUDY OF THE TECTONIC FEATURES OF THE METAMORPHIC BASEMENT OF THE ISLANDS MILOS AND KIMOLOS. THE MORPHOLOGY OF THAT CRYSTALLINE BASEMENT IS OF PRIMARY INTEREST DUE TO THE ABNORMAL HEAT FLOW OBSERVED IN BOTH ISLANDS. FURTHERMORE, THE LOCALIZATION OF AREAS SHOWING VERY SMALL RESISTIVITY VALUES SHOULD SERVE AS A DIRECT INDICATION OF CIRCULATION OF GEOTHERMAL FLUIDS. GRAVITY AND ELECTRICAL RESISTIVITY DATA WERE EMPLOYED FOR THE PURPOSE OF THIS DISSERTATION. ALL DATA HAVE BEEN GIVEN TO THE GEOPHYSICAL LABORATORY OF THE UNIVERSITY OF THESSALONIKI BY THE P.P.C. (PUBLIC POWER CORPORATION).THE DATA WERE COMPOSED FROM SEVERAL SETS MEASURED AT DIFFERENT TIMES BY DIFFERENT FIELD CREWS. THE AUTHOR PARTICIPATED TO THE FIELD CREW IN THE ACQUISITIONOF A PART OF THE DATA, BASICALLY FOR KIMOLOS, DURING AUTUMN 1984. (SHORTENED)\n\n...\n\nΗ ΔΙAΤΡΙΒΗ ΑΥΤΗ ΑΠΟΤΕΛΕΙ ΜΕΡΟΣ ΤΗΣ ΕΡΕΥΝΗΤΙΚΗΣ ΠΡΟΣΠΑΘΕΙΑΣ ΤΟΥ ΕΡΓΑΣΤΗΡΙΟΥ ΓΕΩΦΥΣΙΚΗΣ ΤΟΥ ΑΡΙΣΤΟΤΕΛΕΙΟΥ ΠΑΝΕΠΙΣΤΗΜΙΟΥ ΘΕΣΣΑΛΟΝΙΚΗΣ ΓΙΑ ΤΗΝ ΕΦΑΡΜΟΓΗ ΤΩΝ ΓΕΩΦΥΣΙΚΩΝ ΜΕΘΟΔΩΝ ΔΙΑΣΚΟΠΗΣΗΣ ΣΤΗΝ ΕΠΙΛΥΣΗ ΘΕΩΡΗΤΙΚΩΝ ΚΑΙ ΚΥΡΙΩΣ ΠΡΑΚΤΙΚΩΝ ΠΡΟΒΛΗΜΑΤΩΝ (ΕΝΤΟΠΙΣΜΟΣ ΓΕΩΘΕΡΜΙΚΩΝ ΠΕΔΙΩΝ, ΚΛΠ) ΣΤΟΝ ΕΛΛΗΝΙΚΟ ΧΩΡΟ. ΕΠΕΙΔΗ, Η ΔΙΕΞΑΓΩΓΗ ΕΡΕΥΝΩΝ ΜΕΓΑΛΗΣ ΚΛΙΜΑΚΑΣ ΜΕ ΓΕΩΦΥΣΙΚΕΣ ΔΙΑΣΚΟΠΗΣΕΙΣ ΕΙΝΑΙ ΔΑΠΑΝΗΡΗ, ΤΑ ΔΕΔΟΜΕΝΑ ΠΟΥ ΧΡΗΣΙΜΟΠΟΙΗΘΗΚΑΝ, ΧΟΡΗΓΗΘΗΚΑΝ ΑΠΟ ΤΗΝ Δ.Ε.Μ.Ε./Δ.Ε.Η. (ΔΙΕΥΘΥΝΣΗ ΕΝΑΛΛΑΚΤΙΚΩΝ ΜΟΡΦΩΝ ΕΝΕΡΓΕΙΑΣ ΤΗΣ ΔΗΜΟΣΙΑΣ ΕΠΙΧΕΙΡΗΣΗΣ ΗΛΕΚΤΡΙΣΜΟΥ). Η Δ.Ε.Η. ΧΡΗΜΑΤΟΔΟΤΗΣΕ ΤΙΣ ΕΡΕΥΝΕΣ ΣΤΑ ΝΗΣΙΑ ΜΗΛΟΣ ΚΑΙ ΚΙΜΩΛΟΣ ΚΑΙ ΧΟΡΗΓΗΣΕ ΤΑ ΔΕΔΟΜΕΝΑ ΓΙΑ ΠΑΡΑΠΕΡΑ ΕΠΕΞΕΡΓΑΣΙΑ ΣΤΟ ΕΡΓΑΣΤΗΡΙΟ ΓΕΩΦΥΣΙΚΗΣ ΤΟΥ Α.Π.Θ. ΣΤΗ ΛΗΨΗ ΕΝΟΣ ΜΕΡΟΥΣ ΤΩΝ ΔΕΔΟΜΕΝΩΝ ΣΥΜΜΕΤΕΙΧΕ ΣΤΟ ΣΥΝΕΡΓΕΙΟ ΥΠΑΙΘΡΟΥ ΚΑΙ Ο ΣΥΓΓΡΑΦΕΑΣ ΑΥΤΗΣ ΤΗΣ ΔΙΑΤΡΙΒΗΣ. ΣΚΟΠΟΣ ΤΗΣ ΔΙΑΤΡΙΒΗΣ ΑΥΤΗΣ ΕΙΝΑΙ Η ΜΕΛΕΤΗ ΤΩΝ ΤΕΚΤΟΝΙΚΩΝ ΦΑΙΝΟΜΕΝΩΝ ΤΟΥ ΜΕΤΑΜΟΡΦΩΜΕΝΟΥ ΥΠΟΒΑΘΡΟΥ ΤΩΝ ΝΗΣΙΩΝ ΜΗΛΟΣ ΚΑΙ ΚΙΜΩΛΟΣ. Η ΜΟΡΦΟΛΟΓΙΑ ΤΟΥ ΚΡΥΣΤΑΛΛΟΣΧΙΣΤΩΔΟΥΣ, ΣΕ ΣΥΝΔΥΑΣΜΟ ΜΕ ΠΕΡΙΟΧΕΣ ΠΟΥ ΠΑΡΑΤΗΡΗΘΗΚΑΝ ΠΟΛΥ ΜΙΚΡΕΣ ΤΙΜΕΣ ΕΙΔΙΚΩΝ ΗΛΕΚΤΡΙΚΩΝ ΑΝΤΙΣΤΑΣΕΩΝ, ΕΙΝΑΙ ΜΕΓΑΛΗΣ ΣΗΜΑΣΙΑΣ ΓΙΑ ΤΗΝ ΓΕΩΘΕΡΜΙΚΗ ΕΡΕΥΝΑ. (ΠΕΡΙΚΟΠΗ)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" transliteration",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/portal/ekt-subjects/EKT-voc-classifier/1048745754?language=el",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/portal/ekt-subjects/EKT-voc-classifier/1048745754?language=el",
+          "title": "OpenArchives.gr | Γεωεπιστήμες και Επιστήμες Περιβάλλοντος",
+          "description": "##### The geochemistry of fluids from an active shallow submarine hydrothermal system: Milos island, Hellenic Volcanic Arc\n\nΔημιουργός: Ragnarsdottir, KV, Baltatzis, E, Magganas, A, Valsami-Jones, E, Boyce, AJ, Waldron, S, Alexander, JL, Bailey, EH, Anderson, L\n\nΤύπος τεκμηρίου: Δημοσίευση σε περιοδικό, Επιστημονικό άρθρο\n\nΕπιστημονικό πεδίο: Γεωεπιστήμες και Επιστήμες Περιβάλλοντος\n\nΧρονολογία : 2005\n\nΓλώσσα: Αγγλική γλώσσα\n\nΠεριοδικό : JOURNAL OF VOLCANOLOGY AND GEOTHERMAL RESEARCH\n\nΦορέας: Εθνικό Μετσόβιο Πολυτεχνείο\n\nΣυλλογή: Ψηφιακό Αποθετήριο της Κεντρικής Βιβλιοθήκης του ΕΜΠ | Dspace@NTUA",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" transliteration",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4827",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4827",
+          "title": "openarchives.gr | Η Παναγία Γαλακτοτροφούσα η «Σπηλαιώτισσα» σε έργα Καπεσοβιτών ζωγράφων Ν",
+          "description": "openarchives.gr | Η Παναγία Γαλακτοτροφούσα η «Σπηλαιώτισσα» σε έργα Καπεσοβιτών ζωγράφων Ν\n\n...\n\nκμήριο παρέχεται από τον φορέα : Χριστιανική Αρχαιολογική Εταιρεία\n\n...\n\nΑποθετήριο : Δελτίον Χριστιανικής Αρχαιολογικής Εταιρείας | ΕΚΤ e Journals\n\n...\n\nΤίτλος\n\n Η Παναγία Γαλακτοτροφούσα η «Σπηλαιώτισσα» σε έργα Καπεσοβιτών ζωγράφων Ν (EL) \n\n The Virgin Galaktotrophousa the «Spelaiotissa» in works of painters from Kapesovo (EN) \n\nΔημιουργός\n\n ΝΑΝΟΥ, Μαρία \n\nΤύπος\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\n Τμήμα έκδοσης Δημοσίευση σε περιοδικό (EL) \n\nΗμερομηνία\n\nΧρονολογία\n\n Με αφετηρία δύο όμοιες εικόνες της Γαλακτοτροφούσας με την προσωνυμία «η Σπηλαιώτισσα» που συνδέονται με τον Ιωάννη του Αθανασίου από το Καπέσοβο και το γιο του Αναστάσιο Αναγνώστη, διερευνώνται: τα εικονογραφικά πρότυπα της συγκεκριμένης παραλλαγής, η πιθανή σχέση της με χαρακτικό της Μονής του Μεγάλου Σπηλαίου και η απήχηση που βρίσκει σε τοιχογραφίες, εικόνες και σχέδια του καπεσοβίτικου εργαστηρίου στο τελευταίο τέταρτο του 18ου αιώνα (1778-1793). Τα νέα δεδομένα οδηγούν στην ταύτιση του ζωγράφου Ιωάννη που υπογράφει εικόνα της Γαλακτοτροφούσας «της Σπηλαιώτισσας» στη Συλλογή Βελιμέζη με τον Καπεσοβίτη Ιωάννη του Αθανασίου και στην απόδοση δύο σχεδίων με το ίδιο θέμα (Μουσείο Μπενάκη, Συλλογή Γιαννούλη) στον ίδιο ζωγράφο ή στον κύκλο του εργαστηρίου του. (EL) \n\n Starting with the two similar icons of the Galaktotrophousa entitled «i Spelaiotissa», which are associated with Ioannis, son of Athanasios, from Kapesovo and his son Anastasios Anagnostis, the following are examined: the iconographical models of this specific variation, its possible relation to an engraving of the Mega Spelaion Monastery and its impact on wall paintings, icons and drawings of the Kapesovo workshop in the last quarter of the 18th century (1778-1793). The new information leads to identifying the painter Ioannis, who signs the icons of the Galaktotrophousa «the Spelaiotissa» in the Velimezis Collection, with Ioannis of Kapesovo, son of Athanasios, and to attributing two working drawings with the same theme (Benaki Museum, Giannoulis Collection) to the same painter or to the circle of his workshop. (EN)\n\n...\n\nΤελευταίο τέταρτο 18ου αιώνα (EL) \n\n Ιωάννης του Αθανασίου (EL) \n\n Αγίου Νικολάου (Καπέσοβο) (EL) \n\n Καπεσοβίτες ζωγράφοι (EL) \n\n Ζωγραφική (EL) \n\n Αγίου Γεωργίου (Νεγάδες) (EL) \n\n Ήπειρος (EL) \n\n Γαλακτοτροφούσα Παναγία η «Σπηλαιώτισσα» (EL) \n\n Ναοί Αγίου Νικολάου (Μακρίνο) (EL) \n\n Αγίου Νικολάου (Τσεπέλοβο) (EL) \n\n St. Nicholas (Tsepelovo) (EN) \n\n painters of Kapesovo (EN) \n\n St. George (Negades) (EN) \n\n St. Nicholas (Kapesovo) (EN) \n\n Last quarter of 18th century (EN) \n\n Epirus (EN) \n\n Ioannis son of Athanasios (EN) \n\n Churches of St. Nicholas (Makrino) (EN) \n\n Galaktotrophousa Virgin the «Spelaiotissa» (EN) \n\n Painting (EN)\n\n...\n\nΔελτίον της Χριστιανικής Αρχαιολογικής Εταιρείας; Δελτίον XAE 33 (2012), Περίοδος Δ'. Στη μνήμη του Δημήτρη Κωνστάντιου (1950-2010); 213-228 (EL)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" transliteration",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/eranistis/000088-1495",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/eranistis/000088-1495",
+          "title": "openarchives.gr | Στην Πάτμο το δέκατο έκτο αιώνα. Ο καραβοκύρης κι επιχειρηματίας Διάκος της Κρητικής",
+          "description": "Στην Πάτμο το δέκατο έκτο αιώνα. Ο καραβοκύρης κι επιχειρηματίας Διάκος της Κρητικής (EN) \n\nΔημιουργός\n\n Ζαχαριάδου, Ελισάβετ Α. \n\nΤύπος\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\n Τμήμα έκδοσης Δημοσίευση σε περιοδικό (EL) \n\nΗμερομηνία\n\n 2011-12-30 \n\nΧρονολογία\n\n ΙΝ PATMOS IN THE 16th CENTURY Diakos, Son of Kritikis, Ship-owner and BusinessmanIt is well-established that the island of Patmos was prosperous and thriving by the end of the 16th century. This article examines the case of a successful ship-owner and entrepreneur from Patmos, who can be considered as a representative of this period: with his business connected to the sea, his relations with the Ottoman authorities, his wealth and his attachment to the Greek-Orthodox faith. Although he became somehow an almost legendary figure, his will, preserved in the archive of the Monastery of Patmos, reveals his approach to thought and action.ELISABETH A. ZACHARIADOU (EN) \n\nΘέμα\n\n Diakos son of Kritikis (EN) \n\n monastery of Patmos (EN) \n\n 16th century (EN) \n\n επιχειρηματίας (EN) \n\n 16ος αιώνας (EN) \n\n καραβοκύρης (EN) \n\n Διάκος της Κρητικής (EN) \n\n μονή Αγ. Ιωάννου Θεολόγου Πάτμου (EN) \n\n ship-owner (EN) \n\n entrepreneur (EN)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" transliteration",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8556",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8556",
+          "title": "openarchives.gr | Être chrétien et adepte des lumières le XVIIle siècle au sein de l'empire Ottoman",
+          "description": "openarchives.gr | Être chrétien et adepte des lumières le XVIIle siècle au sein de l'empire Ottoman\n\n Το τεκμήριο παρέχεται από τον φορέα : Εθνικό Ίδρυμα Ερευνών (ΕΙΕ) \n\n Αποθετήριο : Ήλιος - Αποθετήριο Εθνικού Ιδρύματος Ερευνών | αποθετήρια EKT \n\nΤίτλος\n\n Être chrétien et adepte des lumières le XVIIle siècle au sein de l'empire Ottoman \n\nΔημιουργός\n\n Αποστολόπουλος, Δημήτρης \n\nΤύπος\n\n Κεφάλαιο βιβλίου \n\n \n\n Τμήμα έκδοσης Τμήμα βιβλίου (EL) \n\nΗμερομηνία\n\n 2009 \n\nΧρονολογία\n\n 2009 (EL) \n\nΕπιστημονικό πεδίο\n\n Ιστορία (EL) \n\n History (EN) \n\n Ανθρωπιστικές Επιστήμες και Τέχνες ▶ Ιστορία και Αρχαιολογία Ιστορία (EL) \n\nΘέμα\n\n Crete Othoman Empire \n\nΓλώσσα\n\n Γαλλική γλώσσα \n\nΕκδότης\n\n Kaireios Library, Andros, 2009 Καΐρειος Βιβλιοθήκη, Ανδρος, 2009 \n\nΣχολή/Τμήμα/Ινστιτούτο\n\nΓεωγραφική κάλυψη\n\n Crete \n\nΧρονική κάλυψη\n\n 18th century \n\nΠηγή\n\n Captain and Scholar. Papers in memory of Demetrios I. Polemis, p.25-34=Καπετάνιος και Λόγιος, Μελέτες στη μνήμη του Δημήτρη Ι. Πολέμη",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" transliteration",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ieim/000108-24819?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ieim/000108-24819?language=en",
+          "title": "openarchives.gr | Ο φιλόσοφος του 17ου αιώνα Ιωάννης Κωττούνιος και η ιδεολογική προσσέγγιση του έργου του",
+          "description": "openarchives.gr | Ο φιλόσοφος του 17ου αιώνα Ιωάννης Κωττούνιος και η ιδεολογική προσσέγγιση του έργου του\n\n This item is provided by the institution : Ionian Society for Historical Studies \n\nTitle\n\n Ο φιλόσοφος του 17ου αιώνα Ιωάννης Κωττούνιος και η ιδεολογική προσσέγγιση του έργου του (EL) \n\nCreator\n\n Μύαρης, Γεώργιος Κ. \n\nType\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\n Peer-reviewed Article (EN) \n\nDate\n\n 2020-09-24 \n\nYear\n\n 2020 (EN) \n\nDescription\n\n Δε διατίθεται περίληψη / no abstract available (EL) \n\nScientific field\n\nJournal\n\nLanguage\n\n Greek \n\nPublisher\n\n Ιόνιος Εταιρεία Ιστορικών Μελετών / Ionian Society for Historical Studies (EN) \n\nSchool / Department / Institute\n\n 2654-198X 1107-1559 \"Περί Ιστορίας\"; Τόμ. 4 (2003); 183-215 (EL) Peri Istorias; Vol. 4 (2003); 183-215 (EN)\n\n...\n\nΚ",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" transliteration",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-3506",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-3506",
+          "title": "openarchives.gr | Τιμὲς ἀγαθῶν καὶ ἀμοιβὲς ἐργασίας στὴ βενετοκρατούμενη Κρήτη (16ος αἰ.)",
+          "description": "openarchives.gr ... Τιμὲς ἀγαθῶν καὶ ἀμοιβὲς ἐργασίας στὴ βενετοκρατούμενη Κρήτη (16ος αἰ.)\n\n...\n\n> # Τιμὲς ἀγαθῶν καὶ ἀμοιβὲς ἐργασίας στὴ βενετοκρατούμενη Κρήτη (16ος αἰ.)\n> \n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-3506 RDF/XML JSON-LD \n> \n> \n\n Το τεκμήριο παρέχεται από τον φορέα : Ινστιτούτο Ιστορικών Ερευνών/ΕΙΕ \n\nΤίτλος\n\n Τιμὲς ἀγαθῶν καὶ ἀμοιβὲς ἐργασίας στὴ βενετοκρατούμενη Κρήτη (16ος αἰ.) (EL) \n\n Τιμὲς ἀγαθῶν καὶ ἀμοιβὲς ἐργασίας στὴ βενετοκρατούμενη Κρήτη (16ος αἰ.) (EN) \n\nΔημιουργός\n\n ΜΑΛΤΕΖΟΥ, Χρύσα Α. \n\nΤύπος\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\n Ανάλυση του υλικού (EN) \n\n Τμήμα έκδοσης Δημοσίευση σε περιοδικό (EL) \n\nΗμερομηνία\n\n 1985-09-29\n\n...\n\nΧρονολογία\n\nΠεριγραφή\n\n Chryssa A. MaltézouPrix de biens et salaires en Crète vénitienne (XVIe s.) Le registre n. 6 de la bibliothèque de Patmos appartient à la riche collection du monastère qui se rapporte au métoque de St. Jean de Stylos en Crète. C'est le livre de comptes de l'économe du dit métoque, couvrant les années de 1595 à 1601. Les renseignements fournis par ce manuscrit présentent un intérêt particulier, parce qu'ils nous permettent d'étudier les besoins et les obligations économiques du métoque et en même temps de tirer un aspect social de la vie quotidienne en Crète vénitienne à la fin du XVIe siècle.Dans cette étude sont examinées les données du registre, concernant a) les métiers et les salaires des travailleurs, et b) les prix courants des biens du marché crétois. Les informations sont traitées réunies en catégories. Suit un glossaire de termes et de mots idiomatiques. (EL)\n\n...\n\nChryssa A. MaltézouPrix de biens et salaires en Crète vénitienne (XVIe s.) Le registre n. 6 de la bibliothèque de Patmos appartient à la riche collection du monastère qui se rapporte au métoque de St. Jean de Stylos en Crète. C'est le livre de comptes de l'économe du dit métoque, couvrant les années de 1595 à 1601. Les renseignements fournis par ce manuscrit présentent un intérêt particulier, parce qu'ils nous permettent d'étudier les besoins et les obligations économiques du métoque et en même temps de tirer un aspect social de la vie quotidienne en Crète vénitienne à la fin du XVIe siècle.Dans cette étude sont examinées les données du registre, concernant a) les métiers et les salaires des travailleurs, et b) les prix courants des biens du marché crétois. Les informations sont traitées réunies en catégories. Suit un glossaire de termes et de mots idiomatiques. (EN)\n\n...\n\nΕπιστημονικό πεδίο\n\nΘέμα\n\n Οικονομία (EN) Κρήτη (EN) Βενετοκρατία (EN) Εμπόριο (EN) \n\nΠεριοδικό \n\n Βυζαντινά Σύμμεικτα \n\nΓλώσσα\n\n Ελληνική γλώσσα \n\nΕκδότης\n\n Ινστιτούτο Ιστορικών Ερευνών (ΕΙΕ) / Institute of Historical Research (IHR/NHRF) (EN) \n\nΠηγή\n\n 1791-4884 \n\n 1105-1639 \n\n Βυζαντινά Σύμμεικτα; ΣΥΜΜΕΙΚΤΑ 6; 1-32 (EL) \n\n Byzantina Symmeikta; SYMMEIKTA 6; 1-32 (EN)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" transliteration",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:openarchives.gr \\\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\\\" transliteration\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 10, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 10, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" historical name",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18086",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18086",
+          "title": "openarchives.gr | Aspects de l’intendance des Vénitiens dans l’Archipel au cours de la guerre de Morée (1684-1699)",
+          "description": "openarchives.gr | Aspects de l’intendance des Vénitiens dans l’Archipel au cours de la guerre de Morée (1684-1699)\n\n Το τεκμήριο παρέχεται από τον φορέα : Εθνικό Ίδρυμα Ερευνών (ΕΙΕ) \n\n Αποθετήριο : Ήλιος - Αποθετήριο Εθνικού Ιδρύματος Ερευνών | αποθετήρια EKT \n\nΤίτλος\n\n Aspects de l’intendance des Vénitiens dans l’Archipel au cours de la guerre de Morée (1684-1699) \n\nΔημιουργός\n\n Κουτζακιώτης, Γιώργος \n\nΣυντελεστής\n\n Μπίρταχας, Στάθης \n\nΤύπος\n\n Κεφάλαιο βιβλίου \n\n \n\n Τμήμα έκδοσης Τμήμα βιβλίου (EL) \n\nΗμερομηνία\n\n 2022 \n\nΧρονολογία\n\n 2022 (EL) \n\nΠεριγραφή\n\n The present study undertakes to shed light on the ways in which the Venetians tried to cover their pressing needs in money and foodstuffs in order to carry out their naval enterprises in the Aegean during the First Morean War. More specifically, it examines the tax collection mechanism implemented in the Archipelago, so that the Venetian fleet could find a secure livelihood there. This mechanism is described as a process, a method that highlights the modifications it has undergone as well as the role played by various characters in its operation over time. The orientation of the analysis requires that this study be divided into two parts: the first concerns the first years of the war (1684–1690), during which the collection of taxes was part of the operations of the Venetian fleet; the second part refers to the 1690s, when tax collection was entrusted to a private businessman. Consequently, this last part focuses on the action of a one particular individual, which allows us however to approach the commercial activities that had developed in the Archipelago due to the war. Moreover, it enables us to examine the kind of domination that the Most Serene Republic had imposed at least in certain islands of the Aegean (with the exception of Tinos), which historiography has not yet set forth.\n\n...\n\nος ... πό ... σ\n\n...\n\nΧρονική κάλυψη\n\n 1684–1699 17ος αι. \n\nΠηγή\n\n Venetian-Ottoman Wars",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" historical name",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl:3081692",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl:3081692",
+          "title": "openarchives.gr | Nature and origin of the Vani manganese deposit, Milos, Greece: an overview (vol 18, pg 181, 2001)",
+          "description": "openarchives.gr | Nature and origin of the Vani manganese deposit, Milos, Greece: an overview (vol 18, pg 181, 2001)\n\n Το τεκμήριο παρέχεται από τον φορέα : Εθνικό και Καποδιστριακό Πανεπιστήμιο Αθηνών \n\n Αποθετήριο : Πέργαμος \n\nΤίτλος\n\nΔημιουργός\n\n Liakopoulos, A Glasby, GP Papavassiliou, CT Boulegue, J \n\nΤύπος\n\n scientific_publication_article \n\n Επιστημονική δημοσίευση - Άρθρο Περιοδικού (EL) \n\n Scientific publication - Journal Article (EN) \n\n Τμήμα έκδοσης Δημοσίευση σε περιοδικό (EL) \n\nΧρονολογία\n\nΠάροχος\n\nΑποθετήριο / συλλογή\n\nΕπιμέρους συλλογή\n\n Άρθρο Περιοδικού (Journal Article)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" historical name",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_20903",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_20903",
+          "title": "openarchives.gr | Periphyton and its colonization in marine hydrothermal regions of island Milos (Greece)",
+          "description": "openarchives.gr | Periphyton and its colonization in marine hydrothermal regions of island Milos (Greece)\n\n Το τεκμήριο παρέχεται από τον φορέα : Εθνικό Κέντρο Τεκμηρίωσης και Ηλεκτρονικού Περιεχομένου (ΕΚΤ) \n\n Αποθετήριο : Εθνικό Αρχείο Διδακτορικών Διατριβών | ΕΚΤ ΕΑΔΔ \n\nΤίτλος\n\n Το περίφυτο και ο εποικισμός του σε θαλάσσιες περιοχές της Μήλου με υδροθερμικά φαινόμενα \n\n Periphyton and its colonization in marine hydrothermal regions of island Milos (Greece) \n\nΔημιουργός\n\n Louvrou, Ioanna Λούβρου, Ιωάννα \n\nΤύπος\n\n PhD Thesis \n\nΗμερομηνία\n\n 2007 \n\nΧρονολογία\n\n […] Αντικείμενο και στόχος αυτής της διατριβής είναι η μελέτη από συστηματική άποψη των περιφυτικών διατόμων και της ευενδολιθικής μικροχλωρίδας (κυανοβακτήρια, χλωροφύκη) σε παράκτιους βιοτόπους της νήσου Μήλου με θαλάσσια υδροθερμικά πεδία ή σε γειτνίαση με αυτά. Δίνονται επίσης όλα τα απαραίτητα στοιχεία και μία βιβλιογραφική επισκόπηση της οικολογίας και φυκο-γεωγραφίας των οργανισμών αυτών, απαραίτητη για την ταξινομιική τους. Μελετήθηκε υλικό από τον κόλπο Παλαιοχωρίου, ο οποίος παρουσιάζει έντονη υδροθερμική δραστηριότητα, από την υπερπαράλια ζώνη μέχρι βάθους 115m. Συμπληρωματικά μελετήθηκε η λιμνοθάλασσα της Αχιβαδολίμνης ως βιότοπος που γειτνιάζει με τον κόλπο της Μήλου που παρουσιάζει επίσης υδροθερμιικά φαινόμενα, καθώς και η περιοχή Σαρακίνικο με αποθέσεις θαλασσίων απολιθωμένων ιζημάτων από το Πλειστόκαινο. Συγκεκριμένα από τον κόλπο του Παλαιοχωρίου, έγιναν συλλογές επιψαμμικών διατόμων από τη χαρακτηριστική ζώνωση μεμονωμένων αναβλύσεων καθώς και επιψαμμικών διατόμων σε μεγαλύτερη απόσταση από το κέντρο της ανάβλυσης, επιλιθικών διατόμων από βραχώδεις περιοχές της παράλιας και υπερπαράλιας ζώνης, επιζωικών και επιφυτικών διατόμων της παράλιας ζώνης, καθώς και ευενδολιθικών αναπτύξεων σε οργανικής προέλευσης ασβεστιτικό υλικό. Από την Αχιβαδολίμνη έγιναν συλλογές μαλακίων, μικροβιακού τάπητα και χλωροφυκών και μελετήθηκαν τα επιζωικά διάτομα, τα διάτομα του μικροβιακού τάπητα, τα επιφυτικά διάτομα και οι ευενδολιθικοί μικροοργανισμοί. Από το Σαρακίνικο μελετήθηκαν διατομίτες του Πλειστοκαίνου. Οι μέθοδοι επεξεργασίας και παρατήρησης των διατόμων και των ευενδολιθικών μιικροοργανισμών έγιναν σύμφωνα με τις κλασικές τεχνικές. […]\n\n...\n\n[…] Objective of this thesis is the study - from a systematic point of view - of both periphytic diatoms and endoliths (cyanobacteria, chlorophytes) in island Milos, i.e. at its coastal areas with marine hydrothermal fields or in adjacency with them. Also, all essential data and a bibliographic review of ecology and phytogeography of these organisms are given, as a necessary element for their taxonomy. Material was studied from Palaeochori, i.e. a gulf of island Milos presenting intense hydrothermal activity, and in particular from its supralittoral zone up to depth of 115m. Additionally, the lagoon Ahivadolimni was studied, as a biotope that abuts with the gulf Milos (another gulf of island Milos also presenting hydrothermal activity), as well as Pleistocene marine sediments by Sarakiniko. Specifically, from the gulf Palaeochori, collections of epipsammic diatoms were made from the characteristic zonation (green, yellow, white) of vents as well as epipsammic diatoms in bigger distance than the vents centre, epilithic diatoms from rocky regions of the littoral and supralittoral zones, epizoic and epiphytic diatoms of the littoral zone, as well as endolithic growths from calcareous material of biotic origin. In the lagoon Ahivadolimni, collections of mollusks, microbial mats and chlorophytes were made to study epizoic diatoms, diatoms in microbial mats, epiphytic diatoms, as well as euendolithic cyanobacteria and chlorophytes. By Sarakiniko, fossil material (diatomites) of Pleistocene was studied. Treatment and observation of diatoms and euendoliths were made in accordance with the classic techniques. […]",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" historical name",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098",
+          "title": "openarchives.gr | A GEOPHYSICAL STUDY OF MILOS AND KIMOLOS ISLANDS",
+          "description": "openarchives ... KIM ... OS ISLAND\n\n...\n\nΤο τεκμήριο παρέχεται από τον φορέα : Εθνικό Κέντρο Τεκμηρίωσης και Ηλεκ ... νικού Περιεχομένου (ΕΚΤ)\n\n...\n\nΑποθετήριο : Εθνικό Αρχείο Διδακτορικών Διατριβών | ΕΚΤ ΕΑΔΔ \n\nΤίτλος\n\n ΓΕΩΦΥΣΙΚΗ ΔΙΑΣΚΟΠΗΣΗ ΤΩΝ ΝΗΣΙΩΝ ΜΗΛΟΣ ΚΑΙ ΚΙΜΩΛΟΣ \n\n A GEOPHYSICAL STUDY OF MILOS AND KIMOLOS ISLANDS \n\nΔημιουργός\n\n Τσόκας, Γρηγόριος Tsokas, Grigorios \n\nΤύπος\n\n PhD Thesis \n\n Διπλωματική εργασία Διδακτορική διατριβή (EL) \n\nΗμερομηνία\n\n 1985 \n\nΧρονολογία\n\n 1985 (EL) \n\n THE MAIN AIM OF THIS THESIS IS THE STUDY OF THE TECTONIC FEATURES OF THE METAMORPHIC BASEMENT OF THE ISLANDS MILOS AND KIMOLOS. THE MORPHOLOGY OF THAT CRYSTALLINE BASEMENT IS OF PRIMARY INTEREST DUE TO THE ABNORMAL HEAT FLOW OBSERVED IN BOTH ISLANDS. FURTHERMORE, THE LOCALIZATION OF AREAS SHOWING VERY SMALL RESISTIVITY VALUES SHOULD SERVE AS A DIRECT INDICATION OF CIRCULATION OF GEOTHERMAL FLUIDS. GRAVITY AND ELECTRICAL RESISTIVITY DATA WERE EMPLOYED FOR THE PURPOSE OF THIS DISSERTATION. ALL DATA HAVE BEEN GIVEN TO THE GEOPHYSICAL LABORATORY OF THE UNIVERSITY OF THESSALONIKI BY THE P.P.C. (PUBLIC POWER CORPORATION).THE DATA WERE COMPOSED FROM SEVERAL SETS MEASURED AT DIFFERENT TIMES BY DIFFERENT FIELD CREWS. THE AUTHOR PARTICIPATED TO THE FIELD CREW IN THE ACQUISITIONOF A PART OF THE DATA, BASICALLY FOR KIMOLOS, DURING AUTUMN 1984. (SHORTENED)\n\n...\n\nΗ ΔΙAΤΡΙΒΗ ΑΥΤΗ ΑΠΟΤΕΛΕΙ ΜΕΡΟΣ ΤΗΣ ΕΡΕΥΝΗΤΙΚΗΣ ΠΡΟΣΠΑΘΕΙΑΣ ΤΟΥ ΕΡΓΑΣΤΗΡΙΟΥ ΓΕΩΦΥΣΙΚΗΣ ΤΟΥ ΑΡΙΣΤΟΤΕΛΕΙΟΥ ΠΑΝΕΠΙΣΤΗΜΙΟΥ ΘΕΣΣΑΛΟΝΙΚΗΣ ΓΙΑ ΤΗΝ ΕΦΑΡΜΟΓΗ ΤΩΝ ΓΕΩΦΥΣΙΚΩΝ ΜΕΘΟΔΩΝ ΔΙΑΣΚΟΠΗΣΗΣ ΣΤΗΝ ΕΠΙΛΥΣΗ ΘΕΩΡΗΤΙΚΩΝ ΚΑΙ ΚΥΡΙΩΣ ΠΡΑΚΤΙΚΩΝ ΠΡΟΒΛΗΜΑΤΩΝ (ΕΝΤΟΠΙΣΜΟΣ ΓΕΩΘΕΡΜΙΚΩΝ ΠΕΔΙΩΝ, ΚΛΠ) ΣΤΟΝ ΕΛΛΗΝΙΚΟ ΧΩΡΟ. ΕΠΕΙΔΗ, Η ΔΙΕΞΑΓΩΓΗ ΕΡΕΥΝΩΝ ΜΕΓΑΛΗΣ ΚΛΙΜΑΚΑΣ ΜΕ ΓΕΩΦΥΣΙΚΕΣ ΔΙΑΣΚΟΠΗΣΕΙΣ ΕΙΝΑΙ ΔΑΠΑΝΗΡΗ, ΤΑ ΔΕΔΟΜΕΝΑ ΠΟΥ ΧΡΗΣΙΜΟΠΟΙΗΘΗΚΑΝ, ΧΟΡΗΓΗΘΗΚΑΝ ΑΠΟ ΤΗΝ Δ.Ε.Μ.Ε./Δ.Ε.Η. (ΔΙΕΥΘΥΝΣΗ ΕΝΑΛΛΑΚΤΙΚΩΝ ΜΟΡΦΩΝ ΕΝΕΡΓΕΙΑΣ ΤΗΣ ΔΗΜΟΣΙΑΣ ΕΠΙΧΕΙΡΗΣΗΣ ΗΛΕΚΤΡΙΣΜΟΥ). Η Δ.Ε.Η. ΧΡΗΜΑΤΟΔΟΤΗΣΕ ΤΙΣ ΕΡΕΥΝΕΣ ΣΤΑ ΝΗΣΙΑ ΜΗΛΟΣ ΚΑΙ ΚΙΜΩΛΟΣ ΚΑΙ ΧΟΡΗΓΗΣΕ ΤΑ ΔΕΔΟΜΕΝΑ ΓΙΑ ΠΑΡΑΠΕΡΑ ΕΠΕΞΕΡΓΑΣΙΑ ΣΤΟ ΕΡΓΑΣΤΗΡΙΟ ΓΕΩΦΥΣΙΚΗΣ ΤΟΥ Α.Π.Θ. ΣΤΗ ΛΗΨΗ ΕΝΟΣ ΜΕΡΟΥΣ ΤΩΝ ΔΕΔΟΜΕΝΩΝ ΣΥΜΜΕΤΕΙΧΕ ΣΤΟ ΣΥΝΕΡΓΕΙΟ ΥΠΑΙΘΡΟΥ ΚΑΙ Ο ΣΥΓΓΡΑΦΕΑΣ ΑΥΤΗΣ ΤΗΣ ΔΙΑΤΡΙΒΗΣ. ΣΚΟΠΟΣ ΤΗΣ ΔΙΑΤΡΙΒΗΣ ΑΥΤΗΣ ΕΙΝΑΙ Η ΜΕΛΕΤΗ ΤΩΝ ΤΕΚΤΟΝΙΚΩΝ ΦΑΙΝΟΜΕΝΩΝ ΤΟΥ ΜΕΤΑΜΟΡΦΩΜΕΝΟΥ ΥΠΟΒΑΘΡΟΥ ΤΩΝ ΝΗΣΙΩΝ ΜΗΛΟΣ ΚΑΙ ΚΙΜΩΛΟΣ. Η ΜΟΡΦΟΛΟΓΙΑ ΤΟΥ ΚΡΥΣΤΑΛΛΟΣΧΙΣΤΩΔΟΥΣ, ΣΕ ΣΥΝΔΥΑΣΜΟ ΜΕ ΠΕΡΙΟΧΕΣ ΠΟΥ ΠΑΡΑΤΗΡΗΘΗΚΑΝ ΠΟΛΥ ΜΙΚΡΕΣ ΤΙΜΕΣ ΕΙΔΙΚΩΝ ΗΛΕΚΤΡΙΚΩΝ ΑΝΤΙΣΤΑΣΕΩΝ, ΕΙΝΑΙ ΜΕΓΑΛΗΣ ΣΗΜΑΣΙΑΣ ΓΙΑ ΤΗΝ ΓΕΩΘΕΡΜΙΚΗ ΕΡΕΥΝΑ. (ΠΕΡΙΚΟΠΗ)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" historical name",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/portal/ekt-subjects/EKT-voc-classifier/1048745754?language=el",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/portal/ekt-subjects/EKT-voc-classifier/1048745754?language=el",
+          "title": "OpenArchives.gr | Γεωεπιστήμες και Επιστήμες Περιβάλλοντος",
+          "description": "##### The geochemistry of fluids from an active shallow submarine hydrothermal system: Milos island, Hellenic Volcanic Arc\n\nΔημιουργός: Ragnarsdottir, KV, Baltatzis, E, Magganas, A, Valsami-Jones, E, Boyce, AJ, Waldron, S, Alexander, JL, Bailey, EH, Anderson, L\n\nΤύπος τεκμηρίου: Δημοσίευση σε περιοδικό, Επιστημονικό άρθρο\n\nΕπιστημονικό πεδίο: Γεωεπιστήμες και Επιστήμες Περιβάλλοντος\n\nΧρονολογία : 2005\n\nΓλώσσα: Αγγλική γλώσσα\n\nΠεριοδικό : JOURNAL OF VOLCANOLOGY AND GEOTHERMAL RESEARCH\n\nΦορέας: Εθνικό Μετσόβιο Πολυτεχνείο\n\nΣυλλογή: Ψηφιακό Αποθετήριο της Κεντρικής Βιβλιοθήκης του ΕΜΠ | Dspace@NTUA",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" historical name",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ieim/000108-24819?language=en",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ieim/000108-24819?language=en",
+          "title": "openarchives.gr | Ο φιλόσοφος του 17ου αιώνα Ιωάννης Κωττούνιος και η ιδεολογική προσσέγγιση του έργου του",
+          "description": "openarchives.gr | Ο φιλόσοφος του 17ου αιώνα Ιωάννης Κωττούνιος και η ιδεολογική προσσέγγιση του έργου του\n\n This item is provided by the institution : Ionian Society for Historical Studies \n\nTitle\n\n Ο φιλόσοφος του 17ου αιώνα Ιωάννης Κωττούνιος και η ιδεολογική προσσέγγιση του έργου του (EL) \n\nCreator\n\n Μύαρης, Γεώργιος Κ. \n\nType\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\n Peer-reviewed Article (EN) \n\nDate\n\n 2020-09-24 \n\nYear\n\n 2020 (EN) \n\nDescription\n\n Δε διατίθεται περίληψη / no abstract available (EL) \n\nScientific field\n\nJournal\n\nLanguage\n\n Greek \n\nPublisher\n\n Ιόνιος Εταιρεία Ιστορικών Μελετών / Ionian Society for Historical Studies (EN) \n\nSchool / Department / Institute\n\n 2654-198X 1107-1559 \"Περί Ιστορίας\"; Τόμ. 4 (2003); 183-215 (EL) Peri Istorias; Vol. 4 (2003); 183-215 (EN)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" historical name",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/eranistis/000088-1495",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/eranistis/000088-1495",
+          "title": "openarchives.gr | Στην Πάτμο το δέκατο έκτο αιώνα. Ο καραβοκύρης κι επιχειρηματίας Διάκος της Κρητικής",
+          "description": "Στην Πάτμο το δέκατο έκτο αιώνα. Ο καραβοκύρης κι επιχειρηματίας Διάκος της Κρητικής (EN) \n\nΔημιουργός\n\n Ζαχαριάδου, Ελισάβετ Α. \n\nΤύπος\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\n Τμήμα έκδοσης Δημοσίευση σε περιοδικό (EL) \n\nΗμερομηνία\n\n 2011-12-30 \n\nΧρονολογία\n\n ΙΝ PATMOS IN THE 16th CENTURY Diakos, Son of Kritikis, Ship-owner and BusinessmanIt is well-established that the island of Patmos was prosperous and thriving by the end of the 16th century. This article examines the case of a successful ship-owner and entrepreneur from Patmos, who can be considered as a representative of this period: with his business connected to the sea, his relations with the Ottoman authorities, his wealth and his attachment to the Greek-Orthodox faith. Although he became somehow an almost legendary figure, his will, preserved in the archive of the Monastery of Patmos, reveals his approach to thought and action.ELISABETH A. ZACHARIADOU (EN) \n\nΘέμα\n\n Diakos son of Kritikis (EN) \n\n monastery of Patmos (EN) \n\n 16th century (EN) \n\n επιχειρηματίας (EN) \n\n 16ος αιώνας (EN) \n\n καραβοκύρης (EN) \n\n Διάκος της Κρητικής (EN) \n\n μονή Αγ. Ιωάννου Θεολόγου Πάτμου (EN) \n\n ship-owner (EN) \n\n entrepreneur (EN)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" historical name",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8556",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8556",
+          "title": "openarchives.gr | Être chrétien et adepte des lumières le XVIIle siècle au sein de l'empire Ottoman",
+          "description": "openarchives.gr | Être chrétien et adepte des lumières le XVIIle siècle au sein de l'empire Ottoman\n\n Το τεκμήριο παρέχεται από τον φορέα : Εθνικό Ίδρυμα Ερευνών (ΕΙΕ) \n\n Αποθετήριο : Ήλιος - Αποθετήριο Εθνικού Ιδρύματος Ερευνών | αποθετήρια EKT \n\nΤίτλος\n\n Être chrétien et adepte des lumières le XVIIle siècle au sein de l'empire Ottoman \n\nΔημιουργός\n\n Αποστολόπουλος, Δημήτρης \n\nΤύπος\n\n Κεφάλαιο βιβλίου \n\n \n\n Τμήμα έκδοσης Τμήμα βιβλίου (EL) \n\nΗμερομηνία\n\n 2009 \n\nΧρονολογία\n\n 2009 (EL) \n\nΕπιστημονικό πεδίο\n\n Ιστορία (EL) \n\n History (EN) \n\n Ανθρωπιστικές Επιστήμες και Τέχνες ▶ Ιστορία και Αρχαιολογία Ιστορία (EL) \n\nΘέμα\n\n Crete Othoman Empire \n\nΓλώσσα\n\n Γαλλική γλώσσα \n\nΕκδότης\n\n Kaireios Library, Andros, 2009 Καΐρειος Βιβλιοθήκη, Ανδρος, 2009 \n\nΣχολή/Τμήμα/Ινστιτούτο\n\nΓεωγραφική κάλυψη\n\n Crete \n\nΧρονική κάλυψη\n\n 18th century \n\nΠηγή\n\n Captain and Scholar. Papers in memory of Demetrios I. Polemis, p.25-34=Καπετάνιος και Λόγιος, Μελέτες στη μνήμη του Δημήτρη Ι. Πολέμη",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" historical name",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-3506",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-3506",
+          "title": "openarchives.gr | Τιμὲς ἀγαθῶν καὶ ἀμοιβὲς ἐργασίας στὴ βενετοκρατούμενη Κρήτη (16ος αἰ.)",
+          "description": "openarchives.gr | Τιμὲς ἀγαθῶν καὶ ἀμοιβὲς ἐργασίας στὴ βενετοκρατούμενη Κρήτη (16ος αἰ.)\n\n> # Τιμὲς ἀγαθῶν καὶ ἀμοιβὲς ἐργασίας στὴ βενετοκρατούμενη Κρήτη (16ος αἰ.)\n> \n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-3506 RDF/XML JSON-LD \n> \n> \n\n Το τεκμήριο παρέχεται από τον φορέα : Ινστιτούτο Ιστορικών Ερευνών/ΕΙΕ \n\nΤίτλος\n\n Τιμὲς ἀγαθῶν καὶ ἀμοιβὲς ἐργασίας στὴ βενετοκρατούμενη Κρήτη (16ος αἰ.) (EL) \n\n Τιμὲς ἀγαθῶν καὶ ἀμοιβὲς ἐργασίας στὴ βενετοκρατούμενη Κρήτη (16ος αἰ.) (EN) \n\nΔημιουργός\n\n ΜΑΛΤΕΖΟΥ, Χρύσα Α. \n\nΤύπος\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\n Ανάλυση του υλικού (EN) \n\n Τμήμα έκδοσης Δημοσίευση σε περιοδικό (EL) \n\nΗμερομηνία\n\n 1985-09-29 \n\nΧρονολογία\n\nΠεριγραφή\n\n Chryssa A. MaltézouPrix de biens et salaires en Crète vénitienne (XVIe s.) Le registre n. 6 de la bibliothèque de Patmos appartient à la riche collection du monastère qui se rapporte au métoque de St. Jean de Stylos en Crète. C'est le livre de comptes de l'économe du dit métoque, couvrant les années de 1595 à 1601. Les renseignements fournis par ce manuscrit présentent un intérêt particulier, parce qu'ils nous permettent d'étudier les besoins et les obligations économiques du métoque et en même temps de tirer un aspect social de la vie quotidienne en Crète vénitienne à la fin du XVIe siècle.Dans cette étude sont examinées les données du registre, concernant a) les métiers et les salaires des travailleurs, et b) les prix courants des biens du marché crétois. Les informations sont traitées réunies en catégories. Suit un glossaire de termes et de mots idiomatiques. (EL)\n\n...\n\nChryssa A. MaltézouPrix de biens et salaires en Crète vénitienne (XVIe s.) Le registre n. 6 de la bibliothèque de Patmos appartient à la riche collection du monastère qui se rapporte au métoque de St. Jean de Stylos en Crète. C'est le livre de comptes de l'économe du dit métoque, couvrant les années de 1595 à 1601. Les renseignements fournis par ce manuscrit présentent un intérêt particulier, parce qu'ils nous permettent d'étudier les besoins et les obligations économiques du métoque et en même temps de tirer un aspect social de la vie quotidienne en Crète vénitienne à la fin du XVIe siècle.Dans cette étude sont examinées les données du registre, concernant a) les métiers et les salaires des travailleurs, et b) les prix courants des biens du marché crétois. Les informations sont traitées réunies en catégories. Suit un glossaire de termes et de mots idiomatiques. (EN)\n\n...\n\nΕπιστημονικό πεδίο\n\nΘέμα\n\n Οικονομία (EN) Κρήτη (EN) Βενετοκρατία (EN) Εμπόριο (EN) \n\nΠεριοδικό \n\n Βυζαντινά Σύμμεικτα \n\nΓλώσσα\n\n Ελληνική γλώσσα \n\nΕκδότης\n\n Ινστιτούτο Ιστορικών Ερευνών (ΕΙΕ) / Institute of Historical Research (IHR/NHRF) (EN) \n\nΠηγή\n\n 1791-4884 \n\n 1105-1639 \n\n Βυζαντινά Σύμμεικτα; ΣΥΜΜΕΙΚΤΑ 6; 1-32 (EL) \n\n Byzantina Symmeikta; SYMMEIKTA 6; 1-32 (EN)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" historical name",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/historein/000053-35789",
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/historein/000053-35789",
+          "title": "openarchives.gr | Review of Ioannis K. Hassiotis, Ο Οδυσσέας στις θάλασσες του Νότου: Η ελληνική παρουσία στις υπερπόντιες κτήσεις της Ισπανίας (16ος–17ος αι.) [Odysseus in the southern seas: The Greek presence in the Spanish overseas territories (16th–17th century)]",
+          "description": "openarchives.gr | Review of Ioannis K. Hassiotis, Ο Οδυσσέας στις θάλασσες του Νότου: Η ελληνική παρουσία στις υπερπόντιες κτήσεις της Ισπανίας (16ος–17ος αι.) [Odysseus in the southern seas: The Greek presence in the Spanish overseas territories (16th–17th century)]\n\n> # Review of Ioannis K. Hassiotis, Ο Οδυσσέας στις θάλασσες του Νότου: Η ελληνική παρουσία στις υπερπόντιες κτήσεις της Ισπανίας (16ος–17ος αι.) [Odysseus in the southern seas: The Greek presence in the Spanish overseas territories (16th–17th century)]\n> \n> URI: https://www.openarchives.gr/aggregator-openarchives/edm/historein/000053-35789 RDF/XML JSON-LD \n> \n> \n\n Το τεκμήριο παρέχεται από τον φορέα : Εταιρεία Μελέτης της Ιστοριογραφίας και της Θεωρίας της Ιστορίας (ΕΜΙΘΙ) - Ιστορείν \n\n Αποθετήριο : Ιστορείν | ΕΚΤ e Journals \n\nΤίτλος\n\n Review of Ioannis K. Hassiotis, Ο Οδυσσέας στις θάλασσες του Νότου: Η ελληνική παρουσία στις υπερπόντιες κτήσεις της Ισπανίας (16ος–17ος αι.) [Odysseus in the southern seas: The Greek presence in the Spanish overseas territories (16th–17th century)] (EN) \n\n Hassiotis, Ioannis K. ULYSSE DANS LES MERS DU SUD. La présence grecque dans les possessions ultramarines de l'Espagne (XVIe-XVIIe siècles). (FR) \n\nΔημιουργός\n\n Sakkas, Konstantinos \n\nΤύπος\n\n info:eu-repo/semantics/article \n\n info:eu-repo/semantics/publishedVersion \n\n Τμήμα έκδοσης Δημοσίευση σε περιοδικό (EL) \n\n 2024-04-15 \n\n Review of Ioannis K. Hassiotis, Ο Οδυσσέας στις θάλασσες του Νότου: Η ελληνική παρουσία στις υπερπόντιες κτήσεις της Ισπανίας (16ος–17ος αι.). [Odysseus in the southern seas: The Greek presence in the Spanish overseas territories (16th–17th century)]. Thessaloniki: University Studio Press, 2022. 448 pp. (EN) \n\n Cette critique évalue l'œuvre d'Ioannis K. Hassiotis, Ulysse dans les mers du sud. Présence grecque dans les territoires d'outre-mer de l'Espagne (XVIe-XVIIe siècles). Hassiotis explore migration, pratiques socio-économiques, interactions avec la bureaucratie espagnole, hispanisation des noms, rôles des Grecs notables en tant que conquistadors. La monographie examine les défis des distinctions sociales-raciales et de la pureté religieuse, révélant le relativisme religieux des Grecs face à la domination catholique. L'analyse inclut la participation grecque aux institutions administratives et foncières, ainsi que les niveaux d'éducation. La critique met en évidence la fluidité et les biais dans les sources espagnoles, explorant le terme \"levantiscos\" et les défis liés à l'identification ethnique. Elle souligne la complexité des relations entre le rejet et l'utilisation stratégique des compétences grecques par la monarchie espagnole, important pour comprendre le contexte historique mondial et l'influence grecque dans les territoires d'outre-mer espagnols. (FR)",
+          "date": [],
+          "search_providers": [
+            "exa"
+          ],
+          "search_query": "site:openarchives.gr \"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" historical name",
+          "discovery_route": "WEB_SEARCH_API",
+          "description_provenance": "SEARCH_ENGINE_SNIPPET_NOT_INSPECTED_TEXT",
+          "evidence_level": "WEB_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "PUBLIC_ACCESS_ONLY_NO_LOGIN_OR_PAYWALL_BYPASS",
+          "digital_url": null,
+          "search_provider_attempts": [
+            {
+              "provider": "google",
+              "status": "REMOTE_RATE_LIMITED",
+              "request_performed": true,
+              "pagination": "NOT_EXECUTED",
+              "returned_records": 0,
+              "code": "HTTP_429"
+            },
+            {
+              "provider": "exa",
+              "status": "EXECUTED",
+              "request_performed": true,
+              "pagination": "TOP_K_ONLY",
+              "returned_records": 10,
+              "service": "Exa Search API",
+              "more_results_available": null
+            }
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:openarchives.gr \\\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\\\" historical name\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"EXECUTED\", \"request_performed\": true, \"pagination\": \"TOP_K_ONLY\", \"returned_records\": 10, \"service\": \"Exa Search API\", \"more_results_available\": null}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 10, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" alias OR aliases",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Investigate+Ioannis%2FJohn+Kapsis+%28%CE%9A%CE%B1%CF%88%CE%AE%CF%82%2F%CE%9A%CE%B1%CF%88%CE%AE%CF%82+variants%29%2C+associated+with+Milos+in+the+seventeenth+century.+Establish+identity%2C+chronology%2C+titles%2C+primary+references+and+competing+interpretations.+Do+not+merge+names+without+evidence.++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" transliteration",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Investigate+Ioannis%2FJohn+Kapsis+%28%CE%9A%CE%B1%CF%88%CE%AE%CF%82%2F%CE%9A%CE%B1%CF%88%CE%AE%CF%82+variants%29%2C+associated+with+Milos+in+the+seventeenth+century.+Establish+identity%2C+chronology%2C+titles%2C+primary+references+and+competing+interpretations.+Do+not+merge+names+without+evidence.++transliteration%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" variant spelling",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Investigate+Ioannis%2FJohn+Kapsis+%28%CE%9A%CE%B1%CF%88%CE%AE%CF%82%2F%CE%9A%CE%B1%CF%88%CE%AE%CF%82+variants%29%2C+associated+with+Milos+in+the+seventeenth+century.+Establish+identity%2C+chronology%2C+titles%2C+primary+references+and+competing+interpretations.+Do+not+merge+names+without+evidence.++variant+spelling%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Investigate Ioannis/John Kapsis (Καψής/Καψής variants), associated with Milos in the seventeenth century. Establish identity, chronology, titles, primary references and competing interpretations. Do not merge names without evidence.\" historical name",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Investigate+Ioannis%2FJohn+Kapsis+%28%CE%9A%CE%B1%CF%88%CE%AE%CF%82%2F%CE%9A%CE%B1%CF%88%CE%AE%CF%82+variants%29%2C+associated+with+Milos+in+the+seventeenth+century.+Establish+identity%2C+chronology%2C+titles%2C+primary+references+and+competing+interpretations.+Do+not+merge+names+without+evidence.++historical+name%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "result_count": 65,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}

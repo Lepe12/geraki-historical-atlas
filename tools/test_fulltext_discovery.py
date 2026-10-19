@@ -13,6 +13,12 @@ class FulltextTests(unittest.TestCase):
         self.assertIn('capsi',search_terms(self.focus))
         self.assertIn('milo',context_terms(self.focus))
         self.assertNotIn('Jean',search_terms(self.focus))
+        nominative=decompose('Ιωάννης Καψής, βασιλιάς της Μήλου')
+        self.assertIn('capsi',search_terms(nominative))
+        hit=text_match({'context_excerpt':'Giovanni Capsi, re di Milo.'},nominative)
+        self.assertEqual(hit['reason'],'FULLTEXT_COMPLETE_NAME_REQUIRES_REVIEW')
+        self.assertIn('Μήλου',hit['places'])
+        self.assertFalse(hit['identity_verified'])
         self.assertNotIn('capsi',search_terms(decompose('Henry Morgan governor of Jamaica')))
 
     def test_bare_person_queries_search_full_name_before_surname(self):

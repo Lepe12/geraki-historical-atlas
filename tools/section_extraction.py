@@ -11,13 +11,13 @@ import re
 from pathlib import Path
 from urllib.parse import urlsplit
 from candidate_context import variants, STRONG, ACTION
-from research_focus import decompose, fold
+from research_focus import decompose, fold, name_pattern, extended_name_after
 
 YEAR = re.compile(r'(?<!\d)(1\d{3}|20\d{2})(?!\d)')
 # Historical predicates beyond piracy: administrative and diplomatic actions
 # are relevant to a person research question too. All remain provisional.
 PREDICATE = re.compile(r'\b(?:αιχμαλωτ\w*|συλλαμβ\w*|συλληψ\w*|επιτεθ\w*|επιτιθ\w*|επιδρομ\w*|λεηλατ\w*|φυλακ\w*|αποφυλακ\w*|διαμαρτυρ\w*|υπομνημα\w*|αποστελλ\w*|εστειλ\w*|αναλαμβ\w*|διορι\w*|συνεργαζ\w*|αναφερ\w*|βρισκεται|διαταγ\w*|απορριπτ\w*|αρχηγια|attacked|captured|imprisoned|appointed|reported|sent|petitioned|sailed|commanded|assal\w*|cattur\w*|nomm\w*|emprisonn\w*)\b')
-FICTION = re.compile(r'\b(?:μυθιστορημα\w*|μυθοπλασ\w*|novel|fictional|libretto)\b')
+FICTION = re.compile(r'\b(?:μυθιστορημα\w*|μυθοπλασ\w*|novel|novela|romanzo|fictional|libretto)\b')
 SOCIAL = ('instagram.com','facebook.com','tiktok.com','youtube.com','linkedin.com')
 
 def read(path, default=None):
@@ -25,8 +25,10 @@ def read(path, default=None):
     return json.loads(p.read_text(encoding='utf-8')) if p.exists() else ({} if default is None else default)
 
 def matches(text, terms):
-    surface=fold(text)
-    return [term for term in terms if re.search(r'(?<!\w)'+re.escape(fold(term))+r'(?!\w)',surface)]
+    # Join only word hyphenation at a line break; never alter the stored quote
+    # or its original offsets.
+    surface=fold(re.sub(r'(?<=\w)[-\u00ad]\s*\r?\n\s*(?=\w)','',text))
+    return [term for term in terms if re.search(name_pattern(term.split()),surface)]
 
 def paragraphs(text):
     """Keep character offsets into the actual acquired text (including CRLF)."""
@@ -65,15 +67,25 @@ def extract_document(text, source, file, ctx):
         # keep the complete raw excerpt and any mediated page citation intact.
         body=re.split(r'\([^)]*(?:Θησαυρίσματα|[Bb]ibliograph|[Pp]ublication)',raw,maxsplit=1)[0]
         direct=matches(body,terms)
-        short=matches(body,surnames) if document_named or topic else []
+        # A name hundreds of paragraphs earlier cannot identify a bare surname.
+        near_topic=bool(topic and start-topic['locator']['end_char']<1600)
+        short=matches(body,surnames) if document_named or near_topic else []
         other_name=False
+        extended_name=False
+        normalized_body=re.sub(r'(?<=\w)[-\u00ad]\s*\r?\n\s*(?=\w)','',body)
         first_names={fold(t.split()[0]) for t in terms if t.split()}
         for name in short:
             # A different explicit first name must not be collapsed into the
             # requested person merely because a surname is shared.
-            for m in re.finditer(r'\b([^\W\d_]+)\s+'+re.escape(name)+r'\b',body,re.I):
+            for m in re.finditer(r'\b([^\W\d_]+)\s+'+re.escape(name)+r'\b',normalized_body,re.I):
                 before=m.group(1)
-                if before[0].isupper() and fold(before) not in first_names|{'ο','του','τον','η','της','την','the','captain','καπεταν'}:other_name=True
+                if before[0].isupper() and fold(before) not in first_names|{'ο','του','τον','η','της','την','the','captain','καπεταν','il','el','le','la','los','les','don','sir'}:other_name=True
+        for name in direct:
+            # A longer explicitly qualified name may identify a namesake. Do
+            # not infer that e.g. "Name Surname di Otherplace" is the target.
+            for hit in re.finditer(name_pattern(name.split()),fold(normalized_body)):
+                if extended_name_after(normalized_body,hit.end()):
+                    extended_name=True
         if direct:topic={'text':raw,'locator':locator(text,start,end,source,file)}
         # Pronouns alone do not establish a person. They remain a section-context
         # lead only where an explicitly named paragraph is adjacent.
@@ -90,7 +102,8 @@ def extract_document(text, source, file, ctx):
         if not dates and year_heading and lo<=year_heading['year']<=hi:scoped=[year_heading['year']]
         fiction=bool(FICTION.search(fold(body)))
         name_basis='EXPLICIT_NAME' if direct else 'SURNAME_IN_NAMED_CONTEXT' if short else 'ADJACENT_TOPIC_UNRESOLVED'
-        candidate=bool(scoped and predicates and not fiction and not continuity and not other_name)
+        candidate=bool(scoped and predicates and not fiction and not continuity and not other_name and not extended_name
+                       and (direct or document_named))
         uncertainties=['ORIGINAL_NOT_INSPECTED','SOURCE_GENEALOGY_PENDING','INDEPENDENCE_UNRESOLVED']
         if not direct:uncertainties.append('IDENTITY_ASSOCIATION_PROVISIONAL')
         if date_basis=='YEAR_HEADING':uncertainties.append('DATE_FROM_SECTION_HEADING')
@@ -99,6 +112,8 @@ def extract_document(text, source, file, ctx):
         if not predicates:uncertainties.append('ACTION_UNRESOLVED')
         if fiction:uncertainties.append('FICTION_OR_BOOK_REVIEW_CONTEXT')
         if other_name:uncertainties.append('CONFLICTING_GIVEN_NAME')
+        if extended_name:uncertainties.append('EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW')
+        if short and not direct and not document_named:uncertainties.append('SURNAME_IDENTITY_UNRESOLVED')
         if re.search(r'\b(?:εικαζ\w*|πιθανο\w*|perhaps|possibly|allegedly|hypoth\w*)\b',fold(body)):uncertainties.append('SOURCE_EXPRESSES_UNCERTAINTY')
         cite_pages=re.findall(r'(?:σελ\.|pp?\.)\s*(\d+(?:[-–]\d+)?)',raw,re.I)
         key=hashlib.sha256((file+'|'+str(start)+'|'+str(end)).encode()).hexdigest()[:20]
@@ -139,7 +154,8 @@ def build_findings(base, ctx):
 
 def answer_report(report):
     findings=report.get('findings',[])
-    dated=[f for f in findings if f['years_in_scope'] and not {'FICTION_OR_BOOK_REVIEW_CONTEXT','CONFLICTING_GIVEN_NAME'} & set(f['uncertainties'])]
+    dated=[f for f in findings if f['years_in_scope'] and not {'FICTION_OR_BOOK_REVIEW_CONTEXT','CONFLICTING_GIVEN_NAME',
+           'EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW','SURNAME_IDENTITY_UNRESOLVED'} & set(f['uncertainties'])]
     items=sorted(dated,key=lambda f:(f['years_in_scope'],f['finding_id']))
     return {'schema':'pct-source-attributed-answer-v1','question':report.get('question'),
             'target':report.get('target'),'date_range':report.get('date_range'),
