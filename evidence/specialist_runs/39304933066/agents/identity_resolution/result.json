@@ -1,0 +1,2772 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "identity_resolution",
+  "label": "Identity Resolution Agent",
+  "assignment_id": "identity_resolution:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "entity_candidates",
+    "variant_names",
+    "same_entity_assessment",
+    "collision_warnings"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "d0d2371093b65a6e9ec696dc016555e30a00224a50288199ac8fe3122e71ec73",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "identity_resolution",
+    "assignment_id": "identity_resolution:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:SearchCulture.gr / EKT",
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:OpenArchives.gr / EKT"
+    ],
+    "queries": [
+      "\"Μήλος\" variant spelling",
+      "\"Μήλος\" alias OR aliases",
+      "\"Μήλος\" historical name",
+      "\"Μήλος\" transliteration",
+      "\"Melos\" 1660-1680"
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 130,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 102,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82++variant+spelling%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82++variant+spelling%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 623, \"response_sha256\": \"bb9064277c1ceac248461b85f24a0686b66cbc5fee3f86ce53ac8c46d4d52cee\", \"elapsed_ms\": 822}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82++variant+spelling%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+transliteration\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+transliteration\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1038}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+transliteration\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+alias+OR+aliases\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+alias+OR+aliases\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1296}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+alias+OR+aliases\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+variant+spelling\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+variant+spelling\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1356}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+variant+spelling\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+historical+name\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+historical+name\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1475}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+historical+name\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 623, \"response_sha256\": \"4bc99da8dc586d4a191496fec13a4037cc9f1eed756b9b551479ed12106cfb06\", \"elapsed_ms\": 672}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82++historical+name%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82++historical+name%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 622, \"response_sha256\": \"9d1a1a3b1ff5ba6b9ef53ad0d4ec1d5293f365d2ed22312df989adb35667abd7\", \"elapsed_ms\": 731}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82++historical+name%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82++transliteration%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82++transliteration%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 622, \"response_sha256\": \"ebacb8ad2c7f1b15194e1c76516b6194f8ac52baf35b37819df97ee1986558f3\", \"elapsed_ms\": 539}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82++transliteration%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+variant+spelling&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+variant+spelling&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25577, \"response_sha256\": \"d4afe7c4b0f7944d022081b52b132bf5887527da1f72f2052649593baa18f917\", \"elapsed_ms\": 380}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+variant+spelling&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+historical+name&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+historical+name&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25573, \"response_sha256\": \"632269d89d09f25c4d7bc5ac97f2b3634fba8b2b47b402bd1a4dd957060c4d49\", \"elapsed_ms\": 87}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+historical+name&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+alias+OR+aliases&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+alias+OR+aliases&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25577, \"response_sha256\": \"607fdaa0ee8f6a92139a394e0c7e37af041c9da69c000f2cb0c1b8bee818ae8d\", \"elapsed_ms\": 360}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+alias+OR+aliases&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Melos\" 1660-1680",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Melos++1660-1680%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Melos++1660-1680%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 611, \"response_sha256\": \"f8640749320f66d5f4cf35de30f29bb563e50df17dba49d74bae845e15641040\", \"elapsed_ms\": 512}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Melos++1660-1680%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+transliteration&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+transliteration&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 31568, \"response_sha256\": \"c962a29925e5898d8ebbf90e40a369cda78a842446c75ed02f6187ea23cf094b\", \"elapsed_ms\": 94}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+transliteration&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Melos\" 1660-1680",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Melos%22+1660-1680&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 112}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Melos%22+1660-1680&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 112}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Melos\" 1660-1680",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Melos%22+1660-1680\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Melos%22+1660-1680\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 2065}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Melos%22+1660-1680\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Melos\" 1660-1680",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_36379",
+          "title": "Το μέλος στον Πλάτωνα Melos in Plato",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_36379"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/elocus/000018-dlib_8_b_9_metadata-dlib-1454585373-825867-27690.tkl",
+          "title": "Το μέλος στον Πλάτωνα Melos in Plato",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/elocus/000018-dlib_8_b_9_metadata-dlib-1454585373-825867-27690.tkl"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_12451",
+          "title": "Γενετική ανάλυση ποσοτικών χαρακτηριστικών στην πεπονιά (Cucumis melo L.)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_12451"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_38323",
+          "title": "Performance evaluation of academic libraries",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_38323"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_35029",
+          "title": "Η Θεωρία και η πράξη του εξωτερικού μέλους μέσα από τα έντυπα θεωρητικά συγγράμματα του 19ου αιώνα Theory and practice of the exoterikon melos as attested in the printed theoritical editions of 19th century",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_35029"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_55923",
+          "title": "Η θέση της Μήλου στο νησιωτικό σύμπλεγμα των Κυκλάδων των ελληνιστικών χρόνων μέσα από τα οικιστικά και ταφικά αρχαιολογικά δεδομένα The position of Milos in the island complex of the Cyclades through burial and settlement data",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_55923"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36798",
+          "title": "Η θέση της Μήλου στο νησιωτικό σύμπλεγμα των Κυκλάδων των Ελληνιστικών χρόνων μέσα από τα οικιστικά και ταφικά αρχαιολογικά δεδομένα The position of Milos in the island complex of the Cyclades through burial and settlement data",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36798"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18768",
+          "title": "New epigraphic evidence from Melos and new insights in the economic affairs of two Melian ladies in Puteoli on the basis of the Sulpicii archive",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18768"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/JHVMS/000098-21644",
+          "title": "Οι προνύμφες των Meloidae (Triungulinus) σαν εχθροί των μελισσών στην Ελλάδα First Stage Larvae of Meloidae (triungulinus) as enemies of the honey bee in Greece",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/JHVMS/000098-21644"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-207459",
+          "title": "Aluminium toxicity effects on Cucumis melo and response of diphosphonucleoside kinases",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-207459"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-101631",
+          "title": "Αξιολόγηση διαγονιδιακών φυτών Cucumis melo (πεπονιού) στα οποία έχει κατασταλεί το γονίδιο της οξειδάσης του ασκορβικού οξέος",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-101631"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-2263",
+          "title": "Λόγος και μέλος στην υμνογραφία της Μεγάλης Εβδομάδος: γλωσσικές και μουσικολογικές παρατηρήσεις Language and chant (melos) in hymnography of Great and Holy Week",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-2263"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2981330",
+          "title": "Low trans-isomers formation in the aqueous-phase Pt/TPPTS-catalyzed partial hydrogenation of methyl esters of linseed oil",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2981330"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2867904",
+          "title": "birdMelos: Δημιουργία εφαρμογής για την αυτόματη αναγνώριση των φωνημάτων των πτηνών",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2867904"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_6176",
+          "title": "Το βυζαντινό εκκλησάκι της Οσίας Μελούς στην Κω και το οικείο τοπωνύμιο",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_6176"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_57711",
+          "title": "Το Αναστασιματάριον Δανιήλ του πρωτοψάλτου The Anastasimatarion of Daniel the protopsaltes",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_57711"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3420601",
+          "title": "Το Αναστασιματάριον Δανιήλ του Πρωτοψάλτου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3420601"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A1317083",
+          "title": "Εκλεκτική υδρογόνωση των ανανεώσιμων μεθυλεστέρων του λινελαίου καταλυόμενη από συστήματα του λευκοχρύσου τροποποιημένα με το μετά Νατρίου ‘Αλας της τρισουλφονικής τριφαινυλοφωσφίνης σε υδατικό περιβάλλον",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A1317083"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-teiep_2663",
+          "title": "Καλλιέργεια πεπονιού (Cucumis Melo L.) χαμηλής κάλυψης",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-teiep_2663"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_18870",
+          "title": "Μελέτη των μηχανισμών αλλαγής χρώματος των μαργαριταριών έπειτα από επεξεργασία Etude du changement de couleur des perles par traitement",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_18870"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-5111",
+          "title": "Ανακοινώσεις εν τω Αθήνησι συγκροτηθέντι Α΄ Διεθνεί Αρχαιολογικώ Συνέδριω εν τη Αιθούση της Ακαδημίας περί των εν Μήλω Χριστιανικών Κατακομβών, του εν αυτή Βαπτιστηρίου και ετέρων Χριστιανικών αρχαιοτήτων, περί διακρίσεως των όρων Βυζαντινή Αρχαιολογία κα Papers read at the First International Archaeological Congress held in Athens, in the Hall of the Academy concerning the Christian catacombs of Melos, the Baptistery of Melos, and other Christian antiquities, concerning the distinction between the terms Byzantine archaeology and Byzantine art and the terms Christian Archaeology and Christian art.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-5111"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-334383",
+          "title": "Τα ορυχεία της Μήλου: η καταγραφή μιας διαχρονικής βιομηχανικής δραστηριότητας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-334383"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-333235",
+          "title": "Η διαθεματική διδασκαλία του Βυζαντινού και Μεταβυζαντινού Εκκλησιαστικού Μέλους στην Πρωτοβάθμια Εκπαίδευση",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-333235"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_32567",
+          "title": "Η επίδραση του ενδοφυτικού εντομοπαθογόνου μύκητα Beauveria bassiana στο ημίπτερο Aphis gossypii σε καλλιέργεια πεπονιού στην περιοχή της Κόνιτσας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_32567"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-93464",
+          "title": "The ecology and bioactivity of some Greco-Roman medicinal minerals: the case of Melos earth pigments",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-93464"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Melos%22+1660-1680&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Melos%22+1660-1680&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 641939, \"response_sha256\": \"5805b7383440a2fe241f0b0e19dba9ba7b2e1c7b1f7938f446fb58d890d182ad\", \"elapsed_ms\": 3670}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Melos%22+1660-1680&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος\" historical name",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21703",
+          "title": "Αξιοποίηση φλοίδας μήλου ως προσροφητικού μέσου για παραγωγή φίλτρων καθαρισμού νερού",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21703"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21877",
+          "title": "Μελέτη προσρόφησης κυανό του μεθυλενίου από χημική τροποποίηση πυρήνα μήλου ( Malus domestica)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21877"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-10160",
+          "title": "Καλλιέργεια Μήλων στην Περιφέρεια Δυτικής Μακεδονίας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-10160"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-12086",
+          "title": "Μελέτη των κριτηρίων συλλεκτικής ωριμότητας και της μετασυλλεκτικής φυσιολογίας καρπών μηλιάς",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-12086"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_503",
+          "title": "Παρακολούθηση υπολειμμάτων γεωργικών φαρμάκων σε μήλα κατά τη διάρκεια της ψυχροσυντήρησής τους",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_503"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_1478",
+          "title": "Μεταβολές στην ποιότητα μήλων και αχλαδιών μετά από μωλωπισμό",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_1478"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_45372",
+          "title": "Παθογόνα που προκαλούν μετασυλλεκτικές σήψεις στα μήλα και χημική καταπολέμηση",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_45372"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_45701",
+          "title": "Συστήματα συντήρησης μήλου:Η περίπτωση του \"Smartfresh\"",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_45701"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-79003",
+          "title": "Τα Θειωρυχεία της Μήλου και το τοπίο της",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-79003"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-488",
+          "title": "Παραγωγή μήλων στη Δυτική Μακεδονία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-488"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-194",
+          "title": "Εισαγωγές – εξαγωγές μήλων (Ελλάδα)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-194"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_466",
+          "title": "Καινοτόμες μέθοδοι διατήρησης της ποιότητας έτοιμων για κατανάλωση ακτινιδίων και μήλων",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_466"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_640",
+          "title": "Εξέλιξη συγκέντρωσης υπολειμμάτων εντομοκτόνων σε μήλα ολοκληρωμένης παραγωγής στη Ζαγορά",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_640"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_82144",
+          "title": "Ανάλυσης ζήτησης ενέργειας στο υβριδικό σύστημα ηλεκτρικής ενέργειας της Μήλου Analyzing power demand in the hybrid power system of the Melos Island of Greece",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_82144"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-11560",
+          "title": "Προσδιορισμός βιταμίνης C και του ολικού φαινολικού περιεχομένου σε κεράσια και μήλα της περιοχής",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-11560"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_20260",
+          "title": "ΕΙΔΙΚΕΣ ΚΑΙ ΕΝΑΛΛΑΚΤΙΚΕΣ ΜΟΡΦΕΣ ΤΟΥΡΙΣΜΟΥ:ΜΕΛΕΤΗ ΠΕΡΙΠΤΩΣΗΣ ΜΗΛΟΣ",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_20260"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-11249",
+          "title": "Προσδιορισμός φυσικοχημικών παραμέτρων σε εμπορικά δείγματα χυμών πορτοκαλιού και μήλου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-11249"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_1469",
+          "title": "Αποτελεσματικότητα φυσικών αντιοξειδωτικών στην εμφάνιση επιφανειακού εγκαύματος στα μήλα Granny Smith",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_1469"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-79051",
+          "title": "Κέντρο πλαστικών και παραστατικών τεχνών στις πρώην βιομηχανικές εγκαταστάσεις Θειωρυχείων Μήλου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-79051"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_5066",
+          "title": "ΕΞΩΛΕΜΦΑΔΕΝΙΚΑ ΜΗ-HODGKIN'S ΛΕΜΦΩΜΑΤΑ. ΣΥΧΝΟΤΗΤΑ-ΚΛΙΝΙΚΟΕΡΓΑΣΤΗΡΙΑΚΗ ΑΝΑΛΥΣΗ-ΠΡΟΓΝΩΣΤΙΚΟΙ ΠΑΡΑΓΟΝΤΕΣ. ΣΥΓΚΡΙΣΗ ΜΕ ΤΑ ΛΕΜΦΑΔΕΝΙΚΑ ΜΗ-HODGKIN'S ΛΕΜΦΩΜΑΤΑ EXTRANODAL NON-HODGKIN'S LYMPHOMA. PREVALENCE-CLINICOLABORATORY ANALYSIS-PROGNOSTIC FACTORS. COMPARISON WITH NODAL NON-HODGKIN'S LYMPHOMA",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_5066"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_547",
+          "title": "Υπολείμματα αντιοξειδωτικών και μυκητοκτόνων από μετασυλλεκτικές μεταχειρίσεις σε μήλα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_547"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-15928",
+          "title": "Περιβαλλοντική αξιολόγηση κύκλου ζωής της καλλιέργειας μήλων ορεινής Κορινθίας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-15928"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-4523",
+          "title": "Η καλλιέργεια του μήλου στην περιοχή της Αγιάς",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-4523"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-5471",
+          "title": "Η παραγωγή μήλων στο Νομό Καστοριάς",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-5471"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_28171",
+          "title": "Ιοειδή μηλοειδών και πυρηνοκάρπων στην Ελλάδα: μοριακός χαρακτηρισμός και φυλογενετικές σχέσεις Pome and stone fruit viroids in Greece: molecular characterization and phylogenetic analysis",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_28171"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+historical+name&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+historical+name&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 1491680, \"response_sha256\": \"5edb04cd9018f63e2bb8639a80b8e76c2f7b67ae63ba62f5290d4d1787194239\", \"elapsed_ms\": 3919}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+historical+name&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος\" alias OR aliases",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21703",
+          "title": "Αξιοποίηση φλοίδας μήλου ως προσροφητικού μέσου για παραγωγή φίλτρων καθαρισμού νερού",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21703"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21877",
+          "title": "Μελέτη προσρόφησης κυανό του μεθυλενίου από χημική τροποποίηση πυρήνα μήλου ( Malus domestica)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21877"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-10160",
+          "title": "Καλλιέργεια Μήλων στην Περιφέρεια Δυτικής Μακεδονίας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-10160"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-12086",
+          "title": "Μελέτη των κριτηρίων συλλεκτικής ωριμότητας και της μετασυλλεκτικής φυσιολογίας καρπών μηλιάς",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-12086"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_503",
+          "title": "Παρακολούθηση υπολειμμάτων γεωργικών φαρμάκων σε μήλα κατά τη διάρκεια της ψυχροσυντήρησής τους",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_503"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_1478",
+          "title": "Μεταβολές στην ποιότητα μήλων και αχλαδιών μετά από μωλωπισμό",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_1478"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_45372",
+          "title": "Παθογόνα που προκαλούν μετασυλλεκτικές σήψεις στα μήλα και χημική καταπολέμηση",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_45372"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_45701",
+          "title": "Συστήματα συντήρησης μήλου:Η περίπτωση του \"Smartfresh\"",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_45701"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-79003",
+          "title": "Τα Θειωρυχεία της Μήλου και το τοπίο της",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-79003"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-488",
+          "title": "Παραγωγή μήλων στη Δυτική Μακεδονία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-488"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-194",
+          "title": "Εισαγωγές – εξαγωγές μήλων (Ελλάδα)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-194"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_466",
+          "title": "Καινοτόμες μέθοδοι διατήρησης της ποιότητας έτοιμων για κατανάλωση ακτινιδίων και μήλων",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_466"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_640",
+          "title": "Εξέλιξη συγκέντρωσης υπολειμμάτων εντομοκτόνων σε μήλα ολοκληρωμένης παραγωγής στη Ζαγορά",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_640"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_82144",
+          "title": "Ανάλυσης ζήτησης ενέργειας στο υβριδικό σύστημα ηλεκτρικής ενέργειας της Μήλου Analyzing power demand in the hybrid power system of the Melos Island of Greece",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_82144"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-11560",
+          "title": "Προσδιορισμός βιταμίνης C και του ολικού φαινολικού περιεχομένου σε κεράσια και μήλα της περιοχής",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-11560"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_20260",
+          "title": "ΕΙΔΙΚΕΣ ΚΑΙ ΕΝΑΛΛΑΚΤΙΚΕΣ ΜΟΡΦΕΣ ΤΟΥΡΙΣΜΟΥ:ΜΕΛΕΤΗ ΠΕΡΙΠΤΩΣΗΣ ΜΗΛΟΣ",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_20260"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-11249",
+          "title": "Προσδιορισμός φυσικοχημικών παραμέτρων σε εμπορικά δείγματα χυμών πορτοκαλιού και μήλου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-11249"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_1469",
+          "title": "Αποτελεσματικότητα φυσικών αντιοξειδωτικών στην εμφάνιση επιφανειακού εγκαύματος στα μήλα Granny Smith",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_1469"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-79051",
+          "title": "Κέντρο πλαστικών και παραστατικών τεχνών στις πρώην βιομηχανικές εγκαταστάσεις Θειωρυχείων Μήλου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-79051"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_5066",
+          "title": "ΕΞΩΛΕΜΦΑΔΕΝΙΚΑ ΜΗ-HODGKIN'S ΛΕΜΦΩΜΑΤΑ. ΣΥΧΝΟΤΗΤΑ-ΚΛΙΝΙΚΟΕΡΓΑΣΤΗΡΙΑΚΗ ΑΝΑΛΥΣΗ-ΠΡΟΓΝΩΣΤΙΚΟΙ ΠΑΡΑΓΟΝΤΕΣ. ΣΥΓΚΡΙΣΗ ΜΕ ΤΑ ΛΕΜΦΑΔΕΝΙΚΑ ΜΗ-HODGKIN'S ΛΕΜΦΩΜΑΤΑ EXTRANODAL NON-HODGKIN'S LYMPHOMA. PREVALENCE-CLINICOLABORATORY ANALYSIS-PROGNOSTIC FACTORS. COMPARISON WITH NODAL NON-HODGKIN'S LYMPHOMA",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_5066"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_547",
+          "title": "Υπολείμματα αντιοξειδωτικών και μυκητοκτόνων από μετασυλλεκτικές μεταχειρίσεις σε μήλα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_547"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-15928",
+          "title": "Περιβαλλοντική αξιολόγηση κύκλου ζωής της καλλιέργειας μήλων ορεινής Κορινθίας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-15928"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-4523",
+          "title": "Η καλλιέργεια του μήλου στην περιοχή της Αγιάς",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-4523"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-5471",
+          "title": "Η παραγωγή μήλων στο Νομό Καστοριάς",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-5471"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_28171",
+          "title": "Ιοειδή μηλοειδών και πυρηνοκάρπων στην Ελλάδα: μοριακός χαρακτηρισμός και φυλογενετικές σχέσεις Pome and stone fruit viroids in Greece: molecular characterization and phylogenetic analysis",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_28171"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+alias+OR+aliases&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+alias+OR+aliases&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 1491682, \"response_sha256\": \"d842c98a4d101b958805bdcbae64d1e42600173b5f6afd57a0e0dff155468c5d\", \"elapsed_ms\": 4057}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+alias+OR+aliases&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος\" variant spelling",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21703",
+          "title": "Αξιοποίηση φλοίδας μήλου ως προσροφητικού μέσου για παραγωγή φίλτρων καθαρισμού νερού",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21703"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21877",
+          "title": "Μελέτη προσρόφησης κυανό του μεθυλενίου από χημική τροποποίηση πυρήνα μήλου ( Malus domestica)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21877"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-10160",
+          "title": "Καλλιέργεια Μήλων στην Περιφέρεια Δυτικής Μακεδονίας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-10160"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-12086",
+          "title": "Μελέτη των κριτηρίων συλλεκτικής ωριμότητας και της μετασυλλεκτικής φυσιολογίας καρπών μηλιάς",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-12086"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_503",
+          "title": "Παρακολούθηση υπολειμμάτων γεωργικών φαρμάκων σε μήλα κατά τη διάρκεια της ψυχροσυντήρησής τους",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_503"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_1478",
+          "title": "Μεταβολές στην ποιότητα μήλων και αχλαδιών μετά από μωλωπισμό",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_1478"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_45372",
+          "title": "Παθογόνα που προκαλούν μετασυλλεκτικές σήψεις στα μήλα και χημική καταπολέμηση",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_45372"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_45701",
+          "title": "Συστήματα συντήρησης μήλου:Η περίπτωση του \"Smartfresh\"",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_45701"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-79003",
+          "title": "Τα Θειωρυχεία της Μήλου και το τοπίο της",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-79003"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-488",
+          "title": "Παραγωγή μήλων στη Δυτική Μακεδονία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-488"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-194",
+          "title": "Εισαγωγές – εξαγωγές μήλων (Ελλάδα)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-194"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_466",
+          "title": "Καινοτόμες μέθοδοι διατήρησης της ποιότητας έτοιμων για κατανάλωση ακτινιδίων και μήλων",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_466"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_640",
+          "title": "Εξέλιξη συγκέντρωσης υπολειμμάτων εντομοκτόνων σε μήλα ολοκληρωμένης παραγωγής στη Ζαγορά",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_640"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_82144",
+          "title": "Ανάλυσης ζήτησης ενέργειας στο υβριδικό σύστημα ηλεκτρικής ενέργειας της Μήλου Analyzing power demand in the hybrid power system of the Melos Island of Greece",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_82144"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-11560",
+          "title": "Προσδιορισμός βιταμίνης C και του ολικού φαινολικού περιεχομένου σε κεράσια και μήλα της περιοχής",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-11560"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_20260",
+          "title": "ΕΙΔΙΚΕΣ ΚΑΙ ΕΝΑΛΛΑΚΤΙΚΕΣ ΜΟΡΦΕΣ ΤΟΥΡΙΣΜΟΥ:ΜΕΛΕΤΗ ΠΕΡΙΠΤΩΣΗΣ ΜΗΛΟΣ",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_20260"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-11249",
+          "title": "Προσδιορισμός φυσικοχημικών παραμέτρων σε εμπορικά δείγματα χυμών πορτοκαλιού και μήλου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-11249"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_1469",
+          "title": "Αποτελεσματικότητα φυσικών αντιοξειδωτικών στην εμφάνιση επιφανειακού εγκαύματος στα μήλα Granny Smith",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_1469"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-79051",
+          "title": "Κέντρο πλαστικών και παραστατικών τεχνών στις πρώην βιομηχανικές εγκαταστάσεις Θειωρυχείων Μήλου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-79051"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_5066",
+          "title": "ΕΞΩΛΕΜΦΑΔΕΝΙΚΑ ΜΗ-HODGKIN'S ΛΕΜΦΩΜΑΤΑ. ΣΥΧΝΟΤΗΤΑ-ΚΛΙΝΙΚΟΕΡΓΑΣΤΗΡΙΑΚΗ ΑΝΑΛΥΣΗ-ΠΡΟΓΝΩΣΤΙΚΟΙ ΠΑΡΑΓΟΝΤΕΣ. ΣΥΓΚΡΙΣΗ ΜΕ ΤΑ ΛΕΜΦΑΔΕΝΙΚΑ ΜΗ-HODGKIN'S ΛΕΜΦΩΜΑΤΑ EXTRANODAL NON-HODGKIN'S LYMPHOMA. PREVALENCE-CLINICOLABORATORY ANALYSIS-PROGNOSTIC FACTORS. COMPARISON WITH NODAL NON-HODGKIN'S LYMPHOMA",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_5066"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_547",
+          "title": "Υπολείμματα αντιοξειδωτικών και μυκητοκτόνων από μετασυλλεκτικές μεταχειρίσεις σε μήλα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_547"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-15928",
+          "title": "Περιβαλλοντική αξιολόγηση κύκλου ζωής της καλλιέργειας μήλων ορεινής Κορινθίας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-15928"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-4523",
+          "title": "Η καλλιέργεια του μήλου στην περιοχή της Αγιάς",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-4523"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-5471",
+          "title": "Η παραγωγή μήλων στο Νομό Καστοριάς",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-5471"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_28171",
+          "title": "Ιοειδή μηλοειδών και πυρηνοκάρπων στην Ελλάδα: μοριακός χαρακτηρισμός και φυλογενετικές σχέσεις Pome and stone fruit viroids in Greece: molecular characterization and phylogenetic analysis",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_28171"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+variant+spelling&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+variant+spelling&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 1491682, \"response_sha256\": \"c46ce51ce02138ca307136bc42ea399a5c75e1839d395c21dcddc39ba8da4f11\", \"elapsed_ms\": 4233}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+variant+spelling&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος\" transliteration",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_34437",
+          "title": "Textual phenomena addressing youth: Orthographic, typographic, and ideological aspects of the Greek-Cypriot dialect",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_34437"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_15638",
+          "title": "Ο εξαγγλισμός της Νέας Ελληνικής : μια ποιοτική και ποσοτική μελέτη Evaluating Anglicisation in Modern Greek : a qualitative and quantitative survey",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_15638"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_48416",
+          "title": "Ο εξαγγλισμός της νέας ελληνικής: μία ποιοτική και ποσοτική μελέτη L’anglicisation du grec moderne: une étude qualitative et quantitative",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_48416"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-296959",
+          "title": "Roman-alphabeted Greek and transliteration in the digital language practices of Greek secondary school pupils on Facebook",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-296959"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_4935",
+          "title": "Ανάπτυξη μεθόδου με σκοπό την αναγνώριση και εξαγωγή θεματικών λέξεων κλειδιών από διευθύνσεις ιστοσελίδων του ελληνικού Διαδικτύου Keyword identification within Greek URLs",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_4935"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-123186",
+          "title": "Κοινοί θρησκευτικοί όροι ανάμεσα στην αραμαϊκή επιγραφή της Deir 'Alla και στην Παλαιά Διαθήκη: γλωσσολογική και θρησκειοιστορική συγκριτική μελέτη",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-123186"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2993815",
+          "title": "The Greek and Latin Cherubikon",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2993815"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2993026",
+          "title": "Symptomatology and Modes of Emplotment: Paranoid Tropes",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2993026"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/episteme/000109-27644",
+          "title": "The deconstruction of Byzantine mode-organization and the new Chrysanthine ‘order’",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/episteme/000109-27644"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21703",
+          "title": "Αξιοποίηση φλοίδας μήλου ως προσροφητικού μέσου για παραγωγή φίλτρων καθαρισμού νερού",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21703"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21877",
+          "title": "Μελέτη προσρόφησης κυανό του μεθυλενίου από χημική τροποποίηση πυρήνα μήλου ( Malus domestica)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21877"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_21218",
+          "title": "Sentience",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_21218"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-10160",
+          "title": "Καλλιέργεια Μήλων στην Περιφέρεια Δυτικής Μακεδονίας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-10160"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-12086",
+          "title": "Μελέτη των κριτηρίων συλλεκτικής ωριμότητας και της μετασυλλεκτικής φυσιολογίας καρπών μηλιάς",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-12086"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_503",
+          "title": "Παρακολούθηση υπολειμμάτων γεωργικών φαρμάκων σε μήλα κατά τη διάρκεια της ψυχροσυντήρησής τους",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_503"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_1478",
+          "title": "Μεταβολές στην ποιότητα μήλων και αχλαδιών μετά από μωλωπισμό",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_1478"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_45372",
+          "title": "Παθογόνα που προκαλούν μετασυλλεκτικές σήψεις στα μήλα και χημική καταπολέμηση",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_45372"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_45701",
+          "title": "Συστήματα συντήρησης μήλου:Η περίπτωση του \"Smartfresh\"",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_45701"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-79003",
+          "title": "Τα Θειωρυχεία της Μήλου και το τοπίο της",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-79003"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_15143",
+          "title": "Generative Solid Modelling Employing Natural Language Understanding and 3D Data",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_15143"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-488",
+          "title": "Παραγωγή μήλων στη Δυτική Μακεδονία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-488"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-194",
+          "title": "Εισαγωγές – εξαγωγές μήλων (Ελλάδα)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-194"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_466",
+          "title": "Καινοτόμες μέθοδοι διατήρησης της ποιότητας έτοιμων για κατανάλωση ακτινιδίων και μήλων",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_466"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_640",
+          "title": "Εξέλιξη συγκέντρωσης υπολειμμάτων εντομοκτόνων σε μήλα ολοκληρωμένης παραγωγής στη Ζαγορά",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_640"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_82144",
+          "title": "Ανάλυσης ζήτησης ενέργειας στο υβριδικό σύστημα ηλεκτρικής ενέργειας της Μήλου Analyzing power demand in the hybrid power system of the Melos Island of Greece",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_82144"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+transliteration&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+transliteration&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 1514417, \"response_sha256\": \"5f9a984321ab283144aa92afcfa431b8f476048e8d2e7545d711b265a11eec52\", \"elapsed_ms\": 7981}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22+transliteration&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "39304933066",
+    "agent_id": "identity_resolution",
+    "source_leads": [
+      {
+        "id": "lead_718c86845f9e4d65dab942a8",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_36379",
+        "title": "Το μέλος στον Πλάτωνα Melos in Plato",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_241bc2a5dbb4b7f274fb6c51",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/elocus/000018-dlib_8_b_9_metadata-dlib-1454585373-825867-27690.tkl",
+        "title": "Το μέλος στον Πλάτωνα Melos in Plato",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4318bd6dbfcd9f179eac2287",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_12451",
+        "title": "Γενετική ανάλυση ποσοτικών χαρακτηριστικών στην πεπονιά (Cucumis melo L.)",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fed26a932ac5afef1d38a3b2",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_38323",
+        "title": "Performance evaluation of academic libraries",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7e57a7ba2268d2cf88acfd2f",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_35029",
+        "title": "Η Θεωρία και η πράξη του εξωτερικού μέλους μέσα από τα έντυπα θεωρητικά συγγράμματα του 19ου αιώνα Theory and practice of the exoterikon melos as attested in the printed theoritical editions of 19th century",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b0ce24916e2873b798b46a10",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_55923",
+        "title": "Η θέση της Μήλου στο νησιωτικό σύμπλεγμα των Κυκλάδων των ελληνιστικών χρόνων μέσα από τα οικιστικά και ταφικά αρχαιολογικά δεδομένα The position of Milos in the island complex of the Cyclades through burial and settlement data",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f29f2782726b3233c98c58ea",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36798",
+        "title": "Η θέση της Μήλου στο νησιωτικό σύμπλεγμα των Κυκλάδων των Ελληνιστικών χρόνων μέσα από τα οικιστικά και ταφικά αρχαιολογικά δεδομένα The position of Milos in the island complex of the Cyclades through burial and settlement data",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1a29dae6e51cc35b60af7234",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18768",
+        "title": "New epigraphic evidence from Melos and new insights in the economic affairs of two Melian ladies in Puteoli on the basis of the Sulpicii archive",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_000ce40d47ea7bbffcca0771",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/JHVMS/000098-21644",
+        "title": "Οι προνύμφες των Meloidae (Triungulinus) σαν εχθροί των μελισσών στην Ελλάδα First Stage Larvae of Meloidae (triungulinus) as enemies of the honey bee in Greece",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_67b4f1de980e67534dfa2d61",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-207459",
+        "title": "Aluminium toxicity effects on Cucumis melo and response of diphosphonucleoside kinases",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d9c7a9f027b9755b65b6d308",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-101631",
+        "title": "Αξιολόγηση διαγονιδιακών φυτών Cucumis melo (πεπονιού) στα οποία έχει κατασταλεί το γονίδιο της οξειδάσης του ασκορβικού οξέος",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_69441298bf186df738f7102d",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-2263",
+        "title": "Λόγος και μέλος στην υμνογραφία της Μεγάλης Εβδομάδος: γλωσσικές και μουσικολογικές παρατηρήσεις Language and chant (melos) in hymnography of Great and Holy Week",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a9b2f4ca3d2400edf701f3cb",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2981330",
+        "title": "Low trans-isomers formation in the aqueous-phase Pt/TPPTS-catalyzed partial hydrogenation of methyl esters of linseed oil",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c794a23ec98943889f614c26",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2867904",
+        "title": "birdMelos: Δημιουργία εφαρμογής για την αυτόματη αναγνώριση των φωνημάτων των πτηνών",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7ff0b3a22310f7b0eea20fe0",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_6176",
+        "title": "Το βυζαντινό εκκλησάκι της Οσίας Μελούς στην Κω και το οικείο τοπωνύμιο",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_260fd85960c2af25b81df924",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_57711",
+        "title": "Το Αναστασιματάριον Δανιήλ του πρωτοψάλτου The Anastasimatarion of Daniel the protopsaltes",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_13589b4248834f8f672d7623",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3420601",
+        "title": "Το Αναστασιματάριον Δανιήλ του Πρωτοψάλτου",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1c72e8d03a58188749465318",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A1317083",
+        "title": "Εκλεκτική υδρογόνωση των ανανεώσιμων μεθυλεστέρων του λινελαίου καταλυόμενη από συστήματα του λευκοχρύσου τροποποιημένα με το μετά Νατρίου ‘Αλας της τρισουλφονικής τριφαινυλοφωσφίνης σε υδατικό περιβάλλον",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8f6e6a5ea6462e878caa7367",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-teiep_2663",
+        "title": "Καλλιέργεια πεπονιού (Cucumis Melo L.) χαμηλής κάλυψης",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_aa7e831c6266db564b7911e6",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_18870",
+        "title": "Μελέτη των μηχανισμών αλλαγής χρώματος των μαργαριταριών έπειτα από επεξεργασία Etude du changement de couleur des perles par traitement",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_710e0e413320d7f432a3aae1",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-5111",
+        "title": "Ανακοινώσεις εν τω Αθήνησι συγκροτηθέντι Α΄ Διεθνεί Αρχαιολογικώ Συνέδριω εν τη Αιθούση της Ακαδημίας περί των εν Μήλω Χριστιανικών Κατακομβών, του εν αυτή Βαπτιστηρίου και ετέρων Χριστιανικών αρχαιοτήτων, περί διακρίσεως των όρων Βυζαντινή Αρχαιολογία κα Papers read at the First International Archaeological Congress held in Athens, in the Hall of the Academy concerning the Christian catacombs of Melos, the Baptistery of Melos, and other Christian antiquities, concerning the distinction between the terms Byzantine archaeology and Byzantine art and the terms Christian Archaeology and Christian art.",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7ca5b43981ddfa5197c8068f",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-334383",
+        "title": "Τα ορυχεία της Μήλου: η καταγραφή μιας διαχρονικής βιομηχανικής δραστηριότητας",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1d31fff0370e4ea431d32189",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-333235",
+        "title": "Η διαθεματική διδασκαλία του Βυζαντινού και Μεταβυζαντινού Εκκλησιαστικού Μέλους στην Πρωτοβάθμια Εκπαίδευση",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_25dbbb5940286749ee81f273",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_32567",
+        "title": "Η επίδραση του ενδοφυτικού εντομοπαθογόνου μύκητα Beauveria bassiana στο ημίπτερο Aphis gossypii σε καλλιέργεια πεπονιού στην περιοχή της Κόνιτσας",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9f8bb62b012eb8a206be47ad",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-93464",
+        "title": "The ecology and bioactivity of some Greco-Roman medicinal minerals: the case of Melos earth pigments",
+        "query": "\"Melos\" 1660-1680",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_be86d9a88615e2325b0d809e",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21703",
+        "title": "Αξιοποίηση φλοίδας μήλου ως προσροφητικού μέσου για παραγωγή φίλτρων καθαρισμού νερού",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ca85ef3749839de5169e3d4c",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21877",
+        "title": "Μελέτη προσρόφησης κυανό του μεθυλενίου από χημική τροποποίηση πυρήνα μήλου ( Malus domestica)",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3554b3d8e4cf3ad5599d720f",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-10160",
+        "title": "Καλλιέργεια Μήλων στην Περιφέρεια Δυτικής Μακεδονίας",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5ff57bb4b9f792970256df83",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-12086",
+        "title": "Μελέτη των κριτηρίων συλλεκτικής ωριμότητας και της μετασυλλεκτικής φυσιολογίας καρπών μηλιάς",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_931c7a90753b5977589bfaa4",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_503",
+        "title": "Παρακολούθηση υπολειμμάτων γεωργικών φαρμάκων σε μήλα κατά τη διάρκεια της ψυχροσυντήρησής τους",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7fe8ba2213560d7bcb7ef035",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_1478",
+        "title": "Μεταβολές στην ποιότητα μήλων και αχλαδιών μετά από μωλωπισμό",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7b0a8344b2fbfc860fdb6da0",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_45372",
+        "title": "Παθογόνα που προκαλούν μετασυλλεκτικές σήψεις στα μήλα και χημική καταπολέμηση",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fc8f31514caee4ab245e5545",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_45701",
+        "title": "Συστήματα συντήρησης μήλου:Η περίπτωση του \"Smartfresh\"",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_046af1d4ea73bea6d513245c",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-79003",
+        "title": "Τα Θειωρυχεία της Μήλου και το τοπίο της",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0f198922744b25c5bbf0a12d",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-488",
+        "title": "Παραγωγή μήλων στη Δυτική Μακεδονία",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c258f70724eb5b04840ff7c9",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-194",
+        "title": "Εισαγωγές – εξαγωγές μήλων (Ελλάδα)",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f085060f3d2f0527041472af",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_466",
+        "title": "Καινοτόμες μέθοδοι διατήρησης της ποιότητας έτοιμων για κατανάλωση ακτινιδίων και μήλων",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b6049970a6f70d328d27cc04",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_640",
+        "title": "Εξέλιξη συγκέντρωσης υπολειμμάτων εντομοκτόνων σε μήλα ολοκληρωμένης παραγωγής στη Ζαγορά",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_27c089256913b1e91440cd5b",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_82144",
+        "title": "Ανάλυσης ζήτησης ενέργειας στο υβριδικό σύστημα ηλεκτρικής ενέργειας της Μήλου Analyzing power demand in the hybrid power system of the Melos Island of Greece",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_67b3aa10b04108f6c21777df",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-11560",
+        "title": "Προσδιορισμός βιταμίνης C και του ολικού φαινολικού περιεχομένου σε κεράσια και μήλα της περιοχής",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_cd485cc5d25977b51d8b1470",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_20260",
+        "title": "ΕΙΔΙΚΕΣ ΚΑΙ ΕΝΑΛΛΑΚΤΙΚΕΣ ΜΟΡΦΕΣ ΤΟΥΡΙΣΜΟΥ:ΜΕΛΕΤΗ ΠΕΡΙΠΤΩΣΗΣ ΜΗΛΟΣ",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_098abf31c6f29c091ac31942",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-11249",
+        "title": "Προσδιορισμός φυσικοχημικών παραμέτρων σε εμπορικά δείγματα χυμών πορτοκαλιού και μήλου",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1725d5567aacde8ce065ffdb",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_1469",
+        "title": "Αποτελεσματικότητα φυσικών αντιοξειδωτικών στην εμφάνιση επιφανειακού εγκαύματος στα μήλα Granny Smith",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_911da7934c0ea7861caa1485",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-79051",
+        "title": "Κέντρο πλαστικών και παραστατικών τεχνών στις πρώην βιομηχανικές εγκαταστάσεις Θειωρυχείων Μήλου",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a0c13be7be04fbe27a3f454c",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_5066",
+        "title": "ΕΞΩΛΕΜΦΑΔΕΝΙΚΑ ΜΗ-HODGKIN'S ΛΕΜΦΩΜΑΤΑ. ΣΥΧΝΟΤΗΤΑ-ΚΛΙΝΙΚΟΕΡΓΑΣΤΗΡΙΑΚΗ ΑΝΑΛΥΣΗ-ΠΡΟΓΝΩΣΤΙΚΟΙ ΠΑΡΑΓΟΝΤΕΣ. ΣΥΓΚΡΙΣΗ ΜΕ ΤΑ ΛΕΜΦΑΔΕΝΙΚΑ ΜΗ-HODGKIN'S ΛΕΜΦΩΜΑΤΑ EXTRANODAL NON-HODGKIN'S LYMPHOMA. PREVALENCE-CLINICOLABORATORY ANALYSIS-PROGNOSTIC FACTORS. COMPARISON WITH NODAL NON-HODGKIN'S LYMPHOMA",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6c0c737166e9e802d8d6cb6a",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_547",
+        "title": "Υπολείμματα αντιοξειδωτικών και μυκητοκτόνων από μετασυλλεκτικές μεταχειρίσεις σε μήλα",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d71151b89e26b0aa0186e844",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-15928",
+        "title": "Περιβαλλοντική αξιολόγηση κύκλου ζωής της καλλιέργειας μήλων ορεινής Κορινθίας",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0d0f1a159acc61c5c917a63a",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-4523",
+        "title": "Η καλλιέργεια του μήλου στην περιοχή της Αγιάς",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_218d04145160ad700839a8c5",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-5471",
+        "title": "Η παραγωγή μήλων στο Νομό Καστοριάς",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8f13e2e6741b309591b23ce2",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_28171",
+        "title": "Ιοειδή μηλοειδών και πυρηνοκάρπων στην Ελλάδα: μοριακός χαρακτηρισμός και φυλογενετικές σχέσεις Pome and stone fruit viroids in Greece: molecular characterization and phylogenetic analysis",
+        "query": "\"Μήλος\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2dc24acab77863964214a21a",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_34437",
+        "title": "Textual phenomena addressing youth: Orthographic, typographic, and ideological aspects of the Greek-Cypriot dialect",
+        "query": "\"Μήλος\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_65f3e9191b602cfc0d73b391",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_15638",
+        "title": "Ο εξαγγλισμός της Νέας Ελληνικής : μια ποιοτική και ποσοτική μελέτη Evaluating Anglicisation in Modern Greek : a qualitative and quantitative survey",
+        "query": "\"Μήλος\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_471dbb6f10ace873a56d01b3",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_48416",
+        "title": "Ο εξαγγλισμός της νέας ελληνικής: μία ποιοτική και ποσοτική μελέτη L’anglicisation du grec moderne: une étude qualitative et quantitative",
+        "query": "\"Μήλος\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_007d40db76a961312ef9e2bd",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-296959",
+        "title": "Roman-alphabeted Greek and transliteration in the digital language practices of Greek secondary school pupils on Facebook",
+        "query": "\"Μήλος\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_575f8ac6bb99a0ca9437b934",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_4935",
+        "title": "Ανάπτυξη μεθόδου με σκοπό την αναγνώριση και εξαγωγή θεματικών λέξεων κλειδιών από διευθύνσεις ιστοσελίδων του ελληνικού Διαδικτύου Keyword identification within Greek URLs",
+        "query": "\"Μήλος\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fb894d34429cf7038b68fa38",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-123186",
+        "title": "Κοινοί θρησκευτικοί όροι ανάμεσα στην αραμαϊκή επιγραφή της Deir 'Alla και στην Παλαιά Διαθήκη: γλωσσολογική και θρησκειοιστορική συγκριτική μελέτη",
+        "query": "\"Μήλος\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_54ff7a993dd6b6bf04f1d504",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2993815",
+        "title": "The Greek and Latin Cherubikon",
+        "query": "\"Μήλος\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3c02b1f7ce1d1cf4a824aa07",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2993026",
+        "title": "Symptomatology and Modes of Emplotment: Paranoid Tropes",
+        "query": "\"Μήλος\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0ed9e87d892d29e1ef424866",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/episteme/000109-27644",
+        "title": "The deconstruction of Byzantine mode-organization and the new Chrysanthine ‘order’",
+        "query": "\"Μήλος\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3473b22639381af8fe2b7f6b",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_21218",
+        "title": "Sentience",
+        "query": "\"Μήλος\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d973b6840efa1be4625ea2b0",
+        "run_id": "39304933066",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_15143",
+        "title": "Generative Solid Modelling Employing Natural Language Understanding and 3D Data",
+        "query": "\"Μήλος\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      }
+    ],
+    "connector_errors": [
+      {
+        "connector_id": "repo:Internet Culturale",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Melos%22+1660-1680&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 112}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      }
+    ],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "REMOTE_UNAVAILABLE",
+      "hits": [],
+      "verified_count": 0,
+      "error": "HTTPError"
+    }
+  },
+  "result_count": 125,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
