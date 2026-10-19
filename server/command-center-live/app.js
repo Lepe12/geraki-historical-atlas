@@ -256,6 +256,32 @@ const server=http.createServer(async(req,res)=>{
       meta.state="LEARNED";meta.reviewed_at=record.reviewed_at;meta.accepted_items=items.length;meta.attested_quotes=record.historical_evidence.attestations.length;writeKnowledgeIndex(index);
       return json(res,200,{status:"LEARNED",source_id:sourceId,accepted_items:items.length,pages:pages.length,attested_quotes:record.historical_evidence.attestations.length,unresolved_quotes:record.historical_evidence.unresolved.length,historically_verified:false});
     }
+    if(req.method==="POST"&&p==="/knowledge/agent-search"){
+      const auth=String(req.headers.authorization||"");
+      if(!auth.startsWith("Bearer "))return json(res,401,{error:"missing_oidc"});
+      await verifyGithubOidc(auth.slice(7));
+      const body=JSON.parse(await readBody(req));
+      const query=String(body?.query||"").trim().toLowerCase();
+      if(query.length<3||query.length>200)return json(res,400,{error:"invalid_query"});
+      const hits=[];
+      for(const meta of readKnowledgeIndex().filter(x=>x.state==="LEARNED").slice(0,500)){
+        try{
+          const rec=JSON.parse(fs.readFileSync(knowledgeRecordPath(meta.source_id),"utf8"));
+          const attestations=rec.historical_evidence?.attestations||[];
+          for(const att of attestations){
+            if(!String(att.exact_excerpt||"").toLowerCase().includes(query))continue;
+            hits.push({source_id:meta.source_id,source_name:meta.original_name,
+              attestation_id:att.id,page:att.page,locator:att.locator,
+              exact_excerpt:att.exact_excerpt,stage:"INGESTED_UNREVIEWED",
+              original_pdf_replayed:false,historically_verified:false});
+            if(hits.length>=12)break;
+          }
+        }catch(_){}
+        if(hits.length>=12)break;
+      }
+      return json(res,200,{schema:"nabou-agent-learning-evidence-v1",query,hits,
+        count:hits.length,verified_count:0,acquisition_basis:"OPERATOR_SUBMITTED_PDF_PAGE_TEXT"});
+    }
     if(req.method==="GET"&&p==="/knowledge/evidence"){
       if(!sessionAuthorized(req)&&!operatorAuthorized(req))return json(res,401,{error:"operator_authorization_required"});
       const sourceId=String(u.searchParams.get("source_id")||"");
