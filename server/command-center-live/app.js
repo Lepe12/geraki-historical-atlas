@@ -7,6 +7,7 @@ const crypto=require("crypto");
 const fs=require("fs");
 const path=require("path");
 const {URL}=require("url");
+const {execFile}=require("node:child_process");
 const {fromReviewedKnowledge}=require("./historical-evidence");
 const {replayPdf}=require("./pdf-evidence");
 
@@ -174,6 +175,15 @@ function atomicJson(filename,value){
 function knowledgeMutationAuthorized(req){
   return operatorAuthorized(req)||(sessionAuthorized(req)&&trustedWebOrigin(req));
 }
+function syncLearningEvidence(sourceId){
+  const cli=process.env.PCT_EVIDENCE_STORAGE_CLI||path.resolve(__dirname,"../../tools/storage/pct_research_store.php");
+  if(!fs.existsSync(cli))return Promise.resolve({status:"STAGED",reason:"HOST_LOCAL_STORAGE_CLI_NOT_INSTALLED"});
+  return new Promise(resolve=>execFile(process.env.PCT_PHP_BIN||"/opt/plesk/php/8.4/bin/php",[cli,"evidence-learning",sourceId],
+    {timeout:20000,maxBuffer:65536,env:{...process.env,PCT_KNOWLEDGE_DIR:KNOWLEDGE_DIR}},(error,stdout)=>{
+      let result;try{result=JSON.parse(stdout.trim());}catch(_){return resolve({status:"STAGED",reason:"HOST_LOCAL_STORAGE_UNAVAILABLE"});}
+      resolve(!error&&result.status==="PASS"?{status:"DATABASE_COMMITTED",result:result.result}:{status:"STAGED",reason:"DATABASE_IMPORT_BLOCKED"});
+    }));
+}
 function safeFileName(name){
   return String(name||"source.pdf").replace(/[^A-Za-z0-9._() -]+/g,"_").slice(0,180)||"source.pdf";
 }
@@ -279,7 +289,8 @@ const server=http.createServer(async(req,res)=>{
       atomicJson(recordPath,record);
       const currentIndex=readKnowledgeIndex(),currentMeta=currentIndex.find(x=>x.source_id===sourceId);
       currentMeta.state="LEARNED";currentMeta.reviewed_at=record.reviewed_at;currentMeta.accepted_items=record.items.length;currentMeta.attested_quotes=record.historical_evidence.attestations.length;writeKnowledgeIndex(currentIndex);
-      return json(res,200,{status:"LEARNED",source_id:sourceId,accepted_items:record.items.length,pages:pages.length,attested_quotes:record.historical_evidence.attestations.length,unresolved_quotes:record.historical_evidence.unresolved.length,historically_verified:false});
+      const storage=await syncLearningEvidence(sourceId);
+      return json(res,200,{storage,status:"LEARNED",source_id:sourceId,accepted_items:record.items.length,pages:pages.length,attested_quotes:record.historical_evidence.attestations.length,unresolved_quotes:record.historical_evidence.unresolved.length,historically_verified:false});
     }
     if(req.method==="POST"&&p==="/knowledge/agent-search"){
       const auth=String(req.headers.authorization||"");

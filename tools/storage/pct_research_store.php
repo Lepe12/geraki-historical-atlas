@@ -6,6 +6,7 @@ const PCT_VHOST = '/var/www/vhosts/piratecartography.com';
 const PCT_PRIVATE = PCT_VHOST . '/piratecartography-system';
 const PCT_GIT = PCT_VHOST . '/git/geraki-historical-atlas.git';
 const PCT_TEXT_LIMIT = 16777216;
+require_once __DIR__.'/historical_evidence.php';
 
 function emit(array $value): void {
     echo json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR), PHP_EOL;
@@ -129,6 +130,17 @@ function importRun(PDO $db,string $run,array $entries,string $commit,GitBlobs $r
                 foreach (($data['events']??[]) as $i=>$item) if (is_array($item)) { importItem($db,$run,$lane,'EVENT_CANDIDATE',$item,$docKey,(int)$i); $eventCount++; }
             }
         }
+        $bundles=array_filter($entries,fn($e)=>str_ends_with($e['relative'],'/historical_evidence_bundle.json'));
+        foreach ($bundles as $entry) {
+            if (!heInstalled($db)) {audit($db,$run,'HISTORICAL_EVIDENCE_IMPORT','BLOCKED',['reason'=>'EVIDENCE_SCHEMA_NOT_INSTALLED']);continue;}
+            $bundle=json_decode($reader->read($entry['blob']),true,512,JSON_THROW_ON_ERROR);
+            $byPath=[];foreach ($entries as $item)$byPath[$item['relative']]=$item;
+            $result=heImportBundle($db,$bundle,function(string $path)use($reader,$byPath):string{
+                if (!isset($byPath[$path])||$byPath[$path]['bytes']>PCT_TEXT_LIMIT)throw new RuntimeException('DURABLE_SOURCE_TEXT_MISSING');
+                return $reader->read($byPath[$path]['blob']);
+            });
+            audit($db,$run,'HISTORICAL_EVIDENCE_IMPORT','PASS',$result);
+        }
         $jobs=array_values(array_unique(array_filter(array_column($identity,'job'),fn($x)=>is_string($x)&&$x!=='')));
         $hashes=array_values(array_unique(array_filter(array_column($identity,'hash'),fn($x)=>is_string($x)&&preg_match('/^[a-f0-9]{64}$/D',$x))));
         $requests=[]; foreach ($identity as $i) if (is_array($i['request'])) $requests[json_encode($i['request'],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)]=$i['request'];
@@ -149,6 +161,7 @@ function status(PDO $db): array {
     $counts['verified_items']=(int)$db->query('SELECT COUNT(*) FROM pc_research_items WHERE is_verified=1')->fetchColumn();
     return ['database'=>'piratecartography','backend'=>'host-local-mariadb','counts'=>$counts,'recent_runs'=>$db->query('SELECT run_id,target,identity_status,document_count,imported_at FROM pc_research_runs ORDER BY imported_at DESC,run_id DESC LIMIT 10')->fetchAll()];
 }
+if (defined('PCT_STORAGE_LIBRARY_ONLY')) return;
 try {
     $action=$argv[1]??'status';
     if ($action==='self-test-parser') {
@@ -159,7 +172,19 @@ try {
         emit(['status'=>'PASS','tests'=>['tree_parser','invalid_tree_rejected','utf8_gzip_roundtrip']]); exit;
     }
     $db=database();
-    if ($action==='install') {
+    if ($action==='evidence-prepare') {
+        $lock=fopen(PCT_PRIVATE.'/pct-research-storage.lock','c');
+        if (!$lock||!flock($lock,LOCK_EX|LOCK_NB))throw new RuntimeException('OTHER_IMPORT_RUNNING');
+        $backup=heBackup($db,PCT_PRIVATE.'/backups');
+        $migration=heMigrate($db);
+        emit(['status'=>'PASS','backup'=>$backup,'migration'=>$migration]);
+        flock($lock,LOCK_UN);fclose($lock);
+    } elseif ($action==='evidence-learning') {
+        $directory=getenv('PCT_KNOWLEDGE_DIR')?:__DIR__.'/../../server/command-center-live/knowledge-data';
+        emit(['status'=>'PASS','result'=>heImportLearning($db,$directory,$argv[2]??'')]);
+    } elseif ($action==='evidence-status') {
+        emit(['installed'=>heInstalled($db),'migrations'=>heInstalled($db)?$db->query('SELECT * FROM pc_he_schema_migrations')->fetchAll():[]]);
+    } elseif ($action==='install') {
         $schema=file_get_contents(__DIR__.'/schema.sql'); if ($schema===false) throw new RuntimeException('SCHEMA_MISSING');
         foreach (explode(';',$schema) as $statement) if (trim($statement)!=='') $db->exec($statement);
         emit(['status'=>'PASS','schema'=>'pct-host-local-storage-v1']);

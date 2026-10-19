@@ -99,6 +99,12 @@ def migrate(connection):
     try:
         cursor.execute('SELECT DATABASE()')
         if cursor.fetchone()[0]!='piratecartography':raise ValueError('WRONG_DATABASE_BLOCKED')
+        checksum=hashlib.sha256(schema.encode()).hexdigest()
+        cursor.execute("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='pc_he_schema_migrations'")
+        if cursor.fetchone():
+            cursor.execute('SELECT schema_sha256 FROM pc_he_schema_migrations WHERE version=%s',('evidence-v2',))
+            previous=cursor.fetchone()
+            if previous and previous[0]!=checksum:raise ValueError('MIGRATION_CHECKSUM_CHANGED')
         cursor.execute("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='pc_he_citations'")
         if cursor.fetchone():
             cursor.execute('SELECT COUNT(*) FROM pc_he_citations c LEFT JOIN pc_he_sources s ON s.id=c.source_id WHERE s.id IS NULL')
@@ -117,3 +123,45 @@ def migrate(connection):
         connection.commit()
         return {'version':'evidence-v2','schema_sha256':checksum,'database':'piratecartography'}
     finally:cursor.close()
+
+
+def store_research_graph(cursor,graph):
+    """Persist the validated graph in the same MariaDB and caller transaction."""
+    from tools.historical_research_graph import export_jsonld
+    export_jsonld(graph['entities'],graph['relations'])
+    citations={e['id']:e['properties'] for e in graph['entities'] if e['entity_type']=='Citation'}
+    for entity in graph['entities']:
+        properties=json.dumps(entity.get('properties',{}),sort_keys=True,ensure_ascii=False)
+        cursor.execute('SELECT entity_type,label,properties_json FROM pc_he_entities WHERE id=%s',(entity['id'],))
+        existing=cursor.fetchone()
+        values=(entity['entity_type'],entity['label'],properties)
+        if existing:
+            if existing[0]!=values[0] or existing[1]!=values[1] or json.loads(existing[2])!=json.loads(values[2]):raise ValueError('Immutable graph entity conflict')
+        else:
+            cursor.execute('INSERT INTO pc_he_entities (id,entity_type,label,properties_json) VALUES (%s,%s,%s,%s)',(entity['id'],*values))
+    for relation in graph['relations']:
+        for cid in relation['citation_ids']:
+            c=citations[cid]
+            cursor.execute('SELECT id FROM pc_he_citations WHERE attestation_id=%s AND source_id=%s AND locator=%s AND exact_excerpt=%s LIMIT 1',
+                           (relation.get('attestation_id',relation['subject_id']),c['source_id'],c['locator'],c['exact_excerpt']))
+            result=cursor.fetchone()
+            if not result:raise ValueError('Persistent citation required before graph relation')
+            identifier=relation['id']+':'+str(result[0])
+            values=(relation['subject_id'],relation['predicate'],relation['object_id'],result[0],relation['assertion_class'])
+            cursor.execute('SELECT subject_id,predicate,object_id,citation_id,assertion_class FROM pc_he_relations WHERE id=%s',(identifier,))
+            existing=cursor.fetchone()
+            if existing and tuple(existing)!=values:raise ValueError('Immutable graph relation conflict')
+            if not existing:cursor.execute('INSERT INTO pc_he_relations (id,subject_id,predicate,object_id,citation_id,assertion_class) VALUES (%s,%s,%s,%s,%s,%s)',(identifier,*values))
+
+
+def query_entities(cursor,entity_type,start_year=None,end_year=None,limit=100):
+    from tools.historical_research_graph import TYPES
+    if entity_type not in TYPES or type(limit) is not int or not 1<=limit<=500:raise ValueError('Invalid graph query')
+    sql='SELECT id,entity_type,label,properties_json FROM pc_he_entities WHERE entity_type=%s'
+    args=[entity_type]
+    if start_year is not None or end_year is not None:
+        if type(start_year) is not int or type(end_year) is not int or start_year>end_year:raise ValueError('Invalid temporal query')
+        sql+=" AND JSON_VALID(properties_json) AND (JSON_EXTRACT(properties_json,'$.start_year') IS NULL OR JSON_EXTRACT(properties_json,'$.start_year')<=%s) AND (JSON_EXTRACT(properties_json,'$.end_year') IS NULL OR JSON_EXTRACT(properties_json,'$.end_year')>=%s)"
+        args.extend([end_year,start_year])
+    cursor.execute(sql+' ORDER BY id LIMIT %s',(*args,limit))
+    return cursor.fetchall()

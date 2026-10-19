@@ -6,6 +6,7 @@ const path = require("node:path");
 const http = require("node:http");
 const root = fs.mkdtempSync(path.join(os.tmpdir(), "nabou-learning-test-"));
 process.env.PCT_KNOWLEDGE_DIR = root;
+process.env.PCT_EVIDENCE_STORAGE_CLI = path.join(root,"test-storage-disabled.php");
 process.env.PCT_OPERATOR_TOKEN = "local-test-operator-token";
 const {server} = require("./app");
 const auth={authorization:"Bearer local-test-operator-token"};

@@ -9,6 +9,12 @@ on:
       - 'tools/storage/historical_evidence*'
       - 'tools/storage/validate_mariadb_evidence.py'
       - 'tools/research_evidence_bridge.py'
+      - 'tools/historical_authority_resolver.py'
+      - 'tools/historical_research_graph.py'
+      - 'tools/persistent_evidence_bundle.py'
+      - 'tools/test_historical_context.py'
+      - 'tools/storage/historical_evidence.php'
+      - 'tools/storage/pct_research_store.php'
       - 'server/command-center-live/**'
       - '.github/workflows/historical-evidence-tests.yml'
   workflow_dispatch:
@@ -26,13 +32,17 @@ jobs:
       - name: Python syntax and source-first agent/evidence tests
         run: |
           python3 -m compileall -q tools/historical_attestations.py tools/research_evidence_bridge.py tools/orchestrator/jarvis_specialist_worker.py tools/storage/historical_evidence_store.py
-          python3 -m unittest -v tools.test_historical_attestations tools.test_research_evidence_bridge tools.storage.test_historical_evidence_store
+          PYTHONPATH=.:tools python3 -m unittest -v tools.test_historical_attestations tools.test_research_evidence_bridge tools.storage.test_historical_evidence_store tools.test_historical_context
       - name: Existing Node command-center tests
         run: node server/command-center-live/self-test.js
       - name: Install public PDF and OCR tools
         run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-eng tesseract-ocr-ell
       - name: PDF Learning HTTP integration tests
         run: node server/command-center-live/learning-integration-test.js
+      - name: Actual image-only PDF OCR and bounding boxes
+        run: |
+          python3 -m pip install 'Pillow==12.0.0'
+          python3 server/command-center-live/pdf-evidence-integration-test.py
   real-mariadb:
     runs-on: ubuntu-latest
     services:
@@ -55,6 +65,11 @@ jobs:
       - uses: actions/checkout@v4
       - run: python3 -m pip install 'PyMySQL==1.1.2'
       - run: python3 tools/storage/validate_mariadb_evidence.py --receipt /tmp/evidence-database-test.json
+      - name: Existing host PHP adapter and backup/restore integration
+        run: |
+          php -l tools/storage/pct_research_store.php
+          php tools/storage/pct_research_store.php self-test-parser
+          php tools/storage/test_historical_evidence_live.php
       - name: Restart actual isolated DB server
         run: |
           docker restart '${{ job.services.database.id }}'

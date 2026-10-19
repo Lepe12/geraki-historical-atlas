@@ -32,6 +32,8 @@ def main():
     for filename,value in [('answer.json',answer),('geographic_findings.json',geographic(answer))]:
         (out/filename).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
     (out/'answer.md').write_text(render(answer))
+    from persistent_evidence_bundle import write as write_bundle
+    write_bundle(out/'historical_evidence_bundle.json',answer)
     report=validate(parent,analysis_root=dest)
     (out/'validation_report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     print(json.dumps({'status':report['status'],'counts':report['counts'],'blockers':report['blockers']}))

@@ -5,8 +5,9 @@ import os
 from pathlib import Path
 import uuid
 import pymysql
+from tools.historical_research_graph import bundle_graph
 from tools.historical_attestations import Attestation, Citation, MatchCandidate, freeze_candidate_set
-from tools.storage.historical_evidence_store import migrate, transaction, store_source, store_attestation, store_candidate_set, review_attestation
+from tools.storage.historical_evidence_store import migrate, transaction, store_source, store_attestation, store_candidate_set, review_attestation, store_research_graph, query_entities
 
 
 def main():
@@ -28,6 +29,11 @@ def main():
     with transaction(c) as cur:
         store_source(cur,{'id':key,'title':'Synthetic transactional fixture, not a historical source'})
         store_attestation(cur,att)
+        graph=bundle_graph({'sources':[{'id':key,'title':'Synthetic transactional fixture'}],
+                           'attestations':[att.to_record()]})
+        store_research_graph(cur,graph)
+        store_research_graph(cur,graph)
+        assert query_entities(cur,'Source')
         store_candidate_set(cur,freeze_candidate_set([MatchCandidate('mention',key,.8,'fixture')],key,{'fixture':True}))
     for decision in ('OPERATOR_ACCEPTED','RETRACTED'):
         with transaction(c) as cur:review_attestation(cur,att.id,'test operator',decision,'Synthetic transaction test')
@@ -43,7 +49,7 @@ def main():
         cur.execute('SELECT status FROM pc_he_attestations WHERE id=%s',(att.id,));assert cur.fetchone()[0]=='RETRACTED'
     receipt={'test_environment':'ISOLATED_LOCAL_MARIADB_NOT_PRODUCTION','database_version':version,
              'migration':migration,'attestation_id':att.id,'checks':['idempotent_migration','transactional_source_and_citation',
-             'missing_source_foreign_key','rollback_after_failure','candidate_snapshot','audited_review_and_retraction'],
+             'missing_source_foreign_key','rollback_after_failure','candidate_snapshot','citation_backed_graph_and_bounded_query','audited_review_and_retraction'],
              'status':'PASS','restart_readback':'NOT_YET_RUN'}
     dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(json.dumps(receipt,indent=2)+'\n')
     print(json.dumps(receipt));c.close()

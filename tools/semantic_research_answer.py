@@ -83,6 +83,7 @@ def collect(run_root):
                     excluded.append({'finding_id':f.get('finding_id'),'reason':'DATE_HEADING_LOCATOR_MISMATCH'});continue
             key=digest([surface(raw),f.get('years_in_scope',[]),f.get('date_basis')])
             provenance={'lane':p.parent.parent.name,'url':f['url'],'title':f.get('title'),
+                        'acquired_text_path':str(file.relative_to(run_root)),
                         'finding_id':f.get('finding_id'),'locator':loc,'source_text_sha256':f['source_text_sha256'],
                         'reported_archival_reference':f.get('reported_archival_reference')}
             if key in groups:
@@ -95,8 +96,8 @@ def collect(run_root):
             groups[key]=row;seen.append(row)
     # In-scope passages first, then useful unresolved context. Nothing is erased
     # from lane evidence; bounded model coverage is recorded explicitly.
-    from research_topics import BASES
-    seen.sort(key=lambda x:(not bool(x['years_in_scope']),not bool(re.search(BASES,surface(x['text']).casefold())),len(x['text']),x['evidence_id']))
+    from research_topics import BASES,normalized
+    seen.sort(key=lambda x:(not bool(x['years_in_scope']),not bool(re.search(BASES,normalized(x['text']))),len(x['text']),x['evidence_id']))
     return seen,excluded
 
 def model_evidence(row):
@@ -308,7 +309,7 @@ def execute(run_root, question, caller=call, config=None, output_root=None):
     # Identical model items are grouped by ID, not counted as corroboration.
     out['claims']=list({c['claim_id']:c for c in out['claims']}.values())
     claims=out['claims']
-    review=invoke('adversarial_reviewer',RULES+'\nROLE: challenge every proposed claim against its supplied quotation. Flag any alleged corsair base inferred only from a raid, any date outside the question, or an unsupported place identity. Return {"supported_claim_ids":[],"flagged_claims":[{"claim_id":"ID","reason":"reason"}],"contradictions":[{"claim_ids":["IDs"],"explanation":"reason"}],"limitations":[]}. Use only supplied IDs. Supported means model review only, never historical verification. Distinguish actual conflicting source statements from different dates, actors or scope.\nCLAIMS_JSON:\n'+json.dumps([model_claim(c) for c in claims],ensure_ascii=False))
+    review=invoke('adversarial_reviewer',RULES+'\nQUESTION: '+question+'\nROLE: challenge every proposed claim against its supplied quotation. Flag any alleged corsair base inferred only from a raid, any date outside the question, or an unsupported place identity. Return {"supported_claim_ids":[],"flagged_claims":[{"claim_id":"ID","reason":"reason"}],"contradictions":[{"claim_ids":["IDs"],"explanation":"reason"}],"limitations":[]}. Use only supplied IDs. Supported means model review only, never historical verification. Distinguish actual conflicting source statements from different dates, actors or scope.\nCLAIMS_JSON:\n'+json.dumps([model_claim(c) for c in claims],ensure_ascii=False))
     valid={c['claim_id'] for c in claims}
     if not isinstance(review,dict) or forbidden(review) or not isinstance(review.get('supported_claim_ids'),list) or any(not isinstance(cid,str) or cid not in valid for cid in review['supported_claim_ids']):
         out['status']='REVIEW_FAILED';return out
@@ -379,6 +380,8 @@ def main():
     dest=root/'research_answer';dest.mkdir(exist_ok=True)
     (dest/'answer.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (dest/'answer.md').write_text(render(out),encoding='utf-8')
+    from persistent_evidence_bundle import write as write_bundle
+    write_bundle(dest/'historical_evidence_bundle.json',out)
     from research_geographic_findings import build
     geographic=build(out)
     (dest/'geographic_findings.json').write_text(json.dumps(geographic,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
