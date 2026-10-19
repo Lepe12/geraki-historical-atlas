@@ -3,6 +3,8 @@ import argparse
 import datetime
 import json
 from pathlib import Path
+import re
+from urllib.parse import urlsplit
 
 def read(path):
     return json.loads(path.read_text()) if path.is_file() else {}
@@ -19,10 +21,32 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
         raw_candidates.extend(read(lane/'structured_output/candidate_events.json').get('events',[]))
         expansion=read(lane/'repository_plans'/f'{lane.name}.json').get('semantic_query_expansion')
         if expansion and not queries:queries.append(expansion)
-    acquired=[r for r in acquisitions if r.get('status')=='TEXT_ACQUIRED' and any(str(f).endswith('.txt') for f in r.get('files',[]))]
+    acquired=[];challenge_pages=[]
+    for r in acquisitions:
+        if r.get('status')!='TEXT_ACQUIRED' or not any(str(f).endswith('.txt') for f in r.get('files',[])):continue
+        files=r.get('files',[]);web=r.get('web_acquisition') or {}
+        url=str(r.get('acquired_source_url') or r.get('url') or '')
+        host=(urlsplit(url).hostname or '').lower()
+        kind=('PDF_DOCUMENT_TEXT' if any(str(f).endswith('.pdf') for f in files) else
+              'OCR_DOCUMENT_TEXT' if any(str(f).endswith('_djvu.txt') for f in files) else
+              'PAGE_IMAGE_OCR' if web.get('source_type')=='IMAGE_OCR' else
+              'CATALOGUE_METADATA_TEXT' if host in ('catalogue.bnf.fr','www.openarchives.gr','www.searchculture.gr','pares.cultura.gob.es') or '/server/api/core/items/' in url else 'WEB_PAGE_TEXT')
+        if kind=='WEB_PAGE_TEXT':
+            for lane in root.iterdir():
+                for filename in files:
+                    file=lane/str(filename)
+                    if str(filename).endswith('.txt') and file.is_file():
+                        text=file.read_text(errors='replace')[:5000]
+                        if re.search(r'verify.{0,80}(?:not.{0,10}robot|human)|checking your browser|enable javascript.{0,80}continue',text,re.I|re.S):
+                            kind='ACCESS_CHALLENGE_NOT_SOURCE'
+                        break
+        if kind=='ACCESS_CHALLENGE_NOT_SOURCE':
+            challenge_pages.append({'url':url,'reason':'CHALLENGE_PAGE_IN_LEGACY_ACQUISITION_NOT_HISTORICAL_TEXT'});continue
+        acquired.append({**r,'content_kind':kind})
     sources={str(r.get('acquired_source_url') or r.get('url') or r.get('identifier')):{
         'title':r.get('title'),'url':r.get('acquired_source_url') or r.get('url'),
-        'repository':r.get('discovery_repository'),'status':r.get('status'),'files':r.get('files')}
+        'repository':r.get('discovery_repository'),'status':r.get('status'),'files':r.get('files'),
+        'content_kind':r['content_kind']}
         for r in acquired}
     probes=[]
     for p in sorted(validation_root.glob('*/endpoint-report.json')):
@@ -43,7 +67,11 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
         'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
         'status':'INCOMPLETE' if blockers else 'PROVISIONAL_RESEARCH_PIPELINE_PASSED',
         'research_question':answer.get('question'),'sources_acquired':list(sources.values()),
-        'counts':{'unique_acquired_source_urls':len(sources),'raw_candidate_events':len(raw_candidates),
+        'counts':{'unique_acquired_source_urls':len(sources),
+                  'document_or_page_ocr_urls':sum(s['content_kind'] in ('PDF_DOCUMENT_TEXT','OCR_DOCUMENT_TEXT','PAGE_IMAGE_OCR') for s in sources.values()),
+                  'catalogue_metadata_urls':sum(s['content_kind']=='CATALOGUE_METADATA_TEXT' for s in sources.values()),
+                  'other_webpage_urls':sum(s['content_kind']=='WEB_PAGE_TEXT' for s in sources.values()),
+                  'excluded_access_challenge_pages':len(challenge_pages),'raw_candidate_events':len(raw_candidates),
                   'replayed_evidence':len(answer.get('evidence',[])),
                   'model_claims':len(answer.get('claims',[])),
                   'candidate_place_findings':len(geographic.get('findings',[])),
@@ -56,6 +84,7 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
         'native_connector_tests':latest.get('native_connector_tests',[]),
         'connector_endpoint_tests':latest.get('connectors',[]),
         'blockers':blockers,'verification_violations':violations,
+        'excluded_access_challenges':challenge_pages,
         'limits':['BOUNDED_SEARCH_NOT_ALL_RELEVANT_SOURCES','MODEL_ANALYSIS_NOT_HISTORICAL_VERIFICATION',
                   'ORIGINAL_INSPECTION_AND_GENEALOGY_MAY_REMAIN_PENDING',
                   'AUTHENTICATED_ARCHIVES_NOT_SEARCHED_WITHOUT_AUTHORIZED_SESSION']}

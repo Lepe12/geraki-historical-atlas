@@ -2,7 +2,7 @@
 # Run only from the authorized hosting shell, after confirming the Plesk app root.
 set -eu
 umask 077
-COMMIT=1224343dbdd10acd55c9e5f78974d3750d642276
+COMMIT=8e35bf4318740261aa3ebcbd33da636d29e0233f
 : "${PCT_APP_ROOT:?BLOCKED: set PCT_APP_ROOT to the confirmed live Plesk Node application root}"
 APP="$(CDPATH= cd "$PCT_APP_ROOT" && pwd -P)"
 ROOT="$(CDPATH= cd "$APP/../.." && pwd -P)"
@@ -44,17 +44,17 @@ trap 'exit 143' TERM HUP
 TMP="$(mktemp -d "$APP/.nabou-evidence-deploy.XXXXXXXX")"
 BASE="https://raw.githubusercontent.com/Lepe12/geraki-historical-atlas/$COMMIT"
 cat > "$TMP/files.sha256" <<'HASHES'
-f2a87fda0432225d77f80a64588d8904ac2bc5c80e6a81156ba6158b7ee1e6f3 server/command-center-live/historical-evidence.js
+a804a7f91cd78515c2e69e21aad4c3fe8df21a3537242e1938d2da09dbd2618c server/command-center-live/historical-evidence.js
 d77911d3df0477296e13d52ad5d56f904fa8fd0fc45e30912e87b06775e2da77 server/command-center-live/pdf-evidence.js
 cb5b6c316321d17c558ae2818110dbbccba82da6e3350e46cf07642f88b77493 server/command-center-live/pdf-evidence.py
 ba42b53ea61fa9b897114f0fbb74a85f888a370ed8841e313418336b594a9fb1 server/command-center-live/self-test.js
 c5aeca16f3fceef66597cc008aeba5889bc62a08c93bf5a34354247b78cb6f51 server/command-center-live/learning-integration-test.js
 455f1824075d739c14baed7448f33fe91d752c0705b47dca99c42e211fdef335 server/command-center-live/package.json
-80dd835cf2edaf890d1b3af4e55dc6fad34d02cf09ad92c73ba095f142255627 tools/storage/historical_evidence.php
+14daf82e6ba3ac69c1f8ca0a6d1d57d0ba6bdb03de0f80f5b369a16f8decf8e2 tools/storage/historical_evidence.php
 f24414d2da1395ae3448b0d97009a94968cbdcd94aab61ced61f414ea3767816 tools/storage/historical_evidence_schema.sql
 fce0d7f7ea347d1486df1fc70d965229d2172150c76b8254a839502e531756ce tools/storage/schema.sql
 72ca86f71cb01b264dc6ee071e0e85fd0857e61f27a5a027b1cfbf164e34eac5 tools/storage/pct_research_store.php
-982c8431fadcb6a88f8330a81e4ef8dfd7ff5f15642eb73878ba4e0e5317c260 server/command-center-live/app.js
+25455ea35e5e1f515262f63371a74a6131247c68d313393d501e0221f1b8f78c server/command-center-live/app.js
 HASHES
 while read -r hash file; do
   mkdir -p "$TMP/$(dirname "$file")"

@@ -1,20 +1,41 @@
 name: Prepare existing research inference boundary
-description: Install the checksum-verified CPU model when local inference is selected.
+description: Install a checksum-verified CPU model for the existing pipeline.
 runs:
   using: composite
   steps:
-    - uses: actions/cache@v4
+    - name: Select an approved local model and immutable cache
       if: env.PCT_LLM_PROVIDER == 'local_llama_cpp'
+      shell: bash
+      run: |
+        python3 - <<'PY'
+        import os,pathlib
+        models={'Qwen/Qwen2.5-3B-Instruct-GGUF':('qwen2.5-3b','nabou-qwen2.5-3b-q4km-7dabda4d-v2'),
+                'Qwen/Qwen2.5-7B-Instruct-GGUF':('qwen2.5-7b','nabou-official-qwen2.5-7b-q4km-bb5d59e0-v2')}
+        repo=os.getenv('PCT_LOCAL_MODEL_REPOSITORY') or os.getenv('PCT_LLM_MODEL') or 'Qwen/Qwen2.5-3B-Instruct-GGUF'
+        folder,key=models[repo]
+        with open(os.environ['GITHUB_ENV'],'a') as out:
+            out.write('PCT_LOCAL_MODEL_REPOSITORY='+repo+'\n')
+            out.write('NABOU_MODEL_CACHE_DIR='+str(pathlib.Path.home()/'.cache/nabou-models'/folder)+'\n')
+            out.write('NABOU_MODEL_CACHE_KEY='+key+'\n')
+        PY
+    - uses: actions/cache/restore@v4
+      if: env.PCT_LLM_PROVIDER == 'local_llama_cpp'
+      id: model-cache
       with:
-        path: ~/.cache/nabou-models
-        key: nabou-qwen2.5-3b-q4km-7dabda4d-v1
+        path: ${{ env.NABOU_MODEL_CACHE_DIR }}
+        key: ${{ env.NABOU_MODEL_CACHE_KEY }}
     - name: Install CPU inference dependencies
       if: env.PCT_LLM_PROVIDER == 'local_llama_cpp'
       shell: bash
       env:
         CMAKE_BUILD_PARALLEL_LEVEL: '2'
       run: python3 -m pip install --quiet 'llama-cpp-python==0.3.16' --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu 'huggingface-hub==0.36.0'
-    - name: Resolve immutable model and verify checksum
+    - name: Verify every model shard against the official immutable revision
       if: env.PCT_LLM_PROVIDER == 'local_llama_cpp'
       shell: bash
-      run: python3 tools/prepare_local_research_model.py
+      run: python3 tools/prepare_local_research_model.py --destination "$NABOU_MODEL_CACHE_DIR"
+    - uses: actions/cache/save@v4
+      if: env.PCT_LLM_PROVIDER == 'local_llama_cpp' && steps.model-cache.outputs.cache-hit != 'true'
+      with:
+        path: ${{ env.NABOU_MODEL_CACHE_DIR }}
+        key: ${{ env.NABOU_MODEL_CACHE_KEY }}

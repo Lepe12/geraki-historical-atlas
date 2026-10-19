@@ -8,39 +8,43 @@ on:
         type: string
 permissions:
   contents: write
-concurrency:
-  group: pct-command-center-publish
-  cancel-in-progress: false
 jobs:
   answer:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     env:
       PCT_RUN_ID: ${{ inputs.run_id }}
-      PCT_LLM_PROVIDER: ${{ vars.PCT_LLM_PROVIDER || 'openai_compatible' }}
+      PCT_LLM_PROVIDER: ${{ vars.PCT_LLM_PROVIDER || 'local_llama_cpp' }}
+      PCT_LOCAL_MODEL_REPOSITORY: ${{ vars.PCT_LLM_MODEL || 'Qwen/Qwen2.5-7B-Instruct-GGUF' }}
+      PCT_LLM_MODEL: ${{ vars.PCT_LLM_MODEL || 'Qwen/Qwen2.5-7B-Instruct-GGUF' }}
       PCT_LLM_BASE_URL: ${{ vars.PCT_LLM_BASE_URL }}
       PCT_LLM_API_KEY: ${{ secrets.PCT_LLM_API_KEY }}
-      PCT_LLM_EXTRACTOR_MODEL: ${{ vars.PCT_LLM_EXTRACTOR_MODEL || vars.PCT_LLM_MODEL }}
-      PCT_LLM_SYNTHESIS_MODEL: ${{ vars.PCT_LLM_SYNTHESIS_MODEL || vars.PCT_LLM_MODEL }}
-      PCT_LLM_ADVERSARIAL_MODEL: ${{ vars.PCT_LLM_ADVERSARIAL_MODEL || vars.PCT_LLM_MODEL }}
+      PCT_LLM_EXTRACTOR_MODEL: ${{ vars.PCT_LLM_EXTRACTOR_MODEL || vars.PCT_LLM_MODEL || 'Qwen/Qwen2.5-7B-Instruct-GGUF' }}
+      PCT_LLM_SYNTHESIS_MODEL: ${{ vars.PCT_LLM_SYNTHESIS_MODEL || vars.PCT_LLM_MODEL || 'Qwen/Qwen2.5-7B-Instruct-GGUF' }}
+      PCT_LLM_ADVERSARIAL_MODEL: ${{ vars.PCT_LLM_ADVERSARIAL_MODEL || vars.PCT_LLM_MODEL || 'Qwen/Qwen2.5-7B-Instruct-GGUF' }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
-          fetch-depth: 2
+          fetch-depth: 0
       - name: Validate run identifier
         run: python3 -c 'import os,re; assert re.fullmatch(r"\d+",os.environ["PCT_RUN_ID"]), "NUMERIC_RUN_ID_REQUIRED"'
-      - name: Test grounded synthesis
-        run: PYTHONPATH=tools:tools/llm python3 -m unittest tools/test_semantic_research_answer.py -q
-      - name: Build cited semantic answer
+      - uses: ./.github/actions/research-model
+      - name: Real inference against immutable acquired sources
+        run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python3 tools/reanalyse_acquired_research.py --run-id "$PCT_RUN_ID"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semantic-answer-and-evidence
+          path: evidence/runs/${{ env.PCT_RUN_ID }}/semantic_reanalysis_${{ github.run_id }}/
+      - name: Preserve actual answer or failure without overwriting the original run
+        if: always()
         run: |
-          python3 tools/semantic_research_answer.py --run-id "$PCT_RUN_ID"
-          python3 tools/orchestrator/build_command_center_snapshot.py --run-id "$PCT_RUN_ID" --output "command-center/live/runs/$PCT_RUN_ID.json" --latest command-center/live/latest.json
-      - name: Preserve answer and snapshot
-        run: |
-          git config user.name "jarvis-orchestrator[bot]"
-          git config user.email "jarvis-orchestrator@users.noreply.github.com"
-          git add "evidence/runs/$PCT_RUN_ID/research_answer/" command-center/live/
-          git diff --cached --quiet && exit 0
-          git commit -m "Preserve cited semantic answer for run $PCT_RUN_ID"
-          bash tools/push_with_retry.sh
+          set -e
+          dest="evidence/runs/$PCT_RUN_ID/semantic_reanalysis_$GITHUB_RUN_ID"
+          if [ ! -d "$dest" ]; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dest"
+          git commit -m 'Preserve actual model reanalysis and cited evidence'
+          python3 tools/publish_research_outputs.py

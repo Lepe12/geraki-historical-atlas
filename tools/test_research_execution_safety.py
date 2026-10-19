@@ -38,6 +38,36 @@ class SafetyTests(unittest.TestCase):
         from orchestrator.jarvis_event_bus import _publish_remote
         with patch.dict(os.environ,{'GITHUB_ACTIONS':'true','GITHUB_REF':'refs/heads/experiment/test','PCT_COMMAND_CENTER_URL':'https://example.test'}),patch('orchestrator.jarvis_event_bus.urlopen') as request:
             _publish_remote({});request.assert_not_called()
+    def test_overlapping_runs_preserve_all_history_and_newest_snapshot(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            def run(where,*args):return subprocess.check_output(['git',*args],cwd=where,stderr=subprocess.DEVNULL)
+            root=Path(temporary);remote=root/'remote';first=root/'first';second=root/'second'
+            run(root,'init','--bare',str(remote));run(root,'clone',str(remote),str(first))
+            run(first,'config','user.name','Test');run(first,'config','user.email','test@example.test');run(first,'checkout','-b','main')
+            folder=first/'command-center/live';folder.mkdir(parents=True)
+            def snapshot(repo,number):
+                f=repo/'command-center/live'
+                (f/'latest.json').write_text(json.dumps({'run_id':str(number)}))
+                (f/'index.json').write_text(json.dumps({'schema':'nabou-research-history-v1','runs':[{'run_id':str(number),'generated_utc':str(number)}]}))
+            snapshot(first,100);run(first,'add','.');run(first,'commit','-m','initial');run(first,'push','origin','main')
+            run(root,'clone','-b','main',str(remote),str(second));run(second,'config','user.name','Test');run(second,'config','user.email','test@example.test')
+            snapshot(first,200);run(first,'add','.');run(first,'commit','-m','older output')
+            snapshot(second,300);run(second,'add','.');run(second,'commit','-m','newer output')
+            previous=os.getcwd();os.chdir(second)
+            try:
+                with patch.dict(os.environ,{'GITHUB_REF':'refs/heads/main','PCT_PERSISTENCE_MODE':'auto','PCT_SOURCE_SHA':''}):publish()
+            finally:os.chdir(previous)
+            previous=os.getcwd();os.chdir(first)
+            try:
+                with patch.dict(os.environ,{'GITHUB_REF':'refs/heads/main','PCT_PERSISTENCE_MODE':'auto','PCT_SOURCE_SHA':''}):
+                    receipt=publish()
+                    latest=json.loads(run(first,'show',receipt['commit']+':command-center/live/latest.json'))
+                    history=json.loads(run(first,'show',receipt['commit']+':command-center/live/index.json'))
+                    self.assertEqual(latest['run_id'],'300')
+                    self.assertEqual({r['run_id'] for r in history['runs']},{'100','200','300'})
+                    self.assertEqual(receipt['retained_newer_shared_outputs'],1)
+            finally:os.chdir(previous)
+
     def test_output_writer_preserves_concurrent_main_and_rejects_code(self):
         with tempfile.TemporaryDirectory() as d:
             def run(where,*args):return subprocess.check_output(['git',*args],cwd=where,stderr=subprocess.DEVNULL)
