@@ -91,6 +91,10 @@ def discovery_results(run_root:Path,request=None):
                 "context_excerpt":str(row.get('context_excerpt') or row.get('description') or row.get('snippet') or '')[:600],
                 "triage_status":assessment.get("status") or "REVIEW_REQUIRED",
                 "triage_reasons":assessment.get("reasons") or [],
+                "evidence_class":assessment.get("evidence_class"),
+                "source_classification":{"category":(assessment.get("evidence_class") or {}).get("category") or "UNCLASSIFIED",
+                                         "confirmed":False,
+                                         "basis":(assessment.get("evidence_class") or {}).get("basis") or "CONTENT_ASSESSMENT_REQUIRED"},
                 "topical_match":assessment.get("topical_match"),
                 "research_value":assessment.get("research_value"),
                 "evidence_confidence":assessment.get("evidence_confidence"),
@@ -249,7 +253,14 @@ def build(repo:Path,run_id:str):
         if passage:
             row['evidence_record']={k:v for k,v in passage.items() if k!='acquired_text_excerpt'}
             row['bibliography']=source_lookup.get(passage['source_id'],{}).get('bibliography')
-            row['source_classification']=source_lookup.get(passage['source_id'],{}).get('classification')
+            package_class=source_lookup.get(passage['source_id'],{}).get('classification') or {}
+            current=row.get('source_classification') or {}
+            # A search hypothesis stays visible. An explicit source class still
+            # replaces an unclassified discovery label.
+            if current.get('category')!='SEARCH_HYPOTHESIS' and package_class.get('category') not in (None,'UNCLASSIFIED'):
+                row['source_classification']=package_class
+            elif current.get('category') in (None,'UNCLASSIFIED') and package_class:
+                row['source_classification']=package_class
     return {
       "schema":"pct-command-center-live-v1",
       "project":"piratecartography","run_id":run_id,"request_id":request_id,

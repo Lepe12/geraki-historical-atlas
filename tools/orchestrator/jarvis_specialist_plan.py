@@ -103,7 +103,7 @@ def build(target,purpose,date_range="",aliases=None,target_type="auto"):
                         'source_genealogy':['sources','bibliography'],
                         'contradiction':['disputed','history'],
                         'relationship_network':['captain','associates']}.get(aid,['history'])
-            queries=focused_queries(focus,qualifiers)[:int(meta.get('max_queries',8))]
+            queries=focused_queries(focus,qualifiers,include_hypotheses=True)[:int(meta.get('max_queries',8))]
         if memory is not None and successful_queries:
             try:
                 learned=successful_queries(memory,aid,limit=4)
