@@ -111,6 +111,7 @@ def anemi_search(query):
                 row['search_submitted']=True
                 row['submitted_body_excerpt']=' '.join(page.locator('body').inner_text().split())[:2500]
                 row['submitted_query_values']=urllib.parse.parse_qs(urllib.parse.urlsplit(page.url).query).get('cclterm1',[])
+                row['result_links']=page.locator('a').evaluate_all('(els)=>els.slice(0,100).map(e=>({href:e.getAttribute("href"),text:e.innerText,onclick:e.getAttribute("onclick")}))')
                 raw=page.content().encode()
                 row.update(http_status=response.status if response else None,final_url=safe_url(page.url),
                            response_sha256=hashlib.sha256(raw).hexdigest(),response_bytes=len(raw))
