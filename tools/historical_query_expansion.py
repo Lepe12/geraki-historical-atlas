@@ -27,7 +27,8 @@ def expand_queries(lane,target,aliases,date_range="",max_queries=0):
         queries=focused_queries(focus,([str(date_range)] if date_range else [])+EVENT_TERMS.get(lane,EVENT_TERMS['travellers']),include_hypotheses=True)
         return queries[:max_queries] if max_queries and max_queries>0 else queries
     names=[]
-    for raw in [target]+list(aliases or []):
+    seeds=[focus['entity']] if focus['kind']=='place' and focus.get('entity') else [target]
+    for raw in seeds+list(aliases or []):
         v=str(raw).strip()
         if v and v.casefold() not in {x.casefold() for x in names}: names.append(v)
     terms=EVENT_TERMS.get(lane,EVENT_TERMS["travellers"])

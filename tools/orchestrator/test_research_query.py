@@ -44,6 +44,18 @@ class ResearchQueryTests(unittest.TestCase):
         self.assertEqual(split_research_query('Πέτρος Λάντζας 1577–1583')[:2],('Πέτρος Λάντζας','1577-1583'))
         self.assertEqual(split_research_query('Unknown prose with dates 1600-1700')[0],'Unknown prose with dates 1600-1700')
 
+    def test_place_and_event_period_is_not_a_person_phrase(self):
+        for q,place in (
+            ('Μήλος, πειρατεία 1660–1680','Μήλος, πειρατεία'),
+            ('Μήλος πειρατεία 1660-1680','Μήλος πειρατεία'),
+            ('πειρατεία στη Μήλο 1660–1680','πειρατεία στη Μήλο'),
+            ('Milos piracy 1660-1680','Milos piracy'),
+        ):
+            target,dates,_=split_research_query(q)
+            self.assertEqual(target,place)
+            self.assertEqual(dates,'1660-1680')
+        self.assertEqual(split_research_query('Unknown prose with dates 1600-1700')[0],'Unknown prose with dates 1600-1700')
+
     def test_bilingual_name_pair_splits_without_splitting_prose(self):
         from research_query import split_supplied_names
         self.assertEqual(split_supplied_names('Pedro Lanza / Πέτρος Λάντζας'),['Pedro Lanza','Πέτρος Λάντζας'])

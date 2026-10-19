@@ -104,6 +104,23 @@ def _surname_orthography(latin):
     return list(dict.fromkeys([*forms,*more]))
 
 
+_EVENT_WORD = re.compile(r'πειρατ|κουρσ|επιδρομ|pirac|corsair|privateer|^raid$')
+_GLUE = STOP | {'στη','στην','στο','στον','στις','στα','στου','εις','απο','με','and','during','between','near','at','in','a','an'}
+
+
+def _event_place(text):
+    """Return the single place left after an explicit event word.
+
+    'Μήλος, πειρατεία' is a place query. 'Pedro Lanza corsair' is not, because
+    more than one content word remains. Nothing here is an attested alias.
+    """
+    words=_words(text)
+    if not words or len(words)>6 or not any(_EVENT_WORD.search(fold(w)) for w in words):
+        return None
+    kept=[w for w in words if not _EVENT_WORD.search(fold(w)) and fold(w) not in _GLUE]
+    return kept[0] if len(kept)==1 else None
+
+
 def decompose(target, aliases=(), purpose='', kind='unknown', regions=()):
     """Split an explicit name + role + place clause, preserving original text."""
     supplied=split_supplied_names(target)
@@ -122,6 +139,15 @@ def decompose(target, aliases=(), purpose='', kind='unknown', regions=()):
             kind='person'
     if roles:
         kind='person'
+    elif kind in ('unknown','auto','all','place'):
+        place=_event_place(person)
+        if place:
+            kind='place'
+            person=place
+            if names:
+                names[0]=place
+            else:
+                names=[place]
     words=_words(person)
     # A bare two/three-word name is only a retrieval hypothesis. Avoid treating
     # arbitrary prose as a person. Explicit place/event types always win.

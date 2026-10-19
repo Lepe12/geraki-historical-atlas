@@ -104,6 +104,9 @@ def build(target,purpose,date_range="",aliases=None,target_type="auto"):
                         'contradiction':['disputed','history'],
                         'relationship_network':['captain','associates']}.get(aid,['history'])
             queries=focused_queries(focus,qualifiers,include_hypotheses=True)[:int(meta.get('max_queries',8))]
+        elif focus['kind']=='place':
+            qualifiers=[x for x in (date_range,'piracy','πειρατεία','corsair','history') if str(x).strip()]
+            queries=focused_queries(focus,qualifiers,include_hypotheses=True)[:int(meta.get('max_queries',8))]
         if memory is not None and successful_queries:
             try:
                 learned=successful_queries(memory,aid,limit=4)

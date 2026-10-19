@@ -93,6 +93,37 @@ class ResearchFocusTests(unittest.TestCase):
         self.assertTrue(any('Pietro Lanza' in q for q in queries))
         self.assertNotIn('Pietro Lanza',focus['names'])
 
+    def test_milos_piracy_period_is_a_place_not_a_person(self):
+        from historical_query_expansion import expand_queries
+        from research_relevance import discovery_queries
+        focus=decompose('Μήλος, πειρατεία')
+        self.assertEqual(focus['kind'],'place')
+        self.assertEqual(focus['entity'],'Μήλος')
+        self.assertEqual(focus['names'][0],'Μήλος')
+        self.assertNotIn('πειρατεία',focus['entity'])
+        queries=focused_queries(focus,('1660-1680','πειρατεία'),include_hypotheses=True)
+        self.assertIn('"Μήλος"',queries)
+        self.assertIn('"Μήλος" 1660-1680',queries)
+        self.assertNotIn('"πειρατεία, Μήλος"',queries)
+        self.assertEqual(decompose('πειρατεία στη Μήλο')['entity'],'Μήλο')
+        self.assertEqual(decompose('Milos piracy')['kind'],'place')
+        self.assertEqual(decompose('Pedro Lanza')['kind'],'person')
+        self.assertEqual(decompose('Ιωάννης Καψής, βασιλιάς της Μήλου')['kind'],'person')
+        expanded=expand_queries('greek','Μήλος, πειρατεία',[],'1660-1680')
+        self.assertTrue(any('Μήλος' in q and '1660-1680' in q for q in expanded),expanded)
+        self.assertFalse(any('Μήλος, πειρατεία' in q for q in expanded),expanded)
+        ident=identity({'target':'Μήλος, πειρατεία','aliases':['Milo'],'purpose':'πειρατεία','date_range':'1660-1680'},
+                       {'target':'Μήλος, πειρατεία','aliases':['Milo'],'purpose':'πειρατεία','date_range':'1660-1680'})
+        found=discovery_queries(ident)
+        self.assertTrue(any(q.startswith('"Μήλος"') or q.startswith('"Milo"') for q in found),found)
+        self.assertFalse(any('Μήλος, πειρατεία' in q for q in found),found)
+        plan=build('Μήλος, πειρατεία','πειρατεία στη Μήλο','1660-1680')
+        self.assertEqual(plan['target_type'],'place')
+        self.assertEqual(plan['research_focus']['entity'],'Μήλος')
+        for agent in plan['agents']:
+            self.assertTrue(any('Μήλος' in q for q in agent['assigned_queries']),agent['assigned_queries'])
+            self.assertFalse(any('Μήλος, πειρατεία' in q for q in agent['assigned_queries']),agent['assigned_queries'])
+
     def test_nominative_kapsis_keeps_role_and_does_not_attest_foreign_spellings(self):
         focus=decompose('Ιωάννης Καψής, βασιλιάς της Μήλου')
         self.assertEqual(focus['entity'],'Ιωάννης Καψής')

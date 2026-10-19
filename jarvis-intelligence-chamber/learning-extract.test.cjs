@@ -1,0 +1,11 @@
+"use strict";
+const assert=require("node:assert/strict");
+const {proposals}=require("./learning-extract.js");
+const items=proposals([{page:4,text:"Το 1672 ο Πέτρος Λάντζας έδρασε στη Μήλο. Giovanni Capsi του Milo."}]);
+assert.ok(items.some(x=>x.type==="date"&&x.text==="1672"&&x.page===4));
+assert.ok(items.some(x=>x.type==="person"&&x.text.includes("Πέτρος Λάντζας")));
+assert.ok(items.some(x=>x.type==="place"&&x.text==="Μήλο"));
+assert.ok(items.some(x=>x.type==="relationship"&&x.text.includes("→")));
+assert.ok(items.every(x=>x.verification_status==="UNREVIEWED"&&x.status==="pending"&&x.confidence<0.6));
+assert.equal(proposals([{page:1,text:""}]).length,0);
+console.log("LEARNING EXTRACT PASS",items.length);
