@@ -106,6 +106,7 @@ jobs:
           python3 tools/adversarial_scientific_benchmark.py
       - name: Build and validate eleven lane payloads
         env:
+          PCT_TARGET: ""
           PCT_RESEARCH_JOB_ID: ${{ steps.identity.outputs.research_job_id }}
           PCT_EXPECTED_REQUEST_SHA256: ${{ steps.identity.outputs.request_sha256 }}
           PCT_REQUEST_FILE: ${{ steps.identity.outputs.request_file }}
