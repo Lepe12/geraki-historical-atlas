@@ -374,7 +374,16 @@ def execute(run_root, question, caller=call, config=None, output_root=None):
         prompt=RULES+'\nExtraction language: English. QUESTION: '+question+'\nReturn {"items":[{"statement":"The consulted source reports ...","evidence_id":"copy supplied evidence_id","passage_ids":[0],"kind":"source_statement","source_type":"UNVERIFIED","actors":[],"places":[],"dates":[],"usage_type":"UNRESOLVED","uncertainty":[]}]}. Select at most 2 claims directly relevant to the question. For a person question, prioritize the named person, identity and sourced activities; a named place is optional. For a place or geographic topic, prioritize named-place claims. Choose 1-4 adjacent passage_ids from ONE evidence item. Do NOT output a quote: the engine copies the selected original text. Copy entity spellings literally from those selected passages; do not translate names. Dates must be strings copied from the selected passages or date_evidence. Empty arrays are valid. Leave unspecified actors, dates and places empty. State only what the selected passage actually supports, with source attribution. Distinguish an actual base from a raid site, and an intention from an executed action. usage_type may be BASE, ANCHORAGE, REFUGE, RAID_LOCATION, OTHER, UNRESOLVED. Modern studies are SECONDARY_SOURCE; contemporary authorship must be established for PRIMARY_SOURCE. Never infer location or dates from a book title.\nEVIDENCE_JSON:\n'+json.dumps([model_evidence(row) for row in group],ensure_ascii=False)
         payload=invoke('evidence_extractor',prompt)
         items,rejected=validate_items(payload or {},group)
-        out['claims'].extend(items);out['rejected'].extend(rejected)
+        out['rejected'].extend(rejected)
+        if not items and isinstance(payload,dict) and payload.get('items') and rejected:
+            # A real source can be lost through malformed entity arrays or a
+            # sentence selection that omits the named actor. One model repair
+            # may correct the proposal; every original byte/date gate is rerun.
+            repair_prompt=prompt+'\nREPAIR: the previous proposals failed validation. Return corrected items only, or an empty items array if unsupported. actors, places and dates MUST be arrays of literal strings, never objects. Select all adjacent sentences needed for the statement and its named entities, up to 4 passage_ids. An entity outside the selected passages is unsupported. Do not fill absent dates. Do not equate a modern namesake with the historical subject. Do not assert a BASE unless the selected text actually describes that use.\nREJECTED_PROPOSALS_JSON:\n'+json.dumps({'previous':payload,'validation':rejected},ensure_ascii=False)
+            repaired=invoke('evidence_extractor',repair_prompt)
+            items,repair_rejections=validate_items(repaired or {},group)
+            out['rejected'].extend(repair_rejections)
+        out['claims'].extend(items)
     if not out['claims']:out['status']='EXTRACTION_FAILED_OR_UNSUPPORTED';return out
     # Identical model items are grouped by ID, not counted as corroboration.
     out['claims']=list({c['claim_id']:c for c in out['claims']}.values())

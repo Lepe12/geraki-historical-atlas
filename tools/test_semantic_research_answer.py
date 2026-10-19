@@ -31,6 +31,21 @@ def item(eid,**changes):
             'kind':'source_statement','actors':[],'places':[],'dates':['1677'],'uncertainty':[],**changes}
 
 class SemanticAnswer(unittest.TestCase):
+    def test_malformed_extraction_gets_one_repair_and_all_gates_still_apply(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp);eid=collect(tmp)[0][0]['evidence_id'];calls=[]
+            def caller(role,prompt):
+                calls.append(role)
+                if len(calls)==1:return response({'items':[item(eid,actors=[{'name':'invented'}])]})
+                if len(calls)==2:
+                    self.assertIn('REPAIR:',prompt)
+                    return response({'items':[item(eid,quote='An invented historical quote.') ]})
+                raise AssertionError('Repair budget exceeded')
+            out=execute(tmp,'question',caller=caller,config={'configured':True,'missing':[]})
+            self.assertEqual(out['status'],'EXTRACTION_FAILED_OR_UNSUPPORTED')
+            self.assertEqual(out['claims'],[])
+            self.assertEqual(len(calls),2)
+
     def test_indexed_review_requires_explicit_unique_decisions(self):
         claims=[{'claim_id':'a'},{'claim_id':'b'}]
         partial=normalize_review({'decisions':[{'claim_index':0,'decision':'SUPPORTED','reason':'quote supports it'}]},claims)

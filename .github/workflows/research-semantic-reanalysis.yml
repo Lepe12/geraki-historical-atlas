@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      PARENT_RESEARCH_RUN: ${{ inputs.run_id || '39247670206' }}
+      PARENT_RESEARCH_RUN: ${{ inputs.run_id || '39304929906' }}
       PCT_LLM_PROVIDER: local_llama_cpp
       PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen2.5-7B-Instruct-GGUF
       PCT_LLM_MODEL: Qwen/Qwen2.5-7B-Instruct-GGUF
@@ -36,7 +36,7 @@ jobs:
           set -e
           python3 -m pip install --quiet 'llama-cpp-python==0.3.16' --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu 'huggingface-hub==0.36.0'
           python3 tools/prepare_local_research_model.py --destination "$HOME/.cache/nabou-models/qwen2.5-7b"
-      - name: Actual extraction with complete indexed review and cited synthesis
+      - name: Retry actual Kapsis extraction with bounded schema repair and complete review
         run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python3 tools/reanalyse_acquired_research.py --run-id "$PARENT_RESEARCH_RUN"
       - uses: actions/upload-artifact@v4
         if: always()
