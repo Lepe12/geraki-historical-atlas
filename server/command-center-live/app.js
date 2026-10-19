@@ -257,6 +257,7 @@ const server=http.createServer(async(req,res)=>{
       return json(res,200,{status:"LEARNED",source_id:sourceId,accepted_items:items.length,pages:pages.length,attested_quotes:record.historical_evidence.attestations.length,unresolved_quotes:record.historical_evidence.unresolved.length,historically_verified:false});
     }
     if(req.method==="GET"&&p==="/knowledge/evidence"){
+      if(!sessionAuthorized(req)&&!operatorAuthorized(req))return json(res,401,{error:"operator_authorization_required"});
       const sourceId=String(u.searchParams.get("source_id")||"");
       if(!/^src-[A-Za-z0-9-]+$/.test(sourceId))return json(res,400,{error:"invalid_source_id"});
       if(!readKnowledgeIndex().some(x=>x.source_id===sourceId&&x.state==="LEARNED"))return json(res,404,{error:"source_not_learned"});
