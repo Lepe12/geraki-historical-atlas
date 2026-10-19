@@ -1,0 +1,634 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+	<head>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-127826341-1"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+        
+          gtag('config', 'UA-127826341-1');
+        </script>
+
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="../css/eAna.css" />
+        <title>HISTOREIN-1846WEB</title>
+        <style>
+			.note { position: fixed; font-size: 0.8em; width: 550px; right: 17px; bottom: 0px; padding: 5px 20px 13px 20px; border-radius: 10px; background: #f9f5eb;}
+			.close { background: #606061; color: #FFFFFF; line-height: 12px; position: fixed; top:-12px; right: 6px; text-align: center; top: 12px; width: 12px; text-decoration: none; font-weight: bold; -webkit-border-radius: 12px; -moz-border-radius: 12px; border-radius: 12px; -moz-box-shadow: 1px 1px 3px #000; -webkit-box-shadow: 1px 1px 3px #000; box-shadow: 1px 1px 3px #000;}
+			
+			.modalDialog { position: fixed; font-family: Arial, Helvetica, sans-serif; right: 0; bottom: 0; background: rgba(0,0,0,0.2); z-index: 99999; opacity:0; -webkit-transition: opacity 400ms ease-in; -moz-transition: opacity 400ms ease-in; transition:opacity 400ms ease-in; pointer-events: none; }
+			.modalDialog:target { opacity:1; pointer-events: auto; }
+			.modalDialog > div { font-size: 0.8em; width: 550px; position: fixed; right: 0; bottom: 0; padding: 5px 20px 13px 20px; border-radius: 10px; background: #f9f5eb; background: -moz-linear-gradient(#fff, #f9f5eb); background: -webkit-linear-gradient(#fff, #f9f5eb); background: -o-linear-gradient(#fff, #f9f5eb);}
+			.close { background: #606061; color: #FFFFFF; line-height: 12px; position: absolute; right: -12px; text-align: center; top: -12px; width: 12px; text-decoration: none; font-weight: bold; -webkit-border-radius: 12px; -moz-border-radius: 12px; border-radius: 12px; -moz-box-shadow: 1px 1px 3px #000; -webkit-box-shadow: 1px 1px 3px #000; box-shadow: 1px 1px 3px #000; }
+			.close:hover { background: #00d9ff; }
+		</style>
+  	</head>
+
+    <body onload="init();">
+        <script>
+                var VOLS = {
+1846:"Vol. 21.1 (2023): Where was 1821? Space and Territory in the Greek Revolution"
+}
+
+var ART_TITLES = {901:"35712@I^Where was 1821? <br />Space and Territory in the Greek Revolution^NONE^HTML",
+902:"23646@A^Between Historical Reality and Poetic Imagination:<br /> The Space and Time of the 1821 Greek Revolution in Polish Romanticism^NONE^HTML",
+903:"24698@A^Female Fatherlands: Women of Letters, Greek Patriotism and the 1821 Revolution^NONE^HTML",
+904:"24161@A^Islands on Fire? Navigating Ambiguity and Space<br /> during the 1821 Greek Revolution in the Aegean Sea^NONE^HTML",
+905:"26956@A^Empires, Nations and the Question of Territorial Sovereignty<br /> in the Greek Archipelago during the Greek Revolution: The Case of Syros^NONE^HTML",
+906:"24491@A^Fortresses of the Peloponnese, Ottoman Defences<br /> and the Greek Revolution (1821–1828)^NONE^HTML",
+907:"23469@A^The Transformation of Urban Space before and after the Greek Revolution:<br /> The Case of Mega Revma (Arnavutköy)^NONE^HTML",
+908:"27228@B^Review of Areti Adamopoulou, Art and Cold War diplomacy:<br /> International art exhibitions in Athens, 1950–1967^NONE^HTML",
+909:"27428@B^Review of Milena B. Methodieva, Empire and Nation: Muslim Reform in the Balkans^NONE^HTML",
+910:"27486@B^Review of Elli Lemonidou, The First World War (1914–1918):<br /> History of a universal catastrophe^NONE^HTML",
+911:"29435@B^Review of Dimitris D. Arvanitakis, Educating the citizen:<br /> The French presence in the Ionian Sea (1797–1799) and the Greek nation^NONE^HTML",
+912:"27232@B^Review of Leda Papastefanaki and M. Erdem Kabadayı, eds., Working in Greece and Turkey:<br /> A Comparative Labour History from Empires to Nation-States, 1840–1940^NONE^HTML",
+913:"27938@B^Review of Leda Papastefanaki and Nikos Potamianos, eds.,<br /> Labour History in the Semi-Periphery: Southern Europe, 19th–20th Centuries^NONE^HTML",
+914:"28024@B^Review of Nikos Potamianos, ed., Variants of moral economy: Historical and theoretical studies^NONE^HTML",
+915:"28056@B^Review of Nikos Potamianos, &ldquo;Spectacles of insolence&rdquo;:<br /> The social history of carnival in Athens, 1800–1940^NONE^HTML",
+916:"28262@B^Review of A. Kitroeff, The Greeks and the Making of Modern Egypt,<br /> and A. Dalachanis, The Greek Exodus from Egypt: Diaspora Politics and Emigration, 1937–1962^NONE^HTML",
+917:"29144@B^Review of Alexis Heraclides, The Macedonian Question and the Macedonians: A History^NONE^HTML",
+918:"29805@B^Review of Odette Varon-Vassard, Des Sépharades aux Juifs grecs: Histoire, mémoire et identité^NONE^HTML"
+}
+
+var ART_AUTHORS = {
+901:"35712@Michalis Sotiropoulos, Antonis Hadjikyriacou, Ada Dialla",
+902:"23646@Maria Kalinowska",
+903:"24698@Elisavet Papalexopoulou",
+904:"24161@Sakis Gekas",
+905:"26956@Dimitris Kousouris",
+906:"24491@Dilek Özkan Pantazis",
+907:"23469@Esra Ansel",
+908:"27228@Alexandros Teneketzis",
+909:"27428@Eleonora Naxidou",
+910:"27486@Christina Theodosiou",
+911:"29435@Gerassimos D. Pagratis",
+912:"27232@Eyal Ginio",
+913:"27938@Pothiti Hantzaroula",
+914:"28024@Christos Efstathiou",
+915:"28056@Katerina Sergidou",
+916:"28262@Joseph John Viscomi",
+917:"29144@Athena Skoulariki",
+918:"29805@Angeliki Tseti"
+}
+
+var ABSTRACTS = {
+901:"35712@The aim of this special issue of <i>Historein</i> is to offer a new and fresh perspective on the 1821 Greek Revolution by drawing on the insights that the spatial turn has brought to the study of the Age of Revolutions. Our point of departure was that although the revolution took place in time and space, it is questions of temporality and of situating the revolution in a temporal context that have mainly preoccupied historians. This can hardly be said about space. In fact, as we argue, the spatial categories that historians have used have had a &ldquo;natural&rdquo; and self-evident character that required little or no probing. We wanted to interrogate this character, and what we consider as a lacuna in our understanding of the revolution. Thus, the aim of the introduction is threefold. The first part briefly discusses the historiography on space, and the ways in which this has been used in the study of Age of Revolutions. It also explains why the revolution provides a rich setting to think through space and pose questions about spatiality. The second part introduces the articles that comprise the issue. In this part, we also attempt to bring the contributions together by showing that they can be seen as falling into three very broad categories depending on the type of space they feature (space as place, space as territory, and space as an imagined category). The last part considers other possibilities, other vistas of research, where a &ldquo;spatial&rdquo; perspective can take us, if we want to better understand the 1821 Revolution.",
+902:"23646@This article is a literary-historical interpretation of the works of the Polish Romantics. Many of the outstanding Polish Romantic writers were fascinated by the 1821 Greek Revolution. Poland had been subjugated since the end of the eighteenth century so the uprising was an important revolutionary model for Poles. The space and time of the poetic vision of the Greek War of Independence in those Romantic texts was of great importance for historiosophical and existential reflection. The Polish Romantics mentioned many different places that were connected with the Greek Revolution, such as Psara, Chios, Jassy, Kleisova islet and Messolongi. The choice to focus on these places, as well as the contexts of their representation, are significant. A variety of interpretations of the Greek War and Greek heritage emerge from these texts, such as the Greek Uprising as an important event integrating the European tradition and as the embodiment of the main existential and political problems of the nineteenth century, as well as the heroic interpretation of the revolution as an ideal to be emulated by enslaved nations. The Polish Romantic texts under discussion contain various poetic images of the space and time of the Greek War of Independence.",
+903:"24698@This article examines the patriotic discourses of a few female thinkers who were connected with the Greek cause, before and during the Greek Revolution. It examines how they understood Greece and Europe as social, political, geographical and revolutionary spaces and how they understood the gendered character of the war. It seeks to challenge traditional localities of the Greek Revolution by including women who lived in areas that were not encompassed by the Greek nation-state after its inception and did not necessarily use the Greek language in their writings.",
+904:"24161@This article focuses on some aspects of the fascinating histories of islands in the Aegean and the Ionian seas during the Greek Revolution, drawing on documents of the time and histories of the revolution written during or soon after the big event. It looks at the dynamics of the revolution, as seen in the changing perceptions of space in the Aegean Archipelago and the Ionian Seas. It suggests ways to follow the &ldquo;conceptual or political turn&rdquo; and the &ldquo;spatial&rdquo; turn in the history of the revolution, and argues for exploring the political, fiscal and maritime territorialisation that took place, and by historicising the ambiguity that prevailed during the revolution.",
+905:"26956@Based mainly on the correspondence between the local religious and secular authorities, the Sacred Congregation for the Propagation of the Faith (Propaganda Fide) in Rome, representatives of the French and Austrian governments and the Greek insurgents, this article demonstrates how the story of the Catholic community of Syros describes the making of a new frontier but also the shaping of a new territorial conception of sovereignty where multiple agents and jurisdictions co-existed next to each other for centuries. The so-called &ldquo;Pope&rsquo;s Island&rdquo; was the only one with a solid Roman Catholic majority among its inhabitants. After the outbreak of the Greek revolt, Syros declared its neutrality and became a safe haven for Orthodox refugees fleeing from Ottoman reprisals, especially after the Chios massacres in April 1822. By 1825, around 30,000 (mainly Orthodox) refugees had taken over the port, which in the meantime became a Christian &ldquo;Eldorado&rdquo; of legal trade and illegal traffic of all sorts, including piracy booties and slave labour.",
+906:"24491@During the Greek Revolution, the fortresses of the Peloponnese played a crucial role, serving as key defensive positions, sanctuaries for those seeking refuge from violence and sites for negotiations between the Ottoman forces and Greek revolutionaries. By maintaining control over a handful of fortresses in the Morea, the Ottomans were able to monitor the progress of the uprisings. However, their claim to rule persisted until they were eventually compelled to evacuate by French forces in 1828. This article seeks to address the Ottoman presence in the Peloponnese. It explores the whereabouts of Ottoman forces, their defensive strategies against the Greek revolutionaries and the factors that contributed to their successes or failures in confronting the Greek forces. Additionally, it delves into the impact of the physical characteristics of the fortresses, the geography of the region and the weather conditions during the Greek uprising. Focusing primarily on the fortresses of the Peloponnese, the article draws from Ottoman archival documents to shed light on the Ottoman perspective of the Greek revolts.",
+907:"23469@This article aims to uncover the links between the 1821 Greek Revolution and the transformation of the social topography and landscape in Mega Revma (Arnavutköy), a Bosphorus village with a large Greek Orthodox population. In the eyes of the sultan, the Phanariots were the ones who &ldquo;misled the loyal Greek reaya to rebel against their rightful sovereign&rdquo;. Thus, it is not surprising that Mega Revma, as a centre of Phanariot life, was a place transformed by the crisis of 1821. The processes of social and religious restructuring of Mega Revma took place in two main phases. While the first phase (1821–1828) consisted of more violent and immediate responses to the revolution, the second phase was a long process that aimed to Islamise the village using conciliatory measures and building projects.",
+908:"27228@Review of Areti Adamopoulou, <i>Τέχνη και ψυχροπολεμική διπλωματία: Διεθνείς εικαστικές εκθέσεις στην Αθήνα (1950–1967)</i> [Art and Cold War diplomacy: International art exhibitions in Athens, 1950–1967]. Thessaloniki: University Studio Press, 2019. 422 pp.",
+909:"27428@Review of Milena B. Methodieva, <i>Empire and Nation: Muslim Reform in the Balkans</i> (Stanford: Stanford University Press, 2021), 331 pp.",
+910:"27486@Review of Elli Lemonidou, <i>Ο Α΄ Παγκόσμιος Πόλεμος (1914-1918): Ιστορία μιας οικουμενικής καταστροφής</i> [The First World War (1914–1918): History of a universal catastrophe]. Athens: Estia, 2020. 216 pp.",
+911:"29435@Review of Dimitris D. Arvanitakis, <i>Η αγωγή του πολίτη: Η γαλλική παρουσία στο Ιόνιο (1797–1799) και το έθνος των Ελλήνων</i> [Educating the citizen: The French presence in the Ionian Sea (1797–1799) and the Greek nation]. Iraklio: Crete University Press, 2020. 782 pp.",
+912:"27232@Review of Leda Papastefanaki and M. Erdem Kabadayı, eds., <i>Working in Greece and Turkey: A Comparative Labour History from Empires to Nation-States, 1840–1940</i>. New York and Oxford: Berghahn, 2020. xviii + 468 pp.",
+913:"27938@Review of Leda Papastefanaki and Nikos Potamianos, eds., <i>Labour History in the Semi-Periphery: Southern Europe, 19th-20th centuries</i>. Oldenbourg: De Gruyter, 2021, pp. 375.",
+914:"28024@Review of Nikos Potamianos, ed., <i>Εκδοχές της ηθικής οικονομίας: Ιστορικές και θεωρητικές μελέτες </i>[Variants of moral economy: Historical and theoretical studies]. Rethymno: Institute for Mediterranean Studies, 2021. 399 pp.",
+915:"28056@Review of Nikos Potamianos, <i>&ldquo;Της αναιδείας θεάματα&rdquo;: Κοινωνική ιστορία της Αποκριάς στην Αθήνα, 1800–1940</i> [&ldquo;Spectacles of insolence&rdquo;: The social history of carnival in Athens, 1800–1940]. Iraklio: Crete University Press, 2020. 310 pp.",
+916:"28262@Review of Alexander Kitroeff, <i>The Greeks and the Making of Modern Egypt</i>. Cairo: American University in Cairo Press, 2019. 256 pp.; Angelos Dalachanis, <i>The Greek Exodus from Egypt: Diaspora Politics and Emigration, 1937–1962</i>. New York: Berghahn, 2017. 288 pp.",
+917:"29144@Review of Alexis Heraclides, <i>The Macedonian Question and the Macedonians: A History</i>. London: Routledge, 2021. 292 pp.",
+918:"29805@Review of Odette Varon-Vassard, <i>Des Sépharades aux Juifs grecs: Histoire, mémoire et identité.</i>Paris: Le Manuscrit, 2019 (2nd rev. ed., 2021). 291 pp."
+
+}
+
+var CVs = {
+901:"35712@Michalis Sotiropoulos, FRHistS, is currently the 1821 Fellow in Modern Greek Studies at the British School at Athens. He has previously worked and taught at the University of London, Princeton University, the University of Athens and the University of Thrace. A historian of modern Europe, he specialises in the history of the Greek world and the transnational processes (revolts, revolutions, state formation, etc.) that transformed the political culture and ultimately the political geography of this world during the long 19th century. He has written on the 1821 Greek Revolution, law and the formation of states and the historiography on the Age of Revolutions. His most recent monograph, <i>Liberalism after the Revolution: The Intellectual Foundations of the Greek State, ca. 1830–1880</i>, was published by Cambridge University Press in 2023. <br><br>Antonis Hadjikyriacou is Assistant Professor of Ottoman and Turkish History at the Department of Political Science and History of Panteion University, Athens, and an affiliated scholar at the Center for Spatial and Textual Analysis at Stanford University. He has worked and taught at Boğaziçi University (Istanbul); Princeton University; the School of Oriental and African Studies, University of London; Institute for Mediterranean Studies/FORTH, University of Crete; and the University of Cyprus. His research focuses on Cyprus from a Mediterranean vantage point, employing critical GIS tools and digital humanities methods for the purposes of social, economic and environmental history. His work has appeared in the <i>Journal of the Ottoman and Turkish History Association</i>, <i>Turkish Historical Review</i>, <i>Journal of Mediterranean Studies</i> and <i>Princeton Papers</i>, and he has also published widely in Turkish and Greek journals and edited volumes. His monograph <i>Χερσαίο νησί: Η Μεσόγειος και η Κύπρος στην οθωμανική εποχή των επαναστάσεων</i> [Peninsular island: Cyprus and the Mediterranean during the Ottoman age of revolutions] was published in 2023 by Psifides.<br><br>Ada Dialla is Professor of European and Russian History at the Department of Theory and History of Art, Athens School of Fine Arts. She studied history at the State University of Moscow (Lοmonosov) (BA and MSc) and the University of Athens. She was a visiting researcher at the Russian Academy of Science (St Petersburg), École des Hautes Études en Sciences Sociales (Paris), Jordan Center for Advanced Studies in Russia of New York University, Princeton University. She is a founding member and chair of the governing board of the Research Center for the Humanities in Athens. Her main research interests are 19th- and 20th-century Russian and European history. Her recent publications include (with Alexis Heraclides) <i>Humanitarian Intervention in the Long Nineteenth Century: Setting the Precedent</i> (Manchester: Manchester University Press, 2015); with Yanni D. Kotsoni, &ldquo;1821: What Made it Greek? What Made it Revolutionary?,&rdquo; special issue, <i>Historein</i> 20, no 1 (2021); and <i>Η Ρωσική Αυτοκρατορία και ο ελληνικός κόσμος: Τοπικές, ευρωπαϊκές και παγκόσμιες ιστορίες στην Εποχή των Επαναστάσεων</i> [The Russian Empire and the Greek-speaking world: Local, European and global stories in the Age of Revolutions] (Athens: Alexandria, 2023).",
+902:"23646@Maria Kalinowska is Professor at the Faculty of Liberal Arts of the University of Warsaw. She is the author of many books on Romanticism, Philhellenism and the Romantic reception of Greek culture and classical antiquity, among them <i>Mowa i milczenie: romantyczne antynomie samotności</i> [Speech and silence: Romantic antinomies of solitude] (1989); <i>Grecja romantyków: Studia nad obrazem Grecji w literaturze romantycznej</i> [Greece of the Romantics: Studies on the image of Greece in romantic literature] (1994); <i>Los, miłość, sacrum: Studia o dramacie romantycznym i jego dwudziestowiecznej recepcji</i> [Fate, love and the sacred: Studies on Romantic drama and its reception in the twentieth century] (2003); <i>Sypałem ziarna maku… Podróż grecka Zbigniewa Herberta</i> [&ldquo;I sprinkled poppy seeds…&rdquo;: Zbigniew Herbert&rsquo;s Greek journey] (2023); and a new edition of Juliusz Słowacki&rsquo;s <i>Journey to the Holy Land from Naples</i> (2011). She heads the editorial team of a series devoted to philhellenism in Poland (2007, 2012) and one to Sparta in Polish culture (2014, 2015). She is the co-editor of many books, for example: <i>Filhellenizm w Polsce: Rekonesans</i> [Philhellenism in Poland: Reconnaissance], ed. by M. Kalinowska, M. Borowska, J. Ławski, K. Tomaszuk (Warsaw: Wydawnictwo Uniwersytetu Warszawskiego, 2007); <i>Filhellenizm w Polsce: Wybrane tematy</i> [Philhellenism in Poland: Selected themes], ed. by M. Borowska, M. Kalinowska, K. Tomaszuk (Warsaw: Wydawnictwo Uniwersytetu Warszawskiego, 2012); <i>Sparta w kulturze polskiej. Część 1: Model recepcji, spojrzenie europejskie, konteksty greckie</i> [Sparta in Polish culture. Part 1: Reception model, European view, Greek contexts]; <i>Sparta w kulturze polskiej. Część 2: Przekroje, syntezy, konteksty</i> [Sparta in Polish culture. Part 2: Sections, synthesis, contexts], ed. by M. Borowska, M. Kalinowska, J. Speina and K. Tomaszuk (Warsaw: Wydawnictwo Naukowe Sub Lupa, 2014 and 2015); <i> Η Ελλάς των Πολωνών ρομαντικών: Ποιητική ανθολογία</i>, ed. Maria Kalinowska and Paweł Krupka (Athens: Momentum, 2018); <i>Wolność albo śmierć: Polscy filhelleni i powstanie greckie 1821 / Freedom or Death: Polish Philhellenes and the Greek Uprising of 1821</i>, ed. M. Borowska, M. Kalinowska, M. Chilińska (Warsaw: Wydawnictwo Uniwersytetu Warszawskiego, 2021). In 2020 she obtained the Lord Byron Medal from the Society of Hellenism and Philhellenism in Athens.",
+903:"24698@Elisavet Papalexopoulou is a PhD candidate at the European University Institute in Florence and a recipient of a Greek State Scholarships Foundation (IKY) scholarship. Her dissertation, supervised by Professor Emerita Ann Thomson, is titled &ldquo;Intellectual activists in an age of revolutions: women&rsquo;s ideas and political practices in the Greek cultural space (1800–1832)&rdquo;. Before her PhD, she studied English language and literature at the National Kapodistrian University of Athens and completed her MA at the UCL Institute of Education. Her current research focuses on Intellectual History at the Age of Revolutions, with an emphasis on gender.",
+904:"24161@Sakis Gekas is Associate Professor and the Hellenic Heritage Foundation Chair in Modern Greek History at York University, Toronto. He has written on the Ionian Islands under British rule, on merchants and ports in the Mediterranean, and is currently working on the Ionian Islands during the 1821 Revolution, and the history of Greeks in Canada.",
+905:"26956@Dimitris Kousouris studied history and archaeology at the University of Athens (2000) and pursued his postgraduate studies in the École des Hautes Études en Sciences Sociales in Paris, where he received a master&rsquo;s degree (2003) and a PhD in History (2009). His doctoral dissertation examines the postwar (1944–1949) legal purge of the Greek collaborators as an individual case within the framework of the European postwar nation (re-)building process. Since 2015, he is a university assistant in the Institute of Byzantine Studies and Modern Greek Studies of the University of Vienna.",
+906:"24491@Dilek Özkan Pantazis is currently an MSCA postdoctoral fellow at the Cyprus Institute with her project SEABORD, funded by the EU as part of the Marie Skłodowska-Curie Actions, 2022. She is also affiliated as an Academic Fellow with the Research Center of Humanities (RCH) in Athens. Previously, she held positions as a postdoctoral researcher at the University of Macedonia in the Department of Balkan, Slavic and Oriental Studies (2019–2023). She was also a visiting scholar fellow at the University of Graz, Center for Southeast European Studies (2020–2021), and a Visiting Academic Scholar at the University of Oxford, Faculty of Oriental Studies (2016–2017). In 2016, she obtained her PhD from the University of Athens, focusing on the first Ottoman-Greek borders in the borderland of Thessaly and Ottoman modernisation. Additionally, she holds an MA in History from Boğaziçi University (2010) and a BA in History from Istanbul Bilgi University (2005). Her research interests center around Ottoman-Greek relations, borders, and migration flows in Southeast Europe.",
+907:"23469@Esra Ansel completed her undergraduate and master studies at the Department of History of Boğaziçi University. The present article was produced with an updated corpus from her master&rsquo;s thesis (2016) entitled &ldquo;Continuity and Change on the Bosphorus: Arnavutköy Before and After the Greek Revolution of 1821&rdquo;. During her MA studies, she worked as a teaching assistant and research assistant at the history department of Boğaziçi University. During her PhD studies at Bilkent University History Department, she offered HIST 209 History of Turkey courses to international students between 2020 and 2022. She recently received her PhD for her dissertation entitled &ldquo;The Global History of the Ottoman and Turkish Tea Trade&rdquo; (June 2023). She is the author of the article &ldquo;Bureaucrats into Merchants: Tea, Capitalism and the Making of the Republican Bourgeois&rdquo; (Middle Eastern Studies, 2023, https://doi.org/10.1080/00263206.2023.2205134). Her academic interests include global history, social, economic and cultural history during the Late Ottoman and Early Republican Periods, consumption, commodity history, inter-confessional relations, and migration studies.",
+908:"27228@Alexandros Tenekentzis is Assistant Professor of Art History at Department of History and Archaeology, University of Patras, Greece.",
+909:"27428@Eleonora Naxidou is Assistant Professor at the Department of History and Ethnology, Democritus University of Thrace, Greece.",
+910:"27486@Christina Theodosiou is Postdoctoral Researcher at the Department of History and Archaeology, National and Kapodistrian University of Athens, Greece.",
+911:"29435@Gerassimos D. Pagratis is Professor of Italian History and Civilization and Head of the Department of Italian Language and Literature of the National and Kapodistrian University of Athens, Greece.",
+912:"27232@Eyal Ginio is Associate Professor at the Department of Islamic and Middle Eastern Studies, Hebrew University of Jerusalem.",
+913:"27938@Pothiti Hantzaroula is Associate Professor of Historical Anthropology at the Department of Social Anthropology and History at the University of the Aegean. She studied Classics at the University of Athens, did an MA in Social History at the University of Warwick and completed her PhD thesis in History at the European University Institute of Florence in 2002. Among her publications are <i>Sculpting subordination: Waged domestic workers in Greece in the first half of the twentieth century</i> (in Greek, Athens: Papazisis, 2012) and <i>Child Survivors of the Holocaust in Greece: Memory, Testimony and Subjectivity</i> (London: Routledge 2020). Her research interests include the history and historiography of gender and sexuality, intersections of class and gender, memory and history in the Second World War, and the history of emotions. She has translated in Greek Benedict Anderson&rsquo;s <i>Imagined Communities</i> (Athens: Nefeli, 1996).",
+914:"28024@Christos Efstathiou joined the Birmingham International Academy in 2022 and teaches on the Arts, Social Sciences, Business and Law Pathway. He is Teaching Fellow at the University of Birmingham and has taught at the universities of London and Warwick. His publications include <i>E. P. Thompson: A Twentieth Century Romantic</i> (2015) and several articles in peer-reviewed journals.",
+915:"28056@Katerina Sergidou is a Cypriot social anthropologist with a background in history-archaeology and in communication and cultural studies. Since 2017 she has been elaborating a jointly supervised doctoral dissertation in feminist and gender studies at the Department of Social Anthropology and Philosophy of Values/University of the Basque Country (UPV) and the Department of Communication Media and Culture of Panteion University as a fellow of the Greek State Scholarship Foundation (IKY). Her dissertation is on women&rsquo;s participation in the carnival of Cádiz (Andalucía), through a feminist-anthropological perspective. She has undertaken research in Greece and the Spanish state, which has resulted in several journal articles, edited volumes, presentations at international conferences and public writing. Her research interests include contemporary carnival festivities, feminist methodologies in social research, popular art and politics, the concept of feminist hegemony, feminist activism, and feminist writing.",
+916:"28262@Joseph John Viscomi is a lecturer in European History in the Department of History, Classics and Archaeology at Birkbeck, University of London. He is a historian and anthropologist specialised in temporality, migration, and political processes in the Mediterranean region. He is currently completing a manuscript on the departure of Italians from Egypt and has recently published the open-access edited volume <i>Locating the Mediterranean: Connections and Separations across Space and Time</i> (Helsinki University Press, 2022). His research has appeared in <i>History & Anthropology</i>, <i>The Journal of Modern History</i>, <i>Modern Italy</i>, and elsewhere.",
+917:"29144@Athena Skoulariki is Assistant Professor at the Department of Sociology, University of Crete, Greece.",
+918:"29805@National and Kapodistrian University of Athens"
+
+}
+
+                var qs = (function (a) {
+                    if (a == "") return {};
+                    var b = {};
+                    for (var i = 0; i < a.length; ++i)
+                    {
+                        var p = a[i].split('=', 2);
+                        if (p.length == 1)
+                            b[p[0]] = "";
+                        else
+                            b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+                    }
+                    return b;
+                })(window.location.search.substr(1).split('&'));
+                var VOL = qs["1"];
+                var ART = qs["2"];
+                        console.log("START: " + VOL + " / " + ART);
+                var REF = qs["3"];
+                var SECTIONS = "no Sections";
+                var TITLE_CONT = "";
+                //var currIFrameUrl = "https://ejournals.epublishing.ekt.gr/pfiles/journals/14/editor-uploads/issues/" + VOL + "/" + ART + ".html";
+                var currIFrameUrl = "./" + ART + ".html";
+        </script>
+
+        <!-- ********************************** top bar ********************************* -->
+
+        <div class="w3-top" style="left:300px; height:110px;">
+            <ul class="w3-navbar w3-large" style="vertical-align:middle; background: #7e4d35; background: -moz-linear-gradient(#fff, #7e4d35); background: -webkit-linear-gradient(#fff, #7e4d35); background: -o-linear-gradient(#fff, #7e4d35);">
+                <li>
+                    <img src="../images/HistLogo.jpg" alt="Historein Logo" style="width:300px;height:110px;" usemap="#logoMap" />
+                    <map id="logo" name="logoMap">
+                        <area shape="rect" coords="0,0,300,110" target="_blank" alt="TOC" />
+                    </map>
+                    <script>
+                        //document.getElementById("logo").href = "https://ejournals.epublishing.ekt.gr/index.php/historein/issue/view/" + VOL + "/showToc"
+                    </script>
+                </li>
+                <li>
+                    <table>
+                        <tr>
+                            <td>
+                                <ul class="w3-navbar w3-medium  " style="letter-spacing: 0.8px;">
+                                    <!--<li class="w3-medium"><a href="#" onclick="showIframe('VOLUMES')"><span --> 
+                                    <li class="w3-medium"><a href="https://ejournals.epublishing.ekt.gr/index.php/historein/issue/archive"><spanid="VOLUMES" class="w3-hover-text-black w3-medium">Volumes </span>  </a></li>
+                                    <li class="w3-medium"><a href="#" onclick="showAbstract()"><span id="ABSTRACT" class="w3-hover-text-black w3-medium">Abstract</span>  </a></li>
+                                    <li class="w3-dropdown-hover w3-medium"><a href="#"><span class="w3-hover-text-black w3-medium" onclick="loadSections(); w3_openS(); " id="openNavS">Sections</span>  </a></li>
+                                    <li class="w3-dropdown-hover w3-medium">
+                                        <!-- <a href="#"><span id="FORMATS" class="w3-hover-text-black w3-medium">Formats</span>  </a> -->
+                                        <div class="w3-dropdown-content w3-card-4 w3-medium">
+                                            <a id="HIST-PDF" href="#" target="_blank">Read PDF</a>
+                                            <script>
+                                                for (key in ART_TITLES)
+                                                {
+                                                    s = ART_TITLES[key];
+                                                    ar1 = s.split("@");
+                                                    var ar = ar1[1].split("^");
+                                                    if (ar1[0] === ART)
+                                                    {
+                                                        if (ar[2] == "PDF")
+                                                        {
+                                                            document.getElementById("HIST-PDF").href = "./" +  ART + ".pdf";
+                                                        } else
+                                                        {
+                                                            document.getElementById("HIST-PDF").innerHTML = "PDF not available";
+                                                        }
+                                                        break;
+                                                    }
+                                                }
+                                            </script>
+                                        </div>
+                                    </li>
+
+                                    <li class="w3-dropdown-hover w3-medium">
+                                        <!-- <a href="#"><span id="INFO">Info</span></a> -->
+                                         <!--<div id="METADATA-CITE" class="w3-dropdown-content w3-card-4 w3-medium">
+                                            <a id="METADATA" href="" target="_new">Indexing metadata</a> -->
+                                            <script>
+    //document.getElementById("METADATA").href = "https://ejournals.epublishing.ekt.gr/index.php/historein/rt/metadata/" + ART + "/0";
+                                            </script>
+                                            <!-- <a id="CITE" href="" target="_new">How to cite item</a> -->
+                                            <script>
+    //document.getElementById("CITE").href = "https://ejournals.epublishing.ekt.gr/index.php/historein/rt/captureCite/" + ART + "/0";
+                                            </script>
+                                        </div>
+                                    </li>
+                                    <li style="top:5px;"><a id="EKT" href="https://www.ekt.gr/en" target="_blank"> <span id="EKT-EKT" class="w3-hover-text-black w3-medium">EKT</span>  </a></li>
+                                    <li><a href="#" onclick="showIframe(currIFrameUrl + '#top');"><span id="TOP" class="w3-hover-text-black w3-medium">top</span>  </a></li>
+                                </ul>
+                            </td>
+                        </tr>
+
+                    </table>
+
+                    <table style=" margin:0px; padding:0px">
+                        <tr style=" margin:0px; padding:0px">
+                            <td style=" margin:0px; padding:0px">
+                                <ul class="w3-navbar  w3-medium  " style="letter-spacing: 0.8px;">
+                                    <li id="ART_AUTHOR"><a href="#"><span id="AUTHOR_SPAN" style="color:#F9F6F3; " class="w3-hover-text-black" onclick="showCV()"></span></a></li>
+                                    <li id="ART_TITLE"><a href="#"><span id="TITLE_SPAN" style="color:#F9F6F3; " class="w3-hover-text-black"></span></a> </li>
+                                </ul>
+                                <script>
+                                    for (var key in ART_AUTHORS) {
+                                        var s = ART_AUTHORS[key];
+                                        var ar1 = s.split("@");
+                                        if (ar1[0] == ART){
+                                            document.getElementById("AUTHOR_SPAN").innerHTML = ar1[1];
+                                        }
+                                    }
+                                </script>
+                            </td>
+                        </tr>
+                        <tr style="margin:0px; padding:0px">
+                            <td style="margin:0px; padding:0px">
+                                <span class="w3-medium  w3-hover-text-black" id="TITLE_CONT" style="letter-spacing: 0.8px;color:#F9F6F3; "> </span> <!-- class="w3-hover-text-black"-->
+                            </td>
+                        </tr>
+                    </table>
+                </li>
+
+            </ul>
+        </div>
+
+        <script>
+            //alert("li-1: " + ART);
+            for (key in ART_TITLES) {
+                var s = ART_TITLES[key];
+                ar1 = s.split("@");
+                var ar = ar1[1].split("^");
+                //alert("li-2-ART: " + s + "  ==>  " + ar1[0]);
+                if (ar1[0] == ART) {
+                    //alert("li: " + ar[1]);
+                    var ar2 = ar[1].split("=");
+                    if (ar2 !== undefined) {
+                        //alert("li-2: " + ar2.length + " " + ar2[0] + " ==>> " + ar2[1]);
+                        if (ar2.length > 1) {
+                            //alert(ar2[0] + " ==>> " + ar2[1]);
+                            document.getElementById("TITLE_SPAN").innerHTML = ar2[0];
+                            document.getElementById("TITLE_CONT").innerHTML = ar2[1];
+                            break;
+                        } else {
+                            //alert(ar2[0] + " ==>> " );
+                            document.getElementById("TITLE_SPAN").innerHTML = ar2[0];
+                            document.getElementById("TITLE_CONT").innerHTML = "";
+                            break;
+                        }
+                    } else {
+                        //alert("li-3: " + ar[0]);
+                        document.getElementById("TITLE_SPAN").innerHTML = ar[1];
+                    }
+                }
+            }
+        </script>
+        <!-- ********************************** END to bar ************************************** -->
+        
+        <!-- -->
+        <!-- ********************************** START down part ********************************** -->
+        <div style=" margin-top:110px; overflow-y:hidden;">
+            
+            <!-- **********Side navbar Contents ********** -->
+
+            <nav id="Sidenav-Contents" class="w3-sidenav w3-card-2" style="width:300px; height:100%; top:0px; background-color:#f9f5eb; overflow:auto">
+                <a id="CONTENTS" href="#"><span style="color:#403D3D;  font-weight:bold; "> </span></a>
+            </nav>
+            <script>
+                var ar = VOLS[VOL].split("^");
+                document.getElementById("CONTENTS").innerHTML = "CONTENTS     " + ar[0];
+            </script>
+            
+            <script>
+                //load contents
+                var artLeft = "";
+                //var ur = "https://ejournals.epublishing.ekt.gr/pfiles/journals/14/editor-uploads/issues/" + VOL + "/";
+                var introLabel = "";
+                var artLabel = "";
+                var diaLabel = "";
+                var bookLabel = "";
+                var bullLabel = "";
+                var inmemLabel = "";
+                for (var key in ART_TITLES) {
+                    var s = ART_TITLES[key];
+                    var ar1 = s.split("@");
+                    var ar = ar1[1].split("^");
+                    ar[1] = ar[1].replace("= &nbsp &nbsp", "");
+                    var auth = ART_AUTHORS[key];
+                    var ar2 = auth.split("@");
+                    auth = "<span style='font-size:14px;'>" + ar2[1] + "</span>";
+                    //console.log("ar[0]=" + ar[0]);
+                    if (ar[0] == "N") {
+                        artLeft += '<span class="w3-small" style="margin-left:15px; color:#403D3D; font-weight:bold;">EDITORIAL NOTE</span>';
+                        artLeft += '<a ' + ' onclick="' + 'displayFr(' + "'" + ar1[0] + "'" + ');"' + ' href="#" ' + '><span class="w3-small" style="color:403D3D;">' + auth + "<br/>" + ar[1] + '</span> </a>';
+                    }
+                    if (ar[0] == "I") {
+                        if (introLabel == "") {
+                            introLabel = "INTRODUCTION";
+                            artLeft += '<span class="w3-small" style="margin-left:15px; color:#403D3D; font-weight:bold;">INTRODUCTION</span>';
+                            artLeft += '<a ' + ' onclick="' + 'displayFr(' + "'" + ar1[0] + "'" + ');"' + ' href="#" ' + '><span class="w3-small" style="color:403D3D;">' + auth + "<br/>" + ar[1] + '</span> </a>';
+                        }
+                    } else if (ar[0] == "A") {
+                        if (artLabel == "") {
+                            artLabel = "ARTICLES";
+                            artLeft += '<span class="w3-small" style="margin-left:15px; color:#403D3D; font-weight:bold;">ARTICLES</span>';
+                        }
+                        artLeft += '<a ' + ' onclick="' + 'displayFr(' + "'" + ar1[0] + "'" + ');"' + ' href="#" ' + '><span class="w3-small" style="color:403D3D;">' + auth + "<br/>" + ar[1] + '</span> </a>';
+                    } else if (ar[0] == "D") {
+                        if (diaLabel == "") {
+                            diaLabel = "DIALOGOS";
+                            artLeft += '<span class="w3-small" style="margin-left:15px; color:#403D3D; font-weight:bold;">DIALOGOS</span>';
+                        }
+                        artLeft += '<a ' + ' onclick="' + 'displayFr(' + "'" + ar1[0] + "'" + ');"' + ' href="#" ' + '><span class="w3-small" style="color:403D3D;">' + auth + "<br/>" + ar[1] + '</span> </a>';
+                    } else if (ar[0] == "B") {
+                        if (bookLabel == "") {
+                            bookLabel = "BOOK REVIEWS";
+                            artLeft += '<span class="w3-small" style="margin-left:15px; color:#403D3D; font-weight:bold;">BOOK REVIEWS</span>';
+                        }
+                        artLeft += '<a ' + ' onclick="' + 'displayFr(' + "'" + ar1[0] + "'" + ');"' + ' href="#" ' + '><span class="w3-small" style="color:403D3D;">' + auth + "<br/>" + ar[1] + '</span> </a>';
+                    } else if (ar[0] == "L") {
+                        if (bullLabel == "") {
+                            bullLabel = "BULLETIN";
+                            artLeft += '<span class="w3-small" style="margin-left:15px; color:#403D3D; font-weight:bold;">BULLETIN</span>';
+                        }
+                        artLeft += '<a ' + ' onclick="' + 'displayFr(' + "'" + ar1[0] + "'" + ');"' + ' href="#" ' + '><span class="w3-small" style="color:403D3D;">' + auth + "<br/>" + ar[1] + '</span> </a>';
+                    } else if (ar[0] == "M") {
+                        if (inmemLabel == "") {
+                            inmemLabel = "IN MEMORIAM";
+                            artLeft += '<span class="w3-small" style="margin-left:15px; color:#403D3D; font-weight:bold;">IN MEMORIAM</span>';
+                        }
+                        artLeft += '<a ' + ' onclick="' + 'displayFr(' + "'" + ar1[0] + "'" + ');"' + ' href="#" ' + '><span class="w3-small" style="color:403D3D;">' + auth + "<br/>" + ar[1] + '</span> </a>';
+                    }
+                }
+                artLeft = artLeft.replace(/<br \s*[\/]?>/gi, "");
+                artLeft += '<br /><br />';
+                document.getElementById("Sidenav-Contents").innerHTML += artLeft;
+            </script>
+
+            <script>
+                // display ART from chapters
+                function displayFr(which) {
+                    for (var key in ART_AUTHORS) {
+                        var s = ART_AUTHORS[key];
+                        var ar1 = s.split("@");
+                        if (ar1[0] == which) {
+                            document.getElementById("AUTHOR_SPAN").innerHTML = ar1[1];
+                            break;
+                        }
+                    }
+                    ART = which;
+                    for (key in ART_TITLES) {
+                        var s = ART_TITLES[key];
+                        ar1 = s.split("@");
+                        var ar = ar1[1].split("^");
+                        if (ar1[0] == ART) {
+                            var ar2 = ar[1].split("=");
+                            if (ar2 !== undefined) {
+                                if (ar2.length > 1) {
+                                    document.getElementById("TITLE_SPAN").innerHTML = ar2[0];
+                                    document.getElementById("TITLE_CONT").innerHTML = ar2[1];
+                                    break;
+                                } else {
+                                    document.getElementById("TITLE_SPAN").innerHTML = ar2[0];
+                                    document.getElementById("TITLE_CONT").innerHTML = "";
+                                    break;
+                                }
+                            } else {
+                                document.getElementById("TITLE_SPAN").innerHTML = ar[1];
+                            }
+                        }
+                    }
+                    if (ar[2] == "PDF") {
+                        document.getElementById("HIST-PDF").innerHTML = "Read PDF";
+                        document.getElementById("HIST-PDF").href = "./" + ART + ".pdf";
+                    } else {
+                        document.getElementById("HIST-PDF").innerHTML = "PDF not available";
+                        document.getElementById("HIST-PDF").href = "javascript:void(0)";
+                    }
+                    //document.getElementById("METADATA").href = "https://ejournals.epublishing.ekt.gr/index.php/historein/rt/metadata/" + ART + "/0";
+                    //document.getElementById("CITE").href = "https://ejournals.epublishing.ekt.gr/index.php/historein/rt/captureCite/" + ART + "/0";
+                    currIFrameUrl = "./" + which + ".html";
+                    //showIframe("https://ejournals.epublishing.ekt.gr/pfiles/journals/14/editor-uploads/issues/" + VOL + "/" + which + ".html");
+                    //showIframe(currIFrameUrl);
+                    showIframe(currIFrameUrl + '#top');
+                }
+            </script>
+
+            <!-- ********** END Side navbar Contents ********** -->
+            <!-- -->
+            <!-- ********** START Side navbar Sections ********** -->
+            <nav id="Sidenav-Sections" class="w3-sidenav w3-card-2 " style="display:none; width:300px; height:100%; top:0px; background-color:#f9f5eb; overflow:auto;">
+            </nav>
+            <!-- ********** END Side navbar Sections ********** -->
+            <!-- -->
+            <!-- ********** START frame div **********
+    <div style="width:100%; height:100%; margin-left:20px; margin-top:0px; ">
+        <p>START frame div</p>
+        <div id="frDiv" style="width:100%; height:60000px; margin-top:0px; "> </div>
+    </div>
+    -->
+            <!-- ********** START frame div ********** -->
+            <div id="frCont" class="w3-top" style="margin-left:300px; width:90%; margin-top:113px; border:none;">
+                <div id="frDiv" style="width:90%; margin-left:0px; margin-top:0px; border:none;">
+                    <iframe id='frItem' src="" style="margin-left:0px; width:90%; margin-right:50px; overflow-y:scroll; border:none;"> </iframe>
+                </div>
+            </div>
+            <!-- ********** END frame div ********** -->
+
+            <!-- -->
+            <!-- ********** START note div ********** -->
+            <div id="fix" class="note" style="margin-bottom:0px; display:none">
+                <a id="X" href="#" onclick="document.getElementById('fix').style.display='none'; return false;">X</a>
+                <div id="inFix"> </div>
+            </div>
+            <!-- ********** END note div ********** -->
+
+            <script>
+                function noteShow(which) {
+                    //console.log("noteShow: " + which);
+                    if (which.length > 500) {
+                        document.getElementById('fix').style.width = "750px";
+                        document.getElementById('inFix').style.width = "750px";
+                    } else {
+                        document.getElementById('fix').style.width = "650px";
+                        document.getElementById('inFix').style.width = "650px";
+                    }
+                    document.getElementById('inFix').innerHTML = "<br />" + which;
+                    window.scrollBy(0, 200)
+                    document.getElementById('fix').style.display = "flex";
+                    document.getElementById('fix').style.zIndex = "50";
+                }
+            </script>
+
+            <script>
+                function createIframe(which) {
+                    var j = document.getElementById("frItem");
+                    j.src = "./" + ART + ".html";
+                };
+                // load ART from url
+                //console.log("createIframe: createIframe= https://ejournals.epublishing.ekt.gr/pfiles/journals/14/editor-uploads/issues/" + VOL + "/" + ART + ".html");
+                createIframe("./" + ART + ".html");
+            </script>
+
+            <script>
+                function w3_openS() { document.getElementById("Sidenav-Sections").style.display = "block"; }
+                function w3_closeS() { document.getElementById("Sidenav-Sections").style.display = "none"; }
+                function w3_openC() { document.getElementById("Sidenav-Contents").style.display = "block"; }
+                function w3_closeC() {
+                    document.getElementById("Sidenav-Contents").style.display = "none";
+                    document.getElementById("Sidenav-Sections").style.display = "block";
+                }
+
+                function showIframe(which) {
+                    console.log("showIframe which= " + which);
+                    if (which == "#top") {
+                        return;
+                    }
+                    var i = document.getElementById("frItem");
+                    if (which == "VOLUMES") {
+                        //i.src = "https://ejournals.epublishing.ekt.gr/pfiles/journals/14/editor-uploads/issues/" + VOL + "/Volumes.html";
+                        //i.src = "https://ejournals.epublishing.ekt.gr/pfiles/journals/14/editor-uploads/general/Volumes.html";
+                    } else {
+                        i.src = which;
+                    }
+                    gotoFrHash("#top");
+                    //console.log("showIframe: " + i.src);
+                    document.getElementById('fix').style.display = "none";
+                };
+            </script>
+
+            <script>
+                function gotoFrHash(which) {
+                    //console.log("gotoFrHash: frame.contentWindow.postMessage(which, '*') ");
+                    var frame = document.getElementById('frItem');
+                    frame.contentWindow.postMessage(which, '*');
+                }
+            </script>
+
+            <script>
+                function ifrScroll() {
+                    console.log("ifrScroll EMPTY!!! DONOT DELETE");
+                }
+            </script>
+
+            <script>
+                window.addEventListener('message', function (event) {
+                    SECTIONS = event.data;
+                });
+            </script>
+
+            <script>
+                // init
+                function init() {
+                    window.onresize = displayWindowSize; 
+                    displayWindowSize();
+                    //
+                    var ua = window.navigator.userAgent;
+                    var msie = ua.indexOf('Trident');
+                    if (msie > 0) {
+                        document.getElementById("VOLUMES").style.color = "#F9F6F3";
+                        document.getElementById("ABSTRACT").style.color = "#F9F6F3";
+                        document.getElementById("openNavS").style.color = "#F9F6F3";
+                        document.getElementById("FORMATS").style.color = "#F9F6F3";
+                        document.getElementById("INFO").style.color = "#F9F6F3";
+                        document.getElementById("EKT-EKT").style.color = "#F9F6F3";
+                        document.getElementById("TOP").style.color = "#F9F6F3";
+                    }
+                }
+                
+                // displayWindowSize
+                function displayWindowSize() {
+                    if (document.getElementById("frCont") !== null) {
+                        document.getElementById("frCont").style.height = (window.innerHeight - 110).toString() + "px";
+                        document.getElementById("frDiv").style.height = (window.innerHeight - 110).toString() + "px";
+                        document.getElementById("frItem").style.height = (window.innerHeight - 110).toString() + "px";
+                        //
+                        document.getElementById("frCont").style.width = (window.innerWidth - 300).toString() + "px";
+                        document.getElementById("frDiv").style.width = (window.innerWidth - 300).toString() + "px";
+                        document.getElementById("frItem").style.width = (window.innerWidth - 300).toString() + "px";
+                    }
+                }
+                
+                // loadSections
+                function loadSections() {
+                    var init = ' <a href="#"></a> <a href="#"></a> <a href="javascript:void(0)" onclick="w3_closeS()" class="w3-closenav w3-large" style="text-align:right; color:#403D3D;" >Close &times;</a>  <a href="#">SECTIONS</a> '
+                    var el = document.getElementById("Sidenav-Sections");
+                    el.innerHTML = init;
+                    var s1 = '<a id="!" href="javascript:void(0)" onclick="gotoFrHash(';
+                    s1 += "'%'" + ');"><span class="w3-small">*</span></a>';
+                    // var ar1 = SECTIONS.split("&");
+                    var ar1 = SECTIONS.split("@");
+                    for (var i = 0; i < ar1.length - 1; i++) {
+                                console.log("loadSections=" + ar1[i] );
+                        var ar2 = ar1[i].split("^");
+                        var s = s1.replace("!", ar2[0]);
+                        s = s.replace("%", ar2[0]);
+                        s = s.replace("*", ar2[1]);
+                        el.innerHTML += s;
+                    }
+                };
+
+                // showAbstract
+                function showAbstract() {
+                    for (var key in ABSTRACTS) {
+                        var s = ABSTRACTS[key];
+                        var ar1 = s.split("@");
+                        if (ar1[0] == ART) {
+                            noteShow(ar1[1]);
+                        }
+                    }
+                }
+
+                // showCV
+                function showCV() {
+                    for (var key in CVs) {
+                        var s = CVs[key];
+                        var ar1 = s.split("@");
+                        if (ar1[0] == ART) {
+                            noteShow(ar1[1]);
+                            break;
+                        }
+                    }
+                    return;
+
+                    //alert("stop");
+                    for (var key in CVs) {
+                        var s = CVs[key];
+                        var ar1 = s.split("^");
+                        if (ar1[0] == ART) {
+                            s = ar1[1];
+                            // ***** update links *****
+                            //alert(s);
+                            var ar = s.split(" ");
+                            j = ar.length - 1;
+                            //alert(j);
+                            var s1 = " ";
+                            for (var i = 0; i < j; i++) {
+                                var s2 = ar[i];
+                                var s3 = s2.substr(0, 4);
+                                //alert(s3);
+                                if (s3 == "http") {
+                                    s1 += "<a href='" + s2 + "' target='_blank'>" + s2 + "</a>" + " ";
+                                    alert(s1);
+                                } else {
+                                    s1 += s2 + " ";
+                                }
+                            }
+                            //alert();
+                            //noteShow(ar1[1]);
+                            noteShow(s1);
+                        }
+                    }
+                }
+
+                // insertLinks
+                function insertLinks(str, delim) {
+                    var ar = str.split(delim);
+                    var s1 = "";
+                    for (var i = 0; i < ar.length; i++) {
+                        var s2 = ar[i].substr(0, 4);
+                        if (s2 == "http") {
+                            s1 += "<a href='" + ar[i] + "' target='_blank'>" + ar[i] + "</a>" + delim;
+                            //alert(s1);
+                        } else {
+                            s1 += ar[i] + delim;
+                        }
+                    }
+                    return s1;
+                }
+            </script>
+
+
+            <!-- **********************************  END down part ********************************** -->
+
+        </div>
+    </body>
+</html>
+
+
