@@ -8,11 +8,12 @@ import urllib.request
 
 REPOSITORY='Qwen/Qwen2.5-3B-Instruct-GGUF'
 FILENAME='qwen2.5-3b-instruct-q4_k_m.gguf'
+REVISION='7dabda4d13d513e3e842b20f0d435c732f172cbe'
 
 def prepare(destination):
     from huggingface_hub import HfApi,hf_hub_download
     api=HfApi()
-    info=api.model_info(REPOSITORY,revision=os.getenv('PCT_LOCAL_MODEL_REVISION','main'),files_metadata=True)
+    info=api.model_info(REPOSITORY,revision=os.getenv('PCT_LOCAL_MODEL_REVISION',REVISION),files_metadata=True)
     sibling=next(s for s in info.siblings if s.rfilename==FILENAME)
     expected=sibling.lfs.sha256 if sibling.lfs else None
     if not expected:raise ValueError('MODEL_LFS_CHECKSUM_REQUIRED')

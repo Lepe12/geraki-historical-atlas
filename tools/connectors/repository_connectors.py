@@ -102,8 +102,12 @@ class _LinkParser(HTMLParser):
             if txt:self.links.append((self._href,txt))
             self._href=None; self._buf=[]
 
-def _html_search(url, repository, lane, base, keep=None, max_records=25):
-    html=_get(url).decode("utf-8","replace")
+def _html_search(url, repository, lane, base, keep=None, max_records=25, browser=False):
+    if browser:
+        try:from .http_audit import browser_fetch
+        except ImportError:from http_audit import browser_fetch
+        html=browser_fetch(url).decode('utf-8','replace')
+    else:html=_get(url).decode("utf-8","replace")
     p=_LinkParser();p.feed(html);seen=set();recs=[]
     for href,title in p.links:
         absolute=urllib.parse.urljoin(base,href)
@@ -495,18 +499,21 @@ def pares_simancas(q,lane):
         plain=" ".join(plain.split())
         if not (re.search(r'Signatura|Reference code|Call number',plain,re.I) and ("Archivo General de Simancas" in plain)):
             return "RECORD_NOT_CONFIRMED",[],url+" did not confirm a Simancas archival description"
-        title_match=re.search(r"(?is)<title[^>]*>(.*?)</title>",raw)
+        title_match=re.search(r'(?is)<meta\s+property=["\']og:title["\']\s+content=["\'](.*?)["\']\s*/?>',raw) or re.search(r"(?is)<title[^>]*>(.*?)</title>",raw)
         title=unescape(re.sub(r"<[^>]+>"," ",title_match.group(1))).strip() if title_match else "PARES record "+record_id
         sig=re.search(r"(?:Signatura|Reference number|Call number)\s*:\s*(.{1,180}?)(?=Fecha |Date |Nivel de Descripci|Código de Referencia|Reference code|Contexto|Context)",plain,re.I)
         ref=re.search(r"(?:Código de Referencia|Reference code)\s*:\s*(.{1,180}?)(?=Contexto|Contenido y Estructura|Condiciones|Context|Content)",plain,re.I)
+        archival_code=re.search(r'ES\.47161\.AGS(?:/[^\s<]+)?',plain)
+        date_match=re.search(r'(?:Fecha Creaci[oó]n|Date of formation)\s*:\s*([^:]{1,90}?)(?=Nivel de Descripci|Level of description)',plain,re.I)
         return "EXECUTED",[{
             "discovery_repository":"PARES / Archivo General de Simancas",
             "discovery_lane":lane,"connector_status":"EXECUTED",
             "identifier":record_id,"title":title,"url":url,
             "archive":"Archivo General de Simancas",
-            "archival_reference":ref.group(1).strip() if ref else None,
+            "archival_reference":archival_code.group(0) if archival_code else ref.group(1).strip() if ref else None,
             "shelfmark":sig.group(1).strip() if sig else None,
-            "date":[],"digital_url":None,
+            "date":[date_match.group(1).strip()] if date_match else [],"digital_url":None,
+            "metadata_text":plain[:22000],
             "evidence_level":"CATALOGUE_METADATA_ONLY",
         }],url
     except Exception as exc:
@@ -660,7 +667,22 @@ def crossref_works(q,lane):
     return "EXECUTED",out,url
 
 def academia_public(q,lane):
-    return _public_site_index(q,lane,"Academia.edu Public Research","academia.edu",20)
+    url='https://www.academia.edu/search?'+urllib.parse.urlencode({'q':q})
+    try:
+        rows=_html_search(url,'Academia.edu Public Research',lane,'https://www.academia.edu',
+                          lambda u,t:bool(re.search(r'academia\.edu/\d+/',u)) and len(t)>3)
+        return 'EXECUTED',rows,url
+    except urllib.error.HTTPError as error:
+        if error.code not in (401,403,429):raise
+        attempts=[];rows=[]
+        for name,lookup in [('Crossref',crossref_works),('OpenAlex',openalex_works)]:
+            try:
+                status,found,detail=lookup(q,lane)
+                for row in found:row.update(fallback_for='Academia.edu Public Research',fallback_basis='INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS')
+                rows.extend(found);attempts.append({'catalogue':name,'status':status,'records':len(found)})
+            except Exception as fallback_error:attempts.append({'catalogue':name,'status':'FAILED','error_type':type(fallback_error).__name__})
+        return 'REMOTE_ACCESS_BLOCKED',rows,json.dumps({'native_http_status':error.code,
+            'reason':'PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted','alternate_routes':attempts})
 
 def openarchives_public(q,lane):
     base='https://www.openarchives.gr'
@@ -679,13 +701,23 @@ def nlg_public(q,lane):
     return 'EXECUTED',rows,url+' ; native anonymous catalogue; first page only'
 
 def anemi_public(q,lane):
-    return _public_site_index(q,lane,"Anemi / University of Crete","anemi.lib.uoc.gr",25)
+    base='https://anemi.lib.uoc.gr'
+    try:from .http_audit import anemi_search
+    except ImportError:from http_audit import anemi_search
+    html=anemi_search(q).decode('utf-8','replace')
+    parser=_LinkParser();parser.feed(html);rows=[];seen=set()
+    for href,title in parser.links:
+        url=urllib.parse.urljoin(base,href)
+        if '/metadata/' in url and len(title)>3 and url not in seen:
+            seen.add(url);rows.append({'discovery_repository':'Anemi / University of Crete','discovery_lane':lane,
+                'connector_status':'EXECUTED','identifier':url,'url':url,'title':title,'date':[]})
+    return 'EXECUTED',rows[:10],base+'/search ; actual public browser form submitted; bounded metadata only, no bulk downloads'
 
 def sias_public(q,lane):
     base='https://sias-archivi.cultura.gov.it'
     url=base+'/cgi-bin/pagina.pl?'+urllib.parse.urlencode({'RicVM':'ricercasemplice','RicFrmRicSemplice':q,'RicSez':'complessi'})
     rows=_html_search(url,'SIAS / Italian State Archives',lane,base,
-                      lambda u,t:'/cgi-bin/pagina.pl?' in u and bool(re.search(r'(?:TipoPag|Chiave)=',u,re.I)) and len(t)>3)
+                      lambda u,t:'/cgi-bin/pagina.pl?' in u and bool(re.search(r'(?:TipoPag|Chiave)=',u,re.I)) and len(t)>3,browser=True)
     return 'EXECUTED',rows,url+' ; public descriptive catalogue; not restricted to Venice'
 
 def boa_access(q,lane):

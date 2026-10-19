@@ -18,7 +18,7 @@ def identity():
         path=Path(os.environ['PCT_LOCAL_MODEL_PATH'])
         manifest=path.with_suffix('.manifest.json')
         _identity=json.loads(manifest.read_text()) if manifest.exists() else {}
-        actual=hashlib.file_digest(path.open('rb'),'sha256').hexdigest()
+        with path.open('rb') as stream:actual=hashlib.file_digest(stream,'sha256').hexdigest()
         if _identity.get('sha256') and _identity['sha256']!=actual:
             raise ValueError('MODEL_CHECKSUM_MISMATCH')
         _identity.update(sha256=actual,file=path.name)
@@ -32,8 +32,11 @@ def call(role,prompt,route):
         _model=Llama(model_path=os.environ['PCT_LOCAL_MODEL_PATH'],n_ctx=8192,
                      n_threads=max(1,min(4,os.cpu_count() or 1)),verbose=False,seed=42)
     started=time.monotonic()
+    prompt_tokens=len(_model.tokenize(prompt.encode()))+32
+    maximum=min(route.max_output_tokens,1800,8192-prompt_tokens-64)
+    if maximum<128:raise ValueError('MODEL_CONTEXT_BUDGET_EXCEEDED')
     result=_model.create_chat_completion(messages=[{'role':'user','content':prompt}],
-        temperature=route.temperature,max_tokens=min(route.max_output_tokens,2200),
+        temperature=route.temperature,max_tokens=maximum,
         response_format={'type':'json_object'})
     return {'status':'COMPLETED','role':role,'provider':'local_llama_cpp','model':route.model,
             'model_identity':model_identity,'runtime':'llama-cpp-python',

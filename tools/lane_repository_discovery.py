@@ -167,6 +167,8 @@ for repo_index,r in enumerate(plan["repositories"]):
         # Archive overrides above were designed for individual names. They
         # must not restore an entire quoted question for thematic research.
         repo_terms=topic_queries(focus,lane)
+        semantic=[r['query'] for r in (plan.get('semantic_query_expansion') or {}).get('accepted_queries',[]) if r.get('lane')==lane]
+        repo_terms=list(dict.fromkeys(repo_terms[:2]+semantic+repo_terms[2:]))
     completed={a['query'] for a in attempts[repo_index].get('queries',[])}
     pending=[q for q in repo_terms if q not in completed]
     if attempts[repo_index].get('status') in ('API_KEY_REQUIRED','AUTH_OR_BROWSER_REQUIRED','ACCESS_BLOCKED','REMOTE_ACCESS_BLOCKED','REMOTE_RATE_LIMITED'):pending=[]

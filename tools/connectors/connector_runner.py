@@ -48,8 +48,10 @@ def run_connector(connector_id:str, query:str, timeout:int=180):
         native=str(parsed.get('status','')).upper()
         if native in {'BLOCKED','ACCESS_BLOCKED','LOGIN_REQUIRED','API_KEY_REQUIRED','CAPTCHA'}:
             status,code=ConnectorStatus.BLOCKED,native
-        elif native in {'FAILED','ERROR','BROWSER_EXECUTED_NO_API_CONFIRMATION'}:
+        elif native in {'FAILED','ERROR','BROWSER_EXECUTED_NO_API_CONFIRMATION','REMOTE_ERROR','API_SCHEMA_MISMATCH','SEARCH_NOT_CONFIRMED'}:
             status,code=ConnectorStatus.FAILED,native
+        elif native in {'AUTH_OR_BROWSER_REQUIRED','REMOTE_ACCESS_BLOCKED','REMOTE_RATE_LIMITED','TLS_CONFIGURATION_ERROR','ARCHIVE_NOT_CONFIRMED'}:
+            status,code=ConnectorStatus.BLOCKED,native
         elif native=='PARTIAL':status=ConnectorStatus.PARTIAL
     elif status==ConnectorStatus.EXECUTED:
         status,code=ConnectorStatus.FAILED,'INVALID_CONNECTOR_OUTPUT'
@@ -78,6 +80,7 @@ def run_connector(connector_id:str, query:str, timeout:int=180):
         "returncode":proc.returncode,
         "stdout_excerpt":proc.stdout[-5000:],
         "stderr_excerpt":proc.stderr[-2000:],
+        "http_attempts":(parsed.get('diagnostic') or {}).get('http_attempts',[]) if isinstance(parsed,dict) and isinstance(parsed.get('diagnostic'),dict) else [],
       },
       blockers=blockers,
       warnings=warnings,

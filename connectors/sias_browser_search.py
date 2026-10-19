@@ -1,41 +1,15 @@
-"""Restricted browser discovery probe for SIAS Italian State Archives."""
-from __future__ import annotations
-import argparse, asyncio, json, sys
+"""Execute the shared audited catalogue connector; never historical verification."""
+import argparse,json,sys
 from pathlib import Path
-ROOT=Path(__file__).resolve().parent.parent
-if str(ROOT) not in sys.path: sys.path.insert(0,str(ROOT))
-from tools.browser.archive_session import ArchiveBrowserRegistry
+sys.path.insert(0,str(Path(__file__).resolve().parent.parent/'tools'))
+from connectors.repository_connectors import audited_dispatch
+REPOSITORY = 'SIAS / Italian State Archives'
 
-URL="https://sias-archivi.cultura.gov.it"
+def search(term,**kwargs):
+    status,records,detail=audited_dispatch(REPOSITORY,term,'specialist')
+    return {'status':status,'repository':REPOSITORY,'query':term,'records':records,
+            'diagnostic':json.loads(detail),'evidence_level':'CATALOGUE_METADATA_ONLY','verified':False}
 
-async def search(term:str):
-    registry=ArchiveBrowserRegistry(Path("evidence/browser_sessions"),headless=True)
-    session=registry.get("sias")
-    try:
-        await session.go_to(URL)
-        await asyncio.sleep(4)
-        typed=await session.smart_type("cerca",term)
-        if not typed: typed=await session.smart_type("search",term)
-        if typed:
-            await session.press("Enter")
-            await asyncio.sleep(4)
-        body=await session.body_text(16000)
-        shot=await session.screenshot("sias-search")
-        out={
-          "status":"EXECUTED" if typed else "BROWSER_OPENED_SEARCH_INPUT_NOT_FOUND",
-          "source":"SIAS / Italian State Archives",
-          "query":term,
-          "term_visible":term.lower() in body.lower(),
-          "body_excerpt":body[:7000],
-          "screenshot":shot,
-          "audit_log":str(session.audit_path),
-          "warning":"Catalogue/browser discovery only; this does not verify an archival document."
-        }
-        print(json.dumps(out,ensure_ascii=False,indent=2))
-        return out
-    finally:
-        await registry.close_all()
-
-if __name__=="__main__":
-    p=argparse.ArgumentParser(); p.add_argument("query"); a=p.parse_args()
-    asyncio.run(search(a.query))
+if __name__=='__main__':
+    parser=argparse.ArgumentParser();parser.add_argument('query');parser.add_argument('--limit',type=int,default=20);parser.add_argument('--max-pages',type=int,default=1)
+    args=parser.parse_args();print(json.dumps(search(args.query),ensure_ascii=False,indent=2))

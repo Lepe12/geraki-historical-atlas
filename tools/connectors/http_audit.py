@@ -13,7 +13,7 @@ _receipts=ContextVar('connector_http_receipts',default=None)
 
 def safe_url(url):
     parsed=urllib.parse.urlsplit(str(url))
-    params=[(k,'REDACTED' if re.search(r'key|token|secret|password|session',k,re.I) else v)
+    params=[(k,'REDACTED' if re.search(r'^(?:api_?key|access_token|token|secret|password|jsessionid)$',k,re.I) else v)
             for k,v in urllib.parse.parse_qsl(parsed.query,keep_blank_values=True)]
     return urllib.parse.urlunsplit((parsed.scheme,parsed.hostname or '',parsed.path,urllib.parse.urlencode(params),''))
 
@@ -56,5 +56,61 @@ def fetch(url,headers=None,timeout=25,data=None):
         raise
     finally:
         row['elapsed_ms']=round((time.monotonic()-started)*1000)
+        rows=_receipts.get()
+        if rows is not None:rows.append(row)
+
+def browser_fetch(url,timeout=30000):
+    """Normal Chromium TLS validation for public catalogues with legacy TLS.
+
+    No ignore_https_errors, login session, stealth flags or challenge handling.
+    """
+    if urllib.parse.urlsplit(url).hostname not in {'sias-archivi.cultura.gov.it','anemi.lib.uoc.gr'}:
+        raise ValueError('BROWSER_CATALOGUE_HOST_NOT_ALLOWED')
+    from playwright.sync_api import sync_playwright
+    row={'url':safe_url(url),'method':'ANONYMOUS_BROWSER_GET','request_performed':True,
+         'http_status':None,'tls_verification':True}
+    try:
+        with sync_playwright() as pw:
+            browser=pw.chromium.launch(headless=True)
+            try:
+                page=browser.new_page()
+                response=page.goto(url,wait_until='domcontentloaded',timeout=timeout)
+                raw=page.content().encode()
+                row.update(http_status=response.status if response else None,final_url=safe_url(page.url),
+                           response_sha256=hashlib.sha256(raw).hexdigest(),response_bytes=len(raw))
+                return raw
+            finally:browser.close()
+    except Exception as error:
+        row['error_code']=type(error).__name__;raise
+    finally:
+        rows=_receipts.get()
+        if rows is not None:rows.append(row)
+
+def anemi_search(query):
+    """Submit the site's actual anonymous form, preserving its hidden fields."""
+    from playwright.sync_api import sync_playwright
+    url='https://anemi.lib.uoc.gr/search'
+    row={'url':url,'method':'ANONYMOUS_BROWSER_FORM_GET','request_performed':True,
+         'http_status':None,'tls_verification':True,'query':query}
+    try:
+        with sync_playwright() as pw:
+            browser=pw.chromium.launch(headless=True)
+            try:
+                page=browser.new_page()
+                response=page.goto(url,wait_until='domcontentloaded',timeout=30000)
+                field=page.locator('input[name="cclterm1"]')
+                if not field.count():raise ValueError('ANEMI_PUBLIC_SEARCH_FORM_NOT_FOUND')
+                field.fill(query)
+                with page.expect_navigation(wait_until='domcontentloaded',timeout=30000) as submitted:
+                    field.evaluate('(element)=>element.form.requestSubmit()')
+                response=submitted.value
+                raw=page.content().encode()
+                row.update(http_status=response.status if response else None,final_url=safe_url(page.url),
+                           response_sha256=hashlib.sha256(raw).hexdigest(),response_bytes=len(raw))
+                return raw
+            finally:browser.close()
+    except Exception as error:
+        row['error_code']=type(error).__name__;raise
+    finally:
         rows=_receipts.get()
         if rows is not None:rows.append(row)

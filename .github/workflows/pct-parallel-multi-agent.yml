@@ -46,6 +46,14 @@ env:
   PCT_DATE_RANGE: ${{ inputs.date_range }}
   PCT_PURPOSE: ${{ inputs.purpose }}
   PCT_SELECTED_AGENTS: ${{ inputs.selected_agents }}
+  PCT_LLM_PROVIDER: ${{ vars.PCT_LLM_PROVIDER || 'local_llama_cpp' }}
+  PCT_LLM_MODEL: ${{ vars.PCT_LLM_MODEL || 'Qwen/Qwen2.5-3B-Instruct-GGUF' }}
+  PCT_LLM_BASE_URL: ${{ vars.PCT_LLM_BASE_URL }}
+  PCT_LLM_API_KEY: ${{ secrets.PCT_LLM_API_KEY }}
+  PCT_LLM_QUERY_MODEL: ${{ vars.PCT_LLM_QUERY_MODEL || vars.PCT_LLM_MODEL || 'Qwen/Qwen2.5-3B-Instruct-GGUF' }}
+  PCT_LLM_EXTRACTOR_MODEL: ${{ vars.PCT_LLM_EXTRACTOR_MODEL || vars.PCT_LLM_MODEL || 'Qwen/Qwen2.5-3B-Instruct-GGUF' }}
+  PCT_LLM_SYNTHESIS_MODEL: ${{ vars.PCT_LLM_SYNTHESIS_MODEL || vars.PCT_LLM_MODEL || 'Qwen/Qwen2.5-3B-Instruct-GGUF' }}
+  PCT_LLM_ADVERSARIAL_MODEL: ${{ vars.PCT_LLM_ADVERSARIAL_MODEL || vars.PCT_LLM_MODEL || 'Qwen/Qwen2.5-3B-Instruct-GGUF' }}
   # Host-local MariaDB is primary. Airtable is retained only as an explicit legacy option.
   PCT_STORAGE_BACKEND: mariadb
   PCT_UI_REQUEST_ID: ${{ inputs.request_id }}
@@ -71,6 +79,7 @@ jobs:
           filter: blob:none
           sparse-checkout: |
             tools
+            .github/actions/research-model
             config
             data
             library_discovery_requests
@@ -78,15 +87,11 @@ jobs:
       - name: Announce actual request preparation
         run: |
           python3 tools/orchestrator/jarvis_event_bus.py --run-id "$GITHUB_RUN_ID" --event-type mission_preparing --agent-id jarvis --phase request_validation --status PREPARING --detail "Research runner started; validating the canonical request"
+      - uses: ./.github/actions/research-model
       - id: identity
         name: Resolve canonical research request once
         env:
-          PCT_LLM_PROVIDER: ${{ vars.PCT_LLM_PROVIDER || 'openai_compatible' }}
-          PCT_LLM_BASE_URL: ${{ vars.PCT_LLM_BASE_URL }}
-          PCT_LLM_API_KEY: ${{ secrets.PCT_LLM_API_KEY }}
-          PCT_LLM_EXTRACTOR_MODEL: ${{ vars.PCT_LLM_EXTRACTOR_MODEL || vars.PCT_LLM_MODEL }}
-          PCT_LLM_SYNTHESIS_MODEL: ${{ vars.PCT_LLM_SYNTHESIS_MODEL || vars.PCT_LLM_MODEL }}
-          PCT_LLM_ADVERSARIAL_MODEL: ${{ vars.PCT_LLM_ADVERSARIAL_MODEL || vars.PCT_LLM_MODEL }}
+          PCT_SEMANTIC_QUERY_EXPANSION: '1'
         run: |
           python3 tools/research_preflight.py ${{ inputs.require_semantic_analysis && '--require-semantic' || '' }}
       - name: Preserve preflight receipts
@@ -173,6 +178,8 @@ jobs:
       max-parallel: 11
     runs-on: ubuntu-latest
     env:
+      PCT_TARGET: ""
+      PCT_LLM_PROVIDER: disabled
       PCT_REQUEST_FILE: ${{ needs.prepare.outputs.request_file }}
       PCT_EXPECTED_REQUEST_SHA256: ${{ needs.prepare.outputs.request_sha256 }}
       PCT_RESEARCH_JOB_ID: ${{ needs.prepare.outputs.research_job_id }}
@@ -190,6 +197,9 @@ jobs:
         with:
           name: specialist-normalized-${{ github.run_id }}
           path: specialist_sources
+      - uses: actions/download-artifact@v4
+        with:
+          name: pct-research-request-${{ github.run_id }}
       - name: Validate pinned request before research
         run: |
           python3 tools/request_identity.py
@@ -199,6 +209,11 @@ jobs:
       - name: Announce lane start to Command Center
         run: |
           python3 tools/orchestrator/jarvis_event_bus.py --run-id "$GITHUB_RUN_ID" --event-type agent_started --agent-id "$PCT_RESEARCH_LANE" --phase "repository discovery" --percent 5 --status RUNNING --detail "JARVIS lane execution started"
+      - name: Install browser for public legacy catalogues
+        if: contains(fromJSON('["greek","venetian","italian_states"]'), matrix.lane)
+        run: |
+          python3 -m pip install --quiet playwright
+          python3 -m playwright install --with-deps chromium
       - name: Build lane-specific repository plan
         run: |
           python3 tools/lane_repository_plan.py
@@ -436,21 +451,17 @@ jobs:
           fetch-depth: 0
       - name: Refresh durable evidence
         run: git pull --rebase origin main
+      - uses: ./.github/actions/research-model
       - name: Build JARVIS situation board
-        timeout-minutes: 15
+        timeout-minutes: 35
         env:
           PCT_RUN_ID: ${{ github.run_id }}
-          PCT_LLM_PROVIDER: ${{ vars.PCT_LLM_PROVIDER || 'openai_compatible' }}
-          PCT_LLM_BASE_URL: ${{ vars.PCT_LLM_BASE_URL }}
-          PCT_LLM_API_KEY: ${{ secrets.PCT_LLM_API_KEY }}
-          PCT_LLM_EXTRACTOR_MODEL: ${{ vars.PCT_LLM_EXTRACTOR_MODEL || vars.PCT_LLM_MODEL }}
-          PCT_LLM_SYNTHESIS_MODEL: ${{ vars.PCT_LLM_SYNTHESIS_MODEL || vars.PCT_LLM_MODEL }}
-          PCT_LLM_ADVERSARIAL_MODEL: ${{ vars.PCT_LLM_ADVERSARIAL_MODEL || vars.PCT_LLM_MODEL }}
         run: |
           python3 tools/orchestrator/jarvis_state_board.py \
             --run-id "$PCT_RUN_ID" \
             --output "evidence/runs/$PCT_RUN_ID/JARVIS_STATE_BOARD.json"
           python3 tools/semantic_research_answer.py --run-id "$PCT_RUN_ID"
+          python3 tools/research_validation_report.py --run-id "$PCT_RUN_ID"
           python3 tools/orchestrator/build_command_center_snapshot.py \
             --run-id "$PCT_RUN_ID" \
             --output "command-center/live/runs/$PCT_RUN_ID.json" \

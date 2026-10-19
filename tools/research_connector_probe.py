@@ -101,7 +101,7 @@ async def browser_probe(dest):
     rows=[]
     async with async_playwright() as pw:
         browser=await pw.chromium.launch(headless=True)
-        for name,url in [('moreveneto','https://asve.arianna4.cloud/'),('sias','https://sias-archivi.cultura.gov.it/cgi-bin/pagina.pl?RicVM=ricercasemplice&RicFrmRicSemplice=corsari&RicSez=complessi'),('anemi','https://anemi.lib.uoc.gr/')]:
+        for name,url in [('moreveneto','https://asve.arianna4.cloud/'),('sias','https://sias-archivi.cultura.gov.it/cgi-bin/pagina.pl?RicVM=ricercasemplice&RicFrmRicSemplice=corsari&RicSez=complessi'),('anemi','https://anemi.lib.uoc.gr/search')]:
             page=await browser.new_page()
             traffic=[]
             async def capture(response):
@@ -137,7 +137,7 @@ def main():
         checks = list(pool.map(lambda item: inspect(*item, dest), ENDPOINTS.items()))
     from connectors.repository_connectors import audited_dispatch
     native=[]
-    for repository,query in [('OpenArchives.gr / EKT','πειρατεία'),('National Library of Greece Digital Collections','χειρόγραφο'),('SIAS / Italian State Archives','corsari'),('Archivio di Stato di Venezia / Moreveneto','corsari'),('Archivio di Stato di Venezia / Moreveneto','Venezia'),('PARES / Archivo General de Simancas','corsarios'),('SearchCulture.gr / EKT','πειρατεία')]:
+    for repository,query in [('OpenArchives.gr / EKT','πειρατεία'),('National Library of Greece Digital Collections','χειρόγραφο'),('SIAS / Italian State Archives','corsari'),('Archivio di Stato di Venezia / Moreveneto','corsari'),('Archivio di Stato di Venezia / Moreveneto','Venezia'),('PARES / Archivo General de Simancas','corsarios'),('SearchCulture.gr / EKT','πειρατεία'),('Anemi / University of Crete','πειρατεία')]:
         status,records,detail=audited_dispatch(repository,query,'live_validation')
         native.append({'repository':repository,'query':query,'status':status,'records':records,'diagnostic':json.loads(detail)})
     import asyncio

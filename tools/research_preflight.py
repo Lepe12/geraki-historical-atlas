@@ -34,6 +34,9 @@ def prepare(require_semantic=False,case_id='',case_file='config/research-baselin
     target,dates,purpose=split_research_query(ctx['target'],ctx['date_range'],ctx['purpose'])
     normalized={**req,'target':target,'aliases':ctx['aliases'],'date_range':dates,'purpose':purpose}
     validate_question(normalized)
+    if os.getenv('PCT_SEMANTIC_QUERY_EXPANSION')=='1':
+        from research_semantic_queries import expand
+        normalized['semantic_query_expansion']=expand(normalized)
     case=None
     if case_id:
         registry=json.loads(Path(case_file).read_text());case=next((c for c in registry['cases'] if c['id']==case_id),None)

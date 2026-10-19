@@ -1,0 +1,20 @@
+name: Prepare existing research inference boundary
+description: Install the checksum-verified CPU model when local inference is selected.
+runs:
+  using: composite
+  steps:
+    - uses: actions/cache@v4
+      if: env.PCT_LLM_PROVIDER == 'local_llama_cpp'
+      with:
+        path: ~/.cache/nabou-models
+        key: nabou-qwen2.5-3b-q4km-7dabda4d-v1
+    - name: Install CPU inference dependencies
+      if: env.PCT_LLM_PROVIDER == 'local_llama_cpp'
+      shell: bash
+      env:
+        CMAKE_BUILD_PARALLEL_LEVEL: '2'
+      run: python3 -m pip install --quiet 'llama-cpp-python==0.3.16' --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu 'huggingface-hub==0.36.0'
+    - name: Resolve immutable model and verify checksum
+      if: env.PCT_LLM_PROVIDER == 'local_llama_cpp'
+      shell: bash
+      run: python3 tools/prepare_local_research_model.py

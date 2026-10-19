@@ -133,6 +133,19 @@ def validate_items(payload, records):
         row=lookup.get(eid) if isinstance(eid,str) else None
         quote=item.get('quote') if isinstance(item,dict) else None
         statement=item.get('statement') if isinstance(item,dict) else None
+        # Models often collapse OCR whitespace. Replay that formatting change
+        # against the actual source and retain its original bytes and offsets.
+        # No spelling, punctuation or omitted-word repair is allowed.
+        if row and isinstance(quote,str) and quote not in row['text']:
+            compact=[];offsets=[]
+            for hit in re.finditer(r'\S+|\s+',row['text']):
+                value=' ' if hit.group().isspace() else hit.group()
+                compact.append(value)
+                offsets.extend([hit.start()] if value==' ' else range(hit.start(),hit.end()))
+            normalized=''.join(compact);requested=' '.join(quote.split())
+            index=normalized.find(requested)
+            if index>=0 and requested:
+                quote=row['text'][offsets[index]:offsets[index+len(requested)-1]+1]
         if not row or not isinstance(quote,str) or len(quote.strip())<20 or quote not in row['text'] or not isinstance(statement,str) or not statement.strip() or forbidden(item):
             rejected.append({'reason':'INVALID_OR_UNGROUNDED_QUOTATION'});continue
         kind=item.get('kind')
@@ -156,6 +169,7 @@ def validate_items(payload, records):
             'source_uncertainties':row['uncertainties'],'model_analysis':True,'verified':False,
             'source_classification':item.get('source_type') if item.get('source_type') in ('PRIMARY_SOURCE','SECONDARY_SOURCE') else 'UNVERIFIED',
             'classification_status':'MODEL_PROVISIONAL_REQUIRES_SOURCE_CRITICISM',
+            'usage_type':item.get('usage_type') if item.get('usage_type') in ('BASE','ANCHORAGE','REFUGE','RAID_LOCATION','OTHER') else 'UNRESOLVED',
             'assertion_class':{'source_statement':'SOURCE_STATEMENT','inference':'INTERPRETATION','hypothesis':'HYPOTHESIS'}[kind],
             'verification_status':'UNVERIFIED'})
     return accepted,rejected
@@ -210,7 +224,7 @@ def documentary_answer(out, records, run_root):
 
 def execute(run_root, question, caller=call, config=None):
     all_records,excluded=collect(run_root)
-    grouped,deferred=batches(all_records)
+    grouped,deferred=batches(all_records,budget=6500 if os.getenv('PCT_LLM_PROVIDER')=='local_llama_cpp' else 14000)
     selected=[r for b in grouped for r in b]
     conf=configuration() if config is None else config
     out={'schema':VERSION,'question':question,'evidence_hash':digest(all_records),'status':'BLOCKED_CONFIGURATION',
@@ -237,7 +251,7 @@ def execute(run_root, question, caller=call, config=None):
         if result.get('status')=='COMPLETED':out['model_used']=True
         return parse(result)
     for group in grouped:
-        prompt=RULES+'\nROLE: extract evidence-constrained provisional historical information. QUESTION: '+question+'\nReturn {"items":[{"statement":"Greek source-attributed statement","evidence_id":"supplied ID","quote":"exact contiguous source text, at least 20 characters","kind":"source_statement|inference|hypothesis","source_type":"PRIMARY_SOURCE|SECONDARY_SOURCE|UNVERIFIED","actors":[],"places":[],"dates":[],"uncertainty":[]}]}. Extract at most 5 concise claims per batch. Quote a short exact passage. Entities must occur in the quote; dates may also occur in supplied date_evidence. Missing values stay empty. Source classification is provisional; if authorship and contemporary testimony cannot be established use UNVERIFIED. A raid location is not automatically a corsair base. Resolve pronouns only as explicit inference with uncertainty.\nEVIDENCE_JSON:\n'+json.dumps(group,ensure_ascii=False)
+        prompt=RULES+'\nROLE: extract evidence-constrained provisional historical information. QUESTION: '+question+'\nReturn {"items":[{"statement":"Greek source-attributed statement","evidence_id":"supplied ID","quote":"exact contiguous source text, at least 20 characters","kind":"source_statement|inference|hypothesis","source_type":"PRIMARY_SOURCE|SECONDARY_SOURCE|UNVERIFIED","actors":[],"places":[],"dates":[],"uncertainty":[]}]}. Extract at most 3 concise claims per batch, focused on named places and their documented use. Include usage_type: BASE, ANCHORAGE, REFUGE, RAID_LOCATION, OTHER or UNRESOLVED. Quote a short exact passage. Entities must occur in the quote; dates may also occur in supplied date_evidence. Missing values stay empty. Source classification is provisional; if authorship and contemporary testimony cannot be established use UNVERIFIED. A raid location is not automatically a corsair base. Resolve pronouns only as explicit inference with uncertainty.\nEVIDENCE_JSON:\n'+json.dumps(group,ensure_ascii=False)
         payload=invoke('evidence_extractor',prompt)
         items,rejected=validate_items(payload or {},group)
         out['claims'].extend(items);out['rejected'].extend(rejected)
@@ -308,6 +322,9 @@ def main():
     dest=root/'research_answer';dest.mkdir(exist_ok=True)
     (dest/'answer.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (dest/'answer.md').write_text(render(out),encoding='utf-8')
+    from research_geographic_findings import build
+    geographic=build(out)
+    (dest/'geographic_findings.json').write_text(json.dumps(geographic,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print('SEMANTIC_ANSWER',out['status'],'model_used',out['model_used'],'claims',len(out['claims']))
 
 if __name__=='__main__':main()

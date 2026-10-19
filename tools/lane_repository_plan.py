@@ -34,8 +34,10 @@ specialists=specialist_plan(ctx["target"],ctx["purpose"],ctx["date_range"],ctx["
 queries=discovery_queries(ident)+expand_queries(lane,ctx["target"],ctx["aliases"],ctx["date_range"])
 if ident['focus']['kind']=='topic':
     queries=expand_queries(lane,ctx['target'],ctx['aliases'],ctx['date_range'])
+semantic_queries=[r['query'] for r in (req.get('semantic_query_expansion') or {}).get('accepted_queries',[]) if r.get('lane')==lane]
+queries=list(dict.fromkeys(queries[:2]+semantic_queries+queries[2:]))
 queries=list(dict.fromkeys(queries))
-plan={"lane":lane,"request_file":rf.name,"target":ctx["target"],"aliases":ctx["aliases"],"date_range":ctx["date_range"],"languages":langs[lane],"target_identity":ident,"specialist_plan":specialists,"expanded_queries":queries,"repositories":[],"rule":"Search repository/catalogue with auditable multilingual event vocabulary and user-supplied historical name variants; catalogue records are leads only."}
+plan={"lane":lane,"request_file":rf.name,"target":ctx["target"],"aliases":ctx["aliases"],"date_range":ctx["date_range"],"languages":langs[lane],"target_identity":ident,"specialist_plan":specialists,"expanded_queries":queries,"semantic_query_expansion":req.get('semantic_query_expansion'),"repositories":[],"rule":"Search repository/catalogue with auditable multilingual event vocabulary and user-supplied historical name variants; catalogue records are leads only."}
 for name,base in cfg[lane]:
     q=" ".join(terms+[ctx["date_range"]]).strip()
     plan["repositories"].append({"name":name,"base_url":base,"query_seed":q,"status":"DISCOVERY_TARGET"})
