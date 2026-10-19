@@ -1,0 +1,63 @@
+name: Research semantic runtime validation
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research-semantic-runtime.yml'
+      - 'tools/prepare_local_research_model.py'
+permissions:
+  contents: write
+jobs:
+  local-model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            evidence/engine_validation
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/nabou-models
+          key: nabou-qwen2.5-3b-q4km-v1
+      - name: Install CPU inference dependencies
+        env:
+          CMAKE_BUILD_PARALLEL_LEVEL: '2'
+        run: python3 -m pip install --quiet 'llama-cpp-python==0.3.16' --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu 'huggingface-hub==0.36.0'
+      - name: Acquire and checksum official open model
+        run: python3 tools/prepare_local_research_model.py
+      - name: Run real local inference
+        env:
+          PCT_LLM_PROVIDER: local_llama_cpp
+          PCT_LLM_EXTRACTOR_MODEL: Qwen/Qwen2.5-3B-Instruct-GGUF
+        run: |
+          PYTHONPATH=tools/llm python3 - <<'PY'
+          import json,os,pathlib
+          from llm_client import call
+          result=call('evidence_extractor','Return JSON only. This is a runtime protocol test, not a historical source. Supplied test text: "In 1670 the ship sheltered in an unnamed harbour." Return {"date":"exact date from text","place":null,"verification_status":"UNVERIFIED"}. Do not invent a harbour name.')
+          dest=pathlib.Path('evidence/engine_validation')/os.environ['GITHUB_RUN_ID'];dest.mkdir(parents=True,exist_ok=True)
+          (dest/'local-semantic-runtime.json').write_text(json.dumps({'test_type':'RUNTIME_PROTOCOL_NOT_HISTORICAL_RESEARCH','result':result},ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps({k:v for k,v in result.items() if k!='content'}))
+          if result.get('status')!='COMPLETED':raise SystemExit('LOCAL_MODEL_NOT_OPERATIONAL')
+          data=json.loads(result['content'])
+          assert data.get('place') is None and data.get('verification_status')=='UNVERIFIED'
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: local-model-runtime-validation
+          path: evidence/engine_validation/${{ github.run_id }}/
+      - name: Publish runtime receipt
+        if: always()
+        run: |
+          set -e
+          if [ ! -d "evidence/engine_validation/$GITHUB_RUN_ID" ]; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "evidence/engine_validation/$GITHUB_RUN_ID"
+          git commit -m 'Record actual open model runtime validation'
+          python3 tools/publish_research_outputs.py

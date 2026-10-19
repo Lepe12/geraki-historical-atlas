@@ -35,12 +35,13 @@ def surface(text):
 
 def configuration():
     missing=[]
-    for name in ('PCT_LLM_BASE_URL','PCT_LLM_API_KEY'):
+    local=os.getenv('PCT_LLM_PROVIDER')=='local_llama_cpp'
+    for name in (('PCT_LOCAL_MODEL_PATH',) if local else ('PCT_LLM_BASE_URL','PCT_LLM_API_KEY')):
         if not os.getenv(name,'').strip():missing.append(name)
     for role in ROLES:
         r=route(role)
         if r.provider=='disabled' or not r.model:missing.append(role.upper()+'_MODEL_OR_PROVIDER')
-        elif r.provider!='openai_compatible':missing.append('SUPPORTED_PROVIDER')
+        elif r.provider not in ('openai_compatible','local_llama_cpp'):missing.append('SUPPORTED_PROVIDER')
     return {'configured':not missing,'missing':sorted(set(missing))}
 
 def collect(run_root):

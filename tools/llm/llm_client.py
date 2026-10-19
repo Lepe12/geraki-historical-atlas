@@ -16,6 +16,14 @@ def call(role:str,prompt:str)->dict:
           "provider":"disabled","model":None,"verified_promotion_allowed":False
         }
 
+    if r.provider=='local_llama_cpp':
+        try:
+            from local_model import call as local_call
+            return local_call(role,prompt,r)
+        except Exception as exc:
+            return {'status':'FALLBACK_REQUIRED','role':role,'provider':r.provider,'model':r.model,
+                    'error':type(exc).__name__,'verified_promotion_allowed':False}
+
     if r.provider!="openai_compatible":
         return {
           "status":"FALLBACK_REQUIRED","role":role,"fallback":r.fallback,
