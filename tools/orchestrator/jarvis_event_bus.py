@@ -45,6 +45,9 @@ def _oidc_token()->str|None:
     return token
 
 def _publish_remote(event:dict,*,require_remote:bool=False)->None:
+    if os.environ.get("GITHUB_ACTIONS") == "true" and os.environ.get("GITHUB_REF") != "refs/heads/main":
+        if require_remote: raise RuntimeError("EXPERIMENT_REMOTE_EVENT_FORBIDDEN")
+        return
     base=os.environ.get("PCT_COMMAND_CENTER_URL","").strip().rstrip("/")
     if not base:
         if require_remote: raise RuntimeError("REMOTE_EVENT_URL_MISSING")

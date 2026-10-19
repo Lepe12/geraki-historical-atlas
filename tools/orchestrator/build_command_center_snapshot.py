@@ -228,6 +228,13 @@ def build(repo:Path,run_id:str):
     summary=board.get("summary") or {}
     lane_statuses=[a['status'] for a in agents if a['kind']=='research_lane']
     mission_status=('UNKNOWN' if not lane_statuses else 'FAILED' if all(v=='FAILED' for v in lane_statuses) else 'PARTIAL' if any(v!='COMPLETED' for v in lane_statuses) else 'COMPLETED')
+    execution_status=mission_status
+    answer_status=semantic_answer.get('status') or 'NOT_EVALUATED'
+    if answer_status.startswith('BLOCKED'):
+        mission_status=answer_status
+    elif execution_status=='COMPLETED' and not claims:
+        mission_status='INSUFFICIENT_EVIDENCE'
+
     package=build_evidence_package(run_root,request)
     for blocker in blockers:
         failures=provider_failures(blocker.get('detail'))
@@ -274,6 +281,8 @@ def build(repo:Path,run_id:str):
         "purpose":request.get("purpose") or "Historical research operation",
         "research_focus":identity(request,request)['focus'] if request.get('target') else None,
         "status":mission_status,
+        "execution_status":execution_status,
+        "answer_status":answer_status,
         "selected_lanes":int(summary.get("selected_lanes",len([a for a in agents if a["kind"]=="research_lane"])) or 0)
       },
       "metrics":{

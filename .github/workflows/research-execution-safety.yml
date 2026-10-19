@@ -1,0 +1,28 @@
+name: Research execution safety
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/**'
+      - '.github/workflows/*research*.yml'
+      - '.github/workflows/pct-parallel-multi-agent.yml'
+  pull_request:
+    paths:
+      - 'tools/**'
+      - '.github/workflows/*research*.yml'
+      - '.github/workflows/pct-parallel-multi-agent.yml'
+permissions:
+  contents: read
+jobs:
+  safety:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify execution isolation and real Git output publication
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+          PYTHONPATH: tools:tools/orchestrator:tools/llm
+        run: python -m unittest tools.test_research_execution_safety tools.test_research_focus tools.test_fulltext_discovery tools.orchestrator.test_research_query tools.test_research_pipeline_repairs tools.test_section_extraction tools.test_research_evidence_package tools.test_semantic_research_answer -q

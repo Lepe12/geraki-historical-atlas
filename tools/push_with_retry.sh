@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # Preserve committed work when another research job advances main. Never force.
 set -euo pipefail
+if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+  if [ "${GITHUB_REF:-}" != "refs/heads/main" ]; then
+    echo "EXPERIMENT_PRODUCTION_WRITE_FORBIDDEN" >&2
+    exit 1
+  fi
+fi
 for attempt in 1 2 3 4 5; do
   if ! git pull --rebase origin main; then
     echo "Publish stopped: rebase conflict requires review; no remote data was overwritten." >&2

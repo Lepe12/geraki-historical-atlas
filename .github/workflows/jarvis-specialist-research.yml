@@ -59,7 +59,7 @@ permissions:
 
 env:
   PCT_UI_REQUEST_ID: ${{ inputs.request_id }}
-  PCT_COMMAND_CENTER_URL: https://pct-live.piratecartography.com/pct-api/live
+  PCT_COMMAND_CENTER_URL: ${{ github.ref == 'refs/heads/main' && 'https://pct-live.piratecartography.com/pct-api/live' || '' }}
   SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
   EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
 
@@ -281,8 +281,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
-          fetch-depth: 2
+          ref: ${{ github.sha }}
+          fetch-depth: 0
       - uses: actions/download-artifact@v4
         continue-on-error: true
         with:
@@ -299,17 +299,6 @@ jobs:
           python3 tools/orchestrator/jarvis_specialist_aggregate.py \
             --root normalized \
             --output SPECIALIST_AGGREGATE.json
-      - name: Learn from specialist run
-        env:
-          RUN_ID: ${{ github.run_id }}
-        run: |
-          PYTHONPATH=tools/memory python3 - <<'PY'
-          import os
-          from naboux_memory import load,save,learn_results_tree
-          m=load("data/naboux_memory.json")
-          learn_results_tree(m,"normalized",os.environ["RUN_ID"])
-          save(m,"data/naboux_memory.json")
-          PY
       - uses: actions/upload-artifact@v4
         with:
           name: specialist-normalized-${{ github.run_id }}
@@ -328,16 +317,20 @@ jobs:
           find specialist_results -name task_history.jsonl -type f -print0 | while IFS= read -r -d '' f; do
             cat "$f" >> "$dest/TASK_HISTORY.jsonl"
           done
+          if [ "$GITHUB_REF" != "refs/heads/main" ]; then
+            echo "ARTIFACTS_ONLY: production publication skipped"
+            exit 0
+          fi
           git config user.name "jarvis-orchestrator[bot]"
           git config user.email "jarvis-orchestrator@users.noreply.github.com"
-          git add "$dest" data/naboux_memory.json
+          git add "$dest"
           git diff --cached --quiet && exit 0
           git commit -m "Preserve JARVIS specialist research run $RUN_ID"
-          for n in 1 2 3 4 5; do
-            git pull --rebase origin main && git push origin HEAD:main && exit 0
-            git rebase --abort 2>/dev/null || true
-            sleep $((n*2))
-          done
-          echo "WARNING: specialist aggregate commit failed after retries; Actions artifact remains available for recovery."
-          exit 1
+          python3 tools/publish_research_outputs.py
 
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: specialist-evidence-${{ github.run_id }}
+          path: evidence/specialist_runs/${{ github.run_id }}/
+          retention-days: 90
