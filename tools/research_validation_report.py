@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import re
 from urllib.parse import urlsplit
+from research_focus import decompose
 
 def read(path):
     return json.loads(path.read_text()) if path.is_file() else {}
@@ -13,9 +14,10 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
     analysis_root=analysis_root or root
     answer=read(analysis_root/'research_answer/answer.json')
     geographic=read(analysis_root/'research_answer/geographic_findings.json')
-    acquisitions=[];attempts=[];raw_candidates=[];queries=[]
+    acquisitions=[];attempts=[];raw_candidates=[];queries=[];request={}
     for lane in root.iterdir():
         if not lane.is_dir():continue
+        if not request:request=read(lane/'run_manifest/manifest.json').get('normalized_request',{})
         acquisitions.extend(read(lane/'library_acquisition/acquisition_report.json').get('results',[]))
         attempts.extend(read(lane/'lane_discovery'/f'{lane.name}.json').get('attempts',[]))
         raw_candidates.extend(read(lane/'structured_output/candidate_events.json').get('events',[]))
@@ -59,14 +61,18 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
     if not answer.get('evidence'):blockers.append('NO_REPLAYED_EVIDENCE')
     if not required<=completed:blockers.append('SEMANTIC_STAGES_INCOMPLETE')
     if answer.get('status')!='MODEL_ANSWER_PENDING_HUMAN_REVIEW':blockers.append('CITED_MODEL_ANSWER_INCOMPLETE')
-    if not geographic.get('findings'):blockers.append('NO_SUPPORTED_PLACE_FINDINGS')
+    request_kind=decompose(request['target'],request.get('aliases',[]))['kind'] if request.get('target') else 'UNKNOWN'
+    if request_kind!='person' and not geographic.get('findings'):blockers.append('NO_SUPPORTED_PLACE_FINDINGS')
+    supported=set((answer.get('review') or {}).get('supported_claim_ids',[]))
+    cited={cid for section in answer.get('answer_sections',[]) for cid in section.get('claim_ids',[])}
+    if request_kind=='person' and not cited.intersection(supported):blockers.append('NO_SUPPORTED_PERSON_RESEARCH_CLAIMS')
     if not any(q.get('output_status')=='MODEL_QUERIES_AVAILABLE' for q in queries):blockers.append('LIVE_MODEL_QUERY_EXPANSION_NOT_DEMONSTRATED')
     violations=[c.get('claim_id') for c in answer.get('claims',[]) if c.get('verified') or c.get('verification_status')=='VERIFIED']
     if violations:blockers.append('UNSUPPORTED_VERIFICATION_PROMOTION')
     return {'schema':'nabou-e2e-validation-v1','research_run_id':root.name,
         'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
         'status':'INCOMPLETE' if blockers else 'PROVISIONAL_RESEARCH_PIPELINE_PASSED',
-        'research_question':answer.get('question'),'sources_acquired':list(sources.values()),
+        'research_question':answer.get('question'),'request_kind':request_kind,'sources_acquired':list(sources.values()),
         'counts':{'unique_acquired_source_urls':len(sources),
                   'document_or_page_ocr_urls':sum(s['content_kind'] in ('PDF_DOCUMENT_TEXT','OCR_DOCUMENT_TEXT','PAGE_IMAGE_OCR') for s in sources.values()),
                   'catalogue_metadata_urls':sum(s['content_kind']=='CATALOGUE_METADATA_TEXT' for s in sources.values()),
@@ -74,6 +80,7 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
                   'excluded_access_challenge_pages':len(challenge_pages),'raw_candidate_events':len(raw_candidates),
                   'replayed_evidence':len(answer.get('evidence',[])),
                   'model_claims':len(answer.get('claims',[])),
+                  'review_supported_claims':len(supported),'answer_cited_claims':len(cited),
                   'candidate_place_findings':len(geographic.get('findings',[])),
                   'verified':0,'rejected_model_items':sum(r.get('reason')!='UNSUPPORTED_DATE_ATTRIBUTE_REMOVED' for r in answer.get('rejected',[])),
                   'rejected_model_attributes':sum(r.get('reason')=='UNSUPPORTED_DATE_ATTRIBUTE_REMOVED' for r in answer.get('rejected',[])),
