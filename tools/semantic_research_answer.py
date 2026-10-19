@@ -165,7 +165,8 @@ def documentary_answer(out, records, run_root):
     greek_names=[n for n in [request.get('target',''),*request.get('aliases',[])] if re.search('[α-ω]',fold(n))]
     retained=[];held=[]
     for row in records:
-        text=' '.join([row['text'],*[s.get('title') or '' for s in row['occurrences']]])
+        # Publication dates in a modern study do not date its historical subject.
+        text=row['text']
         modern=any(int(y)>=1900 for y in re.findall(r'\b(?:19\d{2}|20\d{2})\b',text))
         if greek_names and modern and not any(re.search(name_pattern(n.split()),fold(row['text'])) for n in greek_names):
             held.append({'evidence_id':row['evidence_id'],'reason':'MODERN_NAMESAKE_REQUIRES_IDENTITY_REVIEW'})

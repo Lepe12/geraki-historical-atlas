@@ -65,12 +65,15 @@ class SemanticAnswer(unittest.TestCase):
             base=Path(tmp)/'travellers'
             p=base/'structured_output/extracted_findings.json';data=json.loads(p.read_text())
             data['findings'][0]['title']='Boletín Oficial 1971 Pedro Lanza'
+            modern=TEXT.replace('1677','1925')
+            (base/'library_acquisition/doc.txt').write_text(modern)
+            data['findings'][0].update(evidence_excerpt=modern,source_text_sha256=hashlib.sha256(modern.encode()).hexdigest())
             p.write_text(json.dumps(data))
             (base/'run_manifest').mkdir()
             (base/'run_manifest/manifest.json').write_text(json.dumps({'normalized_request':{'target':'Pedro Lanza','aliases':['Πέτρος Λάντζας']}}))
             out=execute(tmp,'question',config={'configured':False,'missing':[]})
             self.assertEqual(out['claims'],[])
-            self.assertEqual(len(out['coverage']['identity_held']),1)
+            self.assertTrue(any('NAMESAKE_REQUIRES_IDENTITY_REVIEW' in r['reason'] for r in out['coverage']['excluded']+out['coverage']['identity_held']))
 
     def test_existing_unflagged_namesake_export_is_rechecked_without_changing_source(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -88,6 +91,17 @@ class SemanticAnswer(unittest.TestCase):
             self.assertEqual(out['claims'],[])
             self.assertEqual(out['coverage']['excluded'][0]['reason'],'LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW')
             self.assertEqual(p.read_bytes(),before)
+
+    def test_modern_publication_does_not_date_the_historical_person(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp)
+            base=Path(tmp)/'travellers';p=base/'structured_output/extracted_findings.json'
+            data=json.loads(p.read_text());data['findings'][0]['title']='A modern study published in 2014'
+            p.write_text(json.dumps(data));(base/'run_manifest').mkdir()
+            (base/'run_manifest/manifest.json').write_text(json.dumps({'normalized_request':{'target':'Πέτρος Λάντζας','aliases':['Pietro Lanza']}}))
+            out=execute(tmp,'question',config={'configured':False,'missing':[]})
+            self.assertEqual(len(out['claims']),1)
+            self.assertEqual(out['coverage']['identity_held'],[])
 
     def test_configuration_does_not_leak_key(self):
         env={'PCT_LLM_PROVIDER':'openai_compatible','PCT_LLM_BASE_URL':'https://example.org/v1',

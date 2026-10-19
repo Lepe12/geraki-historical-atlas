@@ -39,6 +39,12 @@ L'Ordine Equestre e Militare della Stella
 - Παραπομπή extract-e-da8686fc0885d7fb7269: https://archive.org/details/lordine-equestre-e-militare-della-stella · γραμμές 1509–1509.
   Απόσπασμα αποκτημένου κειμένου: 1.607 Pietro LANZA Barone del Mojo di Sciacca per la seconda volta
 
+Emrah Safa Gürkan (2014), My money or your life: The Habsburg hunt for Uluc Ali, Studia Historica. Historia Moderna 36, 121–145
+
+- Παραπομπή extract-e-48f8ed2f7bf32638a5ea: https://revistas.usal.es/uno/index.php/Studia_Historica/article/download/shhmo201436121145/12697 · γραμμές 709–710.
+  Απόσπασμα αποκτημένου κειμένου: A similar attempt would be proposed by Pietro Lanza,
+a skilled corsair in Habsburg employ in 1608
+
 L'Ordine Equestre e Militare della Stella
 
 - Παραπομπή extract-e-bbb824596ad3abe705c2: https://archive.org/details/lordine-equestre-e-militare-della-stella · γραμμές 1360–1362.
@@ -130,6 +136,12 @@ Pietro Lanza Di Scalea alle origini degli studi del gioiello siciliano
 - Παραπομπή extract-e-4346e2c0effe59d5b5ef: http://hdl.handle.net/10447/96156 · γραμμές 13–13.
   Απόσπασμα αποκτημένου κειμένου: Pietro Lanza Di Scalea alle origini degli studi del gioiello siciliano
 
+J. M. Floristán (2005), (Arz)obispos griegos en Roma y España (1596–1602), Erytheia 26, 187–212
+
+- Παραπομπή extract-e-edd732736db48d8b9207: https://dialnet.unirioja.es/descarga/articulo/2233252.pdf · γραμμές 384–385.
+  Απόσπασμα αποκτημένου κειμένου: a través de Pedro Lantzas, agente griego al servicio
+de los españoles en este reino
+
 Le proposte di un principe : Pietro Lanza e la "ricchezza del Regno" / Giacomo Dentici
 
 - Παραπομπή extract-e-0afc179d0c260b31746e: http://catalogue.bnf.fr/ark:/12148/cb376873058 · γραμμές 276–277.
@@ -174,11 +186,69 @@ di  Palermo,  quale  così  chiamavasi,  secondo  il  sistema  palermitano,
 il  capo  della  città,  non  si  ebbe  difficoltà  di  comprendere  il  nome 
 di   Pietro  Lanza  nella  terna   ohe  veniva  dal  Decurionato  prc-
 
+Boletín Oficial de la República Argentina. 1971 2da sección
+
+- Παραπομπή extract-e-f95aa13cdefe6b71cf86: https://archive.org/details/Boletin_Oficial_Republica_Argentina_2da_seccion_1971-03-15 · γραμμές 9107–9159.
+  Απόσπασμα αποκτημένου κειμένου: — Suscripción — Acciones — Clase — 
+Integración — Monto. — Pedro Segm 
+10.000 $ 1.000. — Pedro Borrometi S 
+10 000 S 1.000. — Teresa Ramona Me- 
+dina de Segni 2.000 S 200. — Juana Di 
+Luciano de Borrometi 2.000 $ 200. — An- 
+tonio Bautist" Ferrandu 1.000 $ 100. — 
+Natalio Di Módica 1.000 S 100. - Be- 
+nito Di Luciano 1.000 S 100. — Sebastian 
+Castro 1.000 S 100. — Bruno Di Lucrar. > 
+1.000 $ 100. — Pedro Vicente Lanza 1.000 
+S 100 30.000 $ 3.000. — La integración 
+se efectúa en efectivo en su diez por 
+ciento. — Tercero: Designar para inte- 
+grar el órgano administrativo y el fis- 
+calizador: Presidente a Pedro Borrome- 
+ti; vicepresidente á Pedro Segni; voca- 
+les a Teresa Ramona Medina de Segnl. 
+Jurma Di Luciano de Borrometi: suplen- 
+tes a Antonio Bautista Ferrandu. Na- 
+talio Di Módica; síndico titular a Pearo 
+Vicente Lanza, y síndico suplente a 
+Bruno Di Luciano. -— Cuarto: Autorizar 
+en forma expresa a los señores Pedro 
+Borrometi y Pedro Vicente Lanza a fin 
+de que actuando juntamente o en for- 
+ma semrada realicen, todas las gestio- 
+nes y "diligencies necesarias para obte- 
+ner de la autoridad pertinente la apro- 
+bación del estatuto de- la sociedad y au- 
+torización para funcionar en el carácter 
+adoptado, con facultad de aceptar yo 
+proponer modificaciones a la presente, 
+inclusive a ' denominación. — P. Seg- 
+ni. — Di Luciano. — Castro. — Di Lu- 
+ciano — ■ P. Borrometi. — Teresa M. de 
+Segni. — A. Ferrandu. — N. DI Módica. 
+— - Pedro Lanza, — Borrometi. — Certi- 
+fico: En mi carácter de escribano ads- 
+cripto al registro de contratos públicos 
+N-'~2G4. que las firmas que anteceden y 
+d'cen: P. Segni. — Di Luciano. — Cas- 
+tro." -'- Di Luciano. — P. Borrometi. — 
+Teresa. M. de Segni. — A. Ferrandu. — 
+N.' Di Módica, — Pedro Lanza, y Bo- 
+rrometi, son auténticas, han sido puesta,? 
+en mi presencia y corresponden a los 
+señores- Pedro Segni: Bruno Di Lucia- 
+no; Pedro Borrometi: Teresa Ramona 
+Medina de Segni; Antonio Bautista Fe- 
+rrandu: Natalio Di Módica; Pedro Vi- 
+cente Lanza, y Juana Di Luciano de Bo- 
+rrometi. personas de mi conocimiento.
+
 ## Χρονολογικές ενδείξεις στα αποσπάσματα
 
 Οι ενδείξεις δεν αποτελούν επαληθευμένο χρονολόγιο γεγονότων.
 
 - 1596 [extract-e-341e201d8a4628d3376c]
+- 1608 [extract-e-48f8ed2f7bf32638a5ea]
 - 1608 [extract-e-341e201d8a4628d3376c]
 - 1897 [extract-e-4031af16e62243ebeb26]
 - 1897 [extract-e-bb2d06ccbe964d576513]
@@ -197,11 +267,11 @@ di   Pietro  Lanza  nella  terna   ohe  veniva  dal  Decurionato  prc-
 - Η ταύτιση του προσώπου και η ιστορική αλήθεια των αποσπασμάτων χρειάζονται τεκμηρίωση.
 - Οι επαναλήψεις ενός αποσπάσματος δεν υπολογίζονται ως ανεξάρτητες μαρτυρίες.
 - Η απουσία ευρήματος δεν αποδεικνύει απουσία ιστορικής πηγής.
-- 5 αποσπάσματα κρατήθηκαν χωριστά λόγω εκκρεμούς ταύτισης σύγχρονων συνονόματων. Παραμένουν στα αποθηκευμένα ευρήματα.
+- 2 αποσπάσματα κρατήθηκαν χωριστά λόγω εκκρεμούς ταύτισης σύγχρονων συνονόματων. Παραμένουν στα αποθηκευμένα ευρήματα.
 
 ## Περιορισμοί
 
 Ο φάκελος συγκεντρώνει ακριβή αποσπάσματα χωρίς υπηρεσία μοντέλου. Δεν παράγει ερμηνεία ή επιβεβαίωση ιστορικών γεγονότων.
 Η επιτυχής αντιστοίχιση παραπομπής δεν αποδεικνύει από μόνη της ότι η ερμηνεία του μοντέλου είναι σωστή.
 Η ανεξαρτησία των πηγών και η εξέταση πρωτοτύπων δεν θεωρούνται ολοκληρωμένες.
-Κάλυψη: 28/33 μοναδικά αποσπάσματα περιλαμβάνονται στην απάντηση.
+Κάλυψη: 31/33 μοναδικά αποσπάσματα περιλαμβάνονται στην απάντηση.
