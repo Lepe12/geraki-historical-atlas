@@ -157,11 +157,18 @@ for repo_index,r in enumerate(plan["repositories"]):
         interleaved=[q for group in zip_longest(repo_terms,focused,specialist_queries) for q in group if q]
         repo_terms=list(dict.fromkeys(interleaved))[:cap]
     focus=plan.get('target_identity',{}).get('focus') or decompose(plan['target'],plan.get('aliases',[]))
-    if focus['kind']=='person':
+    place_elsewhere=focus['kind']=='place' and name!="SearchCulture.gr / EKT"
+    if focus['kind']=='person' or place_elsewhere:
         cap=max(3,len(repo_terms))
         # Keep the lane's language and alternate names within bounded budgets.
         # Generic English qualifiers previously replaced every archive's plan.
-        repo_terms=focused_queries(focus,EVENT_TERMS.get(lane,()),include_hypotheses=name!="SearchCulture.gr / EKT")[:min(cap,16)]
+        # SearchCulture place filters stay on the chronology/place fields above.
+        qualifiers=list(EVENT_TERMS.get(lane,()))
+        if place_elsewhere:
+            date=str(plan.get('date_range') or '').strip()
+            if date:
+                qualifiers.insert(0,date)
+        repo_terms=focused_queries(focus,qualifiers,include_hypotheses=name!="SearchCulture.gr / EKT")[:min(cap,16)]
     completed={a['query'] for a in attempts[repo_index].get('queries',[])}
     pending=[q for q in repo_terms if q not in completed]
     if attempts[repo_index].get('status') in ('API_KEY_REQUIRED','AUTH_OR_BROWSER_REQUIRED','ACCESS_BLOCKED','REMOTE_ACCESS_BLOCKED','REMOTE_RATE_LIMITED'):pending=[]

@@ -51,7 +51,12 @@ def split_research_query(target, date_range="", purpose=""):
         dates=DATES.search(original)
         head=original[:dates.start()].strip() if dates else ''
         words=re.findall(r'[^\W\d_]+',head,re.UNICODE)
-        if not (dates and not original[dates.end():].strip(' .;,:?') and 1<=len(words)<=4 and all(w[0].isupper() for w in words)):
+        folded_head,_=command_text(head)
+        eventish=bool(re.search(r"πειρατ|κουρσ|επιδρομ|pirac|corsair|privateer|(?<!\w)raid",folded_head))
+        capitalized=bool(words) and all(w[0].isupper() for w in words)
+        # A short name, or a short place plus an explicit event word, may carry
+        # a trailing range. Ordinary prose stays intact.
+        if not (dates and not original[dates.end():].strip(' .;,:?') and 1<=len(words)<=4 and (capitalized or eventish)):
             return original, str(date_range).strip(), str(purpose).strip()
         value=original
     else:

@@ -78,34 +78,8 @@
   }
 
   function proposals(pages){
-    const items=[],seen=new Set(),add=(type,text,page,confidence)=>{
-      text=String(text||"").replace(/\s+/g," ").trim();if(text.length<3)return;
-      const k=type+"|"+page+"|"+text.toLowerCase();if(seen.has(k))return;seen.add(k);
-      items.push({id:"k-"+items.length,type:type==="excerpt"?"claim":type,extraction_kind:type,text,page,pdf_page:page,printed_page:null,confidence,extraction_method:"text_layer_heuristic",verification_status:"UNREVIEWED",status:"pending",editing:false});
-    };
-    const stop=new Set("την τον της του των το τα τις τους στη στην στο στον και εις από απο για με ο η οι εν ένας μια ένα αυτό αυτή σελίδες περιεχόμενα κεφάλαιο βιβλιογραφία the this that from with there their they for and but not chapter page figure table introduction conclusion references bibliography".split(" "));
-    const normalized=t=>t.normalize("NFD").replace(/\p{M}/gu,"").toLowerCase();
-    for(const pg of pages){
-      const text=String(pg.text||"").replace(/\s+/g," ").trim();if(!text)continue;
-      for(const m of text.matchAll(/(?<!\d)(1\d{3}|20\d{2})(?!\d)/g)) add("date",m[1],pg.page,null);
-      // Conservative name candidates; capitals alone do not establish identity.
-      for(const m of text.matchAll(/[\p{Lu}][\p{Ll}’'-]{2,}(?:\s+[\p{Lu}][\p{Ll}’'-]{2,}){1,3}/gu)){
-        const v=m[0].trim();if(v.length>90||v.split(/\s+/).some(w=>stop.has(normalized(w))))continue;
-        add("entity",v,pg.page,null);
-      }
-      // Preserve every passage for review, including contents and OCR noise.
-      // Do not label a sentence a verified historical claim.
-      const passages=text.match(/[^.!?]+(?:[.!?]+|$)/g)||[text];
-      for(const passage of passages){
-        const words=passage.trim().split(/\s+/);let chunk="";
-        for(const word of words){
-          if(chunk.length+word.length>800){add("excerpt",chunk,pg.page,null);chunk="";}
-          chunk+=(chunk?" ":"")+word;
-        }
-        if(chunk.length>=35)add("excerpt",chunk,pg.page,null);
-      }
-    }
-    return items;
+    if(!window.NabouLearning?.proposals)throw new Error("learning_extract_missing");
+    return window.NabouLearning.proposals(pages);
   }
 
   toggle.addEventListener("click",()=>{open();});
