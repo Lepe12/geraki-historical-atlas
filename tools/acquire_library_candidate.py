@@ -7,7 +7,7 @@ LOCATED rather than being misreported as acquired or verified.
 import json,pathlib,urllib.request,urllib.parse,datetime,re,os,time
 from request_context import load_request
 from web_acquisition import acquire as acquire_web, citation_title_match
-from connectors.web_search import search as search_web
+from connectors.citation_search import search as search_web
 from research_relevance import identity, rank, request_digest
 rf,req,ctx=load_request()
 request_sha=request_digest(req,ctx)
