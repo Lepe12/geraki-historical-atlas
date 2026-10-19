@@ -78,7 +78,8 @@ def collect(run_root):
                     excluded.append({'finding_id':f.get('finding_id'),'reason':'DATE_HEADING_LOCATOR_MISMATCH'});continue
             key=digest([surface(raw),f.get('years_in_scope',[]),f.get('date_basis')])
             provenance={'lane':p.parent.parent.name,'url':f['url'],'title':f.get('title'),
-                        'finding_id':f.get('finding_id'),'locator':loc,'source_text_sha256':f['source_text_sha256']}
+                        'finding_id':f.get('finding_id'),'locator':loc,'source_text_sha256':f['source_text_sha256'],
+                        'reported_archival_reference':f.get('reported_archival_reference')}
             if key in groups:
                 groups[key]['occurrences'].append(provenance);continue
             row={'evidence_id':'e-'+key[:20],'text':raw,'years_in_scope':f.get('years_in_scope',[]),
@@ -266,6 +267,7 @@ def render(out):
                 c=claims[cid];src=c['source_occurrences'][0];loc=src['locator']
                 lines.extend(['- Παραπομπή '+cid+': '+src['url']+f' · γραμμές {loc["start_line"]}–{loc["end_line"]}.',
                               '  Απόσπασμα αποκτημένου κειμένου: '+c['quote']])
+                if src.get('reported_archival_reference'):lines.append('  Αρχειακή παραπομπή όπως τη δίνει η μελέτη (το πρωτότυπο δεν εξετάστηκε): '+src['reported_archival_reference']['display'])
             lines.append('')
     else:
         lines.extend(['Δεν παρήχθη σημασιολογική απάντηση από μοντέλο. Τα αποκτημένα αποσπάσματα παραμένουν διαθέσιμα.',''])

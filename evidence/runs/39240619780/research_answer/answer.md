@@ -44,6 +44,7 @@ Emrah Safa Gürkan (2014), My money or your life: The Habsburg hunt for Uluc Ali
 - Παραπομπή extract-e-48f8ed2f7bf32638a5ea: https://revistas.usal.es/uno/index.php/Studia_Historica/article/download/shhmo201436121145/12697 · γραμμές 709–710.
   Απόσπασμα αποκτημένου κειμένου: A similar attempt would be proposed by Pietro Lanza,
 a skilled corsair in Habsburg employ in 1608
+  Αρχειακή παραπομπή όπως τη δίνει η μελέτη (το πρωτότυπο δεν εξετάστηκε): ASV, Capi del Consiglio dei Dieci, Lettere di Ambasciatori, b.19, fol.81, 16 December 1608
 
 L'Ordine Equestre e Militare della Stella
 

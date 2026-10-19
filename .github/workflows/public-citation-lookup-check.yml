@@ -51,7 +51,7 @@ jobs:
                   dest=pathlib.Path('evidence/citation_checks')/os.environ['GITHUB_RUN_ID']/ref['id'];dest.mkdir(parents=True,exist_ok=True)
                   try:item['acquisitions'].append({'basis':basis,'result':acquire(target,dest,follow=True)})
                   except Exception as error:
-                      safe_codes={'DOCUMENT_TOO_LARGE','UNSAFE_DOCUMENT_URL','PRIVATE_DOCUMENT_URL','EXPECTED_PDF_NOT_RETURNED','PDF_TEXT_EXTRACTION_FAILED','UNSUPPORTED_CONTENT_TYPE'}
+                      safe_codes={'DOCUMENT_TOO_LARGE','UNSAFE_DOCUMENT_URL','PRIVATE_DOCUMENT_URL','EXPECTED_PDF_NOT_RETURNED','PDF_TEXT_EXTRACTION_FAILED','UNSUPPORTED_CONTENT_TYPE','UNSUPPORTED_DOCUMENT_TYPE','NO_USABLE_DOCUMENT_TEXT'}
                       item['acquisitions'].append({'basis':basis,'status':'FAILED','error_type':type(error).__name__,'code':str(error) if str(error) in safe_codes else ('HTTP_'+str(error.code) if isinstance(getattr(error,'code',None),int) else 'UNCLASSIFIED_ACQUISITION_ERROR')})
               checks.append(item)
           report={'schema':'pct-public-citation-repair-check-v2','run_id':os.environ['GITHUB_RUN_ID'],'checked_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'test_type':'TARGETED_KNOWN_BIBLIOGRAPHY_FOLLOWUP_NOT_BLIND_RECALL_TEST','references':checks}
