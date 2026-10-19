@@ -6,6 +6,19 @@ from connectors import repository_connectors as rc
 from connectors.http_audit import safe_url,trace,fetch
 
 class HttpAuditTests(unittest.TestCase):
+    def test_pares_http_429_is_rate_limited_not_an_empty_or_blocked_search(self):
+        with patch.object(rc,'_get',side_effect=HTTPError('https://pares.cultura.gob.es/search',429,'wait',{'Retry-After':'120'},None)):
+            status,rows,detail=rc.audited_dispatch('PARES / Archivo General de Simancas','corsarios','spanish_simancas')
+        self.assertEqual(status,'REMOTE_RATE_LIMITED')
+        self.assertEqual(rows,[])
+        self.assertIn('HTTP_429',detail)
+
+    def test_anemi_form_response_is_not_evidence_of_an_executed_search(self):
+        with patch('connectors.http_audit.anemi_search',return_value=b'<html><h1>Simple Search</h1><form></form></html>'):
+            status,rows,_=rc.anemi_public('Crete','greek')
+        self.assertEqual(status,'SEARCH_NOT_CONFIRMED')
+        self.assertEqual(rows,[])
+
     def test_moreveneto_searches_descriptive_fields_and_keeps_metadata_unverified(self):
         config={'communication':{'providers':{'apollo':{'baseUrl':'https://asve.arianna4.cloud//apollo/'}}}}
         response={'data':{'search':{'totalCount':1,'results':{'items':[{'id':'fixture-1','label':'Fixture catalogue record','text':'Corsari in a description'}]}}}}

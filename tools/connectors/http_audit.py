@@ -51,7 +51,9 @@ def fetch(url,headers=None,timeout=25,data=None):
             if len(raw)>8_000_000:raise ValueError('CATALOGUE_RESPONSE_TOO_LARGE')
             return raw
     except Exception as error:
-        if isinstance(error,urllib.error.HTTPError):row['http_status']=error.code
+        if isinstance(error,urllib.error.HTTPError):
+            row['http_status']=error.code
+            row['retry_after']=error.headers.get('Retry-After') if error.headers else None
         row['error_code']=error_code(error)
         raise
     finally:
@@ -102,10 +104,13 @@ def anemi_search(query):
                 field=page.locator('input[name="cclterm1"][type="text"]')
                 if not field.count():raise ValueError('ANEMI_PUBLIC_SEARCH_FORM_NOT_FOUND')
                 field.fill(query)
+                row['search_script_loaded']=page.evaluate('typeof search_tidy === \"function\"')
                 with page.expect_navigation(wait_until='domcontentloaded',timeout=30000) as submitted:
                     field.evaluate('(element)=>element.form.requestSubmit()')
                 response=submitted.value
                 row['search_submitted']=True
+                row['submitted_body_excerpt']=' '.join(page.locator('body').inner_text().split())[:2500]
+                row['submitted_query_values']=urllib.parse.parse_qs(urllib.parse.urlsplit(page.url).query).get('cclterm1',[])
                 raw=page.content().encode()
                 row.update(http_status=response.status if response else None,final_url=safe_url(page.url),
                            response_sha256=hashlib.sha256(raw).hexdigest(),response_bytes=len(raw))

@@ -120,6 +120,12 @@ async def browser_probe(dest):
                     await page.locator('input[placeholder="Cerca nei titoli delle schede..."]').fill('corsari')
                     await page.keyboard.press('Enter')
                     await page.wait_for_timeout(6000)
+                if name=='anemi':
+                    for script in await page.locator('script[src]').evaluate_all('(els)=>els.map(e=>e.src)'):
+                        if '/js/neo.js' in script:
+                            public_script=await page.evaluate('async url => { const r=await fetch(url); return {status:r.status,text:await r.text()}; }',script)
+                            (dest/'anemi-public-search-script.js').write_text(scrub(public_script['text']))
+                            row['public_search_script_http_status']=public_script['status']
                 row.update(http_status=response.status if response else None,final_url=page.url,body_excerpt=(await page.locator('body').inner_text())[:12000],inputs=await page.locator('input').evaluate_all('(els)=>els.map(e=>({name:e.name,type:e.type,placeholder:e.placeholder,ariaLabel:e.getAttribute("aria-label")}))'),links=await page.locator('a[href]').evaluate_all('(els)=>els.slice(0,80).map(e=>({href:e.href,text:e.innerText}))'))
                 file=dest/(name+'.browser.html');file.write_text(scrub(await page.content()));row['response_file']=str(file)
             except Exception as error:row.update(error_type=type(error).__name__,error=scrub(str(error))[:1000])

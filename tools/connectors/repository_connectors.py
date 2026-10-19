@@ -486,12 +486,18 @@ def pares_simancas(q,lane):
             # Confirm each description page before emitting a Simancas hit.
             rows=[]
             for candidate_id in ids[:20]:
+                time.sleep(0.4)
                 record_status,record_rows,record_detail=pares_simancas(candidate_id,lane)
-                if record_status=="EXECUTED":
-                    rows.extend(record_rows)
+                if record_status=="EXECUTED":rows.extend(record_rows)
+                if record_status in ('REMOTE_RATE_LIMITED','REMOTE_ACCESS_BLOCKED'):
+                    # Retain any earlier real descriptions, and stop immediately
+                    # when the catalogue asks this client to wait.
+                    return ('PARTIAL_RESULTS_RATE_LIMITED' if rows else record_status),rows,record_detail
             if rows:
                 return "EXECUTED",rows,search_url+" ; confirmed Simancas descriptions only"
             return "ARCHIVE_NOT_CONFIRMED",[],search_url+" ; "+str(len(ids))+" catalogue links, none confirmed as Archivo General de Simancas"
+        except urllib.error.HTTPError:
+            raise
         except Exception as exc:
             return "ACCESS_BLOCKED",[],search_url+" ; "+type(exc).__name__+": "+str(exc)
 
@@ -526,6 +532,8 @@ def pares_simancas(q,lane):
             "metadata_text":plain[:22000],
             "evidence_level":"CATALOGUE_METADATA_ONLY",
         }],url
+    except urllib.error.HTTPError:
+        raise
     except Exception as exc:
         return "ACCESS_BLOCKED",[],url+" ; "+type(exc).__name__+": "+str(exc)
 
@@ -721,7 +729,8 @@ def anemi_public(q,lane):
         if '/metadata/' in url and len(title)>3 and url not in seen:
             seen.add(url);rows.append({'discovery_repository':'Anemi / University of Crete','discovery_lane':lane,
                 'connector_status':'EXECUTED','identifier':url,'url':url,'title':title,'date':[]})
-    return 'EXECUTED',rows[:10],base+'/search ; actual public browser form submitted; bounded metadata only, no bulk downloads'
+    confirmed=bool(rows) or bool(re.search(r'no (?:records|results|matches)|δεν βρέθηκαν|κανένα αποτέλεσμα|0 results',re.sub('<[^>]+>',' ',html),re.I))
+    return ('EXECUTED' if confirmed else 'SEARCH_NOT_CONFIRMED'),rows[:10],base+'/search ; actual public browser form submitted; '+('result response confirmed' if confirmed else 'returned page does not confirm an executed query')+'; bounded metadata only, no bulk downloads' 
 
 def sias_public(q,lane):
     base='https://sias-archivi.cultura.gov.it'
@@ -753,10 +762,12 @@ def moreveneto_public(q,lane):
     # description/text fields as well as titles; autocomplete alone misses leads.
     full_query='''query { search(searchParameters: {
       totalCount: 0 gallery: false
-      facets: [{id:"query" type:"value"}]
+      facets: [{id:"query" type:"value"}
+        {id:"query-all" type:"value" data:[{value:"1" label:"Cerca in tutti i campi delle schede"}]}]
       page:{offset:0 limit:20}
       results:{order:{type:"score" key:"_score" direction:"DESC"} fields:[{id:"description" highlight:false limit:1000}]}
-      filters:[{facetId:"query" value:%s searchIn:[{key:"label.ngrams^5,text^4,fields.*^3" operator:"LIKE"}]}]
+      filters:[{facetId:"query" value:%s searchIn:[{key:"label.ngrams" operator:"LIKE"}]}
+        {facetId:"query-all" value:null searchIn:[{key:"label.ngrams^5,text^4,fields.*^3" operator:"="}]}]
     }) { totalCount results { items {
       ... on Entity { id label typeOfEntity fields { ... on KeyValueField {key value} } }
       ... on Item { id label title text fields { ... on KeyValueField {key value} } }
@@ -772,7 +783,8 @@ def moreveneto_public(q,lane):
                     'url':None,'date':[],'catalogue_endpoint':endpoint,'metadata_text':item.get('text') or '',
                     'catalogue_fields':item.get('fields',[]),'evidence_level':'CATALOGUE_METADATA_ONLY'})
         return 'EXECUTED',rows,endpoint+' ; native public descriptive search; first 20; total='+str(result.get('totalCount'))
-    full_failure='FULL_SEARCH_SCHEMA_OR_RESPONSE_UNCONFIRMED; autocomplete fallback; '
+    errors=[str(e.get('message',''))[:500] for e in full.get('errors',[]) if isinstance(e,dict)]
+    full_failure='FULL_SEARCH_SCHEMA_OR_RESPONSE_UNCONFIRMED '+json.dumps(errors,ensure_ascii=False)+'; autocomplete fallback; '
     query='''query { autoComplete(input: %s, itemsPagination: {offset: 0, limit: 20}) { totalCount results { ... on EntityCountData { count entity { id label typeOfEntity } } ... on ItemListing { item { id label document_type } } } } }''' % json.dumps(q)
     data=json.loads(fetch(endpoint,headers={**UA,'Accept':'application/json','Content-Type':'application/json'},
                           data=json.dumps({'query':query}).encode()))
