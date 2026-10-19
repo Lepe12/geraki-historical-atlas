@@ -11,13 +11,13 @@ import urllib.parse
 import urllib.request
 
 ENDPOINTS = {
-    'openarchives': ['https://www.openarchives.gr/', 'https://www.openarchives.gr/aggregator-openarchives/portal/', 'https://www.openarchives.gr/aggregator-openarchives/portal/search?query=corsair'],
+    'openarchives': ['https://www.openarchives.gr/', 'https://www.openarchives.gr/aggregator-openarchives/portal/', 'https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1'],
     'nlg': ['https://digitalcollections.nlg.gr/nlg-repo/dl/el/search.html?p.text=%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1', 'https://catalogue.nlg.gr/'],
     'anemi': ['https://anemi.lib.uoc.gr/', 'https://anemi.lib.uoc.gr/search.html'],
     'academia': ['https://www.academia.edu/search?q=corsair'],
     'google_books': ['https://www.googleapis.com/books/v1/volumes?q=corsair&maxResults=5'],
     'moreveneto': ['https://asve.arianna4.cloud/', 'https://moreveneto.archiviodistatovenezia.it/'],
-    'sias': ['https://sias-archivi.cultura.gov.it/cgi-bin/pagina.pl'],
+    'sias': ['https://sias-archivi.cultura.gov.it/cgi-bin/pagina.pl?RicVM=ricercasemplice&RicFrmRicSemplice=corsari'],
     'boa': ['https://katalog.devletarsivleri.gov.tr/'],
     'pares': ['https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=corsarios&archivo=2', 'https://pares.cultura.gob.es/ParesBusquedas20/catalogo/description/6080193'],
     'searchculture': ['https://www.searchculture.gr/aggregator/api/search.json?general_term=%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1&page=1&pageSize=5'],
@@ -68,8 +68,8 @@ def model_probe():
     row = {'provider': 'github_models', 'model': 'openai/gpt-4.1-mini', 'endpoint': url, 'http_status': None, 'request_performed': bool(key), 'paid_billing_configuration_changed': False}
     if not key:
         return {**row, 'status': 'TOKEN_NOT_AVAILABLE'}
-    payload = {'model': row['model'], 'messages': [{'role': 'user', 'content': 'Return JSON only. Given the supplied quotation "In 1670 the vessel anchored at an unnamed island", extract the date and state whether the island can be identified. Never invent an island name. Keys: date, place, status.'}], 'max_tokens': 200, 'temperature': 0}
-    req = urllib.request.Request(url, data=json.dumps(payload).encode(), headers={'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json'})
+    payload = {'model': row['model'], 'messages': [{'role': 'user', 'content': 'Return JSON only. Given the supplied quotation "In 1670 the vessel anchored at an unnamed island", extract the date and state whether the island can be identified. Never invent an island name. Keys: date, place, status.'}], 'max_tokens': 200, 'temperature': 0, 'stream':False}
+    req = urllib.request.Request(url, data=json.dumps(payload).encode(), headers={'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json', 'Accept':'application/json'})
     try:
         with urllib.request.urlopen(req, timeout=60) as response:
             raw=response.read(20000).decode('utf-8','replace')
@@ -80,6 +80,19 @@ def model_probe():
         row.update(http_status=error.code, status='UNAVAILABLE', error_body=scrub(error.read(1500).decode('utf-8','replace')))
     except Exception as error:
         row.update(status='FAILED', error_type=type(error).__name__)
+    # The documented legacy inference endpoint is tested separately; a plain
+    # HTTP 200 health response is not evidence of a model completion.
+    if row.get('status')!='COMPLETED':
+        other={'endpoint':'https://models.inference.ai.azure.com/chat/completions','model':'gpt-4o-mini'}
+        payload['model']=other['model']
+        req=urllib.request.Request(other['endpoint'],data=json.dumps(payload).encode(),headers={'Authorization':'Bearer '+key,'Content-Type':'application/json','Accept':'application/json'})
+        try:
+            with urllib.request.urlopen(req,timeout=60) as response:
+                raw=response.read(20000).decode();other.update(http_status=response.status,content_type=response.headers.get('Content-Type'),response_excerpt=scrub(raw)[:1500])
+                data=json.loads(raw);other.update(status='COMPLETED',content=data['choices'][0]['message']['content'])
+        except urllib.error.HTTPError as error:other.update(status='UNAVAILABLE',http_status=error.code,error_body=scrub(error.read(1500).decode('utf-8','replace')))
+        except Exception as error:other.update(status='FAILED',error_type=type(error).__name__)
+        row['legacy_endpoint_probe']=other
     return row
 
 async def browser_probe(dest):
@@ -88,11 +101,11 @@ async def browser_probe(dest):
     rows=[]
     async with async_playwright() as pw:
         browser=await pw.chromium.launch(headless=True)
-        for name,url in [('moreveneto','https://asve.arianna4.cloud/'),('sias','https://sias-archivi.cultura.gov.it/cgi-bin/pagina.pl')]:
+        for name,url in [('moreveneto','https://asve.arianna4.cloud/'),('sias','https://sias-archivi.cultura.gov.it/cgi-bin/pagina.pl?RicVM=ricercasemplice&RicFrmRicSemplice=corsari')]:
             page=await browser.new_page()
             traffic=[]
             async def capture(response):
-                if any(word in response.url.lower() for word in ('graphql','netseven','config','environment')):
+                if any(word in response.url.lower() for word in ('graphql','netseven','apollo','app-config','environment')):
                     row={'url':scrub(response.url),'http_status':response.status,'method':response.request.method}
                     if response.request.post_data:row['request_body']=scrub(response.request.post_data)[:10000]
                     try:row['response_excerpt']=scrub(await response.text())[:12000]
@@ -118,8 +131,13 @@ def main():
     dest.mkdir(parents=True, exist_ok=True)
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:
         checks = list(pool.map(lambda item: inspect(*item, dest), ENDPOINTS.items()))
+    from connectors.repository_connectors import audited_dispatch
+    native=[]
+    for repository,query in [('OpenArchives.gr / EKT','πειρατεία'),('National Library of Greece Digital Collections','χειρόγραφο'),('SIAS / Italian State Archives','corsari'),('Archivio di Stato di Venezia / Moreveneto','corsari'),('PARES / Archivo General de Simancas','corsarios'),('SearchCulture.gr / EKT','πειρατεία')]:
+        status,records,detail=audited_dispatch(repository,query,'live_validation')
+        native.append({'repository':repository,'query':query,'status':status,'records':records,'diagnostic':json.loads(detail)})
     import asyncio
-    report = {'schema': 'nabou-engine-live-probe-v2', 'run_id': run, 'checked_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'source_revision': os.getenv('GITHUB_SHA'), 'connectors': checks, 'semantic_probe': model_probe(), 'browser_probes':asyncio.run(browser_probe(dest))}
+    report = {'schema': 'nabou-engine-live-probe-v3', 'run_id': run, 'checked_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'source_revision': os.getenv('GITHUB_SHA'), 'connectors': checks, 'native_connector_tests':native,'semantic_probe': model_probe(), 'browser_probes':asyncio.run(browser_probe(dest))}
     (dest / 'endpoint-report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     print(json.dumps({'run_id': run, 'connectors': [{ 'connector': c['connector'], 'http_statuses': [a['http_status'] for a in c['attempts']]} for c in checks], 'semantic_probe': report['semantic_probe']},ensure_ascii=False))
 

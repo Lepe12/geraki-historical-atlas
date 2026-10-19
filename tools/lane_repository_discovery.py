@@ -4,7 +4,7 @@ import os,json,pathlib,urllib.parse,urllib.request,sys,time
 from concurrent.futures import ThreadPoolExecutor
 sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from connectors.bsb_sru import search_bsb
-from connectors.repository_connectors import dispatch
+from connectors.repository_connectors import audited_dispatch as dispatch
 from research_relevance import discovery_queries
 from research_focus import decompose, focused_queries
 from historical_query_expansion import EVENT_TERMS

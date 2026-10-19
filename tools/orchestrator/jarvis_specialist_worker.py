@@ -9,7 +9,7 @@ sys.path.insert(0,str(ROOT/"connectors"))
 sys.path.insert(0,str(ROOT/"orchestrator"))
 
 from connector_batch import run_batch
-from repository_connectors import dispatch as repository_dispatch
+from repository_connectors import audited_dispatch as repository_dispatch
 from jarvis_event_bus import emit
 from jarvis_task_history import record
 from jarvis_runtime_guard import validate_specialist_assignment

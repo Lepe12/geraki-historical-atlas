@@ -16,9 +16,9 @@ UA={"User-Agent":"Piratecartography-Historical-Research/3.0 (+scholarly catalogu
 def _get(url, timeout=20, accept=None):
     headers=dict(UA)
     if accept: headers["Accept"]=accept
-    req=urllib.request.Request(url,headers=headers)
-    with urllib.request.urlopen(req,timeout=timeout) as r:
-        return r.read()
+    try:from .http_audit import fetch
+    except ImportError:from http_audit import fetch
+    return fetch(url,headers=headers,timeout=timeout)
 
 def _json(url, timeout=45):
     return json.loads(_get(url,timeout).decode("utf-8","replace"))
@@ -417,9 +417,7 @@ def searchculture(q,lane):
     else:
         params["general_term"]=q
     url="https://www.searchculture.gr/aggregator/api/search.json?"+urllib.parse.urlencode(params)
-    req=urllib.request.Request(url,headers={**UA,"Accept":"application/json"})
-    with urllib.request.urlopen(req,timeout=30) as resp:
-        d=json.loads(resp.read().decode("utf-8","replace"))
+    d=json.loads(_get(url,timeout=30,accept='application/json').decode('utf-8','replace'))
     out=[]
     for x in d.get("results",[]) or d.get("items",[]) or []:
         uri=x.get("uri") or x.get("id")
@@ -433,6 +431,8 @@ def searchculture(q,lane):
           "title":title,
           "date":x.get("ekt_chronology") or x.get("dc_date") or x.get("date") or [],
           "url":uri,
+          "digital_url":x.get('edm_isShownAt'),
+          "rights":x.get('edm_rights'),
           "metadata_text":json.dumps(x,ensure_ascii=False),
           "raw":x
         })
@@ -467,7 +467,7 @@ def pares_simancas(q,lane):
         search_url="https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?"+urllib.parse.urlencode({"texto":value})
         try:
             html=_get(search_url,timeout=25).decode("utf-8","replace")
-            if "Resultados" not in html and "resultados" not in html:
+            if not re.search(r'resultados|search results|results page',html,re.I):
                 return "SEARCH_NOT_CONFIRMED",[],search_url
             ids=list(dict.fromkeys(re.findall(r'(?:/catalogo/description/|catalogo/description/)([0-9]{2,12})',html)))
             # Search result links are not proof of archive attribution.
@@ -493,12 +493,12 @@ def pares_simancas(q,lane):
         from html import unescape
         plain=unescape(re.sub(r"<[^>]+>"," ",re.sub(r"(?is)<(script|style)[^>]*>.*?</\\1>"," ",raw)))
         plain=" ".join(plain.split())
-        if not ("Signatura" in plain and ("Archivo General de Simancas" in plain)):
+        if not (re.search(r'Signatura|Reference code|Call number',plain,re.I) and ("Archivo General de Simancas" in plain)):
             return "RECORD_NOT_CONFIRMED",[],url+" did not confirm a Simancas archival description"
         title_match=re.search(r"(?is)<title[^>]*>(.*?)</title>",raw)
         title=unescape(re.sub(r"<[^>]+>"," ",title_match.group(1))).strip() if title_match else "PARES record "+record_id
-        sig=re.search(r"Signatura\\s*:\\s*(.{1,180}?)(?=Fecha |Nivel de Descripci|Código de Referencia|Contexto)",plain)
-        ref=re.search(r"Código de Referencia\\s*:\\s*(.{1,180}?)(?=Contexto|Contenido y Estructura|Condiciones)",plain)
+        sig=re.search(r"(?:Signatura|Reference number|Call number)\s*:\s*(.{1,180}?)(?=Fecha |Date |Nivel de Descripci|Código de Referencia|Reference code|Contexto|Context)",plain,re.I)
+        ref=re.search(r"(?:Código de Referencia|Reference code)\s*:\s*(.{1,180}?)(?=Contexto|Contenido y Estructura|Condiciones|Context|Content)",plain,re.I)
         return "EXECUTED",[{
             "discovery_repository":"PARES / Archivo General de Simancas",
             "discovery_lane":lane,"connector_status":"EXECUTED",
@@ -663,16 +663,83 @@ def academia_public(q,lane):
     return _public_site_index(q,lane,"Academia.edu Public Research","academia.edu",20)
 
 def openarchives_public(q,lane):
-    return _public_site_index(q,lane,"OpenArchives.gr / EKT","openarchives.gr",25)
+    base='https://www.openarchives.gr'
+    params={'portalSearches[0].keywords[0].value':q,'portalSearches[0].keywords[0].field':'',
+            'portalSearches[0].booleanOperator':'OR','language':'en'}
+    url=base+'/aggregator-openarchives/portal/advancedSearch/search?'+urllib.parse.urlencode(params)
+    rows=_html_search(url,'OpenArchives.gr / EKT',lane,base,
+                      lambda u,t:'/aggregator-openarchives/edm/' in u and len(t)>3)
+    return 'EXECUTED',rows,url+' ; native public catalogue; first page only'
 
 def nlg_public(q,lane):
-    return _public_site_index(q,lane,"National Library of Greece Digital Collections","digitalcollections.nlg.gr",25)
+    base='https://digitalcollections.nlg.gr'
+    url=base+'/nlg-repo/dl/el/search.html?'+urllib.parse.urlencode({'p.text':q})
+    rows=_html_search(url,'National Library of Greece Digital Collections',lane,base,
+                      lambda u,t: bool(re.search(r'/dl/(?:el|en)/browse/\d+',u)) and len(t)>2)
+    return 'EXECUTED',rows,url+' ; native anonymous catalogue; first page only'
 
 def anemi_public(q,lane):
     return _public_site_index(q,lane,"Anemi / University of Crete","anemi.lib.uoc.gr",25)
 
+def sias_public(q,lane):
+    base='https://sias-archivi.cultura.gov.it'
+    url=base+'/cgi-bin/pagina.pl?'+urllib.parse.urlencode({'RicVM':'ricercasemplice','RicFrmRicSemplice':q,'RicProgetto':'','RicLin':''})
+    rows=_html_search(url,'SIAS / Italian State Archives',lane,base,
+                      lambda u,t:'/cgi-bin/pagina.pl?' in u and bool(re.search(r'(?:TipoPag|Chiave|RicVM)=(?:compl|cons|prod|sogg|scheda|istit)',u,re.I)) and len(t)>3)
+    return 'EXECUTED',rows,url+' ; public descriptive catalogue; not restricted to Venice'
+
+def boa_access(q,lane):
+    url='https://katalog.devletarsivleri.gov.tr/'
+    html=_get(url,timeout=20).decode('utf-8','replace')
+    if re.search(r'name=["\'](?:username|password)["\']',html,re.I):
+        return 'AUTH_OR_BROWSER_REQUIRED',[],json.dumps({'endpoint':url,'reason':'RESEARCHER_LOGIN_AND_CAPTCHA',
+            'search_request_performed':False,'method_attempted':'ANONYMOUS_HTTPS_GET_LOGIN_PAGE',
+            'alternative_route':'Public İSAM and published archival editions can be searched separately; they are not BOA catalogue access.',
+            'credentials_supplied':False})
+    return 'SEARCH_NOT_CONFIRMED',[],url+' ; no public search form confirmed'
+
+def moreveneto_public(q,lane):
+    # Endpoint taken from the live official site's public app-config.local.json,
+    # rather than the unrelated University of Florence GraphQL deployment.
+    try:from .http_audit import fetch
+    except ImportError:from http_audit import fetch
+    config=_json('https://asve.arianna4.cloud/assets/config/app-config.local.json')
+    endpoint=config['communication']['providers']['apollo']['baseUrl']
+    if urllib.parse.urlsplit(endpoint).hostname!='asve.arianna4.cloud':
+        raise ValueError('UNCONFIRMED_MOREVENETO_ENDPOINT')
+    query='''query { autoComplete(input: %s, itemsPagination: {offset: 0, limit: 20}) { totalCount results { ... on EntityCountData { count entity { id label typeOfEntity } } ... on ItemListing { item { id label document_type } } } } }''' % json.dumps(q)
+    data=json.loads(fetch(endpoint,headers={**UA,'Accept':'application/json','Content-Type':'application/json'},
+                          data=json.dumps({'query':query}).encode()))
+    if data.get('errors'):return 'API_SCHEMA_MISMATCH',[],json.dumps({'endpoint':endpoint,'errors':data['errors']})
+    result=(data.get('data') or {}).get('autoComplete')
+    if not isinstance(result,dict):return 'SEARCH_NOT_CONFIRMED',[],endpoint
+    rows=[]
+    for value in result.get('results',[]):
+        item=value.get('item') or value.get('entity') or {}
+        if item.get('id') and item.get('label'):
+            rows.append({'discovery_repository':'Archivio di Stato di Venezia / Moreveneto','discovery_lane':lane,
+                'connector_status':'EXECUTED','identifier':item['id'],'title':item['label'],
+                'url':None,'date':[],'catalogue_endpoint':endpoint,'evidence_level':'CATALOGUE_METADATA_ONLY'})
+    return 'EXECUTED',rows,endpoint+' ; anonymous catalogue autocomplete; total='+str(result.get('totalCount'))
+
 def unsupported(repository, reason="No stable anonymous machine-search connector configured."):
     return "AUTH_OR_BROWSER_REQUIRED",[],reason
+
+def audited_dispatch(repository,q,lane):
+    """Preserve real request receipts and distinguish unexecuted from empty."""
+    try:from .http_audit import trace,error_code
+    except ImportError:from http_audit import trace,error_code
+    with trace() as requests:
+        try:
+            status,records,detail=dispatch(repository,q,lane)
+        except Exception as error:
+            code=error_code(error)
+            status=('REMOTE_RATE_LIMITED' if code=='HTTP_429' else 'REMOTE_ACCESS_BLOCKED' if code in ('HTTP_401','HTTP_403') else 'TLS_CONFIGURATION_ERROR' if code.startswith('TLS_') else 'REMOTE_ERROR')
+            records=[];detail={'error_code':code,'error_type':type(error).__name__}
+    diagnostic={'schema':'nabou-connector-access-v1','repository':repository,'status':status,
+                'http_attempts':requests,'detail':detail,'result_count':len(records),
+                'coverage':'BOUNDED_DISCOVERY_ONLY','verified':False}
+    return status,records,json.dumps(diagnostic,ensure_ascii=False)
 
 def dispatch(repository,q,lane):
     if repository=="Public Web Source Discovery":
@@ -700,9 +767,10 @@ def dispatch(repository,q,lane):
     if repository=="PARES / Archivo General de Simancas":
         return pares_simancas(q,lane)
     if repository in ("Türkiye Devlet Arşivleri / BOA",):
-        return unsupported(repository,"BOA catalogue requires authenticated interactive research access.")
+        return boa_access(q,lane)
     if repository in ("Archivio di Stato di Venezia / SIAS","SIAS / Italian State Archives"):
-        return unsupported(repository,"SIAS target retained; stable anonymous term-search endpoint not yet established.")
+        return sias_public(q,lane)
+    if repository=='Archivio di Stato di Venezia / Moreveneto':return moreveneto_public(q,lane)
     if repository=="Archives nationales":
         return unsupported(repository,"Archives nationales target retained; no general anonymous API connector established.")
     if repository=="British Library":
