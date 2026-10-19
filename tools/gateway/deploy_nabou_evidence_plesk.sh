@@ -16,14 +16,16 @@ for file in historical-evidence.js app.js; do
   curl --fail --location --silent --show-error --max-time 30 "$BASE/$file" --output "$TMP/$file"
   "$NODE" --check "$TMP/$file"
 done
-cp "$APP/app.js" "$TMP/app.js.backup"
-if [ -f "$APP/historical-evidence.js" ]; then cp "$APP/historical-evidence.js" "$TMP/historical-evidence.js.backup"; fi
+BACKUP="$APP/.deployment-backups/$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$BACKUP"
+cp "$APP/app.js" "$BACKUP/app.js"
+if [ -f "$APP/historical-evidence.js" ]; then cp "$APP/historical-evidence.js" "$BACKUP/historical-evidence.js"; fi
 cp "$TMP/historical-evidence.js" "$APP/historical-evidence.js"
 cp "$TMP/app.js" "$APP/app.js"
 if ! "$NODE" "$APP/self-test.js"; then
-  cp "$TMP/app.js.backup" "$APP/app.js"
-  if [ -f "$TMP/historical-evidence.js.backup" ]; then
-    cp "$TMP/historical-evidence.js.backup" "$APP/historical-evidence.js"
+  cp "$BACKUP/app.js" "$APP/app.js"
+  if [ -f "$BACKUP/historical-evidence.js" ]; then
+    cp "$BACKUP/historical-evidence.js" "$APP/historical-evidence.js"
   else
     rm -f "$APP/historical-evidence.js"
   fi
@@ -33,5 +35,6 @@ fi
 mkdir -p "$APP/tmp"
 touch "$APP/tmp/restart.txt"
 echo "FILES_UPDATED: $COMMIT"
+echo "BACKUP_DIRECTORY: $BACKUP"
 echo "PASSENGER_RESTART_REQUESTED"
 echo "Verify new endpoints using the GitHub NABOU Historical Evidence Production Smoke workflow."
