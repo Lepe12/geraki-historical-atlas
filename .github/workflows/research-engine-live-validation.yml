@@ -21,6 +21,11 @@ jobs:
           sparse-checkout: |
             tools
             evidence/engine_validation
+      - name: Install trusted certificates and public browser support
+        run: |
+          python3 -m pip install --quiet --upgrade certifi playwright
+          python3 -m playwright install --with-deps chromium
+          echo "SSL_CERT_FILE=$(python3 -m certifi)" >> "$GITHUB_ENV"
       - name: Inspect public endpoints and existing free model access
         env:
           SEARCHCULTURE_API_KEY: ${{ secrets.SEARCHCULTURE_API_KEY }}

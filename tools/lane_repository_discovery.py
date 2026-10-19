@@ -162,6 +162,11 @@ for repo_index,r in enumerate(plan["repositories"]):
         # Keep the lane's language and alternate names within bounded budgets.
         # Generic English qualifiers previously replaced every archive's plan.
         repo_terms=focused_queries(focus,EVENT_TERMS.get(lane,()),include_hypotheses=name!="SearchCulture.gr / EKT")[:min(cap,16)]
+    elif focus['kind']=='topic':
+        from research_topics import topic_queries
+        # Archive overrides above were designed for individual names. They
+        # must not restore an entire quoted question for thematic research.
+        repo_terms=topic_queries(focus,lane)
     completed={a['query'] for a in attempts[repo_index].get('queries',[])}
     pending=[q for q in repo_terms if q not in completed]
     if attempts[repo_index].get('status') in ('API_KEY_REQUIRED','AUTH_OR_BROWSER_REQUIRED','ACCESS_BLOCKED','REMOTE_ACCESS_BLOCKED','REMOTE_RATE_LIMITED'):pending=[]

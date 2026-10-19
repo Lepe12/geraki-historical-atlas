@@ -61,6 +61,8 @@ def spelling_hypotheses(value, place=False):
 
 
 def search_terms(focus):
+    if focus['kind']=='topic':
+        return ['corsair','corsaire','corsaro','pirate','korsan','πειρατ'] if 'maritime_piracy' in focus.get('topic_concepts',[]) else []
     out=[]
     for name in focus['names']:
         words=name.split()
@@ -70,6 +72,9 @@ def search_terms(focus):
 
 
 def context_terms(focus):
+    if focus['kind']=='topic':
+        from research_topics import region_terms
+        return region_terms(focus,True)
     return list(dict.fromkeys(x for place in focus.get('places',[]) for x in spelling_hypotheses(place,True)))[:12]
 
 
@@ -86,6 +91,9 @@ def role_terms(focus):
 
 def ia_queries(focus, limit=8):
     """Search complete supplied names before surname/OCR recovery hypotheses."""
+    if focus['kind']=='topic':
+        from research_topics import topic_queries
+        return list(dict.fromkeys(topic_queries(focus)+topic_queries(focus,'french')))[:limit]
     queries=[]
     if focus['kind']=='person':
         # Supplied spellings stay ahead of mechanical hypotheses so a short
@@ -119,6 +127,14 @@ def text_match(record,focus):
     # Separate highlights can be from different pages. They are never joined
     # to manufacture name/place co-occurrence.
     candidates=[]
+    if focus['kind']=='topic':
+        from research_topics import topic_match
+        for segment in record.get('fulltext_contexts') or [record.get('context_excerpt') or '']:
+            match=topic_match(segment,focus)
+            if match['topic_event_present']:
+                return {**match,'category':'POSSIBLE_TARGET','reason':'FULLTEXT_THEMATIC_PASSAGE_REQUIRES_REVIEW',
+                        'matched_excerpt':segment,'query_hypothesis':True}
+        return None
     for segment in record.get('fulltext_contexts') or [record.get('context_excerpt') or '']:
         surface=[];offsets=[]
         for i,char in enumerate(segment):

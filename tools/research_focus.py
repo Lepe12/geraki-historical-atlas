@@ -106,6 +106,10 @@ def _surname_orthography(latin):
 
 def decompose(target, aliases=(), purpose='', kind='unknown', regions=()):
     """Split an explicit name + role + place clause, preserving original text."""
+    from research_topics import topic_focus
+    topic = topic_focus(target, kind, regions)
+    if topic:
+        return topic
     supplied=split_supplied_names(target)
     target=supplied[0]
     aliases=[*supplied[1:], *[str(a).strip() for a in aliases if str(a).strip()]]
@@ -138,6 +142,9 @@ def decompose(target, aliases=(), purpose='', kind='unknown', regions=()):
 
 def focused_queries(focus, qualifiers=(), include_hypotheses=False):
     """Every query retains a complete name, or surname with explicit context."""
+    if focus['kind'] == 'topic':
+        from research_topics import topic_queries
+        return topic_queries(focus)
     queries=[]
     contexts=[*focus.get('places',[]),*focus.get('roles',[])]
     batches=[]
@@ -290,6 +297,9 @@ def _topical_match_segment(record, focus):
     original=' '.join(str(record.get(k) or '') for k in
               ('title','description','subject','context_excerpt','metadata_text','text','snippet'))
     text=fold(original)
+    if focus['kind'] == 'topic':
+        from research_topics import topic_match
+        return topic_match(original, focus)
     places=[p for p in focus.get('places',[]) if _token_match(text,p)]
     roles=[r for r in focus.get('roles',[]) if _token_match(text,r)]
     for name in sorted(focus['names'],key=len,reverse=True):

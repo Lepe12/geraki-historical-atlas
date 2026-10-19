@@ -32,6 +32,8 @@ terms=[ctx["target"]]+ctx["aliases"]
 ident=identity(req,ctx)
 specialists=specialist_plan(ctx["target"],ctx["purpose"],ctx["date_range"],ctx["aliases"],ident["type"] if ident["type"] in ("place","person","event") else "all")
 queries=discovery_queries(ident)+expand_queries(lane,ctx["target"],ctx["aliases"],ctx["date_range"])
+if ident['focus']['kind']=='topic':
+    queries=expand_queries(lane,ctx['target'],ctx['aliases'],ctx['date_range'])
 queries=list(dict.fromkeys(queries))
 plan={"lane":lane,"request_file":rf.name,"target":ctx["target"],"aliases":ctx["aliases"],"date_range":ctx["date_range"],"languages":langs[lane],"target_identity":ident,"specialist_plan":specialists,"expanded_queries":queries,"repositories":[],"rule":"Search repository/catalogue with auditable multilingual event vocabulary and user-supplied historical name variants; catalogue records are leads only."}
 for name,base in cfg[lane]:

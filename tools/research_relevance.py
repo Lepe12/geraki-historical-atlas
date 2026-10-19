@@ -203,6 +203,11 @@ def assess(record, ident):
         status='EXCLUDE_FROM_ACQUISITION';reasons.append('EXPLICIT_TOPIC_COLLISION')
     elif record.get('mediatype') and record['mediatype'] not in ('texts',):
         status='REVIEW_REQUIRED';reasons.append('NON_TEXT_OBJECT')
+    elif focus['kind'] == 'topic':
+        if topical['category'] in ('TARGET_MATCH','POSSIBLE_TARGET') and history:
+            status='PRIORITY';reasons.append('THEMATIC_SOURCE_FOR_PASSAGE_INSPECTION')
+        else:
+            status='REVIEW_REQUIRED';reasons.append('THEMATIC_RELEVANCE_UNRESOLVED')
     elif ident.get('type') == 'place':
         if (name_match or regional) and geographic and history: status='PRIORITY'
         else: status='REVIEW_REQUIRED';reasons.append('PLACE_IDENTITY_UNRESOLVED')

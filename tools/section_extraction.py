@@ -50,6 +50,8 @@ def extract_document(text, source, file, ctx):
     terms=variants(ctx['target'],ctx.get('aliases',[]))
     focus=decompose(ctx['target'],ctx.get('aliases',[]))
     kind=focus['kind']
+    if kind=='topic':
+        return extract_topic_document(text,source,file,ctx,focus)
     ranges=[int(y) for y in YEAR.findall(ctx.get('date_range',''))]
     lo,hi=(min(ranges),max(ranges)) if ranges else (0,9999)
     host=(urlsplit(str(source.get('url') or '')).hostname or '').lower()
@@ -137,6 +139,54 @@ def extract_document(text, source, file, ctx):
             'reason':'SOURCE_ATTRIBUTED_SECTION_FINDING' if candidate else 'UNRESOLVED_SECTION_FINDING',
             'extraction_method':'DETERMINISTIC_SECTION_READING','uncertainties':uncertainties,
             'evidence_state':'ACQUIRED','original_inspected':False,'verified':False})
+    return findings
+
+def extract_topic_document(text, source, file, ctx, focus):
+    """Retain real topical passages without requiring an absent person's name.
+
+    An unresolved date is retained as uncertainty, never filled from publication
+    metadata. Long OCR paragraphs are sliced at real character offsets.
+    """
+    from research_topics import PIRACY, BASES, topic_match
+    scope=[int(y) for y in YEAR.findall(ctx.get('date_range',''))]
+    lo,hi=(min(scope),max(scope)) if scope else (0,9999)
+    findings=[]
+    pattern=re.compile(PIRACY)
+    for start,end,raw in paragraphs(text):
+        if not pattern.search(fold(raw)):
+            continue
+        spans=[]
+        if len(raw)<=3500:
+            spans=[(start,end,raw)]
+        else:
+            # Offsets map through accent folding (Greek characters retain one
+            # position in this normalization). Search original word surfaces.
+            for hit in re.finditer(r'(?i)\b(?:corsair\w*|corsar\w*|pirat\w*|korsan\w*|πειρατ\w*|κουρσ\w*)',raw):
+                a=max(start,start+hit.start()-650);b=min(end,start+hit.end()+950)
+                if spans and a<=spans[-1][1]:
+                    a=spans[-1][0];spans[-1]=(a,b,text[a:b])
+                else:spans.append((a,b,text[a:b]))
+        for a,b,quote in spans:
+            years=sorted(set(int(y) for y in YEAR.findall(quote)))
+            scoped=[y for y in years if lo<=y<=hi]
+            uncertainties=['ORIGINAL_NOT_INSPECTED','SOURCE_GENEALOGY_PENDING','INDEPENDENCE_UNRESOLVED',
+                           'TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION']
+            if not scoped:uncertainties.append('EVENT_DATE_UNRESOLVED' if not years else 'DATE_OUTSIDE_SCOPE')
+            fiction=bool(FICTION.search(fold(quote)))
+            if fiction:uncertainties.append('FICTION_OR_BOOK_REVIEW_CONTEXT')
+            match=topic_match(quote,focus)
+            if not match['places']:uncertainties.append('REGIONAL_SCOPE_REQUIRES_REVIEW')
+            candidate=bool(scoped and not fiction and re.search(BASES,fold(quote)))
+            findings.append({'finding_id':'section-'+hashlib.sha256((file+str(a)+quote).encode()).hexdigest()[:20],
+                'file':file,'title':source.get('title'),'url':source.get('acquired_source_url') or source.get('url'),
+                'source_text_sha256':hashlib.sha256(text.encode()).hexdigest(),
+                'evidence_excerpt':quote,'years_in_scope':scoped,'date_basis':'EXPLICIT_PARAGRAPH' if years else 'UNRESOLVED',
+                'date_evidence':None,'matched_names':[],'name_basis':'THEMATIC_CONCEPT',
+                'locator':locator(text,a,b,source,file),'reported_cited_pages':[],
+                'decision':'RETAIN_CANDIDATE' if candidate else 'REVIEW_CONTEXT',
+                'reason':'THEMATIC_SOURCE_PASSAGE_NOT_VERIFIED_BASE',
+                'extraction_method':'DETERMINISTIC_THEMATIC_PASSAGE_READING','uncertainties':uncertainties,
+                'evidence_state':'ACQUIRED','original_inspected':False,'verified':False})
     return findings
 
 def build_findings(base, ctx):

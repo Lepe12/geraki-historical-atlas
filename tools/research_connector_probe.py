@@ -11,15 +11,15 @@ import urllib.parse
 import urllib.request
 
 ENDPOINTS = {
-    'openarchives': ['https://www.openarchives.gr/aggregator/', 'https://www.openarchives.gr/aggregator/search?query=corsair&language=en'],
-    'nlg': ['https://digitalcollections.nlg.gr/', 'https://catalogue.nlg.gr/'],
+    'openarchives': ['https://www.openarchives.gr/', 'https://www.openarchives.gr/aggregator-openarchives/portal/', 'https://www.openarchives.gr/aggregator-openarchives/portal/search?query=corsair'],
+    'nlg': ['https://digitalcollections.nlg.gr/nlg-repo/dl/el/search.html?p.text=%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1', 'https://catalogue.nlg.gr/'],
     'anemi': ['https://anemi.lib.uoc.gr/', 'https://anemi.lib.uoc.gr/search.html'],
     'academia': ['https://www.academia.edu/search?q=corsair'],
     'google_books': ['https://www.googleapis.com/books/v1/volumes?q=corsair&maxResults=5'],
     'moreveneto': ['https://asve.arianna4.cloud/', 'https://moreveneto.archiviodistatovenezia.it/'],
-    'sias': ['https://sias-archivi.cultura.gov.it/', 'https://sias.archivi.beniculturali.it/'],
+    'sias': ['https://sias-archivi.cultura.gov.it/cgi-bin/pagina.pl'],
     'boa': ['https://katalog.devletarsivleri.gov.tr/'],
-    'pares': ['https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=corsarios', 'https://pares.cultura.gob.es/ParesBusquedas20/catalogo/search'],
+    'pares': ['https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=corsarios&archivo=2', 'https://pares.cultura.gob.es/ParesBusquedas20/catalogo/description/6080193'],
     'searchculture': ['https://www.searchculture.gr/aggregator/api/search.json?general_term=%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1&page=1&pageSize=5'],
 }
 
@@ -72,13 +72,45 @@ def model_probe():
     req = urllib.request.Request(url, data=json.dumps(payload).encode(), headers={'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json'})
     try:
         with urllib.request.urlopen(req, timeout=60) as response:
-            data = json.load(response)
-            row.update(http_status=response.status, status='COMPLETED', actual_model=data.get('model'), content=data['choices'][0]['message']['content'], usage=data.get('usage'))
+            raw=response.read(20000).decode('utf-8','replace')
+            row.update(http_status=response.status,content_type=response.headers.get('Content-Type'),response_bytes=len(raw),response_excerpt=scrub(raw)[:1500])
+            data = json.loads(raw)
+            row.update(status='COMPLETED', actual_model=data.get('model'), content=data['choices'][0]['message']['content'], usage=data.get('usage'))
     except urllib.error.HTTPError as error:
         row.update(http_status=error.code, status='UNAVAILABLE', error_body=scrub(error.read(1500).decode('utf-8','replace')))
     except Exception as error:
         row.update(status='FAILED', error_type=type(error).__name__)
     return row
+
+async def browser_probe(dest):
+    """Inspect anonymous public browser routes; stop at login/CAPTCHA."""
+    from playwright.async_api import async_playwright
+    rows=[]
+    async with async_playwright() as pw:
+        browser=await pw.chromium.launch(headless=True)
+        for name,url in [('moreveneto','https://asve.arianna4.cloud/'),('sias','https://sias-archivi.cultura.gov.it/cgi-bin/pagina.pl')]:
+            page=await browser.new_page()
+            traffic=[]
+            async def capture(response):
+                if any(word in response.url.lower() for word in ('graphql','netseven','config','environment')):
+                    row={'url':scrub(response.url),'http_status':response.status,'method':response.request.method}
+                    if response.request.post_data:row['request_body']=scrub(response.request.post_data)[:10000]
+                    try:row['response_excerpt']=scrub(await response.text())[:12000]
+                    except Exception:pass
+                    traffic.append(row)
+            page.on('response',capture)
+            row={'connector':name,'method':'ANONYMOUS_BROWSER','url':url}
+            try:
+                response=await page.goto(url,wait_until='domcontentloaded',timeout=45000)
+                await page.wait_for_timeout(6000)
+                row.update(http_status=response.status if response else None,final_url=page.url,body_excerpt=(await page.locator('body').inner_text())[:12000],inputs=await page.locator('input').evaluate_all('(els)=>els.map(e=>({name:e.name,type:e.type,placeholder:e.placeholder,ariaLabel:e.getAttribute("aria-label")}))'),links=await page.locator('a[href]').evaluate_all('(els)=>els.slice(0,80).map(e=>({href:e.href,text:e.innerText}))'))
+                file=dest/(name+'.browser.html');file.write_text(scrub(await page.content()));row['response_file']=str(file)
+            except Exception as error:row.update(error_type=type(error).__name__,error=scrub(str(error))[:1000])
+            row['api_traffic']=traffic
+            rows.append(row)
+            await page.close()
+        await browser.close()
+    return rows
 
 def main():
     run = os.getenv('GITHUB_RUN_ID', 'local')
@@ -86,7 +118,8 @@ def main():
     dest.mkdir(parents=True, exist_ok=True)
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:
         checks = list(pool.map(lambda item: inspect(*item, dest), ENDPOINTS.items()))
-    report = {'schema': 'nabou-engine-live-probe-v1', 'run_id': run, 'checked_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'source_revision': os.getenv('GITHUB_SHA'), 'connectors': checks, 'semantic_probe': model_probe()}
+    import asyncio
+    report = {'schema': 'nabou-engine-live-probe-v2', 'run_id': run, 'checked_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'source_revision': os.getenv('GITHUB_SHA'), 'connectors': checks, 'semantic_probe': model_probe(), 'browser_probes':asyncio.run(browser_probe(dest))}
     (dest / 'endpoint-report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     print(json.dumps({'run_id': run, 'connectors': [{ 'connector': c['connector'], 'http_statuses': [a['http_status'] for a in c['attempts']]} for c in checks], 'semantic_probe': report['semantic_probe']},ensure_ascii=False))
 

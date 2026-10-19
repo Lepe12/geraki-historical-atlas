@@ -23,6 +23,10 @@ EVENT_TERMS={
 }
 def expand_queries(lane,target,aliases,date_range="",max_queries=0):
     focus=decompose(target,aliases)
+    if focus['kind']=='topic':
+        from research_topics import topic_queries
+        queries=topic_queries(focus,lane)
+        return queries[:max_queries] if max_queries and max_queries>0 else queries
     if focus['kind']=='person':
         queries=focused_queries(focus,([str(date_range)] if date_range else [])+EVENT_TERMS.get(lane,EVENT_TERMS['travellers']),include_hypotheses=True)
         return queries[:max_queries] if max_queries and max_queries>0 else queries
