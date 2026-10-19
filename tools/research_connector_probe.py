@@ -141,7 +141,7 @@ def main():
     dest.mkdir(parents=True, exist_ok=True)
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:
         checks = list(pool.map(lambda item: inspect(*item, dest), ENDPOINTS.items()))
-    report={'schema':'nabou-engine-live-probe-v5','run_id':run,
+    report={'schema':'nabou-engine-live-probe-v6','run_id':run,
             'checked_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
             'source_revision':os.getenv('GITHUB_SHA'),'connectors':checks,
             'native_connector_tests':[],'partial':True}

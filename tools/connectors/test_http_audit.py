@@ -6,6 +6,17 @@ from connectors import repository_connectors as rc
 from connectors.http_audit import safe_url,trace,fetch
 
 class HttpAuditTests(unittest.TestCase):
+    def test_anemi_keeps_empty_metadata_icon_and_reads_its_own_result_row(self):
+        raw=b'''<table><tr><td>Title: A real catalogue title</td><td>Creator: A. Author</td>
+        <td><a href="?offset=1&amp;srfile=/metadata/0/a/metadata-123.tkl"><img src="icon.png"/></a></td></tr>
+        <tr><td>Title: Another catalogue title</td><td><a href="?offset=2&amp;srfile=/metadata/0/b/metadata-456.tkl"></a></td></tr></table>'''
+        with patch('connectors.http_audit.anemi_search',return_value=raw):
+            status,rows,_=rc.anemi_public('corsair','greek')
+        self.assertEqual(status,'EXECUTED')
+        self.assertEqual([r['title'] for r in rows],['A real catalogue title','Another catalogue title'])
+        self.assertTrue(rows[0]['url'].startswith('https://anemi.lib.uoc.gr/search/?'))
+        self.assertEqual(rows[0]['evidence_level'],'CATALOGUE_METADATA_ONLY')
+
     def test_pares_http_429_is_rate_limited_not_an_empty_or_blocked_search(self):
         with patch.object(rc,'_get',side_effect=HTTPError('https://pares.cultura.gob.es/search',429,'wait',{'Retry-After':'120'},None)):
             status,rows,detail=rc.audited_dispatch('PARES / Archivo General de Simancas','corsarios','spanish_simancas')

@@ -718,17 +718,42 @@ def nlg_public(q,lane):
                       lambda u,t: bool(re.search(r'/dl/(?:el|en)/browse/\d+',u)) and len(t)>2)
     return 'EXECUTED',rows,url+' ; native anonymous catalogue; first page only'
 
+class _AnemiResults(HTMLParser):
+    """Result links are empty icons with srfile; titles live in adjacent cells."""
+    def __init__(self):super().__init__();self.rows=[];self.links=[]
+    def handle_starttag(self,tag,attrs):
+        attrs=dict(attrs)
+        if tag=='tr':self.rows.append({'text':[]})
+        if tag=='a' and attrs.get('href'):
+            href=attrs['href'];params=urllib.parse.parse_qs(urllib.parse.urlsplit(href).query)
+            metadata=(params.get('srfile') or [''])[0]
+            if re.fullmatch(r'/metadata/(?:[A-Za-z0-9_-]+/)+[A-Za-z0-9_.-]+\.tkl',metadata):
+                self.links.append((href,metadata,list(self.rows)))
+    def handle_endtag(self,tag):
+        if tag=='tr' and self.rows:self.rows.pop()
+    def handle_data(self,data):
+        for row in self.rows:row['text'].append(data)
+
 def anemi_public(q,lane):
     base='https://anemi.lib.uoc.gr'
     try:from .http_audit import anemi_search
     except ImportError:from http_audit import anemi_search
     html=anemi_search(q).decode('utf-8','replace')
-    parser=_LinkParser();parser.feed(html);rows=[];seen=set()
-    for href,title in parser.links:
-        url=urllib.parse.urljoin(base,href)
-        if '/metadata/' in url and len(title)>3 and url not in seen:
-            seen.add(url);rows.append({'discovery_repository':'Anemi / University of Crete','discovery_lane':lane,
-                'connector_status':'EXECUTED','identifier':url,'url':url,'title':title,'date':[]})
+    parser=_AnemiResults();parser.feed(html);rows=[];seen=set()
+    for href,metadata,contexts in parser.links:
+        if metadata in seen:continue
+        seen.add(metadata);title=None;context=''
+        for row in reversed(contexts):
+            text=' '.join(' '.join(row['text']).split())
+            if len(re.findall(r'\bTitle\s*:',text,re.I))!=1:continue
+            match=re.search(r'\bTitle\s*:\s*(.*?)(?=\b(?:Creator|Publication Date|Publisher|Subject)\s*:|$)',text,re.I)
+            if match and match.group(1).strip():title=match.group(1).strip();context=text;break
+        url=urllib.parse.urljoin(base+'/search/',href)
+        rows.append({'discovery_repository':'Anemi / University of Crete','discovery_lane':lane,
+            'connector_status':'EXECUTED','identifier':metadata,'url':url,
+            'title':title or 'Anemi metadata record '+metadata.rsplit('/',1)[-1],
+            'title_status':'CATALOGUE_LITERAL' if title else 'TITLE_NOT_PARSED',
+            'metadata_text':context,'date':[],'evidence_level':'CATALOGUE_METADATA_ONLY'})
     confirmed=bool(rows) or bool(re.search(r'no (?:records|results|matches)|δεν βρέθηκαν|κανένα αποτέλεσμα|0 results',re.sub('<[^>]+>',' ',html),re.I))
     return ('EXECUTED' if confirmed else 'SEARCH_NOT_CONFIRMED'),rows[:10],base+'/search ; actual public browser form submitted; '+('result response confirmed' if confirmed else 'returned page does not confirm an executed query')+'; bounded metadata only, no bulk downloads' 
 
