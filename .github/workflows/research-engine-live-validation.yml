@@ -12,7 +12,7 @@ permissions:
 jobs:
   endpoints:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,12 +32,15 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: python3 tools/research_connector_probe.py
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: engine-endpoint-validation
           path: evidence/engine_validation/${{ github.run_id }}/
       - name: Persist actual responses
+        if: always()
         run: |
           set -e
+          if [ ! -d "evidence/engine_validation/$GITHUB_RUN_ID" ]; then exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add evidence/engine_validation/

@@ -135,14 +135,24 @@ def main():
     dest.mkdir(parents=True, exist_ok=True)
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:
         checks = list(pool.map(lambda item: inspect(*item, dest), ENDPOINTS.items()))
+    report={'schema':'nabou-engine-live-probe-v4','run_id':run,
+            'checked_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            'source_revision':os.getenv('GITHUB_SHA'),'connectors':checks,
+            'native_connector_tests':[],'partial':True}
+    def checkpoint():
+        (dest/'endpoint-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+    checkpoint()
     from connectors.repository_connectors import audited_dispatch
     native=[]
     for repository,query in [('OpenArchives.gr / EKT','πειρατεία'),('National Library of Greece Digital Collections','χειρόγραφο'),('SIAS / Italian State Archives','corsari'),('Archivio di Stato di Venezia / Moreveneto','corsari'),('Archivio di Stato di Venezia / Moreveneto','Venezia'),('PARES / Archivo General de Simancas','corsarios'),('SearchCulture.gr / EKT','πειρατεία'),('Anemi / University of Crete','πειρατεία')]:
         status,records,detail=audited_dispatch(repository,query,'live_validation')
         native.append({'repository':repository,'query':query,'status':status,'records':records,'diagnostic':json.loads(detail)})
+        report['native_connector_tests']=native
+        checkpoint()
     import asyncio
-    report = {'schema': 'nabou-engine-live-probe-v3', 'run_id': run, 'checked_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'source_revision': os.getenv('GITHUB_SHA'), 'connectors': checks, 'native_connector_tests':native,'semantic_probe': model_probe(), 'browser_probes':asyncio.run(browser_probe(dest))}
-    (dest / 'endpoint-report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
+    report['semantic_probe']=model_probe();checkpoint()
+    report['browser_probes']=asyncio.run(browser_probe(dest))
+    report['partial']=False;checkpoint()
     print(json.dumps({'run_id': run, 'connectors': [{ 'connector': c['connector'], 'http_statuses': [a['http_status'] for a in c['attempts']]} for c in checks], 'semantic_probe': report['semantic_probe']},ensure_ascii=False))
 
 if __name__ == '__main__':

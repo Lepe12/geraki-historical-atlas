@@ -102,6 +102,13 @@ class _LinkParser(HTMLParser):
             if txt:self.links.append((self._href,txt))
             self._href=None; self._buf=[]
 
+class _HeadMetadata(HTMLParser):
+    def __init__(self):super().__init__();self.values={}
+    def handle_starttag(self,tag,attrs):
+        attrs=dict(attrs)
+        if tag.lower()=='meta' and attrs.get('content'):
+            self.values[attrs.get('property') or attrs.get('name')]=attrs['content']
+
 def _html_search(url, repository, lane, base, keep=None, max_records=25, browser=False):
     if browser:
         try:from .http_audit import browser_fetch
@@ -497,10 +504,12 @@ def pares_simancas(q,lane):
         from html import unescape
         plain=unescape(re.sub(r"<[^>]+>"," ",re.sub(r"(?is)<(script|style)[^>]*>.*?</\\1>"," ",raw)))
         plain=" ".join(plain.split())
-        if not (re.search(r'Signatura|Reference code|Call number',plain,re.I) and ("Archivo General de Simancas" in plain)):
+        archive_header=re.search(r'(?is)<div\s+id=["\']nombre_archivo["\'][^>]*>(.*?)</div>',raw)
+        archive_text=' '.join(unescape(re.sub('<[^>]+>',' ',archive_header.group(1))).split()) if archive_header else ''
+        if not (re.search(r'Signatura|Reference code|Call number',plain,re.I) and archive_text=='Archivo General de Simancas'):
             return "RECORD_NOT_CONFIRMED",[],url+" did not confirm a Simancas archival description"
-        title_match=re.search(r'(?is)<meta\s+property=["\']og:title["\']\s+content=["\'](.*?)["\']\s*/?>',raw) or re.search(r"(?is)<title[^>]*>(.*?)</title>",raw)
-        title=unescape(re.sub(r"<[^>]+>"," ",title_match.group(1))).strip() if title_match else "PARES record "+record_id
+        metadata=_HeadMetadata();metadata.feed(raw)
+        title=metadata.values.get('og:title') or 'PARES record '+record_id
         sig=re.search(r"(?:Signatura|Reference number|Call number)\s*:\s*(.{1,180}?)(?=Fecha |Date |Nivel de Descripci|Código de Referencia|Reference code|Contexto|Context)",plain,re.I)
         ref=re.search(r"(?:Código de Referencia|Reference code)\s*:\s*(.{1,180}?)(?=Contexto|Contenido y Estructura|Condiciones|Context|Content)",plain,re.I)
         archival_code=re.search(r'ES\.47161\.AGS(?:/[^\s<]+)?',plain)

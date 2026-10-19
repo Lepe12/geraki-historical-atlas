@@ -28,3 +28,19 @@ class HttpAuditTests(unittest.TestCase):
             status,rows,detail=rc.pares_simancas('corsairs','spanish_simancas')
         self.assertEqual(status,'ARCHIVE_NOT_CONFIRMED')
         self.assertNotEqual(status,'SEARCH_NOT_CONFIRMED')
+
+    def test_simancas_mention_in_another_archives_record_does_not_pass(self):
+        raw=b'''<div id="nombre_archivo">Archivo Historico Nacional</div>
+        Reference code: ES.28079.AHN. Scope: a letter mentions Archivo General de Simancas.'''
+        with patch.object(rc,'_get',return_value=raw):
+            status,rows,_=rc.pares_simancas('1234','spanish_simancas')
+        self.assertEqual(status,'RECORD_NOT_CONFIRMED');self.assertEqual(rows,[])
+
+    def test_simancas_header_and_source_title_are_parsed(self):
+        raw=b'''<meta property="og:title" content="Letter from d'Amico in 1670"/>
+        <div id="nombre_archivo"><a>Archivo General de Simancas</a></div>
+        Reference code: ES.47161.AGS/1. Context. Date of formation: 1670 Level of description: Letter'''
+        with patch.object(rc,'_get',return_value=raw):
+            status,rows,_=rc.pares_simancas('1234','spanish_simancas')
+        self.assertEqual(status,'EXECUTED')
+        self.assertIn("d'Amico",rows[0]['title']);self.assertEqual(rows[0]['date'],['1670'])
