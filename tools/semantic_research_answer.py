@@ -48,9 +48,16 @@ def collect(run_root):
     for p in sorted(Path(run_root).glob('*/structured_output/extracted_findings.json')):
         for f in read(p).get('findings',[]):
             if {'FICTION_OR_BOOK_REVIEW_CONTEXT','CONFLICTING_GIVEN_NAME','DATE_OUTSIDE_SCOPE',
-                'EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW','SURNAME_IDENTITY_UNRESOLVED'} & set(f.get('uncertainties',[])):
+                'EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW','SURNAME_IDENTITY_UNRESOLVED','LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW'} & set(f.get('uncertainties',[])):
                 excluded.append({'finding_id':f.get('finding_id'),'reason':'UNSUITABLE_FOR_AUTOMATIC_SYNTHESIS'});continue
             raw=f.get('evidence_excerpt') or ''
+            # Recheck historical exports without rewriting their indexed evidence.
+            from research_relevance import later_namesake_requires_review
+            from research_focus import decompose
+            req=read(p.parent.parent/'run_manifest/manifest.json',{}).get('normalized_request') or {}
+            scope=[int(y) for y in re.findall(r'\b1\d{3}\b',req.get('date_range',''))]
+            if req.get('target') and not (scope and min(scope)>=1750) and later_namesake_requires_review(raw,decompose(req['target'],req.get('aliases',[]))):
+                excluded.append({'finding_id':f.get('finding_id'),'reason':'LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW'});continue
             loc=f.get('locator') or {}
             if not raw or not f.get('url') or not loc:
                 excluded.append({'finding_id':f.get('finding_id'),'reason':'MISSING_ACQUIRED_PROVENANCE'});continue

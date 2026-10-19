@@ -40,6 +40,8 @@ def audit(root,references):
             if not matches(row.get('title') or '',reference):continue
             # A title inside someone else's bibliography is never acquisition
             # of the cited work. Require matching acquisition metadata + a file.
+            material_type=(row.get('web_acquisition') or {}).get('source_type')
+            if material_type not in ('PDF_TEXT','EPUB_TEXT','OCR_TEXT') and row.get('status')!='OCR_ACQUIRED':continue
             for file in row.get('files') or []:
                 p=base/file
                 if p.resolve().is_relative_to(base.resolve()) and p.suffix=='.txt' and p.is_file() and p.stat().st_size:
@@ -47,7 +49,7 @@ def audit(root,references):
         rows.append({'id':reference['id'],'title':reference['title'],'mentioned':bool(mentions),'work_text_acquired':bool(acquired),'mentions':mentions,'acquisitions':acquired})
     return {'schema':'pct-reference-recall-audit-v1','run_id':root.name,'references':rows,
             'mentioned_count':sum(r['mentioned'] for r in rows),'acquired_work_count':sum(r['work_text_acquired'] for r in rows),
-            'reference_count':len(rows),'limitations':['PARTIAL_HELD_OUT_BIBLIOGRAPHY_NOT_EXHAUSTIVE_GOLD_STANDARD','OCR_CAN_HIDE_REFERENCES','ACQUIRED_METADATA_MATCH_IS_NOT_ORIGINAL_INSPECTION','MENTIONS_ARE_NOT_INDEPENDENT_CORROBORATION']}
+            'reference_count':len(rows),'limitations':['PARTIAL_HELD_OUT_BIBLIOGRAPHY_NOT_EXHAUSTIVE_GOLD_STANDARD','OCR_CAN_HIDE_REFERENCES','ACQUIRED_METADATA_MATCH_IS_NOT_ORIGINAL_INSPECTION','LANDING_PAGE_TEXT_DOES_NOT_COUNT_AS_WORK_TEXT','MENTIONS_ARE_NOT_INDEPENDENT_CORROBORATION']}
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--root',required=True);p.add_argument('--references',required=True);p.add_argument('--output',required=True);a=p.parse_args()

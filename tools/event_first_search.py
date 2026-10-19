@@ -50,7 +50,7 @@ def dedupe(items):
 section_report=build_findings(pathlib.Path('.'),ctx)
 section_hits=[{**f,'lead_type':'SOURCE_SECTION'} for f in section_report['findings'] if f['decision']=='RETAIN_CANDIDATE']
 # Prefer the complete, source-attributed paragraph over a legacy substring hit.
-hits=[h for h in hits if not any(f['file']==h.get('file') and f['locator']['start_line']<=h.get('line',0)<=f['locator']['end_line'] for f in section_hits)]
+hits=[h for h in hits if not any(f['file']==h.get('file') and f['locator']['start_line']<=h.get('line',0)<=f['locator']['end_line'] for f in section_report['findings'])]
 hits.extend(section_hits)
 context_leads.extend({**f,'status':f['reason'],'lead_type':'SOURCE_SECTION'} for f in section_report['findings'] if f['decision']!='RETAIN_CANDIDATE')
 structured=pathlib.Path('structured_output');structured.mkdir(exist_ok=True)

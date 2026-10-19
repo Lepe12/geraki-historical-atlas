@@ -12,6 +12,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 from candidate_context import variants, STRONG, ACTION
 from research_focus import decompose, fold, name_pattern, extended_name_after
+from research_relevance import later_namesake_requires_review
 
 YEAR = re.compile(r'(?<!\d)(1\d{3}|20\d{2})(?!\d)')
 # Historical predicates beyond piracy: administrative and diplomatic actions
@@ -47,7 +48,8 @@ def locator(text, start, end, source, file):
 
 def extract_document(text, source, file, ctx):
     terms=variants(ctx['target'],ctx.get('aliases',[]))
-    kind=decompose(ctx['target'],ctx.get('aliases',[]))['kind']
+    focus=decompose(ctx['target'],ctx.get('aliases',[]))
+    kind=focus['kind']
     ranges=[int(y) for y in YEAR.findall(ctx.get('date_range',''))]
     lo,hi=(min(ranges),max(ranges)) if ranges else (0,9999)
     host=(urlsplit(str(source.get('url') or '')).hostname or '').lower()
@@ -102,9 +104,11 @@ def extract_document(text, source, file, ctx):
         if not dates and year_heading and lo<=year_heading['year']<=hi:scoped=[year_heading['year']]
         fiction=bool(FICTION.search(fold(body)))
         name_basis='EXPLICIT_NAME' if direct else 'SURNAME_IN_NAMED_CONTEXT' if short else 'ADJACENT_TOPIC_UNRESOLVED'
-        candidate=bool(scoped and predicates and not fiction and not continuity and not other_name and not extended_name
+        later_identity=kind=='person' and not (ranges and lo>=1750) and later_namesake_requires_review(body+' '+ ' '.join(str(y) for y in scoped),focus)
+        candidate=bool(not later_identity and scoped and predicates and not fiction and not continuity and not other_name and not extended_name
                        and (direct or document_named))
         uncertainties=['ORIGINAL_NOT_INSPECTED','SOURCE_GENEALOGY_PENDING','INDEPENDENCE_UNRESOLVED']
+        if later_identity:uncertainties.append('LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW')
         if not direct:uncertainties.append('IDENTITY_ASSOCIATION_PROVISIONAL')
         if date_basis=='YEAR_HEADING':uncertainties.append('DATE_FROM_SECTION_HEADING')
         if len(dates)>1:uncertainties.append('MULTIPLE_DATES_REQUIRE_CLAUSE_REVIEW')
@@ -155,7 +159,7 @@ def build_findings(base, ctx):
 def answer_report(report):
     findings=report.get('findings',[])
     dated=[f for f in findings if f['years_in_scope'] and not {'FICTION_OR_BOOK_REVIEW_CONTEXT','CONFLICTING_GIVEN_NAME',
-           'EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW','SURNAME_IDENTITY_UNRESOLVED'} & set(f['uncertainties'])]
+           'EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW','SURNAME_IDENTITY_UNRESOLVED','LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW'} & set(f['uncertainties'])]
     items=sorted(dated,key=lambda f:(f['years_in_scope'],f['finding_id']))
     return {'schema':'pct-source-attributed-answer-v1','question':report.get('question'),
             'target':report.get('target'),'date_range':report.get('date_range'),

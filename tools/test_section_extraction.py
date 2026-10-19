@@ -63,6 +63,23 @@ class SectionExtraction(unittest.TestCase):
         rows=self.extract('Pedro Lantzas was appointed in 1578.',ctx=ctx,source=source)
         self.assertEqual(rows[0]['decision'],'RETAIN_CANDIDATE')
 
+    def test_later_namesake_hold_survives_the_legacy_extraction_path(self):
+        ctx={'target':'Πέτρος Λάντζας','aliases':['Pietro Lanza'],'date_range':'','purpose':'Find sources'}
+        text='Pietro Lanza was appointed in Palermo in 1837.'
+        row=self.extract(text,ctx=ctx,source={'title':'A biography','url':'https://example.org/book'})[0]
+        self.assertEqual(row['decision'],'REVIEW_CONTEXT')
+        self.assertIn('LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW',row['uncertainties'])
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)/'library_acquisition';root.mkdir()
+            (root/'doc.txt').write_text(text)
+            (root/'acquisition_report.json').write_text(json.dumps({'results':[{'title':'A biography','url':'https://example.org/book','files':['library_acquisition/doc.txt']}]}))
+            env={**os.environ,'PCT_TARGET':ctx['target'],'PCT_ALIASES':'Pietro Lanza','PCT_DATE_RANGE':'','PCT_PURPOSE':'Find sources','PCT_RESEARCH_LANE':'travellers'}
+            tools=Path(__file__).resolve().parent
+            for script in ('event_first_search.py','verification_pipeline.py'):
+                subprocess.run([sys.executable,str(tools/script)],cwd=tmp,env=env,check=True,capture_output=True)
+            self.assertEqual(json.loads((Path(tmp)/'structured_output/candidate_events.json').read_text())['events'],[])
+            self.assertTrue(json.loads((Path(tmp)/'structured_output/extracted_findings.json').read_text())['findings'])
+
     def test_surname_does_not_inherit_identity_across_unbounded_document(self):
         ctx={'target':'Pietro Lanza','aliases':[],'date_range':''}
         source={'title':'A collection','url':'https://example.org/book'}

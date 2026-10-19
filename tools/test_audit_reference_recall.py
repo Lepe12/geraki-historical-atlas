@@ -19,7 +19,7 @@ class ReferenceAudit(unittest.TestCase):
     def test_matching_title_requires_actual_nonempty_file(self):
         with tempfile.TemporaryDirectory() as d:
             root,base=self.fixture(d);p=base/'library_acquisition/acquisition_report.json'
-            p.write_text(json.dumps({'results':[{'title':'Known history of islands','files':['library_acquisition/missing.txt']}]}))
+            p.write_text(json.dumps({'results':[{'title':'Known history of islands','web_acquisition':{'source_type':'PDF_TEXT'},'files':['library_acquisition/missing.txt']}]}))
             self.assertEqual(audit(root,REF)['acquired_work_count'],0)
             (base/'library_acquisition/missing.txt').write_text('A page of the acquired work.')
             self.assertEqual(audit(root,REF)['acquired_work_count'],1)

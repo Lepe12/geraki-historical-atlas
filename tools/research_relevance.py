@@ -159,7 +159,7 @@ def evidence_class(record, topical):
             'basis':'CONTENT_ASSESSMENT_REQUIRED'}
 
 
-def _later_namesake(text, focus):
+def later_namesake_requires_review(text, focus):
     """A later Latin namesake is not the supplied Greek person without review."""
     greek=[name for name in focus.get('names',[]) if re.search(r'[α-ω]', fold(name))]
     if not greek:
@@ -245,7 +245,7 @@ def assess(record, ident):
     if MODERN_DOCUMENT.search(title) and not name_match:
         status='EXCLUDE_FROM_ACQUISITION';research_score=min(research_score,20)
         reasons.append('UNRELATED_MODERN_DOCUMENT')
-    if _later_namesake(context, focus):
+    if later_namesake_requires_review(context, focus):
         if status=='PRIORITY':
             status='REVIEW_REQUIRED'
         reasons.append('LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW')

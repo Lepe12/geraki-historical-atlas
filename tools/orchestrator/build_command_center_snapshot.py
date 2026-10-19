@@ -113,7 +113,7 @@ def discovery_results(run_root:Path,request=None):
             if uncertainty & {'FICTION_OR_BOOK_REVIEW_CONTEXT','CONFLICTING_GIVEN_NAME','DATE_OUTSIDE_SCOPE'}:continue
             excerpt=finding.get('context_excerpt') or finding.get('evidence_excerpt')
             if not excerpt:continue
-            identity_hold=bool(uncertainty & {'EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW','SURNAME_IDENTITY_UNRESOLVED'})
+            identity_hold=bool(uncertainty & {'EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW','SURNAME_IDENTITY_UNRESOLVED','LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW'})
             discoveries.append({
                 'lane':lane,'identifier':finding.get('identifier') or finding.get('url'),
                 'title':finding.get('title'),'repository':finding.get('repository'),
@@ -176,6 +176,10 @@ def build(repo:Path,run_id:str):
     spec=read(repo/"evidence/specialist_runs"/run_id/"SPECIALIST_AGGREGATE.json",{})
     request=research_request(run_root)
     claims=candidate_claims(run_root)
+    identity_review=read(run_root/'POST_RUN_IDENTITY_REVIEW.json',{})
+    held_ids={r.get('candidate_id') for r in identity_review.get('reviewed_candidates',[]) if r.get('status')=='IDENTITY_REVIEW_REQUIRED'}
+    identity_held_claims=[{**c,'identity_status':'REVIEW_REQUIRED'} for c in claims if c.get('candidate_id') in held_ids]
+    claims=[c for c in claims if c.get('candidate_id') not in held_ids]
     answers=[{'lane':lane,**answer} for lane in LANE_LABELS if (answer:=read(run_root/lane/'research_dossier/answer.json',{}))]
     semantic_answer=read(run_root/'research_answer/answer.json',{})
     discoveries,coverage=discovery_results(run_root,request)
@@ -300,6 +304,8 @@ def build(repo:Path,run_id:str):
       },
       "agents":agents,
       "claims":claims[:500],
+      "post_run_identity_review":identity_review,
+      "identity_held_claims":identity_held_claims,
       "research_answer":semantic_answer or {'status':'PROVISIONAL_SOURCE_FINDINGS' if any(a.get('findings') for a in answers) else 'INSUFFICIENT_ACQUIRED_EVIDENCE',
                          'lanes':answers,'verified_claims':0,'rule':'Source-attributed findings are not verified historical conclusions.'},
       "discoveries":discoveries,
