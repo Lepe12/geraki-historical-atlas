@@ -22,6 +22,23 @@ def command_text(value):
                 chars.append(folded);offsets.append(pos)
     return "".join(chars),offsets
 
+ALTERNATE_NAMES = re.compile(r"\s+(?:/|\||·)\s+")
+
+
+def split_supplied_names(target):
+    """Split an explicit bilingual name pair. Do not split prose or places."""
+    text = str(target).strip()
+    parts = [part.strip(" .;") for part in ALTERNATE_NAMES.split(text) if part.strip()]
+
+    def nameish(part):
+        words = re.findall(r"[^\W\d_]+", part.split(",")[0], re.UNICODE)
+        return 2 <= len(words) <= 4 and len(part) <= 90 and not any(ch.isdigit() for ch in part)
+
+    if len(parts) < 2 or not all(nameish(part) for part in parts):
+        return [text]
+    return parts
+
+
 def split_research_query(target, date_range="", purpose=""):
     original = str(target).strip()
     folded,offsets = command_text(original)

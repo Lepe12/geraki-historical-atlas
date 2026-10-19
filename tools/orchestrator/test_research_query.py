@@ -44,6 +44,12 @@ class ResearchQueryTests(unittest.TestCase):
         self.assertEqual(split_research_query('Πέτρος Λάντζας 1577–1583')[:2],('Πέτρος Λάντζας','1577-1583'))
         self.assertEqual(split_research_query('Unknown prose with dates 1600-1700')[0],'Unknown prose with dates 1600-1700')
 
+    def test_bilingual_name_pair_splits_without_splitting_prose(self):
+        from research_query import split_supplied_names
+        self.assertEqual(split_supplied_names('Pedro Lanza / Πέτρος Λάντζας'),['Pedro Lanza','Πέτρος Λάντζας'])
+        self.assertEqual(split_supplied_names('Ιωάννης Καψής, βασιλιάς της Μήλου'),['Ιωάννης Καψής, βασιλιάς της Μήλου'])
+        self.assertEqual(split_supplied_names('Unknown prose with dates 1600-1700'),['Unknown prose with dates 1600-1700'])
+
     def test_conflicting_explicit_dates_fail(self):
         with self.assertRaisesRegex(ValueError,"CONFLICTING"):
             split_research_query("Find sources about Rhodes 1600-1700","1500-1550")

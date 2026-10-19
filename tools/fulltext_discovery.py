@@ -18,8 +18,8 @@ IA_FTS='https://be-api.us.archive.org/ia-pub-fts-api'
 GREEK=dict(zip('αβγδεζηθικλμνξοπρστυφχψω',
               ['a','v','g','d','e','z','i','th','i','k','l','m','n','x','o','p','r','s','t','y','f','ch','ps','o']))
 ROLE_VOCAB={
-    'βασιλ':('king','roi','roy','reign','regne','konig','koenig','herrscher','souverain','maitre','rex','βασιλ'),
-    'king':('king','roi','roy','reign','regne','konig','koenig','herrscher','souverain','maitre','rex','βασιλ'),
+    'βασιλ':('king','roi','roy','reign','regne','konig','koenig','herrscher','souverain','maitre','rex','re','rey','rei','βασιλ'),
+    'king':('king','roi','roy','reign','regne','konig','koenig','herrscher','souverain','maitre','rex','re','rey','rei','βασιλ'),
     'κυβερνη':('governor','gouverneur','governatore','κυβερνη'),
     'governor':('governor','gouverneur','governatore','κυβερνη'),
     'πειρατ':('pirat','corsair','corsar','πειρατ'),
@@ -50,6 +50,12 @@ def spelling_hypotheses(value, place=False):
     if latin.startswith('k'):
         forms.insert(1,'c'+latin[1:])
         if not place and latin.endswith('i'):forms.append('c'+latin[1:]+'s')
+    # Nominative -ης transliterates to -is; catalogues also use the -i form.
+    if not place:
+        for form in list(forms):
+            if form.endswith('is') and len(form)>4:
+                forms.append(form[:-1])
+                if form.startswith('k'):forms.append('c'+form[1:-1])
     forms.append(str(value))
     return list(dict.fromkeys(x for x in forms if len(x)>=3))[:6]
 
@@ -67,6 +73,12 @@ def context_terms(focus):
     return list(dict.fromkeys(x for place in focus.get('places',[]) for x in spelling_hypotheses(place,True)))[:12]
 
 
+def _term_hit(text, term):
+    """Short role words must be whole words; longer stems stay prefixes."""
+    trailing=r'(?!\w)' if len(term)<=3 else ''
+    return re.search(r'(?<!\w)'+re.escape(term)+trailing, text)
+
+
 def role_terms(focus):
     return list(dict.fromkeys(t for role in focus.get('roles',[]) for key,terms in ROLE_VOCAB.items()
                              if norm(role).startswith(key) for t in terms))
@@ -76,8 +88,9 @@ def ia_queries(focus, limit=8):
     """Search complete supplied names before surname/OCR recovery hypotheses."""
     queries=[]
     if focus['kind']=='person':
-        names=retrieval_names(focus)
-        for name in names:
+        # Supplied spellings stay ahead of mechanical hypotheses so a short
+        # result limit still searches the name the user actually wrote.
+        for name in focus['names']:
             queries.append('"'+name.replace('"','')+'"')
     places=context_terms(focus)
     for term in search_terms(focus):
@@ -85,9 +98,19 @@ def ia_queries(focus, limit=8):
         if places:q+=' AND ('+' OR '.join('"'+p.replace('"','')+'"' for p in places[:4])+')'
         queries.append(q)
         if focus['kind']=='person' and term==search_terms(focus)[0]:
+            catalogue=[*focus['names']]
             for name in retrieval_names(focus):
+                if fold(name) not in {fold(item) for item in catalogue}:
+                    catalogue.append(name)
+                    break
+            for name in catalogue:
                 words=name.split()
                 if len(words)>=2:queries.append('"'+words[-1]+', '+' '.join(words[:-1])+'"')
+    if focus['kind']=='person':
+        for name in retrieval_names(focus):
+            if fold(name) in {fold(item) for item in focus['names']} or name==name.casefold():
+                continue
+            queries.append('"'+name.replace('"','')+'"')
     return list(dict.fromkeys(queries))[:limit]
 
 
@@ -112,7 +135,7 @@ def text_match(record,focus):
                     places=[p for p in focus.get('places',[]) if any(
                         re.search(r'(?<!\w)'+re.escape(norm(t))+r'(?!\w)',local)
                         for t in spelling_hypotheses(p,True))]
-                    roles=[t for t in role_terms(focus) if re.search(r'(?<!\w)'+re.escape(t),local)]
+                    roles=[t for t in role_terms(focus) if _term_hit(local,t)]
                     context_ok=bool(places) if focus.get('places') else bool(roles)
                     context_missing=bool(focus.get('places') or focus.get('roles')) and not context_ok
                     candidates.append({'category':'POSSIBLE_TARGET',
@@ -129,7 +152,7 @@ def text_match(record,focus):
                         for m in re.finditer(r'(?<!\w)'+re.escape(norm(t))+r'(?!\w)',local))]
                 requested_roles=role_terms(focus)
                 role_context=text[max(0,hit.start()-700):hit.end()+700]
-                roles=[t for t in requested_roles if re.search(r'(?<!\w)'+re.escape(t),role_context)]
+                roles=[t for t in requested_roles if _term_hit(role_context,t)]
                 if (places or focus['kind']=='place') and (not requested_roles or roles):
                     candidates.append({'category':'POSSIBLE_TARGET','reason':'FULLTEXT_NAME_AND_CONTEXT_HYPOTHESIS',
                             'matched_name':term,'places':places,'roles':roles,
