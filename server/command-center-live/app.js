@@ -8,6 +8,7 @@ const fs=require("fs");
 const path=require("path");
 const {URL}=require("url");
 const {fromReviewedKnowledge}=require("./historical-evidence");
+const {replayPdf}=require("./pdf-evidence");
 
 const PORT=Number(process.env.PORT||process.env.PCT_COMMAND_CENTER_PORT||8787);
 const PREFIX=(process.env.PCT_COMMAND_CENTER_PREFIX||"/pct-api/live").replace(/\/$/,"");
@@ -163,7 +164,15 @@ function readKnowledgeIndex(){
   try{const v=JSON.parse(fs.readFileSync(KNOWLEDGE_INDEX,"utf8"));return Array.isArray(v)?v:[];}catch(_){return [];}
 }
 function writeKnowledgeIndex(index){
-  fs.writeFileSync(KNOWLEDGE_INDEX,JSON.stringify(index,null,2));
+  atomicJson(KNOWLEDGE_INDEX,index);
+}
+function atomicJson(filename,value){
+  const temporary=filename+"."+crypto.randomBytes(8).toString("hex")+".tmp";
+  try{fs.writeFileSync(temporary,JSON.stringify(value,null,2),{mode:0o600,flag:"wx"});fs.renameSync(temporary,filename);}
+  finally{if(fs.existsSync(temporary))fs.unlinkSync(temporary);}
+}
+function knowledgeMutationAuthorized(req){
+  return operatorAuthorized(req)||(sessionAuthorized(req)&&trustedWebOrigin(req));
 }
 function safeFileName(name){
   return String(name||"source.pdf").replace(/[^A-Za-z0-9._() -]+/g,"_").slice(0,180)||"source.pdf";
@@ -229,32 +238,48 @@ const server=http.createServer(async(req,res)=>{
     const sm=p.match(/^\/status\/([^/]+)\/([^/]+)$/);
     if(req.method==="GET"&&sm){if(sm[1]!=="piratecartography")return json(res,404,{error:"project"});return json(res,200,await statusFor(sm[2]));}
     if(req.method==="POST"&&p==="/knowledge/upload"){
+      if(!knowledgeMutationAuthorized(req))return json(res,401,{error:"operator_authorization_required"});
       const type=String(req.headers["content-type"]||"").toLowerCase();
       if(!type.includes("application/pdf"))return json(res,415,{error:"pdf_required"});
       const raw=await readRawBody(req);
       if(raw.length<5||raw.subarray(0,5).toString("ascii")!=="%PDF-")return json(res,400,{error:"invalid_pdf"});
+      if(readKnowledgeIndex().length>=500)return json(res,507,{error:"KNOWLEDGE_CAPACITY_REACHED"});
       const sourceId="src-"+Date.now().toString(36)+"-"+crypto.randomBytes(4).toString("hex");
       const original=safeFileName(decodeURIComponent(String(req.headers["x-file-name"]||"source.pdf")));
       const stored=sourceId+".pdf";
-      fs.writeFileSync(path.join(KNOWLEDGE_UPLOAD_DIR,stored),raw,{flag:"wx"});
+      fs.writeFileSync(path.join(KNOWLEDGE_UPLOAD_DIR,stored),raw,{flag:"wx",mode:0o600});
       const index=readKnowledgeIndex();
-      index.unshift({source_id:sourceId,original_name:original,size:raw.length,state:"PENDING_REVIEW",uploaded_at:new Date().toISOString(),accepted_items:0});
-      writeKnowledgeIndex(index.slice(0,500));
+      index.unshift({source_id:sourceId,original_name:original,size:raw.length,source_sha256:crypto.createHash("sha256").update(raw).digest("hex"),state:"PENDING_REVIEW",uploaded_at:new Date().toISOString(),accepted_items:0});
+      writeKnowledgeIndex(index);
       return json(res,201,{status:"UPLOADED",source_id:sourceId,original_name:original,size:raw.length});
     }
     if(req.method==="POST"&&p==="/knowledge/review"){
+      if(!knowledgeMutationAuthorized(req))return json(res,401,{error:"operator_authorization_required"});
       const body=JSON.parse(await readBody(req,8*1024*1024));
       const sourceId=String(body?.source_id||"");
       if(!/^src-[A-Za-z0-9-]+$/.test(sourceId))return json(res,400,{error:"invalid_source_id"});
       const index=readKnowledgeIndex(),meta=index.find(x=>x.source_id===sourceId);
       if(!meta)return json(res,404,{error:"source_not_found"});
-      const pages=Array.isArray(body.pages)?body.pages.slice(0,2000).map(p=>({page:Number(p.page)||0,text:String(p.text||"").slice(0,30000)})):[];
+      let replay;
+      try{replay=await replayPdf(path.join(KNOWLEDGE_UPLOAD_DIR,sourceId+".pdf"));}
+      catch(error){return json(res,error.message==="PDF_PARSER_BUSY"?503:422,{error:error.message,historically_verified:false});}
+      if(meta.source_sha256&&meta.source_sha256!==replay.source_sha256)return json(res,409,{error:"SOURCE_CHECKSUM_MISMATCH"});
+      const pages=replay.pages;
       const items=Array.isArray(body.items)?body.items.slice(0,5000).filter(x=>x&&x.status==="accepted").map((x,i)=>({id:String(x.id||("item-"+i)),type:String(x.type||"claim"),text:String(x.text||"").slice(0,4000),page:Number(x.page)||null,confidence:Number(x.confidence)||0.5,exact_excerpt:String(x.exact_excerpt||x.quote||x.text||"").slice(0,4000),source_id:sourceId,status:"accepted"})):[];
-      const record={schema:"naboux-knowledge-source-v1",source_id:sourceId,original_name:meta.original_name,reviewed_at:new Date().toISOString(),pages,items};
+      const record={schema:"naboux-knowledge-source-v1",source_id:sourceId,original_name:meta.original_name,reviewed_at:new Date().toISOString(),source_sha256:replay.source_sha256,pdf_replay:replay,pages,items};
       record.historical_evidence=fromReviewedKnowledge(record);
-      fs.writeFileSync(knowledgeRecordPath(sourceId),JSON.stringify(record,null,2));
-      meta.state="LEARNED";meta.reviewed_at=record.reviewed_at;meta.accepted_items=items.length;meta.attested_quotes=record.historical_evidence.attestations.length;writeKnowledgeIndex(index);
-      return json(res,200,{status:"LEARNED",source_id:sourceId,accepted_items:items.length,pages:pages.length,attested_quotes:record.historical_evidence.attestations.length,unresolved_quotes:record.historical_evidence.unresolved.length,historically_verified:false});
+      record.submitted_items=items;
+      record.items=items.filter(item=>record.historical_evidence.attestations.some(att=>att.page===item.page&&att.text===item.text&&att.exact_excerpt===item.exact_excerpt));
+      const recordPath=knowledgeRecordPath(sourceId);
+      if(fs.existsSync(recordPath)){
+        const history=path.join(KNOWLEDGE_DIR,"review-history");fs.mkdirSync(history,{recursive:true,mode:0o700});
+        fs.copyFileSync(recordPath,path.join(history,sourceId+"-"+Date.now()+"-"+crypto.randomBytes(4).toString("hex")+".json"),fs.constants.COPYFILE_EXCL);
+      }
+      record.review_event={actor:"authenticated_operator",method:operatorAuthorized(req)?"bearer":"session",reason:String(body.reason||"PDF evidence selection").slice(0,2000),at:record.reviewed_at};
+      atomicJson(recordPath,record);
+      const currentIndex=readKnowledgeIndex(),currentMeta=currentIndex.find(x=>x.source_id===sourceId);
+      currentMeta.state="LEARNED";currentMeta.reviewed_at=record.reviewed_at;currentMeta.accepted_items=record.items.length;currentMeta.attested_quotes=record.historical_evidence.attestations.length;writeKnowledgeIndex(currentIndex);
+      return json(res,200,{status:"LEARNED",source_id:sourceId,accepted_items:record.items.length,pages:pages.length,attested_quotes:record.historical_evidence.attestations.length,unresolved_quotes:record.historical_evidence.unresolved.length,historically_verified:false});
     }
     if(req.method==="POST"&&p==="/knowledge/agent-search"){
       const auth=String(req.headers.authorization||"");
@@ -273,14 +298,14 @@ const server=http.createServer(async(req,res)=>{
             hits.push({source_id:meta.source_id,source_name:meta.original_name,
               attestation_id:att.id,page:att.page,locator:att.locator,
               exact_excerpt:att.exact_excerpt,stage:"INGESTED_UNREVIEWED",
-              original_pdf_replayed:false,historically_verified:false});
+              original_pdf_replayed:att.original_pdf_replayed===true,source_sha256:att.source_sha256||null,historically_verified:false});
             if(hits.length>=12)break;
           }
         }catch(_){}
         if(hits.length>=12)break;
       }
       return json(res,200,{schema:"nabou-agent-learning-evidence-v1",query,hits,
-        count:hits.length,verified_count:0,acquisition_basis:"OPERATOR_SUBMITTED_PDF_PAGE_TEXT"});
+        count:hits.length,verified_count:0,acquisition_basis:"PER_HIT_SOURCE_BASIS"});
     }
     if(req.method==="GET"&&p==="/knowledge/evidence"){
       if(!sessionAuthorized(req)&&!operatorAuthorized(req))return json(res,401,{error:"operator_authorization_required"});
@@ -291,9 +316,11 @@ const server=http.createServer(async(req,res)=>{
       return json(res,200,{source_id:sourceId,historical_evidence:record.historical_evidence||{schema:"nabou-learning-attestations-v1",attestations:[],unresolved:[],verified_count:0}});
     }
     if(req.method==="GET"&&p==="/knowledge/sources"){
+      if(!sessionAuthorized(req)&&!operatorAuthorized(req))return json(res,401,{error:"operator_authorization_required"});
       return json(res,200,{schema:"naboux-knowledge-index-v1",sources:readKnowledgeIndex()});
     }
     if(req.method==="GET"&&p==="/knowledge/search"){
+      if(!sessionAuthorized(req)&&!operatorAuthorized(req))return json(res,401,{error:"operator_authorization_required"});
       const q=String(u.searchParams.get("q")||"").trim().toLowerCase();
       if(q.length<2)return json(res,400,{error:"query_too_short"});
       const results=[];

@@ -5,8 +5,7 @@ const crypto = require("crypto");
  * Turn operator-selected Learning items into *unverified* source attestations
  * only when their exact quotation occurs on the submitted page text.
  *
- * The original PDF is not parsed or replayed by this server: client text
- * therefore remains CLIENT_SUPPLIED_TEXT rather than verified primary evidence.
+ * Server replay is a separate acquisition gate, never historical verification.
  */
 function fromReviewedKnowledge(record) {
   const pages = new Map((record.pages || [])
@@ -16,6 +15,8 @@ function fromReviewedKnowledge(record) {
   for (const item of record.items || []) {
     const page = Number(item.page);
     const sourceText = pages.get(page);
+    const replayed = record.pdf_replay?.original_pdf_replayed === true;
+    const replayPage = (record.pdf_replay?.pages || []).find(p => p.page === page);
     const exact = String(item.exact_excerpt || item.text || "").trim();
     if (!sourceText || !exact || !sourceText.includes(exact)) {
       unresolved.push({item_id: String(item.id || ""),
@@ -34,10 +35,16 @@ function fromReviewedKnowledge(record) {
       text: String(item.text || ""),
       exact_excerpt: exact, page,
       locator: "page " + page,
-      source_basis: "CLIENT_SUPPLIED_PAGE_TEXT_EXACT_MATCH",
+      source_basis: replayed ? "SERVER_PDF_PAGE_TEXT_EXACT_MATCH" : "CLIENT_SUPPLIED_PAGE_TEXT_EXACT_MATCH",
+      source_sha256: replayed ? record.pdf_replay.source_sha256 : null,
+      text_sha256: replayPage?.text_sha256 || null,
+      extraction_method: replayPage?.method || "CLIENT_TEXT",
+      quote_start_char: sourceText.indexOf(exact),
+      quote_end_char: sourceText.indexOf(exact)+exact.length,
+      bounding_boxes: (replayPage?.words || []).filter(w=>w.end_char>sourceText.indexOf(exact)&&w.start_char<sourceText.indexOf(exact)+exact.length).map(w=>w.bbox),
       status: "UNREVIEWED",
       historically_verified: false,
-      original_pdf_replayed: false,
+      original_pdf_replayed: replayed,
       candidate_identity: "UNRESOLVED"
     });
   }
