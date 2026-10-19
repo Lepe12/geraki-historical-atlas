@@ -7,6 +7,7 @@ const crypto=require("crypto");
 const fs=require("fs");
 const path=require("path");
 const {URL}=require("url");
+const {fromReviewedKnowledge}=require("./historical-evidence");
 
 const PORT=Number(process.env.PORT||process.env.PCT_COMMAND_CENTER_PORT||8787);
 const PREFIX=(process.env.PCT_COMMAND_CENTER_PREFIX||"/pct-api/live").replace(/\/$/,"");
@@ -248,11 +249,46 @@ const server=http.createServer(async(req,res)=>{
       const index=readKnowledgeIndex(),meta=index.find(x=>x.source_id===sourceId);
       if(!meta)return json(res,404,{error:"source_not_found"});
       const pages=Array.isArray(body.pages)?body.pages.slice(0,2000).map(p=>({page:Number(p.page)||0,text:String(p.text||"").slice(0,30000)})):[];
-      const items=Array.isArray(body.items)?body.items.slice(0,5000).filter(x=>x&&x.status==="accepted").map((x,i)=>({id:String(x.id||("item-"+i)),type:String(x.type||"claim"),text:String(x.text||"").slice(0,4000),page:Number(x.page)||null,confidence:Number(x.confidence)||0.5,source_id:sourceId,status:"accepted"})):[];
+      const items=Array.isArray(body.items)?body.items.slice(0,5000).filter(x=>x&&x.status==="accepted").map((x,i)=>({id:String(x.id||("item-"+i)),type:String(x.type||"claim"),text:String(x.text||"").slice(0,4000),page:Number(x.page)||null,confidence:Number(x.confidence)||0.5,exact_excerpt:String(x.exact_excerpt||x.quote||x.text||"").slice(0,4000),source_id:sourceId,status:"accepted"})):[];
       const record={schema:"naboux-knowledge-source-v1",source_id:sourceId,original_name:meta.original_name,reviewed_at:new Date().toISOString(),pages,items};
+      record.historical_evidence=fromReviewedKnowledge(record);
       fs.writeFileSync(knowledgeRecordPath(sourceId),JSON.stringify(record,null,2));
-      meta.state="LEARNED";meta.reviewed_at=record.reviewed_at;meta.accepted_items=items.length;writeKnowledgeIndex(index);
-      return json(res,200,{status:"LEARNED",source_id:sourceId,accepted_items:items.length,pages:pages.length});
+      meta.state="LEARNED";meta.reviewed_at=record.reviewed_at;meta.accepted_items=items.length;meta.attested_quotes=record.historical_evidence.attestations.length;writeKnowledgeIndex(index);
+      return json(res,200,{status:"LEARNED",source_id:sourceId,accepted_items:items.length,pages:pages.length,attested_quotes:record.historical_evidence.attestations.length,unresolved_quotes:record.historical_evidence.unresolved.length,historically_verified:false});
+    }
+    if(req.method==="POST"&&p==="/knowledge/agent-search"){
+      const auth=String(req.headers.authorization||"");
+      if(!auth.startsWith("Bearer "))return json(res,401,{error:"missing_oidc"});
+      await verifyGithubOidc(auth.slice(7));
+      const body=JSON.parse(await readBody(req));
+      const query=String(body?.query||"").trim().toLowerCase();
+      if(query.length<3||query.length>200)return json(res,400,{error:"invalid_query"});
+      const hits=[];
+      for(const meta of readKnowledgeIndex().filter(x=>x.state==="LEARNED").slice(0,500)){
+        try{
+          const rec=JSON.parse(fs.readFileSync(knowledgeRecordPath(meta.source_id),"utf8"));
+          const attestations=rec.historical_evidence?.attestations||[];
+          for(const att of attestations){
+            if(!String(att.exact_excerpt||"").toLowerCase().includes(query))continue;
+            hits.push({source_id:meta.source_id,source_name:meta.original_name,
+              attestation_id:att.id,page:att.page,locator:att.locator,
+              exact_excerpt:att.exact_excerpt,stage:"INGESTED_UNREVIEWED",
+              original_pdf_replayed:false,historically_verified:false});
+            if(hits.length>=12)break;
+          }
+        }catch(_){}
+        if(hits.length>=12)break;
+      }
+      return json(res,200,{schema:"nabou-agent-learning-evidence-v1",query,hits,
+        count:hits.length,verified_count:0,acquisition_basis:"OPERATOR_SUBMITTED_PDF_PAGE_TEXT"});
+    }
+    if(req.method==="GET"&&p==="/knowledge/evidence"){
+      if(!sessionAuthorized(req)&&!operatorAuthorized(req))return json(res,401,{error:"operator_authorization_required"});
+      const sourceId=String(u.searchParams.get("source_id")||"");
+      if(!/^src-[A-Za-z0-9-]+$/.test(sourceId))return json(res,400,{error:"invalid_source_id"});
+      if(!readKnowledgeIndex().some(x=>x.source_id===sourceId&&x.state==="LEARNED"))return json(res,404,{error:"source_not_learned"});
+      const record=JSON.parse(fs.readFileSync(knowledgeRecordPath(sourceId),"utf8"));
+      return json(res,200,{source_id:sourceId,historical_evidence:record.historical_evidence||{schema:"nabou-learning-attestations-v1",attestations:[],unresolved:[],verified_count:0}});
     }
     if(req.method==="GET"&&p==="/knowledge/sources"){
       return json(res,200,{schema:"naboux-knowledge-index-v1",sources:readKnowledgeIndex()});

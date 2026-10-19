@@ -1,0 +1,25 @@
+name: Historical Evidence and Learning Integration Tests
+on:
+  push:
+    branches:
+      - feat/historical-attestation-foundation-20261019
+  workflow_dispatch:
+jobs:
+  evidence-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Python syntax and source-first agent/evidence tests
+        run: |
+          python3 -m compileall -q tools/historical_attestations.py tools/research_evidence_bridge.py tools/orchestrator/jarvis_specialist_worker.py tools/storage/historical_evidence_store.py
+          python3 -m unittest -v tools.test_historical_attestations tools.test_research_evidence_bridge tools.storage.test_historical_evidence_store
+      - name: Existing Node command-center tests
+        run: node server/command-center-live/self-test.js
+      - name: PDF Learning HTTP integration tests
+        run: node server/command-center-live/learning-integration-test.js

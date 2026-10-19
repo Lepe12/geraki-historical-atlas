@@ -7,6 +7,8 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parent.parent
 sys.path.insert(0,str(ROOT/"connectors"))
 sys.path.insert(0,str(ROOT/"orchestrator"))
+sys.path.insert(0,str(ROOT.parent))
+from tools.research_evidence_bridge import discovery_to_evidence_queue, query_live_learning
 
 from connector_batch import run_batch
 from repository_connectors import audited_dispatch as repository_dispatch
@@ -107,6 +109,10 @@ def run_one(agent:dict, plan:dict, run_id:str="local", event_root:Path|None=None
             "rule":"Worker executes only JARVIS-assigned sources; routing has no evidence effect."
           },
           "search_runs":outputs,
+          "historical_evidence":{
+            **discovery_to_evidence_queue(outputs,run_id=run_id,agent_id=agent["agent_id"]),
+            "learned_pdf_evidence":query_live_learning(queries),
+          },
           "result_count":sum(len(x.get("records",[])) for x in outputs if isinstance(x,dict)),
           "verified_promotion_allowed":False,
           "rule":"Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
