@@ -25,6 +25,15 @@ class SafetyTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError,'BLOCKED_CONFIGURATION'):prepare(True)
                 self.assertEqual(json.loads(Path('execution_receipts/prepare/semantic_configuration.json').read_text())['status'],'BLOCKED')
             finally:os.chdir(old)
+    def test_source_collection_continues_with_model_blocker_visible(self):
+        with tempfile.TemporaryDirectory() as d,patch.dict(os.environ,{'GITHUB_REF':'refs/heads/main','PCT_TARGET':'Πέτρος Λάντζας','PCT_PURPOSE':'Βιογραφία','PCT_LLM_BASE_URL':'','PCT_LLM_API_KEY':'','GITHUB_OUTPUT':''},clear=False):
+            old=os.getcwd();os.chdir(d)
+            try:
+                result=prepare(False)
+                self.assertEqual(result['target'],'Πέτρος Λάντζας')
+                self.assertEqual(json.loads(Path('execution_receipts/prepare/input.json').read_text())['status'],'SUCCEEDED')
+                self.assertEqual(json.loads(Path('execution_receipts/prepare/semantic_configuration.json').read_text())['status'],'BLOCKED')
+            finally:os.chdir(old)
     def test_experiment_event_never_calls_network(self):
         from orchestrator.jarvis_event_bus import _publish_remote
         with patch.dict(os.environ,{'GITHUB_ACTIONS':'true','GITHUB_REF':'refs/heads/experiment/test','PCT_COMMAND_CENTER_URL':'https://example.test'}),patch('orchestrator.jarvis_event_bus.urlopen') as request:

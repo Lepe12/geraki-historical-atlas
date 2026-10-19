@@ -19,8 +19,6 @@ jobs:
             evidence/configuration
       - name: Check configured names without revealing credentials or calling providers
         env:
-          CONFIGURED_SECRET_MAP: ${{ toJSON(secrets) }}
-          CONFIGURED_VARIABLE_MAP: ${{ toJSON(vars) }}
           PCT_LLM_API_KEY: ${{ secrets.PCT_LLM_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
@@ -44,8 +42,6 @@ jobs:
           secrets='PCT_LLM_API_KEY OPENAI_API_KEY OPENAI_KEY OPENROUTER_API_KEY ANTHROPIC_API_KEY GEMINI_API_KEY GOOGLE_API_KEY DEEPSEEK_API_KEY SERPAPI_API_KEY EXA_API_KEY SEARCHCULTURE_API_KEY'.split()
           variables='PCT_LLM_BASE_URL PCT_LLM_MODEL PCT_LLM_PROVIDER PCT_LLM_EXTRACTOR_MODEL PCT_LLM_SYNTHESIS_MODEL PCT_LLM_ADVERSARIAL_MODEL'.split()
           report={'schema':'pct-configuration-presence-v1','run_id':os.environ['GITHUB_RUN_ID'],'checked_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'secrets_present':{k:bool(os.environ.get(k,'').strip()) for k in secrets},'variables_present':{k:bool(os.environ.get(k,'').strip()) for k in variables},'scope':'Repository and organization secrets accessible to this job; environment-only secrets require their configured environment. Values never stored.'}
-          report['accessible_secret_names']={name:bool(value) for name,value in json.loads(os.environ['CONFIGURED_SECRET_MAP']).items()}
-          report['accessible_variable_names']={name:bool(str(value).strip()) for name,value in json.loads(os.environ['CONFIGURED_VARIABLE_MAP']).items()}
           p=pathlib.Path('evidence/configuration/research-configuration.json');p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps(report,indent=2)+'\n')
           print(json.dumps(report,indent=2))
           PY
