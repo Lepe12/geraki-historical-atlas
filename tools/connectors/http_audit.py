@@ -98,12 +98,14 @@ def anemi_search(query):
             try:
                 page=browser.new_page()
                 response=page.goto(url,wait_until='domcontentloaded',timeout=30000)
-                field=page.locator('input[name="cclterm1"]')
+                row.update(http_status=response.status if response else None,form_loaded=True,search_submitted=False)
+                field=page.locator('input[name="cclterm1"][type="text"]')
                 if not field.count():raise ValueError('ANEMI_PUBLIC_SEARCH_FORM_NOT_FOUND')
                 field.fill(query)
                 with page.expect_navigation(wait_until='domcontentloaded',timeout=30000) as submitted:
                     field.evaluate('(element)=>element.form.requestSubmit()')
                 response=submitted.value
+                row['search_submitted']=True
                 raw=page.content().encode()
                 row.update(http_status=response.status if response else None,final_url=safe_url(page.url),
                            response_sha256=hashlib.sha256(raw).hexdigest(),response_bytes=len(raw))

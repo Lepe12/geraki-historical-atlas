@@ -727,7 +727,7 @@ def sias_public(q,lane):
     base='https://sias-archivi.cultura.gov.it'
     url=base+'/cgi-bin/pagina.pl?'+urllib.parse.urlencode({'RicVM':'ricercasemplice','RicFrmRicSemplice':q,'RicSez':'complessi'})
     rows=_html_search(url,'SIAS / Italian State Archives',lane,base,
-                      lambda u,t:'/cgi-bin/pagina.pl?' in u and bool(re.search(r'(?:TipoPag|Chiave)=',u,re.I)) and len(t)>3,browser=True)
+                      lambda u,t:'/cgi-bin/pagina.pl?' in u and bool(re.search(r'Chiave=\d+',u,re.I)) and len(t)>3,browser=True)
     return 'EXECUTED',rows,url+' ; public descriptive catalogue; not restricted to Venice'
 
 def boa_access(q,lane):
