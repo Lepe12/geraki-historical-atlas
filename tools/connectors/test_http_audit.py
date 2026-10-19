@@ -23,6 +23,11 @@ class HttpAuditTests(unittest.TestCase):
         self.assertEqual(len(rows),1)
         self.assertIn('p.text=corsairs',get.call_args.args[0])
 
+    def test_relative_record_urls_resolve_against_the_actual_search_path(self):
+        with patch.object(rc,'_get',return_value=b'<a href="pagina.pl?TipoPag=comparc&Chiave=42">A real archival record</a>'):
+            rows=rc._html_search('https://example.org/cgi-bin/pagina.pl?q=corsari','SIAS','italian_states','https://example.org')
+        self.assertEqual(rows[0]['url'],'https://example.org/cgi-bin/pagina.pl?TipoPag=comparc&Chiave=42')
+
     def test_pares_accepts_english_results_not_only_spanish(self):
         with patch.object(rc,'_get',return_value=b'<title>PARES</title>Search results with text: corsairs'):
             status,rows,detail=rc.pares_simancas('corsairs','spanish_simancas')

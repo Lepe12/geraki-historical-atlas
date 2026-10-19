@@ -90,8 +90,9 @@ def _sru_records(url, repository, lane):
 
 class _LinkParser(HTMLParser):
     def __init__(self):
-        super().__init__(); self.links=[]; self._href=None; self._buf=[]
+        super().__init__(); self.links=[]; self._href=None; self._buf=[];self.base=None
     def handle_starttag(self,tag,attrs):
+        if tag.lower()=='base':self.base=dict(attrs).get('href')
         if tag.lower()=="a":
             self._href=dict(attrs).get("href"); self._buf=[]
     def handle_data(self,data):
@@ -117,7 +118,7 @@ def _html_search(url, repository, lane, base, keep=None, max_records=25, browser
     else:html=_get(url).decode("utf-8","replace")
     p=_LinkParser();p.feed(html);seen=set();recs=[]
     for href,title in p.links:
-        absolute=urllib.parse.urljoin(base,href)
+        absolute=urllib.parse.urljoin(urllib.parse.urljoin(url,p.base) if p.base else url,href)
         if keep and not keep(absolute,title): continue
         key=(absolute,title)
         if key in seen:continue
