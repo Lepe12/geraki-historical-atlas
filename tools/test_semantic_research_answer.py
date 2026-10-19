@@ -139,21 +139,31 @@ class SemanticAnswer(unittest.TestCase):
     def test_unsupported_quote_entity_date_and_verification_are_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             fixture(tmp);rows,_=collect(tmp);eid=rows[0]['evidence_id']
-            for changes in ({'quote':'Invented passage which is not in the source.'},{'actors':['Someone Else']},{'dates':['1680']},{'verified':True},{'evidence_id':'invented'},{'evidence_id':[]}):
+            for changes in ({'quote':'Invented passage which is not in the source.'},{'actors':['Someone Else']},{'dates':['1680'],'statement':'The event occurred in 1680.'},{'verified':True},{'evidence_id':'invented'},{'evidence_id':[]}):
                 ok,bad=validate_items({'items':[item(eid,**changes)]},rows)
                 self.assertEqual(ok,[]);self.assertTrue(bad)
+
+    def test_bad_optional_date_does_not_erase_valid_source_quotation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp);rows,_=collect(tmp);eid=rows[0]['evidence_id']
+            ok,bad=validate_items({'items':[item(eid,dates=['1680'],source_type='PRIMARY_SOURCE')]},rows)
+            self.assertEqual(ok[0]['quote'],TEXT)
+            self.assertEqual(ok[0]['dates'],[])
+            self.assertEqual(ok[0]['source_classification'],'UNVERIFIED')
+            self.assertIn('UNSUPPORTED_DATE_ATTRIBUTE_REMOVED',[x['reason'] for x in bad])
 
     def test_call_budget_retains_explicit_deferred_coverage(self):
         rows=[{'evidence_id':str(i),'text':'x'*90} for i in range(8)]
         groups,deferred=batches(rows,max_batches=2,budget=200)
         self.assertEqual(len(groups),2);self.assertEqual(len(deferred),6)
 
-    def run_pipeline(self,root,bad_review=False,bad_synthesis=False,fail_role=None):
+    def run_pipeline(self,root,bad_review=False,bad_synthesis=False,fail_role=None,bad_final=False):
         rows,_=collect(root);eid=rows[0]['evidence_id'];state={}
         def caller(role,prompt):
             if role==fail_role:return {'status':'FALLBACK_REQUIRED','error':'NETWORK_UNAVAILABLE'}
             if role=='evidence_extractor':return response({'items':[item(eid)]})
             if role=='adversarial_reviewer':
+                if 'FINAL_ANSWER_JSON:' in prompt:return response({'supported_section_indexes':[[0]] if bad_final else [0],'flagged_sections':[]})
                 claims=json.loads(prompt.split('CLAIMS_JSON:\n')[1]);cid=claims[0]['claim_id'];state['cid']=cid
                 return response({'supported_claim_ids':['fake' if bad_review else cid],'flagged_claims':[],
                     'contradictions':[],'limitations':['Synthetic review only']})
@@ -166,7 +176,7 @@ class SemanticAnswer(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             fixture(tmp);out=self.run_pipeline(tmp)
             self.assertEqual(out['status'],'MODEL_ANSWER_PENDING_HUMAN_REVIEW')
-            self.assertEqual([c['role'] for c in out['calls']],['evidence_extractor','adversarial_reviewer','synthesis'])
+            self.assertEqual([c['role'] for c in out['calls']],['evidence_extractor','adversarial_reviewer','synthesis','adversarial_reviewer'])
             self.assertTrue(out['model_used']);self.assertFalse(out['verified']);self.assertFalse(out['human_reviewed'])
             self.assertIn('https://example.org/source',render(out))
 
@@ -175,6 +185,12 @@ class SemanticAnswer(unittest.TestCase):
             fixture(tmp)
             self.assertEqual(self.run_pipeline(tmp,bad_review=True)['status'],'REVIEW_FAILED')
             self.assertEqual(self.run_pipeline(tmp,bad_synthesis=True)['status'],'SYNTHESIS_REJECTED_INVALID_CITATIONS')
+
+    def test_final_review_schema_failure_cannot_publish_answer(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp);out=self.run_pipeline(tmp,bad_final=True)
+            self.assertEqual(out['status'],'FINAL_ANSWER_REVIEW_FAILED')
+            self.assertEqual(out['answer_sections'],[])
 
     def test_provider_failure_preserves_evidence_without_generated_answer(self):
         with tempfile.TemporaryDirectory() as tmp:

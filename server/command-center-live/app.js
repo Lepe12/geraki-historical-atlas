@@ -47,11 +47,11 @@ function normalizePath(pathname){
   if(pathname.startsWith(PREFIX)) pathname=pathname.slice(PREFIX.length)||"/";
   return pathname||"/";
 }
-function getJson(url){
+function getJson(url,maxBytes=8_000_000){
   return new Promise((resolve,reject)=>{
     const request=https.get(url,{headers:{"user-agent":"piratecartography-command-center-live/1"}},r=>{
       let b="";r.setEncoding("utf8");
-      r.on("data",c=>{b+=c;if(Buffer.byteLength(b)>8_000_000){r.destroy();reject(new Error("response_too_large"));}});
+      r.on("data",c=>{b+=c;if(Buffer.byteLength(b)>maxBytes){r.destroy();reject(new Error("response_too_large"));}});
       r.on("end",()=>{if((r.statusCode||500)>=400)return reject(new Error("http_"+r.statusCode));try{resolve(JSON.parse(b))}catch(e){reject(e)}});
     }).on("error",reject);
     request.setTimeout(10000,()=>request.destroy(new Error("upstream_timeout")));
@@ -88,7 +88,7 @@ function githubWorkflowDispatch(inputs){
 async function refreshBaseline(force=false){
   if(!force && Date.now()-baselineFetchedAt<15000 && baseline)return baseline;
   try{
-    const d=await getJson(RAW_LATEST);
+    const d=await getJson(RAW_LATEST,32_000_000);
     if(d&&d.schema==="pct-command-center-live-v1"){const changed=JSON.stringify(d)!==JSON.stringify(baseline);baseline=d;baselineFetchedAt=Date.now();if(changed)setImmediate(publishSnapshots);}
   }catch(_){}
   return baseline;

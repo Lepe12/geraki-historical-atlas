@@ -38,16 +38,23 @@ def recover(run_id):
              'PCT_MAX_ACQUISITION_CANDIDATES':'12','PCT_ACQUISITION_BATCHES':'1',
              'PCT_ACQUISITION_BUDGET_SECONDS':'240','PCT_CITATION_QUERY_LIMIT':'1',
              'PYTHONPATH':str(tools)+':'+str(tools/'orchestrator')}
-        for script in ('acquire_library_candidate.py','event_first_search.py','run_manifest.py'):
-            subprocess.run(['python3',str(tools/script)],cwd=work,env=env,check=True)
         dest.mkdir(parents=True)
-        for folder in ('library_acquisition','structured_output','research_dossier','event_first_hits','run_manifest'):
-            if (work/folder).exists():shutil.copytree(work/folder,dest/folder)
-        receipt={'schema':'nabou-acquisition-recovery-v1','parent_research_run_id':run_id,
+        phases=[]
+        receipt={'schema':'nabou-acquisition-recovery-v2','parent_research_run_id':run_id,
                  'execution_run_id':job,'type':'REACQUISITION_FROM_FRESH_DISCOVERY_NOT_NEW_BLIND_SEARCH',
-                 'candidate_count':len(rows),'selection_limit':12,
+                 'candidate_count':len(rows),'selection_limit':12,'phases':phases,
                  'source_revision':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
                  'original_lane_outputs_modified':False}
+        (dest/'recovery_receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+        for script in ('acquire_library_candidate.py','event_first_search.py','run_manifest.py'):
+            result=subprocess.run(['python3',str(tools/script)],cwd=work,env=env)
+            phases.append({'script':script,'exit_code':result.returncode})
+            for folder in ('library_acquisition','structured_output','research_dossier','event_first_hits','run_manifest'):
+                if (work/folder).exists():shutil.copytree(work/folder,dest/folder,dirs_exist_ok=True)
+            receipt['status']='PHASE_FAILED' if result.returncode else 'RUNNING'
+            (dest/'recovery_receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+            if result.returncode:raise SystemExit(result.returncode)
+        receipt['status']='COMPLETED'
         (dest/'recovery_receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
         print(json.dumps(receipt))
 

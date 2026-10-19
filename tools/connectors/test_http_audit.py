@@ -6,6 +6,16 @@ from connectors import repository_connectors as rc
 from connectors.http_audit import safe_url,trace,fetch
 
 class HttpAuditTests(unittest.TestCase):
+    def test_moreveneto_searches_descriptive_fields_and_keeps_metadata_unverified(self):
+        config={'communication':{'providers':{'apollo':{'baseUrl':'https://asve.arianna4.cloud//apollo/'}}}}
+        response={'data':{'search':{'totalCount':1,'results':{'items':[{'id':'fixture-1','label':'Fixture catalogue record','text':'Corsari in a description'}]}}}}
+        with patch.object(rc,'_json',return_value=config),patch('connectors.http_audit.fetch',return_value=json.dumps(response).encode()) as fetcher:
+            status,rows,detail=rc.moreveneto_public('corsari','venetian')
+        self.assertEqual(status,'EXECUTED')
+        self.assertIn('fields.*',json.loads(fetcher.call_args.kwargs['data'])['query'])
+        self.assertEqual(rows[0]['evidence_level'],'CATALOGUE_METADATA_ONLY')
+        self.assertIsNone(rows[0]['url'])
+
     def test_credentials_never_in_url_receipts(self):
         self.assertNotIn('private',safe_url('https://example.org/search?apiKey=private&query=corsairs'))
 

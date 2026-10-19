@@ -747,8 +747,32 @@ def moreveneto_public(q,lane):
     except ImportError:from http_audit import fetch
     config=_json('https://asve.arianna4.cloud/assets/config/app-config.local.json')
     endpoint=config['communication']['providers']['apollo']['baseUrl']
-    if urllib.parse.urlsplit(endpoint).hostname!='asve.arianna4.cloud':
+    if urllib.parse.urlsplit(endpoint).hostname!='asve.arianna4.cloud' or urllib.parse.urlsplit(endpoint).scheme!='https':
         raise ValueError('UNCONFIRMED_MOREVENETO_ENDPOINT')
+    # Same public search operation observed in the catalogue browser. Search
+    # description/text fields as well as titles; autocomplete alone misses leads.
+    full_query='''query { search(searchParameters: {
+      totalCount: 0 gallery: false
+      facets: [{id:"query" type:"value"}]
+      page:{offset:0 limit:20}
+      results:{order:{type:"score" key:"_score" direction:"DESC"} fields:[{id:"description" highlight:false limit:1000}]}
+      filters:[{facetId:"query" value:%s searchIn:[{key:"label.ngrams^5,text^4,fields.*^3" operator:"LIKE"}]}]
+    }) { totalCount results { items {
+      ... on Entity { id label typeOfEntity fields { ... on KeyValueField {key value} } }
+      ... on Item { id label title text fields { ... on KeyValueField {key value} } }
+    } } } }''' % json.dumps(q)
+    full=json.loads(fetch(endpoint,headers={**UA,'Accept':'application/json','Content-Type':'application/json'},data=json.dumps({'query':full_query}).encode()))
+    result=(full.get('data') or {}).get('search')
+    if not full.get('errors') and isinstance(result,dict) and isinstance((result.get('results') or {}).get('items'),list):
+        rows=[]
+        for item in result['results']['items']:
+            if item.get('id') and (item.get('label') or item.get('title')):
+                rows.append({'discovery_repository':'Archivio di Stato di Venezia / Moreveneto','discovery_lane':lane,
+                    'connector_status':'EXECUTED','identifier':item['id'],'title':item.get('title') or item['label'],
+                    'url':None,'date':[],'catalogue_endpoint':endpoint,'metadata_text':item.get('text') or '',
+                    'catalogue_fields':item.get('fields',[]),'evidence_level':'CATALOGUE_METADATA_ONLY'})
+        return 'EXECUTED',rows,endpoint+' ; native public descriptive search; first 20; total='+str(result.get('totalCount'))
+    full_failure='FULL_SEARCH_SCHEMA_OR_RESPONSE_UNCONFIRMED; autocomplete fallback; '
     query='''query { autoComplete(input: %s, itemsPagination: {offset: 0, limit: 20}) { totalCount results { ... on EntityCountData { count entity { id label typeOfEntity } } ... on ItemListing { item { id label document_type } } } } }''' % json.dumps(q)
     data=json.loads(fetch(endpoint,headers={**UA,'Accept':'application/json','Content-Type':'application/json'},
                           data=json.dumps({'query':query}).encode()))
@@ -762,7 +786,7 @@ def moreveneto_public(q,lane):
             rows.append({'discovery_repository':'Archivio di Stato di Venezia / Moreveneto','discovery_lane':lane,
                 'connector_status':'EXECUTED','identifier':item['id'],'title':item['label'],
                 'url':None,'date':[],'catalogue_endpoint':endpoint,'evidence_level':'CATALOGUE_METADATA_ONLY'})
-    return 'EXECUTED',rows,endpoint+' ; anonymous catalogue autocomplete; total='+str(result.get('totalCount'))
+    return 'EXECUTED',rows,endpoint+' ; '+full_failure+'anonymous catalogue autocomplete; total='+str(result.get('totalCount'))
 
 def unsupported(repository, reason="No stable anonymous machine-search connector configured."):
     return "AUTH_OR_BROWSER_REQUIRED",[],reason

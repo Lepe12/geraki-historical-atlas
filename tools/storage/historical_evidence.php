@@ -15,6 +15,10 @@ function heBackup(PDO $db,string $directory): array {
     if (!is_dir($directory)&&!mkdir($directory,0700,true)) throw new RuntimeException('BACKUP_DIRECTORY_FAILED');
     chmod($directory,0700);
     $target=$directory.'/evidence-'.gmdate('YmdTHis').'-'.bin2hex(random_bytes(6)).'.sql.gz';
+    foreach (['TRIGGERS'=>'TRIGGER_SCHEMA','ROUTINES'=>'ROUTINE_SCHEMA','EVENTS'=>'EVENT_SCHEMA'] as $table=>$column) {
+        if ($db->query('SELECT COUNT(*) FROM information_schema.'.$table.' WHERE '.$column.'=DATABASE()')->fetchColumn())throw new RuntimeException('DATABASE_OBJECTS_REQUIRE_FULL_DUMP_TOOL');
+    }
+    if ($db->query("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_TYPE<>'BASE TABLE'")->fetchColumn())throw new RuntimeException('NON_TABLE_OBJECTS_REQUIRE_FULL_DUMP_TOOL');
     $stream=gzopen($target,'wb6');if (!$stream) throw new RuntimeException('BACKUP_OPEN_FAILED');
     chmod($target,0600);$tables=0;$rows=0;
     try {

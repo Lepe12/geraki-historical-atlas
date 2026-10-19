@@ -16,7 +16,7 @@ def prepare(destination):
     repository=os.getenv('PCT_LOCAL_MODEL_REPOSITORY',REPOSITORY)
     if repository not in (REPOSITORY,'Qwen/Qwen2.5-7B-Instruct-GGUF'):
         raise ValueError('UNAPPROVED_LOCAL_MODEL_REPOSITORY')
-    revision=os.getenv('PCT_LOCAL_MODEL_REVISION') or (REVISION if repository==REPOSITORY else 'main')
+    revision=os.getenv('PCT_LOCAL_MODEL_REVISION') or (REVISION if repository==REPOSITORY else 'bb5d59e06d9551d752d08b292a50eb208b07ab1f')
     info=api.model_info(repository,revision=revision,files_metadata=True)
     filename='qwen2.5-3b-instruct-q4_k_m.gguf' if repository==REPOSITORY else 'qwen2.5-7b-instruct-q4_k_m.gguf'
     siblings=sorted([s for s in info.siblings if s.rfilename==filename or

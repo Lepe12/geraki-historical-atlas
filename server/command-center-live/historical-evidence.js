@@ -24,6 +24,8 @@ function fromReviewedKnowledge(record) {
         page: Number.isInteger(page) && page > 0 ? page : null});
       continue;
     }
+    const startChar=Array.from(sourceText.slice(0,sourceText.indexOf(exact))).length;
+    const endChar=startChar+Array.from(exact).length;
     const identity = [record.source_id, page, exact, String(item.type || "claim")];
     const id = "att_" + crypto.createHash("sha256").update(JSON.stringify(identity)).digest("hex").slice(0, 24);
     if (seen.has(id)) continue;
@@ -39,9 +41,10 @@ function fromReviewedKnowledge(record) {
       source_sha256: replayed ? record.pdf_replay.source_sha256 : null,
       text_sha256: replayPage?.text_sha256 || null,
       extraction_method: replayPage?.method || "CLIENT_TEXT",
-      quote_start_char: sourceText.indexOf(exact),
-      quote_end_char: sourceText.indexOf(exact)+exact.length,
-      bounding_boxes: (replayPage?.words || []).filter(w=>w.end_char>sourceText.indexOf(exact)&&w.start_char<sourceText.indexOf(exact)+exact.length).map(w=>w.bbox),
+      quote_start_char: startChar,
+      quote_end_char: endChar,
+      offset_unit: "UNICODE_CODE_POINTS",
+      bounding_boxes: (replayPage?.words || []).filter(w=>w.end_char>startChar&&w.start_char<endChar).map(w=>w.bbox),
       status: "UNREVIEWED",
       historically_verified: false,
       original_pdf_replayed: replayed,

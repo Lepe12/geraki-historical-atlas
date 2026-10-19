@@ -144,7 +144,7 @@ def main():
     checkpoint()
     from connectors.repository_connectors import audited_dispatch
     native=[]
-    for repository,query in [('OpenArchives.gr / EKT','πειρατεία'),('National Library of Greece Digital Collections','χειρόγραφο'),('SIAS / Italian State Archives','corsari'),('Archivio di Stato di Venezia / Moreveneto','corsari'),('Archivio di Stato di Venezia / Moreveneto','Venezia'),('PARES / Archivo General de Simancas','corsarios'),('SearchCulture.gr / EKT','πειρατεία'),('Anemi / University of Crete','πειρατεία'),('Academia.edu Public Research','Mediterranean corsairs'),('Google Books','Mediterranean corsairs'),('Türkiye Devlet Arşivleri / BOA','korsan')]:
+    for repository,query in [('OpenArchives.gr / EKT','πειρατεία'),('National Library of Greece Digital Collections','χειρόγραφο'),('SIAS / Italian State Archives','corsari'),('Archivio di Stato di Venezia / Moreveneto','corsari'),('Archivio di Stato di Venezia / Moreveneto','Venezia'),('PARES / Archivo General de Simancas','corsarios'),('SearchCulture.gr / EKT','πειρατεία'),('Anemi / University of Crete','πειρατεία'),('Anemi / University of Crete','Κρήτη'),('Academia.edu Public Research','Mediterranean corsairs'),('Google Books','Mediterranean corsairs'),('Türkiye Devlet Arşivleri / BOA','korsan')]:
         status,records,detail=audited_dispatch(repository,query,'live_validation')
         native.append({'repository':repository,'query':query,'status':status,'records':records,'diagnostic':json.loads(detail)})
         report['native_connector_tests']=native

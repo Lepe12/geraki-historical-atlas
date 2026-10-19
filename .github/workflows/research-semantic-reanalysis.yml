@@ -24,10 +24,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/cache@v4
+      - uses: actions/cache/restore@v4
+        id: model-cache
         with:
           path: ~/.cache/nabou-models/qwen2.5-7b
-          key: nabou-official-qwen2.5-7b-q4km-v1
+          key: nabou-official-qwen2.5-7b-q4km-bb5d59e0-v2
       - name: Prepare real CPU inference
         env:
           CMAKE_BUILD_PARALLEL_LEVEL: '2'
@@ -53,3 +54,9 @@ jobs:
           git add "$dest"
           git commit -m 'Record actual semantic reanalysis with replayed source passages'
           python3 tools/publish_research_outputs.py
+      - name: Retain verified open weights even when research remains incomplete
+        if: always() && steps.model-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/nabou-models/qwen2.5-7b
+          key: nabou-official-qwen2.5-7b-q4km-bb5d59e0-v2

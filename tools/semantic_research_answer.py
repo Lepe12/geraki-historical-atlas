@@ -48,6 +48,8 @@ def configuration():
 def collect(run_root):
     groups={};seen=[];excluded=[]
     for p in sorted(Path(run_root).glob('*/structured_output/extracted_findings.json')):
+        acquisition=read(p.parent.parent/'library_acquisition/acquisition_report.json',{}).get('results',[])
+        source_by_file={Path(str(filename)).name:source for source in acquisition for filename in source.get('files',[])}
         for f in read(p).get('findings',[]):
             if {'FICTION_OR_BOOK_REVIEW_CONTEXT','CONFLICTING_GIVEN_NAME','DATE_OUTSIDE_SCOPE',
                 'EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW','SURNAME_IDENTITY_UNRESOLVED','LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW'} & set(f.get('uncertainties',[])):
@@ -88,16 +90,38 @@ def collect(run_root):
                         'reported_archival_reference':f.get('reported_archival_reference')}
             if key in groups:
                 groups[key]['occurrences'].append(provenance);continue
+            source=source_by_file.get(filename,{})
+            bibliography=f.get('source_bibliography') or {k:source.get(k) for k in ('creator','date','source_type','rights')}
+            bibliography={**bibliography,'date_field_meaning':'PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE'}
             row={'evidence_id':'e-'+key[:20],'text':raw,'years_in_scope':f.get('years_in_scope',[]),
                  'date_basis':f.get('date_basis'),'date_evidence':f.get('date_evidence'),
-                 'source_bibliography':f.get('source_bibliography'),
+                 'source_bibliography':bibliography,
                  'uncertainties':f.get('uncertainties',[]),'occurrences':[provenance],
                  'source_independence':'UNKNOWN_NOT_ESTABLISHED'}
             groups[key]=row;seen.append(row)
     # In-scope passages first, then useful unresolved context. Nothing is erased
     # from lane evidence; bounded model coverage is recorded explicitly.
-    from research_topics import BASES,normalized
-    seen.sort(key=lambda x:(not bool(x['years_in_scope']),not bool(re.search(BASES,normalized(x['text']))),len(x['text']),x['evidence_id']))
+    from research_topics import BASES,PIRACY,normalized,region_terms
+    focus=decompose(req.get('target',''),req.get('aliases',[])) if seen else {}
+    regions=[normalized(term) for term in region_terms(focus,include_hypotheses=True)] if focus.get('kind')=='topic' else []
+    requested_years=[int(y) for y in re.findall(r'\b\d{4}\b',req.get('date_range',''))] if seen else []
+    century=(sum(requested_years)//len(requested_years)-1)//100+1 if requested_years else None
+    def priority(row):
+        text=normalized(row['text'])
+        regional=any(term in text for term in regions) if regions else True
+        event_use=bool(re.search(BASES,text) and re.search(PIRACY,text)) if focus.get('kind')=='topic' else True
+        title=normalized(row['occurrences'][0].get('title') or '')
+        title_period=bool(century and re.search(r'(?<!\d)'+str(century)+r'(?:th|st|nd|rd|ου|ος|ο|e|er)(?!\w)',title)) if focus.get('kind')=='topic' else True
+        return (not bool(row['years_in_scope']),not regional,not event_use,not title_period,len(row['text']),row['evidence_id'])
+    seen.sort(key=priority)
+    # Sample across acquired documents before spending more calls on one book.
+    # Document hashes are sampling keys, never claims of source independence.
+    leaders=[];followers=[];documents=set()
+    for row in seen:
+        document=row['occurrences'][0]['source_text_sha256']
+        if document in documents:followers.append(row)
+        else:leaders.append(row);documents.add(document)
+    seen=leaders+followers
     return seen,excluded
 
 def model_evidence(row):
@@ -151,7 +175,7 @@ def parse(result):
 
 def forbidden(value):
     if isinstance(value,dict):
-        if any(value.get(k) is True for k in ('verified','original_inspected','human_reviewed','corroborated')):return True
+        if any(value.get(k) is True for k in ('verified','historically_verified','source_original_verified','original_inspected','human_reviewed','corroborated')):return True
         if any(value.get(key)=='VERIFIED' for key in ('status','verification_status','evidence_state')):return True
         return any(forbidden(v) for v in value.values())
     if isinstance(value,list):return any(forbidden(v) for v in value)
@@ -194,11 +218,23 @@ def validate_items(payload, records):
         kind=item.get('kind')
         if kind not in ('source_statement','inference','hypothesis'):
             rejected.append({'reason':'MISSING_STATEMENT_KIND'});continue
-        entities={};bad=False
+        entities={};bad=False;field_issues=[]
         for field in ('actors','places','dates'):
             vals=item.get(field,[])
+            if field=='dates' and isinstance(vals,list):
+                vals=[str(v) if type(v) is int else v for v in vals]
             if not isinstance(vals,list) or any(not isinstance(v,str) for v in vals):bad=True;break
             permitted=quote+(str((row.get('date_evidence') or {}).get('text') or '') if field=='dates' else '')
+            if field=='dates':
+                valid_dates=[v for v in vals if v in permitted and all(int(y) in row['years_in_scope'] for y in re.findall(r'(?<!\d)(1\d{3}|20\d{2})(?!\d)',v))]
+                if valid_dates!=vals:
+                    field_issues.append('MODEL_DATE_REJECTED_NOT_SUPPORTED_BY_SELECTED_PASSAGE')
+                    rejected.append({'evidence_id':eid,'reason':'UNSUPPORTED_DATE_ATTRIBUTE_REMOVED','proposed_dates':vals})
+                # Preserve a valid place quotation when an optional date is wrong,
+                # but reject any unsupported date asserted in the statement itself.
+                if any(y not in permitted or int(y) not in row['years_in_scope'] for y in re.findall(r'(?<!\d)(1\d{3}|20\d{2})(?!\d)',statement)):
+                    bad=True;break
+                entities[field]=valid_dates;continue
             if any(v not in permitted for v in vals):bad=True;break
             if field=='dates' and any(int(y) not in row['years_in_scope'] for v in vals for y in re.findall(r'(?<!\d)(1\d{3}|20\d{2})(?!\d)',v)):bad=True;break
             entities[field]=vals
@@ -208,9 +244,11 @@ def validate_items(payload, records):
         accepted.append({'claim_id':'c-'+digest([row['evidence_id'],statement,quote])[:20],
             'statement':statement,'kind':kind,'evidence_id':row['evidence_id'],'quote':quote,
             'quote_offset_in_excerpt':start,**entities,'source_occurrences':row['occurrences'],
-            'uncertainty':item.get('uncertainty') if isinstance(item.get('uncertainty'),list) else [],
+            'uncertainty':(item.get('uncertainty') if isinstance(item.get('uncertainty'),list) else [])+field_issues,
             'source_uncertainties':row['uncertainties'],'model_analysis':True,'verified':False,
-            'source_classification':item.get('source_type') if item.get('source_type') in ('PRIMARY_SOURCE','SECONDARY_SOURCE') else 'UNVERIFIED',
+            # A model label cannot establish contemporary primary authorship.
+            'source_classification':'SECONDARY_SOURCE' if item.get('source_type')=='SECONDARY_SOURCE' else 'UNVERIFIED',
+            'model_proposed_source_classification':item.get('source_type'),
             'classification_status':'MODEL_PROVISIONAL_REQUIRES_SOURCE_CRITICISM',
             'usage_type':item.get('usage_type') if item.get('usage_type') in ('BASE','ANCHORAGE','REFUGE','RAID_LOCATION','OTHER') else 'UNRESOLVED',
             'assertion_class':{'source_statement':'SOURCE_STATEMENT','inference':'INTERPRETATION','hypothesis':'HYPOTHESIS'}[kind],
@@ -309,7 +347,10 @@ def execute(run_root, question, caller=call, config=None, output_root=None):
     # Identical model items are grouped by ID, not counted as corroboration.
     out['claims']=list({c['claim_id']:c for c in out['claims']}.values())
     claims=out['claims']
-    review=invoke('adversarial_reviewer',RULES+'\nQUESTION: '+question+'\nROLE: challenge every proposed claim against its supplied quotation. Flag any alleged corsair base inferred only from a raid, any date outside the question, or an unsupported place identity. Return {"supported_claim_ids":[],"flagged_claims":[{"claim_id":"ID","reason":"reason"}],"contradictions":[{"claim_ids":["IDs"],"explanation":"reason"}],"limitations":[]}. Use only supplied IDs. Supported means model review only, never historical verification. Distinguish actual conflicting source statements from different dates, actors or scope.\nCLAIMS_JSON:\n'+json.dumps([model_claim(c) for c in claims],ensure_ascii=False))
+    evidence_by_id={r['evidence_id']:r for r in selected}
+    review_claims=[{**model_claim(c),'source_context':evidence_by_id[c['evidence_id']]['text'],
+                   'consulted_source':model_evidence(evidence_by_id[c['evidence_id']])['consulted_source']} for c in claims]
+    review=invoke('adversarial_reviewer',RULES+'\nQUESTION: '+question+'\nROLE: check whether each source-attributed statement faithfully reports its supplied quotation. This is QUOTATION SUPPORT, not historical truth or verification. Use source_context to resolve the quotation context. Missing original inspection, primary authorship, independent corroboration or human review are limitations, not reasons to reject a faithful attribution to a consulted source. Do not reject solely because an optional date is unresolved. Flag invented facts, wrong dates, conflated people, a raid falsely called a base, and places demonstrably outside the requested region. Do not invent a geographic identity. Distinguish supported source statements from historical conclusions. Return {"supported_claim_ids":[],"flagged_claims":[{"claim_id":"ID","reason":"reason"}],"contradictions":[{"claim_ids":["IDs"],"explanation":"reason"}],"limitations":[]}. Copy only supplied IDs. Unsupported PRIMARY_SOURCE classification does not invalidate a literal quotation but must remain UNVERIFIED.\nCLAIMS_JSON:\n'+json.dumps(review_claims,ensure_ascii=False))
     valid={c['claim_id'] for c in claims}
     if not isinstance(review,dict) or forbidden(review) or not isinstance(review.get('supported_claim_ids'),list) or any(not isinstance(cid,str) or cid not in valid for cid in review['supported_claim_ids']):
         out['status']='REVIEW_FAILED';return out
@@ -324,6 +365,14 @@ def execute(run_root, question, caller=call, config=None, output_root=None):
     sections=answer.get('answer_sections') if isinstance(answer,dict) else None
     if forbidden(answer) or not isinstance(sections,list) or not sections or any(not isinstance(s,dict) or not isinstance(s.get('text'),str) or not s['text'].strip() or not isinstance(s.get('claim_ids'),list) or not s['claim_ids'] or any(not isinstance(cid,str) or cid not in supported for cid in s['claim_ids']) for s in sections) or any(not isinstance(answer.get(k,[]),list) or any(not isinstance(v,str) for v in answer.get(k,[])) for k in ('unknowns','limitations')):
         out['status']='SYNTHESIS_REJECTED_INVALID_CITATIONS';return out
+    final_review=invoke('adversarial_reviewer',RULES+'\nQUESTION: '+question+'\nCheck the FINAL ANSWER against the supplied claim quotations. Return {"supported_section_indexes":[0],"flagged_sections":[{"index":0,"reason":"reason"}]}. Indexes are zero-based. Support means a faithful attributed paraphrase, not historical verification. Flag invented facts, unsupported dates or identities, incorrect source attribution, and certainty stronger than the evidence. Missing original inspection and human review remain limitations and are not reasons to reject a faithful source attribution. Do not use outside knowledge.\nFINAL_ANSWER_JSON:\n'+json.dumps({'sections':sections,'claims':[model_claim(c) for c in synthesis_claims]},ensure_ascii=False))
+    indexes=final_review.get('supported_section_indexes') if isinstance(final_review,dict) else None
+    flags=final_review.get('flagged_sections',[]) if isinstance(final_review,dict) else None
+    if (forbidden(final_review) or not isinstance(indexes,list) or any(type(i) is not int for i in indexes) or
+        set(indexes)!=set(range(len(sections))) or not isinstance(flags,list) or flags):
+        out['final_answer_review']=final_review
+        out['status']='FINAL_ANSWER_REVIEW_FAILED';return out
+    out['final_answer_review']=final_review
     out.update(status='MODEL_ANSWER_PENDING_HUMAN_REVIEW',answer_sections=sections,
                unknowns=answer.get('unknowns',[]),model_limitations=answer.get('limitations',[]))
     return out
