@@ -41,8 +41,13 @@ if path.exists():
 def dedupe(items):
     output={}
     for item in items:
-        key=(item.get('file'),item.get('repository'),item.get('identifier'),item['place_match'].casefold(),
-             tuple(item['years_in_scope']),item.get('status'),item['context_excerpt'])
+        # Thematic passages need not name a place. Their actual quote and
+        # locator identify them; absence of a toponym is never filled in.
+        key=(item.get('file'),item.get('repository'),item.get('identifier'),
+             str(item.get('place_match') or '').casefold(),
+             tuple(item.get('years_in_scope',[])),item.get('status'),
+             item.get('context_excerpt') or item.get('evidence_excerpt') or '',
+             (item.get('locator') or {}).get('start_char'))
         if key in output: output[key]['occurrence_count']+=1
         else: output[key]={**item,'occurrence_count':1}
     return list(output.values())

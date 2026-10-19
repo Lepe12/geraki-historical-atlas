@@ -181,6 +181,38 @@ def forbidden(value):
     if isinstance(value,list):return any(forbidden(v) for v in value)
     return False
 
+def normalize_review(value, claims):
+    """Map explicit indexed decisions to internal IDs; omissions stay unresolved."""
+    if not isinstance(value,dict) or forbidden(value):return None
+    valid={c['claim_id'] for c in claims}
+    if 'decisions' in value:
+        decisions=value['decisions']
+        if not isinstance(decisions,list):return None
+        seen=set();supported=[];flags=[]
+        for row in decisions:
+            if not isinstance(row,dict):return None
+            i=row.get('claim_index');decision=row.get('decision');reason=row.get('reason')
+            if type(i) is not int or i<0 or i>=len(claims) or i in seen or decision not in ('SUPPORTED','UNSUPPORTED','UNCERTAIN') or not isinstance(reason,str) or not reason.strip():return None
+            seen.add(i);cid=claims[i]['claim_id']
+            if decision=='SUPPORTED':supported.append(cid)
+            else:flags.append({'claim_id':cid,'reason':reason,'decision':decision})
+        normalized={'supported_claim_ids':supported,'flagged_claims':flags,
+                    'contradictions':[],'limitations':value.get('limitations',[])}
+    else:
+        normalized=value
+    supported=normalized.get('supported_claim_ids');flags=normalized.get('flagged_claims',[])
+    contradictions=normalized.get('contradictions',[]);limitations=normalized.get('limitations',[])
+    if (not isinstance(supported,list) or any(not isinstance(cid,str) or cid not in valid for cid in supported)
+        or len(set(supported))!=len(supported) or not isinstance(flags,list)
+        or any(not isinstance(x,dict) or not isinstance(x.get('claim_id'),str) or x['claim_id'] not in valid or not isinstance(x.get('reason'),str) for x in flags)
+        or len({x['claim_id'] for x in flags})!=len(flags)
+        or set(supported)&{x['claim_id'] for x in flags}
+        or not isinstance(contradictions,list)
+        or any(not isinstance(x,dict) or not isinstance(x.get('explanation'),str) or not isinstance(x.get('claim_ids'),list) or not x['claim_ids'] or any(not isinstance(cid,str) or cid not in valid for cid in x['claim_ids']) for x in contradictions)
+        or not isinstance(limitations,list) or any(not isinstance(x,str) for x in limitations)):return None
+    return {**normalized,'missing_claim_ids':sorted(valid-set(supported)-{x['claim_id'] for x in flags})}
+
+
 def validate_items(payload, records):
     lookup={r['evidence_id']:r for r in records};accepted=[];rejected=[]
     values=payload.get('items') if isinstance(payload,dict) else None
@@ -348,17 +380,25 @@ def execute(run_root, question, caller=call, config=None, output_root=None):
     out['claims']=list({c['claim_id']:c for c in out['claims']}.values())
     claims=out['claims']
     evidence_by_id={r['evidence_id']:r for r in selected}
-    review_claims=[{**model_claim(c),'source_context':evidence_by_id[c['evidence_id']]['text'],
-                   'consulted_source':model_evidence(evidence_by_id[c['evidence_id']])['consulted_source']} for c in claims]
-    review=invoke('adversarial_reviewer',RULES+'\nQUESTION: '+question+'\nROLE: check whether each source-attributed statement faithfully reports its supplied quotation. This is QUOTATION SUPPORT, not historical truth or verification. Use source_context to resolve the quotation context. Missing original inspection, primary authorship, independent corroboration or human review are limitations, not reasons to reject a faithful attribution to a consulted source. Do not reject solely because an optional date is unresolved. Flag invented facts, wrong dates, conflated people, a raid falsely called a base, and places demonstrably outside the requested region. Do not invent a geographic identity. Distinguish supported source statements from historical conclusions. Return {"supported_claim_ids":[],"flagged_claims":[{"claim_id":"ID","reason":"reason"}],"contradictions":[{"claim_ids":["IDs"],"explanation":"reason"}],"limitations":[]}. Copy only supplied IDs. Unsupported PRIMARY_SOURCE classification does not invalidate a literal quotation but must remain UNVERIFIED.\nCLAIMS_JSON:\n'+json.dumps(review_claims,ensure_ascii=False))
-    valid={c['claim_id'] for c in claims}
-    if not isinstance(review,dict) or forbidden(review) or not isinstance(review.get('supported_claim_ids'),list) or any(not isinstance(cid,str) or cid not in valid for cid in review['supported_claim_ids']):
-        out['status']='REVIEW_FAILED';return out
-    flags=review.get('flagged_claims',[]);contradictions=review.get('contradictions',[])
-    if not isinstance(flags,list) or not isinstance(contradictions,list) or any(not isinstance(x,dict) or not isinstance(x.get('claim_id'),str) or x['claim_id'] not in valid or not isinstance(x.get('reason'),str) for x in flags) or any(not isinstance(x,dict) or not isinstance(x.get('explanation'),str) or not isinstance(x.get('claim_ids'),list) or not x['claim_ids'] or any(not isinstance(cid,str) or cid not in valid for cid in x['claim_ids']) for x in contradictions):
-        out['status']='REVIEW_FAILED';return out
+    review_claims=[{**model_claim(c),'claim_index':i,
+                   'source_context':evidence_by_id[c['evidence_id']]['text'],
+                   'consulted_source':model_evidence(evidence_by_id[c['evidence_id']])['consulted_source']} for i,c in enumerate(claims)]
+    review_rules=RULES+'\nQUESTION: '+question+'\nROLE: check whether EVERY source-attributed statement faithfully reports its supplied quotation. This is QUOTATION SUPPORT, not historical truth or verification. Missing original inspection, primary authorship, independent corroboration or human review are limitations, not reasons to reject a faithful attribution to a consulted source. An explicitly attributed source conjecture may be supported AS A HYPOTHESIS, never as an established fact. Do not reject solely because an optional date is unresolved. Flag invented facts, wrong dates, conflated people, a raid falsely called a base, and places demonstrably outside the requested region. Do not invent a geographic identity. Return {"decisions":[{"claim_index":0,"decision":"SUPPORTED","reason":"faithful attributed statement"}],"limitations":[]}. Return EXACTLY ONE decision for EVERY supplied claim_index. Use SUPPORTED, UNSUPPORTED or UNCERTAIN. Do not output claim IDs. Unsupported PRIMARY_SOURCE classification must remain UNVERIFIED.'
+    review=normalize_review(invoke('adversarial_reviewer',review_rules+'\nCLAIMS_JSON:\n'+json.dumps(review_claims,ensure_ascii=False)),claims)
+    if review is None:out['status']='REVIEW_FAILED';return out
+    # Repair only explicitly missing decisions, once, without treating silence as
+    # approval. Existing decisions cannot be revised by this repair call.
+    if review['missing_claim_ids']:
+        missing=[c for c in claims if c['claim_id'] in review['missing_claim_ids']]
+        repair_rows=[{**model_claim(c),'claim_index':i} for i,c in enumerate(missing)]
+        repair=normalize_review(invoke('adversarial_reviewer',review_rules+'\nThe previous response omitted these claims. Decide each one.\nCLAIMS_JSON:\n'+json.dumps(repair_rows,ensure_ascii=False)),missing)
+        out['review_repair']=repair
+        if repair is None or repair['missing_claim_ids']:
+            out['review']=review;out['status']='REVIEW_INCOMPLETE';return out
+        for key in ('supported_claim_ids','flagged_claims','contradictions','limitations'):review.setdefault(key,[]).extend(repair.get(key,[]))
+        review['missing_claim_ids']=[]
     out['review']=review
-    supported=set(review['supported_claim_ids'])-{x['claim_id'] for x in flags}
+    supported=set(review['supported_claim_ids'])
     if not supported:out['status']='NO_MODEL_SUPPORTED_CLAIMS';return out
     synthesis_claims=[c for c in claims if c['claim_id'] in supported]
     answer=invoke('synthesis',RULES+'\nROLE: answer the research question in clear Greek using only supplied claims. Attribute statements to consulted sources. Group repetitions; do not call repeated text independent. Present conflicts and uncertainty. Return {"answer_sections":[{"text":"one concise paragraph","claim_ids":["supplied claim IDs"]}],"unknowns":["gaps"],"limitations":["limitations"]}. Every answer paragraph must cite supporting claim IDs. No external knowledge. QUESTION: '+question+'\nCLAIMS_AND_REVIEW_JSON:\n'+json.dumps({'claims':[model_claim(c) for c in synthesis_claims],'review':review},ensure_ascii=False))

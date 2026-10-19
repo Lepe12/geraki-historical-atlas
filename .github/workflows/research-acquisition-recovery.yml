@@ -27,7 +27,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-eng tesseract-ocr-fra tesseract-ocr-ita tesseract-ocr-ell
-      - name: Reacquire eligible fresh leads through repaired routes
+      - name: Reacquire eligible leads and complete thematic passage aggregation
         run: python3 tools/recover_research_acquisition.py --run-id "$PARENT_RESEARCH_RUN"
       - uses: actions/upload-artifact@v4
         if: always()

@@ -1,10 +1,35 @@
 import unittest
+import json
+import os
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
 from research_focus import decompose,topical_match
 from research_topics import topic_queries
 from section_extraction import extract_document
 from research_relevance import identity,assess
 
 class TopicResearchTests(unittest.TestCase):
+    def test_real_cli_retains_themed_sections_without_inventing_a_named_place(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);acq=root/'library_acquisition';acq.mkdir()
+            quote='In 1670 the corsairs anchored in the harbour. The location is unnamed.'
+            (acq/'doc.txt').write_text(quote)
+            (acq/'acquisition_report.json').write_text(json.dumps({'results':[{
+                'title':'Voyage','url':'https://example.org/voyage','files':['library_acquisition/doc.txt']}]}))
+            env={**os.environ,'PCT_TARGET':'Pirate bases and anchorages in the Mediterranean',
+                 'PCT_DATE_RANGE':'1600-1700','PCT_ALIASES':'','PCT_RESEARCH_LANE':'travellers'}
+            for script in ('event_first_search.py','verification_pipeline.py'):
+                result=subprocess.run([sys.executable,str(Path(__file__).parent/script)],cwd=tmp,env=env,capture_output=True,text=True)
+                self.assertEqual(result.returncode,0,result.stderr)
+            hits=json.loads((root/'event_first_hits/event_hits.json').read_text())['hits']
+            self.assertEqual(hits[0]['evidence_excerpt'],quote)
+            self.assertFalse(hits[0]['verified'])
+            events=json.loads((root/'structured_output/candidate_events.json').read_text())['events']
+            self.assertEqual(events[0]['acquired_text_excerpt'],quote)
+            self.assertFalse(events[0]['verified'])
+
     def test_topic_is_not_a_quoted_person(self):
         focus=decompose('Τοπωνύμια πειρατικών και κουρσάρικων ορμητηρίων στην Ανατολική Μεσόγειο')
         self.assertEqual(focus['kind'],'topic')

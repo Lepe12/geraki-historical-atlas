@@ -33,7 +33,7 @@ def extract(filename):
     count = next((int(line.split(':', 1)[1]) for line in info.splitlines() if line.startswith('Pages:')), 0)
     if not 0 < count <= 500:
         raise ValueError('PDF_PAGE_LIMIT_OR_INVALID')
-    text = run(['pdftotext', '-layout', '-enc', 'UTF-8', filename, '-'], 60)
+    text = run(['pdftotext', '-enc', 'UTF-8', filename, '-'], 60)
     chunks = text.split('\f')
     pages = []
     ocr_count = 0
@@ -53,7 +53,10 @@ def extract(filename):
                     raise ValueError('OCR_LANGUAGES_UNAVAILABLE')
                 image = str(Path(tmp) / 'page')
                 run(['pdftoppm', '-f', str(number), '-l', str(number), '-singlefile', '-scale-to', '2200', '-png', filename, image], 30)
-                tsv = run(['tesseract', image + '.png', 'stdout', '-l', '+'.join(available), 'tsv'], 45)
+                # Explicit output setting also works with a separately pinned
+                # tessdata directory that contains models but no configs/tsv.
+                tsv = run(['tesseract', image + '.png', 'stdout', '-l', '+'.join(available),
+                           '-c', 'tessedit_create_tsv=1'], 45)
                 parts, offset, confidences = [], 0, []
                 for row in csv.DictReader(io.StringIO(tsv), delimiter='\t', quoting=csv.QUOTE_NONE):
                     token = (row.get('text') or '').strip()
@@ -70,7 +73,8 @@ def extract(filename):
                 confidence = sum(confidences) / len(confidences) if confidences else None
             greek = sum('\u0370' <= c <= '\u03ff' or '\u1f00' <= c <= '\u1fff' for c in value)
             pages.append({'page': number, 'printed_page': None, 'text': value, 'words': words,
-                          'method': method, 'text_sha256': hashlib.sha256(value.encode()).hexdigest(),
+                          'method': method, 'text_order': 'POPPLER_READING_ORDER' if method == 'PDF_TEXT' else 'OCR_WORD_ORDER',
+                          'text_sha256': hashlib.sha256(value.encode()).hexdigest(),
                           'language': 'el' if greek > 20 else 'UNDETERMINED',
                           'language_method': 'SCRIPT_HEURISTIC_NOT_LANGUAGE_MODEL',
                           'ocr_languages': available if method == 'TESSERACT_OCR' else [],

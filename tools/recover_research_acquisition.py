@@ -47,7 +47,10 @@ def recover(run_id):
                  'original_lane_outputs_modified':False}
         (dest/'recovery_receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
         for script in ('acquire_library_candidate.py','event_first_search.py','run_manifest.py'):
-            result=subprocess.run(['python3',str(tools/script)],cwd=work,env=env)
+            result=subprocess.run(['python3',str(tools/script)],cwd=work,env=env,capture_output=True,text=True)
+            log=dest/'phase_logs';log.mkdir(exist_ok=True)
+            (log/(script+'.stdout.txt')).write_text(result.stdout)
+            (log/(script+'.stderr.txt')).write_text(result.stderr)
             phases.append({'script':script,'exit_code':result.returncode})
             for folder in ('library_acquisition','structured_output','research_dossier','event_first_hits','run_manifest'):
                 if (work/folder).exists():shutil.copytree(work/folder,dest/folder,dirs_exist_ok=True)

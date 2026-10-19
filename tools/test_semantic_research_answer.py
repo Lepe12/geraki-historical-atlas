@@ -7,7 +7,7 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
-from semantic_research_answer import collect,batches,execute,validate_items,configuration,render
+from semantic_research_answer import collect,batches,execute,validate_items,configuration,render,normalize_review
 from llm_client import call
 
 TEXT='In 1677 the ships attacked the island. The account is uncertain.'
@@ -31,6 +31,35 @@ def item(eid,**changes):
             'kind':'source_statement','actors':[],'places':[],'dates':['1677'],'uncertainty':[],**changes}
 
 class SemanticAnswer(unittest.TestCase):
+    def test_indexed_review_requires_explicit_unique_decisions(self):
+        claims=[{'claim_id':'a'},{'claim_id':'b'}]
+        partial=normalize_review({'decisions':[{'claim_index':0,'decision':'SUPPORTED','reason':'quote supports it'}]},claims)
+        self.assertEqual(partial['supported_claim_ids'],['a'])
+        self.assertEqual(partial['missing_claim_ids'],['b'])
+        for index in (True,-1,2,[0]):
+            self.assertIsNone(normalize_review({'decisions':[{'claim_index':index,'decision':'SUPPORTED','reason':'reason'}]},claims))
+        row={'claim_index':0,'decision':'SUPPORTED','reason':'literal'}
+        self.assertIsNone(normalize_review({'decisions':[row,row]},claims))
+        self.assertIsNone(normalize_review({'supported_claim_ids':['a'],'flagged_claims':[{'claim_id':'a','reason':'conflict'}]},claims))
+
+    def test_missing_decision_is_repaired_once_or_fails_closed(self):
+        for repair_ok in (True,False):
+            with tempfile.TemporaryDirectory() as tmp:
+                fixture(tmp);eid=collect(tmp)[0][0]['evidence_id'];state={'reviews':0}
+                def caller(role,prompt):
+                    if role=='evidence_extractor':return response({'items':[item(eid)]})
+                    if role=='adversarial_reviewer':
+                        if 'FINAL_ANSWER_JSON:' in prompt:return response({'supported_section_indexes':[0],'flagged_sections':[]})
+                        state['reviews']+=1
+                        claims=json.loads(prompt.split('CLAIMS_JSON:\n')[1]);state['cid']=claims[0]['claim_id']
+                        return response({'decisions':[{'claim_index':0,'decision':'SUPPORTED','reason':'faithful quotation'}] if repair_ok and state['reviews']==2 else []})
+                    return response({'answer_sections':[{'text':'Η πηγή αναφέρει επίθεση το 1677.','claim_ids':[state['cid']]}]})
+                out=execute(tmp,'question',caller=caller,config={'configured':True,'missing':[]})
+                self.assertEqual(state['reviews'],2)
+                self.assertEqual(out['status'],'MODEL_ANSWER_PENDING_HUMAN_REVIEW' if repair_ok else 'REVIEW_INCOMPLETE')
+                self.assertFalse(out['verified'])
+                if not repair_ok:self.assertEqual(out['answer_sections'],[])
+
     def test_passage_selection_copies_original_without_generated_quote(self):
         with tempfile.TemporaryDirectory() as tmp:
             fixture(tmp);rows,_=collect(tmp);eid=rows[0]['evidence_id']

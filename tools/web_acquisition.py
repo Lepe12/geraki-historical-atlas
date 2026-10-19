@@ -85,7 +85,7 @@ def acquire(url,out,fetcher=fetch,follow=True):
     elif is_pdf:
         binary=out/(stem+'.pdf');binary.write_bytes(data);files.append(str(binary))
         text=out/(stem+'.txt')
-        proc=subprocess.run(['pdftotext','-layout',str(binary),str(text)],capture_output=True,timeout=30)
+        proc=subprocess.run(['pdftotext','-enc','UTF-8',str(binary),str(text)],capture_output=True,timeout=30)
         if proc.returncode:raise ValueError('PDF_TEXT_EXTRACTION_FAILED')
         content=text.read_text(encoding='utf-8',errors='replace')
         offset=0
@@ -95,7 +95,11 @@ def acquire(url,out,fetcher=fetch,follow=True):
             pages.append({'scan_index_0_based':index,'printed_page':None,'start_char':offset,'end_char':offset+len(page),'start_line':content.count('\n',0,offset)+1,'end_line':content.count('\n',0,offset+len(page))+1})
             offset+=len(page)+1
         files.append(str(text))
-        loc=out/(stem+'.pages.json');loc.write_text(json.dumps({'source_url':final,'text_file':str(text),'pages':pages,'original_inspected':False},ensure_ascii=False,indent=2));files.append(str(loc))
+        loc=out/(stem+'.pages.json');loc.write_text(json.dumps({'source_url':final,'text_file':str(text),'pages':pages,
+            'text_order':'POPPLER_READING_ORDER','source_pdf_sha256':hashlib.sha256(data).hexdigest(),
+            'text_sha256':hashlib.sha256(content.encode()).hexdigest(),
+            'extractor_version':subprocess.check_output(['pdftotext','-v'],stderr=subprocess.STDOUT,text=True).splitlines()[0],
+            'original_inspected':False},ensure_ascii=False,indent=2));files.append(str(loc))
     else:
         if not ('html' in ctype.lower() or ctype.lower().startswith('text/plain')):raise ValueError('UNSUPPORTED_DOCUMENT_TYPE')
         raw=data.decode('utf-8','replace')

@@ -36,7 +36,7 @@ jobs:
           set -e
           python3 -m pip install --quiet 'llama-cpp-python==0.3.16' --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu 'huggingface-hub==0.36.0'
           python3 tools/prepare_local_research_model.py --destination "$HOME/.cache/nabou-models/qwen2.5-7b"
-      - name: Actual extraction, adversarial review and cited synthesis
+      - name: Actual extraction with complete indexed review and cited synthesis
         run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python3 tools/reanalyse_acquired_research.py --run-id "$PARENT_RESEARCH_RUN"
       - uses: actions/upload-artifact@v4
         if: always()
