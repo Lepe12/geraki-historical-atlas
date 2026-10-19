@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/public-citation-lookup-check.yml'
       - 'tools/connectors/citation_search.py'
+      - 'tools/web_acquisition.py'
   workflow_dispatch:
 permissions:
   contents: write
@@ -42,13 +43,13 @@ jobs:
               status,rows,detail=search(ref['title'],'greek')
               matched=[row for row in rows if citation_title_match(ref['title'],row)]
               item={'reference_id':ref['id'],'query':ref['title'],'status':status,'diagnostic':json.loads(detail),'matching_records':matched,'acquisitions':[]}
-              target=next((r.get('digital_url') for r in matched if r.get('digital_url')),None)
+              target=next((r.get('digital_url') for r in matched if r.get('digital_url')),None) or next((r.get('url') for r in matched if r.get('url')),None)
               basis='PUBLIC_CATALOGUE_TITLE_MATCH'
               if not target and ref.get('url'):
                   target=ref['url'];basis='PREVIOUSLY_DOCUMENTED_URL_NOT_DISCOVERED_BY_THIS_QUERY'
               if target:
                   dest=pathlib.Path('evidence/citation_checks')/os.environ['GITHUB_RUN_ID']/ref['id'];dest.mkdir(parents=True,exist_ok=True)
-                  try:item['acquisitions'].append({'basis':basis,'result':acquire(target,dest,follow=False)})
+                  try:item['acquisitions'].append({'basis':basis,'result':acquire(target,dest,follow=True)})
                   except Exception as error:item['acquisitions'].append({'basis':basis,'status':'FAILED','error_type':type(error).__name__})
               checks.append(item)
           report={'schema':'pct-public-citation-repair-check-v2','run_id':os.environ['GITHUB_RUN_ID'],'checked_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'test_type':'TARGETED_KNOWN_BIBLIOGRAPHY_FOLLOWUP_NOT_BLIND_RECALL_TEST','references':checks}

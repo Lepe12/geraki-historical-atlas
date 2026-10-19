@@ -149,6 +149,7 @@ def citation_title_match(query, record):
         text=''.join(c for c in unicodedata.normalize('NFD',str(value or '')) if not unicodedata.combining(c)).casefold()
         return set(re.findall(r'[^\W\d_]{4,}',text))-{'with','from','during','della','delle','degli','para','dans','pour','τους','στην','στον','κατα','μετα','περι','history','historical','download','document'}
     wanted=tokens(query)
-    found=tokens(str(record.get('title') or '')+' '+str(record.get('description') or ''))
+    # A description may merely cite another work; it cannot identify this work.
+    found=tokens(record.get('title') or '')
     overlap=len(wanted & found)
-    return bool(len(wanted)>=3 and overlap>=3 and overlap/len(wanted)>=0.55)
+    return bool(len(wanted)>=3 and overlap>=3 and overlap/len(wanted)>=0.8)

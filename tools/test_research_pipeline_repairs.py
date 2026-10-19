@@ -14,6 +14,10 @@ class PipelineRepairs(unittest.TestCase):
         self.assertTrue(citation_title_match(query,{'title':query}))
         self.assertFalse(citation_title_match(query,{'title':'Codice Etico Gruppo Havant','digital_url':'https://example.org/file.pdf'}))
         self.assertFalse(citation_title_match(query,{'title':'Pietro Lanza company history'}))
+        target='Espionage in the 16th century Mediterranean: Secret diplomacy, Mediterranean go-betweens and the Ottoman Habsburg rivalry'
+        self.assertFalse(citation_title_match(target,{'title':'La bolsa o la vida: Los Habsburgo a la caza de Uluc Ali','description':target}))
+        self.assertFalse(citation_title_match('(Arz)obispos griegos en Roma y España (1596-1602)',{'title':'El Privilegio de Nombramiento de Obispos en España, Roma, 1967'}))
+        self.assertTrue(citation_title_match(target,{'title':target,'description':'No abstract'}))
 
     def test_reference_sections_include_unquoted_academic_titles(self):
         text='Παραπομπές\n↑ «Από τη Γαληνοτάτη στον Καθολικότατο: Οι φουρτούνες του Καπετάν-Πέτρου Λάντζα»\nΠηγές[Επεξεργασία]\nGürkan, Emrah Safa (2012). Espionage in the 16th Century Mediterranean: Secret Diplomacy and Rivalry. Washington: University.\n'
