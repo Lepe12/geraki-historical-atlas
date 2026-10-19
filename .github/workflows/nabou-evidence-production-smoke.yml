@@ -1,0 +1,47 @@
+name: NABOU Historical Evidence Production Smoke
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/command-center-live/**'
+      - '.github/workflows/nabou-evidence-production-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  verify-evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check new Learning endpoint exists and requires authorization
+        run: |
+          set -eu
+          code=$(curl --silent --show-error --max-time 15 --output /tmp/nabou-evidence-denied.json --write-out '%{http_code}' 'https://pct-live.piratecartography.com/pct-api/live/knowledge/evidence?source_id=src-fake')
+          echo "UNSIGNED_EVIDENCE_HTTP=$code"
+          if [ "$code" != "401" ]; then
+            echo "::error::Plesk still lacks the evidence API (expected 401, got $code)"
+            exit 1
+          fi
+      - name: End-to-end GitHub OIDC authorized Learning agent search
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.parse, urllib.request
+          base='https://pct-live.piratecartography.com/pct-api/live'
+          uri=os.environ['ACTIONS_ID_TOKEN_REQUEST_URL']
+          parts=urllib.parse.urlsplit(uri)
+          pairs=[(k,v) for k,v in urllib.parse.parse_qsl(parts.query) if k!='audience']
+          pairs.append(('audience','piratecartography-command-center'))
+          uri=urllib.parse.urlunsplit((parts.scheme,parts.netloc,parts.path,urllib.parse.urlencode(pairs),parts.fragment))
+          req=urllib.request.Request(uri,headers={'Authorization':'Bearer '+os.environ['ACTIONS_ID_TOKEN_REQUEST_TOKEN']})
+          with urllib.request.urlopen(req,timeout=15) as resp:
+              token=json.load(resp)['value']
+          payload=json.dumps({'query':'nabou-production-smoke-no-real-person'}).encode()
+          request=urllib.request.Request(base+'/knowledge/agent-search',data=payload,method='POST',
+              headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'})
+          with urllib.request.urlopen(request,timeout=20) as resp:
+              result=json.load(resp)
+          assert result.get('schema')=='nabou-agent-learning-evidence-v1',result
+          assert result.get('verified_count')==0,result
+          print('PRODUCTION_PDF_LEARNING_TO_AGENTS_OIDC_PASS')
+          PY
