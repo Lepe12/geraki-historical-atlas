@@ -124,7 +124,16 @@ for position,x in enumerate(items):
                 if url:
                     rec['web_acquisition_attempted']=True
                     try:
+                        if re.search(r'/server/api/core/items/[^/]+$',str(url)):
+                            from dspace_acquisition import documents
+                            files=documents(url)
+                            rec['dspace_document_candidates']=files
+                            if files:url=files[0]['url'];rec['dspace_item_url']=rec.get('url')
                         acquired=acquire_web(url,OUT)
+                        if acquired.get('source_type')=='IMAGE_OCR':
+                            for page in acquired.get('pages',[]):
+                                page['scan_index_0_based']=rec.get('scan_index_0_based')
+                            acquired['ocr_uncertainty']='AUTOMATIC_OCR_NOT_CONTROLLED_TRANSCRIPTION'
                         rec['web_acquisition']=acquired
                         rec['files'].extend(acquired['files'])
                         rec['status']=acquired['status']
@@ -154,6 +163,12 @@ for position,x in enumerate(items):
                             results.append(linked)
                     except Exception as e:
                         rec.setdefault('errors',[]).append('WEB_ACQUISITION '+type(e).__name__)
+                        safe_codes={'ACCESS_CHALLENGE_RETURNED','UNSUPPORTED_DOCUMENT_TYPE','NO_USABLE_DOCUMENT_TEXT',
+                                    'OCR_RUNTIME_NOT_AVAILABLE','IMAGE_OCR_FAILED','NO_USABLE_OCR_TEXT','EXPECTED_PDF_NOT_RETURNED'}
+                        from connectors.http_audit import safe_url
+                        rec['acquisition_failure']={'method':'PUBLIC_DOCUMENT_GET','url':safe_url(url),
+                            'http_status':getattr(e,'code',None),
+                            'error_code':str(e) if str(e) in safe_codes else type(e).__name__}
 
     except Exception as e:
         rec["status"]="ACQUISITION_ERROR";rec["error"]=f"{type(e).__name__}: {e}"

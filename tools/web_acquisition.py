@@ -24,7 +24,7 @@ class Redirects(urllib.request.HTTPRedirectHandler):
 
 def fetch(url):
     url=public_url(url)
-    req=urllib.request.Request(url,headers={'User-Agent':'Piratecartography-Research/3.0','Accept':'text/html,application/pdf,text/plain'})
+    req=urllib.request.Request(url,headers={'User-Agent':'Piratecartography-Research/3.0','Accept':'text/html,application/pdf,text/plain,application/json,image/*;q=0.8'})
     for attempt in range(3):
         try:
             with urllib.request.build_opener(Redirects()).open(req,timeout=12) as response:
@@ -62,7 +62,27 @@ def acquire(url,out,fetcher=fetch,follow=True):
     files=[];links=[];pages=[];errors=[];metadata={}
     is_pdf=data.startswith(b'%PDF-')
     if re.search(r'\.pdf(?:$|\?)',str(url),re.I) and not is_pdf:raise ValueError('EXPECTED_PDF_NOT_RETURNED')
-    if is_pdf:
+    is_image=ctype.lower().startswith('image/')
+    if is_image:
+        import shutil
+        if not shutil.which('tesseract'):raise ValueError('OCR_RUNTIME_NOT_AVAILABLE')
+        image=out/(stem+('.png' if data.startswith(b'\x89PNG') else '.jpg'))
+        image.write_bytes(data);files.append(str(image))
+        languages='eng+fra+ita+ell'
+        proc=subprocess.run(['tesseract',str(image),'stdout','-l',languages],capture_output=True,timeout=60)
+        if proc.returncode:raise ValueError('IMAGE_OCR_FAILED')
+        content=proc.stdout.decode('utf-8','replace')
+        if len(content.strip())<40:raise ValueError('NO_USABLE_OCR_TEXT')
+        text=out/(stem+'.txt');text.write_text(content,encoding='utf-8');files.append(str(text))
+        pages=[{'scan_index_0_based':None,'printed_page':None,'start_char':0,'end_char':len(content),
+                'image_url':final,'image_file':str(image),'original_inspected':False}]
+        receipt={'source_url':final,'source_image_sha256':hashlib.sha256(data).hexdigest(),
+                 'method':'TESSERACT_OCR','languages':languages,
+                 'version':subprocess.check_output(['tesseract','--version'],text=True).splitlines()[0],
+                 'text_sha256':hashlib.sha256(content.encode()).hexdigest(),
+                 'original_inspected':False,'verified':False}
+        record_file=out/(stem+'.ocr.json');record_file.write_text(json.dumps(receipt,indent=2)+'\n');files.append(str(record_file))
+    elif is_pdf:
         binary=out/(stem+'.pdf');binary.write_bytes(data);files.append(str(binary))
         text=out/(stem+'.txt')
         proc=subprocess.run(['pdftotext','-layout',str(binary),str(text)],capture_output=True,timeout=30)
@@ -85,13 +105,16 @@ def acquire(url,out,fetcher=fetch,follow=True):
             content=''.join(document.parts)
             links=list(dict.fromkeys(urllib.parse.urljoin(final,h) for h in document.links))
         else:content=raw
+        if (re.search(r'verify.{0,45}(?:not a robot|human)',content,re.I|re.S) and
+                re.search(r'javascript|captcha',content,re.I)) or ('Just a moment' in raw[:2000] and '_cf_chl' in raw):
+            raise ValueError('ACCESS_CHALLENGE_RETURNED')
         if len(content.strip())<100:raise ValueError('NO_USABLE_DOCUMENT_TEXT')
         text=out/(stem+'.txt');text.write_text(content,encoding='utf-8');files.append(str(text))
         rawdir=out/'raw';rawdir.mkdir(exist_ok=True)
         rawfile=rawdir/(stem+'.html');rawfile.write_bytes(data);files.append(str(rawfile))
     record={'url':final,'sha256':hashlib.sha256(data).hexdigest(),'files':files,'pages':pages,
             'status':'TEXT_ACQUIRED' if content.strip() else 'PDF_ACQUIRED_NO_TEXT','original_inspected':False,'verification_status':'NEEDS_EVIDENCE',
-            'pdf_file':str(binary) if is_pdf else None,'source_type':'PDF_TEXT' if is_pdf else 'WEB_PAGE_TEXT',
+            'pdf_file':str(binary) if is_pdf else None,'source_type':'IMAGE_OCR' if is_image else 'PDF_TEXT' if is_pdf else 'WEB_PAGE_TEXT',
             'bibliographic_metadata':metadata,'linked_documents':[],'citation_queue':[]}
     pdfs=[]
     for link in links:

@@ -228,8 +228,10 @@ jobs:
           python3 tools/orchestrator/jarvis_event_bus.py --run-id "$GITHUB_RUN_ID" --event-type agent_progress --agent-id "$PCT_RESEARCH_LANE" --phase "repository discovery complete" --percent 35 --status RUNNING --detail "Repository discovery and candidate merge complete"
           if [ "$PCT_RESEARCH_LANE" = "german" ]; then PCT_BSB_POSITIVE_CONTROL=1 python3 tools/bsb_iiif_route.py; fi
           if [ "$PCT_RESEARCH_LANE" = "travellers" ]; then python3 tools/bsb_iiif_route.py; fi
-      - name: Install PDF text extraction
-        run: command -v pdftotext >/dev/null || { sudo apt-get update -qq; sudo apt-get install -y poppler-utils; }
+      - name: Install PDF and public page OCR extraction
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-eng tesseract-ocr-fra tesseract-ocr-ita tesseract-ocr-ell
       - name: Run lane research pipeline
         env:
           PCT_RESEARCH_LANE: ${{ matrix.lane }}

@@ -273,6 +273,9 @@ def topical_match(record, focus):
         for item in value if isinstance(value,list) else [value]:
             if item:
                 segments.append((key,str(item)))
+    if focus['kind']=='topic':
+        from research_topics import topic_match
+        return {**topic_match(' '.join(value for _,value in segments),focus),'matched_field':'DOCUMENT_METADATA'}
     order={'TARGET_MATCH':0,'POSSIBLE_TARGET':1,'CONTEXT_ONLY':2,'UNMATCHED':3}
     matches=[{**_topical_match_segment({'text':value},focus),'matched_field':key}
              for key,value in segments]

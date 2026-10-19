@@ -1,0 +1,44 @@
+name: Research acquisition recovery validation
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Parent research run with fresh discovery leads
+        required: true
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research-acquisition-recovery.yml'
+permissions:
+  contents: write
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PARENT_RESEARCH_RUN: ${{ inputs.run_id || '39247670206' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Install existing PDF extraction and CPU OCR
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-eng tesseract-ocr-fra tesseract-ocr-ita tesseract-ocr-ell
+      - name: Reacquire eligible fresh leads through repaired routes
+        run: python3 tools/recover_research_acquisition.py --run-id "$PARENT_RESEARCH_RUN"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: source-acquisition-recovery
+          path: evidence/runs/${{ env.PARENT_RESEARCH_RUN }}/acquisition_recovery_${{ github.run_id }}/
+      - name: Persist new source bytes and replayable OCR
+        run: |
+          set -e
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "evidence/runs/$PARENT_RESEARCH_RUN/acquisition_recovery_$GITHUB_RUN_ID"
+          git commit -m 'Acquire public source files through repaired routes'
+          python3 tools/publish_research_outputs.py

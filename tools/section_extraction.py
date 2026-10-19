@@ -161,7 +161,7 @@ def extract_topic_document(text, source, file, ctx, focus):
         else:
             # Offsets map through accent folding (Greek characters retain one
             # position in this normalization). Search original word surfaces.
-            for hit in re.finditer(r'(?i)\b(?:corsair\w*|corsar\w*|pirat\w*|korsan\w*|πειρατ\w*|κουρσ\w*)',raw):
+            for hit in re.finditer(r'(?i)\b(?:cor[sſf]air\w*|corsar\w*|pirat\w*|korsan\w*|πειρατ\w*|κουρσ\w*)',raw):
                 a=max(start,start+hit.start()-650);b=min(end,start+hit.end()+950)
                 if spans and a<=spans[-1][1]:
                     a=spans[-1][0];spans[-1]=(a,b,text[a:b])

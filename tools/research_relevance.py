@@ -187,6 +187,9 @@ def assess(record, ident):
     regional = any(contains(context, n) for n in ident.get('region_terms', []) if n)
     history = bool(HISTORY.search(context))
     geographic = bool(GEO.search(context)) or regional
+    if focus['kind']=='topic':
+        geographic=geographic or bool(topical.get('places'))
+        history=history or bool(topical.get('topic_event_present') and topical.get('places'))
     reasons=[];score=0
     if name_match: score+=4;reasons.append('NAME_IN_SOURCE_METADATA')
     if geographic: score+=4;reasons.append('GEOGRAPHIC_CONTEXT')

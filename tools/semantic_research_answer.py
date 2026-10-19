@@ -14,6 +14,7 @@ from pathlib import Path
 import re
 import sys
 import unicodedata
+from urllib.parse import urlsplit
 
 sys.path.insert(0,str(Path(__file__).resolve().parent/'llm'))
 from llm_client import call
@@ -52,6 +53,9 @@ def collect(run_root):
                 'EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW','SURNAME_IDENTITY_UNRESOLVED','LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW'} & set(f.get('uncertainties',[])):
                 excluded.append({'finding_id':f.get('finding_id'),'reason':'UNSUITABLE_FOR_AUTOMATIC_SYNTHESIS'});continue
             raw=f.get('evidence_excerpt') or ''
+            source_host=(urlsplit(str(f.get('url') or '')).hostname or '').lower()
+            if source_host in {'catalogue.bnf.fr','www.openarchives.gr','www.searchculture.gr','pares.cultura.gob.es'} and not (f.get('locator') or {}).get('pdf_file'):
+                excluded.append({'finding_id':f.get('finding_id'),'reason':'CATALOGUE_METADATA_NOT_CONSULTED_DOCUMENT_TEXT'});continue
             # Recheck historical exports without rewriting their indexed evidence.
             from research_relevance import later_namesake_requires_review
             from research_focus import decompose
@@ -91,7 +95,8 @@ def collect(run_root):
             groups[key]=row;seen.append(row)
     # In-scope passages first, then useful unresolved context. Nothing is erased
     # from lane evidence; bounded model coverage is recorded explicitly.
-    seen.sort(key=lambda x:(not bool(x['years_in_scope']),len(x['text']),x['evidence_id']))
+    from research_topics import BASES
+    seen.sort(key=lambda x:(not bool(x['years_in_scope']),not bool(re.search(BASES,surface(x['text']).casefold())),len(x['text']),x['evidence_id']))
     return seen,excluded
 
 def model_evidence(row):

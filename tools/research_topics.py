@@ -9,7 +9,7 @@ import unicodedata
 def normalized(value):
     return ''.join(c for c in unicodedata.normalize('NFD', str(value)) if not unicodedata.combining(c)).casefold()
 
-PIRACY = r'πειρατ|κουρσαρ|pirac|pirat|corsair|corsar|korsan|zeerov|seeraub'
+PIRACY = r'πειρατ|κουρσαρ|pirac|pirat|cor[sſf]air|corsar|korsan|zeeroo?v|seeraub'
 BASES = r'ορμητηρ|αγκυροβολ|καταφυγ|harbou?r|anchorage|haven|bases|refuge|repaire|mouillage'
 REGIONS = {
     'mediterranean': {
