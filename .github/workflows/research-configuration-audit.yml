@@ -1,0 +1,58 @@
+name: Research configuration audit
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/research-configuration-audit.yml']
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            evidence/configuration
+      - name: Check configured names without revealing credentials or calling providers
+        env:
+          PCT_LLM_API_KEY: ${{ secrets.PCT_LLM_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
+          EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+          SEARCHCULTURE_API_KEY: ${{ secrets.SEARCHCULTURE_API_KEY }}
+          PCT_LLM_BASE_URL: ${{ vars.PCT_LLM_BASE_URL }}
+          PCT_LLM_MODEL: ${{ vars.PCT_LLM_MODEL }}
+          PCT_LLM_PROVIDER: ${{ vars.PCT_LLM_PROVIDER }}
+          PCT_LLM_EXTRACTOR_MODEL: ${{ vars.PCT_LLM_EXTRACTOR_MODEL }}
+          PCT_LLM_SYNTHESIS_MODEL: ${{ vars.PCT_LLM_SYNTHESIS_MODEL }}
+          PCT_LLM_ADVERSARIAL_MODEL: ${{ vars.PCT_LLM_ADVERSARIAL_MODEL }}
+        run: |
+          python3 - <<'PY'
+          import datetime,json,os,pathlib
+          secrets='PCT_LLM_API_KEY OPENAI_API_KEY OPENAI_KEY OPENROUTER_API_KEY ANTHROPIC_API_KEY GEMINI_API_KEY GOOGLE_API_KEY DEEPSEEK_API_KEY SERPAPI_API_KEY EXA_API_KEY SEARCHCULTURE_API_KEY'.split()
+          variables='PCT_LLM_BASE_URL PCT_LLM_MODEL PCT_LLM_PROVIDER PCT_LLM_EXTRACTOR_MODEL PCT_LLM_SYNTHESIS_MODEL PCT_LLM_ADVERSARIAL_MODEL'.split()
+          report={'schema':'pct-configuration-presence-v1','run_id':os.environ['GITHUB_RUN_ID'],'checked_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'secrets_present':{k:bool(os.environ.get(k,'').strip()) for k in secrets},'variables_present':{k:bool(os.environ.get(k,'').strip()) for k in variables},'scope':'Repository and organization secrets accessible to this job; environment-only secrets require their configured environment. Values never stored.'}
+          p=pathlib.Path('evidence/configuration/research-configuration.json');p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps(report,indent=2)+'\n')
+          print(json.dumps(report,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: research-configuration-presence
+          path: evidence/configuration/research-configuration.json
+      - name: Publish names and presence only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add evidence/configuration/research-configuration.json
+          git commit -m 'Record research configuration presence without credential values'
+          python3 tools/publish_research_outputs.py
