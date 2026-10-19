@@ -1,118 +1,13 @@
-name: NABOU Darwin Frozen Baseline
-
+name: NABOU baseline input gate
 on:
-  push:
-    branches:
-      - experiment/darwin-nabou
-    paths:
-      - '.github/workflows/nabou-darwin-baseline.yml'
-      - 'darwin-nabou/frozen-tasks.json'
   workflow_dispatch:
-
 permissions:
   contents: read
-  actions: write
-
-concurrency:
-  group: nabou-darwin-frozen-baseline
-  cancel-in-progress: false
-
 jobs:
-  frozen-baseline:
+  input-gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
-    env:
-      GH_TOKEN: ${{ github.token }}
-      REPO: ${{ github.repository }}
-      BRANCH: experiment/darwin-nabou
-      WORKFLOW: pct-parallel-multi-agent.yml
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: experiment/darwin-nabou
-
-      - name: Dispatch ten frozen NABOU tasks
+      - name: Require concrete baseline cases before paid research
         run: |
-          python3 - <<'PY'
-          import json, os, subprocess, time, datetime
-          from pathlib import Path
-
-          repo=os.environ["REPO"]
-          branch=os.environ["BRANCH"]
-          workflow=os.environ["WORKFLOW"]
-          tasks=json.loads(Path("darwin-nabou/frozen-tasks.json").read_text(encoding="utf-8"))
-
-          def gh_json(args):
-              out=subprocess.check_output(["gh",*args], text=True).strip()
-              return json.loads(out) if out else {}
-
-          def list_runs():
-              d=gh_json(["api","-X","GET",f"repos/{repo}/actions/workflows/{workflow}/runs",
-                         "-f",f"branch={branch}","-f","event=workflow_dispatch","-f","per_page=100"])
-              return d.get("workflow_runs",[]) or []
-
-          known={int(x.get("id",0)) for x in list_runs()}
-          runs=[]
-          for item in tasks:
-              cmd=["gh","workflow","run",workflow,"--repo",repo,"--ref",branch,
-                   "-f","target="+item["task"],
-                   "-f","aliases=",
-                   "-f","date_range=",
-                   "-f","purpose=DARWIN_BASELINE|"+item["id"]+"|"+item["type"]]
-              subprocess.run(cmd, check=True)
-              deadline=time.time()+120
-              found=None
-              while time.time()<deadline:
-                  fresh=[x for x in list_runs() if int(x.get("id",0)) not in known]
-                  if fresh:
-                      fresh.sort(key=lambda x:int(x.get("id",0)), reverse=True)
-                      found=fresh[0]; break
-                  time.sleep(2)
-              if not found:
-                  runs.append({"task_id":item["id"],"status":"DISPATCH_ID_NOT_OBSERVED"})
-                  continue
-              rid=int(found["id"]); known.add(rid)
-              runs.append({"task_id":item["id"],"type":item["type"],"run_id":rid,
-                           "url":found.get("html_url"),"status":found.get("status")})
-              print("DISPATCHED",item["id"],rid,flush=True)
-
-          deadline=time.time()+18000
-          pending={x["run_id"] for x in runs if x.get("run_id")}
-          while pending and time.time()<deadline:
-              for row in runs:
-                  rid=row.get("run_id")
-                  if not rid or rid not in pending: continue
-                  d=gh_json(["api",f"repos/{repo}/actions/runs/{rid}"])
-                  row["status"]=d.get("status")
-                  row["conclusion"]=d.get("conclusion")
-                  row["head_sha"]=d.get("head_sha")
-                  if d.get("status")=="completed":
-                      pending.remove(rid)
-                      print("COMPLETED",row["task_id"],rid,row.get("conclusion"),flush=True)
-              if pending: time.sleep(20)
-
-          for row in runs:
-              if row.get("run_id") in pending:
-                  row["status"]="WAIT_TIMEOUT"
-
-          result={
-              "schema":"nabou-darwin-baseline-v1",
-              "generated_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),
-              "branch":branch,
-              "task_count":len(tasks),
-              "completed_count":sum(x.get("status")=="completed" for x in runs),
-              "successful_count":sum(x.get("conclusion")=="success" for x in runs),
-              "failed_count":sum(x.get("conclusion")=="failure" for x in runs),
-              "runs":runs
-          }
-          out=Path("darwin-nabou/results")
-          out.mkdir(parents=True,exist_ok=True)
-          (out/"baseline-runs.json").write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-          print(json.dumps(result,ensure_ascii=False,indent=2))
-          PY
-
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: nabou-darwin-baseline
-          path: darwin-nabou/results/baseline-runs.json
+          echo "BLOCKED_INPUT: frozen baseline tasks need concrete entities, material identifiers and independently checked expected evidence. No research dispatched."
+          exit 1
