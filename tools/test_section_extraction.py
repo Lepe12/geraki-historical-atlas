@@ -80,6 +80,14 @@ class SectionExtraction(unittest.TestCase):
             self.assertEqual(json.loads((Path(tmp)/'structured_output/candidate_events.json').read_text())['events'],[])
             self.assertTrue(json.loads((Path(tmp)/'structured_output/extracted_findings.json').read_text())['findings'])
 
+    def test_modern_namesake_is_held_but_explicit_modern_scope_is_preserved(self):
+        ctx={'target':'Πέτρος Λάντζας','aliases':['Pedro Lanza'],'date_range':''}
+        source={'title':'A biography','url':'https://example.org/book'}
+        rows=self.extract('Pedro Lanza was appointed in 1925.',ctx=ctx,source=source)
+        self.assertEqual(rows[0]['decision'],'REVIEW_CONTEXT')
+        rows=self.extract('Pedro Lanza was appointed in 1925.',ctx={**ctx,'date_range':'1920-1930'},source=source)
+        self.assertEqual(rows[0]['decision'],'RETAIN_CANDIDATE')
+
     def test_surname_does_not_inherit_identity_across_unbounded_document(self):
         ctx={'target':'Pietro Lanza','aliases':[],'date_range':''}
         source={'title':'A collection','url':'https://example.org/book'}

@@ -170,7 +170,7 @@ def later_namesake_requires_review(text, focus):
         if len(words)>=2 and re.search(name_pattern(words), folded):
             return False
     years=[int(year) for year in re.findall(r'\b(1\d{3}|20\d{2})\b', str(text))]
-    return bool(years) and any(1750<=year<=1900 for year in years) and not any(year<=1700 for year in years)
+    return bool(years) and any(1750<=year<=2099 for year in years) and not any(year<=1700 for year in years)
 
 
 def assess(record, ident):
