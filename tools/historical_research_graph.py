@@ -44,19 +44,30 @@ def export_jsonld(entities,relations):
 
 
 def bundle_graph(bundle):
-    entities=[];relations=[];seen=set()
+    entities=[];relations=[];seen=set();source_nodes={}
+    def snapshot(identifier,properties):
+        return identifier+':snapshot:'+hashlib.sha256(json.dumps(properties,sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:20]
     def node(identifier,kind,label,properties):
         if identifier not in seen:
             entities.append({'id':identifier,'entity_type':kind,'label':label,'properties':properties});seen.add(identifier)
-    for source in bundle['sources']:node(source['id'],'Source',source['title'],source)
+    for source in bundle['sources']:
+        key=snapshot(source['id'],source);source_nodes[source['id']]=key
+        node(key,'Source',source['title'],source)
     for att in bundle['attestations']:
-        node(att['id'],'Attestation',att['value'],{'status':att['status'],'historically_verified':False})
+        assertion=att.get('assertion_class') or (att['predicate'] if att['predicate'] in ('SOURCE_STATEMENT','INTERPRETATION','HYPOTHESIS') else 'SOURCE_STATEMENT')
+        properties={'attestation_id':att['id'],'status':att['status'],'historically_verified':False,
+             'assertion_class':assertion,'source_classification':att.get('source_classification','UNVERIFIED'),
+             'model_review':att.get('model_review',{'decision':'NOT_DECIDED','historical_verification':False})}
+        aid=snapshot(att['id'],properties)
+        node(aid,'Attestation',att['value'],properties)
         for citation in att['citations']:
             cid='cite_'+hashlib.sha256(json.dumps(citation,sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:24]
             node(cid,'Citation',citation['locator'],citation)
-            relations.append({'id':att['id']+':'+cid,'subject_id':att['id'],'object_id':citation['source_id'],
+            target=source_nodes[citation['source_id']]
+            rid='rel_'+hashlib.sha256((aid+target+cid).encode()).hexdigest()[:32]
+            relations.append({'id':rid,'subject_id':aid,'object_id':target,'attestation_id':att['id'],
                               'predicate':'reportsInConsultedSource','citation_ids':[cid],
-                              'assertion_class':'SOURCE_STATEMENT'})
+                              'assertion_class':assertion})
     return {'entities':entities,'relations':relations,'jsonld':export_jsonld(entities,relations)}
 
 

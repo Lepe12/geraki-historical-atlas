@@ -52,6 +52,17 @@ class ContextTests(unittest.TestCase):
         graph=bundle_graph(bundle);self.assertEqual(len(graph['relations']),1)
         self.assertTrue(graph['jsonld']['@graph'])
         self.assertFalse(bundle['attestations'][0]['historically_verified'])
+        answer['claims'][0]['kind']='hypothesis'
+        answer['review']={'flagged_claims':[{'claim_id':'c','reason':'Not established'}]}
+        bundle=build(answer);graph=bundle_graph(bundle)
+        self.assertEqual(graph['relations'][0]['assertion_class'],'HYPOTHESIS')
+        att=next(e for e in graph['entities'] if e['entity_type']=='Attestation')
+        self.assertEqual(att['properties']['model_review']['decision'],'FLAGGED')
+        self.assertEqual(att['properties']['status'],'UNREVIEWED')
+        before=att['id']
+        answer['review']={'supported_claim_ids':['c']}
+        new_graph=bundle_graph(build(answer))
+        self.assertNotEqual(before,next(e['id'] for e in new_graph['entities'] if e['entity_type']=='Attestation'))
 
 
 if __name__=='__main__':unittest.main()
