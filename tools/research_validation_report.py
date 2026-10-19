@@ -7,9 +7,10 @@ from pathlib import Path
 def read(path):
     return json.loads(path.read_text()) if path.is_file() else {}
 
-def build(root,validation_root=Path('evidence/engine_validation')):
-    answer=read(root/'research_answer/answer.json')
-    geographic=read(root/'research_answer/geographic_findings.json')
+def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=None):
+    analysis_root=analysis_root or root
+    answer=read(analysis_root/'research_answer/answer.json')
+    geographic=read(analysis_root/'research_answer/geographic_findings.json')
     acquisitions=[];attempts=[];raw_candidates=[];queries=[]
     for lane in root.iterdir():
         if not lane.is_dir():continue

@@ -13,17 +13,28 @@ REVISION='7dabda4d13d513e3e842b20f0d435c732f172cbe'
 def prepare(destination):
     from huggingface_hub import HfApi,hf_hub_download
     api=HfApi()
-    info=api.model_info(REPOSITORY,revision=os.getenv('PCT_LOCAL_MODEL_REVISION',REVISION),files_metadata=True)
-    sibling=next(s for s in info.siblings if s.rfilename==FILENAME)
-    expected=sibling.lfs.sha256 if sibling.lfs else None
-    if not expected:raise ValueError('MODEL_LFS_CHECKSUM_REQUIRED')
+    repository=os.getenv('PCT_LOCAL_MODEL_REPOSITORY',REPOSITORY)
+    if repository not in (REPOSITORY,'Qwen/Qwen2.5-7B-Instruct-GGUF'):
+        raise ValueError('UNAPPROVED_LOCAL_MODEL_REPOSITORY')
+    revision=os.getenv('PCT_LOCAL_MODEL_REVISION') or (REVISION if repository==REPOSITORY else 'main')
+    info=api.model_info(repository,revision=revision,files_metadata=True)
+    filename='qwen2.5-3b-instruct-q4_k_m.gguf' if repository==REPOSITORY else 'qwen2.5-7b-instruct-q4_k_m.gguf'
+    siblings=sorted([s for s in info.siblings if s.rfilename==filename or
+                     (s.rfilename.startswith(filename[:-5]+'-000') and s.rfilename.endswith('.gguf'))],key=lambda s:s.rfilename)
+    if not siblings:raise ValueError('MODEL_QUANTIZATION_NOT_FOUND')
     destination=Path(destination);destination.mkdir(parents=True,exist_ok=True)
-    path=Path(hf_hub_download(REPOSITORY,FILENAME,revision=info.sha,local_dir=destination))
-    with path.open('rb') as stream:actual=hashlib.file_digest(stream,'sha256').hexdigest()
-    if actual!=expected:raise ValueError('MODEL_CHECKSUM_MISMATCH')
-    manifest={'repository':REPOSITORY,'revision':info.sha,'filename':FILENAME,'sha256':actual,
-              'lfs_sha256':expected,'provider':'local_llama_cpp','external_api_key_required':False,
-              'model_url':f'https://huggingface.co/{REPOSITORY}/blob/{info.sha}/{FILENAME}'}
+    files=[]
+    for sibling in siblings:
+        expected=sibling.lfs.sha256 if sibling.lfs else None
+        if not expected:raise ValueError('MODEL_LFS_CHECKSUM_REQUIRED')
+        path=Path(hf_hub_download(repository,sibling.rfilename,revision=info.sha,local_dir=destination))
+        with path.open('rb') as stream:actual=hashlib.file_digest(stream,'sha256').hexdigest()
+        if actual!=expected:raise ValueError('MODEL_CHECKSUM_MISMATCH')
+        files.append({'filename':path.name,'sha256':actual,'lfs_sha256':expected})
+    path=destination/files[0]['filename']
+    manifest={'repository':repository,'revision':info.sha,'filename':path.name,'sha256':files[0]['sha256'],
+              'files':files,'provider':'local_llama_cpp','external_api_key_required':False,
+              'model_url':f'https://huggingface.co/{repository}/tree/{info.sha}'}
     path.with_suffix('.manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     for output in [os.getenv('GITHUB_ENV')]:
         if output:

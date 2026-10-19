@@ -31,6 +31,17 @@ def item(eid,**changes):
             'kind':'source_statement','actors':[],'places':[],'dates':['1677'],'uncertainty':[],**changes}
 
 class SemanticAnswer(unittest.TestCase):
+    def test_passage_selection_copies_original_without_generated_quote(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp);rows,_=collect(tmp);eid=rows[0]['evidence_id']
+            value=item(eid,passage_ids=[0]);value.pop('quote')
+            accepted,rejected=validate_items({'items':[value]},rows)
+            self.assertFalse(rejected)
+            self.assertEqual(accepted[0]['quote'],'In 1677 the ships attacked the island.')
+            for ids in ([99],[-1],[True],[1,0],[0,0]):
+                self.assertFalse(validate_items({'items':[{**value,'passage_ids':ids}]},rows)[0])
+            self.assertFalse(validate_items({'items':[{**value,'quote':'Invented quote'}]},rows)[0])
+
     def test_missing_configuration_never_calls_model_or_claims_completion(self):
         with tempfile.TemporaryDirectory() as tmp,patch.dict(os.environ,{},clear=True):
             fixture(tmp)
