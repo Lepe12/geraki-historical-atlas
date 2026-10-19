@@ -1,0 +1,41 @@
+{
+  "schema": "nabou-production-evidence-smoke-v2",
+  "run_id": "39299736560",
+  "source_revision": "c80ceadd6e11d1b2ea925ce7eee258f55fd8b153",
+  "base_url": "https://pct-live.piratecartography.com/pct-api/live",
+  "checks": [
+    {
+      "method": "GET",
+      "endpoint": "/knowledge/evidence?source_id=src-fake",
+      "expected_http": 401,
+      "http_status": 404,
+      "response_sha256": "d2dfdc9511fbeaa0701d1f8730f4989313b062ca1b61a2bd8bed8f4f5d654b5d",
+      "passed": false
+    },
+    {
+      "method": "POST",
+      "endpoint": "/knowledge/upload",
+      "expected_http": 401,
+      "http_status": 415,
+      "response_sha256": "54dd95bc0f320919be804507ecc9e76075364eed648e09a23e70e1c53c9305f2",
+      "passed": false
+    },
+    {
+      "method": "POST",
+      "endpoint": "/knowledge/review",
+      "expected_http": 401,
+      "http_status": 400,
+      "response_sha256": "f668684b9a98ac842fc2c5763bbb33c21bf3d1ef4f512d8bff7e6d24976cc7b3",
+      "passed": false
+    },
+    {
+      "method": "POST",
+      "endpoint": "/knowledge/agent-search",
+      "expected_http": 200,
+      "passed": false,
+      "http_status": 404,
+      "response_sha256": "d2dfdc9511fbeaa0701d1f8730f4989313b062ca1b61a2bd8bed8f4f5d654b5d"
+    }
+  ],
+  "status": "BLOCKED_PRODUCTION_ACCEPTANCE"
+}
