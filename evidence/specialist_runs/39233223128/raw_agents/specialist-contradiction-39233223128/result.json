@@ -1,0 +1,1000 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "contradiction",
+  "label": "Contradiction / Adversarial Agent",
+  "assignment_id": "contradiction:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "contradicting_evidence",
+    "alternative_explanations",
+    "uncertainties",
+    "falsification_leads"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "65f735fad40cd7d30e871c1a4c1dbbd279ad3b73f31f92bba086ee0d62cdcdbf",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "contradiction",
+    "assignment_id": "contradiction:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:Gallica/BnF",
+      "repo:The National Archives Public Content",
+      "repo:Academia.edu Public Research",
+      "repo:PARES / Archivo General de Simancas"
+    ],
+    "queries": [
+      "\"Pedro Lanza\"",
+      "\"Πέτρος Λάντζας\"",
+      "\"petros lantzas\"",
+      "\"Pietro Lantza\"",
+      "\"Peter Lantza\""
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 108,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:PARES / Archivo General de Simancas",
+        "route_type": "repository_dispatch",
+        "repository": "PARES / Archivo General de Simancas",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:İSAM Kütüphanesi",
+        "route_type": "repository_dispatch",
+        "repository": "İSAM Kütüphanesi",
+        "connector_id": null,
+        "score": 90,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Archives diplomatiques France",
+        "route_type": "repository_dispatch",
+        "repository": "Archives diplomatiques France",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Crossref Scholarly Metadata",
+        "route_type": "repository_dispatch",
+        "repository": "Crossref Scholarly Metadata",
+        "connector_id": null,
+        "score": 86,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Peter Lantza\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Peter+Lantza+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"petros lantzas\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+petros+lantzas+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pietro Lantza\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pietro+Lantza+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pedro Lanza\"",
+      "records": [
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb352909807",
+          "title": "Obras de Lope de Vega. XX-XXI, Crónicas y leyendas dramáticas de España. Tercera sección / ed. y estudio preliminar de D. Marcelino Menéndez Pelayo",
+          "creator": [
+            "Vega, Lope de (1562-1635). Auteur du texte"
+          ],
+          "date": [
+            "1967-1968"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb352909807",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb352909807"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb32427021d",
+          "title": "Letras españolas : Silverio Lanza, Azorín, Baroja, Marquina, Alberto Insúa, Guanyabéns, Unamuno, Vicente Médina, Pedro Corominas, Ciges Aparicio, Répide, Villaespesa, Juan R. Jiménez, Diez-Canedo / Juan Mas y Pi",
+          "creator": [
+            "Mas y Pi, Juan. Auteur du texte"
+          ],
+          "date": [
+            "1911"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb32427021d",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb32427021d"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb390766303",
+          "title": "El Peru de Mario Vargas Llosa : Homenaje al Premio Cervantes 1994 : Exposicion, Alcalá de Henares, Universidad, 24 de abril-24 de mayo 1995 / catalogo Jesus Canete Ochoa, Fernando Fernandez Lanza ; comisario Luis de Toledo",
+          "creator": [],
+          "date": [
+            "1995"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb390766303",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb390766303"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+          "title": "Peter of Auvergne : university master of the 13th century / edited by Christoph Flüeler, Lidia Lanza, Marco Toste",
+          "creator": [],
+          "date": [
+            "2015"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+            "ISBN 3110228483"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb46741746t",
+          "title": "Scriptum super III-VIII libros Politicorum Aristotelis : edizione, introduzione e note / Petrus de Alvernia ; a cura di Lidia Lanza",
+          "creator": [
+            "Pierre d'Auvergne (124.?-1304). Auteur du texte"
+          ],
+          "date": [
+            "2021"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb46741746t",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb46741746t",
+            "ISBN 9783954902781"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb487166572",
+          "title": "Coplas del Querer (Edición 15ºAniversario / Remasterizado 2025) : Edición 15ºAniversario / Remasterizado 2025 / Miguel Poveda",
+          "creator": [
+            "Poveda, Miguel (1973-....). Interprète",
+            "Poveda, Miguel (1973-....). Chant",
+            "Quiroga. Compositeur",
+            "Amargós, Joan Albert (1950-....). Producteur artistique. Arrangeur"
+          ],
+          "date": [
+            "2025"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb487166572",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb487166572"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb31552456m",
+          "title": "Obras de Lope de Vega, publicadas por la Real academia española. [Tomo VII-XV]",
+          "creator": [
+            "Vega, Lope de (1562-1635). Auteur du texte"
+          ],
+          "date": [
+            "1890-1913"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb31552456m",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb31552456m"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb383031229",
+          "title": "El barberillo de Lavapiés / Francisco Asenjo Barbieri, comp. ; María Bayo, S (Marquesita) ; Lola Casariego, MS (Paloma) ; Manuel Lanza, BAR (Lamparilla)... [et al.] ; Coros Polifonico Universitario, La Laguna ; Orquesta Sinfonica de Tenerife ; Victor Pablo Perez, dir.",
+          "creator": [
+            "Barbieri, Francisco Asenjo (1823-1894). Compositeur",
+            "Lanza, Manuel. Baryton (voix)",
+            "Casariego, Lola. Mezzo-soprano",
+            "Bayo, María (1964-....). Soprano"
+          ],
+          "date": [
+            "1995"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb383031229",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb383031229"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb476330809",
+          "title": "Las Voces De Rosario / Rosario",
+          "creator": [
+            "RosarioRosario (1963-....). Interprète",
+            "Rosario (1963-....). Interprète. Chant",
+            "Rosario (1963-....). Interprète. Chant. Voix parlée",
+            "Rosario (1963-....). Interprète"
+          ],
+          "date": [
+            "2024"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb476330809",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb476330809"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb44704268c",
+          "title": "Applications of evolutionary computation : EvoApplications 2012: EvoCOMNET, EvoCOMPLEX, EvoFIN, EvoGAMES, EvoHOT, EvoIASP, EvoNUM, EvoPAR, EvoRISK, EvoSTIM, and EvoSTOC, Málaga, Spain, April 11-13, 2012, Proceedings / Cecilia Di Chio [and others] (eds.)",
+          "creator": [
+            "EvoApplications 2012 (2012 ; Málaga, Spain). Auteur du texte"
+          ],
+          "date": [
+            "2012"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb44704268c",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb44704268c",
+            "ISBN 9783642291784"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb476243418",
+          "title": "Bajando las revoluciones",
+          "creator": [
+            "Tomatito. Interprète. Guitare",
+            "de Lucía, Paco. Interprète. Guitare. Luth. Luths (musique ethnique). Mandoline. Instrumentiste. Chant",
+            "Riqueni, Rafael. Interprète. Guitare",
+            "Márquez, Rocío. Interprète. Voix parlée"
+          ],
+          "date": [
+            "2024"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb476243418",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb476243418"
+          ]
+        }
+      ],
+      "diagnostic": "https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pedro+Lanza+%22&recordSchema=dublincore&maximumRecords=20",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Pedro Lanza\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Pedro Lanza\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Pedro Lanza\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Πέτρος Λάντζας\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Πέτρος Λάντζας\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"petros lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"petros lantzas\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"petros lantzas\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Pietro Lantza\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Pietro Lantza\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Pietro Lantza\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Peter Lantza\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Peter Lantza\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"pct-web-search-coverage-v1\", \"query\": \"site:academia.edu \\\"Peter Lantza\\\"\", \"providers\": [{\"provider\": \"google\", \"status\": \"REMOTE_RATE_LIMITED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_429\"}, {\"provider\": \"exa\", \"status\": \"FAILED\", \"request_performed\": true, \"pagination\": \"NOT_EXECUTED\", \"returned_records\": 0, \"code\": \"HTTP_402\"}], \"coverage\": \"BOUNDED_TOP_RESULTS_ONLY\", \"unique_records\": 0, \"truncated_records\": 0, \"source_independence\": \"PROVIDER_AGREEMENT_IS_NOT_SOURCE_CORROBORATION\"}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pedro Lanza\"",
+      "records": [
+        {
+          "discovery_repository": "PARES / Archivo General de Simancas",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "4618276",
+          "title": "PARES | Archivos Españoles",
+          "url": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/description/4618276",
+          "archive": "Archivo General de Simancas",
+          "archival_reference": null,
+          "shelfmark": null,
+          "date": [],
+          "digital_url": null,
+          "evidence_level": "CATALOGUE_METADATA_ONLY"
+        }
+      ],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Pedro+Lanza%22 ; confirmed Simancas descriptions only",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22 ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22 ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "\"petros lantzas\"",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22petros+lantzas%22 ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22petros+lantzas%22 ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "\"Pietro Lantza\"",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Pietro+Lantza%22 ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Pietro+Lantza%22 ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "ARCHIVE_NOT_CONFIRMED",
+      "query": "\"Peter Lantza\"",
+      "records": [],
+      "diagnostic": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Peter+Lantza%22 ; 0 catalogue links, none confirmed as Archivo General de Simancas",
+      "blockers": [
+        {
+          "code": "ARCHIVE_NOT_CONFIRMED",
+          "detail": "https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Peter+Lantza%22 ; 0 catalogue links, none confirmed as Archivo General de Simancas"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Peter Lantza\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "research guide",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Peter+Lantza%22 ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pedro Lanza\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Pedro+Lanza%22 ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pietro Lantza\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "research guide",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22Pietro+Lantza%22 ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"petros lantzas\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22petros+lantzas%22 ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "research guide",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:contradiction",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "https://www.nationalarchives.gov.uk/search/results/?_q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22 ; bounded public-content hub crawl",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "contradiction",
+      "assignment_id": "contradiction:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "result_count": 32,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
