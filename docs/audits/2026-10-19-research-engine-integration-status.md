@@ -31,7 +31,7 @@ uses standalone pinned language models. Tesseract could exit successfully with
 plain text, which the TSV parser interpreted as no words. Explicit TSV output
 configuration fixes that observed failure. An actual image-only PDF now returns
 three words, pixel boxes and an OCR confidence of approximately 96.3 in the test.
-This English fixture does not measure Greek OCR accuracy. Handwriting recognition
+This English fixture does not measure Greek OCR accuracy. A separate generated Greek-capital image fixture misread the toponym ΜΗΛΟΣ as MHAO%; its actual output and controlled character error rate are retained in `controlled-greek-ocr.json`. This identifies a remaining OCR-quality limitation and is not an accuracy estimate for historical documents. Handwriting recognition
 remains unsupported; no HTR model was installed or evaluated.
 
 ## Semantic extraction and review

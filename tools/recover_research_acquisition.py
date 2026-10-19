@@ -46,13 +46,14 @@ def recover(run_id):
                  'source_revision':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
                  'original_lane_outputs_modified':False}
         (dest/'recovery_receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
-        for script in ('acquire_library_candidate.py','event_first_search.py','run_manifest.py'):
+        for script in ('acquire_library_candidate.py','event_first_search.py','verification_pipeline.py','run_manifest.py'):
             result=subprocess.run(['python3',str(tools/script)],cwd=work,env=env,capture_output=True,text=True)
             log=dest/'phase_logs';log.mkdir(exist_ok=True)
             (log/(script+'.stdout.txt')).write_text(result.stdout)
             (log/(script+'.stderr.txt')).write_text(result.stderr)
             phases.append({'script':script,'exit_code':result.returncode})
-            for folder in ('library_acquisition','structured_output','research_dossier','event_first_hits','run_manifest'):
+            for folder in ('library_acquisition','structured_output','research_dossier','event_first_hits','run_manifest',
+                           'original_inspection','source_genealogy','corroboration','claim_evidence_matrix','verification','qa'):
                 if (work/folder).exists():shutil.copytree(work/folder,dest/folder,dirs_exist_ok=True)
             receipt['status']='PHASE_FAILED' if result.returncode else 'RUNNING'
             (dest/'recovery_receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
