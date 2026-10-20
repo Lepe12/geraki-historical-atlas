@@ -1,0 +1,120 @@
+{
+  "schema": "nabou-production-evidence-smoke-v2",
+  "run_id": "39478111619",
+  "checked_utc": "2026-10-20T18:49:37.345393+00:00",
+  "source_revision": "5e95f7b1136a0ee50dee4fcda1ca4c648c793132",
+  "base_url": "https://pct-live.piratecartography.com/pct-api/live",
+  "checks": [
+    {
+      "method": "GET",
+      "endpoint": "/knowledge/evidence?source_id=src-fake",
+      "expected_http": 401,
+      "http_status": 401,
+      "response_sha256": "4a460407990b63fa217d0ad0ec0f58fe48975b6459455237c9f1744b97f19d27",
+      "passed": true
+    },
+    {
+      "method": "POST",
+      "endpoint": "/knowledge/upload",
+      "expected_http": 401,
+      "http_status": 401,
+      "response_sha256": "4a460407990b63fa217d0ad0ec0f58fe48975b6459455237c9f1744b97f19d27",
+      "passed": true
+    },
+    {
+      "method": "POST",
+      "endpoint": "/knowledge/review",
+      "expected_http": 401,
+      "http_status": 401,
+      "response_sha256": "4a460407990b63fa217d0ad0ec0f58fe48975b6459455237c9f1744b97f19d27",
+      "passed": true
+    },
+    {
+      "method": "POST",
+      "endpoint": "/knowledge/agent-search",
+      "expected_http": 200,
+      "passed": true,
+      "http_status": 200,
+      "response_sha256": "f607afcf27ed116940363b16cc13335b66a9961db5df09abad2197f07a3bf7cf"
+    }
+  ],
+  "public_route_observations": [
+    {
+      "origin": "https://pct-live.piratecartography.com",
+      "endpoint": "/health",
+      "http_status": 200,
+      "response_sha256": "3234d6d49487ee52f5699109fbe2f289df38a3631f0ca80943e0a2298fb1ee5c",
+      "response_schema": null,
+      "reported_health_status": "PASS",
+      "reported_backend_revision": "no-session-dispatch-v1",
+      "credentials_sent": false,
+      "method": "GET"
+    },
+    {
+      "origin": "https://pct-live.piratecartography.com",
+      "endpoint": "/knowledge/evidence?source_id=src-fake",
+      "http_status": 401,
+      "response_sha256": "4a460407990b63fa217d0ad0ec0f58fe48975b6459455237c9f1744b97f19d27",
+      "response_schema": null,
+      "reported_health_status": null,
+      "reported_backend_revision": null,
+      "credentials_sent": false,
+      "method": "GET"
+    },
+    {
+      "origin": "https://www.piratecartography.com",
+      "endpoint": "/health",
+      "http_status": 200,
+      "response_sha256": "3234d6d49487ee52f5699109fbe2f289df38a3631f0ca80943e0a2298fb1ee5c",
+      "response_schema": null,
+      "reported_health_status": "PASS",
+      "reported_backend_revision": "no-session-dispatch-v1",
+      "credentials_sent": false,
+      "method": "GET"
+    },
+    {
+      "origin": "https://www.piratecartography.com",
+      "endpoint": "/knowledge/evidence?source_id=src-fake",
+      "http_status": 401,
+      "response_sha256": "4a460407990b63fa217d0ad0ec0f58fe48975b6459455237c9f1744b97f19d27",
+      "response_schema": null,
+      "reported_health_status": null,
+      "reported_backend_revision": null,
+      "credentials_sent": false,
+      "method": "GET"
+    },
+    {
+      "origin": "https://piratecartography.com",
+      "endpoint": "/health",
+      "http_status": 200,
+      "response_sha256": "3234d6d49487ee52f5699109fbe2f289df38a3631f0ca80943e0a2298fb1ee5c",
+      "response_schema": null,
+      "reported_health_status": "PASS",
+      "reported_backend_revision": "no-session-dispatch-v1",
+      "credentials_sent": false,
+      "method": "GET"
+    },
+    {
+      "origin": "https://piratecartography.com",
+      "endpoint": "/knowledge/evidence?source_id=src-fake",
+      "http_status": 401,
+      "response_sha256": "4a460407990b63fa217d0ad0ec0f58fe48975b6459455237c9f1744b97f19d27",
+      "response_schema": null,
+      "reported_health_status": null,
+      "reported_backend_revision": null,
+      "credentials_sent": false,
+      "method": "GET"
+    }
+  ],
+  "oidc_event_auth_negative_control": {
+    "http_status": 400,
+    "response_sha256": "e8b3f11af8b1ae8f0ba13ef3936cd73071d458a4cc109fd601a2597d9c5cd251",
+    "backend_error_code": "invalid_event",
+    "expected_http": 400,
+    "expected_error": "invalid_event",
+    "passed": true,
+    "event_schema_deliberately_invalid": true,
+    "research_event_creation_requested": false
+  },
+  "status": "PASS"
+}
