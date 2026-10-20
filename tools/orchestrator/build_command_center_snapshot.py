@@ -182,6 +182,7 @@ def build(repo:Path,run_id:str):
     claims=[c for c in claims if c.get('candidate_id') not in held_ids]
     answers=[{'lane':lane,**answer} for lane in LANE_LABELS if (answer:=read(run_root/lane/'research_dossier/answer.json',{}))]
     semantic_answer=read(run_root/'research_answer/answer.json',{})
+    research_validation=read(run_root/'research_answer/validation_report.json',{})
     discoveries,coverage=discovery_results(run_root,request)
     request_id=request_id_for(run_root)
     try:from .jarvis_state_board import lane_state
@@ -238,6 +239,9 @@ def build(repo:Path,run_id:str):
         mission_status=answer_status
     elif answer_status=='SOURCE_DOSSIER_AVAILABLE':
         mission_status='PARTIAL'
+    elif execution_status!='FAILED' and (research_validation.get('status')=='INCOMPLETE' or
+          (semantic_answer and answer_status not in ('NOT_EVALUATED','MODEL_ANSWER_PENDING_HUMAN_REVIEW'))):
+        mission_status='PARTIAL'
     elif execution_status=='COMPLETED' and not claims:
         mission_status='INSUFFICIENT_EVIDENCE'
 
@@ -289,6 +293,8 @@ def build(repo:Path,run_id:str):
         "status":mission_status,
         "execution_status":execution_status,
         "answer_status":answer_status,
+        "research_validation_status":research_validation.get('status','NOT_EVALUATED'),
+        "research_validation_blockers":research_validation.get('blockers',[]),
         "selected_lanes":int(summary.get("selected_lanes",len([a for a in agents if a["kind"]=="research_lane"])) or 0)
       },
       "metrics":{

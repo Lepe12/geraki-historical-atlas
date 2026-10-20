@@ -63,6 +63,24 @@ def main():
         assert len(out['contradictions']['records'])==1
         assert len(out['contradictions']['records'][0]['claims'])==2
         assert out['contradictions']['records'][0]['verified'] is False
+        # Completed lane jobs and retained raw claims cannot mask failed
+        # synthesis or a failed research acceptance report.
+        (base/'travellers/structured_output/candidate_events.json').write_text(json.dumps({'events':[{'candidate_id':'retained','title':'Raw retained lead','verified':False}]}))
+        (base/'research_answer/answer.json').write_text(json.dumps({'status':'FINAL_ANSWER_REVIEW_FAILED','claims':[{'claim_id':'a'}]}))
+        (base/'research_answer/validation_report.json').write_text(json.dumps({'status':'INCOMPLETE','blockers':['CITED_MODEL_ANSWER_INCOMPLETE']}))
+        board=json.loads((base/'JARVIS_STATE_BOARD.json').read_text());board['lanes'][0]['execution_status']='COMPLETED'
+        (base/'JARVIS_STATE_BOARD.json').write_text(json.dumps(board))
+        out=build(r,run)
+        assert out['mission']['execution_status']=='COMPLETED'
+        assert out['mission']['status']=='PARTIAL'
+        assert out['mission']['research_validation_status']=='INCOMPLETE'
+        assert out['mission']['research_validation_blockers']==['CITED_MODEL_ANSWER_INCOMPLETE']
+        assert out['metrics']['candidate_claims']==1
+        (base/'research_answer/answer.json').write_text(json.dumps({'status':'MODEL_ANSWER_PENDING_HUMAN_REVIEW','claims':[{'claim_id':'a'}]}))
+        (base/'research_answer/validation_report.json').write_text(json.dumps({'status':'PROVISIONAL_RESEARCH_PIPELINE_PASSED','blockers':[]}))
+        assert build(r,run)['mission']['status']=='COMPLETED'
+        (base/'research_answer/validation_report.json').write_text(json.dumps({'status':'INCOMPLETE','blockers':['NO_SUPPORTED_PLACE_FINDINGS']}))
+        assert build(r,run)['mission']['status']=='PARTIAL'
         latest=r/"latest.json";latest.write_text('{"run_id":"200"}')
         assert not publish_latest(latest,{"run_id":"123"},'{"run_id":"123"}')
         assert json.loads(latest.read_text())["run_id"]=="200"
