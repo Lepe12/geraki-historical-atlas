@@ -16,6 +16,42 @@ python3 tools/historical_map_source_probe.py --out /tmp/loc-portolan-iiif.json
 The report distinguishes confirmed IIIF metadata from HTTP/network blocks.
 The candidate LoC URL may be stale or blocked; never invent scans or locations.
 
+## Actual unreferenced source image OCR: Aegean Sea, 1662
+
+The **real** Aegean and Dardanelles portolan drawn by François Ollive
+(1662) is available as Public Domain Mark 1.0 at
+https://commons.wikimedia.org/wiki/File:1662_Portolan_chart_of_the_Aegean_Sea_and_the_Dardanelles_by_Fran%C3%A7ois_Ollive.jpg
+and originally from Gallica BnF `btv1b59010993`.
+
+The `real-1662-portolan-ocr` GitHub Actions job downloads the authentic
+Wikimedia Commons original, runs French Tesseract OCR and stores a ZIP artifact
+containing:
+- Original image, for comparing text locations visually.
+- Unlocated OCR JSON with raster SHA-256, candidate words, pixel bounding
+  boxes, OCR confidence and explicit `geolocation:null`.
+- A machine-readable acquisition/execution status report.
+
+**Observed 2026-10-20:** GitHub Actions run 39384731803 really downloaded
+the original and produced **527 raw unreviewed OCR snippets**. Manual quality
+review found many fragments or gibberish, so these are NOT 527 place names.
+A conservative review filter leaves far fewer legible word candidates.
+Do not populate the gazetteer, WHG or map markers from these unreviewed words.
+
+To run locally after legally downloading that image:
+```sh
+python3 tools/historical_map_raw_ocr.py \
+ --image /secure/sources/ollive-1662.jpg \
+ --out /secure/review/ollive-1662-unlocated.json \
+ --source-id commons:1662-ollive-aegean-dardanelles \
+ --source-url 'https://commons.wikimedia.org/wiki/File:1662_Portolan_chart_of_the_Aegean_Sea_and_the_Dardanelles_by_Fran%C3%A7ois_Ollive.jpg' \
+ --title 'François Ollive Aegean and Dardanelles portolan, 1662' \
+ --rights 'Public Domain Mark 1.0 (Wikimedia Commons; original Gallica BnF)' \
+ --year 1662 --language fra
+```
+Import the resulting JSON with **OCR πρωτότυπης εικόνας** in the Map Lab.
+No map point is plotted. Full source georeferencing and specialist OCR remain
+separate research tasks.
+
 ## Real offline, no-fee OCR fallback: Tesseract
 
 This is a **real** OCR executable applied to GeoTIFF pixels, not the
