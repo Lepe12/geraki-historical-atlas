@@ -27,6 +27,17 @@ def main():
     report={'schema':'nabou-production-evidence-smoke-v2','run_id':os.environ['GITHUB_RUN_ID'],
             'checked_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
             'source_revision':os.environ['GITHUB_SHA'],'base_url':base,'checks':[]}
+    # The repository also contains an older www production gate. Observe both
+    # public routes without credentials before attributing404 to deployment.
+    # An alias returning a web page is not proof of a working research API.
+    report['public_route_observations']=[]
+    for origin in ('https://pct-live.piratecartography.com',
+                   'https://www.piratecartography.com','https://piratecartography.com'):
+        for endpoint in ('/health','/knowledge/evidence?source_id=src-fake'):
+            result,data=request(origin+'/pct-api/live'+endpoint)
+            report['public_route_observations'].append({'origin':origin,'endpoint':endpoint,
+                **result,'response_schema':data.get('schema') if isinstance(data,dict) else None,
+                'credentials_sent':False,'method':'GET'})
     for method,endpoint in [('GET','/knowledge/evidence?source_id=src-fake'),
                             ('POST','/knowledge/upload'),('POST','/knowledge/review')]:
         result,_=request(base+endpoint,method,b'{}' if method=='POST' else None,{'Content-Type':'application/json'})
