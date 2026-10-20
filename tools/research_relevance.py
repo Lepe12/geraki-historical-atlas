@@ -159,6 +159,26 @@ def evidence_class(record, topical):
             'basis':'CONTENT_ASSESSMENT_REQUIRED'}
 
 
+def contextual_years(text):
+    """Possible years, excluding explicit addresses, identifiers and page numbers.
+
+    This is a lexical guard, never a claim that a surviving number dates an event.
+    The acquired quotation and its offsets must remain unchanged.
+    """
+    value = fold(str(text))
+    years = []
+    for match in re.finditer(r'(?<![\w.])(1\d{3}|20\d{2})(?!\w)', value):
+        prefix = value[max(0, match.start()-160):match.start()]
+        if re.search(r'(?:\bdomicili\w*|\baddress|\bοδ[οω]\w*|\bstreet|\bstrasse|\brue|\bvia)\b[^.;\n]{0,120}$', prefix.replace('\n', ' ')):
+            continue
+        if re.search(r'(?:\bpp?\.|\bpages?\s+|\bσελ\.|\bσσ?\.|\bfol(?:io)?\.?\s+|\blegajo\s+|\bexpediente\s+|\bregistro\s+|\bno\.?\s+|\bn[º°]\s*)\s*$', prefix):
+            continue
+        if re.search(r'(?:\bpublished|\bpublication|\bεκδοση|\bedition)\s*(?:in\s+|:)?\s*$', prefix):
+            continue
+        years.append(int(match.group(1)))
+    return sorted(set(years))
+
+
 def later_namesake_requires_review(text, focus):
     """A later Latin namesake is not the supplied Greek person without review."""
     greek=[name for name in focus.get('names',[]) if re.search(r'[α-ω]', fold(name))]
@@ -169,7 +189,12 @@ def later_namesake_requires_review(text, focus):
         words=name.split()
         if len(words)>=2 and re.search(name_pattern(words), folded):
             return False
-    years=[int(year) for year in re.findall(r'\b(1\d{3}|20\d{2})\b', str(text))]
+    years=contextual_years(text)
+    # An OCR error such as 1370 beside an explicitly modern corporate record
+    # cannot establish a Renaissance identity. Keep the record for review.
+    corporate=bool(re.search(r'\b(?:sociedad\s+anonima|accionistas|dividendos|shareholders|ανωνυμη\s+εταιρεια)\b', folded))
+    if corporate and any(1900<=year<=2099 for year in years):
+        return True
     return bool(years) and any(1750<=year<=2099 for year in years) and not any(year<=1700 for year in years)
 
 
@@ -305,3 +330,4 @@ def discovery_queries(ident, recovery=False):
 def request_digest(req, ctx):
     payload={**ctx,'target_context':req.get('target_context',{})}
     return hashlib.sha256(json.dumps(payload,ensure_ascii=False,sort_keys=True).encode()).hexdigest()
+

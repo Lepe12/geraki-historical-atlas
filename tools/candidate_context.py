@@ -54,10 +54,12 @@ def assess(text, terms, lo=0, hi=9999, target_kind="place"):
             elif target_kind!="person" and not GEOGRAPHY.search(local):
                 reason = 'NAME_IDENTITY_UNRESOLVED'
             elif events:
+                from research_relevance import contextual_years
+                possible_years=contextual_years(context)
                 for year in re.finditer(r'\b(1[0-9]{3}|20[0-9]{2})\b', context):
                     value = int(year.group(0))
                     around = context[max(0,year.start()-40):year.end()+20]
-                    if lo <= value <= hi and not ROLE.search(around) and any(abs(year.start()-event.start())<=180 for event in events):
+                    if value in possible_years and lo <= value <= hi and not ROLE.search(around) and any(abs(year.start()-event.start())<=180 for event in events):
                         years.append(value)
                 decision, reason = ('RETAIN_CANDIDATE', 'LOCAL_PLACE_ACTION_YEAR') if years else ('REVIEW_CONTEXT', 'EVENT_DATE_UNRESOLVED')
             output.append({'place_match':place.group(0), 'line':text.count('\n',0,place.start())+1,
@@ -101,3 +103,4 @@ def review_preserved(candidate, target, aliases, lo, hi):
     return {'decision':'RETAIN_CANDIDATE' if retained else 'REVIEW_OR_EXCLUDE_FROM_EVENT_QUEUE',
             'reason':'LOCAL_CONTEXT_PRESENT' if retained else 'NO_SUPPORTED_LOCAL_PLACE_ACTION_YEAR',
             'policy':POLICY, 'verified':False}
+

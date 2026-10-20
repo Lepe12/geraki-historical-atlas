@@ -12,7 +12,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 from candidate_context import variants, STRONG, ACTION
 from research_focus import decompose, fold, name_pattern, extended_name_after
-from research_relevance import later_namesake_requires_review
+from research_relevance import contextual_years, later_namesake_requires_review
 
 YEAR = re.compile(r'(?<!\d)(1\d{3}|20\d{2})(?!\d)')
 # Historical predicates beyond piracy: administrative and diplomatic actions
@@ -105,7 +105,7 @@ def extract_document(text, source, file, ctx):
         predicates=sorted(set(PREDICATE.findall(fold(body))))
         predicates+=sorted(set(m.group(0) for m in STRONG.finditer(body)))
         predicates+=sorted(set(m.group(0) for m in ACTION.finditer(body)))
-        dates=sorted(set(int(y) for y in YEAR.findall(body)))
+        dates=contextual_years(body)
         # Never borrow a section year if this paragraph gives a conflicting date.
         date_basis='EXPLICIT_PARAGRAPH' if dates else 'YEAR_HEADING' if year_heading else 'UNRESOLVED'
         scoped=[y for y in dates if lo<=y<=hi]
@@ -173,7 +173,7 @@ def extract_topic_document(text, source, file, ctx, focus):
                     a=spans[-1][0];spans[-1]=(a,b,text[a:b])
                 else:spans.append((a,b,text[a:b]))
         for a,b,quote in spans:
-            years=sorted(set(int(y) for y in YEAR.findall(quote)))
+            years=contextual_years(quote)
             scoped=[y for y in years if lo<=y<=hi]
             uncertainties=['ORIGINAL_NOT_INSPECTED','SOURCE_GENEALOGY_PENDING','INDEPENDENCE_UNRESOLVED',
                            'TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION']
@@ -243,3 +243,4 @@ def render_answer(answer):
     if not answer['findings']:lines.append('Δεν υπάρχει επαρκές αποκτημένο κείμενο για απάντηση στη συγκεκριμένη περίοδο. Αυτό δεν αποδεικνύει απουσία γεγονότων.')
     lines.extend(['','Η ανεξαρτησία των πηγών και οι πιθανές αντιφάσεις δεν έχουν ακόμη αξιολογηθεί.'])
     return '\n'.join(lines)+'\n'
+

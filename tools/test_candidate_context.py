@@ -9,6 +9,11 @@ from evidence_model import normalize_date, toponym_identity
 
 
 class ContextPolicy(unittest.TestCase):
+    def test_address_cannot_date_a_raid_in_legacy_candidate_path(self):
+        hits=assess('Pirates attacked the port of Milo. Address: Street 1292.', ['Milo'],1000,1700)
+        self.assertFalse(any(h['decision']=='RETAIN_CANDIDATE' for h in hits))
+        self.assertTrue(assess('In 1292 pirates attacked the port of Milo.', ['Milo'],1000,1700)[0]['years_in_scope'])
+
     def test_legacy_preserved_request_context_is_reassessed(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)/'runs';lane=root/'123/travellers'
@@ -70,3 +75,4 @@ class ContextPolicy(unittest.TestCase):
 
 
 if __name__=='__main__': unittest.main()
+
