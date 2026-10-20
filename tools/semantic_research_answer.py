@@ -537,10 +537,16 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
                'response_schema_sha256':digest(response_schema) if response_schema else None}
         out['calls'].append(entry)
         (destination/'progress.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
+        def log_call(state):
+            if os.getenv('GITHUB_ACTIONS')=='true' and caller is call:
+                print(json.dumps({'event':'RESEARCH_MODEL_CALL','call_index':len(out['calls']),
+                    'role':role,'status':state,'utc':datetime.datetime.now(datetime.timezone.utc).isoformat()},ensure_ascii=False),flush=True)
+        log_call('RUNNING')
         try:result=caller(role,prompt,response_schema=response_schema) if caller is call else caller(role,prompt)
         except Exception as error:
-            entry.update(status='FAILED',error_type=type(error).__name__)
+            entry.update(status='FAILED',error_type=type(error).__name__,completed_utc=datetime.datetime.now(datetime.timezone.utc).isoformat())
             (destination/'progress.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
+            log_call('FAILED')
             raise
         entry.update({'role':role,'status':result.get('status'),'provider':result.get('provider'),
                              'model':result.get('model'),'error':result.get('error'),
@@ -552,6 +558,7 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
                              'response_schema_sha256':digest(response_schema) if response_schema else None,
                              'completed_utc':datetime.datetime.now(datetime.timezone.utc).isoformat()})
         if result.get('status')=='COMPLETED':out['model_used']=True
+        log_call('COMPLETED' if result.get('status')=='COMPLETED' else 'FAILED')
         # Preserve actual calls even if a later role times out or fails.
         responses=destination/'model_responses';responses.mkdir(exist_ok=True)
         (responses/(str(len(out['calls']))+'-'+role+'.json')).write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
