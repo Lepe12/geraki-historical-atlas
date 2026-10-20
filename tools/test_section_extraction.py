@@ -23,6 +23,8 @@ class SectionExtraction(unittest.TestCase):
         historical=self.extract('Ο Νίκος Δέλτας αιχμαλώτισε πλοίο το 1578 (σελ. 1292).')[0]
         self.assertEqual(historical['years_in_scope'],[1578])
         self.assertEqual(historical['decision'],'RETAIN_CANDIDATE')
+        from research_relevance import contextual_years
+        self.assertEqual(contextual_years('William Rook sailed via Lepanto in 1621.'),[1621])
 
     def test_modern_corporate_record_with_ocr_date_is_held(self):
         ctx={'target':'Pedro Lanza','aliases':['Πέτρος Λάντζας'],'date_range':''}

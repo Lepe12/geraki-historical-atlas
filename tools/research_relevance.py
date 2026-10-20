@@ -169,7 +169,8 @@ def contextual_years(text):
     years = []
     for match in re.finditer(r'(?<![\w.])(1\d{3}|20\d{2})(?!\w)', value):
         prefix = value[max(0, match.start()-160):match.start()]
-        if re.search(r'(?:\bdomicili\w*|\baddress|\bοδ[οω]\w*|\bstreet|\bstrasse|\brue|\bvia)\b[^.;\n]{0,120}$', prefix.replace('\n', ' ')):
+        temporal=bool(re.search(r'\b(?:in|nel|nell.anno|anno|year|το|ετος|en el ano)\s*$', prefix))
+        if not temporal and re.search(r'(?:\bdomicili\w*|\baddress|\bοδ[οω]\w*|\bstreet|\bstrasse|\brue|\bvia)\b[^.;\n]{0,120}$', prefix.replace('\n', ' ')):
             continue
         if re.search(r'(?:\bpp?\.|\bpages?\s+|\bσελ\.|\bσσ?\.|\bfol(?:io)?\.?\s+|\blegajo\s+|\bexpediente\s+|\bregistro\s+|\bno\.?\s+|\bn[º°]\s*)\s*$', prefix):
             continue
