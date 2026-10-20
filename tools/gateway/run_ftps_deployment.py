@@ -46,8 +46,12 @@ def execute(env=None, runner=subprocess.run):
             if 'DEPLOY FAILED: '+error_type in output:
                 report['error_type']=error_type;break
         if report.get('error_type')=='SSLCertVerificationError':
-            # FTP_TLS performs certificate validation before USER/PASS or writes.
-            report['production_changed']=False
+            # Data-channel TLS can also fail later. Only control-channel failure
+            # proves that no credentials or application mutations were sent.
+            phase=re.search(r'DEPLOY_FAILURE_PHASE: ([A-Z_]+)',output)
+            if phase:
+                report['failed_phase']=phase.group(1)
+                if phase.group(1) in ('CONNECT','CONTROL_TLS_LOGIN'):report['production_changed']=False
             match=re.search(r'TLS_VERIFY_CODE: (\d+)',output)
             if match:report['tls_verify_code']=int(match.group(1))
     report['limits']=['BACKEND_FILES_ONLY_NOT_MARIADB_MIGRATION','HTTP_AND_OIDC_VALIDATION_REQUIRED',

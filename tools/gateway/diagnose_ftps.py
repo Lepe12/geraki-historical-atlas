@@ -5,11 +5,43 @@ import json
 import os
 from pathlib import Path
 import posixpath
+import socket
 import ssl
 
 REASONS={9:'CERTIFICATE_NOT_YET_VALID',10:'CERTIFICATE_EXPIRED',18:'SELF_SIGNED_LEAF',
          19:'SELF_SIGNED_CHAIN',20:'ISSUER_CERTIFICATE_UNAVAILABLE',21:'LEAF_SIGNATURE_UNVERIFIABLE',
          62:'HOSTNAME_MISMATCH',64:'IP_ADDRESS_MISMATCH'}
+
+def diagnose_owner_aliases(host,port,factory):
+    """Try only this existing site's DNS names, with no password or writes.
+
+    An alias must resolve to the configured server and pass normal TLS hostname
+    and chain validation. Certificate names are never adopted as trusted input.
+    """
+    results=[]
+    try:expected={row[4][0] for row in socket.getaddrinfo(host,port,type=socket.SOCK_STREAM)}
+    except OSError:return [{'status':'CONFIGURED_SERVER_DNS_UNAVAILABLE'}]
+    for alias in ('ftp.piratecartography.com','piratecartography.com'):
+        row={'owner_alias':alias,'authenticated':False,'production_changed':False}
+        peer=None
+        try:
+            actual={entry[4][0] for entry in socket.getaddrinfo(alias,port,type=socket.SOCK_STREAM)}
+            if not actual or not actual<=expected:
+                row['status']='ALIAS_NOT_PROVEN_SAME_SERVER'
+            else:
+                peer=factory(timeout=12,context=ssl.create_default_context())
+                peer.connect(alias,port);peer.auth()
+                row['status']='TLS_VERIFIED_SAME_SERVER_OWNER_ALIAS'
+        except ssl.SSLCertVerificationError as error:
+            row.update(status='TLS_CERTIFICATE_REJECTED',tls_verify_code=error.verify_code,
+                       tls_reason=REASONS.get(error.verify_code,'CERTIFICATE_VERIFICATION_FAILED'))
+        except (OSError,ftplib.Error) as error:row.update(status='ALIAS_UNAVAILABLE',error_type=type(error).__name__)
+        finally:
+            if peer:
+                try:peer.close()
+                except Exception:pass
+        results.append(row)
+    return results
 
 def diagnose(env=None,factory=ftplib.FTP_TLS):
     env=dict(os.environ if env is None else env)
@@ -41,6 +73,8 @@ def diagnose(env=None,factory=ftplib.FTP_TLS):
     except ssl.SSLCertVerificationError as error:
         result.update(status='TLS_CERTIFICATE_REJECTED',failed_stage=stage,
                       tls_verify_code=error.verify_code,tls_reason=REASONS.get(error.verify_code,'CERTIFICATE_VERIFICATION_FAILED'))
+        if error.verify_code in (62,64):
+            result['owner_alias_tls_probes']=diagnose_owner_aliases(env['PCT_FTPS_HOST'],int(env.get('PCT_FTPS_PORT') or '21'),factory)
     except (OSError,ValueError,ftplib.Error) as error:
         result.update(status='FTPS_DIAGNOSIS_FAILED',failed_stage=stage,error_type=type(error).__name__)
     finally:

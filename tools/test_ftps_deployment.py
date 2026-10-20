@@ -35,6 +35,14 @@ class FtpsDeploymentTests(unittest.TestCase):
         self.assertFalse(report['database_migration_executed'])
         self.assertFalse(report['historical_research_acceptance'])
 
+    def test_late_tls_failure_does_not_claim_production_was_unchanged(self):
+        for phase,expected in [('CONTROL_TLS_LOGIN',False),('RESTART','UNKNOWN')]:
+            runner=Mock(return_value=SimpleNamespace(returncode=1,stdout=
+                'DEPLOY FAILED: SSLCertVerificationError\nDEPLOY_FAILURE_PHASE: '+phase+'\nTLS_VERIFY_CODE: 62\n'))
+            report=module.execute({name:'PRIVATE_FIXTURE' for name in module.REQUIRED},runner)
+            self.assertEqual(report['production_changed'],expected)
+            self.assertEqual(report['tls_verify_code'],62)
+
     def test_untrusted_certificate_blocks_before_login_without_exposing_error(self):
         error=ssl.SSLCertVerificationError('PRIVATE_FIXTURE');error.verify_code=62
         ftp=Mock();ftp.connect.side_effect=error

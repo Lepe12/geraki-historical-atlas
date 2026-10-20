@@ -37,10 +37,13 @@ backups = {}
 written = []
 staged = []
 remote_backups = {}
+phase = 'CONNECT'
 try:
     ftp.connect(HOST, PORT)
+    phase = 'CONTROL_TLS_LOGIN'
     ftp.login(USER, PASSWORD)
     ftp.prot_p()
+    phase = 'PREFLIGHT'
     ftp.cwd(REMOTE)
     print("Authenticated FTPS, app root:", ftp.pwd())
     existing = set(ftp.nlst())
@@ -58,6 +61,7 @@ try:
                 raise
             backups[name] = None
     # Stage every file before modifying the running code.
+    phase = 'STAGE_UPLOAD'
     for name, data in payload.items():
         stage = ".nabou-ftps-" + runid + "-" + name
         ftp.storbinary("STOR " + stage, io.BytesIO(data))
@@ -67,6 +71,7 @@ try:
             raise RuntimeError("Upload checksum mismatch: " + name)
         staged.append(stage)
     # Load helper modules first and app.js last to limit partial activation window.
+    phase = 'ACTIVATE'
     for name in FILES:
         stage = ".nabou-ftps-" + runid + "-" + name
         if backups[name] is not None:
@@ -84,6 +89,7 @@ try:
         written.append(name)
     # Passenger restart marker is only issued after complete successful deployment.
     marker = "tmp/restart.txt"
+    phase = 'RESTART'
     ftp.storbinary("STOR " + marker, io.BytesIO(b""))
     print("DEPLOYED: four verified backend files and issued Passenger restart marker.")
     print("Existing files were retained as remote .nabou-before-* recovery copies.")
@@ -91,6 +97,7 @@ except Exception as exc:
     # Server-supplied messages can repeat login details. Record the error type,
     # never raw exception text or credential-bearing URLs.
     print("DEPLOY FAILED:", type(exc).__name__)
+    print("DEPLOY_FAILURE_PHASE:", phase)
     if isinstance(exc, ssl.SSLCertVerificationError):
         print("TLS_VERIFY_CODE:", exc.verify_code)
     for name in reversed(written):

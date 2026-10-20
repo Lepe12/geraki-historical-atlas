@@ -24,7 +24,7 @@ jobs:
           sparse-checkout: |
             tools
             evidence/production_ftps_diagnostics
-      - name: Diagnose real TLS certificate and existing directories without writes
+      - name: Diagnose real TLS and same-server owner DNS aliases without writes
         run: python3 tools/gateway/diagnose_ftps.py
       - uses: actions/upload-artifact@v4
         if: always()
