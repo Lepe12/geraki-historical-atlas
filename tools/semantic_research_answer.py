@@ -450,8 +450,20 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
     if not selected:out['status']='INSUFFICIENT_ACQUIRED_EVIDENCE';return out
     out['status']='RUNNING_SEMANTIC_ANALYSIS'
     def invoke(role,prompt,response_schema=None):
-        result=caller(role,prompt,response_schema=response_schema) if caller is call else caller(role,prompt)
-        out['calls'].append({'role':role,'status':result.get('status'),'provider':result.get('provider'),
+        destination=Path(output_root or run_root)/'research_answer'
+        destination.mkdir(parents=True,exist_ok=True)
+        entry={'role':role,'status':'RUNNING','requested_model':route(role).model,
+               'started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+               'prompt_sha256':hashlib.sha256(prompt.encode()).hexdigest(),
+               'response_schema_sha256':digest(response_schema) if response_schema else None}
+        out['calls'].append(entry)
+        (destination/'progress.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
+        try:result=caller(role,prompt,response_schema=response_schema) if caller is call else caller(role,prompt)
+        except Exception as error:
+            entry.update(status='FAILED',error_type=type(error).__name__)
+            (destination/'progress.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
+            raise
+        entry.update({'role':role,'status':result.get('status'),'provider':result.get('provider'),
                              'model':result.get('model'),'error':result.get('error'),
                              'model_identity':result.get('model_identity'),'usage':result.get('usage'),
                              'wire_prompt_sha256':result.get('wire_prompt_sha256'),'chat_mode':result.get('chat_mode'),
@@ -462,8 +474,6 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
                              'completed_utc':datetime.datetime.now(datetime.timezone.utc).isoformat()})
         if result.get('status')=='COMPLETED':out['model_used']=True
         # Preserve actual calls even if a later role times out or fails.
-        destination=Path(output_root or run_root)/'research_answer'
-        destination.mkdir(parents=True,exist_ok=True)
         responses=destination/'model_responses';responses.mkdir(exist_ok=True)
         (responses/(str(len(out['calls']))+'-'+role+'.json')).write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
         (destination/'progress.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
@@ -562,10 +572,10 @@ def render(out):
                 c=claims[cid];src=c['source_occurrences'][0];loc=src['locator']
                 bib=src.get('source_bibliography') or {}
                 creators=bib.get('creator') or [];dates=bib.get('date') or []
-                if isinstance(creators,str):creators=[creators]
-                if isinstance(dates,str):dates=[dates]
-                label=((', '.join(creators)+' · ') if creators else '')+(src.get('title') or 'Τίτλος μη διαθέσιμος')
-                if dates:label+=' · έκδοση/μεταδεδομένα: '+', '.join(dates)
+                if not isinstance(creators,list):creators=[creators]
+                if not isinstance(dates,list):dates=[dates]
+                label=((', '.join(map(str,creators))+' · ') if creators else '')+(src.get('title') or 'Τίτλος μη διαθέσιμος')
+                if dates:label+=' · έκδοση/μεταδεδομένα: '+', '.join(map(str,dates))
                 position=f'γραμμές {loc["start_line"]}–{loc["end_line"]}'
                 if loc.get('printed_page') is not None:position+=' · έντυπη σελίδα '+str(loc['printed_page'])
                 scans=loc.get('scan_indexes_0_based') or []

@@ -13,6 +13,10 @@ def read(path):
 def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=None):
     analysis_root=analysis_root or root
     answer=read(analysis_root/'research_answer/answer.json')
+    answer_origin='FINAL_ANSWER_RECORD'
+    if not answer:
+        answer=read(analysis_root/'research_answer/progress.json')
+        answer_origin='PARTIAL_PROGRESS_ONLY_NO_FINAL_ANSWER' if answer else 'NO_ANSWER_OR_PROGRESS_RECORD'
     geographic=read(analysis_root/'research_answer/geographic_findings.json')
     acquisitions=[];attempts=[];raw_candidates=[];queries=[];request={}
     for lane in root.iterdir():
@@ -57,6 +61,7 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
     completed={c['role'] for c in answer.get('calls',[]) if c.get('status')=='COMPLETED'}
     required={'evidence_extractor','adversarial_reviewer','synthesis'}
     blockers=[]
+    if answer_origin!='FINAL_ANSWER_RECORD':blockers.append(answer_origin)
     if not sources:blockers.append('NO_ACQUIRED_SOURCE_TEXT')
     if not answer.get('evidence'):blockers.append('NO_REPLAYED_EVIDENCE')
     if not required<=completed:blockers.append('SEMANTIC_STAGES_INCOMPLETE')
@@ -72,7 +77,7 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
     return {'schema':'nabou-e2e-validation-v1','research_run_id':root.name,
         'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
         'status':'INCOMPLETE' if blockers else 'PROVISIONAL_RESEARCH_PIPELINE_PASSED',
-        'research_question':answer.get('question'),'request_kind':request_kind,'sources_acquired':list(sources.values()),
+        'research_question':answer.get('question'),'answer_record_origin':answer_origin,'request_kind':request_kind,'sources_acquired':list(sources.values()),
         'counts':{'unique_acquired_source_urls':len(sources),
                   'document_or_page_ocr_urls':sum(s['content_kind'] in ('PDF_DOCUMENT_TEXT','OCR_DOCUMENT_TEXT','PAGE_IMAGE_OCR') for s in sources.values()),
                   'catalogue_metadata_urls':sum(s['content_kind']=='CATALOGUE_METADATA_TEXT' for s in sources.values()),
@@ -99,6 +104,7 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--run-id',required=True);p.add_argument('--require-complete',action='store_true');a=p.parse_args()
     root=Path('evidence/runs')/a.run_id
+    (root/'research_answer').mkdir(parents=True,exist_ok=True)
     result=build(root)
     (root/'research_answer/validation_report.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
     print('RESEARCH_E2E_VALIDATION',result['status'],json.dumps(result['counts']))

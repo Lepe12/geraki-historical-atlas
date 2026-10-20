@@ -463,15 +463,27 @@ jobs:
         run: git pull --rebase origin main
       - uses: ./.github/actions/research-model
       - name: Build JARVIS situation board
-        timeout-minutes: 35
         env:
           PCT_RUN_ID: ${{ github.run_id }}
         run: |
           python3 tools/orchestrator/jarvis_state_board.py \
             --run-id "$PCT_RUN_ID" \
             --output "evidence/runs/$PCT_RUN_ID/JARVIS_STATE_BOARD.json"
-          python3 tools/semantic_research_answer.py --run-id "$PCT_RUN_ID"
-          python3 tools/research_validation_report.py --run-id "$PCT_RUN_ID" ${{ needs.prepare.outputs.require_semantic_analysis == 'true' && '--require-complete' || '' }}
+      - name: Extract, review and synthesize the actual acquired sources
+        timeout-minutes: 35
+        env:
+          PCT_RUN_ID: ${{ github.run_id }}
+        run: python3 tools/semantic_research_answer.py --run-id "$PCT_RUN_ID"
+      - name: Record actual validation even after failed or interrupted synthesis
+        if: always()
+        env:
+          PCT_RUN_ID: ${{ github.run_id }}
+        run: python3 tools/research_validation_report.py --run-id "$PCT_RUN_ID" ${{ needs.prepare.outputs.require_semantic_analysis == 'true' && '--require-complete' || '' }}
+      - name: Preserve the actual command center research status
+        if: always()
+        env:
+          PCT_RUN_ID: ${{ github.run_id }}
+        run: |
           python3 tools/orchestrator/build_command_center_snapshot.py \
             --run-id "$PCT_RUN_ID" \
             --output "command-center/live/runs/$PCT_RUN_ID.json" \

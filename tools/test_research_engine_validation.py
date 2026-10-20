@@ -56,3 +56,15 @@ class ResearchEngineValidationTests(unittest.TestCase):
             result=validation(root,Path(tmp)/'probes')
             self.assertEqual(result['status'],'INCOMPLETE')
             self.assertIn('NO_ACQUIRED_SOURCE_TEXT',result['blockers'])
+
+    def test_interrupted_model_progress_is_diagnosed_and_never_accepted_as_final(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)/'123';dest=root/'research_answer';dest.mkdir(parents=True)
+            (dest/'progress.json').write_text(json.dumps({'status':'RUNNING_SEMANTIC_ANALYSIS',
+                'claims':[{'claim_id':'partial','verified':False}],
+                'calls':[{'role':'synthesis','status':'RUNNING'}]}))
+            result=validation(root,Path(tmp)/'probes')
+            self.assertEqual(result['status'],'INCOMPLETE')
+            self.assertEqual(result['counts']['model_claims'],1)
+            self.assertIn('PARTIAL_PROGRESS_ONLY_NO_FINAL_ANSWER',result['blockers'])
+            self.assertEqual(result['semantic_calls'][0]['status'],'RUNNING')
