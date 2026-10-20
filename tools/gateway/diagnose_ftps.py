@@ -1,16 +1,52 @@
 """Read-only explicit FTPS diagnosis; no unverified TLS or credential output."""
 import datetime
 import ftplib
+import hashlib
 import json
 import os
 from pathlib import Path
 import posixpath
+import re
 import socket
 import ssl
 
 REASONS={9:'CERTIFICATE_NOT_YET_VALID',10:'CERTIFICATE_EXPIRED',18:'SELF_SIGNED_LEAF',
          19:'SELF_SIGNED_CHAIN',20:'ISSUER_CERTIFICATE_UNAVAILABLE',21:'LEAF_SIGNATURE_UNVERIFIABLE',
          62:'HOSTNAME_MISMATCH',64:'IP_ADDRESS_MISMATCH'}
+
+def read_storage_metadata(ftp):
+    """Read only the known import receipt/code hashes; never private configs."""
+    result={'database_query_performed_by_this_probe':False,'code_files':[]}
+    def fetch(path,limit=65536):
+        chunks=[];size=0
+        def add(chunk):
+            nonlocal size
+            size+=len(chunk)
+            if size>limit:raise ValueError('METADATA_SIZE_LIMIT')
+            chunks.append(chunk)
+        ftp.retrbinary('RETR '+path,add)
+        return b''.join(chunks)
+    receipt='/piratecartography-system/pct-research-storage-last.json'
+    try:
+        raw=json.loads(fetch(receipt));summary={}
+        if raw.get('status') in ('PASS','PARTIAL_BLOCKED','BUSY'):summary['status']=raw['status']
+        if isinstance(raw.get('source_commit'),str) and re.fullmatch(r'[a-f0-9]{40}',raw['source_commit']):summary['source_commit']=raw['source_commit']
+        for key in ('imported_runs','unchanged_runs','blocked_runs'):
+            if type(raw.get(key)) is int and 0<=raw[key]<=1_000_000:summary[key]=raw[key]
+        result['recorded_import_summary']=summary
+        try:
+            timestamp=ftp.sendcmd('MDTM '+receipt)
+            if re.fullmatch(r'213 \d{14}',timestamp):result['receipt_modified_utc_yyyymmddhhmmss']=timestamp[4:]
+        except ftplib.all_errors:pass
+    except (ValueError,OSError,ftplib.Error):result['recorded_import_summary_status']='UNAVAILABLE'
+    for name in ('pct_research_store.php','historical_evidence.php','historical_evidence_schema.sql'):
+        row={'file':name,'available':False}
+        try:
+            data=fetch('/piratecartography-gateway/tools/storage/'+name,limit=2_000_000)
+            row.update(available=True,sha256=hashlib.sha256(data).hexdigest())
+        except (ValueError,OSError,ftplib.Error):pass
+        result['code_files'].append(row)
+    return result
 
 def diagnose_owner_aliases(host,port,factory):
     """Try only this existing site's DNS names, with no password or writes.
@@ -86,6 +122,12 @@ def diagnose(env=None,factory=ftplib.FTP_TLS):
     stage='CONNECT'
     try:
         ftp.connect(env['PCT_FTPS_HOST'],int(env.get('PCT_FTPS_PORT') or '21'))
+        name=env.get('PCT_FTPS_TLS_SERVER_NAME','').strip().rstrip('.')
+        if name:
+            original={r[4][0] for r in socket.getaddrinfo(env['PCT_FTPS_HOST'],21,type=socket.SOCK_STREAM)}
+            named={r[4][0] for r in socket.getaddrinfo(name,21,type=socket.SOCK_STREAM)}
+            if not original.intersection(named):raise ValueError('TLS_NAME_NOT_BOUND_TO_CONFIGURED_SERVER')
+            ftp.host=name
         stage='AUTH_TLS_AND_LOGIN'
         ftp.login(env['PCT_FTPS_USER'],env['PCT_FTPS_PASSWORD']);ftp.prot_p()
         stage='READ_ONLY_DIRECTORY_PREFLIGHT'
@@ -99,6 +141,7 @@ def diagnose(env=None,factory=ftplib.FTP_TLS):
                 row.update(accessible=True,expected_entries={name:name in names for name in expected})
             except ftplib.all_errors as error:row['error_type']=type(error).__name__
             result['directories'].append(row)
+        result['storage_metadata']=read_storage_metadata(ftp)
         result['status']='FTPS_AUTHENTICATED_READ_ONLY_DIAGNOSIS_COMPLETE'
     except ssl.SSLCertVerificationError as error:
         result.update(status='TLS_CERTIFICATE_REJECTED',failed_stage=stage,

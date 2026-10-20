@@ -17,6 +17,17 @@ diag_spec=importlib.util.spec_from_file_location('ftps_diagnostics',ROOT/'gatewa
 diagnostics=importlib.util.module_from_spec(diag_spec);diag_spec.loader.exec_module(diagnostics)
 
 class FtpsDeploymentTests(unittest.TestCase):
+    def test_storage_receipt_observer_retains_only_nonsecret_metadata(self):
+        ftp=Mock()
+        raw=b'{"status":"PASS","source_commit":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","imported_runs":2,"password":"PRIVATE_FIXTURE","unexpected":"PRIVATE_FIXTURE"}'
+        ftp.retrbinary.side_effect=lambda command,callback:callback(raw)
+        ftp.sendcmd.return_value='213 20261020190000'
+        report=diagnostics.read_storage_metadata(ftp)
+        self.assertEqual(report['recorded_import_summary']['imported_runs'],2)
+        self.assertFalse(report['database_query_performed_by_this_probe'])
+        self.assertNotIn('PRIVATE_FIXTURE',str(report))
+        self.assertEqual(ftp.retrbinary.call_count,4)
+
     def test_explicit_tls_name_is_verified_on_the_original_server(self):
         ftp=Mock();output=io.StringIO()
         env={name:'PRIVATE_FIXTURE' for name in module.REQUIRED}
