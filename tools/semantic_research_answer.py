@@ -104,6 +104,10 @@ def collect(run_root, provenance_root=None):
             from research_focus import decompose
             req=read(p.parent.parent/'run_manifest/manifest.json',{}).get('normalized_request') or {}
             metadata=f.get('source_bibliography') or source_by_file.get(Path(str(f.get('file') or '')).name,{})
+            from historical_source_admissibility import hold_reason
+            source_hold=hold_reason({**metadata,'title':f.get('title')})
+            if source_hold:
+                excluded.append({'finding_id':f.get('finding_id'),'reason':source_hold});continue
             hold=person_passage_hold_reason(raw,f.get('title'),req,f.get('uncertainties',[]),metadata,f.get('years_in_scope'))
             if hold:
                 excluded.append({'finding_id':f.get('finding_id'),'reason':hold});continue

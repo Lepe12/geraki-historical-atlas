@@ -257,6 +257,11 @@ def assess(record, ident):
         if status=='PRIORITY':
             status='REVIEW_REQUIRED'
         reasons.append('LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW')
+    from historical_source_admissibility import hold_reason
+    source_hold=hold_reason(record)
+    if source_hold:
+        status='EXCLUDE_FROM_ACQUISITION';research_score=min(research_score,20)
+        reasons.append(source_hold)
 
     return {
         'status':status,'score':score,'reasons':reasons,

@@ -77,9 +77,13 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
         if claim.get('claim_id') not in cited:continue
         row=evidence_by_id.get(claim.get('evidence_id'),{})
         title=(row.get('occurrences') or [{}])[0].get('title')
+        from historical_source_admissibility import hold_reason
+        source_hold=hold_reason({**(row.get('source_bibliography') or {}),'title':title})
+        if source_hold:quality_rejections.append({'claim_id':claim['claim_id'],'reason':source_hold,'gate':'SOURCE_ADMISSIBILITY'})
         reason=person_passage_hold_reason(row.get('text',''),title,request,row.get('uncertainties',[]),row.get('source_bibliography'),row.get('years_in_scope'))
         if reason:quality_rejections.append({'claim_id':claim['claim_id'],'reason':reason})
-    if quality_rejections:blockers.append('ANSWER_CONTAINS_UNRESOLVED_PERSON_OR_BIBLIOGRAPHIC_LEADS')
+    if any(r.get('gate')=='SOURCE_ADMISSIBILITY' for r in quality_rejections):blockers.append('ANSWER_CITES_NON_HISTORICAL_OR_GENERATED_SOURCE')
+    if any(r.get('gate')!='SOURCE_ADMISSIBILITY' for r in quality_rejections):blockers.append('ANSWER_CONTAINS_UNRESOLVED_PERSON_OR_BIBLIOGRAPHIC_LEADS')
     if request_kind=='person' and not cited.intersection(supported):blockers.append('NO_SUPPORTED_PERSON_RESEARCH_CLAIMS')
     if not any(q.get('output_status')=='MODEL_QUERIES_AVAILABLE' for q in queries):blockers.append('LIVE_MODEL_QUERY_EXPANSION_NOT_DEMONSTRATED')
     violations=[c.get('claim_id') for c in answer.get('claims',[]) if c.get('verified') or c.get('verification_status')=='VERIFIED']
