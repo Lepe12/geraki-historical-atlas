@@ -6,6 +6,31 @@ import shutil
 import subprocess
 from section_extraction import build_findings
 
+def corrected_bibliography(source, pdf_sha256, repository=None):
+    """Apply documented metadata only to the identical acquired PDF bytes."""
+    repository=Path(repository or Path(__file__).resolve().parents[1]).resolve()
+    index=repository/'data/source_bibliographic_corrections.json'
+    if not index.is_file():return source,None
+    matches=[]
+    for name in json.loads(index.read_text()).get('records',[]):
+        record=(repository/name).resolve()
+        if not record.is_relative_to(repository) or not record.is_file():raise ValueError('INVALID_BIBLIOGRAPHIC_CORRECTION_RECORD')
+        raw=record.read_bytes();value=json.loads(raw)
+        if value.get('pdf_sha256')!=pdf_sha256:continue
+        work=value.get('actual_work') or {}
+        if not work.get('title') or not work.get('author') or not work.get('year'):raise ValueError('INCOMPLETE_BIBLIOGRAPHIC_CORRECTION')
+        matches.append((name,hashlib.sha256(raw).hexdigest(),work))
+    if len(matches)>1:raise ValueError('CONFLICTING_BIBLIOGRAPHIC_CORRECTIONS_REQUIRE_REVIEW')
+    if not matches:return source,None
+    name,sha,work=matches[0]
+    corrected={**source,'title':work['title'],'creator':[work['author']],'date':[str(work['year'])]}
+    receipt={'basis':'DOCUMENTED_METADATA_FOR_IDENTICAL_PDF_SHA256_NOT_HISTORICAL_VERIFICATION',
+             'record':name,'record_sha256':sha,'pdf_sha256':pdf_sha256,
+             'previous':{k:source.get(k) for k in ('title','creator','date')},'corrected_work':work,
+             'original_acquisition_report_modified':False}
+    corrected['bibliographic_correction']=receipt
+    return corrected,receipt
+
 
 def prepare(parent, destination, request):
     parent=Path(parent).resolve();destination=Path(destination).resolve()
@@ -34,6 +59,8 @@ def prepare(parent, destination, request):
                 text_file=library/(stem+'.txt')
                 receipt={'lane':lane.name,'source_url':url,'original_pdf':original,'original_pdf_sha256':raw_sha,
                          'extractor_version':version,'network_request_performed':False}
+                corrected,correction=corrected_bibliography(source,raw_sha)
+                if correction:receipt['bibliographic_correction']=correction
                 try:
                     subprocess.run(['pdftotext','-enc','UTF-8',str(pdf),str(text_file)],check=True,capture_output=True,timeout=30)
                     content=text_file.read_text(encoding='utf-8',errors='replace')
@@ -50,7 +77,7 @@ def prepare(parent, destination, request):
                          'pdf_file':original,'pdf_reference_base':'PARENT_RESEARCH_RUN','text_order':'POPPLER_READING_ORDER',
                          'extraction_provenance':'DERIVED_FROM_EXISTING_PDF_BYTES_NOT_NEW_DOWNLOAD',
                          'source_pdf_sha256':raw_sha,'text_sha256':hashlib.sha256(content.encode()).hexdigest(),'extractor_version':version}
-                    records.append({**source,'files':files,'web_acquisition':web})
+                    records.append({**corrected,'files':files,'web_acquisition':web})
                     handled.add(pdf.with_suffix('.txt'))
                     receipt.update(status='READING_ORDER_DERIVED',derived_text_path=str(text_file.relative_to(parent)),
                                    derived_text_sha256=web['text_sha256'])
