@@ -13,6 +13,24 @@ SOURCE={'title':'Νίκος Δέλτας: biography','url':'https://example.org/
         'web_acquisition':{'source_type':'WEB_PAGE_TEXT','files':['library_acquisition/doc.txt']}}
 
 class SectionExtraction(unittest.TestCase):
+    def test_address_and_page_numbers_do_not_become_event_years(self):
+        ctx={'target':'Pedro Lanza','aliases':['Πέτρος Λάντζας'],'date_range':''}
+        text='Pedro Lanza, nacido el 9 de julio de 1925, domiciliado en Pi y Margall 1292, segundo piso.'
+        row=self.extract(text,ctx=ctx,source={'title':'Boletín Oficial 1971','url':'https://example.org/register'})[0]
+        self.assertEqual(row['years_in_scope'],[1925])
+        self.assertIn('LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW',row['uncertainties'])
+        self.assertEqual(row['evidence_excerpt'],text)
+        historical=self.extract('Ο Νίκος Δέλτας αιχμαλώτισε πλοίο το 1578 (σελ. 1292).')[0]
+        self.assertEqual(historical['years_in_scope'],[1578])
+        self.assertEqual(historical['decision'],'RETAIN_CANDIDATE')
+
+    def test_modern_corporate_record_with_ocr_date_is_held(self):
+        ctx={'target':'Pedro Lanza','aliases':['Πέτρος Λάντζας'],'date_range':''}
+        text='Pedro Lanza fue nombrado en la sociedad anónima. Buenos Aires, 2 abril de 1970; constituida el 2 de abril de 1370.'
+        row=self.extract(text,ctx=ctx,source={'title':'Boletín Oficial','url':'https://example.org/register'})[0]
+        self.assertIn('LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW',row['uncertainties'])
+        self.assertEqual(row['decision'],'REVIEW_CONTEXT')
+
     def extract(self,text,ctx=None,source=None):
         return extract_document(text,source or SOURCE,'doc.txt',ctx or CTX)
 
@@ -145,3 +163,4 @@ class SectionExtraction(unittest.TestCase):
             self.assertIn('example.org/history',(base/'research_dossier/answer.md').read_text())
 
 if __name__=='__main__':unittest.main()
+

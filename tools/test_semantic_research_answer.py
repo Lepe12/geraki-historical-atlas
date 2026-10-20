@@ -407,6 +407,40 @@ class SemanticAnswer(unittest.TestCase):
             self.assertEqual(out['coverage']['excluded'][0]['reason'],'LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW')
             self.assertEqual(p.read_bytes(),before)
 
+    def test_replay_removes_address_year_without_rewriting_acquired_evidence(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp)
+            base=Path(tmp)/'travellers';p=base/'structured_output/extracted_findings.json'
+            text='In 1677 the ships attacked the island. The address was Street 1292.'
+            (base/'library_acquisition/doc.txt').write_text(text)
+            data=json.loads(p.read_text());f=data['findings'][0]
+            f.update(evidence_excerpt=text,source_text_sha256=hashlib.sha256(text.encode()).hexdigest(),years_in_scope=[1292,1677])
+            f['locator'].update(start_char=0,end_char=len(text))
+            p.write_text(json.dumps(data));before=p.read_bytes()
+            rows,_=collect(tmp)
+            self.assertEqual(rows[0]['years_in_scope'],[1677])
+            self.assertEqual(rows[0]['text'],text)
+            self.assertEqual(p.read_bytes(),before)
+
+    def test_bibliographic_reference_in_history_book_is_a_lead_not_an_answer(self):
+        from semantic_research_answer import person_passage_hold_reason
+        request={'target':'Πέτρος Λάντζας','aliases':['Pedro Lanza'],'date_range':''}
+        text='Μιχαήλ Θ. Λάσκαρις, «Πέτρος Λάντζας, διοικητής της Πάργας», Αθήνα 1956, 237–253.'
+        reason=person_passage_hold_reason(text,'Ιστορία του Νέου Ελληνισμού',request,[])
+        self.assertEqual(reason,'BIBLIOGRAPHIC_REFERENCE_REQUIRES_CITED_WORK_ACQUISITION')
+        narrative='Ο Πέτρος Λάντζας διορίστηκε το 1573.'
+        self.assertIsNone(person_passage_hold_reason(narrative,'Ιστορία',request,[]))
+        damaged='ᾱ, Ἑλ. Μ. «άσκαρι, Ὁ Κερκυραῖος Πέτρος Λάντζας, «Αφιέρωμα εις την Ήπειρον», Αθήναι 1956, σ. 251.'
+        self.assertEqual(person_passage_hold_reason(damaged,'Ιστορία',request,[]),reason)
+        narrative_with_reference='Ο Πέτρος Λάντζας διορίστηκε το 1573. Βλ. «Μελέτη», Αθήνα 1956, σ. 251.'
+        self.assertIsNone(person_passage_hold_reason(narrative_with_reference,'Ιστορία',request,[]))
+
+    def test_empty_attribution_scaffold_is_not_a_synthesized_answer(self):
+        from semantic_research_answer import valid_synthesis
+        for text in ('According to the consulted source ...','According to the source…','Σύμφωνα με την πηγή ...'):
+            self.assertFalse(valid_synthesis({'answer_sections':[{'text':text,'claim_ids':['c-real']}]},{'c-real'}))
+        self.assertTrue(valid_synthesis({'answer_sections':[{'text':'According to the source, the captain was captured.','claim_ids':['c-real']}]},{'c-real'}))
+
     def test_modern_publication_does_not_date_the_historical_person(self):
         with tempfile.TemporaryDirectory() as tmp:
             fixture(tmp)
@@ -528,3 +562,4 @@ class SemanticAnswer(unittest.TestCase):
             self.assertEqual(out['error'],'RuntimeError');self.assertNotIn('test-secret',json.dumps(out))
 
 if __name__=='__main__':unittest.main()
+

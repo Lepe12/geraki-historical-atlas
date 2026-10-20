@@ -74,9 +74,17 @@ def person_passage_hold_reason(text,title,request,uncertainties,bibliography=Non
         and requested_years and max(requested_years)<1750 and not years_in_scope and not title_period_hint):
         return 'LATER_CONTEMPORARY_BIOGRAPHY_REQUIRES_IDENTITY_REVIEW'
     bibliography_hint=bool(re.search(r'bibliograph|βιβλιογραφ',fold(title or '')))
-    reference_start=bool(re.match(r'[^«\n]{1,100},\s*«[^»]+»',text,re.S))
+    reference_start=bool(re.match(r'[^«]{1,160},\s*«[^»]+»',surface(text),re.S))
     publication_date=bool(re.search(r'(?<!\d)(?:18|19|20)\d{2}(?!\d)',text))
-    if bibliography_hint and reference_start and publication_date:
+    cited_pages=bool(re.search(r'(?:\d{1,4}\s*[-–]\s*\d{1,4}|(?:pp?\.|σ\.|σελ\.)\s*\d{1,4})\s*[,.;]?\s*$',text))
+    # Damaged OCR can insert an unmatched guillemet into the author's name.
+    # Citation-only paragraphs still remain leads; narrative with an appended
+    # reference must retain its actual source-attributed action.
+    from section_extraction import PREDICATE
+    outside_quotes=re.sub(r'[«\"][^»\"]*[»\"]',' ',surface(text))
+    narrative=bool(PREDICATE.search(fold(outside_quotes)) or re.search(r'\b(?:was|were|served|sailed|attacked|reported)\b',fold(outside_quotes)))
+    citation_only=len(text)<800 and cited_pages and ('«' in text or '"' in text) and not narrative
+    if publication_date and (reference_start and bibliography_hint or citation_only):
         return 'BIBLIOGRAPHIC_REFERENCE_REQUIRES_CITED_WORK_ACQUISITION'
     return None
 
@@ -133,10 +141,22 @@ def collect(run_root, provenance_root=None):
                 dl=date_evidence.get('locator') or {};ds,de=dl.get('start_char'),dl.get('end_char')
                 if not isinstance(ds,int) or not isinstance(de,int) or ds<0 or de<=ds or text[ds:de]!=date_evidence.get('text'):
                     excluded.append({'finding_id':f.get('finding_id'),'reason':'DATE_HEADING_LOCATOR_MISMATCH'});continue
+            # Historical exports may contain address/page numbers in their year
+            # list. Recheck analysis metadata without changing immutable sources.
+            from research_relevance import contextual_years
+            years=f.get('years_in_scope',[])
+            date_basis=f.get('date_basis')
+            uncertainties=list(f.get('uncertainties',[]))
+            if date_basis!='YEAR_HEADING':
+                possible=contextual_years(raw)
+                years=[year for year in years if year in possible]
+                if years!=f.get('years_in_scope',[]):
+                    uncertainties.append('NON_DATE_NUMBERS_EXCLUDED_FROM_YEARS')
+                    if not years:date_basis='UNRESOLVED'
             # Similar OCR/formatting is not a byte-identical quotation. A quote
             # from one version must never be attributed to a differently laid
             # out version merely because their whitespace-normalized words agree.
-            key=digest([raw,f.get('years_in_scope',[]),f.get('date_basis')])
+            key=digest([raw,years,date_basis])
             source=source_by_file.get(filename,{})
             document=source.get('web_acquisition') or {};binary=None
             if document.get('pdf_file'):
@@ -166,10 +186,10 @@ def collect(run_root, provenance_root=None):
             if key in groups:
                 groups[key]['occurrences'].append(provenance);continue
             row={'evidence_id':'e-'+key[:20],'text':raw,'similar_text_fingerprint':digest(surface(raw)),
-                 'years_in_scope':f.get('years_in_scope',[]),
-                 'date_basis':f.get('date_basis'),'date_evidence':f.get('date_evidence'),
+                 'years_in_scope':years,
+                 'date_basis':date_basis,'date_evidence':f.get('date_evidence'),
                  'source_bibliography':bibliography,
-                 'uncertainties':f.get('uncertainties',[]),'occurrences':[provenance],
+                 'uncertainties':uncertainties,'occurrences':[provenance],
                  'source_independence':'UNKNOWN_NOT_ESTABLISHED'}
             groups[key]=row;seen.append(row)
     # In-scope passages first, then useful unresolved context. Nothing is erased
@@ -365,9 +385,11 @@ def explicit_centuries(text):
     return sorted(set(numbers))
 
 def valid_synthesis(answer,supported):
+    from research_focus import fold
     sections=answer.get('answer_sections') if isinstance(answer,dict) else None
     return (not forbidden(answer) and isinstance(sections,list) and bool(sections)
             and all(isinstance(s,dict) and isinstance(s.get('text'),str) and bool(s['text'].strip()) and
+                    not re.fullmatch(r'(?:according to (?:the )?(?:(?:consulted|supplied) )?source|συμφωνα με την πηγη)[\s.\u2026:;–—-]*',fold(s['text']).strip()) and
                     isinstance(s.get('claim_ids'),list) and bool(s['claim_ids']) and
                     all(isinstance(cid,str) and cid in supported for cid in s['claim_ids']) for s in sections)
             and all(isinstance(answer.get(k,[]),list) and all(isinstance(v,str) for v in answer.get(k,[])) for k in ('unknowns','limitations')))
@@ -839,3 +861,4 @@ def main():
     print('SEMANTIC_ANSWER',out['status'],'model_used',out['model_used'],'claims',len(out['claims']))
 
 if __name__=='__main__':main()
+
