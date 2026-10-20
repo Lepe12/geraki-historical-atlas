@@ -1,0 +1,2235 @@
+{
+  "schema": "pct-semantic-answer-v3",
+  "question": "Ιωάννης Καψής (1600-1700)\nResearch scope: Έλεγξε με πραγματικές πηγές την ιστορική ταυτότητα του Ιωάννη Καψή και την αναφορά σε βασιλιά της Μήλου. Μην θεωρήσεις τον τίτλο ή τις εναλλακτικές γραφές εξακριβωμένα πριν από το τεκμήριο. Οι ξενόγλωσσες γραφές είναι υποθέσεις αναζήτησης. Δώσε ακριβές απόσπασμα, σελίδα ή φύλλο, βιβλιογραφική και αρχειακή παραπομπή, αντιφάσεις και κενά.",
+  "evidence_hash": "d0aebe7261f39f289e7fa1b26febd772aefd8f5767e59d6b6a32fd593deea76a",
+  "status": "MODEL_ANSWER_PENDING_HUMAN_REVIEW",
+  "generated_utc": "2026-10-20T05:56:53.843594+00:00",
+  "model_configuration": {
+    "schema": "pct-llm-routing-summary-v1",
+    "prompt_version": "2026-10-20.1",
+    "routes": {
+      "planner": {
+        "role": "planner",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "fast",
+        "temperature": 0.1,
+        "max_output_tokens": 1800,
+        "fallback": "deterministic_planner",
+        "requires_evidence": false,
+        "prompt_version": "2026-10-20.1"
+      },
+      "query_expander": {
+        "role": "query_expander",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "fast",
+        "temperature": 0.2,
+        "max_output_tokens": 1600,
+        "fallback": "deterministic_query_expander",
+        "requires_evidence": false,
+        "prompt_version": "2026-10-20.1"
+      },
+      "evidence_extractor": {
+        "role": "evidence_extractor",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "precise",
+        "temperature": 0.0,
+        "max_output_tokens": 2600,
+        "fallback": "source_first_extractor",
+        "requires_evidence": true,
+        "prompt_version": "2026-10-20.1"
+      },
+      "synthesis": {
+        "role": "synthesis",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "reasoning",
+        "temperature": 0.1,
+        "max_output_tokens": 4200,
+        "fallback": "source_first_report",
+        "requires_evidence": true,
+        "prompt_version": "2026-10-20.1"
+      },
+      "adversarial_reviewer": {
+        "role": "adversarial_reviewer",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "reasoning",
+        "temperature": 0.1,
+        "max_output_tokens": 3200,
+        "fallback": "deterministic_gap_review",
+        "requires_evidence": true,
+        "prompt_version": "2026-10-20.1"
+      },
+      "replanner": {
+        "role": "replanner",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "reasoning",
+        "temperature": 0.1,
+        "max_output_tokens": 2200,
+        "fallback": "registered_route_replan",
+        "requires_evidence": false,
+        "prompt_version": "2026-10-20.1"
+      }
+    },
+    "verified_promotion_allowed": false
+  },
+  "configuration": {
+    "configured": true,
+    "missing": []
+  },
+  "model_used": true,
+  "claims": [
+    {
+      "claim_id": "c-f6628dc1818bc27114dd",
+      "statement": "The consulted source reports that in 1677, the island of Milos under Ottoman rule acquired a pirate king.",
+      "kind": "source_statement",
+      "evidence_id": "e-e0414c5b55ea4f65dcb6",
+      "quote": "Η Μήλος εν µέσω οθωμανικής κυριαρχίας, το 1677 απέ- \nκτησε πειρατή βασιλιά!",
+      "quote_offset_in_excerpt": 0,
+      "actors": [],
+      "places": [],
+      "dates": [],
+      "source_occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/diadromi_174",
+          "title": "Διαδρομή Ελευθερίας 174 (2017 Sep)",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/travellers/library_acquisition/diadromi_174_diadromi_174_djvu.txt",
+          "finding_id": "finding-818c2c0e3a2422cabd71",
+          "locator": {
+            "url": "https://archive.org/details/diadromi_174",
+            "source_file": "diadromi_174_diadromi_174_djvu.txt",
+            "start_char": 127361,
+            "end_char": 127436,
+            "start_line": 3557,
+            "end_line": 3558,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false,
+            "offset_unit": "UNICODE_CODE_POINTS",
+            "span_semantics": "EXACT_QUOTE"
+          },
+          "source_text_sha256": "3e4e658a54947737c278d495f736f3592615d6f23800c4e391d097256f0e8a09",
+          "page_boundaries": [],
+          "reported_archival_reference": null,
+          "context_locator": {
+            "url": "https://archive.org/details/diadromi_174",
+            "source_file": "diadromi_174_diadromi_174_djvu.txt",
+            "start_char": 127361,
+            "end_char": 127466,
+            "start_line": 3557,
+            "end_line": 3558,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false
+          }
+        }
+      ],
+      "entity_surface_corrections": [],
+      "date_evidence": null,
+      "date_basis": "EXPLICIT_PARAGRAPH",
+      "uncertainty": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED"
+      ],
+      "source_uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED"
+      ],
+      "model_analysis": true,
+      "verified": false,
+      "source_classification": "UNVERIFIED",
+      "model_proposed_source_classification": "UNVERIFIED",
+      "classification_status": "MODEL_PROVISIONAL_REQUIRES_SOURCE_CRITICISM",
+      "usage_type": "UNRESOLVED",
+      "assertion_class": "SOURCE_STATEMENT",
+      "verification_status": "UNVERIFIED"
+    },
+    {
+      "claim_id": "c-aafc9f6829d06961aee9",
+      "statement": "The consulted source reports that Ioannis Kapsis, with his brothers of the Tromara and Niko, set out with two galleys from the Mytikas of Aetolia and sailed throughout the Aegean and Ionian seas.",
+      "kind": "source_statement",
+      "evidence_id": "e-53a8cb1a482a82abf5c5",
+      "quote": " Ο Ιωάννης Κάψης µε τα αδέρφια \nτου Τροµάρα και Νίκο εξορμούσαν µε δύο γαλέρες από \nτον Μύτικα της Αιτωλοακαρνανίας και σάλπαραν σε όλο \nστο Αιγαίο και το Ιόνιο.",
+      "quote_offset_in_excerpt": 75,
+      "actors": [],
+      "places": [],
+      "dates": [],
+      "source_occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/diadromi_174",
+          "title": "Διαδρομή Ελευθερίας 174 (2017 Sep)",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/travellers/library_acquisition/diadromi_174_diadromi_174_djvu.txt",
+          "finding_id": "finding-4606aa4622a69bbfbbc9",
+          "locator": {
+            "url": "https://archive.org/details/diadromi_174",
+            "source_file": "diadromi_174_diadromi_174_djvu.txt",
+            "start_char": 132303,
+            "end_char": 132464,
+            "start_line": 3677,
+            "end_line": 3680,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false,
+            "offset_unit": "UNICODE_CODE_POINTS",
+            "span_semantics": "EXACT_QUOTE"
+          },
+          "source_text_sha256": "3e4e658a54947737c278d495f736f3592615d6f23800c4e391d097256f0e8a09",
+          "page_boundaries": [],
+          "reported_archival_reference": null,
+          "context_locator": {
+            "url": "https://archive.org/details/diadromi_174",
+            "source_file": "diadromi_174_diadromi_174_djvu.txt",
+            "start_char": 132228,
+            "end_char": 133193,
+            "start_line": 3676,
+            "end_line": 3693,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false
+          }
+        }
+      ],
+      "entity_surface_corrections": [],
+      "date_evidence": null,
+      "date_basis": "EXPLICIT_PARAGRAPH",
+      "uncertainty": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED"
+      ],
+      "source_uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED"
+      ],
+      "model_analysis": true,
+      "verified": false,
+      "source_classification": "UNVERIFIED",
+      "model_proposed_source_classification": "UNVERIFIED",
+      "classification_status": "MODEL_PROVISIONAL_REQUIRES_SOURCE_CRITICISM",
+      "usage_type": "UNRESOLVED",
+      "assertion_class": "SOURCE_STATEMENT",
+      "verification_status": "UNVERIFIED"
+    },
+    {
+      "claim_id": "c-789d1988cbf7d8dc5095",
+      "statement": "The consulted source reports Kapsis, Ioannis as a government official in the Foreign Affairs Ministry.",
+      "kind": "source_statement",
+      "evidence_id": "e-8aab33c628208b80457b",
+      "quote": " Min. of Foreign Affairs Kapsis, Ioannis",
+      "quote_offset_in_excerpt": 129,
+      "actors": [],
+      "places": [],
+      "dates": [],
+      "source_occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/micro_IA41152816_0272",
+          "title": "Chiefs of State and Cabinet Members of Foreign Governments",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/travellers/library_acquisition/micro_IA41152816_0272_micro_IA41152816_0272_djvu.txt",
+          "finding_id": "finding-d5ce10da5f04b81427cf",
+          "locator": {
+            "url": "https://archive.org/details/micro_IA41152816_0272",
+            "source_file": "micro_IA41152816_0272_micro_IA41152816_0272_djvu.txt",
+            "start_char": 77193,
+            "end_char": 77233,
+            "start_line": 3480,
+            "end_line": 3480,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false,
+            "offset_unit": "UNICODE_CODE_POINTS",
+            "span_semantics": "EXACT_QUOTE"
+          },
+          "source_text_sha256": "a8e02ae9da0b31734b42d69c835116d308fa25d10a74a695692a34c75a3e0f65",
+          "page_boundaries": [],
+          "reported_archival_reference": null,
+          "context_locator": {
+            "url": "https://archive.org/details/micro_IA41152816_0272",
+            "source_file": "micro_IA41152816_0272_micro_IA41152816_0272_djvu.txt",
+            "start_char": 77064,
+            "end_char": 77233,
+            "start_line": 3477,
+            "end_line": 3480,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false
+          }
+        }
+      ],
+      "entity_surface_corrections": [],
+      "date_evidence": null,
+      "date_basis": "UNRESOLVED",
+      "uncertainty": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "source_uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "model_analysis": true,
+      "verified": false,
+      "source_classification": "UNVERIFIED",
+      "model_proposed_source_classification": "UNVERIFIED",
+      "classification_status": "MODEL_PROVISIONAL_REQUIRES_SOURCE_CRITICISM",
+      "usage_type": "UNRESOLVED",
+      "assertion_class": "SOURCE_STATEMENT",
+      "verification_status": "UNVERIFIED"
+    },
+    {
+      "claim_id": "c-9a9b2e9c3a059cf5ebe2",
+      "statement": "The consulted source reports that a person named Jean Capsi was hanged at the door of the bagne.",
+      "kind": "source_statement",
+      "evidence_id": "e-4c3be40dab82e166c360",
+      "quote": " Quelques jours après, on pendait sire \nJean Capsi à la porte du bagne.",
+      "quote_offset_in_excerpt": 135,
+      "actors": [
+        "Jean Capsi"
+      ],
+      "places": [],
+      "dates": [],
+      "source_occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/bub_gb_3hLLFdLKo_gC",
+          "title": "Impressions de voyage, de Paris à Sébastopol, par le Dr Félix Maynard",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/travellers/library_acquisition/bub_gb_3hLLFdLKo_gC_bub_gb_3hLLFdLKo_gC_djvu.txt",
+          "finding_id": "finding-05aca871cf463791b761",
+          "locator": {
+            "url": "https://archive.org/details/bub_gb_3hLLFdLKo_gC",
+            "source_file": "bub_gb_3hLLFdLKo_gC_bub_gb_3hLLFdLKo_gC_djvu.txt",
+            "start_char": 61745,
+            "end_char": 61816,
+            "start_line": 2341,
+            "end_line": 2342,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false,
+            "offset_unit": "UNICODE_CODE_POINTS",
+            "span_semantics": "EXACT_QUOTE"
+          },
+          "source_text_sha256": "083cbf2fbc9f7abdcd7a566c0e1332b4807897b16ed0e91bf3248515b52f2119",
+          "page_boundaries": [],
+          "reported_archival_reference": null,
+          "context_locator": {
+            "url": "https://archive.org/details/bub_gb_3hLLFdLKo_gC",
+            "source_file": "bub_gb_3hLLFdLKo_gC_bub_gb_3hLLFdLKo_gC_djvu.txt",
+            "start_char": 61610,
+            "end_char": 61816,
+            "start_line": 2339,
+            "end_line": 2342,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false
+          }
+        }
+      ],
+      "entity_surface_corrections": [],
+      "date_evidence": null,
+      "date_basis": "UNRESOLVED",
+      "uncertainty": [
+        "ACTION_UNRESOLVED"
+      ],
+      "source_uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "model_analysis": true,
+      "verified": false,
+      "source_classification": "UNVERIFIED",
+      "model_proposed_source_classification": "UNVERIFIED",
+      "classification_status": "MODEL_PROVISIONAL_REQUIRES_SOURCE_CRITICISM",
+      "usage_type": "UNRESOLVED",
+      "assertion_class": "SOURCE_STATEMENT",
+      "verification_status": "UNVERIFIED"
+    }
+  ],
+  "answer_sections": [
+    {
+      "text": "According to the consulted source, the island of Milos under Ottoman rule acquired a pirate king in 1677; historical verification is pending.",
+      "claim_ids": [
+        "c-f6628dc1818bc27114dd"
+      ]
+    },
+    {
+      "text": "The consulted source reports that Ioannis Kapsis, with his brothers of the Tromara and Niko, set out with two galleys from the Mytikas of Aetolia and sailed throughout the Aegean and Ionian seas; historical verification is pending.",
+      "claim_ids": [
+        "c-aafc9f6829d06961aee9"
+      ]
+    },
+    {
+      "text": "The consulted source mentions Kapsis, Ioannis as a government official in the Foreign Affairs Ministry; historical verification is pending.",
+      "claim_ids": [
+        "c-789d1988cbf7d8dc5095"
+      ]
+    },
+    {
+      "text": "The consulted source reports that a person named Jean Capsi was hanged at the door of the bagne; historical verification is pending.",
+      "claim_ids": [
+        "c-9a9b2e9c3a059cf5ebe2"
+      ]
+    }
+  ],
+  "coverage": {
+    "unique_passages": 19,
+    "selected_passages": 14,
+    "repeated_occurrences": 9,
+    "deferred": [
+      {
+        "evidence_id": "e-1aea7c696d59d092b4d9",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b613a1ff7eaa8c0b0766",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-ccb0cebd4415e2d318b8",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-ed22d2b5ee6da2917cf4",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-a0c9e705ca8358fbd8a1",
+        "reason": "MODEL_CALL_BUDGET"
+      }
+    ],
+    "excluded": [
+      {
+        "finding_id": "finding-8f6d64d0e16ae3902a69",
+        "reason": "UNSUITABLE_FOR_AUTOMATIC_SYNTHESIS"
+      }
+    ]
+  },
+  "evidence": [
+    {
+      "evidence_id": "e-e0414c5b55ea4f65dcb6",
+      "text": "Η Μήλος εν µέσω οθωμανικής κυριαρχίας, το 1677 απέ- \nκτησε πειρατή βασιλιά! Ο Ιωάννης Κάψης µε τα αδέρφια",
+      "similar_text_fingerprint": "93c3a514d1eae2a7ff216472eafb879e2a2e9ea18bbc8a53a0a273dc8ea1ebb3",
+      "years_in_scope": [
+        1677
+      ],
+      "date_basis": "EXPLICIT_PARAGRAPH",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": null,
+        "date": null,
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/diadromi_174",
+          "title": "Διαδρομή Ελευθερίας 174 (2017 Sep)",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/travellers/library_acquisition/diadromi_174_diadromi_174_djvu.txt",
+          "finding_id": "finding-818c2c0e3a2422cabd71",
+          "locator": {
+            "url": "https://archive.org/details/diadromi_174",
+            "source_file": "diadromi_174_diadromi_174_djvu.txt",
+            "start_char": 127361,
+            "end_char": 127466,
+            "start_line": 3557,
+            "end_line": 3558,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "3e4e658a54947737c278d495f736f3592615d6f23800c4e391d097256f0e8a09",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 1.0,
+        "title_period_hint": true,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-53a8cb1a482a82abf5c5",
+      "text": "Η Μήλος εν µέσω οθωμανικής κυριαρχίας, το 1677 απέ- \nκτησε πειρατή βασιλιά! Ο Ιωάννης Κάψης µε τα αδέρφια \nτου Τροµάρα και Νίκο εξορμούσαν µε δύο γαλέρες από \nτον Μύτικα της Αιτωλοακαρνανίας και σάλπαραν σε όλο \nστο Αιγαίο και το Ιόνιο. Ο Κάψης σε µια στάση του στην \nΜήλο γνώρισε την κόρη ενός πλούσιου προύχοντα όπου \nκαι την παντρεύτηκε αφήνοντας στην άκρη τον πειρατικό \nβίο. Μετά από την σύντομη ανάπαυλα ο Κάψης γίνεται \nπάλι πειρατής µε αφορμή την δολοφονία του αδελφού \nτου Τροµάρα από τους Οθωμανούς. Ο Κάψης κατατρέ- \nχει τους Οθωμανούς, ισχυροποιείται µε πλοία, άνδρες \nκαι όπλα και επιστρέφει στην Μήλο, όπου διώχνει τους \nΟθωμανούς και χρήζει τον εαυτό του βασιλιά του νησιού. \nΗ στέψη γίνεται στον μητροπολιτικό ναό από τον Λατίνο \nεπίσκοπο των καθολικών δόν Καμίλλο. Για τρία χρόνια η \nΜήλος είναι ελεύθερη από την Οθωμανική κυριαρχία και \nυπακούει στους νόµους του πειρατή. Ο Κάψης συγκροτεί \nόλες τις λειτουργίες ενός κράτους µε δικαστήριο, αστυνο-",
+      "similar_text_fingerprint": "2a1829c3cf90f925930c8e664f7c3cf2f3d079db46bc870d4523a14b9df97857",
+      "years_in_scope": [
+        1677
+      ],
+      "date_basis": "EXPLICIT_PARAGRAPH",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": null,
+        "date": null,
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/diadromi_174",
+          "title": "Διαδρομή Ελευθερίας 174 (2017 Sep)",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/travellers/library_acquisition/diadromi_174_diadromi_174_djvu.txt",
+          "finding_id": "finding-4606aa4622a69bbfbbc9",
+          "locator": {
+            "url": "https://archive.org/details/diadromi_174",
+            "source_file": "diadromi_174_diadromi_174_djvu.txt",
+            "start_char": 132228,
+            "end_char": 133193,
+            "start_line": 3676,
+            "end_line": 3693,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "3e4e658a54947737c278d495f736f3592615d6f23800c4e391d097256f0e8a09",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 1.0,
+        "title_period_hint": true,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-8fab32ddd66ef441a2ab",
+      "text": "Η Μήλος εν µέσω οθωμανικής κυριαρχίας, το 1677 απέ- \nκτησε πειρατή βασιλιά! Ο Ιωάννης Κάψης µε τα αδέρφια \nτου Τροµάρα και Νίκο εξορμούσαν µε δύο γαλέρες από \nτον Μύτικα της Αιτωλοακαρνανίας και σάλπαραν σε όλο \nστο Αιγαίο και το Ιόνιο. Ο Κάψης σε µια στάση του στην \nΜήλο γνώρισε την κόρη ενός πλούσιου προύχοντα όπου \nκαι την παντρεύτηκε αφήνοντας στην άκρη τον πειρατικό \nβίο. Μετά από την σύντομη ανάπαυλα ο Κάψης γίνεται \nπάλι πειρατής µε αφορμή την δολοφονία του αδελφού \nτου Τροµάρα από τους Οθωμανούς. Ο Κάψης κατατρέ- \nχει τους Οθωμανούς, ισχυροποιείται µε πλοία, άνδρες \nκαι όπλα και επιστρέφει στην Μήλο, όπου διώχνει τους \nΟθωμανούς και χρήζει τον εαυτό του βασιλιά του νησιού. \nΗ στέψη γίνεται στον μητροπολιτικό ναό από τον Λατίνο \nεπίσκοπο των καθολικών δόν Καμίλλο. Για τρία χρόνια η \nΜήλος είναι ελεύθερη από την Οθωμανική κυριαρχία και \nυπακούει στους νόμους του πειρατή. Ο Κάψης συγκροτεί \nόλες τις λειτουργίες ενός κράτους µε δικαστήριο, αστυνο- \nµία, στρατό και Φοροεισπρακτικό μηχανισμό. Η κυριαρχία \nτου Κάψη, όµως, Φαίνεται πως περιορίζονταν από την \nεξουσία της εκκλησίας και των προεστών,που ακόµα διεκ- \nδικούσαν µεγάλο μερίδιο από τους φόρους των κατοίκων. \nΤο 1680 η κυριαρχία του Κάψη τελειώνει. Οι Οθωμανοί \nτων συλλαμβάνουν, τον οδηγούν στην Κωνσταντινούπολη \nκαι τον απαγχονίζουν. Οι εκδοχές για το πώς οδηγήθηκε \nστα χέρια των Οθωμανών είναι δύο: α) Ο Κάψης παρα- \nπλανήθηκε από τους Οθωμανούς οι οποίοι του είπαν ότι \nήρθαν για να τον τιμήσουν και να του προσφέρουν δώρα \nκαι οδηγήθηκε σε µια γαλέρα όπου βρίσκονταν τα δώρα... \nβ) Ο Κάψης ηγήθηκε εξέγερσης ενάντια στους φόρουςπου \nέπρεπε οι κάτοικοι να πληρώνουν στο πατριαρχείο και",
+      "similar_text_fingerprint": "09bded27a8050fd0beb5e0a431488ada214670122ca312b97eb3356923270257",
+      "years_in_scope": [
+        1677,
+        1680
+      ],
+      "date_basis": "EXPLICIT_PARAGRAPH",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": null,
+        "date": null,
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "MULTIPLE_DATES_REQUIRE_CLAUSE_REVIEW"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/diadromi_174",
+          "title": "Διαδρομή Ελευθερίας 174 (2017 Sep)",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/travellers/library_acquisition/diadromi_174_diadromi_174_djvu.txt",
+          "finding_id": "finding-4b6d7fc1d572368243da",
+          "locator": {
+            "url": "https://archive.org/details/diadromi_174",
+            "source_file": "diadromi_174_diadromi_174_djvu.txt",
+            "start_char": 138529,
+            "end_char": 140197,
+            "start_line": 3821,
+            "end_line": 3851,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "3e4e658a54947737c278d495f736f3592615d6f23800c4e391d097256f0e8a09",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 1.0,
+        "title_period_hint": true,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-955ba61c43dc3fc694ee",
+      "text": "6. Ιωάννη Καψή, Υφυπουργό Προεδρίας της ^Κυβέρνησης \nκαι Εξωτερικών.",
+      "similar_text_fingerprint": "aec1b7b01c5ea8ccd06db850c4c974b3cd52f7447ae553218568927d543a2118",
+      "years_in_scope": [],
+      "date_basis": "YEAR_HEADING",
+      "date_evidence": {
+        "text": "1881",
+        "locator": {
+          "url": "https://archive.org/details/GreekGovernmentGazette-19870100176",
+          "source_file": "GreekGovernmentGazette-19870100176_19870100176_djvu.txt",
+          "start_char": 0,
+          "end_char": 4,
+          "start_line": 1,
+          "end_line": 1,
+          "printed_page": null,
+          "scan_indexes_0_based": [],
+          "pdf_file": null,
+          "original_inspected": false
+        }
+      },
+      "source_bibliography": {
+        "creator": [
+          "The Government of the Hellenic Republic"
+        ],
+        "date": [
+          "1987-01-01T00:00:00Z"
+        ],
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "DATE_FROM_SECTION_HEADING",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/GreekGovernmentGazette-19870100176",
+          "title": "Greek Government Gazette: Part 1, 1987 no. 176",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/travellers/library_acquisition/GreekGovernmentGazette-19870100176_19870100176_djvu.txt",
+          "finding_id": "finding-a00e058e33b9678624d8",
+          "locator": {
+            "url": "https://archive.org/details/GreekGovernmentGazette-19870100176",
+            "source_file": "GreekGovernmentGazette-19870100176_19870100176_djvu.txt",
+            "start_char": 1649,
+            "end_char": 1717,
+            "start_line": 84,
+            "end_line": 85,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "5781dcf950cdc1f484127caa80da6967126471707c5b6ecc8fbe3fd2380f5852",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 1,
+        "title_period_hint": true,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-649f56f5916c1dddf863",
+      "text": "JEAN CAPSI.",
+      "similar_text_fingerprint": "707d2aa23e6d48fc0d89b792c69e6b0a386bc0543017b8c03c64f3bbda5d8daa",
+      "years_in_scope": [],
+      "date_basis": "UNRESOLVED",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": null,
+        "date": [
+          "1698"
+        ],
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "british",
+          "url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+          "title": "Saulger, Robert: Histoire nouvelle des anciens ducs et autres souverains de l'Archipel: avec la description des principales isles",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/british/library_acquisition/51a1e91aae26bdbdb49d6796.txt",
+          "finding_id": "finding-7055522661b2b00a118c",
+          "locator": {
+            "url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+            "source_file": "51a1e91aae26bdbdb49d6796.txt",
+            "start_char": 343,
+            "end_char": 354,
+            "start_line": 12,
+            "end_line": 12,
+            "printed_page": null,
+            "scan_indexes_0_based": [
+              336
+            ],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "923217dcccd81731f1e9f40f9f9addc3d8d529387022b4017574d2a5a0fc00a7",
+          "page_boundaries": [
+            {
+              "scan_index_0_based": 336,
+              "printed_page": null,
+              "start_char": 0,
+              "end_char": 925,
+              "image_url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+              "image_file": "library_acquisition/51a1e91aae26bdbdb49d6796.jpg",
+              "original_inspected": false
+            }
+          ],
+          "reported_archival_reference": null
+        },
+        {
+          "lane": "dutch",
+          "url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+          "title": "Saulger, Robert: Histoire nouvelle des anciens ducs et autres souverains de l'Archipel: avec la description des principales isles",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/dutch/library_acquisition/51a1e91aae26bdbdb49d6796.txt",
+          "finding_id": "finding-7055522661b2b00a118c",
+          "locator": {
+            "url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+            "source_file": "51a1e91aae26bdbdb49d6796.txt",
+            "start_char": 343,
+            "end_char": 354,
+            "start_line": 12,
+            "end_line": 12,
+            "printed_page": null,
+            "scan_indexes_0_based": [
+              336
+            ],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "923217dcccd81731f1e9f40f9f9addc3d8d529387022b4017574d2a5a0fc00a7",
+          "page_boundaries": [
+            {
+              "scan_index_0_based": 336,
+              "printed_page": null,
+              "start_char": 0,
+              "end_char": 925,
+              "image_url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+              "image_file": "library_acquisition/51a1e91aae26bdbdb49d6796.jpg",
+              "original_inspected": false
+            }
+          ],
+          "reported_archival_reference": null
+        },
+        {
+          "lane": "greek",
+          "url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+          "title": "Saulger, Robert: Histoire nouvelle des anciens ducs et autres souverains de l'Archipel: avec la description des principales isles",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/greek/library_acquisition/51a1e91aae26bdbdb49d6796.txt",
+          "finding_id": "finding-7055522661b2b00a118c",
+          "locator": {
+            "url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+            "source_file": "51a1e91aae26bdbdb49d6796.txt",
+            "start_char": 343,
+            "end_char": 354,
+            "start_line": 12,
+            "end_line": 12,
+            "printed_page": null,
+            "scan_indexes_0_based": [
+              336
+            ],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "923217dcccd81731f1e9f40f9f9addc3d8d529387022b4017574d2a5a0fc00a7",
+          "page_boundaries": [
+            {
+              "scan_index_0_based": 336,
+              "printed_page": null,
+              "start_char": 0,
+              "end_char": 925,
+              "image_url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+              "image_file": "library_acquisition/51a1e91aae26bdbdb49d6796.jpg",
+              "original_inspected": false
+            }
+          ],
+          "reported_archival_reference": null
+        },
+        {
+          "lane": "italian_states",
+          "url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+          "title": "Saulger, Robert: Histoire nouvelle des anciens ducs et autres souverains de l'Archipel: avec la description des principales isles",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/italian_states/library_acquisition/51a1e91aae26bdbdb49d6796.txt",
+          "finding_id": "finding-7055522661b2b00a118c",
+          "locator": {
+            "url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+            "source_file": "51a1e91aae26bdbdb49d6796.txt",
+            "start_char": 343,
+            "end_char": 354,
+            "start_line": 12,
+            "end_line": 12,
+            "printed_page": null,
+            "scan_indexes_0_based": [
+              336
+            ],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "923217dcccd81731f1e9f40f9f9addc3d8d529387022b4017574d2a5a0fc00a7",
+          "page_boundaries": [
+            {
+              "scan_index_0_based": 336,
+              "printed_page": null,
+              "start_char": 0,
+              "end_char": 925,
+              "image_url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+              "image_file": "library_acquisition/51a1e91aae26bdbdb49d6796.jpg",
+              "original_inspected": false
+            }
+          ],
+          "reported_archival_reference": null
+        },
+        {
+          "lane": "north_african",
+          "url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+          "title": "Saulger, Robert: Histoire nouvelle des anciens ducs et autres souverains de l'Archipel: avec la description des principales isles",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/north_african/library_acquisition/51a1e91aae26bdbdb49d6796.txt",
+          "finding_id": "finding-7055522661b2b00a118c",
+          "locator": {
+            "url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+            "source_file": "51a1e91aae26bdbdb49d6796.txt",
+            "start_char": 343,
+            "end_char": 354,
+            "start_line": 12,
+            "end_line": 12,
+            "printed_page": null,
+            "scan_indexes_0_based": [
+              336
+            ],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "923217dcccd81731f1e9f40f9f9addc3d8d529387022b4017574d2a5a0fc00a7",
+          "page_boundaries": [
+            {
+              "scan_index_0_based": 336,
+              "printed_page": null,
+              "start_char": 0,
+              "end_char": 925,
+              "image_url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+              "image_file": "library_acquisition/51a1e91aae26bdbdb49d6796.jpg",
+              "original_inspected": false
+            }
+          ],
+          "reported_archival_reference": null
+        },
+        {
+          "lane": "ottoman",
+          "url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+          "title": "Saulger, Robert: Histoire nouvelle des anciens ducs et autres souverains de l'Archipel: avec la description des principales isles",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/ottoman/library_acquisition/51a1e91aae26bdbdb49d6796.txt",
+          "finding_id": "finding-7055522661b2b00a118c",
+          "locator": {
+            "url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+            "source_file": "51a1e91aae26bdbdb49d6796.txt",
+            "start_char": 343,
+            "end_char": 354,
+            "start_line": 12,
+            "end_line": 12,
+            "printed_page": null,
+            "scan_indexes_0_based": [
+              336
+            ],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "923217dcccd81731f1e9f40f9f9addc3d8d529387022b4017574d2a5a0fc00a7",
+          "page_boundaries": [
+            {
+              "scan_index_0_based": 336,
+              "printed_page": null,
+              "start_char": 0,
+              "end_char": 925,
+              "image_url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+              "image_file": "library_acquisition/51a1e91aae26bdbdb49d6796.jpg",
+              "original_inspected": false
+            }
+          ],
+          "reported_archival_reference": null
+        },
+        {
+          "lane": "spanish_simancas",
+          "url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+          "title": "Saulger, Robert: Histoire nouvelle des anciens ducs et autres souverains de l'Archipel: avec la description des principales isles",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/spanish_simancas/library_acquisition/51a1e91aae26bdbdb49d6796.txt",
+          "finding_id": "finding-7055522661b2b00a118c",
+          "locator": {
+            "url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+            "source_file": "51a1e91aae26bdbdb49d6796.txt",
+            "start_char": 343,
+            "end_char": 354,
+            "start_line": 12,
+            "end_line": 12,
+            "printed_page": null,
+            "scan_indexes_0_based": [
+              336
+            ],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "923217dcccd81731f1e9f40f9f9addc3d8d529387022b4017574d2a5a0fc00a7",
+          "page_boundaries": [
+            {
+              "scan_index_0_based": 336,
+              "printed_page": null,
+              "start_char": 0,
+              "end_char": 925,
+              "image_url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+              "image_file": "library_acquisition/51a1e91aae26bdbdb49d6796.jpg",
+              "original_inspected": false
+            }
+          ],
+          "reported_archival_reference": null
+        },
+        {
+          "lane": "travellers",
+          "url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+          "title": "Saulger, Robert: Histoire nouvelle des anciens ducs et autres souverains de l'Archipel: avec la description des principales isles",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/travellers/library_acquisition/51a1e91aae26bdbdb49d6796.txt",
+          "finding_id": "finding-7055522661b2b00a118c",
+          "locator": {
+            "url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+            "source_file": "51a1e91aae26bdbdb49d6796.txt",
+            "start_char": 343,
+            "end_char": 354,
+            "start_line": 12,
+            "end_line": 12,
+            "printed_page": null,
+            "scan_indexes_0_based": [
+              336
+            ],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "923217dcccd81731f1e9f40f9f9addc3d8d529387022b4017574d2a5a0fc00a7",
+          "page_boundaries": [
+            {
+              "scan_index_0_based": 336,
+              "printed_page": null,
+              "start_char": 0,
+              "end_char": 925,
+              "image_url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+              "image_file": "library_acquisition/51a1e91aae26bdbdb49d6796.jpg",
+              "original_inspected": false
+            }
+          ],
+          "reported_archival_reference": null
+        },
+        {
+          "lane": "venetian",
+          "url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+          "title": "Saulger, Robert: Histoire nouvelle des anciens ducs et autres souverains de l'Archipel: avec la description des principales isles",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/venetian/library_acquisition/51a1e91aae26bdbdb49d6796.txt",
+          "finding_id": "finding-7055522661b2b00a118c",
+          "locator": {
+            "url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+            "source_file": "51a1e91aae26bdbdb49d6796.txt",
+            "start_char": 343,
+            "end_char": 354,
+            "start_line": 12,
+            "end_line": 12,
+            "printed_page": null,
+            "scan_indexes_0_based": [
+              336
+            ],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "923217dcccd81731f1e9f40f9f9addc3d8d529387022b4017574d2a5a0fc00a7",
+          "page_boundaries": [
+            {
+              "scan_index_0_based": 336,
+              "printed_page": null,
+              "start_char": 0,
+              "end_char": 925,
+              "image_url": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00337/full/full/0/default.jpg",
+              "image_file": "library_acquisition/51a1e91aae26bdbdb49d6796.jpg",
+              "original_inspected": false
+            }
+          ],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 0,
+        "title_period_hint": true,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-c69cf5a2395a68c5b1aa",
+      "text": "ΙΩΑΝΝΗΣ ΚΑΨΗΣ",
+      "similar_text_fingerprint": "b166070d19e1f91e00e05ae49f37266eb768e65150d68fafed4ea9e44d9afce6",
+      "years_in_scope": [],
+      "date_basis": "UNRESOLVED",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": [
+          "The Government of the Hellenic Republic"
+        ],
+        "date": [
+          "1987-01-01T00:00:00Z"
+        ],
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/GreekGovernmentGazette-19870200241",
+          "title": "Greek Government Gazette: Part 2, 1987 no. 241",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/travellers/library_acquisition/GreekGovernmentGazette-19870200241_19870200241_djvu.txt",
+          "finding_id": "finding-a647b6ab408b59a44a3b",
+          "locator": {
+            "url": "https://archive.org/details/GreekGovernmentGazette-19870200241",
+            "source_file": "GreekGovernmentGazette-19870200241_19870200241_djvu.txt",
+            "start_char": 8385,
+            "end_char": 8398,
+            "start_line": 409,
+            "end_line": 409,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "c6e53df7f7ef8016cbc2bba3c57431c0ccb7a781159fb9562b6cbe352906f05a",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        },
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/GreekGovernmentGazette-19870200392",
+          "title": "Greek Government Gazette: Part 2, 1987 no. 392",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/travellers/library_acquisition/GreekGovernmentGazette-19870200392_19870200392_djvu.txt",
+          "finding_id": "finding-6c8715bb59b69f40da0d",
+          "locator": {
+            "url": "https://archive.org/details/GreekGovernmentGazette-19870200392",
+            "source_file": "GreekGovernmentGazette-19870200392_19870200392_djvu.txt",
+            "start_char": 2834,
+            "end_char": 2847,
+            "start_line": 128,
+            "end_line": 128,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "7818d34f519618b4f7a471ff2706a1cecc6c610006b54568d44e9b05bb54f010",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 0,
+        "title_period_hint": true,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-8aab33c628208b80457b",
+      "text": "Dep. Min. i Papathemelis, Stylianos \nDep. Min. of Finance Roumeliotis, Panayiotis \nDep. Min. of Finance Tsovolas, Dimitrios \nDep. Min. of Foreign Affairs Kapsis, Ioannis",
+      "similar_text_fingerprint": "9e50738d2dab47008396ea48de0dd76d7e5643f9c66e0c7c887396cf70cf4ba5",
+      "years_in_scope": [],
+      "date_basis": "UNRESOLVED",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": [
+          "United States. Central Intelligence Agency. Directorate of Intelligence"
+        ],
+        "date": [
+          "1982-08-01T00:00:00Z"
+        ],
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/micro_IA41152816_0272",
+          "title": "Chiefs of State and Cabinet Members of Foreign Governments",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/travellers/library_acquisition/micro_IA41152816_0272_micro_IA41152816_0272_djvu.txt",
+          "finding_id": "finding-d5ce10da5f04b81427cf",
+          "locator": {
+            "url": "https://archive.org/details/micro_IA41152816_0272",
+            "source_file": "micro_IA41152816_0272_micro_IA41152816_0272_djvu.txt",
+            "start_char": 77064,
+            "end_char": 77233,
+            "start_line": 3477,
+            "end_line": 3480,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "a8e02ae9da0b31734b42d69c835116d308fa25d10a74a695692a34c75a3e0f65",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 0,
+        "title_period_hint": true,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-f4e7e30d81a54241fca6",
+      "text": "Marcopoulos,  Christos \nFilippopoulos,  Athanassios \nMaroudas,  Dimitris \nDaskalakis,  George \nSfyriou,  Cosmas \nStathis,  Theodoras \nPapastefanakis,  Emmanuel \nKapsis,  Ioannis \nPangalos,  Theodoras",
+      "similar_text_fingerprint": "18bb2a385280f309bb49e6f162448776c9d29c04622bf02389e28ade002962d4",
+      "years_in_scope": [],
+      "date_basis": "UNRESOLVED",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": [
+          "Washington, D.C. :The Center",
+          "United States. Central Intelligence Agency",
+          "National Foreign Assessment Center (U.S.)",
+          "United States. Central Intelligence Agency. Directorate of Intelligence"
+        ],
+        "date": [
+          "2003-01-01T00:00:00Z"
+        ],
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/chiefsofstateca8900wash_0",
+          "title": "Chiefs of State and Cabinet members of foreign governments /National Foreign Assessment Center",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/travellers/library_acquisition/chiefsofstateca8900wash_0_chiefsofstateca8900wash_0_djvu.txt",
+          "finding_id": "finding-8c4ae0dacc3518251825",
+          "locator": {
+            "url": "https://archive.org/details/chiefsofstateca8900wash_0",
+            "source_file": "chiefsofstateca8900wash_0_chiefsofstateca8900wash_0_djvu.txt",
+            "start_char": 100660,
+            "end_char": 100859,
+            "start_line": 5731,
+            "end_line": 5739,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "f9fae580156adf2ada5f03518619a448cf91e4e79c1a96ef192b6edd6bd5c02b",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 0,
+        "title_period_hint": true,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-9e1bb165b3662ad3bcee",
+      "text": "Un capitan-pacha, sous prétexte de traiter de la paix^ \nTattira dans sa galère^ et le conduisit, chargé de chaînes^ \nà Gonstantinople. Quelques jours après, on pendait sire \nJean Capsi à la porte du bagne.",
+      "similar_text_fingerprint": "617cf85c4934914f13f181e9b869a3d1cc7fb847daee5b43ba4a29313165e45a",
+      "years_in_scope": [],
+      "date_basis": "UNRESOLVED",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": [
+          "Félix Maynard"
+        ],
+        "date": [
+          "1855-01-01T00:00:00Z"
+        ],
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/impressionsdevo01mayngoog",
+          "title": "Impressions de voyage de Paris à Sébastopol",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/travellers/library_acquisition/impressionsdevo01mayngoog_impressionsdevo01mayngoog_djvu.txt",
+          "finding_id": "finding-e352d4c3c8fb04813db8",
+          "locator": {
+            "url": "https://archive.org/details/impressionsdevo01mayngoog",
+            "source_file": "impressionsdevo01mayngoog_impressionsdevo01mayngoog_djvu.txt",
+            "start_char": 68232,
+            "end_char": 68437,
+            "start_line": 1875,
+            "end_line": 1878,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "5318830634c7b3294ab7ef08d06bc532987a52d79cf42375f79a3bd47ba7063f",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 0,
+        "title_period_hint": true,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-4c3be40dab82e166c360",
+      "text": "Un capitan-pacha, sous prétexte de traiter de la paix, \nl’attira dans sa galère, et le conduisit, chargé de chaînes, \nà Constantinople. Quelques jours après, on pendait sire \nJean Capsi à la porte du bagne.",
+      "similar_text_fingerprint": "59737bedaa72ec725017a4fad712e40cb01ff361cfcd1529c44d6912de37ae4b",
+      "years_in_scope": [],
+      "date_basis": "UNRESOLVED",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": [
+          "Maynard, Félix, Dr. aut (FrPBN)10478143"
+        ],
+        "date": [
+          "1855-01-01T00:00:00Z"
+        ],
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/bub_gb_3hLLFdLKo_gC",
+          "title": "Impressions de voyage, de Paris à Sébastopol, par le Dr Félix Maynard",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/travellers/library_acquisition/bub_gb_3hLLFdLKo_gC_bub_gb_3hLLFdLKo_gC_djvu.txt",
+          "finding_id": "finding-05aca871cf463791b761",
+          "locator": {
+            "url": "https://archive.org/details/bub_gb_3hLLFdLKo_gC",
+            "source_file": "bub_gb_3hLLFdLKo_gC_bub_gb_3hLLFdLKo_gC_djvu.txt",
+            "start_char": 61610,
+            "end_char": 61816,
+            "start_line": 2339,
+            "end_line": 2342,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "083cbf2fbc9f7abdcd7a566c0e1332b4807897b16ed0e91bf3248515b52f2119",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 0,
+        "title_period_hint": true,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-cc827b1f96a2e9ee101c",
+      "text": "Un  capitan-pacha,  sous  prétexte  de  traiter  de  la  paix, \nlattira  dans  sa  galère,  et  le  conduisit,  chargé  de  chaînes, \nà  Constantinople.  Quelques  jours  après,  on  pendait  sire \nJean  Capsi  à  la  porte  du  bagne.",
+      "similar_text_fingerprint": "2a2413561bb211a01b8c0aa6686ad29ef4733b8b7009d964c80a423e6472667d",
+      "years_in_scope": [],
+      "date_basis": "UNRESOLVED",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": [
+          "Maynard, Félix, 1813-1858"
+        ],
+        "date": [
+          "1855-01-01T00:00:00Z"
+        ],
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/impressionsdevo00mayngoog",
+          "title": "Impressions de voyage de Paris à Sébastopol",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/travellers/library_acquisition/impressionsdevo00mayngoog_impressionsdevo00mayngoog_djvu.txt",
+          "finding_id": "finding-84a7384a5479214874ef",
+          "locator": {
+            "url": "https://archive.org/details/impressionsdevo00mayngoog",
+            "source_file": "impressionsdevo00mayngoog_impressionsdevo00mayngoog_djvu.txt",
+            "start_char": 76336,
+            "end_char": 76571,
+            "start_line": 1675,
+            "end_line": 1678,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "6531d1b86a6becd16cb63dc50c7e6beb153cecbb52c96c14f9f4a8693fb42f38",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 0,
+        "title_period_hint": true,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-27f55699049bbfa1fe5c",
+      "text": "Un  capitan-pacha,  sous  prétexte  de  traiter  de  la  paix, \nl'attira  dans  sa  galère,  et  le  conduisit,  chargé  de  chaînes, \nà  Constantinople.  Quelques  jom-s  après,  on  pendait  sire \nJean  Capsi  à  la  porte  du  bagne.",
+      "similar_text_fingerprint": "114871af7077cb41bd0ec56c949ef0095cc4047b4d3d9d2f4e1b0ca78db39d9d",
+      "years_in_scope": [],
+      "date_basis": "UNRESOLVED",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": [
+          "Maynard, Félix, 1813-1858",
+          "Dumas, Alexandre, 1802-1870"
+        ],
+        "date": [
+          "1855-01-01T00:00:00Z"
+        ],
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/impressionsdevoy00mayn",
+          "title": "Impressions de voyage de Paris à Sébastopol",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/travellers/library_acquisition/impressionsdevoy00mayn_impressionsdevoy00mayn_djvu.txt",
+          "finding_id": "finding-dd111b13c64b7c034fbc",
+          "locator": {
+            "url": "https://archive.org/details/impressionsdevoy00mayn",
+            "source_file": "impressionsdevoy00mayn_impressionsdevoy00mayn_djvu.txt",
+            "start_char": 67921,
+            "end_char": 68157,
+            "start_line": 1569,
+            "end_line": 1572,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "dc6c89383fa4d3c6f295a7028ca66bef0eae2e933c0f4bd0dfcbe94a3cfe65c8",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 0,
+        "title_period_hint": true,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-485fa811343cdbc8b41a",
+      "text": "Αγριογιάννη θεοδώρα του Μιχαήλ \nΑραβόσιτό Ζωή του Δημητρίου \nΑσσυχίδου Ελισσάβετ του Κυριάκου \nΓιωτοπούλου Αθανασία του Σωτηρίου - Παντελή \nΗλιοπούλου Βενετία του Ιωάννη \nΚαψής Ιωάννης του Παναγιώτη \nΜπακογιάννη Αικατερίνη του Δημητρίου * \nΜπεκιάρη Καλλιόπη του Χριστοφόρου \nΤζανακάκη Κυριακή του Στυλιανού.",
+      "similar_text_fingerprint": "a3b3550f598b5d8d5caead2ee3dfe78c3bab4dc716863ad8445cf3cb7d80b50f",
+      "years_in_scope": [],
+      "date_basis": "UNRESOLVED",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": [
+          "The Government of the Hellenic Republic"
+        ],
+        "date": [
+          "1995-01-01T00:00:00Z"
+        ],
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/GreekGovernmentGazette-19950300038",
+          "title": "Greek Government Gazette: Part 3, 1995 no. 38",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/travellers/library_acquisition/GreekGovernmentGazette-19950300038_19950300038_djvu.txt",
+          "finding_id": "finding-c34f7f87c39d3c771788",
+          "locator": {
+            "url": "https://archive.org/details/GreekGovernmentGazette-19950300038",
+            "source_file": "GreekGovernmentGazette-19950300038_19950300038_djvu.txt",
+            "start_char": 12979,
+            "end_char": 13286,
+            "start_line": 498,
+            "end_line": 506,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "b3e57ae01633a01adbcc5c01932fc3d39e1c8ed291f66dedc149fbecf2a20509",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 0,
+        "title_period_hint": true,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-3982d77acc56301dbadf",
+      "text": "α) Ο βουλευτής Ιωάννης Καψής, Πρόεδρος της Ειδικής \nΚοινοβουλευτικής Επιτροπής Θεσμών και Διαφάνειας, \nβ) Ο Χρήστος Πολυζωγόπουλος. ως εκπρόσωπος της \nΓ.Σ.Ε.Ε. και ο Κώστας Τρικκαίος ως αναπληρωτής του, ο \nΧαράλαμπος Καλύβας ως εκπρόσωπος της Α.Δ.Ε.Δ.Υ και \nη Δέσποινα Τσαγδή ως αναπληρώτριά του, \nγ) Ο Κωστής Παπαϊωάννου, ως εκπρόσωπος της Διε¬ \nθνούς Αμνηστίας, και η Γεωργία Ζερβού ως αναπληρώ- \nτριάτου, ο Νίκος Φραγκάκης, ως εκπρόσωπος της Ελλη¬ \nνικής Ένωσης για τα Δικαιώματα του Ανθρώπου και ο \nΓιάννης Σουριαδάκης, ως αναπληρωτής του, η Αλίκη Γιω- \nτοπούλου - Μαραγκοπούλου, ως εκπρόσωπος του Ιδρύ¬ \nματος Μαραγκοπούλου για τα Ανθρώπινα Δικαιώματα και \nο Λίνος-Αλέξανδρος Σισιλιάνος, ως αναπληρωτής της, η",
+      "similar_text_fingerprint": "fc5b04d43d9878cb81dd0b51616a3f30bcf479bcf0966e918633fb5bcb780f56",
+      "years_in_scope": [],
+      "date_basis": "UNRESOLVED",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": [
+          "The Government of the Hellenic Republic"
+        ],
+        "date": [
+          "1999-01-01T00:00:00Z"
+        ],
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/GreekGovernmentGazette-19990201833",
+          "title": "Greek Government Gazette: Part 2, 1999 no. 1833",
+          "acquired_text_path": "semantic_reanalysis_39376752977/derived_sources/travellers/library_acquisition/GreekGovernmentGazette-19990201833_19990201833_djvu.txt",
+          "finding_id": "finding-0f6c3dbf8a54273a02a2",
+          "locator": {
+            "url": "https://archive.org/details/GreekGovernmentGazette-19990201833",
+            "source_file": "GreekGovernmentGazette-19990201833_19990201833_djvu.txt",
+            "start_char": 2720,
+            "end_char": 3434,
+            "start_line": 114,
+            "end_line": 127,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "original_inspected": false
+          },
+          "source_text_sha256": "891deee22287b3791ea1a1df97bff1346c91e1233dcc3332a11bcfcb4b75a113",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 0,
+        "title_period_hint": true,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    }
+  ],
+  "calls": [
+    {
+      "role": "evidence_extractor",
+      "status": "COMPLETED",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF",
+      "error": null,
+      "model_identity": {
+        "repository": "Qwen/Qwen3-8B-GGUF",
+        "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+        "filename": "Qwen3-8B-Q4_K_M.gguf",
+        "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+        "files": [
+          {
+            "filename": "Qwen3-8B-Q4_K_M.gguf",
+            "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+            "lfs_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785"
+          }
+        ],
+        "provider": "local_llama_cpp",
+        "external_api_key_required": false,
+        "model_url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/tree/7c41481f57cb95916b40956ab2f0b139b296d974",
+        "file": "Qwen3-8B-Q4_K_M.gguf"
+      },
+      "usage": {
+        "prompt_tokens": 4431,
+        "completion_tokens": 255,
+        "total_tokens": 4686
+      },
+      "wire_prompt_sha256": "58faec0f5a1606722edf9bae8498aea040b73ee2cc652e8175aab3415e187f7f",
+      "chat_mode": "CHATML_NO_THINK",
+      "finish_reason": "stop",
+      "elapsed_seconds": 452.06,
+      "prompt_sha256": "6add0c55b20f3830803540020d6646f6e89450b272fa8099e870469da665d50d",
+      "response_sha256": "daf2e1a4406dfa630ea277f2bfa98547983afa6c1b677c4a39a8f410eda1b1fe",
+      "prompt_version": "2026-10-20.1",
+      "response_schema_sha256": "950542f68eb7c1f68d522d70d7723f7e08e762023a69cc44ce80008937d5d98b",
+      "completed_utc": "2026-10-20T06:04:35.356173+00:00"
+    },
+    {
+      "role": "evidence_extractor",
+      "status": "COMPLETED",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF",
+      "error": null,
+      "model_identity": {
+        "repository": "Qwen/Qwen3-8B-GGUF",
+        "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+        "filename": "Qwen3-8B-Q4_K_M.gguf",
+        "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+        "files": [
+          {
+            "filename": "Qwen3-8B-Q4_K_M.gguf",
+            "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+            "lfs_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785"
+          }
+        ],
+        "provider": "local_llama_cpp",
+        "external_api_key_required": false,
+        "model_url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/tree/7c41481f57cb95916b40956ab2f0b139b296d974",
+        "file": "Qwen3-8B-Q4_K_M.gguf"
+      },
+      "usage": {
+        "prompt_tokens": 2934,
+        "completion_tokens": 263,
+        "total_tokens": 3197
+      },
+      "wire_prompt_sha256": "33af79ce4e113bd9866e8363521c52f40b4f0f2b8d91bb725fc24d5a8c495aad",
+      "chat_mode": "CHATML_NO_THINK",
+      "finish_reason": "stop",
+      "elapsed_seconds": 252.08,
+      "prompt_sha256": "b8f58073d17b54a46ba87c4f1dc3ac60375a936c0522e3ee6e769f058fcad1ff",
+      "response_sha256": "3c6a868abeca8c6498bd71ceda7e99786a54640f6ab820c4bbc4eebb37a3d322",
+      "prompt_version": "2026-10-20.1",
+      "response_schema_sha256": "2e268db0e11f3f03f63b987fded645a748b7fc5995d6e6f5e933da4584e8f49f",
+      "completed_utc": "2026-10-20T06:08:47.437491+00:00"
+    },
+    {
+      "role": "evidence_extractor",
+      "status": "COMPLETED",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF",
+      "error": null,
+      "model_identity": {
+        "repository": "Qwen/Qwen3-8B-GGUF",
+        "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+        "filename": "Qwen3-8B-Q4_K_M.gguf",
+        "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+        "files": [
+          {
+            "filename": "Qwen3-8B-Q4_K_M.gguf",
+            "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+            "lfs_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785"
+          }
+        ],
+        "provider": "local_llama_cpp",
+        "external_api_key_required": false,
+        "model_url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/tree/7c41481f57cb95916b40956ab2f0b139b296d974",
+        "file": "Qwen3-8B-Q4_K_M.gguf"
+      },
+      "usage": {
+        "prompt_tokens": 3430,
+        "completion_tokens": 296,
+        "total_tokens": 3726
+      },
+      "wire_prompt_sha256": "23b85bc9de4e313693b201d795481cbbf0e9fd8b72cf7ff523f72500fd1b65c0",
+      "chat_mode": "CHATML_NO_THINK",
+      "finish_reason": "stop",
+      "elapsed_seconds": 123.75,
+      "prompt_sha256": "a8c75dcecd4a10b2145248c9915b072169941ae77f42faf66276d789b2d44ff8",
+      "response_sha256": "aab3ecdaa7aaf7e06c98a88845d0629394f354082ca36e0dea6acbfc21b82a9a",
+      "prompt_version": "2026-10-20.1",
+      "response_schema_sha256": "2e268db0e11f3f03f63b987fded645a748b7fc5995d6e6f5e933da4584e8f49f",
+      "completed_utc": "2026-10-20T06:10:51.188091+00:00"
+    },
+    {
+      "role": "evidence_extractor",
+      "status": "COMPLETED",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF",
+      "error": null,
+      "model_identity": {
+        "repository": "Qwen/Qwen3-8B-GGUF",
+        "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+        "filename": "Qwen3-8B-Q4_K_M.gguf",
+        "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+        "files": [
+          {
+            "filename": "Qwen3-8B-Q4_K_M.gguf",
+            "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+            "lfs_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785"
+          }
+        ],
+        "provider": "local_llama_cpp",
+        "external_api_key_required": false,
+        "model_url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/tree/7c41481f57cb95916b40956ab2f0b139b296d974",
+        "file": "Qwen3-8B-Q4_K_M.gguf"
+      },
+      "usage": {
+        "prompt_tokens": 3462,
+        "completion_tokens": 217,
+        "total_tokens": 3679
+      },
+      "wire_prompt_sha256": "dc64d8d243795d85d63ee3c0aaf8da01e567722671d1b1ed893bc9e093927044",
+      "chat_mode": "CHATML_NO_THINK",
+      "finish_reason": "stop",
+      "elapsed_seconds": 301.83,
+      "prompt_sha256": "f71fef1e0669f385a954d720fb33dc40260ae5d7f6dbdfcc204b8803185d40f3",
+      "response_sha256": "8f1f840adde2fc4b6c47070c0a2f2452b98baf2fe64ca2bd3761e1bc366b2137",
+      "prompt_version": "2026-10-20.1",
+      "response_schema_sha256": "3733930c4a351c4d602657c3ad2db9e133d3a9bc1956d165991a219be41af42b",
+      "completed_utc": "2026-10-20T06:15:53.018698+00:00"
+    },
+    {
+      "role": "adversarial_reviewer",
+      "status": "COMPLETED",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF",
+      "error": null,
+      "model_identity": {
+        "repository": "Qwen/Qwen3-8B-GGUF",
+        "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+        "filename": "Qwen3-8B-Q4_K_M.gguf",
+        "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+        "files": [
+          {
+            "filename": "Qwen3-8B-Q4_K_M.gguf",
+            "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+            "lfs_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785"
+          }
+        ],
+        "provider": "local_llama_cpp",
+        "external_api_key_required": false,
+        "model_url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/tree/7c41481f57cb95916b40956ab2f0b139b296d974",
+        "file": "Qwen3-8B-Q4_K_M.gguf"
+      },
+      "usage": {
+        "prompt_tokens": 1024,
+        "completion_tokens": 415,
+        "total_tokens": 1439
+      },
+      "wire_prompt_sha256": "8aee72eabc3acae96d5efce591304a07910023c7a3c8c0103890329a65fe0634",
+      "chat_mode": "CHATML_NO_THINK",
+      "finish_reason": "stop",
+      "elapsed_seconds": 150.74,
+      "prompt_sha256": "2d90e2bcb45328268fcd02548611f5f43685d7e09cdc232f8b19a696e5ed01d0",
+      "response_sha256": "df52a56c568c42e569cf8595f8b134631d3889dce84d5fee88ae527d480c9308",
+      "prompt_version": "2026-10-20.1",
+      "response_schema_sha256": "14f6f9bcac6a096aea59255d4c6ef68ef383f16999e3d7381a7ae8859bb0742b",
+      "completed_utc": "2026-10-20T06:18:23.759539+00:00"
+    },
+    {
+      "role": "adversarial_reviewer",
+      "status": "COMPLETED",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF",
+      "error": null,
+      "model_identity": {
+        "repository": "Qwen/Qwen3-8B-GGUF",
+        "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+        "filename": "Qwen3-8B-Q4_K_M.gguf",
+        "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+        "files": [
+          {
+            "filename": "Qwen3-8B-Q4_K_M.gguf",
+            "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+            "lfs_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785"
+          }
+        ],
+        "provider": "local_llama_cpp",
+        "external_api_key_required": false,
+        "model_url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/tree/7c41481f57cb95916b40956ab2f0b139b296d974",
+        "file": "Qwen3-8B-Q4_K_M.gguf"
+      },
+      "usage": {
+        "prompt_tokens": 1865,
+        "completion_tokens": 113,
+        "total_tokens": 1978
+      },
+      "wire_prompt_sha256": "dc588d67119aba08cd9ec891fbbf7405af96d086d8d332356263e773294bac8a",
+      "chat_mode": "CHATML_NO_THINK",
+      "finish_reason": "stop",
+      "elapsed_seconds": 97.49,
+      "prompt_sha256": "b423951cf2b5189a418d4cc121984afedfe284afdb103b0751ee5b28c70e5e71",
+      "response_sha256": "3707e951f27ef153a3828bc440395686c200f0526586bd43020011cbaded06f1",
+      "prompt_version": "2026-10-20.1",
+      "response_schema_sha256": "14f6f9bcac6a096aea59255d4c6ef68ef383f16999e3d7381a7ae8859bb0742b",
+      "completed_utc": "2026-10-20T06:20:01.256985+00:00"
+    },
+    {
+      "role": "adversarial_reviewer",
+      "status": "COMPLETED",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF",
+      "error": null,
+      "model_identity": {
+        "repository": "Qwen/Qwen3-8B-GGUF",
+        "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+        "filename": "Qwen3-8B-Q4_K_M.gguf",
+        "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+        "files": [
+          {
+            "filename": "Qwen3-8B-Q4_K_M.gguf",
+            "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+            "lfs_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785"
+          }
+        ],
+        "provider": "local_llama_cpp",
+        "external_api_key_required": false,
+        "model_url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/tree/7c41481f57cb95916b40956ab2f0b139b296d974",
+        "file": "Qwen3-8B-Q4_K_M.gguf"
+      },
+      "usage": {
+        "prompt_tokens": 934,
+        "completion_tokens": 146,
+        "total_tokens": 1080
+      },
+      "wire_prompt_sha256": "3b159aa61eb34f728631f63a1f2b5d6882f80e9da5e12b39b5438f51c6cdb582",
+      "chat_mode": "CHATML_NO_THINK",
+      "finish_reason": "stop",
+      "elapsed_seconds": 46.14,
+      "prompt_sha256": "fa397b2e988a2c26266df7c161a7246b49c1ad4838dc257d7b4fd9192f463370",
+      "response_sha256": "5de60d808bc0b6409369a6218444e68636df800d0519d014be42ab8689337944",
+      "prompt_version": "2026-10-20.1",
+      "response_schema_sha256": "14f6f9bcac6a096aea59255d4c6ef68ef383f16999e3d7381a7ae8859bb0742b",
+      "completed_utc": "2026-10-20T06:20:47.402549+00:00"
+    },
+    {
+      "role": "adversarial_reviewer",
+      "status": "COMPLETED",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF",
+      "error": null,
+      "model_identity": {
+        "repository": "Qwen/Qwen3-8B-GGUF",
+        "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+        "filename": "Qwen3-8B-Q4_K_M.gguf",
+        "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+        "files": [
+          {
+            "filename": "Qwen3-8B-Q4_K_M.gguf",
+            "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+            "lfs_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785"
+          }
+        ],
+        "provider": "local_llama_cpp",
+        "external_api_key_required": false,
+        "model_url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/tree/7c41481f57cb95916b40956ab2f0b139b296d974",
+        "file": "Qwen3-8B-Q4_K_M.gguf"
+      },
+      "usage": {
+        "prompt_tokens": 933,
+        "completion_tokens": 463,
+        "total_tokens": 1396
+      },
+      "wire_prompt_sha256": "6dda22810cc5f6bbe98e27da52fda0ba14add97c3a74722849c98f6627bb14dd",
+      "chat_mode": "CHATML_NO_THINK",
+      "finish_reason": "stop",
+      "elapsed_seconds": 120.9,
+      "prompt_sha256": "ea2e44b73ed727328afcd17144711e10fa18295f111dc98b35b475f9a91bbfd3",
+      "response_sha256": "ebf8f1a44533dd9942404b5cb552202c8d5a9e79d1cd41cbe84a3351f8e68632",
+      "prompt_version": "2026-10-20.1",
+      "response_schema_sha256": "14f6f9bcac6a096aea59255d4c6ef68ef383f16999e3d7381a7ae8859bb0742b",
+      "completed_utc": "2026-10-20T06:22:48.309251+00:00"
+    },
+    {
+      "role": "synthesis",
+      "status": "COMPLETED",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF",
+      "error": null,
+      "model_identity": {
+        "repository": "Qwen/Qwen3-8B-GGUF",
+        "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+        "filename": "Qwen3-8B-Q4_K_M.gguf",
+        "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+        "files": [
+          {
+            "filename": "Qwen3-8B-Q4_K_M.gguf",
+            "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+            "lfs_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785"
+          }
+        ],
+        "provider": "local_llama_cpp",
+        "external_api_key_required": false,
+        "model_url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/tree/7c41481f57cb95916b40956ab2f0b139b296d974",
+        "file": "Qwen3-8B-Q4_K_M.gguf"
+      },
+      "usage": {
+        "prompt_tokens": 2225,
+        "completion_tokens": 931,
+        "total_tokens": 3156
+      },
+      "wire_prompt_sha256": "a9e9ad855cf2ab556837003f23207f967d5eaa20fa445404e7af5db8d0661f1e",
+      "chat_mode": "CHATML_NO_THINK",
+      "finish_reason": "stop",
+      "elapsed_seconds": 403.44,
+      "prompt_sha256": "2ea657472762143b5800f5a5816ff6e0b4152ef57e25a65e6c567ec968c0d28e",
+      "response_sha256": "bea6940d08a62398b0622a53a67a95890a81699e0ca8bd96d4d644effac0d6ca",
+      "prompt_version": "2026-10-20.1",
+      "response_schema_sha256": "5cd5981afb28a68b5be1defbca3d66ef1e814d50f253c54ef71c36b5246fec1c",
+      "completed_utc": "2026-10-20T06:29:31.750078+00:00"
+    },
+    {
+      "role": "adversarial_reviewer",
+      "status": "COMPLETED",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF",
+      "error": null,
+      "model_identity": {
+        "repository": "Qwen/Qwen3-8B-GGUF",
+        "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+        "filename": "Qwen3-8B-Q4_K_M.gguf",
+        "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+        "files": [
+          {
+            "filename": "Qwen3-8B-Q4_K_M.gguf",
+            "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+            "lfs_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785"
+          }
+        ],
+        "provider": "local_llama_cpp",
+        "external_api_key_required": false,
+        "model_url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/tree/7c41481f57cb95916b40956ab2f0b139b296d974",
+        "file": "Qwen3-8B-Q4_K_M.gguf"
+      },
+      "usage": {
+        "prompt_tokens": 1826,
+        "completion_tokens": 223,
+        "total_tokens": 2049
+      },
+      "wire_prompt_sha256": "55206a9ee58e8c29469ff7f88cf2896e982a2b5a89f65f472dbcf6dde24cc8b9",
+      "chat_mode": "CHATML_NO_THINK",
+      "finish_reason": "stop",
+      "elapsed_seconds": 188.97,
+      "prompt_sha256": "83cb7e9a660b7fa27ba0e57f84ed2309ed2abbe9d39eaaf6ca6f20497a209024",
+      "response_sha256": "d25eddb0dfad57a8d6bbfc62b11e3d04ef481dabf21a5005dfd3c0f527a7fc2c",
+      "prompt_version": "2026-10-20.1",
+      "response_schema_sha256": "fd60ba929b5509b152d1e46d92b2cbedfed4ae13287ffdd494795c9a70c71688",
+      "completed_utc": "2026-10-20T06:32:40.719543+00:00"
+    }
+  ],
+  "rejected": [
+    {
+      "reason": "ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE",
+      "evidence_id": "e-955ba61c43dc3fc694ee",
+      "field": "dates",
+      "proposed_values": [],
+      "selected_passage_ids": [
+        0
+      ]
+    },
+    {
+      "reason": "INVALID_OR_UNGROUNDED_QUOTATION"
+    },
+    {
+      "reason": "INVALID_OR_UNGROUNDED_QUOTATION"
+    },
+    {
+      "reason": "ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE",
+      "evidence_id": "e-4c3be40dab82e166c360",
+      "field": "actors",
+      "proposed_values": [
+        "Jean Capsi"
+      ],
+      "selected_passage_ids": [
+        0
+      ]
+    }
+  ],
+  "limitations": [
+    "MODEL_OUTPUT_REQUIRES_REVIEW",
+    "ORIGINAL_INSPECTION_NOT_PERFORMED",
+    "SOURCE_INDEPENDENCE_NOT_ESTABLISHED",
+    "BOUNDED_EVIDENCE_COVERAGE"
+  ],
+  "verified": false,
+  "human_reviewed": false,
+  "claim_reviews": [
+    {
+      "claim_id": "c-f6628dc1818bc27114dd",
+      "review": {
+        "supported_claim_ids": [
+          "c-f6628dc1818bc27114dd"
+        ],
+        "flagged_claims": [],
+        "contradictions": [],
+        "limitations": [
+          "Original not inspected",
+          "Source genealogy pending",
+          "Independence unresolved",
+          "No primary authorship verification",
+          "No independent corroboration",
+          "No human review",
+          "No geographic identity verification",
+          "No exact page or line reference",
+          "No citation of original source material",
+          "No verification of the term 'πειρατή βασιλιά' in other sources",
+          "No confirmation of the date 1677 in other sources",
+          "No verification of the name 'Ιωάννης Κάψης' in other sources",
+          "No confirmation of the context of the statement in the source material",
+          "No verification of the source's reliability or credibility",
+          "No evidence of the source's original publication or edition",
+          "No evidence of the source's authorship or editorial history",
+          "No evidence of the source's publication date or edition history",
+          "No evidence of the source's original language or translation history",
+          "No evidence of the source's original context or surrounding text"
+        ],
+        "missing_claim_ids": []
+      }
+    },
+    {
+      "claim_id": "c-aafc9f6829d06961aee9",
+      "review": {
+        "supported_claim_ids": [
+          "c-aafc9f6829d06961aee9"
+        ],
+        "flagged_claims": [],
+        "contradictions": [],
+        "limitations": [
+          "ORIGINAL_NOT_INSPECTED",
+          "SOURCE_GENEALOGY_PENDING",
+          "INDEPENDENCE_UNRESOLVED"
+        ],
+        "missing_claim_ids": []
+      }
+    },
+    {
+      "claim_id": "c-789d1988cbf7d8dc5095",
+      "review": {
+        "supported_claim_ids": [
+          "c-789d1988cbf7d8dc5095"
+        ],
+        "flagged_claims": [],
+        "contradictions": [],
+        "limitations": [
+          "ORIGINAL_NOT_INSPECTED",
+          "SOURCE_GENEALOGY_PENDING",
+          "INDEPENDENCE_UNRESOLVED",
+          "EVENT_DATE_UNRESOLVED",
+          "ACTION_UNRESOLVED"
+        ],
+        "missing_claim_ids": []
+      }
+    },
+    {
+      "claim_id": "c-9a9b2e9c3a059cf5ebe2",
+      "review": {
+        "supported_claim_ids": [
+          "c-9a9b2e9c3a059cf5ebe2"
+        ],
+        "flagged_claims": [],
+        "contradictions": [],
+        "limitations": [
+          "The source is untrusted data and requires further verification.",
+          "The source classification is UNVERIFIED, which means the statement is not confirmed by verified sources.",
+          "The source context is provided, but it does not include additional information to confirm the historical accuracy of the statement.",
+          "The consulted source is a book titled 'Impressions de voyage, de Paris à Sébastopol, par le Dr Félix Maynard', which may not be a primary source for the events described.",
+          "The statement is based on the quoted text from the source, but the authenticity of the text and its context is not independently verified.",
+          "The source is cited with a URL, but the URL may not lead to the exact page or section containing the quoted text.",
+          "The statement does not provide specific dates or places beyond the quoted text, which may limit its historical accuracy.",
+          "The source is not a primary source, and the quoted text may be a secondary account or a fictional narrative.",
+          "The statement does not mention any specific historical figures or events that could be cross-referenced with other sources.",
+          "The source is not a primary source, and the quoted text may be a fictional narrative or a misinterpretation of historical events."
+        ],
+        "missing_claim_ids": []
+      }
+    }
+  ],
+  "review": {
+    "supported_claim_ids": [
+      "c-f6628dc1818bc27114dd",
+      "c-aafc9f6829d06961aee9",
+      "c-789d1988cbf7d8dc5095",
+      "c-9a9b2e9c3a059cf5ebe2"
+    ],
+    "flagged_claims": [],
+    "contradictions": [],
+    "limitations": [
+      "CLAIM_FIDELITY_REVIEWED_SEPARATELY; CROSS_SOURCE_CORROBORATION_NOT_ESTABLISHED",
+      "Original not inspected",
+      "Source genealogy pending",
+      "Independence unresolved",
+      "No primary authorship verification",
+      "No independent corroboration",
+      "No human review",
+      "No geographic identity verification",
+      "No exact page or line reference",
+      "No citation of original source material",
+      "No verification of the term 'πειρατή βασιλιά' in other sources",
+      "No confirmation of the date 1677 in other sources",
+      "No verification of the name 'Ιωάννης Κάψης' in other sources",
+      "No confirmation of the context of the statement in the source material",
+      "No verification of the source's reliability or credibility",
+      "No evidence of the source's original publication or edition",
+      "No evidence of the source's authorship or editorial history",
+      "No evidence of the source's publication date or edition history",
+      "No evidence of the source's original language or translation history",
+      "No evidence of the source's original context or surrounding text",
+      "ORIGINAL_NOT_INSPECTED",
+      "SOURCE_GENEALOGY_PENDING",
+      "INDEPENDENCE_UNRESOLVED",
+      "ORIGINAL_NOT_INSPECTED",
+      "SOURCE_GENEALOGY_PENDING",
+      "INDEPENDENCE_UNRESOLVED",
+      "EVENT_DATE_UNRESOLVED",
+      "ACTION_UNRESOLVED",
+      "The source is untrusted data and requires further verification.",
+      "The source classification is UNVERIFIED, which means the statement is not confirmed by verified sources.",
+      "The source context is provided, but it does not include additional information to confirm the historical accuracy of the statement.",
+      "The consulted source is a book titled 'Impressions de voyage, de Paris à Sébastopol, par le Dr Félix Maynard', which may not be a primary source for the events described.",
+      "The statement is based on the quoted text from the source, but the authenticity of the text and its context is not independently verified.",
+      "The source is cited with a URL, but the URL may not lead to the exact page or section containing the quoted text.",
+      "The statement does not provide specific dates or places beyond the quoted text, which may limit its historical accuracy.",
+      "The source is not a primary source, and the quoted text may be a secondary account or a fictional narrative.",
+      "The statement does not mention any specific historical figures or events that could be cross-referenced with other sources.",
+      "The source is not a primary source, and the quoted text may be a fictional narrative or a misinterpretation of historical events."
+    ],
+    "missing_claim_ids": [],
+    "invalid_review_claim_ids": []
+  },
+  "requested_answer_language": "en",
+  "greek_translation_status": "NOT_GENERATED_OR_VALIDATED",
+  "final_answer_attempts": [
+    {
+      "sections": [
+        {
+          "text": "According to the consulted source, the island of Milos under Ottoman rule acquired a pirate king in 1677; historical verification is pending.",
+          "claim_ids": [
+            "c-f6628dc1818bc27114dd"
+          ]
+        },
+        {
+          "text": "The consulted source reports that Ioannis Kapsis, with his brothers of the Tromara and Niko, set out with two galleys from the Mytikas of Aetolia and sailed throughout the Aegean and Ionian seas; historical verification is pending.",
+          "claim_ids": [
+            "c-aafc9f6829d06961aee9"
+          ]
+        },
+        {
+          "text": "The consulted source mentions Kapsis, Ioannis as a government official in the Foreign Affairs Ministry; historical verification is pending.",
+          "claim_ids": [
+            "c-789d1988cbf7d8dc5095"
+          ]
+        },
+        {
+          "text": "The consulted source reports that a person named Jean Capsi was hanged at the door of the bagne; historical verification is pending.",
+          "claim_ids": [
+            "c-9a9b2e9c3a059cf5ebe2"
+          ]
+        }
+      ],
+      "review": {
+        "supported_section_indexes": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "flagged_sections": [],
+        "section_decisions": [
+          {
+            "section_index": 0,
+            "source_support_reason": "The source mentions the island of Milos under Ottoman rule acquiring a pirate king in 1677, which directly supports the claim.",
+            "unsupported_answer_spans": [],
+            "decision": "SUPPORTED"
+          },
+          {
+            "section_index": 1,
+            "source_support_reason": "The source describes Ioannis Kapsis with his brothers setting out with two galleys from Mytikas of Aetolia, supporting the claim.",
+            "unsupported_answer_spans": [],
+            "decision": "SUPPORTED"
+          },
+          {
+            "section_index": 2,
+            "source_support_reason": "The source states Kapsis, Ioannis as a government official in the Foreign Affairs Ministry, supporting the claim.",
+            "unsupported_answer_spans": [],
+            "decision": "SUPPORTED"
+          },
+          {
+            "section_index": 3,
+            "source_support_reason": "The source reports a person named Jean Capsi being hanged at the door of the bagne, supporting the claim.",
+            "unsupported_answer_spans": [],
+            "decision": "SUPPORTED"
+          }
+        ]
+      }
+    }
+  ],
+  "final_answer_review": {
+    "supported_section_indexes": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "flagged_sections": [],
+    "section_decisions": [
+      {
+        "section_index": 0,
+        "source_support_reason": "The source mentions the island of Milos under Ottoman rule acquiring a pirate king in 1677, which directly supports the claim.",
+        "unsupported_answer_spans": [],
+        "decision": "SUPPORTED"
+      },
+      {
+        "section_index": 1,
+        "source_support_reason": "The source describes Ioannis Kapsis with his brothers setting out with two galleys from Mytikas of Aetolia, supporting the claim.",
+        "unsupported_answer_spans": [],
+        "decision": "SUPPORTED"
+      },
+      {
+        "section_index": 2,
+        "source_support_reason": "The source states Kapsis, Ioannis as a government official in the Foreign Affairs Ministry, supporting the claim.",
+        "unsupported_answer_spans": [],
+        "decision": "SUPPORTED"
+      },
+      {
+        "section_index": 3,
+        "source_support_reason": "The source reports a person named Jean Capsi being hanged at the door of the bagne, supporting the claim.",
+        "unsupported_answer_spans": [],
+        "decision": "SUPPORTED"
+      }
+    ]
+  },
+  "unknowns": [
+    "gaps including unresolved identities and dates, lack of exact page or line references, no citation of original source material, no verification of the term 'πειρατή βασιλιά' in other sources, no confirmation of the date 1677 in other sources, no verification of the name 'Ιωάννης Κάψης' in other sources, no confirmation of the context of the statement in the source material, no verification of the source's reliability or credibility, no evidence of the source's original publication or edition, no evidence of the source's authorship or editorial history, no evidence of the source's publication date or edition history, no evidence of the source's original language or translation history, no evidence of the source's original context or surrounding text"
+  ],
+  "model_limitations": [
+    "CLAIM_FIDELITY_REVIEWED_SEPARATELY; CROSS_SOURCE_CORROBORATION_NOT_ESTABLISHED, Original not inspected, Source genealogy pending, Independence unresolved, No primary authorship verification, No independent corroboration, No human review, No geographic identity verification, No exact page or line reference, No citation of original source material, No verification of the term 'πειρατή βασιλιά' in other sources, No confirmation of the date 1677 in other sources, No verification of the name 'Ιωάννης Κάψης' in other sources, No confirmation of the context of the statement in the source material, No verification of the source's reliability or credibility, No evidence of the source's original publication or edition, No evidence of the source's authorship or editorial history, No evidence of the source's publication date or edition history, No evidence of the source's original language or translation history, No evidence of the source's original context or surrounding text, ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, EVENT_DATE_UNRESOLVED, ACTION_UNRESOLVED, The source is untrusted data and requires further verification. The source classification is UNVERIFIED, which means the statement is not confirmed by verified sources. The source context is provided, but it does not include additional information to confirm the historical accuracy of the statement. The consulted source is a book titled 'Impressions de voyage, de Paris à Sébastopol, par le Dr Félix Maynard', which may not be a primary source for the events described. The statement is based on the quoted text from the source, but the authenticity of the text and its context is not independently verified. The source is cited with a URL, but the URL may not lead to the exact page or section containing the quoted text. The statement does not provide specific dates or places beyond the quoted text, which may limit its historical accuracy. The source is not a primary source, and the quoted text may be a secondary account or a fictional narrative. The statement does not mention any specific historical figures or events that could be cross-referenced with other sources. The source is not a primary source, and the quoted text may be a fictional narrative or a misinterpretation of historical events."
+  ],
+  "execution_receipt": {
+    "parent_run_id": "39304929906",
+    "analysis_run_id": "39376752977",
+    "execution_type": "REAL_MODEL_REANALYSIS_OF_ACQUIRED_SOURCES_NOT_NEW_DISCOVERY",
+    "software_revision": "5b5d4997343b7a65cacab80fb356a6f000f5c03c",
+    "original_lane_outputs_modified": false
+  }
+}
