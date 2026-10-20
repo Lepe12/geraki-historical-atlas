@@ -5,6 +5,8 @@ on:
     paths:
       - 'tools/historical_map_intelligence.py'
       - 'tools/historical_map_ocr.py'
+      - 'tools/historical_map_raw_ocr.py'
+      - 'tools/test_historical_map_raw_ocr.py'
       - 'tools/test_historical_map_ocr.py'
       - 'tools/historical_map_source_probe.py'
       - 'tools/test_historical_map_source_probe.py'
@@ -17,6 +19,8 @@ on:
     paths:
       - 'tools/historical_map_intelligence.py'
       - 'tools/historical_map_ocr.py'
+      - 'tools/historical_map_raw_ocr.py'
+      - 'tools/test_historical_map_raw_ocr.py'
       - 'tools/test_historical_map_ocr.py'
       - 'tools/historical_map_source_probe.py'
       - 'tools/test_historical_map_source_probe.py'
@@ -50,7 +54,7 @@ jobs:
           python3 -m pip install --quiet rasterio pyproj pillow
       - name: Run historical map OCR against a real synthetic GeoTIFF and test safe source access
         run: |
-          python3 -m unittest tools.test_historical_map_ocr tools.test_historical_map_source_probe -v
+          python3 -m unittest tools.test_historical_map_ocr tools.test_historical_map_source_probe tools.test_historical_map_raw_ocr -v
       - name: Audit authentic 1670 portolan IIIF availability without claiming acquisition
         run: |
           python3 tools/historical_map_source_probe.py --out historical-map-iiif-probe.json
@@ -83,3 +87,53 @@ jobs:
           assert Path('jarvis-intelligence-chamber/historical-map-lab.css').is_file()
           print('HISTORICAL_MAP_LAB_ASSET_GATE_PASS')
           PY
+  real-1662-portolan-ocr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools
+            data/historical-map-sources
+      - name: Install local French OCR
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-fra
+      - name: Download verified public-domain 1662 portolan and run unlocated OCR
+        run: |
+          mkdir -p /tmp/nabou-portolan historical-map-pilot-output
+          IMAGE="https://upload.wikimedia.org/wikipedia/commons/7/74/1662_Portolan_chart_of_the_Aegean_Sea_and_the_Dardanelles_by_Fran%C3%A7ois_Ollive.jpg"
+          if ! curl --fail --location --silent --show-error --retry 1 --max-time 55 \
+               -H 'User-Agent: NABOU-HistoricalResearch/1.0 (+https://github.com/Lepe12/geraki-historical-atlas)' \
+               "$IMAGE" -o /tmp/nabou-portolan/ollive-1662.jpg; then
+            echo '{"status":"SOURCE_IMAGE_DOWNLOAD_BLOCKED","historically_verified":0}' > historical-map-pilot-output/status.json
+            echo "REAL_1662_SOURCE_IMAGE_BLOCKED"
+            exit 0
+          fi
+          python3 tools/historical_map_raw_ocr.py \
+            --image /tmp/nabou-portolan/ollive-1662.jpg \
+            --out historical-map-pilot-output/raw-1662-ollive-unlocated.json \
+            --source-id "commons:1662-ollive-aegean-dardanelles" \
+            --source-url "https://commons.wikimedia.org/wiki/File:1662_Portolan_chart_of_the_Aegean_Sea_and_the_Dardanelles_by_Fran%C3%A7ois_Ollive.jpg" \
+            --title "Francois Ollive, Aegean and Dardanelles Portolan (1662)" \
+            --rights "Public Domain Mark 1.0, Wikimedia Commons; original BnF Gallica btv1b59010993" \
+            --year 1662 --language fra
+          python3 - <<'PY'
+          import json
+          data=json.load(open("historical-map-pilot-output/raw-1662-ollive-unlocated.json"))
+          assert data["schema"]=="nabou-unlocated-historical-map-ocr-v1"
+          assert data["georeferencing_status"]=="NOT_GEOREFERENCED"
+          assert data["historically_verified"]==0
+          print("REAL_1662_PORTOLAN_OCR_EXECUTED",data["ocr"]["labels_found"],"labels (UNREVIEWED)")
+          with open("historical-map-pilot-output/status.json","w") as f:
+              json.dump({"status":"REAL_IMAGE_OCR_EXECUTED_NOT_GEOREFERENCED",
+                         "labels_unreviewed":data["ocr"]["labels_found"],
+                         "historically_verified":0},f)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: historical-1662-ollive-real-ocr-pilot
+          path: historical-map-pilot-output/
+          if-no-files-found: warn
