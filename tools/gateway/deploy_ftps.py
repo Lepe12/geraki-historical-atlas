@@ -16,15 +16,17 @@ import uuid
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = Path("server/command-center-live")
 FILES = ("historical-evidence.js", "pdf-evidence.py", "pdf-evidence.js", "app.js")
-REMOTE = os.environ["PCT_FTPS_APP_ROOT"].rstrip("/")
+REMOTE = (os.getenv("PCT_FTPS_APP_ROOT") or "/").rstrip("/") or "/"
 HOST = os.environ["PCT_FTPS_HOST"]
 USER = os.environ["PCT_FTPS_USER"]
 PASSWORD = os.environ["PCT_FTPS_PASSWORD"]
 PORT = int(os.getenv("PCT_FTPS_PORT", "21"))
 
-if not REMOTE.startswith("/") or REMOTE == "/":
-    sys.exit("BLOCKED: PCT_FTPS_APP_ROOT must be absolute and not /")
-if not REMOTE.endswith("/server/command-center-live"):
+if not REMOTE.startswith("/"):
+    sys.exit("BLOCKED: PCT_FTPS_APP_ROOT must be absolute")
+# "/" is allowed ONLY for an FTP account rooted at the application directory.
+# Verify the exact app structure after login, before any writes.
+if REMOTE != "/" and not REMOTE.endswith("/server/command-center-live"):
     sys.exit("BLOCKED: remote path must end with /server/command-center-live")
 
 payload = {name: (ROOT / SOURCE / name).read_bytes() for name in FILES}
@@ -43,7 +45,7 @@ try:
     existing = set(ftp.nlst())
     # Preflight: ensure this really is the NABOU app and not an arbitrary directory.
     listing = {posixpath.basename(item.rstrip("/")) for item in existing}
-    if not {"package.json", "public", "tmp"}.issubset(listing):
+    if not {"package.json", "public", "tmp", "knowledge-data"}.issubset(listing):
         raise RuntimeError("BLOCKED: destination does not match expected Plesk app directory")
     for name in FILES:
         try:
