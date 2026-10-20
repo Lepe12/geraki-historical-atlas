@@ -1,3 +1,27 @@
+## Superseding evening validation — 20 October 2026
+
+Actual production probe **39478111619 passes HTTP authorization and GitHub OIDC**.
+The previous evidence-route 404 observations below are historical. This proves
+neither current MariaDB writes nor research completeness.
+
+FTPS bindings exist. Actual read-only diagnosis **39478587141** rejects the
+configured IP with TLS verification code64 (`IP_ADDRESS_MISMATCH`). Verification
+was retained; no new SSH credentials are required. Future FTPS deployment needs
+the confirmed hosting TLS hostname.
+
+Current byte/content replay keeps the substantive first topic and corrected
+Lantzas answers provisionally accepted, but rejects the placeholder recoveries
+39393890418 and39469108053. Run39474727677 correctly remains incomplete with
+no narrative evidence. Model prompts no longer supply placeholder answer prose;
+stored-result validation replays exact source bytes and checks cited claim IDs.
+The original outputs remain immutable.57 targeted tests passed.
+
+Fresh research39477311589 and39477358672 is in progress. See
+[the current Greek report](2026-10-20-research-validation-report.md) and
+`current-citation-and-content-revalidation.json` for evidence and limits.
+
+## Historical observations (superseded where noted above)
+
 ## Latest actual result: fresh search now returns one cited finding
 
 Fresh run [39377319867](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/39377319867)
