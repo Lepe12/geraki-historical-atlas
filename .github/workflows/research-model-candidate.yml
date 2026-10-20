@@ -1,0 +1,56 @@
+name: Inspect official free research model candidate
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/research-model-candidate.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            evidence/configuration
+      - name: Read official public model revision and checksum metadata
+        run: |
+          python3 - <<'PY'
+          import datetime,hashlib,json,os,pathlib,urllib.request,urllib.error
+          url='https://huggingface.co/api/models/Qwen/Qwen3-8B-GGUF?blobs=true'
+          report={'schema':'nabou-public-model-candidate-v1','repository':'Qwen/Qwen3-8B-GGUF','endpoint':url,
+                  'checked_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'api_credentials_used':False,'inference_tested':False}
+          try:
+              with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'NABOU-Research/4.0'}),timeout=30) as response:
+                  raw=response.read(2000000);report['http_status']=response.status
+              data=json.loads(raw)
+              report.update(response_sha256=hashlib.sha256(raw).hexdigest(),revision=data.get('sha'),gated=data.get('gated'),
+                  license=(data.get('cardData') or {}).get('license'),
+                  quantizations=[x for x in data.get('siblings',[]) if 'q4_k_m' in x.get('rfilename','').lower()])
+          except urllib.error.HTTPError as error:report.update(http_status=error.code,error_type=type(error).__name__)
+          except Exception as error:report['error_type']=type(error).__name__
+          dest=pathlib.Path('evidence/configuration')/os.environ['GITHUB_RUN_ID'];dest.mkdir(parents=True,exist_ok=True)
+          (dest/'candidate-model.json').write_text(json.dumps(report,indent=2)+'\n')
+          print(json.dumps(report))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: public-model-metadata
+          path: evidence/configuration/${{ github.run_id }}/
+      - name: Preserve actual public response metadata
+        if: always()
+        run: |
+          set -e
+          destination="evidence/configuration/$GITHUB_RUN_ID"
+          if [ ! -d "$destination" ]; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$destination"
+          git commit -m 'Record official free model revision and integrity metadata'
+          python3 tools/publish_research_outputs.py
