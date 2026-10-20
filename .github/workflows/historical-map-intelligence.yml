@@ -47,6 +47,7 @@ jobs:
           python3 -m py_compile tools/historical_map_intelligence.py
           node --check jarvis-intelligence-chamber/historical-map-core.mjs
           node --check jarvis-intelligence-chamber/historical-map-lab.mjs
+          node --check jarvis-intelligence-chamber/historical-map-review.mjs
       - name: Install local open-source OCR and raster georeferencing dependencies
         run: |
           sudo apt-get update -qq
@@ -73,6 +74,8 @@ jobs:
           if-no-files-found: warn
       - name: MapKurator GeoJSON + mocked WHG service unit tests
         run: python3 -m unittest tools.test_historical_map_intelligence -v
+      - name: Source-image OCR and human-review safety unit tests
+        run: node --test jarvis-intelligence-chamber/historical-map-review-core.test.mjs
       - name: UI geo-evidence contract tests
         run: node --test jarvis-intelligence-chamber/historical-map-core.test.mjs
       - name: Ensure 3D renderer imports and Map Lab entry point present
@@ -85,6 +88,7 @@ jobs:
           lab=Path('jarvis-intelligence-chamber/historical-map-lab.html').read_text()
           assert 'historical-map-lab.mjs' in lab
           assert Path('jarvis-intelligence-chamber/historical-map-lab.css').is_file()
+          assert Path('jarvis-intelligence-chamber/historical-map-review.html').is_file()
           print('HISTORICAL_MAP_LAB_ASSET_GATE_PASS')
           PY
   real-1662-portolan-ocr:
