@@ -31,6 +31,17 @@ def item(eid,**changes):
             'kind':'source_statement','actors':[],'places':[],'dates':['1677'],'uncertainty':[],**changes}
 
 class SemanticAnswer(unittest.TestCase):
+    def test_entity_formatting_copies_real_mention_without_spelling_or_identity_repair(self):
+        from semantic_research_answer import literal_entity_surface
+        quote='The CORSAIRS named Romanos\nManetas anchored at Milos.'
+        self.assertEqual(literal_entity_surface('corsairs',quote),'CORSAIRS')
+        self.assertEqual(literal_entity_surface('Romanos Manetas',quote),'Romanos\nManetas')
+        self.assertIsNone(literal_entity_surface('Milo',quote))
+        self.assertIsNone(literal_entity_surface('Manetas Romanos',quote))
+        self.assertIsNone(literal_entity_surface('Μήλος',quote))
+        self.assertIsNone(literal_entity_surface('Petro','Petró'))
+        self.assertEqual(literal_entity_surface('Petró','Petro\u0301'),'Petro\u0301')
+
     def test_whitespace_variants_are_not_misattributed_as_identical_quotes(self):
         with tempfile.TemporaryDirectory() as tmp:
             fixture(tmp);fixture(tmp,'greek','https://example.org/other-version')
@@ -56,6 +67,14 @@ class SemanticAnswer(unittest.TestCase):
             c=accepted[0];loc=c['source_occurrences'][0]['locator']
             self.assertEqual(TEXT[loc['start_char']:loc['end_char']],c['quote'])
             self.assertEqual(loc['scan_indexes_0_based'],[1]);self.assertEqual(loc['span_semantics'],'EXACT_QUOTE')
+
+    def test_repeated_sentence_uses_the_selected_occurrence(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp);row=collect(tmp)[0][0];row['text']=TEXT+' '+TEXT
+            value=item(row['evidence_id'],passage_ids=[2]);value.pop('quote')
+            accepted,rejected=validate_items({'items':[value]},[row])
+            self.assertFalse(rejected)
+            self.assertEqual(accepted[0]['source_occurrences'][0]['locator']['start_char'],len(TEXT))
 
     def test_flagged_synthesis_is_revised_once_and_reviewed_again(self):
         for second_pass in (True,False):

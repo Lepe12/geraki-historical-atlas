@@ -211,6 +211,28 @@ def forbidden(value):
     if isinstance(value,list):return any(forbidden(v) for v in value)
     return False
 
+def literal_entity_surface(value,text):
+    """Copy a real mention across case/Unicode typography and line whitespace.
+
+    No accent removal, spelling repair, name reordering or identity merge.
+    """
+    if not isinstance(value,str) or not value.strip():return None
+    normalized=[];offsets=[]
+    for index,char in enumerate(text):
+        for folded in unicodedata.normalize('NFKD',char).casefold():
+            if folded.isspace():
+                if normalized and normalized[-1]==' ':continue
+                folded=' '
+            normalized.append(folded);offsets.append(index)
+    needle=' '.join(unicodedata.normalize('NFKD',value).casefold().split())
+    flat=''.join(normalized)
+    def word(char):return char.isalnum() or char=='_' or unicodedata.category(char).startswith('M')
+    for match in re.finditer(re.escape(needle),flat):
+        if match.start() and word(flat[match.start()-1]):continue
+        if match.end()<len(flat) and word(flat[match.end()]):continue
+        return text[offsets[match.start()]:offsets[match.end()-1]+1]
+    return None
+
 def normalize_review(value, claims):
     """Map explicit indexed decisions to internal IDs; omissions stay unresolved."""
     if not isinstance(value,dict) or forbidden(value):return None
@@ -248,6 +270,7 @@ def validate_items(payload, records):
     values=payload.get('items') if isinstance(payload,dict) else None
     if not isinstance(values,list):return [],[{'reason':'INVALID_EXTRACTION_SCHEMA'}]
     for item in values[:50]:
+        selected_start=None
         eid=item.get('evidence_id') if isinstance(item,dict) else None
         row=lookup.get(eid) if isinstance(eid,str) else None
         quote=item.get('quote') if isinstance(item,dict) else None
@@ -259,6 +282,7 @@ def validate_items(payload, records):
                 ids!=list(range(ids[0],ids[-1]+1))):
                 rejected.append({'reason':'INVALID_PASSAGE_SELECTION'});continue
             replay=row['text'][parts[ids[0]]['start_char']:parts[ids[-1]]['end_char']]
+            selected_start=parts[ids[0]]['start_char']
             if quote is not None and quote!=replay:
                 rejected.append({'reason':'GENERATED_QUOTE_CONFLICTS_WITH_PASSAGE'});continue
             quote=replay
@@ -280,7 +304,7 @@ def validate_items(payload, records):
         kind=item.get('kind')
         if kind not in ('source_statement','inference','hypothesis'):
             rejected.append({'reason':'MISSING_STATEMENT_KIND'});continue
-        entities={};bad=False;field_issues=[]
+        entities={};bad=False;field_issues=[];surface_corrections=[]
         for field in ('actors','places','dates'):
             vals=item.get(field,[])
             if field=='dates' and isinstance(vals,list):
@@ -297,15 +321,21 @@ def validate_items(payload, records):
                 if any(y not in permitted or int(y) not in row['years_in_scope'] for y in re.findall(r'(?<!\d)(1\d{3}|20\d{2})(?!\d)',statement)):
                     bad=True;break
                 entities[field]=valid_dates;continue
-            if any(v not in permitted for v in vals):bad=True;break
+            actual=[literal_entity_surface(v,quote) for v in vals]
+            if any(v is None for v in actual):bad=True;break
+            surface_corrections.extend({'field':field,'proposed':v,'source_surface':a,
+                'method':'UNICODE_CASE_AND_WHITESPACE_ONLY'} for v,a in zip(vals,actual) if v!=a)
             if field=='dates' and any(int(y) not in row['years_in_scope'] for v in vals for y in re.findall(r'(?<!\d)(1\d{3}|20\d{2})(?!\d)',v)):bad=True;break
-            entities[field]=vals
+            entities[field]=actual
         if bad:
-            rejected.append({'reason':'ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE'});continue
-        start=row['text'].find(quote)
+            rejected.append({'reason':'ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE','evidence_id':eid,
+                             'field':field,'proposed_values':item.get(field),
+                             'selected_passage_ids':item.get('passage_ids')});continue
+        start=selected_start if selected_start is not None else row['text'].find(quote)
         accepted.append({'claim_id':'c-'+digest([row['evidence_id'],statement,quote])[:20],
             'statement':statement,'kind':kind,'evidence_id':row['evidence_id'],'quote':quote,
             'quote_offset_in_excerpt':start,**entities,'source_occurrences':quote_occurrences(row,start,quote),
+            'entity_surface_corrections':surface_corrections,
             'date_evidence':row.get('date_evidence'),'date_basis':row.get('date_basis'),
             'uncertainty':(item.get('uncertainty') if isinstance(item.get('uncertainty'),list) else [])+field_issues,
             'source_uncertainties':row['uncertainties'],'model_analysis':True,'verified':False,

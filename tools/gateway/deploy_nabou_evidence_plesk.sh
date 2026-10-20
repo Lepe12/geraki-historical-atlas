@@ -2,7 +2,7 @@
 # Run only from the authorized hosting shell, after confirming the Plesk app root.
 set -eu
 umask 077
-COMMIT=2aec8964a65b410dfdab46191a16c91620be2e38
+COMMIT=2ed5af390ca793a501698bc01b286b323aad6141
 : "${PCT_APP_ROOT:?BLOCKED: set PCT_APP_ROOT to the confirmed live Plesk Node application root}"
 APP="$(CDPATH= cd "$PCT_APP_ROOT" && pwd -P)"
 ROOT="$(CDPATH= cd "$APP/../.." && pwd -P)"
@@ -50,7 +50,7 @@ d77911d3df0477296e13d52ad5d56f904fa8fd0fc45e30912e87b06775e2da77  server/command
 ba42b53ea61fa9b897114f0fbb74a85f888a370ed8841e313418336b594a9fb1  server/command-center-live/self-test.js
 c5aeca16f3fceef66597cc008aeba5889bc62a08c93bf5a34354247b78cb6f51  server/command-center-live/learning-integration-test.js
 455f1824075d739c14baed7448f33fe91d752c0705b47dca99c42e211fdef335  server/command-center-live/package.json
-14daf82e6ba3ac69c1f8ca0a6d1d57d0ba6bdb03de0f80f5b369a16f8decf8e2  tools/storage/historical_evidence.php
+031d03af7d6db0bd60ac4b3fa85a68fdf8183d64b2a453c7d3e6d1d06a7e5e38  tools/storage/historical_evidence.php
 f24414d2da1395ae3448b0d97009a94968cbdcd94aab61ced61f414ea3767816  tools/storage/historical_evidence_schema.sql
 fce0d7f7ea347d1486df1fc70d965229d2172150c76b8254a839502e531756ce  tools/storage/schema.sql
 72ca86f71cb01b264dc6ee071e0e85fd0857e61f27a5a027b1cfbf164e34eac5  tools/storage/pct_research_store.php
