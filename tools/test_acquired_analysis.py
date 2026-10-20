@@ -46,7 +46,15 @@ class AcquiredAnalysis(unittest.TestCase):
                 for occurrence in r['occurrences']:
                     path=root/occurrence['acquired_text_path'];self.assertTrue(path.is_file())
                     self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(),occurrence['source_text_sha256'])
+                    binary=occurrence['source_pdf']
+                    self.assertEqual(binary['sha256'],hashlib.sha256(raw).hexdigest())
+                    self.assertEqual(root/binary['path'],pdf)
+                    self.assertEqual(occurrence['locator']['pdf_reference_base'],'PARENT_RESEARCH_RUN')
             self.assertFalse(list(dest.rglob('*.pdf')))
             with self.assertRaises(FileExistsError):prepare(root,dest,request)
+            pdf.write_bytes(raw+b'\n% changed after acquisition\n')
+            rows,excluded=collect(dest,provenance_root=root)
+            self.assertEqual(rows,[])
+            self.assertTrue(any(e['reason']=='SOURCE_PDF_CHECKSUM_MISMATCH' for e in excluded))
 
 if __name__=='__main__':unittest.main()

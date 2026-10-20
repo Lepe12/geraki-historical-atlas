@@ -23,6 +23,7 @@ def build(answer):
             content_key=hashlib.sha256((occurrence['url']+'\0'+sha).encode()).hexdigest()
             metadata={'title':occurrence.get('title'),'bibliography':bibliography,
                       'research_run_id':parent_run,'analysis_run_id':analysis_run,'text_path':path,
+                      'source_pdf':occurrence.get('source_pdf'),
                       'source_classification':claim.get('source_classification','UNVERIFIED')}
             metadata_sha=hashlib.sha256(json.dumps(metadata,sort_keys=True,ensure_ascii=False).encode()).hexdigest()
             # Corrected bibliographies append a new source version; an earlier
@@ -33,6 +34,7 @@ def build(answer):
                           'source_content_key':content_key,'research_run_id':parent_run,'analysis_run_id':analysis_run,
                           'durable_git_path':('evidence/runs/'+str(parent_run)+'/'+path) if parent_run else None,
                           'version_rule':'SOURCE_VERSIONS_AND_REPEATED_CONTENT_ARE_NOT_INDEPENDENT_CORROBORATION',
+                          'source_pdf':occurrence.get('source_pdf'),
                           'url':occurrence['url'],'text_path':path,'text_sha256':sha,
                           'source_classification':claim.get('source_classification','UNVERIFIED'),
                           'classification_status':'PROVISIONAL_SOURCE_CRITICISM_PENDING'}

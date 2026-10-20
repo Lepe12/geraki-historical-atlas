@@ -53,6 +53,9 @@ def collect(run_root, provenance_root=None):
     def load_document(path):
         raw=path.read_bytes()
         return raw.decode('utf-8',errors='replace'),hashlib.sha256(raw).hexdigest()
+    @lru_cache(maxsize=32)
+    def binary_sha256(path):
+        with path.open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
     groups={};seen=[];excluded=[]
     for p in sorted(Path(run_root).glob('*/structured_output/extracted_findings.json')):
         acquisition=read(p.parent.parent/'library_acquisition/acquisition_report.json',{}).get('results',[])
@@ -95,11 +98,26 @@ def collect(run_root, provenance_root=None):
             # out version merely because their whitespace-normalized words agree.
             key=digest([raw,f.get('years_in_scope',[]),f.get('date_basis')])
             source=source_by_file.get(filename,{})
+            document=source.get('web_acquisition') or {};binary=None
+            if document.get('pdf_file'):
+                base=Path(provenance_root or run_root) if document.get('pdf_reference_base')=='PARENT_RESEARCH_RUN' else p.parent.parent
+                pdf=(base/document['pdf_file']).resolve()
+                if not pdf.is_relative_to(base.resolve()):
+                    excluded.append({'finding_id':f.get('finding_id'),'reason':'UNSAFE_SOURCE_PDF_PATH'});continue
+                if pdf.is_file():
+                    actual=binary_sha256(pdf)
+                    expected=document.get('source_pdf_sha256') or document.get('sha256')
+                    if expected and expected!=actual:
+                        excluded.append({'finding_id':f.get('finding_id'),'reason':'SOURCE_PDF_CHECKSUM_MISMATCH'});continue
+                    binary={'path':str(pdf.relative_to(Path(provenance_root or run_root).resolve())),
+                            'sha256':actual,'binding_status':'ACTUAL_DURABLE_PDF_BYTES_HASHED_NOT_ORIGINAL_INSPECTION'}
+                else:binary={'binding_status':'PDF_NOT_DURABLE_TEXT_ONLY'}
             bibliography=f.get('source_bibliography') or {k:source.get(k) for k in ('creator','date','source_type','rights')}
             bibliography={**bibliography,'date_field_meaning':'PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE'}
             if source.get('bibliographic_correction'):bibliography['documented_correction']=source['bibliographic_correction']
             provenance={'lane':p.parent.parent.name,'url':f['url'],'title':f.get('title'),
                         'source_bibliography':bibliography,
+                        'source_pdf':binary,
                         'acquired_text_path':str(file.relative_to(provenance_root or run_root)),
                         'finding_id':f.get('finding_id'),'locator':loc,'source_text_sha256':f['source_text_sha256'],
                         'page_boundaries':[page for page in (source.get('web_acquisition') or {}).get('pages',[])

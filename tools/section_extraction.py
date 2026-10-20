@@ -48,7 +48,9 @@ def locator(text, start, end, source, file):
             'start_char':start,'end_char':end,'start_line':text.count('\n',0,start)+1,
             'end_line':text.count('\n',0,end)+1,'printed_page':None,
             'scan_indexes_0_based':[p['scan_index_0_based'] for p in pages],
-            'pdf_file':document.get('pdf_file'),'original_inspected':False}
+            'pdf_file':document.get('pdf_file'),
+            'pdf_reference_base':document.get('pdf_reference_base','LANE_ROOT'),
+            'original_inspected':False}
 
 def extract_document(text, source, file, ctx):
     terms=variants(ctx['target'],ctx.get('aliases',[]))
