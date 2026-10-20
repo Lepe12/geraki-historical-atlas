@@ -116,3 +116,28 @@ Their presence is **unknown**, not proven absent. The environment list returned2
 with github-pages. No hosting management connection has been verified. The
 previous bulk-context inventory was blocked by GitHub before execution and was
 removed; it must not be approved as a deployment workaround.
+
+Both models passed the three actual source-fidelity controls in39376752977;
+this does not establish full historical accuracy. The core semantic default is
+now the tested official Qwen3-8B profile while configured provider/model overrides
+remain available. The fresh11-lane end-to-end request is
+[39377319867](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/39377319867),
+with no seeded source URLs and required semantic acceptance. Its actual query
+expansion and preflight completed; lane acquisition and final synthesis remain
+running at this checkpoint.
+
+Citations now retain creator/publication metadata. Source versions retain their
+parent and analysis run IDs and durable Git path, so identical text in different
+runs does not leave an ambiguous stored relative path. A shared content key
+explicitly prevents counting versions as independent corroboration. Failed or
+interrupted calls preserve a running/failure receipt, and the workflow records
+validation even after synthesis failure; partial progress never passes final
+answer acceptance.
+
+The actual first page of the Astypalaia secondary study was visually inspected.
+The source-attributed hideout/provisions claim and the author's **most likely**
+Vathy hypothesis are recorded separately in
+`evidence/source_inspections/2026-10-20/astypalaia-abstract.json`. This developer
+inspection is neither an independent gold benchmark nor proof that the automated
+pipeline has passed. Underlying primary-source inspection and independent
+corroboration remain pending.
