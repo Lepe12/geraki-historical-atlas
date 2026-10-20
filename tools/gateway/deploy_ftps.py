@@ -33,6 +33,7 @@ ftp = ftplib.FTP_TLS(timeout=30)
 backups = {}
 written = []
 staged = []
+remote_backups = {}
 try:
     ftp.connect(HOST, PORT)
     ftp.login(USER, PASSWORD)
@@ -66,20 +67,31 @@ try:
     for name in FILES:
         stage = ".nabou-ftps-" + runid + "-" + name
         if backups[name] is not None:
-            ftp.delete(name)
-        ftp.rename(stage, name)
+            backup_name = ".nabou-before-" + runid + "-" + name
+            ftp.rename(name, backup_name)
+            remote_backups[name] = backup_name
+        # Write to the live name only after original has been saved remotely.
+        try:
+            ftp.rename(stage, name)
+        except Exception:
+            if name in remote_backups:
+                ftp.rename(remote_backups.pop(name), name)
+            raise
         staged.remove(stage)
         written.append(name)
     # Passenger restart marker is only issued after complete successful deployment.
     marker = "tmp/restart.txt"
     ftp.storbinary("STOR " + marker, io.BytesIO(b""))
     print("DEPLOYED: four verified backend files and issued Passenger restart marker.")
+    print("Existing files were retained as remote .nabou-before-* recovery copies.")
 except Exception as exc:
     print("DEPLOY FAILED:", type(exc).__name__, str(exc))
     for name in reversed(written):
         try:
             ftp.delete(name)
-            if backups[name] is not None:
+            if name in remote_backups:
+                ftp.rename(remote_backups[name], name)
+            elif backups[name] is not None:
                 ftp.storbinary("STOR " + name, io.BytesIO(backups[name]))
         except Exception:
             print("ROLLBACK NEEDS MANUAL CHECK:", name)
