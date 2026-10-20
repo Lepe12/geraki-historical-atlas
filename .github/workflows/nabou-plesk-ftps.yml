@@ -1,5 +1,10 @@
 name: NABOU Plesk FTPS deployment
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/nabou-plesk-ftps.yml'
+      - 'tools/gateway/deploy_ftps.py'
+      - 'server/command-center-live/**'
   workflow_dispatch:
     inputs:
       confirm:
@@ -15,8 +20,23 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check backend syntax and tests (no credentials, no deployment)
+        run: |
+          set -euo pipefail
+          node --check server/command-center-live/app.js
+          node --check server/command-center-live/historical-evidence.js
+          node --check server/command-center-live/pdf-evidence.js
+          python3 -m py_compile server/command-center-live/pdf-evidence.py tools/gateway/deploy_ftps.py
+          node server/command-center-live/self-test.js
   deploy:
-    if: ${{ inputs.confirm == 'DEPLOY-NABOU' }}
+    needs: validate
+
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.confirm == 'DEPLOY-NABOU' }}
     runs-on: ubuntu-latest
     environment: nabou-production
     timeout-minutes: 12
