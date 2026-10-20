@@ -171,6 +171,43 @@ async function loadFile(file,kind) {
     detailsFor(null);render();
   }catch(e){alertState("Απορρίφθηκε αρχείο: "+String(e.message||e).slice(0,120),true);}
 }
+$("rawOcrFile").addEventListener("change",async e=>{
+  const file=e.target.files?.[0];
+  if(!file)return;
+  const report=$("rawOcrReport");
+  try{
+    if(file.size>8*1024*1024)throw Error("Το OCR αρχείο υπερβαίνει τα 8 MB");
+    const data=JSON.parse(await file.text());
+    if(data.schema!=="nabou-unlocated-historical-map-ocr-v1" ||
+       data.georeferencing_status!=="NOT_GEOREFERENCED" ||
+       data.historically_verified!==0 ||
+       !Array.isArray(data.labels) || data.labels.length>4000 ||
+       data.labels.some(x=>x.geolocation!==null || x.historically_verified!==false ||
+         typeof x.text_raw!=="string" || x.text_raw.length>140)) {
+      throw Error("Δεν είναι ασφαλές μη γεωαναφερμένο OCR αρχείο");
+    }
+    const fragment=document.createDocumentFragment();
+    const heading=document.createElement("strong");
+    heading.textContent=data.labels.length+" OCR επιγραφές · ΧΩΡΙΣ γεωγραφική ταύτιση";
+    fragment.append(heading);
+    const paragraph=document.createElement("p");
+    paragraph.textContent="Πηγή: "+String(data.source?.title||data.source?.id||"Άγνωστη")+
+      ". Εμφανίζονται οι πρώτες 25 μη ελεγμένες αναγνώσεις. Δεν μεταφέρονται στον χάρτη.";
+    fragment.append(paragraph);
+    const list=document.createElement("ol");
+    for(const item of data.labels.slice(0,25)){
+      const li=document.createElement("li");
+      li.textContent=item.text_raw+" · OCR "+
+        Math.round(100*Number(item.ocr_confidence||0))+"% · pixels "+
+        JSON.stringify(item.pixel_bbox||[]);
+      list.append(li);
+    }
+    fragment.append(list);
+    report.replaceChildren(fragment);
+  }catch(error){
+    report.textContent="Αδυναμία εισαγωγής OCR: "+String(error.message||error).slice(0,130);
+  }
+});
 $("featuresFile").addEventListener("change",e=>loadFile(e.target.files?.[0],"features"));
 $("candidatesFile").addEventListener("change",e=>loadFile(e.target.files?.[0],"candidates"));
 $("year").addEventListener("input",e=>{year=Number(e.target.value);$("yearLabel").textContent=String(year);render();});
