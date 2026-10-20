@@ -20,6 +20,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parent/'llm'))
 from llm_client import call
 from llm_router import route, routing_summary
 import research_response_schema as schemas
+from section_extraction import read_acquired_text
 
 VERSION='pct-semantic-answer-v2'
 ROLES=('evidence_extractor','adversarial_reviewer','synthesis')
@@ -75,26 +76,32 @@ def collect(run_root, provenance_root=None):
             file=p.parent.parent/'library_acquisition'/filename
             if not filename or not file.is_file():
                 excluded.append({'finding_id':f.get('finding_id'),'reason':'ACQUIRED_FILE_MISSING'});continue
-            text=file.read_text(encoding='utf-8',errors='replace')
+            text=read_acquired_text(file)
             start,end=loc.get('start_char'),loc.get('end_char')
-            if not isinstance(start,int) or not isinstance(end,int) or start<0 or end<=start or text[start:end]!=raw or hashlib.sha256(text.encode()).hexdigest()!=f.get('source_text_sha256'):
+            if not isinstance(start,int) or not isinstance(end,int) or start<0 or end<=start or text[start:end]!=raw or hashlib.sha256(file.read_bytes()).hexdigest()!=f.get('source_text_sha256'):
                 excluded.append({'finding_id':f.get('finding_id'),'reason':'ACQUIRED_TEXT_OR_LOCATOR_MISMATCH'});continue
             date_evidence=f.get('date_evidence')
             if date_evidence:
                 dl=date_evidence.get('locator') or {};ds,de=dl.get('start_char'),dl.get('end_char')
                 if not isinstance(ds,int) or not isinstance(de,int) or ds<0 or de<=ds or text[ds:de]!=date_evidence.get('text'):
                     excluded.append({'finding_id':f.get('finding_id'),'reason':'DATE_HEADING_LOCATOR_MISMATCH'});continue
-            key=digest([surface(raw),f.get('years_in_scope',[]),f.get('date_basis')])
+            # Similar OCR/formatting is not a byte-identical quotation. A quote
+            # from one version must never be attributed to a differently laid
+            # out version merely because their whitespace-normalized words agree.
+            key=digest([raw,f.get('years_in_scope',[]),f.get('date_basis')])
+            source=source_by_file.get(filename,{})
             provenance={'lane':p.parent.parent.name,'url':f['url'],'title':f.get('title'),
                         'acquired_text_path':str(file.relative_to(provenance_root or run_root)),
                         'finding_id':f.get('finding_id'),'locator':loc,'source_text_sha256':f['source_text_sha256'],
+                        'page_boundaries':[page for page in (source.get('web_acquisition') or {}).get('pages',[])
+                                           if page.get('end_char',-1)>start and page.get('start_char',0)<end],
                         'reported_archival_reference':f.get('reported_archival_reference')}
             if key in groups:
                 groups[key]['occurrences'].append(provenance);continue
-            source=source_by_file.get(filename,{})
             bibliography=f.get('source_bibliography') or {k:source.get(k) for k in ('creator','date','source_type','rights')}
             bibliography={**bibliography,'date_field_meaning':'PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE'}
-            row={'evidence_id':'e-'+key[:20],'text':raw,'years_in_scope':f.get('years_in_scope',[]),
+            row={'evidence_id':'e-'+key[:20],'text':raw,'similar_text_fingerprint':digest(surface(raw)),
+                 'years_in_scope':f.get('years_in_scope',[]),
                  'date_basis':f.get('date_basis'),'date_evidence':f.get('date_evidence'),
                  'source_bibliography':bibliography,
                  'uncertainties':f.get('uncertainties',[]),'occurrences':[provenance],
@@ -155,7 +162,23 @@ def passages(text):
 
 def model_claim(claim):
     return {k:claim.get(k) for k in ('claim_id','statement','kind','quote','actors','places','dates',
-                                    'source_classification','classification_status','usage_type','uncertainty')}
+                                    'source_classification','classification_status','usage_type','uncertainty','date_evidence','date_basis')}
+
+def quote_occurrences(row,start,quote):
+    output=[]
+    for source in row['occurrences']:
+        original=source.get('locator') or {}
+        locator={**original}
+        if type(original.get('start_char')) is int:
+            a=original['start_char']+start;b=a+len(quote)
+            locator.update(start_char=a,end_char=b,offset_unit='UNICODE_CODE_POINTS',span_semantics='EXACT_QUOTE')
+            if type(original.get('start_line')) is int:
+                locator['start_line']=original['start_line']+row['text'][:start].count('\n')
+                locator['end_line']=locator['start_line']+quote.count('\n')
+            if source.get('page_boundaries'):
+                locator['scan_indexes_0_based']=[p['scan_index_0_based'] for p in source['page_boundaries'] if p['end_char']>a and p['start_char']<b]
+        output.append({**source,'locator':locator,'context_locator':original})
+    return output
 
 def batches(records,max_batches=3,budget=14000):
     selected=[];deferred=[];group=[];size=0
@@ -282,7 +305,8 @@ def validate_items(payload, records):
         start=row['text'].find(quote)
         accepted.append({'claim_id':'c-'+digest([row['evidence_id'],statement,quote])[:20],
             'statement':statement,'kind':kind,'evidence_id':row['evidence_id'],'quote':quote,
-            'quote_offset_in_excerpt':start,**entities,'source_occurrences':row['occurrences'],
+            'quote_offset_in_excerpt':start,**entities,'source_occurrences':quote_occurrences(row,start,quote),
+            'date_evidence':row.get('date_evidence'),'date_basis':row.get('date_basis'),
             'uncertainty':(item.get('uncertainty') if isinstance(item.get('uncertainty'),list) else [])+field_issues,
             'source_uncertainties':row['uncertainties'],'model_analysis':True,'verified':False,
             # A model label cannot establish contemporary primary authorship.
@@ -477,7 +501,7 @@ def render(out):
                   ('Ο φάκελος συγκεντρώνει ακριβή αποσπάσματα χωρίς υπηρεσία μοντέλου. Δεν παράγει ερμηνεία ή επιβεβαίωση ιστορικών γεγονότων.' if out.get('answer_mode')=='EXACT_SOURCE_EXTRACTS' else 'Η απάντηση είναι ανάλυση μοντέλου που περιμένει ανθρώπινο έλεγχο. Δεν αποτελεί επαλήθευση ιστορικών γεγονότων.'),
                   'Η επιτυχής αντιστοίχιση παραπομπής δεν αποδεικνύει από μόνη της ότι η ερμηνεία του μοντέλου είναι σωστή.',
                   'Η ανεξαρτησία των πηγών και η εξέταση πρωτοτύπων δεν θεωρούνται ολοκληρωμένες.',
-                  f'Κάλυψη: {out["coverage"]["selected_passages"]}/{out["coverage"]["unique_passages"]} μοναδικά αποσπάσματα περιλαμβάνονται στην απάντηση.'])
+                  f'Κάλυψη μοντέλου: {out["coverage"]["selected_passages"]}/{out["coverage"]["unique_passages"]} μοναδικά αποσπάσματα επιλέχθηκαν για ανάλυση. Αυτό δεν σημαίνει ότι όλα τεκμηριώνουν την τελική απάντηση.'])
     return '\n'.join(lines)+'\n'
 
 def main():

@@ -31,6 +31,32 @@ def item(eid,**changes):
             'kind':'source_statement','actors':[],'places':[],'dates':['1677'],'uncertainty':[],**changes}
 
 class SemanticAnswer(unittest.TestCase):
+    def test_whitespace_variants_are_not_misattributed_as_identical_quotes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp);fixture(tmp,'greek','https://example.org/other-version')
+            lane=Path(tmp)/'greek';changed=TEXT.replace('ships attacked','ships\r\nattacked')
+            (lane/'library_acquisition/doc.txt').write_bytes(changed.encode())
+            p=lane/'structured_output/extracted_findings.json';data=json.loads(p.read_text());f=data['findings'][0]
+            f.update(evidence_excerpt=changed,source_text_sha256=hashlib.sha256(changed.encode()).hexdigest())
+            f['locator'].update(end_char=len(changed));p.write_text(json.dumps(data))
+            rows,excluded=collect(tmp)
+            self.assertFalse(excluded);self.assertEqual(len(rows),2)
+            self.assertEqual(rows[0]['similar_text_fingerprint'],rows[1]['similar_text_fingerprint'])
+            self.assertTrue(all(len(r['occurrences'])==1 for r in rows))
+
+    def test_selected_quote_gets_exact_character_locator_and_page(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp);rows,_=collect(tmp);row=rows[0]
+            boundary=TEXT.index(' The account')
+            row['occurrences'][0]['page_boundaries']=[{'start_char':0,'end_char':boundary,'scan_index_0_based':0},
+                {'start_char':boundary,'end_char':len(TEXT),'scan_index_0_based':1}]
+            value=item(row['evidence_id'],passage_ids=[1],statement='The source expresses uncertainty.');value.pop('quote');value['dates']=[]
+            accepted,rejected=validate_items({'items':[value]},rows)
+            self.assertFalse(rejected)
+            c=accepted[0];loc=c['source_occurrences'][0]['locator']
+            self.assertEqual(TEXT[loc['start_char']:loc['end_char']],c['quote'])
+            self.assertEqual(loc['scan_indexes_0_based'],[1]);self.assertEqual(loc['span_semantics'],'EXACT_QUOTE')
+
     def test_flagged_synthesis_is_revised_once_and_reviewed_again(self):
         for second_pass in (True,False):
             with tempfile.TemporaryDirectory() as tmp:

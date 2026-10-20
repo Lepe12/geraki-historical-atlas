@@ -37,6 +37,10 @@ def paragraphs(text):
         raw=m.group(0).rstrip()
         if raw:yield m.start(),m.start()+len(raw),raw
 
+def read_acquired_text(path):
+    # Character locators must retain CRLF and every other source character.
+    with Path(path).open(encoding='utf-8',errors='replace',newline='') as stream:return stream.read()
+
 def locator(text, start, end, source, file):
     document=source.get('web_acquisition') or {}
     pages=[p for p in document.get('pages',[]) if p.get('end_char',-1)>start and p.get('start_char',0)<end]
@@ -201,7 +205,10 @@ def build_findings(base, ctx):
     for file in sorted(root.glob('*.txt')):
         # No anonymous text may become a source-attributed finding.
         source=by_file.get(file.name)
-        if source:findings.extend(extract_document(file.read_text(encoding='utf-8',errors='replace'),source,file.name,ctx))
+        if source:
+            rows=extract_document(read_acquired_text(file),source,file.name,ctx)
+            for row in rows:row['source_text_sha256']=hashlib.sha256(file.read_bytes()).hexdigest()
+            findings.extend(rows)
     return {'schema':'pct-section-findings-v1','target':ctx['target'],'question':ctx.get('purpose'),
             'date_range':ctx.get('date_range'),'documents_considered':len(by_file),'findings':findings,
             'candidate_count':sum(f['decision']=='RETAIN_CANDIDATE' for f in findings),

@@ -24,6 +24,12 @@ if ($result['inserted_attestations']!==0)throw new RuntimeException('IMPORT_DUPL
 if ((int)heQuery($db,'SELECT COUNT(*) FROM pc_he_relations WHERE subject_id=?',[$att['id']])->fetchColumn()!==1)throw new RuntimeException('GRAPH_RELATION_NOT_PERSISTED');
 try {$db->beginTransaction();heImportBundle($db,$bundle,fn($path)=>'Tampered source');throw new RuntimeException('TAMPERING_ACCEPTED');}
 catch (RuntimeException $e) {$db->rollBack();if ($e->getMessage()!=='EVIDENCE_TEXT_CHECKSUM_MISMATCH')throw $e;}
+$wrong=$bundle;$wrong['attestations'][0]['citations'][0]['locator']=json_encode(['start_char'=>1,'end_char'=>strlen($text),'offset_unit'=>'UNICODE_CODE_POINTS','span_semantics'=>'EXACT_QUOTE']);
+try {$db->beginTransaction();heImportBundle($db,$wrong,fn($path)=>$text);throw new RuntimeException('WRONG_LOCATOR_ACCEPTED');}
+catch (RuntimeException $e) {$db->rollBack();if ($e->getMessage()!=='QUOTE_LOCATOR_REPLAY_FAILED')throw $e;}
+$unicode='α🙂Milo';$us=$source;$us['id'].='-unicode';$us['text_sha256']=hash('sha256',$unicode);
+$ua=$att;$ua['id']='att_'.bin2hex(random_bytes(12));$ua['citations']=[['source_id'=>$us['id'],'locator'=>json_encode(['start_char'=>2,'end_char'=>6,'offset_unit'=>'UNICODE_CODE_POINTS','span_semantics'=>'EXACT_QUOTE']),'exact_excerpt'=>'Milo','attribution'=>'stated']];
+$db->beginTransaction();heImportBundle($db,['schema'=>'nabou-persistent-evidence-bundle-v1','sources'=>[$us],'attestations'=>[$ua]],fn($path)=>$unicode);$db->commit();
 $backup=heBackup($db,sys_get_temp_dir().'/nabou-php-backup-test-'.bin2hex(random_bytes(5)));
 $sql=gzdecode(file_get_contents($backup['file']));if ($sql===false||!str_contains($sql,'CREATE TABLE')||hash_file('sha256',$backup['file'])!==$backup['sha256'])throw new RuntimeException('BACKUP_INVALID');
 $restored='nabou_restore_'.bin2hex(random_bytes(5));$db->exec('CREATE DATABASE `'.$restored.'` CHARACTER SET utf8mb4');
@@ -34,4 +40,4 @@ try {
     if ($quote!==$text)throw new RuntimeException('BACKUP_RESTORE_QUOTE_FAILED');
     $restore=null;
 } finally {$db->exec('DROP DATABASE `'.$restored.'`');}
-echo json_encode(['status'=>'PASS','environment'=>'ISOLATED_TEST_NOT_PRODUCTION','tests'=>['PDO migration','durable quote replay','idempotent import','citation-backed relational graph','tampered text rejected','complete database backup','restore into isolated database'],'migration'=>$first]),PHP_EOL;
+echo json_encode(['status'=>'PASS','environment'=>'ISOLATED_TEST_NOT_PRODUCTION','tests'=>['PDO migration','durable quote replay','idempotent import','citation-backed relational graph','tampered text rejected','wrong exact locator rejected','Greek and supplementary Unicode locator replay','complete database backup','restore into isolated database'],'migration'=>$first]),PHP_EOL;

@@ -21,7 +21,10 @@ def build(answer):
                           'url':occurrence['url'],'text_path':path,'text_sha256':sha,
                           'source_classification':claim.get('source_classification','UNVERIFIED'),
                           'classification_status':'PROVISIONAL_SOURCE_CRITICISM_PENDING'}
-            citations.append(Citation(sid,json.dumps(occurrence['locator'],sort_keys=True),claim['quote'],
+            locator={k:v for k,v in occurrence['locator'].items() if k in (
+                'start_char','end_char','start_line','end_line','printed_page','scan_indexes_0_based',
+                'pdf_file','pdf_reference_base','offset_unit','span_semantics')}
+            citations.append(Citation(sid,json.dumps(locator,sort_keys=True),claim['quote'],
                                       'stated' if claim.get('kind')=='source_statement' else 'inferred'))
         if not citations:
             deferred.append({'claim_id':claim.get('claim_id'),'reason':'DURABLE_TEXT_BINDING_MISSING'});continue

@@ -76,6 +76,15 @@ function heImportBundle(PDO $db,array $bundle,callable $readText): array {
         foreach ($att['citations'] as $citation) {
             $source=$sources[$citation['source_id']]??null;
             if (!$source||$citation['exact_excerpt']===''||!str_contains($source['text'],$citation['exact_excerpt']))throw new RuntimeException('QUOTE_REPLAY_FAILED');
+            $locator=json_decode($citation['locator'],true);
+            if (is_array($locator)&&(array_key_exists('start_char',$locator)||array_key_exists('end_char',$locator))) {
+                $a=$locator['start_char']??null;$b=$locator['end_char']??null;
+                if (!is_int($a)||!is_int($b)||$a<0||$b<=$a||isset($locator['offset_unit'])&&$locator['offset_unit']!=='UNICODE_CODE_POINTS')throw new RuntimeException('INVALID_UNICODE_LOCATOR');
+                if (function_exists('mb_substr'))$span=mb_substr($source['text'],$a,$b-$a,'UTF-8');
+                elseif (function_exists('iconv_substr'))$span=iconv_substr($source['text'],$a,$b-$a,'UTF-8');
+                else throw new RuntimeException('UNICODE_LOCATOR_RUNTIME_UNAVAILABLE');
+                if ($span===false||(($locator['span_semantics']??'')==='EXACT_QUOTE'?$span!==$citation['exact_excerpt']:!str_contains($span,$citation['exact_excerpt'])))throw new RuntimeException('QUOTE_LOCATOR_REPLAY_FAILED');
+            }
         }
         $existing=heQuery($db,'SELECT entity_id,predicate,value_text FROM pc_he_attestations WHERE id=?',[$att['id']])->fetch(PDO::FETCH_NUM);
         if ($existing) {
