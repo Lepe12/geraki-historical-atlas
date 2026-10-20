@@ -1,0 +1,108 @@
+{
+  "schema": "nabou-production-evidence-smoke-v2",
+  "run_id": "39387201362",
+  "checked_utc": "2026-10-20T07:32:47.019205+00:00",
+  "source_revision": "f885a4e05acb4c4d187e11522c55a81511ba49ab",
+  "base_url": "https://pct-live.piratecartography.com/pct-api/live",
+  "checks": [
+    {
+      "method": "GET",
+      "endpoint": "/knowledge/evidence?source_id=src-fake",
+      "expected_http": 401,
+      "http_status": 404,
+      "response_sha256": "d2dfdc9511fbeaa0701d1f8730f4989313b062ca1b61a2bd8bed8f4f5d654b5d",
+      "passed": false
+    },
+    {
+      "method": "POST",
+      "endpoint": "/knowledge/upload",
+      "expected_http": 401,
+      "http_status": 415,
+      "response_sha256": "54dd95bc0f320919be804507ecc9e76075364eed648e09a23e70e1c53c9305f2",
+      "passed": false
+    },
+    {
+      "method": "POST",
+      "endpoint": "/knowledge/review",
+      "expected_http": 401,
+      "http_status": 400,
+      "response_sha256": "f668684b9a98ac842fc2c5763bbb33c21bf3d1ef4f512d8bff7e6d24976cc7b3",
+      "passed": false
+    },
+    {
+      "method": "POST",
+      "endpoint": "/knowledge/agent-search",
+      "expected_http": 200,
+      "passed": false,
+      "http_status": 404,
+      "response_sha256": "d2dfdc9511fbeaa0701d1f8730f4989313b062ca1b61a2bd8bed8f4f5d654b5d"
+    }
+  ],
+  "public_route_observations": [
+    {
+      "origin": "https://pct-live.piratecartography.com",
+      "endpoint": "/health",
+      "http_status": 200,
+      "response_sha256": "98e93b1399ed0d8a49e01f9f66d82b1b4a5b545b37e0a7b8f02f8a6aac282eb9",
+      "response_schema": null,
+      "credentials_sent": false,
+      "method": "GET"
+    },
+    {
+      "origin": "https://pct-live.piratecartography.com",
+      "endpoint": "/knowledge/evidence?source_id=src-fake",
+      "http_status": 404,
+      "response_sha256": "d2dfdc9511fbeaa0701d1f8730f4989313b062ca1b61a2bd8bed8f4f5d654b5d",
+      "response_schema": null,
+      "credentials_sent": false,
+      "method": "GET"
+    },
+    {
+      "origin": "https://www.piratecartography.com",
+      "endpoint": "/health",
+      "http_status": 200,
+      "response_sha256": "98e93b1399ed0d8a49e01f9f66d82b1b4a5b545b37e0a7b8f02f8a6aac282eb9",
+      "response_schema": null,
+      "credentials_sent": false,
+      "method": "GET"
+    },
+    {
+      "origin": "https://www.piratecartography.com",
+      "endpoint": "/knowledge/evidence?source_id=src-fake",
+      "http_status": 404,
+      "response_sha256": "d2dfdc9511fbeaa0701d1f8730f4989313b062ca1b61a2bd8bed8f4f5d654b5d",
+      "response_schema": null,
+      "credentials_sent": false,
+      "method": "GET"
+    },
+    {
+      "origin": "https://piratecartography.com",
+      "endpoint": "/health",
+      "http_status": 200,
+      "response_sha256": "98e93b1399ed0d8a49e01f9f66d82b1b4a5b545b37e0a7b8f02f8a6aac282eb9",
+      "response_schema": null,
+      "credentials_sent": false,
+      "method": "GET"
+    },
+    {
+      "origin": "https://piratecartography.com",
+      "endpoint": "/knowledge/evidence?source_id=src-fake",
+      "http_status": 404,
+      "response_sha256": "d2dfdc9511fbeaa0701d1f8730f4989313b062ca1b61a2bd8bed8f4f5d654b5d",
+      "response_schema": null,
+      "credentials_sent": false,
+      "method": "GET"
+    }
+  ],
+  "oidc_event_auth_negative_control": {
+    "http_status": 400,
+    "response_sha256": "e8b3f11af8b1ae8f0ba13ef3936cd73071d458a4cc109fd601a2597d9c5cd251",
+    "backend_error_code": "invalid_event",
+    "expected_http": 400,
+    "expected_error": "invalid_event",
+    "passed": true,
+    "event_schema_deliberately_invalid": true,
+    "research_event_creation_requested": false
+  },
+  "status": "BLOCKED_PRODUCTION_ACCEPTANCE"
+}
