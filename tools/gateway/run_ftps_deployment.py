@@ -43,6 +43,14 @@ def execute(env=None, runner=subprocess.run):
     output=result.stdout or ''
     report['process_exit_code']=result.returncode
     report['rollback_needs_manual_check']='ROLLBACK NEEDS MANUAL CHECK:' in output
+    phase=re.search(r'DEPLOY_FAILURE_PHASE: ([A-Z_]+)',output)
+    if phase:
+        report['failed_phase']=phase.group(1)
+        if phase.group(1) in ('CONNECT','CONTROL_TLS_LOGIN','VALIDATE_TLS_NAME','PREFLIGHT'):report['production_changed']=False
+    reply=re.search(r'FTP_REPLY_CODE: (\d{3})',output)
+    if reply:report['ftp_reply_code']=int(reply.group(1))
+    reason=re.search(r'FTP_FAILURE_REASON: ([A-Z_]+)',output)
+    if reason:report['ftp_failure_reason']=reason.group(1)
     if result.returncode==0 and storage and 'STORAGE_FILES_STAGED_AWAITING_EXISTING_HOST_LOCAL_CRON' in output:
         report.update(status='STORAGE_FILES_STAGED_AWAITING_HOST_LOCAL_MIGRATION',production_changed=True,
                       uploaded_files_hash_checked=True,passenger_restart_requested=False)
@@ -51,7 +59,7 @@ def execute(env=None, runner=subprocess.run):
                       uploaded_files_hash_checked=True,passenger_restart_requested=True)
     else:
         # Failure after mutation may have invoked rollback; never infer unchanged.
-        report.update(status='FTPS_DEPLOYMENT_FAILED',production_changed='UNKNOWN')
+        report.update(status='FTPS_DEPLOYMENT_FAILED',production_changed=False if phase and phase.group(1) in ('CONNECT','CONTROL_TLS_LOGIN','VALIDATE_TLS_NAME','PREFLIGHT') else 'UNKNOWN')
         for error_type in ('SSLCertVerificationError','SSLError','gaierror','TimeoutError',
                            'ConnectionRefusedError','error_perm','error_temp','RuntimeError'):
             if 'DEPLOY FAILED: '+error_type in output:

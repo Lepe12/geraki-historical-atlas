@@ -8,6 +8,11 @@ STRING={'type':'string'}
 STRINGS=array(STRING)
 SHORT_STRINGS=array({'type':'string','maxLength':240},5)
 
+def query_expansion(lanes):
+    # Fixed keys require one actual query per registered lane, without template
+    # lane names or duplicate rows displacing another source family.
+    return obj({'queries':obj({lane:{'type':'string','minLength':3,'maxLength':100} for lane in sorted(lanes)})})
+
 def extraction(evidence_ids, question_kind=None):
     places=array(STRING)
     actors=array(STRING)

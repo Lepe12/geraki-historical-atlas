@@ -9,7 +9,15 @@ permissions:
 jobs:
   query-language:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - case: person
+            request: library_discovery_requests/lantzas-engine-acceptance-20261020.json
+          - case: topic
+            request: library_discovery_requests/eastern-med-1600-1700-engine-validation-20261020.json
     env:
       PCT_LLM_PROVIDER: local_llama_cpp
       PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen3-8B-GGUF
@@ -25,12 +33,22 @@ jobs:
             library_discovery_requests
             evidence/configuration
       - uses: ./.github/actions/research-model
+      - name: Compile the actual constrained query schema
+        run: |
+          PYTHONPATH=tools python3 - <<'PY'
+          import json
+          from llama_cpp import LlamaGrammar
+          from research_response_schema import query_expansion
+          lanes=['greek','travellers','venetian','french','british','spanish_simancas','ottoman','italian_states','dutch','german','north_african']
+          LlamaGrammar.from_json_schema(json.dumps(query_expansion(lanes)),verbose=False)
+          print('ACTUAL_QUERY_GRAMMAR_COMPILED_NOT_SOURCE_RESEARCH_ACCEPTANCE')
+          PY
       - name: Run actual multilingual query expansion
-        run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python3 tools/research_semantic_queries.py --request library_discovery_requests/eastern-med-1600-1700-engine-validation-20261020.json --output "evidence/configuration/$GITHUB_RUN_ID/query-language-validation.json"
+        run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python3 tools/research_semantic_queries.py --request "${{ matrix.request }}" --output "evidence/configuration/$GITHUB_RUN_ID/query-language-validation-${{ matrix.case }}.json"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: actual-query-language-diagnostic
+          name: actual-query-language-diagnostic-${{ matrix.case }}
           path: evidence/configuration/${{ github.run_id }}/
       - name: Persist actual diagnostic without claiming source research acceptance
         if: always()

@@ -6,6 +6,9 @@ on:
     paths: ['.github/workflows/nabou-ftps-diagnostics.yml']
 permissions:
   contents: write
+concurrency:
+  group: nabou-production-ftps
+  cancel-in-progress: false
 jobs:
   diagnose:
     runs-on: ubuntu-latest

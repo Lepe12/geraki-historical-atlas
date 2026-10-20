@@ -20,16 +20,16 @@ diagnostics=importlib.util.module_from_spec(diag_spec);diag_spec.loader.exec_mod
 
 class FtpsDeploymentTests(unittest.TestCase):
     def test_storage_request_is_activated_last_and_failed_activation_restores_legacy_cli(self):
-        prefix='../../tools/storage/'
+        prefix='/piratecartography-gateway/tools/storage/'
         for fail in (False,True):
             class FakeFtp:
                 def __init__(self):self.files={prefix+'pct_research_store.php':b'legacy importer'};self.activations=[]
                 def connect(self,*args):pass
                 def login(self,*args):pass
                 def prot_p(self):pass
-                def cwd(self,*args):pass
+                def cwd(self,path):self.directory=path
                 def pwd(self):return '/piratecartography-gateway/server/command-center-live'
-                def nlst(self,path=None):return ['pct_research_store.php'] if path else ['package.json','public','tmp','knowledge-data']
+                def nlst(self,path=None):return ['pct_research_store.php'] if self.directory==prefix.rstrip('/') else ['package.json','public','tmp','knowledge-data']
                 def retrbinary(self,command,callback):
                     path=command[5:]
                     if path not in self.files:raise ftplib.error_perm('550 absent')

@@ -53,8 +53,9 @@ if MODE=='evidence_storage':
     # Dependencies first, CLI next, explicit request LAST. The existing cron
     # cannot request a migration against partially transferred files.
     order=('historical_evidence.php','historical_evidence_schema.sql','evidence_schema_request.php','pct_research_store.php')
-    payload={'../../tools/storage/'+name:code[name] for name in order}
-    payload['../../tools/storage/.evidence-schema-install-request.json']=(json.dumps(manifest,indent=2)+'\n').encode()
+    storage_directory=posixpath.normpath(REMOTE+'/../../tools/storage')
+    payload={storage_directory+'/'+name:code[name] for name in order}
+    payload[storage_directory+'/.evidence-schema-install-request.json']=(json.dumps(manifest,indent=2)+'\n').encode()
     FILES=tuple(payload)
 runid = uuid.uuid4().hex[:12]
 ftp = ftplib.FTP_TLS(timeout=30, context=ssl.create_default_context())
@@ -86,7 +87,9 @@ try:
     if not {"package.json", "public", "tmp", "knowledge-data"}.issubset(listing):
         raise RuntimeError("BLOCKED: destination does not match expected Plesk app directory")
     if MODE=='evidence_storage':
-        existing_storage={posixpath.basename(x.rstrip('/')) for x in ftp.nlst('../../tools/storage')}
+        ftp.cwd(storage_directory)
+        existing_storage={posixpath.basename(x.rstrip('/')) for x in ftp.nlst()}
+        ftp.cwd(REMOTE)
         if 'pct_research_store.php' not in existing_storage:raise RuntimeError('EXISTING_HOST_LOCAL_IMPORTER_REQUIRED')
         if '.evidence-schema-install-request.json' in existing_storage:raise RuntimeError('PENDING_SCHEMA_REQUEST_ALREADY_EXISTS')
     for name in FILES:
@@ -100,7 +103,7 @@ try:
             known=existing_storage if MODE=='evidence_storage' else listing
             if posixpath.basename(name) in known:raise RuntimeError('EXISTING_FILE_BACKUP_UNAVAILABLE')
             backups[name] = None
-    if MODE=='evidence_storage' and backups['../../tools/storage/.evidence-schema-install-request.json'] is not None:
+    if MODE=='evidence_storage' and backups[storage_directory+'/.evidence-schema-install-request.json'] is not None:
         raise RuntimeError('PENDING_SCHEMA_REQUEST_ALREADY_EXISTS')
     # Stage every file before modifying the running code.
     phase = 'STAGE_UPLOAD'
@@ -143,6 +146,14 @@ except Exception as exc:
     # never raw exception text or credential-bearing URLs.
     print("DEPLOY FAILED:", type(exc).__name__)
     print("DEPLOY_FAILURE_PHASE:", phase)
+    if isinstance(exc,ftplib.Error):
+        reply=re.match(r'(\d{3})',str(exc))
+        if reply:print('FTP_REPLY_CODE:',reply.group(1))
+        for pattern,reason in ((r'too many|maximum.*connection','CONNECTION_LIMIT'),
+                               (r'no such|not found|no files','PATH_NOT_FOUND'),
+                               (r'permission|not permitted|access denied','PERMISSION_DENIED'),
+                               (r'session reuse|tls session','TLS_SESSION_REQUIREMENT')):
+            if re.search(pattern,str(exc),re.I):print('FTP_FAILURE_REASON:',reason);break
     if isinstance(exc, ssl.SSLCertVerificationError):
         print("TLS_VERIFY_CODE:", exc.verify_code)
     for name in reversed(written):
