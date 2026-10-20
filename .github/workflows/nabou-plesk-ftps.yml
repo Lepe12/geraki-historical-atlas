@@ -1,0 +1,89 @@
+name: NABOU Plesk FTPS deployment
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/nabou-plesk-ftps.yml'
+      - 'tools/gateway/deploy_ftps.py'
+      - 'server/command-center-live/**'
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type DEPLOY-NABOU to authorize production backend-only deployment'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nabou-production-ftps
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check backend syntax and tests (no credentials, no deployment)
+        run: |
+          set -euo pipefail
+          node --check server/command-center-live/app.js
+          node --check server/command-center-live/historical-evidence.js
+          node --check server/command-center-live/pdf-evidence.js
+          python3 -m py_compile server/command-center-live/pdf-evidence.py tools/gateway/deploy_ftps.py
+          node server/command-center-live/self-test.js
+  deploy:
+    needs: validate
+
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.confirm == 'DEPLOY-NABOU' }}
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 12
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_APP_ROOT: ${{ vars.PCT_FTPS_APP_ROOT }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate configuration and code
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$PCT_FTPS_HOST" || { echo "Missing secret PCT_FTPS_HOST"; exit 1; }
+          test -n "$PCT_FTPS_USER" || { echo "Missing secret PCT_FTPS_USER"; exit 1; }
+          test -n "$PCT_FTPS_PASSWORD" || { echo "Missing secret PCT_FTPS_PASSWORD"; exit 1; }
+          test -n "$PCT_FTPS_APP_ROOT" || { echo "Missing variable PCT_FTPS_APP_ROOT"; exit 1; }
+          node --check server/command-center-live/app.js
+          node --check server/command-center-live/historical-evidence.js
+          node --check server/command-center-live/pdf-evidence.js
+          python3 -m py_compile server/command-center-live/pdf-evidence.py tools/gateway/deploy_ftps.py
+          node server/command-center-live/self-test.js
+      - name: Deploy backend files through FTPS
+        run: python3 tools/gateway/deploy_ftps.py
+      - name: Verify production health and evidence route
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,time,urllib.error,urllib.request
+          base="https://www.piratecartography.com/pct-api/live"
+          for attempt in range(12):
+              try:
+                  with urllib.request.urlopen(base+"/health",timeout=12) as response:
+                      data=json.load(response)
+                      if response.status==200 and data.get("status")=="PASS":break
+              except Exception:pass
+              time.sleep(5)
+          else:raise SystemExit("Production health did not pass")
+          req=urllib.request.Request(base+"/knowledge/evidence")
+          try:
+              with urllib.request.urlopen(req,timeout=12) as r: status=r.status
+          except urllib.error.HTTPError as e:status=e.code
+          print("Evidence response status:",status)
+          if status==404:raise SystemExit("FAIL: evidence route remains unknown (404)")
+          if status not in (200,400,401,403):raise SystemExit("Unexpected evidence endpoint response: "+str(status))
+          print("Production health and route verification passed")
+          PY
