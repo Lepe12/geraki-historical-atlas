@@ -95,7 +95,11 @@ def collect(run_root, provenance_root=None):
             # out version merely because their whitespace-normalized words agree.
             key=digest([raw,f.get('years_in_scope',[]),f.get('date_basis')])
             source=source_by_file.get(filename,{})
+            bibliography=f.get('source_bibliography') or {k:source.get(k) for k in ('creator','date','source_type','rights')}
+            bibliography={**bibliography,'date_field_meaning':'PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE'}
+            if source.get('bibliographic_correction'):bibliography['documented_correction']=source['bibliographic_correction']
             provenance={'lane':p.parent.parent.name,'url':f['url'],'title':f.get('title'),
+                        'source_bibliography':bibliography,
                         'acquired_text_path':str(file.relative_to(provenance_root or run_root)),
                         'finding_id':f.get('finding_id'),'locator':loc,'source_text_sha256':f['source_text_sha256'],
                         'page_boundaries':[page for page in (source.get('web_acquisition') or {}).get('pages',[])
@@ -103,8 +107,6 @@ def collect(run_root, provenance_root=None):
                         'reported_archival_reference':f.get('reported_archival_reference')}
             if key in groups:
                 groups[key]['occurrences'].append(provenance);continue
-            bibliography=f.get('source_bibliography') or {k:source.get(k) for k in ('creator','date','source_type','rights')}
-            bibliography={**bibliography,'date_field_meaning':'PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE'}
             row={'evidence_id':'e-'+key[:20],'text':raw,'similar_text_fingerprint':digest(surface(raw)),
                  'years_in_scope':f.get('years_in_scope',[]),
                  'date_basis':f.get('date_basis'),'date_evidence':f.get('date_evidence'),
@@ -151,6 +153,8 @@ def collect(run_root, provenance_root=None):
 def model_evidence(row):
     """Keep full replay receipts on disk; avoid repeating them in model context."""
     value={k:row.get(k) for k in ('evidence_id','years_in_scope','date_basis','date_evidence','source_bibliography','uncertainties')}
+    value['source_bibliography']={k:v for k,v in (row.get('source_bibliography') or {}).items()
+                                  if k in ('creator','date','source_type','rights','evidence_level','date_field_meaning')}
     # Character offsets belong to engine-side replay, not model generation.
     # Repeating two offsets for every short sentence can otherwise exclude an
     # acquired source purely because of JSON overhead rather than text length.
@@ -556,7 +560,17 @@ def render(out):
             lines.append(section['text']);lines.append('')
             for cid in section['claim_ids']:
                 c=claims[cid];src=c['source_occurrences'][0];loc=src['locator']
-                lines.extend(['- Παραπομπή '+cid+': '+src['url']+f' · γραμμές {loc["start_line"]}–{loc["end_line"]}.',
+                bib=src.get('source_bibliography') or {}
+                creators=bib.get('creator') or [];dates=bib.get('date') or []
+                if isinstance(creators,str):creators=[creators]
+                if isinstance(dates,str):dates=[dates]
+                label=((', '.join(creators)+' · ') if creators else '')+(src.get('title') or 'Τίτλος μη διαθέσιμος')
+                if dates:label+=' · έκδοση/μεταδεδομένα: '+', '.join(dates)
+                position=f'γραμμές {loc["start_line"]}–{loc["end_line"]}'
+                if loc.get('printed_page') is not None:position+=' · έντυπη σελίδα '+str(loc['printed_page'])
+                scans=loc.get('scan_indexes_0_based') or []
+                if scans:position+=' · σελίδες PDF (αρίθμηση από 1): '+', '.join(str(i+1) for i in scans)
+                lines.extend(['- Παραπομπή '+cid+': '+label+' · '+src['url']+' · '+position+'.',
                               '  Απόσπασμα αποκτημένου κειμένου: '+c['quote']])
                 if src.get('reported_archival_reference'):lines.append('  Αρχειακή παραπομπή όπως τη δίνει η μελέτη (το πρωτότυπο δεν εξετάστηκε): '+src['reported_archival_reference']['display'])
             lines.append('')

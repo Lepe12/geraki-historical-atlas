@@ -16,8 +16,14 @@ def build(answer):
         for occurrence in claim.get('source_occurrences',[]):
             path=occurrence.get('acquired_text_path');sha=occurrence.get('source_text_sha256')
             if not path or not sha:continue
-            sid='src_'+hashlib.sha256((occurrence['url']+'\0'+sha).encode()).hexdigest()[:32]
+            bibliography=occurrence.get('source_bibliography') or {}
+            metadata={'title':occurrence.get('title'),'bibliography':bibliography}
+            metadata_sha=hashlib.sha256(json.dumps(metadata,sort_keys=True,ensure_ascii=False).encode()).hexdigest()
+            # Corrected bibliographies append a new source version; an earlier
+            # immutable database row must not silently hide the correction.
+            sid='src_'+hashlib.sha256((occurrence['url']+'\0'+sha+'\0'+metadata_sha).encode()).hexdigest()[:32]
             sources[sid]={'id':sid,'title':occurrence.get('title') or 'TITLE_NOT_SUPPLIED',
+                          'source_bibliography':bibliography,'bibliographic_metadata_sha256':metadata_sha,
                           'url':occurrence['url'],'text_path':path,'text_sha256':sha,
                           'source_classification':claim.get('source_classification','UNVERIFIED'),
                           'classification_status':'PROVISIONAL_SOURCE_CRITICISM_PENDING'}

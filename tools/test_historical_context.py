@@ -63,6 +63,13 @@ class ContextTests(unittest.TestCase):
         answer['review']={'supported_claim_ids':['c']}
         new_graph=bundle_graph(build(answer))
         self.assertNotEqual(before,next(e['id'] for e in new_graph['entities'] if e['entity_type']=='Attestation'))
+        before_bundle=build(answer)
+        occurrence=answer['claims'][0]['source_occurrences'][0]
+        occurrence['source_bibliography']={'creator':['Actual fixture author'],'date':['2026']}
+        corrected_bundle=build(answer)
+        self.assertNotEqual(before_bundle['sources'][0]['id'],corrected_bundle['sources'][0]['id'])
+        self.assertNotEqual(before_bundle['attestations'][0]['id'],corrected_bundle['attestations'][0]['id'])
+        self.assertEqual(corrected_bundle['sources'][0]['source_bibliography']['creator'],['Actual fixture author'])
 
 
 if __name__=='__main__':unittest.main()
