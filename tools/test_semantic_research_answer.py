@@ -49,6 +49,19 @@ class SemanticAnswer(unittest.TestCase):
                 rows,excluded=collect(tmp)
                 self.assertEqual(rows,[]);self.assertEqual(excluded[0]['reason'],reason)
                 self.assertEqual(file.read_text(),text)
+        from semantic_research_answer import person_passage_hold_reason
+        request={'target':'Ιωάννης Δοκιμής','aliases':['Jean Test']}
+        self.assertIsNone(person_passage_hold_reason('Quelques jours après, on pendait sire Jean Test à la porte du bagne.',
+            'Synthetic French narrative',request,['EVENT_DATE_UNRESOLVED','ACTION_UNRESOLVED']))
+        self.assertIsNotNone(person_passage_hold_reason('In 1608 Nicola Test Principe di Esempio',
+            'Synthetic rank list',{'target':'Νικόλαος Δοκιμής','aliases':['Nicola Test']},[]))
+        request={'target':'Νικόλαος Δοκιμής','aliases':['Nicola Test'],'date_range':'1500-1650'}
+        bibliography={'date':['1884']}
+        text='Nicola Test entered the city administration after completing his studies.'
+        self.assertIsNotNone(person_passage_hold_reason(text,'Biographies of illustrious contemporaries',request,[],bibliography,[]))
+        for title in ('Historical study of the requested person','Biographies of 16th century contemporaries'):
+            self.assertIsNone(person_passage_hold_reason(text,title,request,[],bibliography,[]))
+        self.assertIsNone(person_passage_hold_reason(text,'Biographies of illustrious contemporaries',request,[],bibliography,[1608]))
 
     def test_entity_formatting_copies_real_mention_without_spelling_or_identity_repair(self):
         from semantic_research_answer import literal_entity_surface

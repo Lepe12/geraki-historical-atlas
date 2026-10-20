@@ -77,7 +77,7 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
         if claim.get('claim_id') not in cited:continue
         row=evidence_by_id.get(claim.get('evidence_id'),{})
         title=(row.get('occurrences') or [{}])[0].get('title')
-        reason=person_passage_hold_reason(row.get('text',''),title,request,row.get('uncertainties',[]))
+        reason=person_passage_hold_reason(row.get('text',''),title,request,row.get('uncertainties',[]),row.get('source_bibliography'),row.get('years_in_scope'))
         if reason:quality_rejections.append({'claim_id':claim['claim_id'],'reason':reason})
     if quality_rejections:blockers.append('ANSWER_CONTAINS_UNRESOLVED_PERSON_OR_BIBLIOGRAPHIC_LEADS')
     if request_kind=='person' and not cited.intersection(supported):blockers.append('NO_SUPPORTED_PERSON_RESEARCH_CLAIMS')

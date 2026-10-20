@@ -48,12 +48,30 @@ def configuration():
         elif r.provider not in ('openai_compatible','local_llama_cpp'):missing.append('SUPPORTED_PROVIDER')
     return {'configured':not missing,'missing':sorted(set(missing))}
 
-def person_passage_hold_reason(text,title,request,uncertainties):
+def person_passage_hold_reason(text,title,request,uncertainties,bibliography=None,years_in_scope=None):
     from research_focus import fold,name_pattern,decompose
-    if decompose(request.get('target',''),request.get('aliases',[])).get('kind')!='person':return None
+    focus=decompose(request.get('target',''),request.get('aliases',[]))
+    if focus.get('kind')!='person':return None
     literal_target=bool(re.search(name_pattern(fold(request['target']).split()),fold(text)))
-    if not literal_target and {'EVENT_DATE_UNRESOLVED','ACTION_UNRESOLVED'}<=set(uncertainties):
+    folded=fold(text)
+    alias_patterns=[name_pattern(fold(name).split()) for name in focus.get('names',[]) if name.strip()]
+    name_only=bool(alias_patterns and re.fullmatch(r'[\s\d.*–—-]*(?:'+'|'.join(alias_patterns)+r')[\d.,\s]*',folded))
+    nominal_fragment=(len(text)<250 or {'EVENT_DATE_UNRESOLVED','ACTION_UNRESOLVED'}<=set(uncertainties)) and bool(re.search(r'\b(?:baron\w*|principe|prince|nobile|noble|cavalier\w*|dedicat\w*|galant\w*)\b',folded))
+    substantive_context=bool(re.search(r'\b(?:was|were|became|served|propos\w*|pend\w*|servi\w*|agente|corsar\w*|corsair\w*|pirat\w*|govern\w*|gouvern\w*|gobern\w*)\b',folded))
+    # Missing dates or an incomplete action lexicon are not evidence of an
+    # irrelevant person. Hold only isolated rank/dedication fragments; preserve
+    # substantive, even undated, foreign-language narratives for model review.
+    if not literal_target and (name_only or nominal_fragment and not substantive_context):
         return 'ALIAS_ONLY_WITHOUT_IDENTITY_OR_EVENT_CONTEXT_RETAINED_AS_LEAD'
+    folded_title=fold(title or '')
+    contemporary_biographies=bool(re.search(r'biograph|biograf|βιογραφ',folded_title) and re.search(r'contempor|συγχρον',folded_title))
+    publication_years=[int(y) for y in re.findall(r'(?<!\d)(?:1\d{3}|20\d{2})(?!\d)',str((bibliography or {}).get('date') or ''))]
+    requested_years=[int(y) for y in re.findall(r'(?<!\d)(?:1\d{3}|20\d{2})(?!\d)',request.get('date_range',''))]
+    centuries=range((min(requested_years)-1)//100+1,(max(requested_years)-1)//100+2) if requested_years else []
+    title_period_hint=any(re.search(r'(?<!\d)'+str(c)+r'(?:th|st|nd|rd|ου|ος|e)(?!\w)',folded_title) for c in centuries)
+    if (not literal_target and contemporary_biographies and publication_years and min(publication_years)>=1750
+        and requested_years and max(requested_years)<1750 and not years_in_scope and not title_period_hint):
+        return 'LATER_CONTEMPORARY_BIOGRAPHY_REQUIRES_IDENTITY_REVIEW'
     bibliography_hint=bool(re.search(r'bibliograph|βιβλιογραφ',fold(title or '')))
     reference_start=bool(re.match(r'[^«\n]{1,100},\s*«[^»]+»',text,re.S))
     publication_date=bool(re.search(r'(?<!\d)(?:18|19|20)\d{2}(?!\d)',text))
@@ -85,7 +103,8 @@ def collect(run_root, provenance_root=None):
             from research_relevance import later_namesake_requires_review
             from research_focus import decompose
             req=read(p.parent.parent/'run_manifest/manifest.json',{}).get('normalized_request') or {}
-            hold=person_passage_hold_reason(raw,f.get('title'),req,f.get('uncertainties',[]))
+            metadata=f.get('source_bibliography') or source_by_file.get(Path(str(f.get('file') or '')).name,{})
+            hold=person_passage_hold_reason(raw,f.get('title'),req,f.get('uncertainties',[]),metadata,f.get('years_in_scope'))
             if hold:
                 excluded.append({'finding_id':f.get('finding_id'),'reason':hold});continue
             scope=[int(y) for y in re.findall(r'\b1\d{3}\b',req.get('date_range',''))]
