@@ -38,7 +38,16 @@ const matches={schema:"nabou-historical-map-candidates-v1",historically_verified
    const page=await browser.newPage({viewport:{width:1440,height:900}});
    const errors=[];page.on("pageerror",e=>errors.push(e.message));
    await page.route("**/cdn.jsdelivr.net/**",r=>r.abort()); // coast optional; grid must work offline
+   // The published site bundles the authentic chart. Stub only the transport here;
+   // this browser test validates default visibility without making external requests.
+   await page.route("**/assets/ollive-aegean-1662-preview.jpg",route=>route.fulfill({
+     status:200,contentType:"image/png",
+     body:Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL/nwAAAABJRU5ErkJggg==","base64")
+   }));
    await page.goto("http://127.0.0.1:"+server.address().port+"/jarvis-intelligence-chamber/historical-map-lab.html");
+   const sourceImage=page.locator("#historicalMapPreview");
+   assert.equal(await sourceImage.isVisible(),true);
+   await page.waitForFunction(()=>document.querySelector("#historicalMapPreview")?.naturalWidth>0);
    await page.locator("#rawOcrFile").setInputFiles({
      name:"unlocated-realistic-ocr-fixture.json",mimeType:"application/json",
      buffer:Buffer.from(JSON.stringify({
