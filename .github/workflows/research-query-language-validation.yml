@@ -1,0 +1,45 @@
+name: Real multilingual research query diagnostic
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/research-query-language-validation.yml','tools/research_semantic_queries.py']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  query-language:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PCT_LLM_PROVIDER: local_llama_cpp
+      PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen2.5-3B-Instruct-GGUF
+      PCT_LLM_MODEL: Qwen/Qwen2.5-3B-Instruct-GGUF
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+          sparse-checkout: |
+            .github/actions
+            tools
+            library_discovery_requests
+            evidence/configuration
+      - uses: ./.github/actions/research-model
+      - name: Run actual multilingual query expansion
+        run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python3 tools/research_semantic_queries.py --request library_discovery_requests/eastern-med-1600-1700-engine-validation-20261020.json --output "evidence/configuration/$GITHUB_RUN_ID/query-language-validation.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: actual-query-language-diagnostic
+          path: evidence/configuration/${{ github.run_id }}/
+      - name: Persist actual diagnostic without claiming source research acceptance
+        if: always()
+        run: |
+          set -e
+          destination="evidence/configuration/$GITHUB_RUN_ID"
+          if [ ! -d "$destination" ]; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$destination"
+          git commit -m 'Record real multilingual query generation diagnostic'
+          python3 tools/publish_research_outputs.py
