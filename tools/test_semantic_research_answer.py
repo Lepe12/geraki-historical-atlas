@@ -441,6 +441,21 @@ class SemanticAnswer(unittest.TestCase):
             self.assertEqual(out['status'],'EXTRACTION_FAILED_OR_UNSUPPORTED')
             self.assertTrue(out['evidence']);self.assertEqual(out['answer_sections'],[])
 
+    def test_exception_retains_exact_prompt_and_code_provenance_before_model_completion(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp)
+            def caller(role,prompt):raise TimeoutError('simulated interrupted provider')
+            with self.assertRaises(TimeoutError):
+                execute(tmp,'Synthetic question',caller=caller,config={'configured':True,'missing':[]})
+            destination=Path(tmp)/'research_answer'
+            progress=json.loads((destination/'progress.json').read_text())
+            entry=progress['calls'][0]
+            self.assertEqual(entry['status'],'FAILED')
+            self.assertEqual(entry['error_type'],'TimeoutError')
+            self.assertTrue(entry['completed_utc'])
+            self.assertEqual(hashlib.sha256((destination/entry['prompt_file']).read_bytes()).hexdigest(),entry['prompt_sha256'])
+            self.assertTrue(progress['semantic_module_sha256'])
+
     def test_client_rejects_credential_url_and_redacts_exception(self):
         env={'PCT_LLM_PROVIDER':'openai_compatible','PCT_LLM_SYNTHESIS_MODEL':'m','PCT_LLM_API_KEY':'test-secret',
              'PCT_LLM_BASE_URL':'https://user:password@example.org/v1'}

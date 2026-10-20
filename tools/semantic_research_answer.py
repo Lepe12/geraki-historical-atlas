@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 import re
 import sys
+import subprocess
 import unicodedata
 from urllib.parse import urlsplit
 
@@ -525,6 +526,14 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
          'limitations':['MODEL_OUTPUT_REQUIRES_REVIEW','ORIGINAL_INSPECTION_NOT_PERFORMED',
                         'SOURCE_INDEPENDENCE_NOT_ESTABLISHED','BOUNDED_EVIDENCE_COVERAGE'],
          'verified':False,'human_reviewed':False}
+    # Stamp the actual running code before inference, including failed runs.
+    # The module hash also identifies an uncommitted source change precisely.
+    out['semantic_module_sha256']=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    try:
+        revision=subprocess.run(['git','-C',str(Path(__file__).resolve().parents[1]),'rev-parse','HEAD'],
+                                stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,timeout=5,check=False)
+        out['software_revision']=revision.stdout.strip() if revision.returncode==0 else None
+    except (OSError,subprocess.TimeoutExpired):out['software_revision']=None
     if not conf['configured']:return documentary_answer(out,all_records,run_root)
     if not selected:out['status']='INSUFFICIENT_ACQUIRED_EVIDENCE';return out
     out['status']='RUNNING_SEMANTIC_ANALYSIS'
@@ -536,6 +545,10 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
                'prompt_sha256':hashlib.sha256(prompt.encode()).hexdigest(),
                'response_schema_sha256':digest(response_schema) if response_schema else None}
         out['calls'].append(entry)
+        responses=destination/'model_responses';responses.mkdir(exist_ok=True)
+        prompt_name=str(len(out['calls']))+'-'+role+'.prompt.txt'
+        (responses/prompt_name).write_bytes(prompt.encode('utf-8'))
+        entry['prompt_file']='model_responses/'+prompt_name
         (destination/'progress.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
         def log_call(state):
             if os.getenv('GITHUB_ACTIONS')=='true' and caller is call:
@@ -560,7 +573,6 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
         if result.get('status')=='COMPLETED':out['model_used']=True
         log_call('COMPLETED' if result.get('status')=='COMPLETED' else 'FAILED')
         # Preserve actual calls even if a later role times out or fails.
-        responses=destination/'model_responses';responses.mkdir(exist_ok=True)
         (responses/(str(len(out['calls']))+'-'+role+'.json')).write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
         (destination/'progress.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
         return parse(result)
@@ -733,8 +745,6 @@ def main():
         if question:break
     out=execute(root,question or 'Historical research')
     out['research_run_id']=args.run_id
-    import subprocess
-    out['software_revision']=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
     dest=root/'research_answer';dest.mkdir(exist_ok=True)
     (dest/'answer.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (dest/'answer.md').write_text(render(out),encoding='utf-8')
