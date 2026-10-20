@@ -1,5 +1,14 @@
 import {validateOcr,fileHash,newReview,applyReading,addGcp,csvForQgisGcps,reviewStats} from "./historical-map-review-core.mjs";
 const $=id=>document.getElementById(id);
+const originalPreview=$("defaultPortolanImage");
+if(originalPreview){
+  originalPreview.addEventListener("error",()=>{
+    if(originalPreview.dataset.remoteFallback)return;
+    originalPreview.dataset.remoteFallback="1";
+    originalPreview.src="https://upload.wikimedia.org/wikipedia/commons/7/74/1662_Portolan_chart_of_the_Aegean_Sea_and_the_Dardanelles_by_Fran%C3%A7ois_Ollive.jpg";
+  });
+}
+
 const canvas=$("reviewCanvas"),ctx=canvas.getContext("2d");
 let ocr=null,review=null,image=null,imageHash=null,imageObjectUrl=null,chosen=null;
 let zoom=1,offsetX=0,offsetY=0,dragged=false,start=null,gcpMode=false;
