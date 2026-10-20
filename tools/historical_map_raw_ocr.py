@@ -54,13 +54,20 @@ def run_raw_ocr(image, *, source_id, source_url, rights, title,
             "proposed_place_id":None
         })
         if len(labels)>=4000:break
+    # Confidence filtering is a review TRIAGE, not lexical/historical proof.
+    triage=[item for item in labels
+        if item["ocr_confidence"]>=0.6 and len(item["text_raw"])>=4
+        and sum(ch.isalpha() for ch in item["text_raw"])/len(item["text_raw"])>=0.7]
     return {
         "schema":"nabou-unlocated-historical-map-ocr-v1",
         "source":{"id":source_id,"url":source_url,"title":title,
                   "year":source_year,"rights":rights,
                   "image_sha256":hashlib.sha256(image.read_bytes()).hexdigest()},
         "ocr":{"engine":"tesseract","language":language,
-               "mapkurator_model_used":False,"labels_found":len(labels)},
+               "mapkurator_model_used":False,"labels_found":len(labels),
+               "higher_confidence_word_candidates":len(triage),
+               "quality_status":"LOW_READABILITY_NEEDS_HUMAN_REVIEW" if len(triage)<max(5,len(labels)*0.05) else "UNASSESSED_REQUIRES_HUMAN_REVIEW",
+               "triage_does_not_verify_toponyms":True},
         "labels":labels,
         "georeferencing_status":"NOT_GEOREFERENCED",
         "historically_verified":0,
