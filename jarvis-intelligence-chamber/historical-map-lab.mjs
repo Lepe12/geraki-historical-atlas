@@ -1,6 +1,15 @@
 import {validateEvidenceCollection,validateCandidates,visibleFeatures,anchor} from "./historical-map-core.mjs";
 
 const $=id=>document.getElementById(id);
+const originalPreview=$("historicalMapPreview");
+if(originalPreview){
+  originalPreview.addEventListener("error",()=>{
+    if(originalPreview.dataset.remoteFallback)return;
+    originalPreview.dataset.remoteFallback="1";
+    originalPreview.src="https://upload.wikimedia.org/wikipedia/commons/7/74/1662_Portolan_chart_of_the_Aegean_Sea_and_the_Dardanelles_by_Fran%C3%A7ois_Ollive.jpg";
+  });
+}
+
 const canvas=$("mapCanvas"),ctx=canvas.getContext("2d");
 let collection=null,candidates=null,coast=[],selected=null,visible=[],year=1670;
 let zoom=1,panX=0,panY=0,drag=false,dragStart=null,moved=false;
