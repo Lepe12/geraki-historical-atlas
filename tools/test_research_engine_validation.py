@@ -34,6 +34,9 @@ class ResearchEngineValidationTests(unittest.TestCase):
             self.assertIn('DURABLE_CITATION_BYTE_REPLAY_FAILED',validation(root,Path(tmp)/'probes')['blockers'])
             source.write_bytes(raw)
             stored=json.loads((answer/'answer.json').read_text())
+            stored['claims'][0]['source_occurrences'][0]['url']='urn:nabou:uploaded-pdf:'+hashlib.sha256(raw).hexdigest()
+            (answer/'answer.json').write_text(json.dumps(stored))
+            self.assertEqual(validation(root,Path(tmp)/'probes')['status'],'PROVISIONAL_RESEARCH_PIPELINE_PASSED')
             stored['answer_sections'][0]['text']='According to the consulted source ...'
             (answer/'answer.json').write_text(json.dumps(stored))
             self.assertIn('INVALID_OR_PLACEHOLDER_CITED_SYNTHESIS',validation(root,Path(tmp)/'probes')['blockers'])

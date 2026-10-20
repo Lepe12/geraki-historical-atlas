@@ -34,7 +34,12 @@ def replay_citations(root, answer, cited):
                 if type(a) is not int or type(b) is not int or a<0 or b<=a:raise ValueError('EXACT_QUOTE_LOCATOR_MISSING')
                 quote=claim.get('quote')
                 if not isinstance(quote,str) or not quote or text[a:b]!=quote:raise ValueError('SOURCE_QUOTE_REPLAY_MISMATCH')
-                if urlsplit(str(occurrence.get('url') or '')).scheme not in ('http','https'):raise ValueError('SOURCE_URL_MISSING')
+                # Uploaded private PDFs have stable urn:nabou identifiers. A
+                # physical archival reference need not have a public web URL.
+                reference=str(occurrence.get('url') or '')
+                if (urlsplit(reference).scheme not in ('http','https','urn','doi')
+                    and not occurrence.get('reported_archival_reference')):
+                    raise ValueError('SOURCE_IDENTIFIER_MISSING')
                 row.update(status='PASS',text_path=relative,text_sha256=sha,
                            start_char=a,end_char=b,offset_unit='UNICODE_CODE_POINTS',original_inspected=False)
             except ValueError as error:row['reason']=str(error)
