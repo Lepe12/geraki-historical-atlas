@@ -151,7 +151,10 @@ def collect(run_root, provenance_root=None):
 def model_evidence(row):
     """Keep full replay receipts on disk; avoid repeating them in model context."""
     value={k:row.get(k) for k in ('evidence_id','years_in_scope','date_basis','date_evidence','source_bibliography','uncertainties')}
-    value['passages']=passages(row['text'])
+    # Character offsets belong to engine-side replay, not model generation.
+    # Repeating two offsets for every short sentence can otherwise exclude an
+    # acquired source purely because of JSON overhead rather than text length.
+    value['passages']=[{k:p[k] for k in ('passage_id','text')} for p in passages(row['text'])]
     value['consulted_source']={k:(row.get('occurrences') or [{}])[0].get(k) for k in ('title','url')}
     value['repeated_occurrences']=len(row.get('occurrences',[]))
     value['source_independence']='UNKNOWN_NOT_ESTABLISHED'

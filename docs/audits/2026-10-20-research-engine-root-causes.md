@@ -71,3 +71,48 @@ Historical Greek OCR quality, handwriting recognition, portolan georeferencing,
 independent source genealogy and independently annotated accuracy comparisons
 remain incomplete. Machine confidence is not historical verification. No UI,
 colour or 3D renderer source was changed.
+
+## Observed followup and next live validation
+
+The completed Qwen2.5-7B retry39372264436 still produced **zero accepted answer
+paragraphs in all four cases**. It sometimes rejected a faithful French paraphrase
+because an unnamed prison was not identified, and copied a contradictory example
+from the final-review prompt. The fresh Lantzas followup39372433114 acquired nine
+document/OCR URLs, including the two declared seed papers, but also returned zero
+accepted model claims. Neither run passed research acceptance.
+
+The following corrections are now on main:
+
+- Generic `archipelago` remains a search alias but cannot establish Mediterranean
+  geography by itself. The actual corpus replay now selects the Astypalaia
+  author's English abstract and excludes the Bahamas passage from the bounded
+  model sample. See `source-selection-replay.json` in the integration evidence.
+- Final reviews explain source support before deciding. Unsupported decisions
+  must identify literal unsupported words in the answer, and each paragraph
+  requires exactly one decision. Individual claims are reviewed separately to
+  avoid repeating every source context in an overflowing combined prompt.
+- Model messages omit engine-only sentence offsets. The actual acquired Gürkan
+  passage now fits the6500-character selection budget:5392 instead of6737
+  characters. Its quotation and durable offsets are unchanged. See
+  `actual-source-budget-replay.json`. This is a selection replay, not inference.
+- A documented bibliography correction applies only when the actual PDF SHA256
+  matches the inspected record. The original acquisition metadata remains
+  untouched. The first followup used an incorrect Gürkan subtitle; the immutable
+  old receipt is retained, and corrected derived metadata records its basis.
+
+Actual model comparison and four-case reanalysis are running under
+[39376752977](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/39376752977).
+The candidate is the official Apache2.0 Qwen3-8B Q4_K_M model, revision
+`7c41481f57cb95916b40956ab2f0b139b296d974`, verified against the official LFS
+SHA256. It requires no paid API. The controls include faithful English/French
+source attributions and a deliberately false date/verification claim. These are
+controlled diagnostics, not independently annotated historical accuracy scores.
+The run pins its checkout; later corrections are not silently retrofitted into
+an already running execution. A fresh end-to-end discovery run remains necessary
+before claiming the current engine meets the acceptance criterion.
+
+Credential metadata audit39374009832 returned403 for secret and variable names.
+Their presence is **unknown**, not proven absent. The environment list returned200
+with github-pages. No hosting management connection has been verified. The
+previous bulk-context inventory was blocked by GitHub before execution and was
+removed; it must not be approved as a deployment workaround.

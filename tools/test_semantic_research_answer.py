@@ -7,7 +7,7 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
-from semantic_research_answer import collect,batches,execute,validate_items,configuration,render,normalize_review,normalize_final_review
+from semantic_research_answer import collect,batches,execute,validate_items,configuration,render,normalize_review,normalize_final_review,model_evidence
 from llm_client import call
 
 TEXT='In 1677 the ships attacked the island. The account is uncertain.'
@@ -169,6 +169,14 @@ class SemanticAnswer(unittest.TestCase):
             for ids in ([99],[-1],[True],[1,0],[0,0]):
                 self.assertFalse(validate_items({'items':[{**value,'passage_ids':ids}]},rows)[0])
             self.assertFalse(validate_items({'items':[{**value,'quote':'Invented quote'}]},rows)[0])
+
+    def test_model_passages_do_not_repeat_engine_only_offsets(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp);row=collect(tmp)[0][0]
+            wire=model_evidence(row)
+            self.assertTrue(wire['passages'])
+            self.assertTrue(all(set(p)=={'passage_id','text'} for p in wire['passages']))
+            self.assertEqual(''.join(p['text'] for p in wire['passages']),row['text'])
 
     def test_missing_configuration_never_calls_model_or_claims_completion(self):
         with tempfile.TemporaryDirectory() as tmp,patch.dict(os.environ,{},clear=True):
