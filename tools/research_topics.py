@@ -80,9 +80,19 @@ def topic_queries(focus, lane='travellers'):
 def topic_match(text, focus):
     value = normalized(text)
     event = bool(re.search(PIRACY, value))
-    places = [term for term in region_terms(focus, True) if normalized(term) in value]
+    places = strong_region_matches(text,focus)
     genre = bool(re.search(r'voyag|travel|viagg|περιηγ|portolan|seyahat|archipel|arcipel', value))
     return {'category': 'TARGET_MATCH' if event and places else 'POSSIBLE_TARGET' if event or (genre and places) else 'CONTEXT_ONLY' if places else 'UNMATCHED',
             'reason': 'THEMATIC_CONCEPT_AND_REGION' if event and places else 'THEMATIC_SCOPE_REQUIRES_PASSAGE_REVIEW',
             'matched_name': None, 'places': places, 'roles': [], 'topic_event_present': event,
             'identity_verified': False}
+
+def strong_region_matches(text,focus):
+    """Generic archipelago is a search hint, never Mediterranean geography."""
+    value=normalized(text)
+    ambiguous={'archipelago','archipel','arcipelago'}
+    matches=[term for term in region_terms(focus,True) if normalized(term) not in ambiguous and normalized(term) in value]
+    for key in focus.get('region_concepts',[]):
+        if re.search(REGIONS[key]['pattern'],value) and REGIONS[key]['forms'][0] not in matches:
+            matches.append(REGIONS[key]['forms'][0])
+    return matches

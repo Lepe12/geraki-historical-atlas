@@ -21,6 +21,7 @@ from llm_client import call
 from llm_router import route, routing_summary
 import research_response_schema as schemas
 from section_extraction import read_acquired_text
+from functools import lru_cache
 
 VERSION='pct-semantic-answer-v2'
 ROLES=('evidence_extractor','adversarial_reviewer','synthesis')
@@ -48,6 +49,10 @@ def configuration():
     return {'configured':not missing,'missing':sorted(set(missing))}
 
 def collect(run_root, provenance_root=None):
+    @lru_cache(maxsize=32)
+    def load_document(path):
+        raw=path.read_bytes()
+        return raw.decode('utf-8',errors='replace'),hashlib.sha256(raw).hexdigest()
     groups={};seen=[];excluded=[]
     for p in sorted(Path(run_root).glob('*/structured_output/extracted_findings.json')):
         acquisition=read(p.parent.parent/'library_acquisition/acquisition_report.json',{}).get('results',[])
@@ -76,9 +81,9 @@ def collect(run_root, provenance_root=None):
             file=p.parent.parent/'library_acquisition'/filename
             if not filename or not file.is_file():
                 excluded.append({'finding_id':f.get('finding_id'),'reason':'ACQUIRED_FILE_MISSING'});continue
-            text=read_acquired_text(file)
+            text,file_sha256=load_document(file)
             start,end=loc.get('start_char'),loc.get('end_char')
-            if not isinstance(start,int) or not isinstance(end,int) or start<0 or end<=start or text[start:end]!=raw or hashlib.sha256(file.read_bytes()).hexdigest()!=f.get('source_text_sha256'):
+            if not isinstance(start,int) or not isinstance(end,int) or start<0 or end<=start or text[start:end]!=raw or file_sha256!=f.get('source_text_sha256'):
                 excluded.append({'finding_id':f.get('finding_id'),'reason':'ACQUIRED_TEXT_OR_LOCATOR_MISMATCH'});continue
             date_evidence=f.get('date_evidence')
             if date_evidence:
@@ -109,28 +114,33 @@ def collect(run_root, provenance_root=None):
             groups[key]=row;seen.append(row)
     # In-scope passages first, then useful unresolved context. Nothing is erased
     # from lane evidence; bounded model coverage is recorded explicitly.
-    from research_topics import BASES,PIRACY,normalized,region_terms
+    from research_topics import BASES,PIRACY,normalized,strong_region_matches
     focus=decompose(req.get('target',''),req.get('aliases',[])) if seen else {}
-    regions=[normalized(term) for term in region_terms(focus,include_hypotheses=True)] if focus.get('kind')=='topic' else []
     requested_years=[int(y) for y in re.findall(r'\b\d{4}\b',req.get('date_range',''))] if seen else []
     century=(sum(requested_years)//len(requested_years)-1)//100+1 if requested_years else None
     def priority(row):
         text=normalized(row['text'])
-        regional=any(term in text for term in regions) if regions else True
+        regional=bool(strong_region_matches(text,focus)) if focus.get('kind')=='topic' else True
         event_use=bool(re.search(BASES,text) and re.search(PIRACY,text)) if focus.get('kind')=='topic' else True
         title=normalized(row['occurrences'][0].get('title') or '')
         title_period=bool(century and re.search(r'(?<!\d)'+str(century)+r'(?:th|st|nd|rd|ου|ος|ο|e|er)(?!\w)',title)) if focus.get('kind')=='topic' else True
-        return (not bool(row['years_in_scope']),not regional,not event_use,not title_period,len(row['text']),row['evidence_id'])
+        all_years=set(re.findall(r'(?<!\d)(?:1\d{3}|20\d{2})(?!\d)',row['text']))
+        coherence=sum(int(y) in row['years_in_scope'] for y in all_years)/len(all_years) if all_years else int(bool(row.get('date_evidence')))
+        row['sampling_features']={'strong_region_match':regional,'event_and_use_match':event_use,
+                                  'in_scope_year_fraction':coherence,'title_period_hint':title_period,
+                                  'role':'SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION'}
+        first=(not regional,not bool(row['years_in_scope'])) if focus.get('kind')=='topic' else (not bool(row['years_in_scope']),False)
+        return (*first,not event_use,not title_period,-coherence,len(row['text']),row['evidence_id'])
     seen.sort(key=priority)
     # Sample across acquired documents before spending more calls on one book.
     # Document hashes are sampling keys, never claims of source independence.
     sampled=[]
     # Diversity is subordinate to temporal relevance. Unknown-date name lists
     # must not displace complete in-scope passages from the same document.
-    for dated in (True,False):
+    for tier in sorted({priority(row)[:2] for row in seen}):
         leaders=[];followers=[];documents=set()
         for row in seen:
-            if bool(row['years_in_scope'])!=dated:continue
+            if priority(row)[:2]!=tier:continue
             document=row['occurrences'][0]['source_text_sha256']
             if document in documents:followers.append(row)
             else:leaders.append(row);documents.add(document)

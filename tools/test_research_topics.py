@@ -7,10 +7,19 @@ import tempfile
 from pathlib import Path
 from research_focus import decompose,topical_match
 from research_topics import topic_queries
+from research_topics import topic_match,strong_region_matches
 from section_extraction import extract_document
 from research_relevance import identity,assess
 
 class TopicResearchTests(unittest.TestCase):
+    def test_archipelago_does_not_make_bahamas_a_mediterranean_match(self):
+        focus=decompose('Pirate bases and anchorages in the Mediterranean')
+        text='Pirates sheltered in the Bahamas, an archipelago off the southeastern coast of the United States.'
+        self.assertEqual(strong_region_matches(text,focus),[])
+        self.assertNotEqual(topic_match(text,focus)['category'],'TARGET_MATCH')
+        self.assertTrue(strong_region_matches('Οι κουρσάροι της Μεσογείου.',focus))
+        self.assertTrue(strong_region_matches('Corsairs used anchorages in the Aegean.',focus))
+
     def test_real_cli_retains_themed_sections_without_inventing_a_named_place(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);acq=root/'library_acquisition';acq.mkdir()
