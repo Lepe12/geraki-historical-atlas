@@ -50,6 +50,20 @@ def main():
     uri=urllib.parse.urlunsplit((parts.scheme,parts.netloc,parts.path,urllib.parse.urlencode(params),parts.fragment))
     token_receipt,value=request(uri,headers={'Authorization':'Bearer '+os.environ['ACTIONS_ID_TOKEN_REQUEST_TOKEN']})
     if token_receipt['http_status']==200 and value.get('value'):
+        # Deliberately invalid event schema: verify the existing OIDC gate
+        # without adding an event or changing the live research mission.
+        auth_receipt,auth_body=request(base+'/events','POST',
+            json.dumps({'project':'piratecartography','schema':'nabou-auth-diagnostic-invalid-event'}).encode(),
+            {'Authorization':'Bearer '+value['value'],'Content-Type':'application/json'})
+        known_errors={'invalid_event','invalid_token','invalid_alg','invalid_issuer_or_audience',
+                      'expired_or_not_yet_valid','wrong_repository','wrong_ref','unknown_kid',
+                      'bad_signature','body_too_large','not_found','missing_oidc'}
+        error=auth_body.get('error') if isinstance(auth_body,dict) else None
+        report['oidc_event_auth_negative_control']={**auth_receipt,
+            'backend_error_code':error if error in known_errors else 'UNCLASSIFIED_ERROR_NOT_RECORDED',
+            'expected_http':400,'expected_error':'invalid_event',
+            'passed':auth_receipt['http_status']==400 and error=='invalid_event',
+            'event_schema_deliberately_invalid':True,'research_event_creation_requested':False}
         result,data=request(base+oidc['endpoint'],'POST',json.dumps({'query':'nabou-production-smoke-no-real-person'}).encode(),
                             {'Authorization':'Bearer '+value['value'],'Content-Type':'application/json'})
         oidc.update(result,passed=result['http_status']==200 and data.get('schema')=='nabou-agent-learning-evidence-v1' and data.get('verified_count')==0)
