@@ -64,6 +64,20 @@ class SemanticAnswer(unittest.TestCase):
             self.assertEqual(out['status'],'MODEL_ANSWER_PENDING_HUMAN_REVIEW')
             self.assertEqual(len(out['review']['flagged_claims']),1)
 
+    def test_one_word_place_request_requires_a_place_during_real_pipeline_validation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp);eid=collect(tmp)[0][0]['evidence_id']
+            manifest=Path(tmp)/'travellers/run_manifest';manifest.mkdir()
+            (manifest/'manifest.json').write_text(json.dumps({'normalized_request':{'target':'Μήλος','aliases':['Milo']}}))
+            def caller(role,prompt):
+                self.assertEqual(role,'evidence_extractor')
+                return response({'items':[item(eid)]})
+            out=execute(tmp,'Μήλος (1660-1680)',caller=caller,config={'configured':True,'missing':[]})
+            self.assertEqual(out['request_kind'],'place')
+            self.assertEqual(out['status'],'EXTRACTION_FAILED_OR_UNSUPPORTED')
+            self.assertEqual(out['claims'],[])
+            self.assertEqual(out['rejected'][0]['reason'],'GEOGRAPHIC_FINDING_REQUIRES_LITERAL_PLACE')
+
     def test_unresolved_alias_only_and_bibliographic_leads_do_not_become_person_answers(self):
         cases=[('Nicola Test Principe di Esempio','Synthetic source',
                 ['EVENT_DATE_UNRESOLVED','ACTION_UNRESOLVED'],'ALIAS_ONLY_WITHOUT_IDENTITY_OR_EVENT_CONTEXT_RETAINED_AS_LEAD'),

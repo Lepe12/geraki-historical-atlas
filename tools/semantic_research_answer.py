@@ -499,10 +499,14 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
         request=read(manifest).get('normalized_request') or {}
         if request:break
     question_kind=decompose(request.get('target',''),request.get('aliases',[])).get('kind') if request else None
+    # Normalized one-word place requests can have no explicit type. The
+    # research acceptance contract already requires geographic findings for
+    # every non-person request; apply the same requirement during extraction.
+    if request and question_kind not in ('person','topic'):question_kind='place'
     grouped,deferred=batches(all_records,budget=6500 if os.getenv('PCT_LLM_PROVIDER')=='local_llama_cpp' else 14000)
     selected=[r for b in grouped for r in b]
     conf=configuration() if config is None else config
-    out={'schema':VERSION,'question':question,'evidence_hash':digest(all_records),'status':'BLOCKED_CONFIGURATION',
+    out={'schema':VERSION,'question':question,'request_kind':question_kind,'evidence_hash':digest(all_records),'status':'BLOCKED_CONFIGURATION',
          'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
          'model_configuration':routing_summary(),
          'configuration':conf,'model_used':False,'claims':[],'answer_sections':[],
