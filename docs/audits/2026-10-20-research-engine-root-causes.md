@@ -141,3 +141,26 @@ Vathy hypothesis are recorded separately in
 inspection is neither an independent gold benchmark nor proof that the automated
 pipeline has passed. Underlying primary-source inspection and independent
 corroboration remain pending.
+
+At06:12UTC, all11fresh discovery/acquisition lanes had completed. The acquisition
+snapshot contains125unique acquired URLs:25PDF-text URLs,34book-OCR URLs,
+2page-image OCR URLs, and64other acquired text URLs still requiring content-type
+triage. These are URL counts, not independent publications or accepted findings.
+The new run reacquired the Astypalaia study from its live repository. The current
+metadata observation39378892256 confirms that the four reanalysis jobs are in
+actual extraction/review/synthesis, and the fresh aggregator has started preparing
+its model. No final accepted-answer count is available at this checkpoint.
+
+The production recheck is now current:
+[39378925242](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/39378925242),
+checked20October at06:11UTC. GETevidence remains404, unsigned upload415,
+unsigned review400, and correctly signed GitHub OIDC agent-search404.
+Production acceptance remains **BLOCKED**. Source-version persistence and exact
+citation/provenance readback passed against isolated MariaDB; this does not imply
+that production received the files or schema.
+
+PDF reference bases and actual binary SHA256 bindings are now retained with each
+citation. A changed acquired PDF is rejected before synthesis. The actual
+3991-passage corpus replay still retains3991passages after this check, and all
+three selected source PDFs have actual durable-byte bindings. These bindings do
+not mark their pages as visually inspected or their historical claims verified.
