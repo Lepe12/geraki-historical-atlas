@@ -1,5 +1,6 @@
 """Persist actual production HTTP results without tokens, documents or response bodies."""
 import hashlib
+import datetime
 import json
 import os
 from pathlib import Path
@@ -24,6 +25,7 @@ def request(url, method='GET', body=None, headers=None):
 def main():
     base='https://pct-live.piratecartography.com/pct-api/live'
     report={'schema':'nabou-production-evidence-smoke-v2','run_id':os.environ['GITHUB_RUN_ID'],
+            'checked_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
             'source_revision':os.environ['GITHUB_SHA'],'base_url':base,'checks':[]}
     for method,endpoint in [('GET','/knowledge/evidence?source_id=src-fake'),
                             ('POST','/knowledge/upload'),('POST','/knowledge/review')]:
