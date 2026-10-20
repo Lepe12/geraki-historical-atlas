@@ -11,7 +11,8 @@ from research_validation_report import build as validate
 
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--run-id',required=True);args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--run-id',required=True)
+    parser.add_argument('--resume-reviewed-claims',action='store_true');args=parser.parse_args()
     job=os.environ['GITHUB_RUN_ID']
     if not re.fullmatch(r'\d+',args.run_id) or not re.fullmatch(r'\d+',job):
         raise ValueError('NUMERIC_RUN_IDS_REQUIRED')
@@ -25,12 +26,14 @@ def main():
              'execution_type':'REAL_MODEL_REANALYSIS_OF_ACQUIRED_SOURCES_NOT_NEW_DISCOVERY',
              'software_revision':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
              'original_lane_outputs_modified':False}
+    if args.resume_reviewed_claims:receipt['execution_type']='RESUME_REPLAYED_EXTRACTION_WITH_NEW_CLAIM_REVIEWS_SYNTHESIS_AND_FINAL_REVIEW_NOT_NEW_DISCOVERY'
     (dest/'execution_receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
     from prepare_acquired_analysis import prepare
-    prepared=dest/'derived_sources'
-    prepare(parent,prepared,request)
+    prepared=parent if args.resume_reviewed_claims else dest/'derived_sources'
+    if not args.resume_reviewed_claims:prepare(parent,prepared,request)
     question+='\nResearch scope: '+request.get('purpose','')
-    answer=execute(prepared,question,output_root=dest,provenance_root=parent)
+    answer=execute(prepared,question,output_root=dest,provenance_root=parent,
+                   resume_reviewed_from=parent/'research_answer/answer.json' if args.resume_reviewed_claims else None)
     answer['execution_receipt']=receipt
     out=dest/'research_answer';out.mkdir(exist_ok=True)
     for filename,value in [('answer.json',answer),('geographic_findings.json',geographic(answer))]:

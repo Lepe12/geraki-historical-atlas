@@ -9,6 +9,10 @@ on:
         required: true
         type: string
         description: Existing research run whose actual acquired sources will be reanalysed
+      resume_reviewed_claims:
+        type: boolean
+        default: false
+        description: Replay existing extraction receipts, then run new reviews and synthesis
 permissions:
   contents: write
 jobs:
@@ -19,12 +23,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        parent_run: ${{ fromJSON(inputs.run_id && format('["{0}"]', inputs.run_id) || '["39372433114"]') }}
+        parent_run: ${{ fromJSON(inputs.run_id && format('["{0}"]', inputs.run_id) || '["39385248640"]') }}
     env:
       PARENT_RESEARCH_RUN: ${{ matrix.parent_run }}
       PCT_LLM_PROVIDER: local_llama_cpp
       PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen3-8B-GGUF
       PCT_LLM_MODEL: Qwen/Qwen3-8B-GGUF
+      PCT_RESUME_REVIEWED_CLAIMS: ${{ github.event_name == 'push' && '1' || inputs.resume_reviewed_claims && '1' || '0' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -43,7 +48,12 @@ jobs:
           print('ACTUAL_LLAMA_CPP_SCHEMA_GRAMMARS_PASS; NOT_HISTORICAL_RESEARCH_ACCEPTANCE')
           PYSCHEMA
       - name: Derive PDF reading order and run all real semantic stages
-        run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python3 tools/reanalyse_acquired_research.py --run-id "$PARENT_RESEARCH_RUN"
+        run: |
+          if [ "$PCT_RESUME_REVIEWED_CLAIMS" = 1 ]; then
+            PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python3 tools/reanalyse_acquired_research.py --run-id "$PARENT_RESEARCH_RUN" --resume-reviewed-claims
+          else
+            PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python3 tools/reanalyse_acquired_research.py --run-id "$PARENT_RESEARCH_RUN"
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:

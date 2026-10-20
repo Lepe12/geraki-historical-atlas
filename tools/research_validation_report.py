@@ -59,8 +59,34 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
         probes.append(read(p))
     latest=probes[-1] if probes else {}
     completed={c['role'] for c in answer.get('calls',[]) if c.get('status')=='COMPLETED'}
+    reused=answer.get('reused_semantic_calls',[]);resume=answer.get('resume_context') or {}
+    valid_reuse=False
+    if reused:
+        try:
+            import hashlib
+            from semantic_research_answer import digest
+            original_path=(root/resume['original_record_path']).resolve()
+            if not original_path.is_relative_to(root.resolve()):raise ValueError('UNSAFE_RESUME_RECORD')
+            original_bytes=original_path.read_bytes();original=json.loads(original_bytes)
+            if hashlib.sha256(original_bytes).hexdigest()!=resume['original_record_sha256'] or original.get('question')!=answer.get('question'):raise ValueError('RESUME_RECORD_CHANGED')
+            needed=set(resume['retained_claim_ids']);covered=set()
+            if not needed or needed!={c['claim_id'] for c in answer.get('claims',[])}:raise ValueError('RESUME_CLAIM_SET_CHANGED')
+            for entry in reused:
+                file=(root/entry['response_file']).resolve()
+                if not file.is_relative_to(root.resolve()):raise ValueError('UNSAFE_RESUME_RESPONSE')
+                raw=file.read_bytes();value=json.loads(raw)
+                if type(entry['original_call_index']) is not int or entry['original_call_index']<1:raise ValueError('INVALID_RESUME_CALL_INDEX')
+                old=original['calls'][entry['original_call_index']-1]
+                if (entry.get('role')!='evidence_extractor' or entry.get('status')!='COMPLETED' or value.get('status')!='COMPLETED'
+                    or old.get('role')!='evidence_extractor' or value.get('role','evidence_extractor')!='evidence_extractor'
+                    or hashlib.sha256(raw).hexdigest()!=entry['response_file_sha256'] or digest(value)!=old['response_sha256']):raise ValueError('RESUME_RESPONSE_CHANGED')
+                covered.update(entry['supported_claim_ids_replayed'])
+            if covered!=needed:raise ValueError('RESUME_CLAIMS_NOT_COVERED_BY_EXTRACTOR_RECEIPTS')
+            valid_reuse=True;completed.add('evidence_extractor')
+        except (ValueError,OSError,KeyError,IndexError,TypeError):valid_reuse=False
     required={'evidence_extractor','adversarial_reviewer','synthesis'}
     blockers=[]
+    if reused and not valid_reuse:blockers.append('REUSED_EXTRACTION_RECEIPTS_NOT_VALIDATED')
     if answer_origin!='FINAL_ANSWER_RECORD':blockers.append(answer_origin)
     if not sources:blockers.append('NO_ACQUIRED_SOURCE_TEXT')
     if not answer.get('evidence'):blockers.append('NO_REPLAYED_EVIDENCE')
@@ -104,7 +130,8 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
                   'verified':0,'rejected_model_items':sum(r.get('reason')!='UNSUPPORTED_DATE_ATTRIBUTE_REMOVED' for r in answer.get('rejected',[])),
                   'rejected_model_attributes':sum(r.get('reason')=='UNSUPPORTED_DATE_ATTRIBUTE_REMOVED' for r in answer.get('rejected',[])),
                   'deferred_passages':len(answer.get('coverage',{}).get('deferred',[]))},
-        'semantic_calls':answer.get('calls',[]),'model_configuration':answer.get('model_configuration'),
+        'semantic_calls':answer.get('calls',[]),'reused_semantic_calls':reused,
+        'reused_extraction_receipts_validated':valid_reuse,'model_configuration':answer.get('model_configuration'),
         'query_expansion':queries,'research_connector_attempts':attempts,
         'latest_connector_probe_run':latest.get('run_id'),
         'native_connector_tests':latest.get('native_connector_tests',[]),

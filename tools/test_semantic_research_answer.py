@@ -31,6 +31,67 @@ def item(eid,**changes):
             'kind':'source_statement','actors':[],'places':[],'dates':['1677'],'uncertainty':[],**changes}
 
 class SemanticAnswer(unittest.TestCase):
+    def test_explicit_source_century_outside_question_is_held_without_using_publication_dates(self):
+        row={'evidence_id':'e','text':'The consulted source describes Milo as a corsair base in the14th century.',
+             'years_in_scope':[],'occurrences':[],'uncertainties':[]}
+        # Actual output uses a space before the numeric century.
+        row['text']=row['text'].replace('the14th','the 14th')
+        value=item('e',quote=row['text'],statement=row['text'],places=['Milo'],dates=[])
+        accepted,rejected=validate_items({'items':[value]},[row],'topic',(1600,1700))
+        self.assertFalse(accepted);self.assertEqual(rejected[0]['reason'],'EXPLICIT_CENTURY_OUTSIDE_REQUESTED_PERIOD')
+        self.assertTrue(validate_items({'items':[value]},[row],'topic',(1300,1400))[0])
+
+    def test_uncited_gap_paragraph_gets_one_format_repair_before_fidelity_review(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp);eid=collect(tmp)[0][0]['evidence_id'];state={'drafts':0}
+            def caller(role,prompt):
+                if role=='evidence_extractor':return response({'items':[item(eid)]})
+                if role=='adversarial_reviewer':
+                    if 'FINAL_ANSWER_JSON:' in prompt:return response({'supported_section_indexes':[0],'flagged_sections':[]})
+                    cid=json.loads(prompt.split('CLAIMS_JSON:\n')[1])[0]['claim_id'];state['cid']=cid
+                    return response({'supported_claim_ids':[cid],'flagged_claims':[]})
+                state['drafts']+=1
+                sections=[{'text':'The source reports an attack in1677.','claim_ids':[state['cid']]}]
+                if state['drafts']==1:sections.append({'text':'Some research gaps remain.','claim_ids':[]})
+                else:self.assertIn('FORMAT REPAIR:',prompt)
+                return response({'answer_sections':sections,'unknowns':['Research gaps remain.'],'limitations':[]})
+            out=execute(tmp,'question',caller=caller,config={'configured':True,'missing':[]})
+            self.assertEqual(state['drafts'],2);self.assertEqual(len(out['synthesis_protocol_repairs']),1)
+            self.assertEqual(out['status'],'MODEL_ANSWER_PENDING_HUMAN_REVIEW')
+
+    def test_resume_replays_extractor_receipts_and_runs_new_reviews_without_new_extraction(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp);original=self.run_pipeline(tmp)
+            path=Path(tmp)/'research_answer/answer.json';path.write_text(json.dumps(original))
+            calls=[];cid=original['claims'][0]['claim_id']
+            def caller(role,prompt):
+                calls.append(role);self.assertNotEqual(role,'evidence_extractor')
+                if role=='adversarial_reviewer':
+                    return response({'supported_section_indexes':[0],'flagged_sections':[]} if 'FINAL_ANSWER_JSON:' in prompt else {'supported_claim_ids':[cid],'flagged_claims':[]})
+                return response({'answer_sections':[{'text':'The consulted source reports an attack in1677.','claim_ids':[cid]}]})
+            out=execute(tmp,original['question'],caller=caller,config={'configured':True,'missing':[]},
+                        output_root=Path(tmp)/'recovered',resume_reviewed_from=path)
+            self.assertEqual(out['status'],'MODEL_ANSWER_PENDING_HUMAN_REVIEW')
+            self.assertEqual(calls,['adversarial_reviewer','synthesis','adversarial_reviewer'])
+            self.assertEqual(len(out['reused_semantic_calls']),1)
+            self.assertFalse(out['resume_context']['new_extraction_performed'])
+            destination=Path(tmp)/'recovered/research_answer';destination.mkdir(exist_ok=True)
+            (destination/'answer.json').write_text(json.dumps(out))
+            from research_validation_report import build as validate_research
+            report=validate_research(Path(tmp),Path(tmp)/'probes',analysis_root=Path(tmp)/'recovered')
+            self.assertTrue(report['reused_extraction_receipts_validated'])
+            self.assertNotIn('SEMANTIC_STAGES_INCOMPLETE',report['blockers'])
+            # Altering an old response prevents reuse, even though its source
+            # quotation and the claimed previous verdict still exist.
+            response_file=path.parent/'model_responses/1-evidence_extractor.json'
+            response_file.write_text('{"status":"COMPLETED","content":"{}"}')
+            report=validate_research(Path(tmp),Path(tmp)/'probes',analysis_root=Path(tmp)/'recovered')
+            self.assertFalse(report['reused_extraction_receipts_validated'])
+            self.assertIn('REUSED_EXTRACTION_RECEIPTS_NOT_VALIDATED',report['blockers'])
+            blocked=execute(tmp,original['question'],caller=caller,config={'configured':True,'missing':[]},
+                            output_root=Path(tmp)/'blocked',resume_reviewed_from=path)
+            self.assertEqual(blocked['status'],'BLOCKED_RESUME_PROVENANCE')
+
     def test_discovery_genres_and_missing_geographic_entities_cannot_become_findings(self):
         with tempfile.TemporaryDirectory() as tmp:
             fixture(tmp);rows=collect(tmp)[0];eid=rows[0]['evidence_id']

@@ -6,6 +6,7 @@ def array(items,maximum=None):
     return value
 STRING={'type':'string'}
 STRINGS=array(STRING)
+SHORT_STRINGS=array({'type':'string','maxLength':240},5)
 
 def extraction(evidence_ids, question_kind=None):
     places=array(STRING)
@@ -23,18 +24,20 @@ def extraction(evidence_ids, question_kind=None):
 
 def review(count):
     decisions=array(obj({'claim_index':{'type':'integer','enum':list(range(count))},
-                         'reason':STRING,'decision':{'type':'string','enum':['SUPPORTED','UNSUPPORTED','UNCERTAIN']}}),count)
+                         'reason':{'type':'string','maxLength':600},'decision':{'type':'string','enum':['SUPPORTED','UNSUPPORTED','UNCERTAIN']}}),count)
     decisions['minItems']=count
-    return obj({'decisions':decisions,'limitations':STRINGS})
+    return obj({'decisions':decisions,'limitations':SHORT_STRINGS})
 
 def synthesis(claim_ids):
-    return obj({'answer_sections':array(obj({'text':STRING,'claim_ids':array({'type':'string','enum':claim_ids})}),4),
-                'unknowns':STRINGS,'limitations':STRINGS})
+    citations=array({'type':'string','enum':claim_ids},len(claim_ids));citations['minItems']=1
+    sections=array(obj({'text':{'type':'string','maxLength':480},'claim_ids':citations}),min(4,len(claim_ids)))
+    sections['minItems']=1
+    return obj({'answer_sections':sections,'unknowns':SHORT_STRINGS,'limitations':SHORT_STRINGS})
 
 def final_review(count):
     indexes={'type':'integer','enum':list(range(count))}
-    decisions=array(obj({'section_index':indexes,'source_support_reason':STRING,
-                         'unsupported_answer_spans':STRINGS,
+    decisions=array(obj({'section_index':indexes,'source_support_reason':{'type':'string','maxLength':600},
+                         'unsupported_answer_spans':array({'type':'string','maxLength':160},3),
                          'decision':{'type':'string','enum':['SUPPORTED','UNSUPPORTED','UNCERTAIN']}}),count)
     decisions['minItems']=count
     return obj({'section_decisions':decisions})

@@ -358,7 +358,21 @@ def normalize_final_review(value,sections):
     return {'supported_section_indexes':supported,'flagged_sections':flags,'section_decisions':rows}
 
 
-def validate_items(payload, records, question_kind=None):
+def explicit_centuries(text):
+    numbers=[int(n) for n in re.findall(r'\b(\d{1,2})(?:st|nd|rd|th)[\s‑–-]+centur(?:y|ies)\b',str(text),re.I)]
+    words={'thirteenth':13,'fourteenth':14,'fifteenth':15,'sixteenth':16,'seventeenth':17,'eighteenth':18,'nineteenth':19,'twentieth':20}
+    numbers.extend(value for word,value in words.items() if re.search(r'\b'+word+r'[\s‑–-]+centur(?:y|ies)\b',str(text),re.I))
+    return sorted(set(numbers))
+
+def valid_synthesis(answer,supported):
+    sections=answer.get('answer_sections') if isinstance(answer,dict) else None
+    return (not forbidden(answer) and isinstance(sections,list) and bool(sections)
+            and all(isinstance(s,dict) and isinstance(s.get('text'),str) and bool(s['text'].strip()) and
+                    isinstance(s.get('claim_ids'),list) and bool(s['claim_ids']) and
+                    all(isinstance(cid,str) and cid in supported for cid in s['claim_ids']) for s in sections)
+            and all(isinstance(answer.get(k,[]),list) and all(isinstance(v,str) for v in answer.get(k,[])) for k in ('unknowns','limitations')))
+
+def validate_items(payload, records, question_kind=None, requested_range=None):
     lookup={r['evidence_id']:r for r in records};accepted=[];rejected=[]
     values=payload.get('items') if isinstance(payload,dict) else None
     if not isinstance(values,list):return [],[{'reason':'INVALID_EXTRACTION_SCHEMA'}]
@@ -395,6 +409,10 @@ def validate_items(payload, records, question_kind=None):
         if not row or not isinstance(quote,str) or len(quote.strip())<20 or quote not in row['text'] or not isinstance(statement,str) or not statement.strip() or forbidden(item):
             rejected.append({'reason':'INVALID_OR_UNGROUNDED_QUOTATION'});continue
         kind=item.get('kind')
+        centuries=explicit_centuries(statement)
+        if requested_range and centuries and all(century*100<requested_range[0] or (century-1)*100+1>requested_range[1] for century in centuries):
+            rejected.append({'reason':'EXPLICIT_CENTURY_OUTSIDE_REQUESTED_PERIOD','evidence_id':eid,
+                             'centuries':centuries,'requested_range':list(requested_range),'proposed_item':item});continue
         if question_kind and len(statement)>320:
             rejected.append({'reason':'STATEMENT_REQUIRES_ATOMIC_SCOPE','evidence_id':eid,'proposed_item':item});continue
         passage_kind=item.get('passage_kind','NARRATIVE_EVIDENCE')
@@ -453,6 +471,54 @@ def validate_items(payload, records, question_kind=None):
             'verification_status':'UNVERIFIED'})
     return accepted,rejected
 
+def resume_reviewed_claims(path,question,records,question_kind,requested_range,root):
+    """Replay real extractor receipts and source bytes; never inherit a verdict."""
+    root=Path(root).resolve();path=Path(path).resolve()
+    if not path.is_relative_to(root):raise ValueError('RESUME_PATH_OUTSIDE_RESEARCH_RUN')
+    raw=path.read_bytes();original=json.loads(raw)
+    if not isinstance(original,dict) or original.get('question')!=question:raise ValueError('RESUME_QUESTION_MISMATCH')
+    supported=set((original.get('review') or {}).get('supported_claim_ids',[]))
+    current={r['evidence_id']:r for r in records};previous={r['evidence_id']:r for r in original.get('evidence',[])}
+    retained=[];rejected=[]
+    for claim in original.get('claims',[]):
+        if claim.get('claim_id') not in supported:continue
+        eid=claim.get('evidence_id');row=current.get(eid);old=previous.get(eid)
+        if not row or not old or digest(model_evidence(row))!=digest(model_evidence(old)):
+            rejected.append({'reason':'RESUME_SOURCE_CONTEXT_CHANGED','claim_id':claim.get('claim_id')});continue
+        item={k:claim.get(k) for k in ('statement','evidence_id','quote','kind','actors','places','dates','uncertainty')}
+        item.update(passage_kind=claim.get('passage_kind','NARRATIVE_EVIDENCE'),
+                    source_type=claim.get('model_proposed_source_classification') or claim.get('source_classification','UNVERIFIED'))
+        accepted,issues=validate_items({'items':[item]},[row],question_kind,requested_range);rejected.extend(issues)
+        if not accepted:continue
+        offset=claim.get('quote_offset_in_excerpt')
+        if type(offset) is not int or row['text'][offset:offset+len(claim['quote'])]!=claim['quote']:
+            raise ValueError('RESUME_QUOTATION_OFFSET_MISMATCH')
+        value=accepted[0]
+        if value['claim_id']!=claim['claim_id']:raise ValueError('RESUME_CLAIM_IDENTITY_CHANGED')
+        value.update(quote_offset_in_excerpt=offset,source_occurrences=quote_occurrences(row,offset,value['quote']))
+        retained.append(value)
+    ids={c['claim_id'] for c in retained};covered=set();receipts=[]
+    for index,entry in enumerate(original.get('calls',[]),1):
+        if entry.get('role')!='evidence_extractor' or entry.get('status')!='COMPLETED':continue
+        response_file=path.parent/'model_responses'/f'{index}-evidence_extractor.json'
+        if not response_file.is_file():continue
+        body=response_file.read_bytes();response=json.loads(body)
+        if digest(response)!=entry.get('response_sha256'):raise ValueError('RESUME_RESPONSE_RECEIPT_HASH_MISMATCH')
+        items,_=validate_items(parse(response) or {},records,question_kind,requested_range)
+        matched=ids.intersection(c['claim_id'] for c in items)
+        if not matched:continue
+        covered.update(matched)
+        receipts.append({**entry,'reused':True,'original_call_index':index,
+                         'response_file':str(response_file.relative_to(root)),
+                         'response_file_sha256':hashlib.sha256(body).hexdigest(),
+                         'supported_claim_ids_replayed':sorted(matched)})
+    if ids and ids!=covered:raise ValueError('RESUME_EXTRACTION_RECEIPTS_NOT_PROVEN')
+    context={'original_record_path':str(path.relative_to(root)),
+             'original_record_sha256':hashlib.sha256(raw).hexdigest(),'original_status':original.get('status'),
+             'same_question':True,'source_context_replayed':True,'extractor_responses_replayed':True,
+             'new_extraction_performed':False,'retained_claim_ids':sorted(ids)}
+    return retained,rejected,receipts,context
+
 def documentary_answer(out, records, run_root):
     """Build a source dossier by exact extraction, without a model or inference."""
     # Reuse the recorded request; modern Latin namesakes stay outside the dossier.
@@ -501,7 +567,7 @@ def documentary_answer(out, records, run_root):
     out['documentary_timeline'].sort(key=lambda x:str(x['year']))
     return out
 
-def execute(run_root, question, caller=call, config=None, output_root=None, provenance_root=None):
+def execute(run_root, question, caller=call, config=None, output_root=None, provenance_root=None,resume_reviewed_from=None):
     from research_focus import decompose
     all_records,excluded=collect(run_root,provenance_root)
     request={}
@@ -513,6 +579,8 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
     # research acceptance contract already requires geographic findings for
     # every non-person request; apply the same requirement during extraction.
     if request and question_kind not in ('person','topic'):question_kind='place'
+    requested_years=[int(y) for y in re.findall(r'\b(?:1\d{3}|20\d{2})\b',request.get('date_range',''))]
+    requested_range=(min(requested_years),max(requested_years)) if requested_years else None
     grouped,deferred=batches(all_records,budget=6500 if os.getenv('PCT_LLM_PROVIDER')=='local_llama_cpp' else 14000)
     selected=[r for b in grouped for r in b]
     conf=configuration() if config is None else config
@@ -576,7 +644,17 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
         (responses/(str(len(out['calls']))+'-'+role+'.json')).write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
         (destination/'progress.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
         return parse(result)
-    for group in grouped:
+    if resume_reviewed_from:
+        try:
+            resumed,rejections,receipts,context=resume_reviewed_claims(resume_reviewed_from,question,selected,question_kind,requested_range,provenance_root or run_root)
+        except (ValueError,OSError) as error:
+            code=str(error)
+            out.update(status='BLOCKED_RESUME_PROVENANCE',resume_error_type=type(error).__name__,
+                       resume_error_code=code if re.fullmatch(r'[A-Z_]+',code) else 'RESUME_RECORD_OR_SOURCE_UNAVAILABLE');return out
+        out['claims']=resumed;out['rejected'].extend(rejections)
+        out['reused_semantic_calls']=receipts;out['resume_context']=context
+        if not resumed:out['status']='NO_REUSABLE_REVIEWED_SOURCE_CLAIMS';return out
+    for group in ([] if resume_reviewed_from else grouped):
         prompt=RULES+'\nExtraction language: English. QUESTION: '+question+'\nReturn {"items":[{"passage_kind":"NARRATIVE_EVIDENCE","statement":"The consulted source reports ...","evidence_id":"copy supplied evidence_id","passage_ids":[0],"kind":"source_statement","source_type":"UNVERIFIED","actors":[],"places":[],"dates":[],"usage_type":"UNRESOLVED","uncertainty":[]}]}. Select at most 2 claims directly relevant to the question. For a person question, prioritize the named person, identity and sourced activities; a named place is optional. For a place or geographic topic, prioritize named-place claims. Choose 1-4 adjacent passage_ids from ONE evidence item. Do NOT output a quote: the engine copies the selected original text. Copy entity spellings literally from those selected passages; do not translate names. Dates must be strings copied from the selected passages or date_evidence. Empty arrays are valid. Leave unspecified actors, dates and places empty. State only what the selected passage actually supports, with source attribution. Distinguish an actual base from a raid site, and an intention from an executed action. usage_type may be BASE, ANCHORAGE, REFUGE, RAID_LOCATION, OTHER, UNRESOLVED. Modern studies are SECONDARY_SOURCE; contemporary authorship must be established for PRIMARY_SOURCE. Never infer location or dates from a book title.\nEVIDENCE_JSON:\n'+json.dumps([model_evidence(row) for row in group],ensure_ascii=False)
         prompt+='\nClassify passage_kind before proposing a claim. Index entries, bibliography citations, catalogue descriptions and lists of names are discovery leads, not narrative evidence for a historical event. Only NARRATIVE_EVIDENCE may support an answer. Relevant means answering the requested subject, activity and period, not merely repeating its spelling. Do not turn medieval background or a modern namesake into the requested historical finding.'
         prompt+=' Each statement should express ONE short source-attributed fact, at most30 words. Do not retell several people\'s conversations or a whole chronology in one claim. Historical narrative in a footnote may be NARRATIVE_EVIDENCE; a citation listing a work without its consulted content is a BIBLIOGRAPHIC_REFERENCE.'
@@ -585,7 +663,7 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
             prompt+=' Every proposed item MUST contain at least one literal place from the selected passages. If no relevant named-place narrative is available, return an empty items array. Unresolved dates are allowed but must remain unresolved.'
         schema=schemas.extraction([r['evidence_id'] for r in group],question_kind)
         payload=invoke('evidence_extractor',prompt,schema)
-        items,rejected=validate_items(payload or {},group,question_kind)
+        items,rejected=validate_items(payload or {},group,question_kind,requested_range)
         out['rejected'].extend(rejected)
         if not items and isinstance(payload,dict) and payload.get('items') and rejected:
             # A real source can be lost through malformed entity arrays or a
@@ -598,7 +676,7 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
                    if re.fullmatch(r'1\d{3}|20\d{2}',date) and int(date) in row['years_in_scope'] and date in part['text']]
             repair_prompt+='\nLiteral date search hints, NOT proof of an event date: '+json.dumps(hints[:8],ensure_ascii=False)+'\nSelect the appropriate narrative sentence if it supports the claim, or remove the unsupported date from BOTH statement and dates. A bibliographic or archival reference date alone does not date a narrated event.'
             repaired=invoke('evidence_extractor',repair_prompt,schema)
-            items,repair_rejections=validate_items(repaired or {},group,question_kind)
+            items,repair_rejections=validate_items(repaired or {},group,question_kind,requested_range)
             out['rejected'].extend(repair_rejections)
         out['claims'].extend(items)
     if not out['claims']:out['status']='EXTRACTION_FAILED_OR_UNSUPPORTED';return out
@@ -641,14 +719,19 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
     synthesis_context={'claims':[model_claim(c) for c in synthesis_claims]}
     synthesis_rules+='\nDo not discuss rejected, absent or uncited claims, internal claim IDs, or review procedures in answer prose. Verification state is supplied separately by the engine; keep historical prose limited to the cited source attribution. Put research gaps in unknowns and limitations.'
     synthesis_rules+=' Unresolved identity establishes NEITHER that two name forms are the same person NOR that they are distinct individuals. Do not assert either relationship without a supported claim explicitly establishing it. Keep each paragraph to one short finding, at most35 words.'
+    synthesis_rules+=' Do not pad the answer with gap paragraphs. Put every gap in unknowns or limitations. Do not repeat a date or century from a claim unless that temporal statement occurs in its actual quotation; leave dates supplied only by context unresolved in the answer prose.'
     synthesis_prompt=synthesis_rules+'\nCLAIMS_AND_REVIEW_JSON:\n'+json.dumps(synthesis_context,ensure_ascii=False)
     answer=invoke('synthesis',synthesis_prompt,schemas.synthesis(sorted(supported)))
+    if not valid_synthesis(answer,supported) and out['calls'][-1]['status']=='COMPLETED':
+        original=answer
+        answer=invoke('synthesis',synthesis_prompt+'\nFORMAT REPAIR: return only actual supported findings in answer_sections. Each paragraph requires at least one supplied supporting claim ID. Gaps and limitations must not be answer paragraphs. Do not invent citations.\nINVALID_DRAFT_JSON:\n'+json.dumps(original,ensure_ascii=False),schemas.synthesis(sorted(supported)))
+        out['synthesis_protocol_repairs']=[{'initial_answer':original,'repaired_answer':answer}]
     out['requested_answer_language']='en'
     out['greek_translation_status']='NOT_GENERATED_OR_VALIDATED'
     out['final_answer_attempts']=[]
     for attempt in range(3):
         sections=answer.get('answer_sections') if isinstance(answer,dict) else None
-        if forbidden(answer) or not isinstance(sections,list) or not sections or any(not isinstance(s,dict) or not isinstance(s.get('text'),str) or not s['text'].strip() or not isinstance(s.get('claim_ids'),list) or not s['claim_ids'] or any(not isinstance(cid,str) or cid not in supported for cid in s['claim_ids']) for s in sections) or any(not isinstance(answer.get(k,[]),list) or any(not isinstance(v,str) for v in answer.get(k,[])) for k in ('unknowns','limitations')):
+        if not valid_synthesis(answer,supported):
             out['status']='SYNTHESIS_REJECTED_INVALID_CITATIONS';return out
         raw_final_review=invoke('adversarial_reviewer',RULES+'\nQUESTION: '+question+'\nCheck each FINAL ANSWER paragraph against ONLY the quotations supporting its cited claims. Return section_decisions with EXACTLY ONE entry for EVERY zero-based section_index. For each entry, first explain the source_support_reason from the supplied quotations, then give unsupported_answer_spans (exact literal words copied from the answer, empty for a faithful paragraph), and finally decision SUPPORTED, UNSUPPORTED or UNCERTAIN. An UNSUPPORTED decision must identify at least one actual unsupported span. Do not invent a mismatch or copy placeholder reasons. Do not require a named prison, precise year or geographic identification if the paragraph does not assert one. Support means a faithful, explicitly attributed paraphrase, not historical verification. An UNVERIFIED source can be faithfully cited: that label alone is NOT an unsupported assertion. Missing original inspection and human review are limitations, not quotation mismatches. A clearly marked source conjecture is allowed as a HYPOTHESIS. Flag invented facts, scope dates asserted as event dates, namesake conflations, wrong source attribution and certainty stronger than the quotation. Do not require prior historical verification. Do not use outside knowledge.\nFINAL_ANSWER_JSON:\n'+json.dumps({'sections':sections,'claims':[model_claim(c) for c in synthesis_claims]},ensure_ascii=False),schemas.final_review(len(sections)))
         final_review=normalize_final_review(raw_final_review,sections)

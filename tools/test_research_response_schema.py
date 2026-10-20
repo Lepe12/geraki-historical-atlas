@@ -24,6 +24,9 @@ class ResponseSchemaTests(unittest.TestCase):
         self.assertEqual(person['properties']['actors']['minItems'],1)
         self.assertEqual(schemas.review(2)['properties']['decisions']['minItems'],2)
         self.assertEqual(schemas.synthesis(['c-supported'])['properties']['answer_sections']['items']['properties']['claim_ids']['items']['enum'],['c-supported'])
+        answer=schemas.synthesis(['c-supported'])['properties']['answer_sections']
+        self.assertEqual(answer['minItems'],1);self.assertEqual(answer['maxItems'],1)
+        self.assertEqual(answer['items']['properties']['claim_ids']['minItems'],1)
 
     def test_local_boundary_passes_real_schema_to_grammar_response_format(self):
         seen={}
