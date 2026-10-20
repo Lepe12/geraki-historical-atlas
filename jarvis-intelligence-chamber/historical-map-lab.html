@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#06111c">
+<title>NABOU//X — Historical Map Lab</title>
+<link rel="stylesheet" href="./historical-map-lab.css">
+</head>
+<body>
+<main class="hm-shell">
+<header class="hm-head">
+  <div class="hm-brand"><span class="hm-logo">N//X</span><div><small>NABOU//X · ΕΠΙΣΤΗΜΟΝΙΚΗ ΧΑΡΤΟΓΡΑΦΙΑ</small><h1>Historical Map Lab</h1></div></div>
+  <a class="hm-back" href="./index.html">← Επιστροφή στο NABOU</a>
+</header>
+<section class="hm-intro">
+ <div><strong>Από τον ιστορικό χάρτη στην τεκμηριωμένη ταυτοποίηση.</strong><p>Εμφανίζονται μόνο γεωαναφερμένες επιγραφές με στοιχεία προέλευσης. Δεν σημαίνουν βεβαιωμένους οικισμούς, πειρατικές βάσεις ή ιστορικά γεγονότα.</p></div>
+ <span class="hm-state" id="status">Δεν έχουν φορτωθεί δεδομένα</span>
+</section>
+<section class="hm-content">
+ <aside class="hm-controls" aria-label="Εργαλεία ερευνητικού χάρτη">
+  <h2>Δεδομένα και έλεγχος</h2>
+  <label for="featuresFile">1. Επιγραφές ιστορικού χάρτη (GeoJSON)</label>
+  <input id="featuresFile" type="file" accept=".json,.geojson,application/geo+json,application/json">
+  <label for="candidatesFile">2. Υποψήφιες ταυτίσεις WHG (JSON)</label>
+  <input id="candidatesFile" type="file" accept=".json,application/json">
+  <div class="hm-divider"></div>
+  <label for="year">Χρονική περίοδος <strong id="yearLabel">1670</strong></label>
+  <input id="year" type="range" min="1450" max="1900" value="1670" step="10">
+  <label class="hm-check"><input id="undated" type="checkbox" checked> Συμπερίλαβε επιγραφές χωρίς χρονολογία</label>
+  <label for="searchLabels">Αναζήτηση τοπωνυμίων</label>
+  <input id="searchLabels" type="search" placeholder="π.χ. Milo, Termia">
+  <button id="resetMap" class="hm-button" type="button">Επαναφορά θέσης</button>
+  <p class="hm-note">Το κείμενο και οι θέσεις προέρχονται από το εισαγόμενο αρχείο. Χωρίς σωστή γεωαναφορά δεν σχεδιάζουμε καμία ιστορική θέση.</p>
+  <details>
+   <summary>Πώς παράγονται τα δεδομένα;</summary>
+   <p>Το <code>tools/historical_map_intelligence.py</code> μετατρέπει γεωαναφερμένο mapKurator GeoJSON σε αρχεία NABOU. Οι προτάσεις World Historical Gazetteer δημιουργούνται με το ίδιο εργαλείο, προαιρετικά, με διαπιστευτήριο στον server. Δεν γίνεται εισαγωγή κλειδιών στο πρόγραμμα περιήγησης.</p>
+  </details>
+ </aside>
+ <section class="hm-map-panel" aria-label="Γεωγραφικός χάρτης της Μεσογείου">
+  <div class="hm-map-top"><span>ΜΕΣΟΓΕΙΟΣ / ΠΡΑΓΜΑΤΙΚΕΣ ΣΥΝΤΕΤΑΓΜΕΝΕΣ</span><span id="mapCount">0 επιγραφές</span></div>
+  <canvas id="mapCanvas" aria-label="Χάρτης ιστορικών επιγραφών" role="img"></canvas>
+  <div class="hm-map-footer"><span><i class="hm-key"></i> Υποψήφια αναγνώριση — όχι ιστορική επαλήθευση</span><span>WGS84 · EPSG:4326</span></div>
+ </section>
+ <aside class="hm-details" aria-live="polite" aria-label="Στοιχεία ιστορικής επιγραφής">
+  <h2>Τεκμήριο και ταύτιση</h2>
+  <div id="details"><p>Φορτώστε GeoJSON και επιλέξτε μια επιγραφή για την προέλευση και τις πιθανές ταυτίσεις.</p></div>
+ </aside>
+</section>
+<footer>Research-first GIS · mapKurator output adapter · World Historical Gazetteer candidates · χωρίς αυτόματη ιστορική βεβαιότητα</footer>
+</main>
+<script type="module" src="./historical-map-lab.mjs"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+name: NABOU Historical Map Intelligence CI
+on:
+  push:
+    branches: [main, feat/historical-map-intelligence-20261020]
+    paths:
+      - 'tools/historical_map_intelligence.py'
+      - 'tools/test_historical_map_intelligence.py'
+      - 'jarvis-intelligence-chamber/historical-map-*'
+      - 'jarvis-intelligence-chamber/index.html'
+      - '.github/workflows/historical-map-intelligence.yml'
+  pull_request:
+    paths:
+      - 'tools/historical_map_intelligence.py'
+      - 'tools/test_historical_map_intelligence.py'
+      - 'jarvis-intelligence-chamber/historical-map-*'
+      - 'jarvis-intelligence-chamber/index.html'
+      - '.github/workflows/historical-map-intelligence.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Static Python and browser modules
+        run: |
+          python3 -m py_compile tools/historical_map_intelligence.py
+          node --check jarvis-intelligence-chamber/historical-map-core.mjs
+          node --check jarvis-intelligence-chamber/historical-map-lab.mjs
+      - name: MapKurator GeoJSON + mocked WHG service unit tests
+        run: python3 -m unittest tools.test_historical_map_intelligence -v
+      - name: UI geo-evidence contract tests
+        run: node --test jarvis-intelligence-chamber/historical-map-core.test.mjs
+      - name: Ensure 3D renderer imports and Map Lab entry point present
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          html=Path('jarvis-intelligence-chamber/index.html').read_text()
+          assert 'historical-map-lab.html' in html
+          assert 'chamber.js' in html and 'gpu-field.js' in html
+          lab=Path('jarvis-intelligence-chamber/historical-map-lab.html').read_text()
+          assert 'historical-map-lab.mjs' in lab
+          assert Path('jarvis-intelligence-chamber/historical-map-lab.css').is_file()
+          print('HISTORICAL_MAP_LAB_ASSET_GATE_PASS')
+          PY
