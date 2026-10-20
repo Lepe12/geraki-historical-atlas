@@ -127,3 +127,9 @@ source genealogy, and comparisons against independent baselines remain incomplet
 JSON-LD uses the local vocabulary with Schema.org/PROV; PLATO conformance is not
 claimed. The full university-research integration is not complete while these
 requirements or real semantic/production acceptance remain unresolved.
+
+
+Update20October2026: all four fresh baseline cases completed without an accepted
+answer. Anemi subsequently passed live record parsing. See
+[the root-cause audit](2026-10-20-research-engine-root-causes.md) for the actual
+case outcomes, corrections and new retry identifiers.
