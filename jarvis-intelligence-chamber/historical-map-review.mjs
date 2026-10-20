@@ -1,5 +1,14 @@
 import {validateOcr,fileHash,newReview,applyReading,addGcp,csvForQgisGcps,reviewStats} from "./historical-map-review-core.mjs";
 const $=id=>document.getElementById(id);
+const originalPreview=$("defaultPortolanImage");
+if(originalPreview){
+  originalPreview.addEventListener("error",()=>{
+    if(originalPreview.dataset.remoteFallback)return;
+    originalPreview.dataset.remoteFallback="1";
+    originalPreview.src="https://upload.wikimedia.org/wikipedia/commons/7/74/1662_Portolan_chart_of_the_Aegean_Sea_and_the_Dardanelles_by_Fran%C3%A7ois_Ollive.jpg";
+  });
+}
+
 const canvas=$("reviewCanvas"),ctx=canvas.getContext("2d");
 let ocr=null,review=null,image=null,imageHash=null,imageObjectUrl=null,chosen=null;
 let zoom=1,offsetX=0,offsetY=0,dragged=false,start=null,gcpMode=false;
@@ -116,6 +125,7 @@ $("originalImage").addEventListener("change",async e=>{
   const file=e.target.files?.[0];if(!file)return;
   try{
     image=null;imageHash=null;review=null;chosen=null;
+    $("defaultPortolanPreview").hidden=false;canvas.hidden=true;
     $("exportReview").disabled=true;$("exportGcpCsv").disabled=true;
     render();
     if(file.size>35*1024*1024||!["image/jpeg","image/png"].includes(file.type))throw Error("Χρειάζεται JPG/PNG μέχρι 35 MB");
@@ -128,6 +138,7 @@ $("originalImage").addEventListener("change",async e=>{
       img.src=imageObjectUrl;
     });
     image=img;imageHash=hash;zoom=1;offsetX=0;offsetY=0;
+    $("defaultPortolanPreview").hidden=true;canvas.hidden=false;resize();
     $("imageInfo").textContent=img.naturalWidth+"×"+img.naturalHeight+" · SHA-256 "+hash.slice(0,12)+"…";
     await tryMatch();
   }catch(err){status("Αποτυχία εικόνας: "+String(err.message||err),true);}

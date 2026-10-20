@@ -34,8 +34,22 @@ const ocr={
    browser=await chromium.launch({headless:true,args:["--no-sandbox","--disable-dev-shm-usage"]});
    const page=await browser.newPage({viewport:{width:1440,height:900},acceptDownloads:true});
    const errors=[];page.on("pageerror",e=>errors.push(e.message));
+   // The published site bundles the authentic chart. Stub only the transport here;
+   // this browser test validates default visibility without making external requests.
+   await page.route("**/assets/ollive-aegean-1662-preview.jpg",route=>route.fulfill({
+     status:200,contentType:"image/png",
+     body:Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL/nwAAAABJRU5ErkJggg==","base64")
+   }));
    await page.goto("http://127.0.0.1:"+server.address().port+"/jarvis-intelligence-chamber/historical-map-review.html");
+   const defaultPreview=page.locator("#defaultPortolanPreview");
+   assert.equal(await defaultPreview.isVisible(),true);
+   await page.waitForFunction(()=>document.querySelector("#defaultPortolanImage")?.naturalWidth>0);
+   assert.equal(await page.locator("#reviewCanvas").isVisible(),false);
+
    await page.locator("#originalImage").setInputFiles({name:"synthetic.png",mimeType:"image/png",buffer:png});
+   await page.waitForFunction(()=>document.querySelector("#reviewCanvas")?.hidden===false);
+   assert.equal(await defaultPreview.isVisible(),false);
+   assert.equal(await page.locator("#reviewCanvas").isVisible(),true);
    await page.locator("#ocrInput").setInputFiles({name:"synthetic.json",mimeType:"application/json",buffer:Buffer.from(JSON.stringify(ocr))});
    await page.waitForFunction(()=>document.querySelector("#reviewStatus")?.textContent?.includes("SHA-256 εικόνας: MATCH"));
    await page.locator("#reviewer").fill("Researcher Test");
