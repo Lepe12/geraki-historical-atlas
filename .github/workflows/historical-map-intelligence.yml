@@ -4,6 +4,11 @@ on:
     branches: [main, feat/historical-map-intelligence-20261020]
     paths:
       - 'tools/historical_map_intelligence.py'
+      - 'tools/historical_map_ocr.py'
+      - 'tools/test_historical_map_ocr.py'
+      - 'tools/historical_map_source_probe.py'
+      - 'tools/test_historical_map_source_probe.py'
+      - 'data/historical-map-sources/**'
       - 'tools/test_historical_map_intelligence.py'
       - 'jarvis-intelligence-chamber/historical-map-*'
       - 'jarvis-intelligence-chamber/index.html'
@@ -11,6 +16,11 @@ on:
   pull_request:
     paths:
       - 'tools/historical_map_intelligence.py'
+      - 'tools/historical_map_ocr.py'
+      - 'tools/test_historical_map_ocr.py'
+      - 'tools/historical_map_source_probe.py'
+      - 'tools/test_historical_map_source_probe.py'
+      - 'data/historical-map-sources/**'
       - 'tools/test_historical_map_intelligence.py'
       - 'jarvis-intelligence-chamber/historical-map-*'
       - 'jarvis-intelligence-chamber/index.html'
@@ -33,6 +43,30 @@ jobs:
           python3 -m py_compile tools/historical_map_intelligence.py
           node --check jarvis-intelligence-chamber/historical-map-core.mjs
           node --check jarvis-intelligence-chamber/historical-map-lab.mjs
+      - name: Install local open-source OCR and raster georeferencing dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-eng
+          python3 -m pip install --quiet rasterio pyproj pillow
+      - name: Run historical map OCR against a real synthetic GeoTIFF and test safe source access
+        run: |
+          python3 -m unittest tools.test_historical_map_ocr tools.test_historical_map_source_probe -v
+      - name: Audit authentic 1670 portolan IIIF availability without claiming acquisition
+        run: |
+          python3 tools/historical_map_source_probe.py --out historical-map-iiif-probe.json
+          python3 - <<'PY'
+          import json
+          report=json.load(open("historical-map-iiif-probe.json"))
+          assert report["historical_map_labels_extracted"]==0
+          assert report["images_downloaded"]==0
+          print("ARCHIVE_ACCESS_STATE="+report["status"])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: historical-map-iiif-access-probe
+          path: historical-map-iiif-probe.json
+          if-no-files-found: warn
       - name: MapKurator GeoJSON + mocked WHG service unit tests
         run: python3 -m unittest tools.test_historical_map_intelligence -v
       - name: UI geo-evidence contract tests
