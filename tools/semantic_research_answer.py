@@ -390,6 +390,8 @@ def validate_items(payload, records, question_kind=None):
         if not row or not isinstance(quote,str) or len(quote.strip())<20 or quote not in row['text'] or not isinstance(statement,str) or not statement.strip() or forbidden(item):
             rejected.append({'reason':'INVALID_OR_UNGROUNDED_QUOTATION'});continue
         kind=item.get('kind')
+        if question_kind and len(statement)>320:
+            rejected.append({'reason':'STATEMENT_REQUIRES_ATOMIC_SCOPE','evidence_id':eid,'proposed_item':item});continue
         passage_kind=item.get('passage_kind','NARRATIVE_EVIDENCE')
         if passage_kind!='NARRATIVE_EVIDENCE':
             rejected.append({'evidence_id':eid,'reason':'DISCOVERY_LEAD_NOT_NARRATIVE_EVIDENCE',
@@ -431,7 +433,7 @@ def validate_items(payload, records, question_kind=None):
                              'evidence_id':eid,'proposed_item':item});continue
         start=selected_start if selected_start is not None else row['text'].find(quote)
         accepted.append({'claim_id':'c-'+digest([row['evidence_id'],statement,quote])[:20],
-            'statement':statement,'kind':kind,'evidence_id':row['evidence_id'],'quote':quote,
+            'statement':statement,'kind':kind,'passage_kind':passage_kind,'evidence_id':row['evidence_id'],'quote':quote,
             'quote_offset_in_excerpt':start,**entities,'source_occurrences':quote_occurrences(row,start,quote),
             'entity_surface_corrections':surface_corrections,
             'date_evidence':row.get('date_evidence'),'date_basis':row.get('date_basis'),

@@ -48,13 +48,13 @@ env:
   PCT_PURPOSE: ${{ inputs.purpose }}
   PCT_SELECTED_AGENTS: ${{ inputs.selected_agents }}
   PCT_LLM_PROVIDER: ${{ vars.PCT_LLM_PROVIDER || 'local_llama_cpp' }}
-  PCT_LLM_MODEL: ${{ vars.PCT_LLM_MODEL || 'Qwen/Qwen2.5-3B-Instruct-GGUF' }}
+  PCT_LLM_MODEL: ${{ vars.PCT_LLM_MODEL || 'Qwen/Qwen3-8B-GGUF' }}
   PCT_LLM_BASE_URL: ${{ vars.PCT_LLM_BASE_URL }}
   PCT_LLM_API_KEY: ${{ secrets.PCT_LLM_API_KEY }}
-  PCT_LLM_QUERY_MODEL: ${{ vars.PCT_LLM_QUERY_MODEL || vars.PCT_LLM_MODEL || 'Qwen/Qwen2.5-3B-Instruct-GGUF' }}
-  PCT_LLM_EXTRACTOR_MODEL: ${{ vars.PCT_LLM_EXTRACTOR_MODEL || vars.PCT_LLM_MODEL || 'Qwen/Qwen2.5-3B-Instruct-GGUF' }}
-  PCT_LLM_SYNTHESIS_MODEL: ${{ vars.PCT_LLM_SYNTHESIS_MODEL || vars.PCT_LLM_MODEL || 'Qwen/Qwen2.5-3B-Instruct-GGUF' }}
-  PCT_LLM_ADVERSARIAL_MODEL: ${{ vars.PCT_LLM_ADVERSARIAL_MODEL || vars.PCT_LLM_MODEL || 'Qwen/Qwen2.5-3B-Instruct-GGUF' }}
+  PCT_LLM_QUERY_MODEL: ${{ vars.PCT_LLM_QUERY_MODEL || vars.PCT_LLM_MODEL || 'Qwen/Qwen3-8B-GGUF' }}
+  PCT_LLM_EXTRACTOR_MODEL: ${{ vars.PCT_LLM_EXTRACTOR_MODEL || vars.PCT_LLM_MODEL || 'Qwen/Qwen3-8B-GGUF' }}
+  PCT_LLM_SYNTHESIS_MODEL: ${{ vars.PCT_LLM_SYNTHESIS_MODEL || vars.PCT_LLM_MODEL || 'Qwen/Qwen3-8B-GGUF' }}
+  PCT_LLM_ADVERSARIAL_MODEL: ${{ vars.PCT_LLM_ADVERSARIAL_MODEL || vars.PCT_LLM_MODEL || 'Qwen/Qwen3-8B-GGUF' }}
   # Host-local MariaDB is primary. Airtable is retained only as an explicit legacy option.
   PCT_STORAGE_BACKEND: mariadb
   PCT_UI_REQUEST_ID: ${{ inputs.request_id }}
@@ -470,7 +470,7 @@ jobs:
             --run-id "$PCT_RUN_ID" \
             --output "evidence/runs/$PCT_RUN_ID/JARVIS_STATE_BOARD.json"
       - name: Extract, review and synthesize the actual acquired sources
-        timeout-minutes: 35
+        timeout-minutes: 50
         env:
           PCT_RUN_ID: ${{ github.run_id }}
         run: python3 tools/semantic_research_answer.py --run-id "$PCT_RUN_ID"
