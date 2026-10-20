@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        parent_run: ${{ fromJSON(inputs.run_id && format('["{0}"]', inputs.run_id) || '["39377319867","39372433114"]') }}
+        parent_run: ${{ fromJSON(inputs.run_id && format('["{0}"]', inputs.run_id) || '["39372433114"]') }}
     env:
       PARENT_RESEARCH_RUN: ${{ matrix.parent_run }}
       PCT_LLM_PROVIDER: local_llama_cpp

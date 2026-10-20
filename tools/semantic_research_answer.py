@@ -426,6 +426,9 @@ def validate_items(payload, records, question_kind=None):
         if question_kind in ('place','topic') and not entities['places']:
             rejected.append({'reason':'GEOGRAPHIC_FINDING_REQUIRES_LITERAL_PLACE',
                              'evidence_id':eid,'proposed_item':item});continue
+        if question_kind=='person' and not entities['actors']:
+            rejected.append({'reason':'PERSON_FINDING_REQUIRES_LITERAL_ACTOR',
+                             'evidence_id':eid,'proposed_item':item});continue
         start=selected_start if selected_start is not None else row['text'].find(quote)
         accepted.append({'claim_id':'c-'+digest([row['evidence_id'],statement,quote])[:20],
             'statement':statement,'kind':kind,'evidence_id':row['evidence_id'],'quote':quote,
@@ -551,6 +554,8 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
     for group in grouped:
         prompt=RULES+'\nExtraction language: English. QUESTION: '+question+'\nReturn {"items":[{"passage_kind":"NARRATIVE_EVIDENCE","statement":"The consulted source reports ...","evidence_id":"copy supplied evidence_id","passage_ids":[0],"kind":"source_statement","source_type":"UNVERIFIED","actors":[],"places":[],"dates":[],"usage_type":"UNRESOLVED","uncertainty":[]}]}. Select at most 2 claims directly relevant to the question. For a person question, prioritize the named person, identity and sourced activities; a named place is optional. For a place or geographic topic, prioritize named-place claims. Choose 1-4 adjacent passage_ids from ONE evidence item. Do NOT output a quote: the engine copies the selected original text. Copy entity spellings literally from those selected passages; do not translate names. Dates must be strings copied from the selected passages or date_evidence. Empty arrays are valid. Leave unspecified actors, dates and places empty. State only what the selected passage actually supports, with source attribution. Distinguish an actual base from a raid site, and an intention from an executed action. usage_type may be BASE, ANCHORAGE, REFUGE, RAID_LOCATION, OTHER, UNRESOLVED. Modern studies are SECONDARY_SOURCE; contemporary authorship must be established for PRIMARY_SOURCE. Never infer location or dates from a book title.\nEVIDENCE_JSON:\n'+json.dumps([model_evidence(row) for row in group],ensure_ascii=False)
         prompt+='\nClassify passage_kind before proposing a claim. Index entries, bibliography citations, catalogue descriptions and lists of names are discovery leads, not narrative evidence for a historical event. Only NARRATIVE_EVIDENCE may support an answer. Relevant means answering the requested subject, activity and period, not merely repeating its spelling. Do not turn medieval background or a modern namesake into the requested historical finding.'
+        prompt+=' Each statement should express ONE short source-attributed fact, at most30 words. Do not retell several people\'s conversations or a whole chronology in one claim. Historical narrative in a footnote may be NARRATIVE_EVIDENCE; a citation listing a work without its consulted content is a BIBLIOGRAPHIC_REFERENCE.'
+        if question_kind=='person':prompt+=' Every item MUST contain a literal actor mention in actors from the selected passages. Select the sentence actually naming that actor. If an event date is absent from those sentences, leave it out of BOTH dates and statement.'
         if question_kind in ('place','topic'):
             prompt+=' Every proposed item MUST contain at least one literal place from the selected passages. If no relevant named-place narrative is available, return an empty items array. Unresolved dates are allowed but must remain unresolved.'
         schema=schemas.extraction([r['evidence_id'] for r in group],question_kind)
@@ -562,6 +567,11 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
             # sentence selection that omits the named actor. One model repair
             # may correct the proposal; every original byte/date gate is rerun.
             repair_prompt=prompt+'\nREPAIR: the previous proposals failed validation. Return corrected items only, or an empty items array if unsupported. actors, places and dates MUST be arrays of literal strings, never objects. Select all adjacent sentences needed for the statement and its named entities, up to 4 passage_ids. An entity outside the selected passages is unsupported. Do not fill absent dates. Do not equate a modern namesake with the historical subject. Do not assert a BASE unless the selected text actually describes that use.\nREJECTED_PROPOSALS_JSON:\n'+json.dumps({'previous':payload,'validation':rejected},ensure_ascii=False)
+            proposed_dates={str(d) for item in payload.get('items',[]) if isinstance(item,dict) and isinstance(item.get('dates'),list) for d in item['dates'] if isinstance(d,(str,int))}
+            hints=[{'evidence_id':row['evidence_id'],'passage_id':part['passage_id'],'date':date,'text':part['text']}
+                   for row in group for part in passages(row['text']) for date in sorted(proposed_dates)
+                   if re.fullmatch(r'1\d{3}|20\d{2}',date) and int(date) in row['years_in_scope'] and date in part['text']]
+            repair_prompt+='\nLiteral date search hints, NOT proof of an event date: '+json.dumps(hints[:8],ensure_ascii=False)+'\nSelect the appropriate narrative sentence if it supports the claim, or remove the unsupported date from BOTH statement and dates. A bibliographic or archival reference date alone does not date a narrated event.'
             repaired=invoke('evidence_extractor',repair_prompt,schema)
             items,repair_rejections=validate_items(repaired or {},group,question_kind)
             out['rejected'].extend(repair_rejections)
@@ -605,12 +615,13 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
     # The complete review remains in the durable answer/review receipts.
     synthesis_context={'claims':[model_claim(c) for c in synthesis_claims]}
     synthesis_rules+='\nDo not discuss rejected, absent or uncited claims, internal claim IDs, or review procedures in answer prose. Verification state is supplied separately by the engine; keep historical prose limited to the cited source attribution. Put research gaps in unknowns and limitations.'
+    synthesis_rules+=' Unresolved identity establishes NEITHER that two name forms are the same person NOR that they are distinct individuals. Do not assert either relationship without a supported claim explicitly establishing it. Keep each paragraph to one short finding, at most35 words.'
     synthesis_prompt=synthesis_rules+'\nCLAIMS_AND_REVIEW_JSON:\n'+json.dumps(synthesis_context,ensure_ascii=False)
     answer=invoke('synthesis',synthesis_prompt,schemas.synthesis(sorted(supported)))
     out['requested_answer_language']='en'
     out['greek_translation_status']='NOT_GENERATED_OR_VALIDATED'
     out['final_answer_attempts']=[]
-    for attempt in range(2):
+    for attempt in range(3):
         sections=answer.get('answer_sections') if isinstance(answer,dict) else None
         if forbidden(answer) or not isinstance(sections,list) or not sections or any(not isinstance(s,dict) or not isinstance(s.get('text'),str) or not s['text'].strip() or not isinstance(s.get('claim_ids'),list) or not s['claim_ids'] or any(not isinstance(cid,str) or cid not in supported for cid in s['claim_ids']) for s in sections) or any(not isinstance(answer.get(k,[]),list) or any(not isinstance(v,str) for v in answer.get(k,[])) for k in ('unknowns','limitations')):
             out['status']='SYNTHESIS_REJECTED_INVALID_CITATIONS';return out
@@ -629,8 +640,19 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
             or any(not isinstance(f,dict) or type(f.get('index')) is not int or not 0<=f['index']<len(sections) or not isinstance(f.get('reason'),str) or not f['reason'].strip() for f in flags)):
             out['status']='FINAL_ANSWER_REVIEW_FAILED';return out
         if set(indexes)==set(range(len(sections))) and not flags:break
-        if attempt:
+        if attempt==2:
             out['status']='FINAL_ANSWER_REVIEW_FAILED';return out
+        if attempt==1:
+            # Keep only paragraphs explicitly supported by the reviewer, then
+            # require a NEW review of the smaller answer. No flagged paragraph
+            # is accepted, and no reviewer decision is changed into support.
+            flagged={f['index'] for f in flags}
+            keep=[i for i in indexes if i not in flagged]
+            if not keep:out['status']='FINAL_ANSWER_REVIEW_FAILED';return out
+            out['excluded_answer_sections']=[{'section_index':i,'section':s,'review':final_review}
+                                            for i,s in enumerate(sections) if i not in keep]
+            answer={**answer,'answer_sections':[sections[i] for i in sorted(keep)]}
+            continue
         # One bounded correction of actual unsupported content, followed by a
         # NEW review. A rejected draft can never become the accepted answer.
         feedback={'previous_answer':answer,'adversarial_review':final_review}

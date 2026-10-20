@@ -9,13 +9,15 @@ STRINGS=array(STRING)
 
 def extraction(evidence_ids, question_kind=None):
     places=array(STRING)
+    actors=array(STRING)
     if question_kind in ('place','topic'):places['minItems']=1
+    if question_kind=='person':actors['minItems']=1
     item=obj({'passage_kind':{'type':'string','enum':['NARRATIVE_EVIDENCE','BIBLIOGRAPHIC_REFERENCE','INDEX_ENTRY','CATALOGUE_METADATA','NAME_LIST']},
-        'statement':STRING,'evidence_id':{'type':'string','enum':evidence_ids},
+        'statement':{'type':'string','maxLength':320},'evidence_id':{'type':'string','enum':evidence_ids},
         'passage_ids':array({'type':'integer','minimum':0},4),
         'kind':{'type':'string','enum':['source_statement','inference','hypothesis']},
         'source_type':{'type':'string','enum':['UNVERIFIED','PRIMARY_SOURCE','SECONDARY_SOURCE']},
-        'actors':STRINGS,'places':places,'dates':STRINGS,
+        'actors':actors,'places':places,'dates':STRINGS,
         'usage_type':{'type':'string','enum':['BASE','ANCHORAGE','REFUGE','RAID_LOCATION','OTHER','UNRESOLVED']},'uncertainty':STRINGS})
     return obj({'items':array(item,2)})
 

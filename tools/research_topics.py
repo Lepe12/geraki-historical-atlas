@@ -69,7 +69,11 @@ def topic_queries(focus, lane='travellers'):
     region = preferred.get(lane, 'Mediterranean') if 'mediterranean' in focus.get('region_concepts', []) else (regions[0] if regions else '')
     # The second route deliberately searches source genres. A travel book may
     # discuss corsairs on one page without indexing them in its catalogue title.
-    queries = [f'{event} {region}', f'{genre} {region}', f'{event} {base} {region}']
+    # Catalogue descriptions often omit a geographic scope even when a book
+    # contains relevant chapters. Preserve a bounded single-concept route;
+    # acquisition triage still separates modern/software piracy and off-scope
+    # records. A zero-result compound query must not exhaust discovery.
+    queries = [f'{event} {region}', f'{genre} {region}',event,f'{event} {base} {region}']
     for key in focus.get('region_concepts', []):
         scopes = REGIONS[key]['search_scope_hypotheses']
         if scopes:

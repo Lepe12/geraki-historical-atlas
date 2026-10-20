@@ -20,6 +20,8 @@ class ResponseSchemaTests(unittest.TestCase):
         geo=schemas.extraction(['e-actual'],'place')['properties']['items']['items']
         self.assertEqual(geo['properties']['places']['minItems'],1)
         self.assertNotIn('minItems',item['properties']['places'])
+        person=schemas.extraction(['e-actual'],'person')['properties']['items']['items']
+        self.assertEqual(person['properties']['actors']['minItems'],1)
         self.assertEqual(schemas.review(2)['properties']['decisions']['minItems'],2)
         self.assertEqual(schemas.synthesis(['c-supported'])['properties']['answer_sections']['items']['properties']['claim_ids']['items']['enum'],['c-supported'])
 

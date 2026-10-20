@@ -45,6 +45,8 @@ class TopicResearchTests(unittest.TestCase):
         self.assertEqual(focus['names'],[])
         self.assertTrue(all('Τοπωνύμια' not in q for q in topic_queries(focus,'venetian')))
         self.assertIn('corsari Mediterraneo',topic_queries(focus,'venetian'))
+        self.assertIn('corsari',topic_queries(focus,'venetian')[:3])
+        self.assertIn('πειρατεία',topic_queries(focus,'greek')[:3])
 
     def test_person_and_other_geography_preserved(self):
         self.assertEqual(decompose('Πέτρος Λάντζας')['kind'],'person')

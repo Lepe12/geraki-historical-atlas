@@ -41,7 +41,9 @@ class SemanticAnswer(unittest.TestCase):
             accepted,rejected=validate_items({'items':[item(eid)]},rows,'place')
             self.assertFalse(accepted)
             self.assertEqual(rejected[0]['reason'],'GEOGRAPHIC_FINDING_REQUIRES_LITERAL_PLACE')
-            self.assertTrue(validate_items({'items':[item(eid)]},rows,'person')[0])
+            accepted,rejected=validate_items({'items':[item(eid)]},rows,'person')
+            self.assertFalse(accepted)
+            self.assertEqual(rejected[0]['reason'],'PERSON_FINDING_REQUIRES_LITERAL_ACTOR')
 
     def test_quarantined_claims_never_enter_synthesis_context(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -175,6 +177,32 @@ class SemanticAnswer(unittest.TestCase):
                 self.assertEqual(state['drafts'],2);self.assertEqual(state['final_reviews'],2)
                 self.assertEqual(out['status'],'MODEL_ANSWER_PENDING_HUMAN_REVIEW' if second_pass else 'FINAL_ANSWER_REVIEW_FAILED')
                 if not second_pass:self.assertEqual(out['answer_sections'],[])
+                self.assertFalse(out['verified'])
+
+    def test_supported_paragraphs_survive_only_after_new_subset_review(self):
+        for subset_passes in (True,False):
+            with tempfile.TemporaryDirectory() as tmp:
+                fixture(tmp);eid=collect(tmp)[0][0]['evidence_id'];state={'reviews':0,'ids':[]}
+                def caller(role,prompt):
+                    if role=='evidence_extractor':return response({'items':[item(eid),item(eid,statement='The account is uncertain.')]})
+                    if role=='adversarial_reviewer':
+                        if 'FINAL_ANSWER_JSON:' not in prompt:
+                            cid=json.loads(prompt.split('CLAIMS_JSON:\n')[1])[0]['claim_id'];state['ids'].append(cid)
+                            return response({'supported_claim_ids':[cid],'flagged_claims':[]})
+                        state['reviews']+=1
+                        sections=json.loads(prompt.split('FINAL_ANSWER_JSON:\n')[1])['sections']
+                        if state['reviews']<3:
+                            return response({'supported_section_indexes':[0],'flagged_sections':[{'index':1,'reason':'Invented2001 date'}]})
+                        self.assertEqual(len(sections),1)
+                        self.assertNotIn('2001',sections[0]['text'])
+                        return response({'supported_section_indexes':[0] if subset_passes else [],'flagged_sections':[] if subset_passes else [{'index':0,'reason':'Unresolved support'}]})
+                    return response({'answer_sections':[{'text':'The source reports an attack in1677.','claim_ids':[state['ids'][0]]},
+                                                        {'text':'The source reports an attack in2001.','claim_ids':[state['ids'][1]]}]})
+                out=execute(tmp,'question',caller=caller,config={'configured':True,'missing':[]})
+                self.assertEqual(state['reviews'],3)
+                self.assertEqual(out['status'],'MODEL_ANSWER_PENDING_HUMAN_REVIEW' if subset_passes else 'FINAL_ANSWER_REVIEW_FAILED')
+                self.assertEqual(len(out['answer_sections']),1 if subset_passes else 0)
+                self.assertEqual(len(out['excluded_answer_sections']),1)
                 self.assertFalse(out['verified'])
 
     def test_malformed_extraction_gets_one_repair_and_all_gates_still_apply(self):
