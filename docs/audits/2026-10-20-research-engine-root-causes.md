@@ -1,3 +1,47 @@
+## Latest actual result: fresh search now returns one cited finding
+
+Fresh run [39377319867](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/39377319867)
+completed all eleven source-family lanes, real query expansion, acquisition,
+Qwen3-8B extraction, claim reviews, synthesis and final review. It returned one
+accepted source-attributed finding: Astypalaia provided corsairs with provisions,
+drinking water and safe anchorages, according to Koutzakiotis2023, PDF scan1.
+The exact quotation and offsets are durable in the answer record. The model
+reviewed three selected passages; this is bounded coverage, not all3755 passages.
+Final report:122 unique acquired URLs,61 document/page-OCR URLs,37 catalogue
+records,24 other web pages,41 raw event candidates,4 model proposals,1 cited
+place finding and **zero historically VERIFIED claims**. The earlier acquisition
+checkpoint counted125 raw URLs; the final report is authoritative for usable
+sources. One finding proves the complete research path can execute, not complete
+historical coverage or readiness for doctoral work.
+
+Actual isolated MariaDB import/readback of the fresh proposals passed:4 source
+versions,4 attestations,5 exact citation readbacks, second import inserted0.
+Every attestation remained UNREVIEWED. See `fresh-e2e-database-readback.json`.
+This does not claim production installation.
+
+The first8B four-case retry also exposed false positives. Its Lantzas answer
+included a bibliography and unresolved noble namesakes; its original green result
+is explicitly rejected in `lantzas-answer-quality-revalidation.json`. Kapsis
+included a modern ministry name list. Milos quoted an index and undated medieval
+background and remains incomplete. The older thematic answer failed its final
+review after synthesis discussed a flagged claim while citing a different claim.
+
+Correction b9120ccf3 removes quarantined claims/review reasons from synthesis,
+requires a passage genre, excludes bibliography/index/catalogue/name-list leads
+from narrative claims, requires literal place entities for geographic questions,
+and makes question relevance part of adversarial review.73 targeted regressions
+and all4 actual llama.cpp schema grammars passed. Actual new-code model reanalysis
+is [39381959769](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/39381959769);
+its results are pending. These tests do not substitute for its real outcomes.
+
+A concise machine-readable report with HTTP attempts, source/model counts and
+remaining blockers is `evidence/integration_validation/2026-10-20/live-validation-summary.json`.
+Production probe39378925242 still finds the evidence and signed agent routes404;
+no connected Plesk/SSH management capability is available. Native SIAS timeout,
+PARES/Google Books429, Academia403 and BOA login/CAPTCHA remain access limitations.
+
+## Earlier baseline and correction history
+
 # NABOU research engine: actual failures and current correction, 20 October 2026
 
 The four fresh cases completed. **None passed research acceptance.** Successful
