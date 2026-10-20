@@ -620,6 +620,7 @@ def main():
         data=read(path);question=data.get('question') or data.get('target')
         if question:break
     out=execute(root,question or 'Historical research')
+    out['research_run_id']=args.run_id
     import subprocess
     out['software_revision']=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
     dest=root/'research_answer';dest.mkdir(exist_ok=True)

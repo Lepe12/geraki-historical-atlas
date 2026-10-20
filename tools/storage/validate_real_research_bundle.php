@@ -11,6 +11,10 @@ $reader=function($path)use($root){$full=realpath($root.'/'.$path);if (!$full||!s
 $db->beginTransaction();$first=heImportBundle($db,$bundle,$reader);$db->commit();
 $db->beginTransaction();$second=heImportBundle($db,$bundle,$reader);$db->commit();
 if ($second['inserted_attestations']!==0)throw new RuntimeException('IMPORT_NOT_IDEMPOTENT');
+foreach ($bundle['sources'] as $source) {
+ $stored=heQuery($db,'SELECT provenance_json FROM pc_he_sources WHERE id=?',[$source['id']])->fetchColumn();
+ if (!$stored||json_decode($stored,true,512,JSON_THROW_ON_ERROR)!==$source)throw new RuntimeException('SOURCE_PROVENANCE_READBACK_MISMATCH');
+}
 $quotes=0;$states=[];
 foreach ($bundle['attestations'] as $att) {
  foreach ($att['citations'] as $c){

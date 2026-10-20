@@ -70,6 +70,13 @@ class ContextTests(unittest.TestCase):
         self.assertNotEqual(before_bundle['sources'][0]['id'],corrected_bundle['sources'][0]['id'])
         self.assertNotEqual(before_bundle['attestations'][0]['id'],corrected_bundle['attestations'][0]['id'])
         self.assertEqual(corrected_bundle['sources'][0]['source_bibliography']['creator'],['Actual fixture author'])
+        answer['research_run_id']='123'
+        first=build(answer)['sources'][0]
+        self.assertEqual(first['durable_git_path'],'evidence/runs/123/lane/library_acquisition/a.txt')
+        answer['research_run_id']='456'
+        second=build(answer)['sources'][0]
+        self.assertNotEqual(first['id'],second['id'])
+        self.assertEqual(first['source_content_key'],second['source_content_key'])
 
 
 if __name__=='__main__':unittest.main()

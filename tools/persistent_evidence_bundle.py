@@ -11,19 +11,28 @@ def build(answer):
     review=answer.get('review') or {}
     supported=set(review.get('supported_claim_ids',[]))
     flags={r['claim_id']:r for r in review.get('flagged_claims',[])}
+    receipt=answer.get('execution_receipt') or {}
+    parent_run=receipt.get('parent_run_id') or answer.get('research_run_id')
+    analysis_run=receipt.get('analysis_run_id') or parent_run
     for claim in answer.get('claims',[]):
         citations=[]
         for occurrence in claim.get('source_occurrences',[]):
             path=occurrence.get('acquired_text_path');sha=occurrence.get('source_text_sha256')
             if not path or not sha:continue
             bibliography=occurrence.get('source_bibliography') or {}
-            metadata={'title':occurrence.get('title'),'bibliography':bibliography}
+            content_key=hashlib.sha256((occurrence['url']+'\0'+sha).encode()).hexdigest()
+            metadata={'title':occurrence.get('title'),'bibliography':bibliography,
+                      'research_run_id':parent_run,'analysis_run_id':analysis_run,'text_path':path,
+                      'source_classification':claim.get('source_classification','UNVERIFIED')}
             metadata_sha=hashlib.sha256(json.dumps(metadata,sort_keys=True,ensure_ascii=False).encode()).hexdigest()
             # Corrected bibliographies append a new source version; an earlier
             # immutable database row must not silently hide the correction.
-            sid='src_'+hashlib.sha256((occurrence['url']+'\0'+sha+'\0'+metadata_sha).encode()).hexdigest()[:32]
+            sid='src_'+hashlib.sha256((content_key+'\0'+metadata_sha).encode()).hexdigest()[:32]
             sources[sid]={'id':sid,'title':occurrence.get('title') or 'TITLE_NOT_SUPPLIED',
-                          'source_bibliography':bibliography,'bibliographic_metadata_sha256':metadata_sha,
+                          'source_bibliography':bibliography,'source_version_metadata_sha256':metadata_sha,
+                          'source_content_key':content_key,'research_run_id':parent_run,'analysis_run_id':analysis_run,
+                          'durable_git_path':('evidence/runs/'+str(parent_run)+'/'+path) if parent_run else None,
+                          'version_rule':'SOURCE_VERSIONS_AND_REPEATED_CONTENT_ARE_NOT_INDEPENDENT_CORROBORATION',
                           'url':occurrence['url'],'text_path':path,'text_sha256':sha,
                           'source_classification':claim.get('source_classification','UNVERIFIED'),
                           'classification_status':'PROVISIONAL_SOURCE_CRITICISM_PENDING'}
