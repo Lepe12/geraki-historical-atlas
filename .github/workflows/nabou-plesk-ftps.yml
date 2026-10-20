@@ -1,5 +1,8 @@
 name: NABOU Plesk FTPS deployment
 on:
+  push:
+    branches: [main]
+    paths: ['ops_ftps_requests/nabou-existing-host.json']
   pull_request:
     paths:
       - '.github/workflows/nabou-plesk-ftps.yml'
@@ -29,10 +32,27 @@ concurrency:
 
 jobs:
   validate:
+    outputs:
+      authorized_push: ${{ steps.request.outputs.authorized }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      - name: Validate explicit existing-host deployment request
+        id: request
+        if: github.event_name == 'push'
+        run: |
+          python3 - <<'PYREQUEST'
+          import json,os
+          from pathlib import Path
+          request=json.loads(Path('ops_ftps_requests/nabou-existing-host.json').read_text())
+          assert request.get('schema')=='nabou-existing-ftps-deployment-request-v1'
+          assert request.get('mode')=='deploy'
+          assert request.get('application')=='server/command-center-live'
+          assert request.get('backend_only') is True
+          assert request.get('confirmation')=='DEPLOY-NABOU'
+          with open(os.environ['GITHUB_OUTPUT'],'a') as out:out.write('authorized=true\n')
+          PYREQUEST
       - name: Check backend syntax and tests (no credentials, no deployment)
         run: |
           set -euo pipefail
@@ -57,8 +77,11 @@ jobs:
       - name: Diagnose FTPS directories (read-only)
         run: python3 tools/gateway/diagnose_ftps.py
   deploy:
+    permissions:
+      contents: write
+      id-token: write
     needs: validate
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'deploy' && inputs.confirm == 'DEPLOY-NABOU' }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.mode == 'deploy' && inputs.confirm == 'DEPLOY-NABOU') || (github.event_name == 'push' && needs.validate.outputs.authorized_push == 'true') }}
     runs-on: ubuntu-latest
     environment: nabou-production
     timeout-minutes: 12
@@ -70,42 +93,37 @@ jobs:
       PCT_FTPS_APP_ROOT: /piratecartography-gateway/server/command-center-live
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Validate configuration and code
         shell: bash
         run: |
           set -euo pipefail
-          test -n "$PCT_FTPS_HOST" || { echo "Missing secret PCT_FTPS_HOST"; exit 1; }
-          test -n "$PCT_FTPS_USER" || { echo "Missing secret PCT_FTPS_USER"; exit 1; }
-          test -n "$PCT_FTPS_PASSWORD" || { echo "Missing secret PCT_FTPS_PASSWORD"; exit 1; }
-          test -n "$PCT_FTPS_APP_ROOT" || { echo "Missing variable PCT_FTPS_APP_ROOT"; exit 1; }
           node --check server/command-center-live/app.js
           node --check server/command-center-live/historical-evidence.js
           node --check server/command-center-live/pdf-evidence.js
           python3 -m py_compile server/command-center-live/pdf-evidence.py tools/gateway/deploy_ftps.py
           node server/command-center-live/self-test.js
-      - name: Deploy backend files through FTPS
-        run: python3 tools/gateway/deploy_ftps.py
-      - name: Verify production health and evidence route
-        shell: bash
+      - name: Deploy backend files through verified FTPS and record outcome
+        run: python3 tools/gateway/run_ftps_deployment.py
+      - name: Verify actual production HTTP and OIDC after deployment
+        run: python3 tools/probe_evidence_production.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: actual-ftps-deployment-and-http-outcome
+          path: |
+            evidence/production_ftps/${{ github.run_id }}/
+            evidence/production_smoke/${{ github.run_id }}/
+      - name: Persist actual deployment outcome without credential values
+        if: always()
         run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          import json,time,urllib.error,urllib.request
-          base="https://www.piratecartography.com/pct-api/live"
-          for attempt in range(12):
-              try:
-                  with urllib.request.urlopen(base+"/health",timeout=12) as response:
-                      data=json.load(response)
-                      if response.status==200 and data.get("status")=="PASS":break
-              except Exception:pass
-              time.sleep(5)
-          else:raise SystemExit("Production health did not pass")
-          req=urllib.request.Request(base+"/knowledge/evidence")
-          try:
-              with urllib.request.urlopen(req,timeout=12) as r: status=r.status
-          except urllib.error.HTTPError as e:status=e.code
-          print("Evidence response status:",status)
-          if status==404:raise SystemExit("FAIL: evidence route remains unknown (404)")
-          if status not in (200,400,401,403):raise SystemExit("Unexpected evidence endpoint response: "+str(status))
-          print("Production health and route verification passed")
-          PY
+          set -e
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for path in "evidence/production_ftps/$GITHUB_RUN_ID" "evidence/production_smoke/$GITHUB_RUN_ID"; do
+            if [ -d "$path" ]; then git add "$path"; fi
+          done
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record actual existing-host FTPS deployment and production probes'
+          python3 tools/publish_research_outputs.py

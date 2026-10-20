@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Read-only FTPS directory discovery; prints directory *names*, never contents or secrets."""
-import ftplib, os, posixpath
-ftp=ftplib.FTP_TLS(timeout=20)
+import ftplib, os, posixpath, ssl
+ftp=ftplib.FTP_TLS(timeout=20,context=ssl.create_default_context())
 try:
     ftp.connect(os.environ["PCT_FTPS_HOST"],int(os.getenv("PCT_FTPS_PORT","21")))
     ftp.login(os.environ["PCT_FTPS_USER"],os.environ["PCT_FTPS_PASSWORD"])

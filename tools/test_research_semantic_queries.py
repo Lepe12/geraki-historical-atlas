@@ -3,6 +3,14 @@ import unittest
 from research_semantic_queries import expand
 
 class QueryLanguageTests(unittest.TestCase):
+    def test_expansion_receives_supplied_aliases_without_claiming_identity(self):
+        def caller(role,prompt):
+            self.assertIn('Πέτρος Λάντζας',prompt)
+            self.assertIn('Pietro Lanza',prompt)
+            self.assertIn('NOT_IDENTITY_PROOF',prompt)
+            return {'status':'COMPLETED','content':'{"queries":[]}'}
+        expand({'target':'Pedro Lanza','aliases':['Πέτρος Λάντζας','Pietro Lanza']},caller)
+
     def test_wrong_script_does_not_displace_native_queries_and_raw_leads_are_retained(self):
         proposals=[{'lane':'venetian','query':'πειρατικές αγκυροβόλια Οθωνείας 1600-1700'},
                    {'lane':'venetian','query':'corsari porti Arcipelago'},

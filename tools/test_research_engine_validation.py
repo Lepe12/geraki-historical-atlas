@@ -23,6 +23,13 @@ class ResearchEngineValidationTests(unittest.TestCase):
             report=validation(root,Path(tmp)/'probes')
             self.assertEqual(report['request_kind'],'person')
             self.assertEqual(report['status'],'PROVISIONAL_RESEARCH_PIPELINE_PASSED')
+            stored=json.loads((answer/'answer.json').read_text())
+            stored['answer_sections'][0]['text']='According to the consulted source ...'
+            (answer/'answer.json').write_text(json.dumps(stored))
+            self.assertIn('INVALID_OR_PLACEHOLDER_CITED_SYNTHESIS',validation(root,Path(tmp)/'probes')['blockers'])
+            stored['answer_sections']=[{'text':'The source names the person.','claim_ids':['unknown-claim']}]
+            (answer/'answer.json').write_text(json.dumps(stored))
+            self.assertIn('ANSWER_CITATIONS_NOT_BOUND_TO_SUPPORTED_CLAIMS',validation(root,Path(tmp)/'probes')['blockers'])
             request=lane/'run_manifest/manifest.json';request.write_text(json.dumps({'normalized_request':{'target':'Μήλος'}}))
             self.assertIn('NO_SUPPORTED_PLACE_FINDINGS',validation(root,Path(tmp)/'probes')['blockers'])
 

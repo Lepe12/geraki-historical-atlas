@@ -96,7 +96,14 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
     if request_kind!='person' and not geographic.get('findings'):blockers.append('NO_SUPPORTED_PLACE_FINDINGS')
     supported=set((answer.get('review') or {}).get('supported_claim_ids',[]))
     cited={cid for section in answer.get('answer_sections',[]) for cid in section.get('claim_ids',[])}
-    from semantic_research_answer import person_passage_hold_reason
+    from semantic_research_answer import person_passage_hold_reason, valid_synthesis
+    # Revalidate stored output with today's content gate. A historical success
+    # label and completed model calls do not make placeholder prose an answer.
+    if not valid_synthesis(answer, supported):
+        blockers.append('INVALID_OR_PLACEHOLDER_CITED_SYNTHESIS')
+    claim_ids={claim.get('claim_id') for claim in answer.get('claims',[])}
+    if not cited or not cited<=supported or not cited<=claim_ids:
+        blockers.append('ANSWER_CITATIONS_NOT_BOUND_TO_SUPPORTED_CLAIMS')
     evidence_by_id={row.get('evidence_id'):row for row in answer.get('evidence',[])}
     quality_rejections=[]
     for claim in answer.get('claims',[]):

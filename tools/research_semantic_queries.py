@@ -11,6 +11,7 @@ def expand(request,caller=None):
     from research_focus import decompose
     focus=decompose(request.get('target',''),request.get('aliases',[]))
     prompt='''Return JSON only: {"queries":[{"lane":"registered lane","query":"short catalogue query"}]}. Propose at most 12 multilingual source-discovery queries for the supplied historical question. Queries are hypotheses, never facts or results. Use common subject and geographic terms, plus travel-book/catalogue vocabulary. Do not quote the entire question, invent personal identities, or name undocumented archive records. Use these lanes: greek, travellers, venetian, french, british, spanish_simancas, ottoman, italian_states, dutch, german, north_african. One query per lane. Keep each query under 100 characters. QUESTION_JSON: '''+json.dumps({k:request.get(k) for k in ('target','purpose','date_range')},ensure_ascii=False)
+    prompt+='\nSUPPLIED_NAME_OR_PLACE_VARIANTS_NOT_IDENTITY_PROOF: '+json.dumps(request.get('aliases',[]),ensure_ascii=False)
     prompt+='\nUse the catalogue language of each lane: greek=Greek; travellers/british=English; venetian/italian_states=Italian; french/north_african=French; spanish_simancas=Spanish; ottoman=Turkish; dutch=Dutch; german=German. Do not merely copy Greek prose into foreign-language lanes. Preserve genuine supplied personal names as retrieval variants, without asserting identity.'
     if focus.get('kind')=='topic':
         from research_topics import topic_queries,VOCAB

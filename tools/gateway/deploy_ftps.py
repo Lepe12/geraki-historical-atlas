@@ -10,6 +10,7 @@ import io
 import os
 from pathlib import Path
 import posixpath
+import ssl
 import sys
 import uuid
 
@@ -31,7 +32,7 @@ if REMOTE != "/" and not REMOTE.endswith("/server/command-center-live"):
 
 payload = {name: (ROOT / SOURCE / name).read_bytes() for name in FILES}
 runid = uuid.uuid4().hex[:12]
-ftp = ftplib.FTP_TLS(timeout=30)
+ftp = ftplib.FTP_TLS(timeout=30, context=ssl.create_default_context())
 backups = {}
 written = []
 staged = []
@@ -87,7 +88,9 @@ try:
     print("DEPLOYED: four verified backend files and issued Passenger restart marker.")
     print("Existing files were retained as remote .nabou-before-* recovery copies.")
 except Exception as exc:
-    print("DEPLOY FAILED:", type(exc).__name__, str(exc))
+    # Server-supplied messages can repeat login details. Record the error type,
+    # never raw exception text or credential-bearing URLs.
+    print("DEPLOY FAILED:", type(exc).__name__)
     for name in reversed(written):
         try:
             ftp.delete(name)
