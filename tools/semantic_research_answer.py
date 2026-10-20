@@ -589,6 +589,7 @@ def main():
         request=read(manifest).get('normalized_request') or {}
         if request.get('target'):
             question=request['target']+(' ('+request['date_range']+')' if request.get('date_range') else '')
+            if request.get('purpose'):question+='\nResearch scope: '+request['purpose']
             break
     for path in sorted(root.glob('*/research_dossier/answer.json')):
         if question:break
