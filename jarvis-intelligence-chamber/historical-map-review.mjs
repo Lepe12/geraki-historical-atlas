@@ -116,6 +116,7 @@ $("originalImage").addEventListener("change",async e=>{
   const file=e.target.files?.[0];if(!file)return;
   try{
     image=null;imageHash=null;review=null;chosen=null;
+    $("defaultPortolanPreview").hidden=false;canvas.hidden=true;
     $("exportReview").disabled=true;$("exportGcpCsv").disabled=true;
     render();
     if(file.size>35*1024*1024||!["image/jpeg","image/png"].includes(file.type))throw Error("Χρειάζεται JPG/PNG μέχρι 35 MB");
@@ -128,6 +129,7 @@ $("originalImage").addEventListener("change",async e=>{
       img.src=imageObjectUrl;
     });
     image=img;imageHash=hash;zoom=1;offsetX=0;offsetY=0;
+    $("defaultPortolanPreview").hidden=true;canvas.hidden=false;resize();
     $("imageInfo").textContent=img.naturalWidth+"×"+img.naturalHeight+" · SHA-256 "+hash.slice(0,12)+"…";
     await tryMatch();
   }catch(err){status("Αποτυχία εικόνας: "+String(err.message||err),true);}
