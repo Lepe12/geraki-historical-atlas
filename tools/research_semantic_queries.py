@@ -8,8 +8,13 @@ from pathlib import Path
 def expand(request,caller=None):
     sys.path.insert(0,str(Path(__file__).parent/'llm'))
     from llm_client import call
+    from research_focus import decompose
+    focus=decompose(request.get('target',''),request.get('aliases',[]))
     prompt='''Return JSON only: {"queries":[{"lane":"registered lane","query":"short catalogue query"}]}. Propose at most 12 multilingual source-discovery queries for the supplied historical question. Queries are hypotheses, never facts or results. Use common subject and geographic terms, plus travel-book/catalogue vocabulary. Do not quote the entire question, invent personal identities, or name undocumented archive records. Use these lanes: greek, travellers, venetian, french, british, spanish_simancas, ottoman, italian_states, dutch, german, north_african. One query per lane. Keep each query under 100 characters. QUESTION_JSON: '''+json.dumps({k:request.get(k) for k in ('target','purpose','date_range')},ensure_ascii=False)
     prompt+='\nUse the catalogue language of each lane: greek=Greek; travellers/british=English; venetian/italian_states=Italian; french/north_african=French; spanish_simancas=Spanish; ottoman=Turkish; dutch=Dutch; german=German. Do not merely copy Greek prose into foreign-language lanes. Preserve genuine supplied personal names as retrieval variants, without asserting identity.'
+    if focus.get('kind')=='topic':
+        from research_topics import topic_queries,VOCAB
+        prompt+='\nCONTROLLED_RETRIEVAL_STARTING_POINTS_NOT_HISTORICAL_FACTS: '+json.dumps({lane:topic_queries(focus,lane) for lane in VOCAB},ensure_ascii=False)
     result=(caller or call)('query_expander',prompt)
     receipt={k:result.get(k) for k in ('status','provider','model','model_identity','usage','error','elapsed_seconds','finish_reason')}
     receipt['prompt_sha256']=hashlib.sha256(prompt.encode()).hexdigest()
@@ -17,8 +22,7 @@ def expand(request,caller=None):
     try:data=json.loads(result.get('content',''))
     except (ValueError,TypeError):data={}
     rows=[];rejected=[];seen=set()
-    from research_focus import decompose
-    thematic=decompose(request.get('target',''),request.get('aliases',[])).get('kind')=='topic'
+    thematic=focus.get('kind')=='topic'
     lanes={'greek','travellers','venetian','french','british','spanish_simancas','ottoman','italian_states','dutch','german','north_african'}
     for row in data.get('queries',[]) if isinstance(data,dict) and isinstance(data.get('queries'),list) else []:
         if not (isinstance(row,dict) and row.get('lane') in lanes and isinstance(row.get('query'),str) and 2<len(row['query'])<=100 and '\n' not in row['query'] and row['query']!=request['target']):
@@ -35,6 +39,8 @@ def expand(request,caller=None):
     receipt['proposed_queries']=data.get('queries',[]) if isinstance(data,dict) else []
     receipt['rejected_queries']=rejected
     receipt['accepted_queries']=rows[:12]
+    receipt['lane_coverage']={'accepted_lanes':sorted(seen),'missing_lanes':sorted(lanes-seen),
+                              'complete':seen==lanes,'language_check':'CONSERVATIVE_SCRIPT_CHECK_NOT_FULL_LANGUAGE_IDENTIFICATION'}
     receipt['output_status']='MODEL_QUERIES_AVAILABLE' if rows else 'MODEL_QUERY_EXPANSION_FAILED'
     return receipt
 
@@ -44,8 +50,9 @@ if __name__=='__main__':
     args=parser.parse_args();raw=Path(args.request).read_bytes();request=json.loads(raw)
     result=expand(request)
     result.update(scope='LIVE_QUERY_EXPANSION_DIAGNOSTIC_NOT_SOURCE_RESEARCH_ACCEPTANCE',
-                  request_sha256=hashlib.sha256(raw).hexdigest(),request_path=args.request)
+                  request_sha256=hashlib.sha256(raw).hexdigest(),request_path=args.request,
+                  validation_status='PASS' if result['lane_coverage']['complete'] else 'INCOMPLETE_LANE_COVERAGE')
     destination=Path(args.output);destination.parent.mkdir(parents=True,exist_ok=True)
     destination.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
     print(json.dumps({'status':result['output_status'],'accepted':len(result['accepted_queries']),'rejected':len(result['rejected_queries'])}))
-    if result['output_status']!='MODEL_QUERIES_AVAILABLE':raise SystemExit(1)
+    if result['output_status']!='MODEL_QUERIES_AVAILABLE' or result['validation_status']!='PASS':raise SystemExit(1)

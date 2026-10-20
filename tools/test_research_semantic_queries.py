@@ -13,6 +13,8 @@ class QueryLanguageTests(unittest.TestCase):
         self.assertEqual([r['query'] for r in result['accepted_queries']],[r['query'] for r in proposals[1:]])
         self.assertEqual(result['proposed_queries'],proposals)
         self.assertEqual(result['rejected_queries'][0]['reason'],'GREEK_THEMATIC_PROSE_IN_FOREIGN_LANGUAGE_LANE')
+        self.assertFalse(result['lane_coverage']['complete'])
+        self.assertIn('german',result['lane_coverage']['missing_lanes'])
 
     def test_personal_name_search_is_preserved_and_duplicate_lane_is_bounded(self):
         rows=[{'lane':'venetian','query':'Πέτρος Λάντζας'},{'lane':'venetian','query':'Pietro Lanza'}]
