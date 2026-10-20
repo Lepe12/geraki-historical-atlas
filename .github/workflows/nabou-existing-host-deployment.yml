@@ -1,0 +1,55 @@
+name: Install reviewed evidence package on existing Plesk host
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['ops_deployment_requests/*.json']
+permissions:
+  contents: write
+  id-token: write
+concurrency:
+  group: nabou-existing-production-host
+  cancel-in-progress: false
+jobs:
+  deploy-existing-host:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            evidence/production_deploy
+            evidence/production_smoke
+      - name: Validate explicit bindings and use reviewed backup and deployment package
+        env:
+          PCT_PLESK_SSH_HOST: ${{ secrets.PCT_PLESK_SSH_HOST || vars.PCT_PLESK_SSH_HOST }}
+          PCT_PLESK_SSH_USER: ${{ secrets.PCT_PLESK_SSH_USER || vars.PCT_PLESK_SSH_USER }}
+          PCT_PLESK_SSH_PRIVATE_KEY: ${{ secrets.PCT_PLESK_SSH_PRIVATE_KEY }}
+          PCT_PLESK_SSH_KNOWN_HOSTS: ${{ secrets.PCT_PLESK_SSH_KNOWN_HOSTS || vars.PCT_PLESK_SSH_KNOWN_HOSTS }}
+          PCT_PLESK_SSH_PORT: ${{ vars.PCT_PLESK_SSH_PORT }}
+          PCT_APP_ROOT: ${{ vars.PCT_APP_ROOT || secrets.PCT_APP_ROOT }}
+        run: python3 tools/gateway/deploy_existing_evidence_host.py
+      - name: Verify actual production HTTP and OIDC after installation
+        run: python3 tools/probe_evidence_production.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: existing-host-deployment-outcome
+          path: |
+            evidence/production_deploy/${{ github.run_id }}/
+            evidence/production_smoke/${{ github.run_id }}/
+      - name: Persist non-secret actual deployment outcome
+        if: always()
+        run: |
+          set -e
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for path in "evidence/production_deploy/$GITHUB_RUN_ID" "evidence/production_smoke/$GITHUB_RUN_ID"; do
+            if [ -d "$path" ]; then git add "$path"; fi
+          done
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record actual existing-host deployment outcome without credential values'
+          python3 tools/publish_research_outputs.py
