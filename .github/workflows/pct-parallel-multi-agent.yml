@@ -73,6 +73,7 @@ jobs:
       request_file: ${{ steps.identity.outputs.request_file }}
       request_sha256: ${{ steps.identity.outputs.request_sha256 }}
       research_job_id: ${{ steps.identity.outputs.research_job_id }}
+      require_semantic_analysis: ${{ steps.identity.outputs.require_semantic_analysis }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -470,7 +471,7 @@ jobs:
             --run-id "$PCT_RUN_ID" \
             --output "evidence/runs/$PCT_RUN_ID/JARVIS_STATE_BOARD.json"
           python3 tools/semantic_research_answer.py --run-id "$PCT_RUN_ID"
-          python3 tools/research_validation_report.py --run-id "$PCT_RUN_ID"
+          python3 tools/research_validation_report.py --run-id "$PCT_RUN_ID" ${{ needs.prepare.outputs.require_semantic_analysis == 'true' && '--require-complete' || '' }}
           python3 tools/orchestrator/build_command_center_snapshot.py \
             --run-id "$PCT_RUN_ID" \
             --output "command-center/live/runs/$PCT_RUN_ID.json" \

@@ -97,8 +97,9 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
                   'AUTHENTICATED_ARCHIVES_NOT_SEARCHED_WITHOUT_AUTHORIZED_SESSION']}
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--run-id',required=True);a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--run-id',required=True);p.add_argument('--require-complete',action='store_true');a=p.parse_args()
     root=Path('evidence/runs')/a.run_id
     result=build(root)
     (root/'research_answer/validation_report.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
     print('RESEARCH_E2E_VALIDATION',result['status'],json.dumps(result['counts']))
+    if a.require_complete and result['status']=='INCOMPLETE':raise SystemExit(1)

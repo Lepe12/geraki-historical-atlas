@@ -31,6 +31,7 @@ def validate_case(case):
 def prepare(require_semantic=False,case_id='',case_file='config/research-baseline-v2.json'):
     policy=from_environment();record('execution_receipts','prepare','policy','SUCCEEDED',policy=policy)
     _,req,ctx=load_request()
+    require_semantic=require_semantic or req.get('require_semantic_analysis') is True
     target,dates,purpose=split_research_query(ctx['target'],ctx['date_range'],ctx['purpose'])
     normalized={**req,'target':target,'aliases':ctx['aliases'],'date_range':dates,'purpose':purpose}
     validate_question(normalized)
@@ -58,6 +59,7 @@ def prepare(require_semantic=False,case_id='',case_file='config/research-baselin
     record('execution_receipts','prepare','semantic_configuration','SUCCEEDED' if config['configured'] else 'BLOCKED',missing=config['missing'])
     if require_semantic and not config['configured']:raise ValueError('BLOCKED_CONFIGURATION_SEMANTIC_MODELS_REQUIRED')
     outputs={**policy,'request_file':'resolved_research_request.json','request_sha256':identity['request_sha256'],
+             'require_semantic_analysis':require_semantic,
              'research_job_id':identity['research_job_id'],'target':target,'aliases':'|'.join(ctx['aliases']),
              'date_range':dates,'purpose':purpose,'target_type':(normalized.get('target_context') or {}).get('type','auto')}
     destination=os.getenv('GITHUB_OUTPUT')
