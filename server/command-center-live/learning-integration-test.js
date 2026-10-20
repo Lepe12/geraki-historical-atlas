@@ -53,7 +53,7 @@ async function main(){
       items:[{id:"e1",type:"toponym",text:"Milo",page:1,status:"accepted"},
              {id:"e2",type:"claim",text:"Unquoted invented statement",page:1,status:"accepted"}]};
     const reviewed=await request(port,"POST","/knowledge/review",JSON.stringify(review),{...auth,"content-type":"application/json"});
-    assert.equal(reviewed.status,200);
+    assert.equal(reviewed.status,200,"PDF learning replay error: "+JSON.stringify(reviewed.json));
     assert.equal(reviewed.json.attested_quotes,1);
     assert.equal(reviewed.json.unresolved_quotes,1);
     assert.equal(reviewed.json.historically_verified,false);
