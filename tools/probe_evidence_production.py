@@ -37,6 +37,8 @@ def main():
             result,data=request(origin+'/pct-api/live'+endpoint)
             report['public_route_observations'].append({'origin':origin,'endpoint':endpoint,
                 **result,'response_schema':data.get('schema') if isinstance(data,dict) else None,
+                'reported_health_status':data.get('status') if endpoint=='/health' and isinstance(data,dict) else None,
+                'reported_backend_revision':str(data.get('revision',''))[:120] if endpoint=='/health' and isinstance(data,dict) else None,
                 'credentials_sent':False,'method':'GET'})
     for method,endpoint in [('GET','/knowledge/evidence?source_id=src-fake'),
                             ('POST','/knowledge/upload'),('POST','/knowledge/review')]:

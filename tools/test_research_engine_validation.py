@@ -1,4 +1,5 @@
 import json
+import hashlib
 import os
 from pathlib import Path
 import tempfile
@@ -16,13 +17,22 @@ class ResearchEngineValidationTests(unittest.TestCase):
             (lane/'run_manifest/manifest.json').write_text(json.dumps({'normalized_request':{'target':'Πέτρος Λάντζας','aliases':['Pedro Lantzas']}}))
             (lane/'library_acquisition/acquisition_report.json').write_text(json.dumps({'results':[{'status':'TEXT_ACQUIRED','url':'https://example.org/source','files':['library_acquisition/source.pdf','library_acquisition/source.txt']}]}))
             (lane/'repository_plans/greek.json').write_text(json.dumps({'semantic_query_expansion':{'output_status':'MODEL_QUERIES_AVAILABLE'}}))
+            raw='Η πηγή κατονομάζει τον Πέτρο.\r\n'.encode()
+            source=lane/'library_acquisition/source.txt';source.write_bytes(raw)
+            occurrence={'url':'https://example.org/source','acquired_text_path':'greek/library_acquisition/source.txt',
+                        'source_text_sha256':hashlib.sha256(raw).hexdigest(),
+                        'locator':{'start_char':0,'end_char':len(raw.decode()),'offset_unit':'UNICODE_CODE_POINTS'}}
             (answer/'answer.json').write_text(json.dumps({'status':'MODEL_ANSWER_PENDING_HUMAN_REVIEW','evidence':[{'id':'e'}],
                 'calls':[{'role':r,'status':'COMPLETED'} for r in ('synthesis','evidence_extractor','adversarial_reviewer')],
-                'review':{'supported_claim_ids':['c']},'claims':[{'claim_id':'c','verified':False}],
+                'review':{'supported_claim_ids':['c']},'claims':[{'claim_id':'c','verified':False,'quote':raw.decode(),'source_occurrences':[occurrence]}],
                 'answer_sections':[{'text':'The source names the person.','claim_ids':['c']}]}))
             report=validation(root,Path(tmp)/'probes')
             self.assertEqual(report['request_kind'],'person')
             self.assertEqual(report['status'],'PROVISIONAL_RESEARCH_PIPELINE_PASSED')
+            self.assertEqual(report['durable_citation_replays'][0]['status'],'PASS')
+            source.write_bytes(raw.replace(b'\r\n',b'\n'))
+            self.assertIn('DURABLE_CITATION_BYTE_REPLAY_FAILED',validation(root,Path(tmp)/'probes')['blockers'])
+            source.write_bytes(raw)
             stored=json.loads((answer/'answer.json').read_text())
             stored['answer_sections'][0]['text']='According to the consulted source ...'
             (answer/'answer.json').write_text(json.dumps(stored))

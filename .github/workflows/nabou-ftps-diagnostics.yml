@@ -1,0 +1,45 @@
+name: Read-only existing NABOU FTPS certificate diagnosis
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/nabou-ftps-diagnostics.yml']
+permissions:
+  contents: write
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 8
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            evidence/production_ftps_diagnostics
+      - name: Diagnose real TLS certificate and existing directories without writes
+        run: python3 tools/gateway/diagnose_ftps.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: readonly-ftps-certificate-diagnosis
+          path: evidence/production_ftps_diagnostics/${{ github.run_id }}/
+      - name: Persist diagnosis without credential values
+        if: always()
+        run: |
+          set -e
+          path="evidence/production_ftps_diagnostics/$GITHUB_RUN_ID"
+          test -d "$path" || exit 0
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$path"
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record real FTPS TLS diagnosis without production mutation'
+          python3 tools/publish_research_outputs.py

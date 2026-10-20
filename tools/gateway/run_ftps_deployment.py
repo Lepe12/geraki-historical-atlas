@@ -3,6 +3,7 @@ import datetime
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -44,6 +45,11 @@ def execute(env=None, runner=subprocess.run):
                            'ConnectionRefusedError','error_perm','error_temp','RuntimeError'):
             if 'DEPLOY FAILED: '+error_type in output:
                 report['error_type']=error_type;break
+        if report.get('error_type')=='SSLCertVerificationError':
+            # FTP_TLS performs certificate validation before USER/PASS or writes.
+            report['production_changed']=False
+            match=re.search(r'TLS_VERIFY_CODE: (\d+)',output)
+            if match:report['tls_verify_code']=int(match.group(1))
     report['limits']=['BACKEND_FILES_ONLY_NOT_MARIADB_MIGRATION','HTTP_AND_OIDC_VALIDATION_REQUIRED',
                       'NO_HISTORICAL_VERIFICATION_PROMOTION']
     return report

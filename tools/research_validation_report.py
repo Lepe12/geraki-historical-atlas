@@ -1,6 +1,7 @@
 """Read actual durable research outputs and fail closed on incomplete e2e work."""
 import argparse
 import datetime
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -9,6 +10,37 @@ from research_focus import decompose
 
 def read(path):
     return json.loads(path.read_text()) if path.is_file() else {}
+
+def replay_citations(root, answer, cited):
+    """Check stored citations against durable original bytes, not model labels."""
+    cache={};results=[];base=root.resolve()
+    for claim in answer.get('claims',[]):
+        if claim.get('claim_id') not in cited:continue
+        occurrences=claim.get('source_occurrences') or []
+        if not occurrences:
+            results.append({'claim_id':claim.get('claim_id'),'status':'FAILED','reason':'SOURCE_OCCURRENCES_MISSING'})
+        for occurrence in occurrences:
+            row={'claim_id':claim.get('claim_id'),'url':occurrence.get('url'),'status':'FAILED'}
+            try:
+                relative=occurrence.get('acquired_text_path')
+                if not isinstance(relative,str) or not relative:raise ValueError('DURABLE_TEXT_PATH_MISSING')
+                file=(base/relative).resolve()
+                if not file.is_relative_to(base):raise ValueError('UNSAFE_DURABLE_TEXT_PATH')
+                if file not in cache:
+                    raw=file.read_bytes();cache[file]=(raw.decode('utf-8',errors='replace'),hashlib.sha256(raw).hexdigest())
+                text,sha=cache[file]
+                if sha!=occurrence.get('source_text_sha256'):raise ValueError('SOURCE_TEXT_CHECKSUM_MISMATCH')
+                loc=occurrence.get('locator') or {};a=loc.get('start_char');b=loc.get('end_char')
+                if type(a) is not int or type(b) is not int or a<0 or b<=a:raise ValueError('EXACT_QUOTE_LOCATOR_MISSING')
+                quote=claim.get('quote')
+                if not isinstance(quote,str) or not quote or text[a:b]!=quote:raise ValueError('SOURCE_QUOTE_REPLAY_MISMATCH')
+                if urlsplit(str(occurrence.get('url') or '')).scheme not in ('http','https'):raise ValueError('SOURCE_URL_MISSING')
+                row.update(status='PASS',text_path=relative,text_sha256=sha,
+                           start_char=a,end_char=b,offset_unit='UNICODE_CODE_POINTS',original_inspected=False)
+            except ValueError as error:row['reason']=str(error)
+            except (OSError,TypeError):row['reason']='DURABLE_SOURCE_TEXT_UNAVAILABLE'
+            results.append(row)
+    return results
 
 def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=None):
     analysis_root=analysis_root or root
@@ -104,6 +136,9 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
     claim_ids={claim.get('claim_id') for claim in answer.get('claims',[])}
     if not cited or not cited<=supported or not cited<=claim_ids:
         blockers.append('ANSWER_CITATIONS_NOT_BOUND_TO_SUPPORTED_CLAIMS')
+    citation_replays=replay_citations(root,answer,cited)
+    if cited and (not citation_replays or any(row['status']!='PASS' for row in citation_replays)):
+        blockers.append('DURABLE_CITATION_BYTE_REPLAY_FAILED')
     evidence_by_id={row.get('evidence_id'):row for row in answer.get('evidence',[])}
     quality_rejections=[]
     for claim in answer.get('claims',[]):
@@ -144,6 +179,7 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
         'native_connector_tests':latest.get('native_connector_tests',[]),
         'connector_endpoint_tests':latest.get('connectors',[]),
         'blockers':blockers,'quality_gate_rejections':quality_rejections,'verification_violations':violations,
+        'durable_citation_replays':citation_replays,
         'excluded_access_challenges':challenge_pages,
         'limits':['BOUNDED_SEARCH_NOT_ALL_RELEVANT_SOURCES','MODEL_ANALYSIS_NOT_HISTORICAL_VERIFICATION',
                   'ORIGINAL_INSPECTION_AND_GENEALOGY_MAY_REMAIN_PENDING',

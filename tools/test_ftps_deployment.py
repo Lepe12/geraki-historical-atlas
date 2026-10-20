@@ -36,7 +36,8 @@ class FtpsDeploymentTests(unittest.TestCase):
         self.assertFalse(report['historical_research_acceptance'])
 
     def test_untrusted_certificate_blocks_before_login_without_exposing_error(self):
-        ftp=Mock();ftp.connect.side_effect=ssl.SSLCertVerificationError('PRIVATE_FIXTURE')
+        error=ssl.SSLCertVerificationError('PRIVATE_FIXTURE');error.verify_code=62
+        ftp=Mock();ftp.connect.side_effect=error
         output=io.StringIO()
         with patch.dict(os.environ,{name:'PRIVATE_FIXTURE' for name in module.REQUIRED}), \
              patch('ftplib.FTP_TLS',return_value=ftp) as factory, contextlib.redirect_stdout(output):

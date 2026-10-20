@@ -91,6 +91,8 @@ except Exception as exc:
     # Server-supplied messages can repeat login details. Record the error type,
     # never raw exception text or credential-bearing URLs.
     print("DEPLOY FAILED:", type(exc).__name__)
+    if isinstance(exc, ssl.SSLCertVerificationError):
+        print("TLS_VERIFY_CODE:", exc.verify_code)
     for name in reversed(written):
         try:
             ftp.delete(name)
