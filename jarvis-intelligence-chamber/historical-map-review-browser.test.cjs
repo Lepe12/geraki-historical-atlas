@@ -47,6 +47,7 @@ const ocr={
    assert.equal(await page.locator("#reviewCanvas").isVisible(),false);
 
    await page.locator("#originalImage").setInputFiles({name:"synthetic.png",mimeType:"image/png",buffer:png});
+   await page.waitForFunction(()=>document.querySelector("#reviewCanvas")?.hidden===false);
    assert.equal(await defaultPreview.isVisible(),false);
    assert.equal(await page.locator("#reviewCanvas").isVisible(),true);
    await page.locator("#ocrInput").setInputFiles({name:"synthetic.json",mimeType:"application/json",buffer:Buffer.from(JSON.stringify(ocr))});
