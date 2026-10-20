@@ -26,11 +26,13 @@ def diagnose_owner_aliases(host,port,factory):
         peer=None
         try:
             actual={entry[4][0] for entry in socket.getaddrinfo(alias,port,type=socket.SOCK_STREAM)}
-            if not actual or not actual<=expected:
+            if not actual.intersection(expected):
                 row['status']='ALIAS_NOT_PROVEN_SAME_SERVER'
             else:
                 peer=factory(timeout=12,context=ssl.create_default_context())
-                peer.connect(alias,port);peer.auth()
+                # Pin the actual connection to the configured server. DNS may
+                # also return other pool/IPv6 addresses; never follow those.
+                peer.connect(host,port);peer.host=alias;peer.auth()
                 row['status']='TLS_VERIFIED_SAME_SERVER_OWNER_ALIAS'
         except ssl.SSLCertVerificationError as error:
             row.update(status='TLS_CERTIFICATE_REJECTED',tls_verify_code=error.verify_code,
@@ -52,13 +54,14 @@ def diagnose_canonical_hostname(host,port,factory):
     result={'authenticated':False,'production_changed':False};peer=None
     try:
         hostname=socket.gethostbyaddr(host)[0].rstrip('.')
+        result['public_dns_hostname']=hostname
         expected={row[4][0] for row in socket.getaddrinfo(host,port,type=socket.SOCK_STREAM)}
         actual={row[4][0] for row in socket.getaddrinfo(hostname,port,type=socket.SOCK_STREAM)}
-        if not actual or not actual<=expected:
+        if not actual.intersection(expected):
             result['status']='REVERSE_DNS_NOT_FORWARD_CONFIRMED';return result
         result.update(public_dns_hostname=hostname,forward_confirmed_same_server=True)
         peer=factory(timeout=12,context=ssl.create_default_context())
-        peer.connect(hostname,port);peer.auth()
+        peer.connect(host,port);peer.host=hostname;peer.auth()
         result['status']='CANONICAL_HOSTNAME_TLS_VERIFIED_NOT_AUTHENTICATED'
     except ssl.SSLCertVerificationError as error:
         result.update(status='TLS_CERTIFICATE_REJECTED',tls_verify_code=error.verify_code,
