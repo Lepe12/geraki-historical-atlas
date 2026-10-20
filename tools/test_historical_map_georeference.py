@@ -56,7 +56,7 @@ class HistoricalMapGeoreferencingTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"disjoint"):
             fit_candidate(self.review,self.path,control_ids=self.controls,
                           check_ids=[self.controls[0],self.checks[1]])
-        with self.assertRaisesRegex(ValueError,"at least 4"):
+        with self.assertRaisesRegex(ValueError,"At least 4"):
             fit_candidate(self.review,self.path,control_ids=self.controls[:3],check_ids=self.checks)
 
     def test_refuse_invalid_gcp_provenance(self):
