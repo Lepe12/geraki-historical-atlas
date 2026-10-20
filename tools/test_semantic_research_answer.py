@@ -31,6 +31,28 @@ def item(eid,**changes):
             'kind':'source_statement','actors':[],'places':[],'dates':['1677'],'uncertainty':[],**changes}
 
 class SemanticAnswer(unittest.TestCase):
+    def test_flagged_synthesis_is_revised_once_and_reviewed_again(self):
+        for second_pass in (True,False):
+            with tempfile.TemporaryDirectory() as tmp:
+                fixture(tmp);eid=collect(tmp)[0][0]['evidence_id'];state={'drafts':0,'final_reviews':0}
+                def caller(role,prompt):
+                    if role=='evidence_extractor':return response({'items':[item(eid)]})
+                    if role=='adversarial_reviewer':
+                        if 'FINAL_ANSWER_JSON:' not in prompt:
+                            claims=json.loads(prompt.split('CLAIMS_JSON:\n')[1]);state['cid']=claims[0]['claim_id']
+                            return response({'supported_claim_ids':[state['cid']],'flagged_claims':[]})
+                        state['final_reviews']+=1
+                        passed=second_pass and state['final_reviews']==2
+                        return response({'supported_section_indexes':[0] if passed else [],
+                                         'flagged_sections':[] if passed else [{'index':0,'reason':'unsupported date'}]})
+                    state['drafts']+=1
+                    return response({'answer_sections':[{'text':'According to the source, ships attacked in 1677. Verification is pending.','claim_ids':[state['cid']]}]})
+                out=execute(tmp,'question',caller=caller,config={'configured':True,'missing':[]})
+                self.assertEqual(state['drafts'],2);self.assertEqual(state['final_reviews'],2)
+                self.assertEqual(out['status'],'MODEL_ANSWER_PENDING_HUMAN_REVIEW' if second_pass else 'FINAL_ANSWER_REVIEW_FAILED')
+                if not second_pass:self.assertEqual(out['answer_sections'],[])
+                self.assertFalse(out['verified'])
+
     def test_malformed_extraction_gets_one_repair_and_all_gates_still_apply(self):
         with tempfile.TemporaryDirectory() as tmp:
             fixture(tmp);eid=collect(tmp)[0][0]['evidence_id'];calls=[]

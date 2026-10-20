@@ -8,7 +8,7 @@ import json,os,urllib.request,urllib.error
 from urllib.parse import urlsplit
 from llm_router import route
 
-def call(role:str,prompt:str)->dict:
+def call(role:str,prompt:str,response_schema=None)->dict:
     r=route(role)
     if r.provider=="disabled" or not r.model:
         return {
@@ -19,7 +19,7 @@ def call(role:str,prompt:str)->dict:
     if r.provider=='local_llama_cpp':
         try:
             from local_model import call as local_call
-            return local_call(role,prompt,r)
+            return local_call(role,prompt,r,response_schema=response_schema)
         except Exception as exc:
             return {'status':'FALLBACK_REQUIRED','role':role,'provider':r.provider,'model':r.model,
                     'error':type(exc).__name__,'verified_promotion_allowed':False}
@@ -45,12 +45,14 @@ def call(role:str,prompt:str)->dict:
     if parsed.scheme!='https' or not parsed.hostname or parsed.username or parsed.password or parsed.query or parsed.fragment:
         return {"status":"FALLBACK_REQUIRED","role":role,"fallback":r.fallback,
                 "provider":r.provider,"model":r.model,"error":"INVALID_LLM_BASE_URL","verified_promotion_allowed":False}
-    body=json.dumps({
+    payload={
       "model":r.model,
       "messages":[{"role":"user","content":prompt}],
       "temperature":r.temperature,
       "max_tokens":r.max_output_tokens
-    }).encode("utf-8")
+    }
+    if response_schema is not None:payload['response_format']={'type':'json_schema','json_schema':{'name':'research_response','strict':True,'schema':response_schema}}
+    body=json.dumps(payload).encode('utf-8')
     req=urllib.request.Request(
       base+"/chat/completions",data=body,method="POST",
       headers={"Authorization":"Bearer "+key,"Content-Type":"application/json"}

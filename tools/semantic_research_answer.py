@@ -19,6 +19,7 @@ from urllib.parse import urlsplit
 sys.path.insert(0,str(Path(__file__).resolve().parent/'llm'))
 from llm_client import call
 from llm_router import route, routing_summary
+import research_response_schema as schemas
 
 VERSION='pct-semantic-answer-v2'
 ROLES=('evidence_extractor','adversarial_reviewer','synthesis')
@@ -45,7 +46,7 @@ def configuration():
         elif r.provider not in ('openai_compatible','local_llama_cpp'):missing.append('SUPPORTED_PROVIDER')
     return {'configured':not missing,'missing':sorted(set(missing))}
 
-def collect(run_root):
+def collect(run_root, provenance_root=None):
     groups={};seen=[];excluded=[]
     for p in sorted(Path(run_root).glob('*/structured_output/extracted_findings.json')):
         acquisition=read(p.parent.parent/'library_acquisition/acquisition_report.json',{}).get('results',[])
@@ -85,7 +86,7 @@ def collect(run_root):
                     excluded.append({'finding_id':f.get('finding_id'),'reason':'DATE_HEADING_LOCATOR_MISMATCH'});continue
             key=digest([surface(raw),f.get('years_in_scope',[]),f.get('date_basis')])
             provenance={'lane':p.parent.parent.name,'url':f['url'],'title':f.get('title'),
-                        'acquired_text_path':str(file.relative_to(run_root)),
+                        'acquired_text_path':str(file.relative_to(provenance_root or run_root)),
                         'finding_id':f.get('finding_id'),'locator':loc,'source_text_sha256':f['source_text_sha256'],
                         'reported_archival_reference':f.get('reported_archival_reference')}
             if key in groups:
@@ -116,12 +117,18 @@ def collect(run_root):
     seen.sort(key=priority)
     # Sample across acquired documents before spending more calls on one book.
     # Document hashes are sampling keys, never claims of source independence.
-    leaders=[];followers=[];documents=set()
-    for row in seen:
-        document=row['occurrences'][0]['source_text_sha256']
-        if document in documents:followers.append(row)
-        else:leaders.append(row);documents.add(document)
-    seen=leaders+followers
+    sampled=[]
+    # Diversity is subordinate to temporal relevance. Unknown-date name lists
+    # must not displace complete in-scope passages from the same document.
+    for dated in (True,False):
+        leaders=[];followers=[];documents=set()
+        for row in seen:
+            if bool(row['years_in_scope'])!=dated:continue
+            document=row['occurrences'][0]['source_text_sha256']
+            if document in documents:followers.append(row)
+            else:leaders.append(row);documents.add(document)
+        sampled.extend(leaders+followers)
+    seen=sampled
     return seen,excluded
 
 def model_evidence(row):
@@ -335,8 +342,8 @@ def documentary_answer(out, records, run_root):
     out['documentary_timeline'].sort(key=lambda x:str(x['year']))
     return out
 
-def execute(run_root, question, caller=call, config=None, output_root=None):
-    all_records,excluded=collect(run_root)
+def execute(run_root, question, caller=call, config=None, output_root=None, provenance_root=None):
+    all_records,excluded=collect(run_root,provenance_root)
     grouped,deferred=batches(all_records,budget=6500 if os.getenv('PCT_LLM_PROVIDER')=='local_llama_cpp' else 14000)
     selected=[r for b in grouped for r in b]
     conf=configuration() if config is None else config
@@ -353,14 +360,15 @@ def execute(run_root, question, caller=call, config=None, output_root=None):
     if not conf['configured']:return documentary_answer(out,all_records,run_root)
     if not selected:out['status']='INSUFFICIENT_ACQUIRED_EVIDENCE';return out
     out['status']='RUNNING_SEMANTIC_ANALYSIS'
-    def invoke(role,prompt):
-        result=caller(role,prompt)
+    def invoke(role,prompt,response_schema=None):
+        result=caller(role,prompt,response_schema=response_schema) if caller is call else caller(role,prompt)
         out['calls'].append({'role':role,'status':result.get('status'),'provider':result.get('provider'),
                              'model':result.get('model'),'error':result.get('error'),
                              'model_identity':result.get('model_identity'),'usage':result.get('usage'),
                              'finish_reason':result.get('finish_reason'),'elapsed_seconds':result.get('elapsed_seconds'),
                              'prompt_sha256':hashlib.sha256(prompt.encode()).hexdigest(),
                              'response_sha256':digest(result),'prompt_version':route(role).prompt_version,
+                             'response_schema_sha256':digest(response_schema) if response_schema else None,
                              'completed_utc':datetime.datetime.now(datetime.timezone.utc).isoformat()})
         if result.get('status')=='COMPLETED':out['model_used']=True
         # Preserve actual calls even if a later role times out or fails.
@@ -372,7 +380,8 @@ def execute(run_root, question, caller=call, config=None, output_root=None):
         return parse(result)
     for group in grouped:
         prompt=RULES+'\nExtraction language: English. QUESTION: '+question+'\nReturn {"items":[{"statement":"The consulted source reports ...","evidence_id":"copy supplied evidence_id","passage_ids":[0],"kind":"source_statement","source_type":"UNVERIFIED","actors":[],"places":[],"dates":[],"usage_type":"UNRESOLVED","uncertainty":[]}]}. Select at most 2 claims directly relevant to the question. For a person question, prioritize the named person, identity and sourced activities; a named place is optional. For a place or geographic topic, prioritize named-place claims. Choose 1-4 adjacent passage_ids from ONE evidence item. Do NOT output a quote: the engine copies the selected original text. Copy entity spellings literally from those selected passages; do not translate names. Dates must be strings copied from the selected passages or date_evidence. Empty arrays are valid. Leave unspecified actors, dates and places empty. State only what the selected passage actually supports, with source attribution. Distinguish an actual base from a raid site, and an intention from an executed action. usage_type may be BASE, ANCHORAGE, REFUGE, RAID_LOCATION, OTHER, UNRESOLVED. Modern studies are SECONDARY_SOURCE; contemporary authorship must be established for PRIMARY_SOURCE. Never infer location or dates from a book title.\nEVIDENCE_JSON:\n'+json.dumps([model_evidence(row) for row in group],ensure_ascii=False)
-        payload=invoke('evidence_extractor',prompt)
+        schema=schemas.extraction([r['evidence_id'] for r in group])
+        payload=invoke('evidence_extractor',prompt,schema)
         items,rejected=validate_items(payload or {},group)
         out['rejected'].extend(rejected)
         if not items and isinstance(payload,dict) and payload.get('items') and rejected:
@@ -380,7 +389,7 @@ def execute(run_root, question, caller=call, config=None, output_root=None):
             # sentence selection that omits the named actor. One model repair
             # may correct the proposal; every original byte/date gate is rerun.
             repair_prompt=prompt+'\nREPAIR: the previous proposals failed validation. Return corrected items only, or an empty items array if unsupported. actors, places and dates MUST be arrays of literal strings, never objects. Select all adjacent sentences needed for the statement and its named entities, up to 4 passage_ids. An entity outside the selected passages is unsupported. Do not fill absent dates. Do not equate a modern namesake with the historical subject. Do not assert a BASE unless the selected text actually describes that use.\nREJECTED_PROPOSALS_JSON:\n'+json.dumps({'previous':payload,'validation':rejected},ensure_ascii=False)
-            repaired=invoke('evidence_extractor',repair_prompt)
+            repaired=invoke('evidence_extractor',repair_prompt,schema)
             items,repair_rejections=validate_items(repaired or {},group)
             out['rejected'].extend(repair_rejections)
         out['claims'].extend(items)
@@ -393,14 +402,14 @@ def execute(run_root, question, caller=call, config=None, output_root=None):
                    'source_context':evidence_by_id[c['evidence_id']]['text'],
                    'consulted_source':model_evidence(evidence_by_id[c['evidence_id']])['consulted_source']} for i,c in enumerate(claims)]
     review_rules=RULES+'\nQUESTION: '+question+'\nROLE: check whether EVERY source-attributed statement faithfully reports its supplied quotation. This is QUOTATION SUPPORT, not historical truth or verification. Missing original inspection, primary authorship, independent corroboration or human review are limitations, not reasons to reject a faithful attribution to a consulted source. An explicitly attributed source conjecture may be supported AS A HYPOTHESIS, never as an established fact. Do not reject solely because an optional date is unresolved. Flag invented facts, wrong dates, conflated people, a raid falsely called a base, and places demonstrably outside the requested region. Do not invent a geographic identity. Return {"decisions":[{"claim_index":0,"decision":"SUPPORTED","reason":"faithful attributed statement"}],"limitations":[]}. Return EXACTLY ONE decision for EVERY supplied claim_index. Use SUPPORTED, UNSUPPORTED or UNCERTAIN. Do not output claim IDs. Unsupported PRIMARY_SOURCE classification must remain UNVERIFIED.'
-    review=normalize_review(invoke('adversarial_reviewer',review_rules+'\nCLAIMS_JSON:\n'+json.dumps(review_claims,ensure_ascii=False)),claims)
+    review=normalize_review(invoke('adversarial_reviewer',review_rules+'\nCLAIMS_JSON:\n'+json.dumps(review_claims,ensure_ascii=False),schemas.review(len(claims))),claims)
     if review is None:out['status']='REVIEW_FAILED';return out
     # Repair only explicitly missing decisions, once, without treating silence as
     # approval. Existing decisions cannot be revised by this repair call.
     if review['missing_claim_ids']:
         missing=[c for c in claims if c['claim_id'] in review['missing_claim_ids']]
         repair_rows=[{**model_claim(c),'claim_index':i} for i,c in enumerate(missing)]
-        repair=normalize_review(invoke('adversarial_reviewer',review_rules+'\nThe previous response omitted these claims. Decide each one.\nCLAIMS_JSON:\n'+json.dumps(repair_rows,ensure_ascii=False)),missing)
+        repair=normalize_review(invoke('adversarial_reviewer',review_rules+'\nThe previous response omitted these claims. Decide each one.\nCLAIMS_JSON:\n'+json.dumps(repair_rows,ensure_ascii=False),schemas.review(len(missing))),missing)
         out['review_repair']=repair
         if repair is None or repair['missing_claim_ids']:
             out['review']=review;out['status']='REVIEW_INCOMPLETE';return out
@@ -410,18 +419,33 @@ def execute(run_root, question, caller=call, config=None, output_root=None):
     supported=set(review['supported_claim_ids'])
     if not supported:out['status']='NO_MODEL_SUPPORTED_CLAIMS';return out
     synthesis_claims=[c for c in claims if c['claim_id'] in supported]
-    answer=invoke('synthesis',RULES+'\nROLE: answer the research question in clear Greek using only supplied claims. Attribute statements to consulted sources. Group repetitions; do not call repeated text independent. Present conflicts and uncertainty. Return {"answer_sections":[{"text":"one concise paragraph","claim_ids":["supplied claim IDs"]}],"unknowns":["gaps"],"limitations":["limitations"]}. Every answer paragraph must cite supporting claim IDs. No external knowledge. QUESTION: '+question+'\nCLAIMS_AND_REVIEW_JSON:\n'+json.dumps({'claims':[model_claim(c) for c in synthesis_claims],'review':review},ensure_ascii=False))
-    sections=answer.get('answer_sections') if isinstance(answer,dict) else None
-    if forbidden(answer) or not isinstance(sections,list) or not sections or any(not isinstance(s,dict) or not isinstance(s.get('text'),str) or not s['text'].strip() or not isinstance(s.get('claim_ids'),list) or not s['claim_ids'] or any(not isinstance(cid,str) or cid not in supported for cid in s['claim_ids']) for s in sections) or any(not isinstance(answer.get(k,[]),list) or any(not isinstance(v,str) for v in answer.get(k,[])) for k in ('unknowns','limitations')):
-        out['status']='SYNTHESIS_REJECTED_INVALID_CITATIONS';return out
-    final_review=invoke('adversarial_reviewer',RULES+'\nQUESTION: '+question+'\nCheck the FINAL ANSWER against the supplied claim quotations. Return {"supported_section_indexes":[0],"flagged_sections":[{"index":0,"reason":"reason"}]}. Indexes are zero-based. Support means a faithful attributed paraphrase, not historical verification. Flag invented facts, unsupported dates or identities, incorrect source attribution, and certainty stronger than the evidence. Missing original inspection and human review remain limitations and are not reasons to reject a faithful source attribution. Do not use outside knowledge.\nFINAL_ANSWER_JSON:\n'+json.dumps({'sections':sections,'claims':[model_claim(c) for c in synthesis_claims]},ensure_ascii=False))
-    indexes=final_review.get('supported_section_indexes') if isinstance(final_review,dict) else None
-    flags=final_review.get('flagged_sections',[]) if isinstance(final_review,dict) else None
-    if (forbidden(final_review) or not isinstance(indexes,list) or any(type(i) is not int for i in indexes) or
-        set(indexes)!=set(range(len(sections))) or not isinstance(flags,list) or flags):
+    synthesis_rules=RULES+'\nROLE: answer in concise English using ONLY supplied supported claims. Greek translation is a separate unvalidated step; do not translate into Greek here. Use one short paragraph per distinct finding, at most 4 paragraphs. Attribute every statement to the consulted source and explicitly state that historical verification is pending. Copy personal and place names from the quotations without changing identity. The user supplied aliases are SEARCH HYPOTHESES, not evidence of a shared identity: a Latin namesake must not be equated with the requested Greek person. Preserve every conjecture as a conjecture. The question date range is a FILTER, not evidence that an undated event occurred then. Do not add dates, places, actions, ranks or relationships absent from the quoted evidence. Do not call repetitions independent. Return {"answer_sections":[{"text":"According to the consulted source ...; historical verification is pending.","claim_ids":["supplied claim IDs"]}],"unknowns":["gaps including unresolved identities and dates"],"limitations":["limitations"]}. Every paragraph must cite only its actual supporting claim IDs. QUESTION: '+question
+    synthesis_context={'claims':[model_claim(c) for c in synthesis_claims],'review':review}
+    synthesis_prompt=synthesis_rules+'\nCLAIMS_AND_REVIEW_JSON:\n'+json.dumps(synthesis_context,ensure_ascii=False)
+    answer=invoke('synthesis',synthesis_prompt,schemas.synthesis(sorted(supported)))
+    out['requested_answer_language']='en'
+    out['greek_translation_status']='NOT_GENERATED_OR_VALIDATED'
+    out['final_answer_attempts']=[]
+    for attempt in range(2):
+        sections=answer.get('answer_sections') if isinstance(answer,dict) else None
+        if forbidden(answer) or not isinstance(sections,list) or not sections or any(not isinstance(s,dict) or not isinstance(s.get('text'),str) or not s['text'].strip() or not isinstance(s.get('claim_ids'),list) or not s['claim_ids'] or any(not isinstance(cid,str) or cid not in supported for cid in s['claim_ids']) for s in sections) or any(not isinstance(answer.get(k,[]),list) or any(not isinstance(v,str) for v in answer.get(k,[])) for k in ('unknowns','limitations')):
+            out['status']='SYNTHESIS_REJECTED_INVALID_CITATIONS';return out
+        final_review=invoke('adversarial_reviewer',RULES+'\nQUESTION: '+question+'\nCheck each FINAL ANSWER paragraph against ONLY the quotations supporting its cited claims. Return {"supported_section_indexes":[0],"flagged_sections":[{"index":0,"reason":"specific unsupported assertion"}]}. Indexes are zero-based. Support means a faithful, explicitly attributed paraphrase, not historical verification. An UNVERIFIED source can be faithfully cited: that label alone is NOT an unsupported assertion. Missing original inspection and human review are limitations, not quotation mismatches. A clearly marked source conjecture is allowed as a HYPOTHESIS. Flag invented facts, scope dates asserted as event dates, namesake conflations, wrong source attribution and certainty stronger than the quotation. Do not require prior historical verification. Do not use outside knowledge. Do not include a section in both supported and flagged arrays.\nFINAL_ANSWER_JSON:\n'+json.dumps({'sections':sections,'claims':[model_claim(c) for c in synthesis_claims]},ensure_ascii=False),schemas.final_review(len(sections)))
+        indexes=final_review.get('supported_section_indexes') if isinstance(final_review,dict) else None
+        flags=final_review.get('flagged_sections',[]) if isinstance(final_review,dict) else None
         out['final_answer_review']=final_review
-        out['status']='FINAL_ANSWER_REVIEW_FAILED';return out
-    out['final_answer_review']=final_review
+        out['final_answer_attempts'].append({'sections':sections,'review':final_review})
+        if (forbidden(final_review) or not isinstance(indexes,list) or any(type(i) is not int or not 0<=i<len(sections) for i in indexes)
+            or len(set(indexes))!=len(indexes) or not isinstance(flags,list)
+            or any(not isinstance(f,dict) or type(f.get('index')) is not int or not 0<=f['index']<len(sections) or not isinstance(f.get('reason'),str) or not f['reason'].strip() for f in flags)):
+            out['status']='FINAL_ANSWER_REVIEW_FAILED';return out
+        if set(indexes)==set(range(len(sections))) and not flags:break
+        if attempt:
+            out['status']='FINAL_ANSWER_REVIEW_FAILED';return out
+        # One bounded correction of actual unsupported content, followed by a
+        # NEW review. A rejected draft can never become the accepted answer.
+        feedback={'previous_answer':answer,'adversarial_review':final_review}
+        answer=invoke('synthesis',synthesis_prompt+'\nREVISE: remove or correct every flagged assertion using only the supplied quotations. Acknowledge uncertainty and pending historical verification. Do not merely restate a rejected draft.\nREJECTED_DRAFT_AND_REVIEW:\n'+json.dumps(feedback,ensure_ascii=False),schemas.synthesis(sorted(supported)))
     out.update(status='MODEL_ANSWER_PENDING_HUMAN_REVIEW',answer_sections=sections,
                unknowns=answer.get('unknowns',[]),model_limitations=answer.get('limitations',[]))
     return out

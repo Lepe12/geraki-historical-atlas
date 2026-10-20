@@ -28,7 +28,7 @@ def identity():
         _identity.update(sha256=actual,file=path.name)
     return _identity
 
-def call(role,prompt,route):
+def call(role,prompt,route,response_schema=None):
     global _model
     model_identity=identity()
     if model_identity.get("repository")!=route.model:raise ValueError("MODEL_ROUTE_IDENTITY_MISMATCH")
@@ -40,12 +40,15 @@ def call(role,prompt,route):
     prompt_tokens=len(_model.tokenize(prompt.encode()))+32
     maximum=min(route.max_output_tokens,1800,8192-prompt_tokens-64)
     if maximum<128:raise ValueError('MODEL_CONTEXT_BUDGET_EXCEEDED')
+    response_format={'type':'json_object'}
+    if response_schema is not None:response_format['schema']=response_schema
     result=_model.create_chat_completion(messages=[{'role':'user','content':prompt}],
         temperature=route.temperature,max_tokens=maximum,
-        response_format={'type':'json_object'})
+        response_format=response_format)
     return {'status':'COMPLETED','role':role,'provider':'local_llama_cpp','model':route.model,
             'model_identity':model_identity,'runtime':'llama-cpp-python',
             'content':result['choices'][0]['message']['content'],
             'finish_reason':result['choices'][0].get('finish_reason'),
             'usage':result.get('usage'),'elapsed_seconds':round(time.monotonic()-started,2),
+            'response_schema_sha256':hashlib.sha256(json.dumps(response_schema,sort_keys=True,ensure_ascii=False,separators=(',',':')).encode()).hexdigest() if response_schema else None,
             'verified_promotion_allowed':False}

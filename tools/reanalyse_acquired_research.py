@@ -26,7 +26,11 @@ def main():
              'software_revision':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
              'original_lane_outputs_modified':False}
     (dest/'execution_receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
-    answer=execute(parent,question,output_root=dest)
+    from prepare_acquired_analysis import prepare
+    prepared=dest/'derived_sources'
+    prepare(parent,prepared,request)
+    question+='\nResearch scope: '+request.get('purpose','')
+    answer=execute(prepared,question,output_root=dest,provenance_root=parent)
     answer['execution_receipt']=receipt
     out=dest/'research_answer';out.mkdir(exist_ok=True)
     for filename,value in [('answer.json',answer),('geographic_findings.json',geographic(answer))]:

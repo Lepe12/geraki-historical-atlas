@@ -13,6 +13,12 @@ on:
       - 'tools/historical_research_graph.py'
       - 'tools/persistent_evidence_bundle.py'
       - 'tools/test_historical_context.py'
+      - 'tools/prepare_acquired_analysis.py'
+      - 'tools/research_response_schema.py'
+      - 'tools/llm/local_model.py'
+      - 'tools/llm/llm_client.py'
+      - 'tools/test_acquired_analysis.py'
+      - 'tools/test_research_response_schema.py'
       - 'tools/storage/historical_evidence.php'
       - 'tools/storage/pct_research_store.php'
       - 'server/command-center-live/**'
@@ -39,6 +45,8 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-eng tesseract-ocr-ell
       - name: PDF Learning HTTP integration tests
         run: node server/command-center-live/learning-integration-test.js
+      - name: Actual acquired PDF reading order and constrained response protocols
+        run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=.:tools:tools/llm python3 -m unittest -v tools.test_acquired_analysis tools.test_source_acquisition_routes tools.test_research_response_schema tools.test_semantic_research_answer
       - name: Actual image-only PDF OCR and bounding boxes
         run: |
           python3 -m pip install 'Pillow==12.0.0'
