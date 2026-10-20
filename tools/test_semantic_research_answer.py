@@ -7,7 +7,7 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
-from semantic_research_answer import collect,batches,execute,validate_items,configuration,render,normalize_review
+from semantic_research_answer import collect,batches,execute,validate_items,configuration,render,normalize_review,normalize_final_review
 from llm_client import call
 
 TEXT='In 1677 the ships attacked the island. The account is uncertain.'
@@ -141,6 +141,23 @@ class SemanticAnswer(unittest.TestCase):
                 self.assertEqual(out['status'],'MODEL_ANSWER_PENDING_HUMAN_REVIEW' if repair_ok else 'REVIEW_INCOMPLETE')
                 self.assertFalse(out['verified'])
                 if not repair_ok:self.assertEqual(out['answer_sections'],[])
+
+    def test_final_review_requires_concrete_spans_and_complete_decisions(self):
+        sections=[{'text':'According to the source, ships attacked in 1677.'}]
+        decision={'section_index':0,'source_support_reason':'The quotation gives this year.',
+                  'unsupported_answer_spans':[],'decision':'SUPPORTED'}
+        normalized=normalize_final_review({'section_decisions':[decision]},sections)
+        self.assertEqual(normalized['supported_section_indexes'],[0])
+        self.assertEqual(normalized['flagged_sections'],[])
+        for invalid in ([],[decision,decision],[{**decision,'decision':'UNSUPPORTED'}],
+                        [{**decision,'unsupported_answer_spans':['1677']}],
+                        [{**decision,'decision':'UNSUPPORTED','unsupported_answer_spans':['generic placeholder']}],
+                        [{**decision,'section_index':True}]):
+            self.assertIsNone(normalize_final_review({'section_decisions':invalid},sections))
+        rejected={**decision,'decision':'UNSUPPORTED','unsupported_answer_spans':['1677']}
+        normalized=normalize_final_review({'section_decisions':[rejected]},sections)
+        self.assertEqual(normalized['supported_section_indexes'],[])
+        self.assertEqual(normalized['flagged_sections'][0]['unsupported_answer_spans'],['1677'])
 
     def test_passage_selection_copies_original_without_generated_quote(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -9,16 +9,19 @@ import urllib.request
 REPOSITORY='Qwen/Qwen2.5-3B-Instruct-GGUF'
 FILENAME='qwen2.5-3b-instruct-q4_k_m.gguf'
 REVISION='7dabda4d13d513e3e842b20f0d435c732f172cbe'
+MODELS={REPOSITORY:(REVISION,FILENAME),
+        'Qwen/Qwen2.5-7B-Instruct-GGUF':('bb5d59e06d9551d752d08b292a50eb208b07ab1f','qwen2.5-7b-instruct-q4_k_m.gguf'),
+        'Qwen/Qwen3-8B-GGUF':('7c41481f57cb95916b40956ab2f0b139b296d974','Qwen3-8B-Q4_K_M.gguf')}
 
 def prepare(destination):
     from huggingface_hub import HfApi,hf_hub_download
     api=HfApi()
     repository=os.getenv('PCT_LOCAL_MODEL_REPOSITORY',REPOSITORY)
-    if repository not in (REPOSITORY,'Qwen/Qwen2.5-7B-Instruct-GGUF'):
+    if repository not in MODELS:
         raise ValueError('UNAPPROVED_LOCAL_MODEL_REPOSITORY')
-    revision=os.getenv('PCT_LOCAL_MODEL_REVISION') or (REVISION if repository==REPOSITORY else 'bb5d59e06d9551d752d08b292a50eb208b07ab1f')
+    default_revision,filename=MODELS[repository]
+    revision=os.getenv('PCT_LOCAL_MODEL_REVISION') or default_revision
     info=api.model_info(repository,revision=revision,files_metadata=True)
-    filename='qwen2.5-3b-instruct-q4_k_m.gguf' if repository==REPOSITORY else 'qwen2.5-7b-instruct-q4_k_m.gguf'
     siblings=sorted([s for s in info.siblings if s.rfilename==filename or
                      (s.rfilename.startswith(filename[:-5]+'-000') and s.rfilename.endswith('.gguf'))],key=lambda s:s.rfilename)
     if not siblings:raise ValueError('MODEL_QUANTIZATION_NOT_FOUND')

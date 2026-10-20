@@ -35,14 +35,16 @@ def call(role,prompt,route,response_schema=None):
     if _model is None:
         from llama_cpp import Llama
         _model=Llama(model_path=os.environ['PCT_LOCAL_MODEL_PATH'],n_ctx=8192,
-                     n_threads=max(1,min(4,os.cpu_count() or 1)),verbose=False,seed=42)
+                     n_threads=max(1,min(4,os.cpu_count() or 1)),verbose=False,seed=42,
+                     chat_format='chatml' if model_identity.get('repository')=='Qwen/Qwen3-8B-GGUF' else None)
     started=time.monotonic()
-    prompt_tokens=len(_model.tokenize(prompt.encode()))+32
+    wire_prompt=prompt+'\n/no_think' if model_identity.get('repository')=='Qwen/Qwen3-8B-GGUF' else prompt
+    prompt_tokens=len(_model.tokenize(wire_prompt.encode()))+32
     maximum=min(route.max_output_tokens,1800,8192-prompt_tokens-64)
     if maximum<128:raise ValueError('MODEL_CONTEXT_BUDGET_EXCEEDED')
     response_format={'type':'json_object'}
     if response_schema is not None:response_format['schema']=response_schema
-    result=_model.create_chat_completion(messages=[{'role':'user','content':prompt}],
+    result=_model.create_chat_completion(messages=[{'role':'user','content':wire_prompt}],
         temperature=route.temperature,max_tokens=maximum,
         response_format=response_format)
     return {'status':'COMPLETED','role':role,'provider':'local_llama_cpp','model':route.model,
@@ -51,4 +53,6 @@ def call(role,prompt,route,response_schema=None):
             'finish_reason':result['choices'][0].get('finish_reason'),
             'usage':result.get('usage'),'elapsed_seconds':round(time.monotonic()-started,2),
             'response_schema_sha256':hashlib.sha256(json.dumps(response_schema,sort_keys=True,ensure_ascii=False,separators=(',',':')).encode()).hexdigest() if response_schema else None,
+            'wire_prompt_sha256':hashlib.sha256(wire_prompt.encode()).hexdigest(),
+            'chat_mode':'CHATML_NO_THINK' if model_identity.get('repository')=='Qwen/Qwen3-8B-GGUF' else 'MODEL_DEFAULT',
             'verified_promotion_allowed':False}

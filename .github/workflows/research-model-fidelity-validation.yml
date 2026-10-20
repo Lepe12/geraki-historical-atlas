@@ -1,0 +1,82 @@
+name: Free model fidelity controls and actual research retry
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/research-model-fidelity-validation.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    continue-on-error: ${{ matrix.model != 'Qwen/Qwen3-8B-GGUF' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        model: ['Qwen/Qwen2.5-7B-Instruct-GGUF','Qwen/Qwen3-8B-GGUF']
+    env:
+      PCT_LLM_PROVIDER: local_llama_cpp
+      PCT_LLM_MODEL: ${{ matrix.model }}
+      PCT_LOCAL_MODEL_REPOSITORY: ${{ matrix.model }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/research-model
+      - name: Actual model decisions on faithful citations, a false date and a French paraphrase
+        run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python3 tools/check_model_fidelity_controls.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fidelity-${{ strategy.job-index }}
+          path: evidence/configuration/${{ github.run_id }}/
+      - name: Preserve actual model control outcome including failure
+        if: always()
+        run: |
+          set -e
+          destination="evidence/configuration/$GITHUB_RUN_ID"
+          if [ ! -d "$destination" ]; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$destination"
+          git commit -m 'Record actual controlled model fidelity comparison'
+          python3 tools/publish_research_outputs.py
+  research:
+    needs: controls
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        parent: ['39372433114','39304929906','39304933066','39304936293']
+    env:
+      PARENT_RESEARCH_RUN: ${{ matrix.parent }}
+      PCT_LLM_PROVIDER: local_llama_cpp
+      PCT_LLM_MODEL: Qwen/Qwen3-8B-GGUF
+      PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen3-8B-GGUF
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/research-model
+      - name: Install the public PDF reader
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+      - name: Actual extraction, source review, synthesis and paragraph review
+        run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python3 tools/reanalyse_acquired_research.py --run-id "$PARENT_RESEARCH_RUN"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: actual-research-${{ matrix.parent }}
+          path: evidence/runs/${{ matrix.parent }}/semantic_reanalysis_${{ github.run_id }}/
+      - name: Preserve actual source derivation and research outcome
+        if: always()
+        run: |
+          set -e
+          destination="evidence/runs/$PARENT_RESEARCH_RUN/semantic_reanalysis_$GITHUB_RUN_ID"
+          if [ ! -d "$destination" ]; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$destination"
+          git commit -m 'Record actual research retry with calibrated free model'
+          python3 tools/publish_research_outputs.py

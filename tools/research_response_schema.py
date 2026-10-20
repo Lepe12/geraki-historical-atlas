@@ -18,7 +18,7 @@ def extraction(evidence_ids):
 
 def review(count):
     decisions=array(obj({'claim_index':{'type':'integer','enum':list(range(count))},
-                         'decision':{'type':'string','enum':['SUPPORTED','UNSUPPORTED','UNCERTAIN']},'reason':STRING}),count)
+                         'reason':STRING,'decision':{'type':'string','enum':['SUPPORTED','UNSUPPORTED','UNCERTAIN']}}),count)
     decisions['minItems']=count
     return obj({'decisions':decisions,'limitations':STRINGS})
 
@@ -28,5 +28,8 @@ def synthesis(claim_ids):
 
 def final_review(count):
     indexes={'type':'integer','enum':list(range(count))}
-    return obj({'supported_section_indexes':array(indexes,count),
-                'flagged_sections':array(obj({'index':indexes,'reason':STRING}),count)})
+    decisions=array(obj({'section_index':indexes,'source_support_reason':STRING,
+                         'unsupported_answer_spans':STRINGS,
+                         'decision':{'type':'string','enum':['SUPPORTED','UNSUPPORTED','UNCERTAIN']}}),count)
+    decisions['minItems']=count
+    return obj({'section_decisions':decisions})
