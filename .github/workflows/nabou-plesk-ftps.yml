@@ -22,6 +22,19 @@ on:
         description: 'Type DEPLOY-NABOU to authorize production backend-only deployment'
         required: true
         type: string
+      payload:
+        description: 'Backend files, or explicitly requested existing host-local evidence storage'
+        type: choice
+        options: [backend, evidence_storage]
+        default: backend
+      storage_confirmation:
+        description: 'For storage only: INSTALL-EXISTING-EVIDENCE-SCHEMA'
+        type: string
+        required: false
+      replay_runs:
+        description: 'Optional numeric existing run IDs, comma-separated'
+        type: string
+        required: false
 
 permissions:
   contents: read
@@ -35,6 +48,9 @@ jobs:
     outputs:
       authorized_push: ${{ steps.request.outputs.authorized }}
       tls_server_name: ${{ steps.request.outputs.tls_server_name }}
+      payload: ${{ steps.request.outputs.payload }}
+      storage_confirmation: ${{ steps.request.outputs.storage_confirmation }}
+      replay_runs: ${{ steps.request.outputs.replay_runs }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -55,9 +71,20 @@ jobs:
           name=request.get('tls_server_name','')
           assert isinstance(name,str) and len(name)<=253
           assert not name or re.fullmatch(r'[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?',name)
+          payload=request.get('payload','backend')
+          assert payload in ('backend','evidence_storage')
+          confirmation=request.get('storage_confirmation','')
+          assert confirmation in ('','INSTALL-EXISTING-EVIDENCE-SCHEMA')
+          if payload=='evidence_storage':assert confirmation=='INSTALL-EXISTING-EVIDENCE-SCHEMA'
+          runs=request.get('replay_runs',[])
+          assert isinstance(runs,list) and len(runs)<=10
+          assert all(isinstance(run,str) and re.fullmatch(r'\d+',run) for run in runs)
           with open(os.environ['GITHUB_OUTPUT'],'a') as out:
               out.write('authorized=true\n')
               out.write('tls_server_name='+name+'\n')
+              out.write('payload='+payload+'\n')
+              out.write('storage_confirmation='+confirmation+'\n')
+              out.write('replay_runs='+','.join(runs)+'\n')
           PYREQUEST
       - name: Check backend syntax and tests (no credentials, no deployment)
         run: |
@@ -67,6 +94,9 @@ jobs:
           node --check server/command-center-live/pdf-evidence.js
           python3 -m py_compile server/command-center-live/pdf-evidence.py tools/gateway/deploy_ftps.py
           node server/command-center-live/self-test.js
+          php -l tools/storage/historical_evidence.php
+          php -l tools/storage/evidence_schema_request.php
+          php -l tools/storage/pct_research_store.php
   diagnose:
     needs: validate
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'diagnose' }}
@@ -98,6 +128,9 @@ jobs:
       PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
       PCT_FTPS_APP_ROOT: /piratecartography-gateway/server/command-center-live
       PCT_FTPS_TLS_SERVER_NAME: ${{ needs.validate.outputs.tls_server_name || vars.PCT_FTPS_TLS_SERVER_NAME }}
+      PCT_FTPS_PAYLOAD: ${{ needs.validate.outputs.payload || inputs.payload || 'backend' }}
+      PCT_FTPS_STORAGE_CONFIRMATION: ${{ needs.validate.outputs.storage_confirmation || inputs.storage_confirmation }}
+      PCT_EVIDENCE_REPLAY_RUNS: ${{ needs.validate.outputs.replay_runs || inputs.replay_runs }}
     steps:
       - uses: actions/checkout@v4
         with:

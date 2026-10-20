@@ -19,6 +19,7 @@ $graph=['entities'=>[
 $bundle=['schema'=>'nabou-persistent-evidence-bundle-v1','sources'=>[$source],'attestations'=>[$att],'graph'=>$graph];
 $db->beginTransaction();$result=heImportBundle($db,$bundle,fn($path)=>$text);$db->commit();
 if ($result['inserted_attestations']!==1)throw new RuntimeException('IMPORT_FAILED');
+if ($result['citation_readbacks']!==1)throw new RuntimeException('CITATION_READBACK_NOT_PERFORMED');
 $db->beginTransaction();$result=heImportBundle($db,$bundle,fn($path)=>$text);$db->commit();
 if ($result['inserted_attestations']!==0)throw new RuntimeException('IMPORT_DUPLICATED');
 if ((int)heQuery($db,'SELECT COUNT(*) FROM pc_he_relations WHERE subject_id=?',[$att['id']])->fetchColumn()!==1)throw new RuntimeException('GRAPH_RELATION_NOT_PERSISTED');

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Manually gated FTPS deployment of only the NABOU Node backend, with rollback.
+"""Explicit existing-host FTPS backend/storage deployment, with file rollback.
 
 Credentials come from GitHub Actions secrets. Never prints credentials.
 FTPS requires an explicitly configured FTP account with access to the Plesk app root.
@@ -7,6 +7,7 @@ FTPS requires an explicitly configured FTP account with access to the Plesk app 
 import ftplib
 import hashlib
 import io
+import json
 import os
 from pathlib import Path
 import posixpath
@@ -25,6 +26,8 @@ USER = os.environ["PCT_FTPS_USER"]
 PASSWORD = os.environ["PCT_FTPS_PASSWORD"]
 PORT = int(os.getenv("PCT_FTPS_PORT", "21"))
 TLS_NAME = os.getenv('PCT_FTPS_TLS_SERVER_NAME','').strip().rstrip('.')
+MODE = os.getenv('PCT_FTPS_PAYLOAD','backend')
+if MODE not in ('backend','evidence_storage'):sys.exit('BLOCKED: unknown deployment payload')
 
 if not REMOTE.startswith("/"):
     sys.exit("BLOCKED: PCT_FTPS_APP_ROOT must be absolute")
@@ -34,6 +37,25 @@ if REMOTE != "/" and not REMOTE.endswith("/server/command-center-live"):
     sys.exit("BLOCKED: remote path must end with /server/command-center-live")
 
 payload = {name: (ROOT / SOURCE / name).read_bytes() for name in FILES}
+if MODE=='evidence_storage':
+    if os.getenv('PCT_FTPS_STORAGE_CONFIRMATION')!='INSTALL-EXISTING-EVIDENCE-SCHEMA':
+        sys.exit('BLOCKED: explicit existing evidence schema confirmation required')
+    if REMOTE=='/':sys.exit('BLOCKED: storage deployment requires the confirmed repository layout')
+    names=('historical_evidence.php','historical_evidence_schema.sql','pct_research_store.php','evidence_schema_request.php')
+    code={name:(ROOT/'tools/storage'/name).read_bytes() for name in names}
+    requested_runs=[value for value in os.getenv('PCT_EVIDENCE_REPLAY_RUNS','').split(',') if value]
+    if len(requested_runs)>10 or any(not re.fullmatch(r'\d+',value) for value in requested_runs):
+        sys.exit('BLOCKED: invalid explicitly requested evidence replay runs')
+    manifest={'schema':'nabou-evidence-schema-install-request-v1','database':'piratecartography',
+              'confirmation':'INSTALL-EXISTING-EVIDENCE-SCHEMA','source_revision':os.environ['GITHUB_SHA'],
+              'code_sha256':{name:hashlib.sha256(code[name]).hexdigest() for name in names},
+              'requested_runs':requested_runs}
+    # Dependencies first, CLI next, explicit request LAST. The existing cron
+    # cannot request a migration against partially transferred files.
+    order=('historical_evidence.php','historical_evidence_schema.sql','evidence_schema_request.php','pct_research_store.php')
+    payload={'../../tools/storage/'+name:code[name] for name in order}
+    payload['../../tools/storage/.evidence-schema-install-request.json']=(json.dumps(manifest,indent=2)+'\n').encode()
+    FILES=tuple(payload)
 runid = uuid.uuid4().hex[:12]
 ftp = ftplib.FTP_TLS(timeout=30, context=ssl.create_default_context())
 backups = {}
@@ -63,6 +85,10 @@ try:
     listing = {posixpath.basename(item.rstrip("/")) for item in existing}
     if not {"package.json", "public", "tmp", "knowledge-data"}.issubset(listing):
         raise RuntimeError("BLOCKED: destination does not match expected Plesk app directory")
+    if MODE=='evidence_storage':
+        existing_storage={posixpath.basename(x.rstrip('/')) for x in ftp.nlst('../../tools/storage')}
+        if 'pct_research_store.php' not in existing_storage:raise RuntimeError('EXISTING_HOST_LOCAL_IMPORTER_REQUIRED')
+        if '.evidence-schema-install-request.json' in existing_storage:raise RuntimeError('PENDING_SCHEMA_REQUEST_ALREADY_EXISTS')
     for name in FILES:
         try:
             chunks = []
@@ -71,23 +97,27 @@ try:
         except ftplib.error_perm as exc:
             if not str(exc).startswith("550"):
                 raise
+            known=existing_storage if MODE=='evidence_storage' else listing
+            if posixpath.basename(name) in known:raise RuntimeError('EXISTING_FILE_BACKUP_UNAVAILABLE')
             backups[name] = None
+    if MODE=='evidence_storage' and backups['../../tools/storage/.evidence-schema-install-request.json'] is not None:
+        raise RuntimeError('PENDING_SCHEMA_REQUEST_ALREADY_EXISTS')
     # Stage every file before modifying the running code.
     phase = 'STAGE_UPLOAD'
     for name, data in payload.items():
-        stage = ".nabou-ftps-" + runid + "-" + name
+        stage = posixpath.join(posixpath.dirname(name),'.nabou-ftps-'+runid+'-'+posixpath.basename(name))
+        staged.append(stage)
         ftp.storbinary("STOR " + stage, io.BytesIO(data))
         chunks = []
         ftp.retrbinary("RETR " + stage, chunks.append)
         if hashlib.sha256(b"".join(chunks)).digest() != hashlib.sha256(data).digest():
             raise RuntimeError("Upload checksum mismatch: " + name)
-        staged.append(stage)
     # Load helper modules first and app.js last to limit partial activation window.
     phase = 'ACTIVATE'
     for name in FILES:
-        stage = ".nabou-ftps-" + runid + "-" + name
+        stage = posixpath.join(posixpath.dirname(name),'.nabou-ftps-'+runid+'-'+posixpath.basename(name))
         if backups[name] is not None:
-            backup_name = ".nabou-before-" + runid + "-" + name
+            backup_name = posixpath.join(posixpath.dirname(name),'.nabou-before-'+runid+'-'+posixpath.basename(name))
             ftp.rename(name, backup_name)
             remote_backups[name] = backup_name
         # Write to the live name only after original has been saved remotely.
@@ -100,10 +130,13 @@ try:
         staged.remove(stage)
         written.append(name)
     # Passenger restart marker is only issued after complete successful deployment.
-    marker = "tmp/restart.txt"
-    phase = 'RESTART'
-    ftp.storbinary("STOR " + marker, io.BytesIO(b""))
-    print("DEPLOYED: four verified backend files and issued Passenger restart marker.")
+    if MODE=='backend':
+        marker = "tmp/restart.txt"
+        phase = 'RESTART'
+        ftp.storbinary("STOR " + marker, io.BytesIO(b""))
+        print("DEPLOYED: four verified backend files and issued Passenger restart marker.")
+    else:
+        print('STORAGE_FILES_STAGED_AWAITING_EXISTING_HOST_LOCAL_CRON')
     print("Existing files were retained as remote .nabou-before-* recovery copies.")
 except Exception as exc:
     # Server-supplied messages can repeat login details. Record the error type,

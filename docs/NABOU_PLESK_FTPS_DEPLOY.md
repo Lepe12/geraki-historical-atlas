@@ -1,6 +1,9 @@
 # NABOU//X: Plesk FTPS deployment setup
 
-Status: **NOT CONNECTED** until a valid FTPS account and its remote folder are verified. The PR checks only confirm source syntax and tests; they do not prove Plesk connectivity or live deployment.
+Status: **existing-host FTPS deployment confirmed** by run39480819391, followed
+by actual HTTP/GitHub OIDC PASS. Read-only diagnosis39481201814 also confirmed
+the active legacy host-local importer, while the new evidence PHP/schema files
+were absent. Schema installation is a separate explicit operation below.
 
 ## Hosting prerequisites
 
@@ -53,6 +56,36 @@ It does not disable verification or follow a different server address.
 
 The action runs syntax and Node self-tests first, transfers only four backend files over TLS, verifies SHA-256 of staged files, saves existing remote files for recovery, places `app.js` last, triggers the Passenger restart marker, and tests health and evidence routes.
 
-**Limits:** FTPS deployment does **not** apply the PHP/MariaDB schema and does **not** prove the full PDF Learning/evidence pipeline. The schema and data migration must be validated separately. A 200 health alone is not a complete acceptance test. On a failed job, inspect the logs and the server, and confirm a safe rollback before retrying.
+**Backend mode limits:** the four-file deployment does **not** apply the
+PHP/MariaDB schema or prove the full PDF Learning/evidence pipeline. A200 health
+alone is not a complete acceptance test. On a failed job, inspect the report and
+confirm a safe rollback before retrying.
+
+## Existing host-local evidence schema installation
+
+The explicit `evidence_storage` payload installs only four versioned storage
+files and a hash-bound request under the existing `tools/storage` directory.
+It requires the additional confirmation `INSTALL-EXISTING-EVIDENCE-SCHEMA`.
+This payload does not replace the Node backend or restart Passenger.
+
+The existing host-local cron348 consumes the request while holding the existing
+storage lock. It verifies all code hashes and the exact `piratecartography`
+database, creates a private0600 database snapshot, then applies the additive
+`pc_he_*` migration. Success preserves the applied request; failure quarantines
+it instead of repeating backups/DDL every five minutes. Ordinary sync without
+an explicit request never initiates a migration. No new public administrative
+endpoint, database, cron job or backend is created.
+
+After installation, the same importer ingests source-bound UNREVIEWED evidence
+and checks citation database readbacks inside the transaction. A schema request
+may explicitly select existing numeric run IDs for one-time evidence replay.
+No historical verification or human review state is promoted.
+
+The private `pct-evidence-schema-last.json` and `pct-research-storage-last.json`
+receipts record the actual migration, backup checksum and recent import counts.
+The read-only FTPS diagnostic exports only approved receipt fields/code hashes;
+it never reads credentials or backup contents. Transfer success remains
+`STORAGE_FILES_STAGED_AWAITING_HOST_LOCAL_MIGRATION` until those host-produced
+receipts and the requested evidence counts have been checked.
 
 The frontend, 3D, GitHub Pages, and research query selectors are not touched by this workflow.

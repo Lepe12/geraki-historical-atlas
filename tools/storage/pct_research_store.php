@@ -7,6 +7,7 @@ const PCT_PRIVATE = PCT_VHOST . '/piratecartography-system';
 const PCT_GIT = PCT_VHOST . '/git/geraki-historical-atlas.git';
 const PCT_TEXT_LIMIT = 16777216;
 require_once __DIR__.'/historical_evidence.php';
+require_once __DIR__.'/evidence_schema_request.php';
 
 function emit(array $value): void {
     echo json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR), PHP_EOL;
@@ -92,9 +93,9 @@ function importItem(PDO $db,string $run,string $lane,string $kind,array $item,st
     query($db,'INSERT INTO pc_research_items (version_key,run_id,lane,kind,external_id,title,reference,declared_evidence_state,review_status,is_verified,payload_sha256,source_document_key,is_current) VALUES (?,?,?,?,?,?,?,?,?,0,?,?,1) ON DUPLICATE KEY UPDATE is_current=1',
         [$key,$run,$lane,$kind,$external===null?null:mb_substr($external,0,512),valueText($item['title']??$item['source_file']??null),valueText($item['url']??$item['digital_url']??$item['identifier']??null),valueText($item['evidence_state']??null),'IMPORTED_UNREVIEWED',$sha,$documentKey]);
 }
-function importRun(PDO $db,string $run,array $entries,string $commit,GitBlobs $reader): array {
+function importRun(PDO $db,string $run,array $entries,string $commit,GitBlobs $reader,bool $force=false): array {
     $digest=treeDigest($entries);
-    if (query($db,'SELECT tree_sha256 FROM pc_research_runs WHERE run_id=?',[$run])->fetchColumn()===$digest) return ['run_id'=>$run,'status'=>'UNCHANGED'];
+    if (!$force&&query($db,'SELECT tree_sha256 FROM pc_research_runs WHERE run_id=?',[$run])->fetchColumn()===$digest) return ['run_id'=>$run,'status'=>'UNCHANGED'];
     $db->beginTransaction();
     try {
         query($db,'UPDATE pc_research_documents SET is_current=0 WHERE run_id=?',[$run]);
@@ -191,6 +192,10 @@ try {
     } elseif ($action==='sync') {
         $lock=fopen(PCT_PRIVATE.'/pct-research-storage.lock','c');
         if (!$lock || !flock($lock,LOCK_EX|LOCK_NB)) { emit(['status'=>'BUSY','reason'=>'OTHER_IMPORT_RUNNING']); exit; }
+        // Consume only the explicitly deployed, hash-bound request. Normal sync
+        // never changes schemas. The existing lock serializes backup and DDL.
+        $migration=heApplyRequestedSchema($db,__DIR__.'/.evidence-schema-install-request.json',PCT_PRIVATE);
+        $forceRuns=$migration['requested_runs']??[];
         if (!in_array('--no-fetch',$argv,true)) git(['fetch','--quiet','origin']);
         $commit=trim(git(['rev-parse','main'])); if (!preg_match('/^[a-f0-9]{40}$/D',$commit)) throw new RuntimeException('INVALID_COMMIT');
         $groups=parseTree(git(['ls-tree','-rlz',$commit,'--','evidence/runs']));
@@ -198,11 +203,19 @@ try {
         $only=null; foreach ($argv as $arg) if (str_starts_with($arg,'--run=')) $only=substr($arg,6);
         foreach ($groups as $run=>$entries) {
             if ($only!==null && (string)$run!==$only) continue;
-            try { $result=importRun($db,(string)$run,$entries,$commit,$reader); if ($result['status']==='UNCHANGED') $unchanged++; else { $imported++; emit($result); } }
+            try { $result=importRun($db,(string)$run,$entries,$commit,$reader,in_array((string)$run,$forceRuns,true)); if ($result['status']==='UNCHANGED') $unchanged++; else { $imported++; emit($result); } }
             catch (Throwable $e) { $blocked++; emit(['run_id'=>(string)$run,'status'=>'BLOCKED','error'=>get_class($e)]); }
         }
         $reader->close();
         $summary=['status'=>$blocked===0?'PASS':'PARTIAL_BLOCKED','source_commit'=>$commit,'imported_runs'=>$imported,'unchanged_runs'=>$unchanged,'blocked_runs'=>$blocked];
+        $summary['evidence_schema_installed']=heInstalled($db);
+        $summary['evidence_migration_status']=$migration['status'];
+        $summary['recent_runs']=$db->query('SELECT run_id,source_commit,document_count,imported_at FROM pc_research_runs ORDER BY imported_at DESC,run_id DESC LIMIT 10')->fetchAll();
+        $summary['evidence_counts_by_recent_run']=[];
+        if ($summary['evidence_schema_installed'])foreach ($summary['recent_runs'] as $recent) {
+            $counts=heQuery($db,"SELECT COUNT(DISTINCT s.id) AS sources,COUNT(DISTINCT c.attestation_id) AS attestations,COUNT(c.id) AS citations FROM pc_he_sources s LEFT JOIN pc_he_citations c ON c.source_id=s.id WHERE JSON_VALID(s.provenance_json) AND JSON_UNQUOTE(JSON_EXTRACT(s.provenance_json,'$.research_run_id'))=?",[$recent['run_id']])->fetch();
+            $summary['evidence_counts_by_recent_run'][]=['run_id'=>(string)$recent['run_id'],'sources'=>(int)$counts['sources'],'attestations'=>(int)$counts['attestations'],'citations'=>(int)$counts['citations']];
+        }
         audit($db,null,'SYNC',$summary['status'],$summary); emit($summary); emit(status($db));
         file_put_contents(PCT_PRIVATE.'/pct-research-storage-last.json',json_encode($summary,JSON_PRETTY_PRINT|JSON_THROW_ON_ERROR).PHP_EOL,LOCK_EX);
         chmod(PCT_PRIVATE.'/pct-research-storage-last.json',0600); flock($lock,LOCK_UN); fclose($lock); exit($blocked===0?0:1);

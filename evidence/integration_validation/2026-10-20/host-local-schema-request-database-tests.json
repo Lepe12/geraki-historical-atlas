@@ -1,0 +1,48 @@
+{
+  "schema": "nabou-host-local-storage-installation-tests-v1",
+  "environment": "ISOLATED_MARIADB_NOT_PRODUCTION",
+  "migration_request_test": {
+    "status": "PASS",
+    "environment": "ISOLATED_MARIADB_NOT_PRODUCTION",
+    "tampered_request_rejected_before_backup": true,
+    "existing_evidence_row_counts_preserved": {
+      "pc_he_sources": 27,
+      "pc_he_attestations": 28,
+      "pc_he_citations": 32
+    },
+    "private_database_backup_hash_verified": true,
+    "backup_mode": "0600",
+    "backup_sha256": "d0373d4bf7f59bf548ae7d40351510b7bbd5d6b61f1332a0a98c53ba835fc298",
+    "migration_version": "evidence-v2",
+    "schema_sha256": "f24414d2da1395ae3448b0d97009a94968cbdcd94aab61ced61f414ea3767816",
+    "request_consumed": true,
+    "second_invocation": "NOT_REQUESTED",
+    "historical_verification_promoted": false
+  },
+  "quote_graph_backup_restore_test": {
+    "status": "PASS",
+    "environment": "ISOLATED_TEST_NOT_PRODUCTION",
+    "tests": [
+      "PDO migration",
+      "durable quote replay",
+      "idempotent import",
+      "citation-backed relational graph",
+      "tampered text rejected",
+      "wrong exact locator rejected",
+      "Greek and supplementary Unicode locator replay",
+      "complete database backup",
+      "restore into isolated database"
+    ],
+    "migration": {
+      "version": "evidence-v2",
+      "schema_sha256": "f24414d2da1395ae3448b0d97009a94968cbdcd94aab61ced61f414ea3767816",
+      "database": "piratecartography"
+    }
+  },
+  "current_code_sha256": {
+    "historical_evidence.php": "b68df0ca30369859d57c96ca6663b715a4077b7d447aa209cfaa2d83f9d229ed",
+    "historical_evidence_schema.sql": "f24414d2da1395ae3448b0d97009a94968cbdcd94aab61ced61f414ea3767816",
+    "pct_research_store.php": "c25e88436fc084afd1f14b8a9754a536c9804cdcfdaa401761df4f4592f3a5de",
+    "evidence_schema_request.php": "78fc4fd51cd08eb3f5c3e2393f010718622007d8ca8f310585030b0fb4ded67a"
+  }
+}

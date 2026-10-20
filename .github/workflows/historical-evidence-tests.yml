@@ -21,6 +21,8 @@ on:
       - 'tools/test_research_response_schema.py'
       - 'tools/storage/historical_evidence.php'
       - 'tools/storage/pct_research_store.php'
+      - 'tools/storage/evidence_schema_request.php'
+      - 'tools/storage/test_evidence_schema_request.php'
       - 'server/command-center-live/**'
       - '.github/workflows/historical-evidence-tests.yml'
   workflow_dispatch:
@@ -78,6 +80,8 @@ jobs:
           php -l tools/storage/pct_research_store.php
           php tools/storage/pct_research_store.php self-test-parser
           php tools/storage/test_historical_evidence_live.php
+          php tools/storage/test_evidence_schema_request.php > /tmp/evidence-schema-request-test.json
+          cat /tmp/evidence-schema-request-test.json
       - name: Restart actual isolated DB server
         run: |
           docker restart '${{ job.services.database.id }}'
@@ -91,4 +95,6 @@ jobs:
         if: always()
         with:
           name: actual-mariadb-validation
-          path: /tmp/evidence-database-test.json
+          path: |
+            /tmp/evidence-database-test.json
+            /tmp/evidence-schema-request-test.json

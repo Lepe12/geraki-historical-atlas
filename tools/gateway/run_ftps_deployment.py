@@ -25,6 +25,13 @@ def execute(env=None, runner=subprocess.run):
     root=Path(__file__).resolve().parents[2]
     names=('historical-evidence.js','pdf-evidence.py','pdf-evidence.js','app.js')
     report['local_payload_sha256']={name:hashlib.sha256((root/'server/command-center-live'/name).read_bytes()).hexdigest() for name in names}
+    storage=env.get('PCT_FTPS_PAYLOAD')=='evidence_storage'
+    if storage:
+        if env.get('PCT_FTPS_STORAGE_CONFIRMATION')!='INSTALL-EXISTING-EVIDENCE-SCHEMA':
+            report['status']='BLOCKED_STORAGE_DEPLOYMENT_NOT_CONFIRMED';return report
+        report['payload']='EXISTING_HOST_LOCAL_EVIDENCE_STORAGE_ONLY'
+        names=('historical_evidence.php','historical_evidence_schema.sql','pct_research_store.php','evidence_schema_request.php')
+        report['local_payload_sha256']={name:hashlib.sha256((root/'tools/storage'/name).read_bytes()).hexdigest() for name in names}
     report['connection_attempted']=True
     try:
         result=runner([sys.executable,str(Path(__file__).with_name('deploy_ftps.py'))],
@@ -36,7 +43,10 @@ def execute(env=None, runner=subprocess.run):
     output=result.stdout or ''
     report['process_exit_code']=result.returncode
     report['rollback_needs_manual_check']='ROLLBACK NEEDS MANUAL CHECK:' in output
-    if result.returncode==0 and 'DEPLOYED: four verified backend files' in output:
+    if result.returncode==0 and storage and 'STORAGE_FILES_STAGED_AWAITING_EXISTING_HOST_LOCAL_CRON' in output:
+        report.update(status='STORAGE_FILES_STAGED_AWAITING_HOST_LOCAL_MIGRATION',production_changed=True,
+                      uploaded_files_hash_checked=True,passenger_restart_requested=False)
+    elif result.returncode==0 and 'DEPLOYED: four verified backend files' in output:
         report.update(status='FILES_INSTALLED_HTTP_AND_DATABASE_VALIDATION_REQUIRED',production_changed=True,
                       uploaded_files_hash_checked=True,passenger_restart_requested=True)
     else:
@@ -55,7 +65,7 @@ def execute(env=None, runner=subprocess.run):
                 if phase.group(1) in ('CONNECT','CONTROL_TLS_LOGIN'):report['production_changed']=False
             match=re.search(r'TLS_VERIFY_CODE: (\d+)',output)
             if match:report['tls_verify_code']=int(match.group(1))
-    report['limits']=['BACKEND_FILES_ONLY_NOT_MARIADB_MIGRATION','HTTP_AND_OIDC_VALIDATION_REQUIRED',
+    report['limits']=['HOST_LOCAL_MIGRATION_PENDING' if storage else 'BACKEND_FILES_ONLY_NOT_MARIADB_MIGRATION','HTTP_AND_OIDC_VALIDATION_REQUIRED',
                       'NO_HISTORICAL_VERIFICATION_PROMOTION']
     return report
 
@@ -66,6 +76,6 @@ def main():
     dest=Path('evidence/production_ftps')/run;dest.mkdir(parents=True,exist_ok=True)
     (dest/'report.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report,indent=2))
-    if report['status']!='FILES_INSTALLED_HTTP_AND_DATABASE_VALIDATION_REQUIRED':raise SystemExit(1)
+    if report['status'] not in ('FILES_INSTALLED_HTTP_AND_DATABASE_VALIDATION_REQUIRED','STORAGE_FILES_STAGED_AWAITING_HOST_LOCAL_MIGRATION'):raise SystemExit(1)
 
 if __name__=='__main__':main()

@@ -29,17 +29,48 @@ def read_storage_metadata(ftp):
     receipt='/piratecartography-system/pct-research-storage-last.json'
     try:
         raw=json.loads(fetch(receipt));summary={}
+        if not isinstance(raw,dict):raise ValueError('INVALID_RECEIPT_SHAPE')
         if raw.get('status') in ('PASS','PARTIAL_BLOCKED','BUSY'):summary['status']=raw['status']
         if isinstance(raw.get('source_commit'),str) and re.fullmatch(r'[a-f0-9]{40}',raw['source_commit']):summary['source_commit']=raw['source_commit']
         for key in ('imported_runs','unchanged_runs','blocked_runs'):
             if type(raw.get(key)) is int and 0<=raw[key]<=1_000_000:summary[key]=raw[key]
+        if type(raw.get('evidence_schema_installed')) is bool:summary['evidence_schema_installed']=raw['evidence_schema_installed']
+        if raw.get('evidence_migration_status') in ('PASS','NOT_REQUESTED','BLOCKED'):summary['evidence_migration_status']=raw['evidence_migration_status']
+        summary['recent_runs']=[]
+        for run in (raw.get('recent_runs') if isinstance(raw.get('recent_runs'),list) else [])[:10]:
+            if not isinstance(run,dict) or not re.fullmatch(r'\d+',str(run.get('run_id',''))):continue
+            item={'run_id':str(run['run_id'])}
+            if re.fullmatch(r'[a-f0-9]{40}',str(run.get('source_commit',''))):item['source_commit']=run['source_commit']
+            if str(run.get('document_count','')).isdigit():item['document_count']=int(run['document_count'])
+            if re.fullmatch(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}',str(run.get('imported_at',''))):item['imported_at_utc']=run['imported_at']
+            summary['recent_runs'].append(item)
+        summary['evidence_counts_by_recent_run']=[]
+        for run in (raw.get('evidence_counts_by_recent_run') if isinstance(raw.get('evidence_counts_by_recent_run'),list) else [])[:10]:
+            if not isinstance(run,dict) or not re.fullmatch(r'\d+',str(run.get('run_id',''))):continue
+            if all(type(run.get(key)) is int and run[key]>=0 for key in ('sources','attestations','citations')):
+                summary['evidence_counts_by_recent_run'].append({key:run[key] for key in ('run_id','sources','attestations','citations')})
         result['recorded_import_summary']=summary
         try:
             timestamp=ftp.sendcmd('MDTM '+receipt)
             if re.fullmatch(r'213 \d{14}',timestamp):result['receipt_modified_utc_yyyymmddhhmmss']=timestamp[4:]
         except ftplib.all_errors:pass
     except (ValueError,OSError,ftplib.Error):result['recorded_import_summary_status']='UNAVAILABLE'
-    for name in ('pct_research_store.php','historical_evidence.php','historical_evidence_schema.sql'):
+    try:
+        raw=json.loads(fetch('/piratecartography-system/pct-evidence-schema-last.json'))
+        if not isinstance(raw,dict) or raw.get('schema')!='nabou-evidence-schema-installation-v1':raise ValueError('INVALID_SCHEMA_RECEIPT')
+        migration={'schema':raw['schema']}
+        if raw.get('status') in ('PASS','BLOCKED'):migration['status']=raw['status']
+        if raw.get('schema_version')=='evidence-v2':migration['schema_version']=raw['schema_version']
+        if re.fullmatch(r'\d{4}-\d{2}-\d{2}T[0-9:+-]+',str(raw.get('completed_utc',''))):migration['completed_utc']=raw['completed_utc']
+        for key in ('backup_created','historical_verification_promoted'):
+            if type(raw.get(key)) is bool:migration[key]=raw[key]
+        for key in ('failed_stage','error_type','reason'):
+            if re.fullmatch(r'[A-Za-z][A-Za-z0-9_]{1,100}',str(raw.get(key,''))):migration[key]=raw[key]
+        for key in ('schema_sha256','backup_sha256','request_sha256'):
+            if re.fullmatch(r'[a-f0-9]{64}',str(raw.get(key,''))):migration[key]=raw[key]
+        result['recorded_evidence_schema_installation']=migration
+    except (ValueError,OSError,ftplib.Error):result['recorded_evidence_schema_status']='UNAVAILABLE'
+    for name in ('pct_research_store.php','historical_evidence.php','historical_evidence_schema.sql','evidence_schema_request.php'):
         row={'file':name,'available':False}
         try:
             data=fetch('/piratecartography-gateway/tools/storage/'+name,limit=2_000_000)

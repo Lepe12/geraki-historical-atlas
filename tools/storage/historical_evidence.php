@@ -5,7 +5,8 @@ function heQuery(PDO $db,string $sql,array $args=[]): PDOStatement {
     $s=$db->prepare($sql);$s->execute($args);return $s;
 }
 function heInstalled(PDO $db): bool {
-    return (bool)heQuery($db,"SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='pc_he_schema_migrations'")->fetchColumn();
+    $exists=(bool)heQuery($db,"SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='pc_he_schema_migrations'")->fetchColumn();
+    return $exists&&(bool)heQuery($db,"SELECT version FROM pc_he_schema_migrations WHERE version='evidence-v2'")->fetchColumn();
 }
 function heBackupWrite($stream,string $text): void {
     while ($text!=='') {$written=gzwrite($stream,$text);if ($written===false||$written===0)throw new RuntimeException('BACKUP_WRITE_FAILED');$text=substr($text,$written);}
@@ -65,7 +66,7 @@ function heMigrate(PDO $db): array {
 /** Caller owns transaction and supplies a trusted durable-byte reader. */
 function heImportBundle(PDO $db,array $bundle,callable $readText): array {
     if (($bundle['schema']??'')!=='nabou-persistent-evidence-bundle-v1')throw new RuntimeException('INVALID_EVIDENCE_BUNDLE');
-    $sources=[];$inserted=0;
+    $sources=[];$inserted=0;$readbacks=0;
     foreach ($bundle['sources']??[] as $source) {
         $text=$readText($source['text_path']);
         if (hash('sha256',$text)!==$source['text_sha256'])throw new RuntimeException('EVIDENCE_TEXT_CHECKSUM_MISMATCH');
@@ -92,6 +93,7 @@ function heImportBundle(PDO $db,array $bundle,callable $readText): array {
             $expected=array_map(fn($c)=>[$c['source_id'],$c['locator'],$c['exact_excerpt'],$c['attribution']],$att['citations']);sort($expected);
             $stored=heQuery($db,'SELECT source_id,locator,exact_excerpt,attribution FROM pc_he_citations WHERE attestation_id=?',[$att['id']])->fetchAll(PDO::FETCH_NUM);sort($stored);
             if ($stored!==$expected)throw new RuntimeException('IMMUTABLE_CITATION_CONFLICT');
+            $readbacks+=count($stored);
             continue;
         }
         foreach ($att['citations'] as $citation) {
@@ -99,11 +101,16 @@ function heImportBundle(PDO $db,array $bundle,callable $readText): array {
             heQuery($db,'INSERT IGNORE INTO pc_he_sources (id,title,source_url,source_type,provenance_json) VALUES (?,?,?,?,?)',[$s['id'],$s['title'],$s['url'],'UNVERIFIED',json_encode($s,JSON_THROW_ON_ERROR)]);
         }
         heQuery($db,'INSERT INTO pc_he_attestations (id,entity_id,predicate,value_text,start_year,end_year,status) VALUES (?,?,?,?,?,?,?)',[$att['id'],$att['entity_id'],$att['predicate'],$att['value'],$att['start_year']??null,$att['end_year']??null,'UNREVIEWED']);
-        foreach ($att['citations'] as $citation)heQuery($db,'INSERT INTO pc_he_citations (attestation_id,source_id,locator,exact_excerpt,attribution) VALUES (?,?,?,?,?)',[$att['id'],$citation['source_id'],$citation['locator'],$citation['exact_excerpt'],$citation['attribution']]);
+        foreach ($att['citations'] as $citation) {
+            heQuery($db,'INSERT INTO pc_he_citations (attestation_id,source_id,locator,exact_excerpt,attribution) VALUES (?,?,?,?,?)',[$att['id'],$citation['source_id'],$citation['locator'],$citation['exact_excerpt'],$citation['attribution']]);
+            $stored=heQuery($db,'SELECT exact_excerpt FROM pc_he_citations WHERE id=?',[$db->lastInsertId()])->fetchColumn();
+            if ($stored!==$citation['exact_excerpt'])throw new RuntimeException('CITATION_DATABASE_READBACK_MISMATCH');
+            $readbacks++;
+        }
         $inserted++;
     }
     if (isset($bundle['graph']))heImportGraph($db,$bundle['graph']);
-    return ['inserted_attestations'=>$inserted,'verified'=>0];
+    return ['inserted_attestations'=>$inserted,'citation_readbacks'=>$readbacks,'verified'=>0];
 }
 /** Replayed server records are ingested as UNREVIEWED, independently of UI selection. */
 function heImportLearning(PDO $db,string $directory,string $id): array {
