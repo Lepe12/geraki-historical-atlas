@@ -65,7 +65,7 @@ class HistoricalMapIntelligenceTests(unittest.TestCase):
     def test_whg_query_has_scope_but_no_unverified_container(self):
         queries, ids = make_whg_queries(converted(), namespaces="whg,gn")
         self.assertEqual(queries["q0"], {"query": "Milo", "mode": "fuzzy",
-                                         "namespaces": "whg,gn", "start": 1650, "end": 1700})
+                                         "namespaces": "whg,gn"})
         self.assertEqual(len(ids), 1)
 
     def test_whg_requires_token(self):

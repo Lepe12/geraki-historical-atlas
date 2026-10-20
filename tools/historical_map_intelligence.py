@@ -121,12 +121,10 @@ def make_whg_queries(collection, *, namespaces=None):
         q = {"query": name, "mode": "fuzzy"}
         if namespaces:
             q["namespaces"] = namespaces
-        # Year hints filter a candidate search, never validate its identity.
-        start, end = feature["properties"].get("start_year"), feature["properties"].get("end_year")
-        if start is not None:
-            q["start"] = start
-        if end is not None:
-            q["end"] = end
+        # WHG warns start/end are HARD filters that wrongly exclude
+        # modern authority records for historical names. Keep map years
+        # on the source feature and apply historical context in human review.
+        # Do not use period hints as matching filters.
         queries[key] = q
         feature_lookup[key] = feature["id"]
     return queries, feature_lookup

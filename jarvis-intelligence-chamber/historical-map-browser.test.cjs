@@ -39,6 +39,18 @@ const matches={schema:"nabou-historical-map-candidates-v1",historically_verified
    const errors=[];page.on("pageerror",e=>errors.push(e.message));
    await page.route("**/cdn.jsdelivr.net/**",r=>r.abort()); // coast optional; grid must work offline
    await page.goto("http://127.0.0.1:"+server.address().port+"/jarvis-intelligence-chamber/historical-map-lab.html");
+   await page.locator("#rawOcrFile").setInputFiles({
+     name:"unlocated-realistic-ocr-fixture.json",mimeType:"application/json",
+     buffer:Buffer.from(JSON.stringify({
+       schema:"nabou-unlocated-historical-map-ocr-v1",
+       source:{id:"synthetic",title:"Synthetic OCR fixture"},
+       georeferencing_status:"NOT_GEOREFERENCED",historically_verified:0,
+       labels:[{text_raw:"TERMIA",pixel_bbox:[10,20,30,12],
+         ocr_confidence:0.82,geolocation:null,historically_verified:false}]
+     }))
+   });
+   assert.match(await page.locator("#rawOcrReport").innerText(),/TERMIA/);
+   assert.match(await page.locator("#mapCount").innerText(),/0 γεωαναφερμένες/);
    await page.locator("#featuresFile").setInputFiles({
      name:"synthetic.geojson",mimeType:"application/json",buffer:Buffer.from(JSON.stringify(sample))
    });
