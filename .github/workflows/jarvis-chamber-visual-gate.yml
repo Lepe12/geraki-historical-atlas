@@ -37,6 +37,8 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Verify Historical Map Lab in actual headless Chromium
         run: node jarvis-intelligence-chamber/historical-map-browser.test.cjs
+      - name: Verify original map image and manual GCP review in actual headless Chromium
+        run: node jarvis-intelligence-chamber/historical-map-review-browser.test.cjs
       # The current four-destination workspace replaces the legacy cinematic and voice shell.
       # Each browser suite starts its own isolated server and never dispatches production work.
       - name: Verify renderer, workspace navigation and responsive layout
