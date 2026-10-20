@@ -1,0 +1,120 @@
+import { Target } from '@/stores/trackingStore';
+
+// Simulated targets for Geo Tracking
+export const mockTargets: Target[] = [
+  {
+    id: 'RT_AB1123',
+    callsign: 'ALPHA-7',
+    lat: 37.7749,
+    lng: -122.4194,
+    altitude: 0,
+    speed: 35,
+    heading: 145,
+    status: 'active',
+    classification: 'hostile',
+    lastSeen: new Date().toISOString(),
+    trail: [
+      [-122.425, 37.780],
+      [-122.422, 37.778],
+      [-122.419, 37.775],
+    ],
+  },
+  {
+    id: 'DELTA_FOXTROT',
+    callsign: 'DELTA-F',
+    lat: 37.7851,
+    lng: -122.4094,
+    altitude: 0,
+    speed: 42,
+    heading: 220,
+    status: 'active',
+    classification: 'unknown',
+    lastSeen: new Date(Date.now() - 120000).toISOString(),
+    trail: [
+      [-122.400, 37.790],
+      [-122.405, 37.788],
+      [-122.409, 37.785],
+    ],
+  },
+  {
+    id: 'BRAVO_ECHO',
+    callsign: 'BRAVO-E',
+    lat: 37.7695,
+    lng: -122.4300,
+    altitude: 15,
+    speed: 0,
+    heading: 0,
+    status: 'idle',
+    classification: 'neutral',
+    lastSeen: new Date(Date.now() - 600000).toISOString(),
+    trail: [
+      [-122.432, 37.770],
+      [-122.431, 37.769],
+      [-122.430, 37.769],
+    ],
+  },
+  {
+    id: 'GHOST_UNIT',
+    callsign: 'GHOST-1',
+    lat: 37.7920,
+    lng: -122.3950,
+    altitude: 0,
+    speed: 58,
+    heading: 80,
+    status: 'active',
+    classification: 'hostile',
+    lastSeen: new Date().toISOString(),
+    trail: [
+      [-122.410, 37.788],
+      [-122.405, 37.790],
+      [-122.398, 37.792],
+    ],
+  },
+  {
+    id: 'WHISKEY_01',
+    callsign: 'WHISKEY',
+    lat: 37.7600,
+    lng: -122.4350,
+    altitude: 0,
+    speed: 12,
+    heading: 310,
+    status: 'active',
+    classification: 'friendly',
+    lastSeen: new Date(Date.now() - 30000).toISOString(),
+    trail: [
+      [-122.438, 37.758],
+      [-122.437, 37.759],
+      [-122.436, 37.760],
+    ],
+  },
+  {
+    id: 'KILO_NINER',
+    callsign: 'KILO-9',
+    lat: 37.7830,
+    lng: -122.4150,
+    altitude: 0,
+    speed: 0,
+    heading: 0,
+    status: 'lost',
+    classification: 'unknown',
+    lastSeen: new Date(Date.now() - 3600000).toISOString(),
+    trail: [
+      [-122.418, 37.785],
+      [-122.416, 37.784],
+      [-122.415, 37.783],
+    ],
+  },
+];
+
+export const classificationColors = {
+  friendly: { color: '#00ff88', label: 'FRIENDLY' },
+  neutral: { color: '#ffc107', label: 'NEUTRAL' },
+  hostile: { color: '#ff3366', label: 'HOSTILE' },
+  unknown: { color: '#a855f7', label: 'UNKNOWN' },
+};
+
+export const statusColors = {
+  active: { color: '#00f0ff', label: 'ACTIVE' },
+  idle: { color: '#ffc107', label: 'IDLE' },
+  lost: { color: '#ff3366', label: 'LOST' },
+};
