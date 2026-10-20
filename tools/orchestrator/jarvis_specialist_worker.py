@@ -9,6 +9,7 @@ sys.path.insert(0,str(ROOT/"connectors"))
 sys.path.insert(0,str(ROOT/"orchestrator"))
 sys.path.insert(0,str(ROOT.parent))
 from tools.research_evidence_bridge import discovery_to_evidence_queue, query_live_learning
+from tools.historical_map_agent_bridge import curated_map_leads
 
 from connector_batch import run_batch
 from repository_connectors import audited_dispatch as repository_dispatch
@@ -112,6 +113,7 @@ def run_one(agent:dict, plan:dict, run_id:str="local", event_root:Path|None=None
           "historical_evidence":{
             **discovery_to_evidence_queue(outputs,run_id=run_id,agent_id=agent["agent_id"]),
             "learned_pdf_evidence":query_live_learning(queries),
+            "historical_map_catalogue":curated_map_leads(queries),
           },
           "result_count":sum(len(x.get("records",[])) for x in outputs if isinstance(x,dict)),
           "verified_promotion_allowed":False,

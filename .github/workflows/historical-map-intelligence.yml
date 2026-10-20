@@ -4,6 +4,15 @@ on:
     branches: [main, feat/historical-map-intelligence-20261020]
     paths:
       - 'tools/historical_map_intelligence.py'
+      - 'tools/historical_map_georeference.py'
+      - 'tools/historical_map_multiangle_ocr.py'
+      - 'tools/test_historical_map_multiangle_ocr.py'
+      - 'tools/test_historical_map_georeference.py'
+      - 'tools/historical_map_learning_bridge.py'
+      - 'tools/test_historical_map_learning_bridge.py'
+      - 'tools/historical_map_agent_bridge.py'
+      - 'tools/test_historical_map_agent_bridge.py'
+      - 'tools/orchestrator/jarvis_specialist_worker.py'
       - 'tools/historical_map_ocr.py'
       - 'tools/historical_map_raw_ocr.py'
       - 'tools/test_historical_map_raw_ocr.py'
@@ -18,6 +27,15 @@ on:
   pull_request:
     paths:
       - 'tools/historical_map_intelligence.py'
+      - 'tools/historical_map_georeference.py'
+      - 'tools/historical_map_multiangle_ocr.py'
+      - 'tools/test_historical_map_multiangle_ocr.py'
+      - 'tools/test_historical_map_georeference.py'
+      - 'tools/historical_map_learning_bridge.py'
+      - 'tools/test_historical_map_learning_bridge.py'
+      - 'tools/historical_map_agent_bridge.py'
+      - 'tools/test_historical_map_agent_bridge.py'
+      - 'tools/orchestrator/jarvis_specialist_worker.py'
       - 'tools/historical_map_ocr.py'
       - 'tools/historical_map_raw_ocr.py'
       - 'tools/test_historical_map_raw_ocr.py'
@@ -72,6 +90,14 @@ jobs:
           name: historical-map-iiif-access-probe
           path: historical-map-iiif-probe.json
           if-no-files-found: warn
+      - name: Scientific georeference hold-out and map-to-agent/learning tests
+        run: |
+          python3 -m unittest -v \
+            tools.test_historical_map_georeference \
+            tools.test_historical_map_agent_bridge \
+            tools.test_historical_map_learning_bridge \
+            tools.test_historical_map_multiangle_ocr
+          python3 -m py_compile tools/orchestrator/jarvis_specialist_worker.py
       - name: MapKurator GeoJSON + mocked WHG service unit tests
         run: python3 -m unittest tools.test_historical_map_intelligence -v
       - name: Source-image OCR and human-review safety unit tests
@@ -104,6 +130,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-fra
+          python3 -m pip install --quiet pillow
       - name: Download verified public-domain 1662 portolan and run unlocated OCR
         run: |
           mkdir -p /tmp/nabou-portolan historical-map-pilot-output
@@ -124,6 +151,23 @@ jobs:
             --title "Francois Ollive, Aegean and Dardanelles Portolan (1662)" \
             --rights "Public Domain Mark 1.0, Wikimedia Commons; original BnF Gallica btv1b59010993" \
             --year 1662 --language fra
+          python3 tools/historical_map_multiangle_ocr.py \
+            --image /tmp/nabou-portolan/ollive-1662.jpg \
+            --out historical-map-pilot-output/rotations-1662-ollive-unlocated.json \
+            --source-id "commons:1662-ollive-aegean-dardanelles" \
+            --source-url "https://commons.wikimedia.org/wiki/File:1662_Portolan_chart_of_the_Aegean_Sea_and_the_Dardanelles_by_Fran%C3%A7ois_Ollive.jpg" \
+            --title "Francois Ollive, Aegean and Dardanelles Portolan (1662)" \
+            --rights "Public Domain Mark 1.0, Wikimedia Commons; original BnF Gallica btv1b59010993" \
+            --year 1662 --language fra --angles 0,90,270 --min-confidence 0.55
+          python3 - <<'PY'
+          import json
+          a=json.load(open("historical-map-pilot-output/rotations-1662-ollive-unlocated.json"))
+          b=json.load(open("historical-map-pilot-output/raw-1662-ollive-unlocated.json"))
+          assert a["source"]["image_sha256"]==b["source"]["image_sha256"]
+          assert a["historically_verified"]==0
+          assert all(x["geolocation"] is None for x in a["labels"])
+          print("REAL_1662_ROTATED_OCR_CANDIDATES",a["ocr"]["raw_candidates_per_angle"],"unique",len(a["labels"]))
+          PY
           python3 - <<'PY'
           import json
           data=json.load(open("historical-map-pilot-output/raw-1662-ollive-unlocated.json"))
