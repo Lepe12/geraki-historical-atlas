@@ -353,7 +353,7 @@ def normalize_final_review(value,sections):
     return {'supported_section_indexes':supported,'flagged_sections':flags,'section_decisions':rows}
 
 
-def validate_items(payload, records):
+def validate_items(payload, records, question_kind=None):
     lookup={r['evidence_id']:r for r in records};accepted=[];rejected=[]
     values=payload.get('items') if isinstance(payload,dict) else None
     if not isinstance(values,list):return [],[{'reason':'INVALID_EXTRACTION_SCHEMA'}]
@@ -390,6 +390,10 @@ def validate_items(payload, records):
         if not row or not isinstance(quote,str) or len(quote.strip())<20 or quote not in row['text'] or not isinstance(statement,str) or not statement.strip() or forbidden(item):
             rejected.append({'reason':'INVALID_OR_UNGROUNDED_QUOTATION'});continue
         kind=item.get('kind')
+        passage_kind=item.get('passage_kind','NARRATIVE_EVIDENCE')
+        if passage_kind!='NARRATIVE_EVIDENCE':
+            rejected.append({'evidence_id':eid,'reason':'DISCOVERY_LEAD_NOT_NARRATIVE_EVIDENCE',
+                             'passage_kind':passage_kind,'proposed_item':item});continue
         if kind not in ('source_statement','inference','hypothesis'):
             rejected.append({'reason':'MISSING_STATEMENT_KIND'});continue
         entities={};bad=False;field_issues=[];surface_corrections=[]
@@ -419,6 +423,9 @@ def validate_items(payload, records):
             rejected.append({'reason':'ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE','evidence_id':eid,
                              'field':field,'proposed_values':item.get(field),
                              'selected_passage_ids':item.get('passage_ids')});continue
+        if question_kind in ('place','topic') and not entities['places']:
+            rejected.append({'reason':'GEOGRAPHIC_FINDING_REQUIRES_LITERAL_PLACE',
+                             'evidence_id':eid,'proposed_item':item});continue
         start=selected_start if selected_start is not None else row['text'].find(quote)
         accepted.append({'claim_id':'c-'+digest([row['evidence_id'],statement,quote])[:20],
             'statement':statement,'kind':kind,'evidence_id':row['evidence_id'],'quote':quote,
@@ -485,7 +492,13 @@ def documentary_answer(out, records, run_root):
     return out
 
 def execute(run_root, question, caller=call, config=None, output_root=None, provenance_root=None):
+    from research_focus import decompose
     all_records,excluded=collect(run_root,provenance_root)
+    request={}
+    for manifest in sorted(Path(run_root).glob('*/run_manifest/manifest.json')):
+        request=read(manifest).get('normalized_request') or {}
+        if request:break
+    question_kind=decompose(request.get('target',''),request.get('aliases',[])).get('kind') if request else None
     grouped,deferred=batches(all_records,budget=6500 if os.getenv('PCT_LLM_PROVIDER')=='local_llama_cpp' else 14000)
     selected=[r for b in grouped for r in b]
     conf=configuration() if config is None else config
@@ -532,10 +545,13 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
         (destination/'progress.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
         return parse(result)
     for group in grouped:
-        prompt=RULES+'\nExtraction language: English. QUESTION: '+question+'\nReturn {"items":[{"statement":"The consulted source reports ...","evidence_id":"copy supplied evidence_id","passage_ids":[0],"kind":"source_statement","source_type":"UNVERIFIED","actors":[],"places":[],"dates":[],"usage_type":"UNRESOLVED","uncertainty":[]}]}. Select at most 2 claims directly relevant to the question. For a person question, prioritize the named person, identity and sourced activities; a named place is optional. For a place or geographic topic, prioritize named-place claims. Choose 1-4 adjacent passage_ids from ONE evidence item. Do NOT output a quote: the engine copies the selected original text. Copy entity spellings literally from those selected passages; do not translate names. Dates must be strings copied from the selected passages or date_evidence. Empty arrays are valid. Leave unspecified actors, dates and places empty. State only what the selected passage actually supports, with source attribution. Distinguish an actual base from a raid site, and an intention from an executed action. usage_type may be BASE, ANCHORAGE, REFUGE, RAID_LOCATION, OTHER, UNRESOLVED. Modern studies are SECONDARY_SOURCE; contemporary authorship must be established for PRIMARY_SOURCE. Never infer location or dates from a book title.\nEVIDENCE_JSON:\n'+json.dumps([model_evidence(row) for row in group],ensure_ascii=False)
-        schema=schemas.extraction([r['evidence_id'] for r in group])
+        prompt=RULES+'\nExtraction language: English. QUESTION: '+question+'\nReturn {"items":[{"passage_kind":"NARRATIVE_EVIDENCE","statement":"The consulted source reports ...","evidence_id":"copy supplied evidence_id","passage_ids":[0],"kind":"source_statement","source_type":"UNVERIFIED","actors":[],"places":[],"dates":[],"usage_type":"UNRESOLVED","uncertainty":[]}]}. Select at most 2 claims directly relevant to the question. For a person question, prioritize the named person, identity and sourced activities; a named place is optional. For a place or geographic topic, prioritize named-place claims. Choose 1-4 adjacent passage_ids from ONE evidence item. Do NOT output a quote: the engine copies the selected original text. Copy entity spellings literally from those selected passages; do not translate names. Dates must be strings copied from the selected passages or date_evidence. Empty arrays are valid. Leave unspecified actors, dates and places empty. State only what the selected passage actually supports, with source attribution. Distinguish an actual base from a raid site, and an intention from an executed action. usage_type may be BASE, ANCHORAGE, REFUGE, RAID_LOCATION, OTHER, UNRESOLVED. Modern studies are SECONDARY_SOURCE; contemporary authorship must be established for PRIMARY_SOURCE. Never infer location or dates from a book title.\nEVIDENCE_JSON:\n'+json.dumps([model_evidence(row) for row in group],ensure_ascii=False)
+        prompt+='\nClassify passage_kind before proposing a claim. Index entries, bibliography citations, catalogue descriptions and lists of names are discovery leads, not narrative evidence for a historical event. Only NARRATIVE_EVIDENCE may support an answer. Relevant means answering the requested subject, activity and period, not merely repeating its spelling. Do not turn medieval background or a modern namesake into the requested historical finding.'
+        if question_kind in ('place','topic'):
+            prompt+=' Every proposed item MUST contain at least one literal place from the selected passages. If no relevant named-place narrative is available, return an empty items array. Unresolved dates are allowed but must remain unresolved.'
+        schema=schemas.extraction([r['evidence_id'] for r in group],question_kind)
         payload=invoke('evidence_extractor',prompt,schema)
-        items,rejected=validate_items(payload or {},group)
+        items,rejected=validate_items(payload or {},group,question_kind)
         out['rejected'].extend(rejected)
         if not items and isinstance(payload,dict) and payload.get('items') and rejected:
             # A real source can be lost through malformed entity arrays or a
@@ -543,7 +559,7 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
             # may correct the proposal; every original byte/date gate is rerun.
             repair_prompt=prompt+'\nREPAIR: the previous proposals failed validation. Return corrected items only, or an empty items array if unsupported. actors, places and dates MUST be arrays of literal strings, never objects. Select all adjacent sentences needed for the statement and its named entities, up to 4 passage_ids. An entity outside the selected passages is unsupported. Do not fill absent dates. Do not equate a modern namesake with the historical subject. Do not assert a BASE unless the selected text actually describes that use.\nREJECTED_PROPOSALS_JSON:\n'+json.dumps({'previous':payload,'validation':rejected},ensure_ascii=False)
             repaired=invoke('evidence_extractor',repair_prompt,schema)
-            items,repair_rejections=validate_items(repaired or {},group)
+            items,repair_rejections=validate_items(repaired or {},group,question_kind)
             out['rejected'].extend(repair_rejections)
         out['claims'].extend(items)
     if not out['claims']:out['status']='EXTRACTION_FAILED_OR_UNSUPPORTED';return out
@@ -552,6 +568,7 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
     claims=out['claims']
     evidence_by_id={r['evidence_id']:r for r in selected}
     review_rules=RULES+'\nQUESTION: '+question+'\nROLE: check whether EVERY source-attributed statement faithfully reports its supplied quotation. This is QUOTATION SUPPORT, not historical truth or verification. Missing original inspection, primary authorship, independent corroboration or human review are limitations, not reasons to reject a faithful attribution to a consulted source. An explicitly attributed source conjecture may be supported AS A HYPOTHESIS, never as an established fact. Do not reject solely because an optional date is unresolved. Flag invented facts, wrong dates, conflated people, a raid falsely called a base, and places demonstrably outside the requested region. Do not invent a geographic identity. Return decisions records with claim_index, reason and decision, plus a limitations list. Explain the actual quotation support or precise mismatch in reason BEFORE choosing the verdict. Return EXACTLY ONE decision for EVERY supplied claim_index. Use SUPPORTED, UNSUPPORTED or UNCERTAIN. Do not output claim IDs. Unsupported PRIMARY_SOURCE classification must remain UNVERIFIED.'
+    review_rules+='\nAlso check QUESTION RELEVANCE and passage genre. A faithful quote about a different namesake, a modern minister, an index entry, a bibliographic reference, or unrelated trade/building materials does not answer a historical piracy question. Use UNSUPPORTED for demonstrated irrelevance, UNCERTAIN for unresolved target identity or temporal applicability, and explain that separately from quotation fidelity. Do not require an exact date when the source context supports the requested period; never infer that context from the question itself.'
     review={'supported_claim_ids':[],'flagged_claims':[],'contradictions':[],
             'limitations':['CLAIM_FIDELITY_REVIEWED_SEPARATELY; CROSS_SOURCE_CORROBORATION_NOT_ESTABLISHED'],
             'missing_claim_ids':[],'invalid_review_claim_ids':[]}
@@ -579,8 +596,11 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
         out['status']='REVIEW_FAILED' if review['invalid_review_claim_ids'] else 'REVIEW_INCOMPLETE' if review['missing_claim_ids'] else 'NO_MODEL_SUPPORTED_CLAIMS'
         return out
     synthesis_claims=[c for c in claims if c['claim_id'] in supported]
-    synthesis_rules=RULES+'\nROLE: answer in concise English using ONLY supplied supported claims. Greek translation is a separate unvalidated step; do not translate into Greek here. Use one short paragraph per distinct finding, at most 4 paragraphs. Attribute every statement to the consulted source and explicitly state that historical verification is pending. Copy personal and place names from the quotations without changing identity. The user supplied aliases are SEARCH HYPOTHESES, not evidence of a shared identity: a Latin namesake must not be equated with the requested Greek person. Preserve every conjecture as a conjecture. The question date range is a FILTER, not evidence that an undated event occurred then. Do not add dates, places, actions, ranks or relationships absent from the quoted evidence. Do not call repetitions independent. Return {"answer_sections":[{"text":"According to the consulted source ...; historical verification is pending.","claim_ids":["supplied claim IDs"]}],"unknowns":["gaps including unresolved identities and dates"],"limitations":["limitations"]}. Every paragraph must cite only its actual supporting claim IDs. QUESTION: '+question
-    synthesis_context={'claims':[model_claim(c) for c in synthesis_claims],'review':review}
+    synthesis_rules=RULES+'\nROLE: answer in concise English using ONLY supplied supported claims. Greek translation is a separate unvalidated step; do not translate into Greek here. Use one short paragraph per distinct finding, at most 4 paragraphs. Attribute every statement to the consulted source. The engine separately records that historical verification is pending. Copy personal and place names from the quotations without changing identity. The user supplied aliases are SEARCH HYPOTHESES, not evidence of a shared identity: a Latin namesake must not be equated with the requested Greek person. Preserve every conjecture as a conjecture. The question date range is a FILTER, not evidence that an undated event occurred then. Do not add dates, places, actions, ranks or relationships absent from the quoted evidence. Do not call repetitions independent. Return {"answer_sections":[{"text":"According to the consulted source ...","claim_ids":["supplied claim IDs"]}],"unknowns":["gaps including unresolved identities and dates"],"limitations":["limitations"]}. Every paragraph must cite only its actual supporting claim IDs. QUESTION: '+question
+    # Quarantined claims and their IDs must never become synthesis material.
+    # The complete review remains in the durable answer/review receipts.
+    synthesis_context={'claims':[model_claim(c) for c in synthesis_claims]}
+    synthesis_rules+='\nDo not discuss rejected, absent or uncited claims, internal claim IDs, or review procedures in answer prose. Verification state is supplied separately by the engine; keep historical prose limited to the cited source attribution. Put research gaps in unknowns and limitations.'
     synthesis_prompt=synthesis_rules+'\nCLAIMS_AND_REVIEW_JSON:\n'+json.dumps(synthesis_context,ensure_ascii=False)
     answer=invoke('synthesis',synthesis_prompt,schemas.synthesis(sorted(supported)))
     out['requested_answer_language']='en'

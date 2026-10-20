@@ -31,6 +31,39 @@ def item(eid,**changes):
             'kind':'source_statement','actors':[],'places':[],'dates':['1677'],'uncertainty':[],**changes}
 
 class SemanticAnswer(unittest.TestCase):
+    def test_discovery_genres_and_missing_geographic_entities_cannot_become_findings(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp);rows=collect(tmp)[0];eid=rows[0]['evidence_id']
+            for genre in ('INDEX_ENTRY','BIBLIOGRAPHIC_REFERENCE','CATALOGUE_METADATA','NAME_LIST'):
+                accepted,rejected=validate_items({'items':[item(eid,passage_kind=genre)]},rows)
+                self.assertFalse(accepted)
+                self.assertEqual(rejected[0]['reason'],'DISCOVERY_LEAD_NOT_NARRATIVE_EVIDENCE')
+            accepted,rejected=validate_items({'items':[item(eid)]},rows,'place')
+            self.assertFalse(accepted)
+            self.assertEqual(rejected[0]['reason'],'GEOGRAPHIC_FINDING_REQUIRES_LITERAL_PLACE')
+            self.assertTrue(validate_items({'items':[item(eid)]},rows,'person')[0])
+
+    def test_quarantined_claims_never_enter_synthesis_context(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture(tmp);eid=collect(tmp)[0][0]['evidence_id'];state={'supported':None}
+            def caller(role,prompt):
+                if role=='evidence_extractor':
+                    return response({'items':[item(eid),item(eid,statement='An unrelated rejected claim.')]})
+                if role=='adversarial_reviewer':
+                    if 'FINAL_ANSWER_JSON:' in prompt:
+                        return response({'supported_section_indexes':[0],'flagged_sections':[]})
+                    claim=json.loads(prompt.split('CLAIMS_JSON:\n')[1])[0]
+                    if claim['statement']=='An unrelated rejected claim.':
+                        return response({'supported_claim_ids':[],'flagged_claims':[{'claim_id':claim['claim_id'],'reason':'QUARANTINED_SECRET_MARKER'}]})
+                    state['supported']=claim['claim_id']
+                    return response({'supported_claim_ids':[claim['claim_id']],'flagged_claims':[]})
+                self.assertNotIn('QUARANTINED_SECRET_MARKER',prompt)
+                self.assertNotIn('An unrelated rejected claim.',prompt)
+                return response({'answer_sections':[{'text':'The source reports an attack in 1677.','claim_ids':[state['supported']]}]})
+            out=execute(tmp,'question',caller=caller,config={'configured':True,'missing':[]})
+            self.assertEqual(out['status'],'MODEL_ANSWER_PENDING_HUMAN_REVIEW')
+            self.assertEqual(len(out['review']['flagged_claims']),1)
+
     def test_unresolved_alias_only_and_bibliographic_leads_do_not_become_person_answers(self):
         cases=[('Nicola Test Principe di Esempio','Synthetic source',
                 ['EVENT_DATE_UNRESOLVED','ACTION_UNRESOLVED'],'ALIAS_ONLY_WITHOUT_IDENTITY_OR_EVENT_CONTEXT_RETAINED_AS_LEAD'),

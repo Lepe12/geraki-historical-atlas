@@ -16,6 +16,10 @@ class ResponseSchemaTests(unittest.TestCase):
         self.assertEqual(item['properties']['actors']['items']['type'],'string')
         self.assertEqual(item['properties']['evidence_id']['enum'],['e-actual'])
         self.assertFalse(item['additionalProperties'])
+        self.assertIn('passage_kind',item['required'])
+        geo=schemas.extraction(['e-actual'],'place')['properties']['items']['items']
+        self.assertEqual(geo['properties']['places']['minItems'],1)
+        self.assertNotIn('minItems',item['properties']['places'])
         self.assertEqual(schemas.review(2)['properties']['decisions']['minItems'],2)
         self.assertEqual(schemas.synthesis(['c-supported'])['properties']['answer_sections']['items']['properties']['claim_ids']['items']['enum'],['c-supported'])
 
