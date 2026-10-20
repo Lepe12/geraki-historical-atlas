@@ -17,6 +17,7 @@ def execute(env=None, runner=subprocess.run):
             'source_revision':env.get('GITHUB_SHA'),
             'bindings_present':{k:bool(env.get(k,'').strip()) for k in REQUIRED},
             'credential_values_recorded':False,'connection_attempted':False,
+            'explicit_tls_name_configured':bool(env.get('PCT_FTPS_TLS_SERVER_NAME','').strip()),
             'production_changed':False,'database_migration_executed':False,
             'historical_research_acceptance':False}
     if not all(report['bindings_present'].values()):

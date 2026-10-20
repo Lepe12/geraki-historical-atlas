@@ -10,6 +10,8 @@ import io
 import os
 from pathlib import Path
 import posixpath
+import re
+import socket
 import ssl
 import sys
 import uuid
@@ -22,6 +24,7 @@ HOST = os.environ["PCT_FTPS_HOST"]
 USER = os.environ["PCT_FTPS_USER"]
 PASSWORD = os.environ["PCT_FTPS_PASSWORD"]
 PORT = int(os.getenv("PCT_FTPS_PORT", "21"))
+TLS_NAME = os.getenv('PCT_FTPS_TLS_SERVER_NAME','').strip().rstrip('.')
 
 if not REMOTE.startswith("/"):
     sys.exit("BLOCKED: PCT_FTPS_APP_ROOT must be absolute")
@@ -39,7 +42,16 @@ staged = []
 remote_backups = {}
 phase = 'CONNECT'
 try:
+    if TLS_NAME:
+        phase = 'VALIDATE_TLS_NAME'
+        if len(TLS_NAME)>253 or not re.fullmatch(r'[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?',TLS_NAME):
+            raise RuntimeError('INVALID_TLS_SERVER_NAME')
+        expected={row[4][0] for row in socket.getaddrinfo(HOST,PORT,type=socket.SOCK_STREAM)}
+        actual={row[4][0] for row in socket.getaddrinfo(TLS_NAME,PORT,type=socket.SOCK_STREAM)}
+        if not expected.intersection(actual):raise RuntimeError('TLS_NAME_NOT_BOUND_TO_CONFIGURED_SERVER')
+    phase = 'CONNECT'
     ftp.connect(HOST, PORT)
+    if TLS_NAME:ftp.host=TLS_NAME
     phase = 'CONTROL_TLS_LOGIN'
     ftp.login(USER, PASSWORD)
     ftp.prot_p()

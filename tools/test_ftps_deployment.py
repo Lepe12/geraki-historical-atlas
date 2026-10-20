@@ -17,6 +17,24 @@ diag_spec=importlib.util.spec_from_file_location('ftps_diagnostics',ROOT/'gatewa
 diagnostics=importlib.util.module_from_spec(diag_spec);diag_spec.loader.exec_module(diagnostics)
 
 class FtpsDeploymentTests(unittest.TestCase):
+    def test_explicit_tls_name_is_verified_on_the_original_server(self):
+        ftp=Mock();output=io.StringIO()
+        env={name:'PRIVATE_FIXTURE' for name in module.REQUIRED}
+        env.update(PCT_FTPS_HOST='192.0.2.1',PCT_FTPS_TLS_SERVER_NAME='node.example.invalid')
+        address=lambda ip:(2,1,6,'',(ip,21))
+        def stop_before_authentication(*args,**kwargs):
+            self.assertEqual(ftp.host,'node.example.invalid')
+            raise RuntimeError('STOP_ISOLATED_TEST_BEFORE_AUTHENTICATION')
+        ftp.login.side_effect=stop_before_authentication
+        with patch.dict(os.environ,env),patch('ftplib.FTP_TLS',return_value=ftp) as factory, \
+             patch('socket.getaddrinfo',side_effect=[[address('192.0.2.1')],[address('192.0.2.1')]]), \
+             contextlib.redirect_stdout(output):
+            with self.assertRaises(SystemExit):runpy.run_path(str(ROOT/'gateway/deploy_ftps.py'),run_name='__main__')
+        ftp.connect.assert_called_once_with('192.0.2.1',21)
+        ftp.storbinary.assert_not_called()
+        self.assertEqual(factory.call_args.kwargs['context'].verify_mode,ssl.CERT_REQUIRED)
+        self.assertNotIn('PRIVATE_FIXTURE',output.getvalue())
+
     def test_canonical_probe_accepts_dual_stack_dns_but_pins_original_server_without_login(self):
         ftp=Mock();factory=Mock(return_value=ftp)
         address=lambda ip:(2,1,6,'',(ip,21))

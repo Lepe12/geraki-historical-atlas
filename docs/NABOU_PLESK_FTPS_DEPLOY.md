@@ -43,6 +43,14 @@ server error messages are never stored. Missing bindings stop before connection.
 The subsequent `evidence/production_smoke/<run_id>/report.json` performs actual
 HTTP and GitHub OIDC checks. A successful upload alone is not acceptance.
 
+For an existing account configured with a numeric server IP, provide the confirmed
+hosting TLS hostname in the request's `tls_server_name`, or the environment
+variable `PCT_FTPS_TLS_SERVER_NAME`. Read-only probe39480213981 verified
+`linux3087.grserver.gr` against the configured server with normal CA and hostname
+checks. Deployment first checks forward DNS, connects to the original configured
+address, and uses the explicitly configured name for control/data TLS validation.
+It does not disable verification or follow a different server address.
+
 The action runs syntax and Node self-tests first, transfers only four backend files over TLS, verifies SHA-256 of staged files, saves existing remote files for recovery, places `app.js` last, triggers the Passenger restart marker, and tests health and evidence routes.
 
 **Limits:** FTPS deployment does **not** apply the PHP/MariaDB schema and does **not** prove the full PDF Learning/evidence pipeline. The schema and data migration must be validated separately. A 200 health alone is not a complete acceptance test. On a failed job, inspect the logs and the server, and confirm a safe rollback before retrying.

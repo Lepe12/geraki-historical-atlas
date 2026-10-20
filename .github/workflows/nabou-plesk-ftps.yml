@@ -34,6 +34,7 @@ jobs:
   validate:
     outputs:
       authorized_push: ${{ steps.request.outputs.authorized }}
+      tls_server_name: ${{ steps.request.outputs.tls_server_name }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -43,7 +44,7 @@ jobs:
         if: github.event_name == 'push'
         run: |
           python3 - <<'PYREQUEST'
-          import json,os
+          import json,os,re
           from pathlib import Path
           request=json.loads(Path('ops_ftps_requests/nabou-existing-host.json').read_text())
           assert request.get('schema')=='nabou-existing-ftps-deployment-request-v1'
@@ -51,7 +52,12 @@ jobs:
           assert request.get('application')=='server/command-center-live'
           assert request.get('backend_only') is True
           assert request.get('confirmation')=='DEPLOY-NABOU'
-          with open(os.environ['GITHUB_OUTPUT'],'a') as out:out.write('authorized=true\n')
+          name=request.get('tls_server_name','')
+          assert isinstance(name,str) and len(name)<=253
+          assert not name or re.fullmatch(r'[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?',name)
+          with open(os.environ['GITHUB_OUTPUT'],'a') as out:
+              out.write('authorized=true\n')
+              out.write('tls_server_name='+name+'\n')
           PYREQUEST
       - name: Check backend syntax and tests (no credentials, no deployment)
         run: |
@@ -91,6 +97,7 @@ jobs:
       PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
       PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
       PCT_FTPS_APP_ROOT: /piratecartography-gateway/server/command-center-live
+      PCT_FTPS_TLS_SERVER_NAME: ${{ needs.validate.outputs.tls_server_name || vars.PCT_FTPS_TLS_SERVER_NAME }}
     steps:
       - uses: actions/checkout@v4
         with:
