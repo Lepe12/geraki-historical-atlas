@@ -125,6 +125,28 @@ jobs:
           python -m pip install --quiet pillow
           python generate_diorama_assets.py
 
+      - name: Bundle authentic 1662 Aegean map image for immediate viewing
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL="https://upload.wikimedia.org/wikipedia/commons/7/74/1662_Portolan_chart_of_the_Aegean_Sea_and_the_Dardanelles_by_Fran%C3%A7ois_Ollive.jpg"
+          TARGET="_site/jarvis-intelligence-chamber/assets"
+          mkdir -p "$TARGET"
+          curl --fail --location --silent --show-error --retry 2 --connect-timeout 15 --max-time 100 "$URL" -o /tmp/nabou-ollive-original.jpg
+          python - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          original=Image.open("/tmp/nabou-ollive-original.jpg")
+          original.thumbnail((1700,1400))
+          path=Path("_site/jarvis-intelligence-chamber/assets/ollive-aegean-1662-preview.jpg")
+          original.convert("RGB").save(path,quality=85,optimize=True)
+          print("BUNDLED_AUTHENTIC_1662_MAP",original.size,path.stat().st_size)
+          PY
+          printf '%s\n' 'François Ollive, Aegean Sea and Dardanelles portolan, 1662.' \
+            'Original: BnF Gallica btv1b59010993; redistributed via Wikimedia Commons.' \
+            'Public Domain Mark 1.0; preview resized from the authentic source.' \
+            "$URL" > "$TARGET/OLLive-1662-SOURCE.txt"
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
