@@ -48,6 +48,19 @@ def configuration():
         elif r.provider not in ('openai_compatible','local_llama_cpp'):missing.append('SUPPORTED_PROVIDER')
     return {'configured':not missing,'missing':sorted(set(missing))}
 
+def person_passage_hold_reason(text,title,request,uncertainties):
+    from research_focus import fold,name_pattern,decompose
+    if decompose(request.get('target',''),request.get('aliases',[])).get('kind')!='person':return None
+    literal_target=bool(re.search(name_pattern(fold(request['target']).split()),fold(text)))
+    if not literal_target and {'EVENT_DATE_UNRESOLVED','ACTION_UNRESOLVED'}<=set(uncertainties):
+        return 'ALIAS_ONLY_WITHOUT_IDENTITY_OR_EVENT_CONTEXT_RETAINED_AS_LEAD'
+    bibliography_hint=bool(re.search(r'bibliograph|βιβλιογραφ',fold(title or '')))
+    reference_start=bool(re.match(r'[^«\n]{1,100},\s*«[^»]+»',text,re.S))
+    publication_date=bool(re.search(r'(?<!\d)(?:18|19|20)\d{2}(?!\d)',text))
+    if bibliography_hint and reference_start and publication_date:
+        return 'BIBLIOGRAPHIC_REFERENCE_REQUIRES_CITED_WORK_ACQUISITION'
+    return None
+
 def collect(run_root, provenance_root=None):
     @lru_cache(maxsize=32)
     def load_document(path):
@@ -72,6 +85,9 @@ def collect(run_root, provenance_root=None):
             from research_relevance import later_namesake_requires_review
             from research_focus import decompose
             req=read(p.parent.parent/'run_manifest/manifest.json',{}).get('normalized_request') or {}
+            hold=person_passage_hold_reason(raw,f.get('title'),req,f.get('uncertainties',[]))
+            if hold:
+                excluded.append({'finding_id':f.get('finding_id'),'reason':hold});continue
             scope=[int(y) for y in re.findall(r'\b1\d{3}\b',req.get('date_range',''))]
             if req.get('target') and not (scope and min(scope)>=1750) and later_namesake_requires_review(raw,decompose(req['target'],req.get('aliases',[]))):
                 excluded.append({'finding_id':f.get('finding_id'),'reason':'LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW'});continue

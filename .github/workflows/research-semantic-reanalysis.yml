@@ -19,28 +19,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        parent_run: ${{ fromJSON(inputs.run_id && format('["{0}"]', inputs.run_id) || '["39304927069","39304929906","39304933066","39304936293"]') }}
+        parent_run: ${{ fromJSON(inputs.run_id && format('["{0}"]', inputs.run_id) || '["39372433114"]') }}
     env:
       PARENT_RESEARCH_RUN: ${{ matrix.parent_run }}
       PCT_LLM_PROVIDER: local_llama_cpp
-      PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen2.5-7B-Instruct-GGUF
-      PCT_LLM_MODEL: Qwen/Qwen2.5-7B-Instruct-GGUF
+      PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen3-8B-GGUF
+      PCT_LLM_MODEL: Qwen/Qwen3-8B-GGUF
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/cache/restore@v4
-        id: model-cache
-        with:
-          path: ~/.cache/nabou-models/qwen2.5-7b
-          key: nabou-official-qwen2.5-7b-q4km-bb5d59e0-v2
-      - name: Prepare real CPU inference
-        env:
-          CMAKE_BUILD_PARALLEL_LEVEL: '2'
-        run: |
-          set -e
-          python3 -m pip install --quiet 'llama-cpp-python==0.3.16' --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu 'huggingface-hub==0.36.0'
-          python3 tools/prepare_local_research_model.py --destination "$HOME/.cache/nabou-models/qwen2.5-7b"
+      - uses: ./.github/actions/research-model
       - name: Install the existing public PDF reader
         run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
       - name: Check actual llama.cpp stage schema grammars
@@ -71,9 +60,3 @@ jobs:
           git add "$dest"
           git commit -m 'Record actual semantic reanalysis with replayed source passages'
           python3 tools/publish_research_outputs.py
-      - name: Retain verified open weights even when research remains incomplete
-        if: always() && steps.model-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: ~/.cache/nabou-models/qwen2.5-7b
-          key: nabou-official-qwen2.5-7b-q4km-bb5d59e0-v2

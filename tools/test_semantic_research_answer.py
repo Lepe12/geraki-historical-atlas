@@ -31,6 +31,25 @@ def item(eid,**changes):
             'kind':'source_statement','actors':[],'places':[],'dates':['1677'],'uncertainty':[],**changes}
 
 class SemanticAnswer(unittest.TestCase):
+    def test_unresolved_alias_only_and_bibliographic_leads_do_not_become_person_answers(self):
+        cases=[('Nicola Test Principe di Esempio','Synthetic source',
+                ['EVENT_DATE_UNRESOLVED','ACTION_UNRESOLVED'],'ALIAS_ONLY_WITHOUT_IDENTITY_OR_EVENT_CONTEXT_RETAINED_AS_LEAD'),
+               ('Author, «Νικόλαος Δοκιμής, διοικητής (4575)», Athens 1956, pp. 10–12.',
+                'Synthetic bibliographic guide',['ACTION_UNRESOLVED'],'BIBLIOGRAPHIC_REFERENCE_REQUIRES_CITED_WORK_ACQUISITION')]
+        for text,title,flags,reason in cases:
+            with tempfile.TemporaryDirectory() as tmp:
+                fixture(tmp);base=Path(tmp)/'travellers';file=base/'library_acquisition/doc.txt';file.write_text(text)
+                fp=base/'structured_output/extracted_findings.json';f=json.loads(fp.read_text())['findings'][0]
+                f.update(evidence_excerpt=text,title=title,uncertainties=flags,years_in_scope=[],
+                         source_text_sha256=hashlib.sha256(file.read_bytes()).hexdigest(),
+                         locator={'start_char':0,'end_char':len(text),'start_line':1,'end_line':1})
+                fp.write_text(json.dumps({'findings':[f]}));(base/'run_manifest').mkdir()
+                (base/'run_manifest/manifest.json').write_text(json.dumps({'normalized_request':{
+                    'target':'Νικόλαος Δοκιμής','aliases':['Nicola Test'],'date_range':'1500-1650'}}))
+                rows,excluded=collect(tmp)
+                self.assertEqual(rows,[]);self.assertEqual(excluded[0]['reason'],reason)
+                self.assertEqual(file.read_text(),text)
+
     def test_entity_formatting_copies_real_mention_without_spelling_or_identity_repair(self):
         from semantic_research_answer import literal_entity_surface
         quote='The CORSAIRS named Romanos\nManetas anchored at Milos.'

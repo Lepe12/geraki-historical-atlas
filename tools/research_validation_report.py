@@ -70,6 +70,16 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
     if request_kind!='person' and not geographic.get('findings'):blockers.append('NO_SUPPORTED_PLACE_FINDINGS')
     supported=set((answer.get('review') or {}).get('supported_claim_ids',[]))
     cited={cid for section in answer.get('answer_sections',[]) for cid in section.get('claim_ids',[])}
+    from semantic_research_answer import person_passage_hold_reason
+    evidence_by_id={row.get('evidence_id'):row for row in answer.get('evidence',[])}
+    quality_rejections=[]
+    for claim in answer.get('claims',[]):
+        if claim.get('claim_id') not in cited:continue
+        row=evidence_by_id.get(claim.get('evidence_id'),{})
+        title=(row.get('occurrences') or [{}])[0].get('title')
+        reason=person_passage_hold_reason(row.get('text',''),title,request,row.get('uncertainties',[]))
+        if reason:quality_rejections.append({'claim_id':claim['claim_id'],'reason':reason})
+    if quality_rejections:blockers.append('ANSWER_CONTAINS_UNRESOLVED_PERSON_OR_BIBLIOGRAPHIC_LEADS')
     if request_kind=='person' and not cited.intersection(supported):blockers.append('NO_SUPPORTED_PERSON_RESEARCH_CLAIMS')
     if not any(q.get('output_status')=='MODEL_QUERIES_AVAILABLE' for q in queries):blockers.append('LIVE_MODEL_QUERY_EXPANSION_NOT_DEMONSTRATED')
     violations=[c.get('claim_id') for c in answer.get('claims',[]) if c.get('verified') or c.get('verification_status')=='VERIFIED']
@@ -95,7 +105,7 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
         'latest_connector_probe_run':latest.get('run_id'),
         'native_connector_tests':latest.get('native_connector_tests',[]),
         'connector_endpoint_tests':latest.get('connectors',[]),
-        'blockers':blockers,'verification_violations':violations,
+        'blockers':blockers,'quality_gate_rejections':quality_rejections,'verification_violations':violations,
         'excluded_access_challenges':challenge_pages,
         'limits':['BOUNDED_SEARCH_NOT_ALL_RELEVANT_SOURCES','MODEL_ANALYSIS_NOT_HISTORICAL_VERIFICATION',
                   'ORIGINAL_INSPECTION_AND_GENEALOGY_MAY_REMAIN_PENDING',
