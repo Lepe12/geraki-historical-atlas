@@ -7,6 +7,14 @@ on:
       - 'server/command-center-live/**'
   workflow_dispatch:
     inputs:
+      mode:
+        description: 'Choose diagnosis (read-only) or deployment'
+        required: true
+        type: choice
+        options:
+          - diagnose
+          - deploy
+        default: diagnose
       confirm:
         description: 'Type DEPLOY-NABOU to authorize production backend-only deployment'
         required: true
@@ -33,10 +41,24 @@ jobs:
           node --check server/command-center-live/pdf-evidence.js
           python3 -m py_compile server/command-center-live/pdf-evidence.py tools/gateway/deploy_ftps.py
           node server/command-center-live/self-test.js
+  diagnose:
+    needs: validate
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'diagnose' }}
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 5
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Diagnose FTPS directories (read-only)
+        run: python3 tools/gateway/diagnose_ftps.py
   deploy:
     needs: validate
-
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.confirm == 'DEPLOY-NABOU' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'deploy' && inputs.confirm == 'DEPLOY-NABOU' }}
     runs-on: ubuntu-latest
     environment: nabou-production
     timeout-minutes: 12
