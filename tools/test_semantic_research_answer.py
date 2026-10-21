@@ -7,7 +7,7 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
-from semantic_research_answer import collect,batches,execute,validate_items,configuration,render,normalize_review,normalize_final_review,model_evidence
+from semantic_research_answer import collect,batches,execute,validate_items,configuration,render,geographic_claim_hold_reason,normalize_review,normalize_final_review,model_evidence
 from llm_client import call
 
 TEXT='In 1677 the ships attacked the island. The account is uncertain.'
@@ -31,6 +31,20 @@ def item(eid,**changes):
             'kind':'source_statement','actors':[],'places':[],'dates':['1677'],'uncertainty':[],**changes}
 
 class SemanticAnswer(unittest.TestCase):
+    def test_human_eponym_is_not_itself_a_spatial_name(self):
+        quote='Ένα αγκυροβόλιο φέρει το όνομα του Creveliers, προφανώς λόγω του θανάτου του. Πρόκειται για το «Port Couvelier» στη θέση του Βαθιού.'
+        self.assertEqual(geographic_claim_hold_reason({'quote':quote,'places':['Creveliers'],'usage_type':'ANCHORAGE'}),'PERSON_MENTION_REQUIRES_EXPLICIT_SPATIAL_NAME')
+        self.assertIsNone(geographic_claim_hold_reason({'quote':quote,'places':['Port Couvelier'],'usage_type':'ANCHORAGE'}))
+
+    def test_ambush_in_comparison_does_not_establish_a_raid_at_other_harbor(self):
+        quote='Το «Λιμάνι Creveliers» δεν είναι το μοναδικό. Ένας από τους όρμους των Φούρνων ονομάζεται όρμος Μανέτα, συνεργάτη του Creveliers. Το νησιωτικό σύμπλεγμα ήταν γνωστός τόπος ενέδρας.'
+        self.assertEqual(geographic_claim_hold_reason({'quote':quote,'places':['Λιμάνι Creveliers'],'usage_type':'RAID_LOCATION'}),'RAID_LOCATION_NOT_STATED_IN_SELECTED_QUOTE')
+        self.assertEqual(geographic_claim_hold_reason({'quote':quote,'places':['Creveliers'],'usage_type':'ANCHORAGE'}),'PERSON_MENTION_REQUIRES_EXPLICIT_SPATIAL_NAME')
+
+    def test_explicit_anchorages_are_not_suppressed(self):
+        quote='Astypalaia provided provisions and plenty of safe anchorages for the corsairs.'
+        self.assertIsNone(geographic_claim_hold_reason({'quote':quote,'places':['Astypalaia'],'usage_type':'ANCHORAGE'}))
+
     def test_explicit_source_century_outside_question_is_held_without_using_publication_dates(self):
         row={'evidence_id':'e','text':'The consulted source describes Milo as a corsair base in the14th century.',
              'years_in_scope':[],'occurrences':[],'uncertainties':[]}

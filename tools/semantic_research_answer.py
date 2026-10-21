@@ -199,7 +199,9 @@ def collect(run_root, provenance_root=None):
     focus=decompose(req.get('target',''),req.get('aliases',[])) if seen else {}
     requested_years=[int(y) for y in re.findall(r'\b\d{4}\b',req.get('date_range',''))] if seen else []
     century=(sum(requested_years)//len(requested_years)-1)//100+1 if requested_years else None
+    priorities={}
     def priority(row):
+        if row['evidence_id'] in priorities:return priorities[row['evidence_id']]
         text=normalized(row['text'])
         regional=bool(strong_region_matches(text,focus)) if focus.get('kind')=='topic' else True
         event_use=bool(re.search(BASES,text) and re.search(PIRACY,text)) if focus.get('kind')=='topic' else True
@@ -207,11 +209,18 @@ def collect(run_root, provenance_root=None):
         title_period=bool(century and re.search(r'(?<!\d)'+str(century)+r'(?:th|st|nd|rd|ου|ος|ο|e|er)(?!\w)',title)) if focus.get('kind')=='topic' else True
         all_years=set(re.findall(r'(?<!\d)(?:1\d{3}|20\d{2})(?!\d)',row['text']))
         coherence=sum(int(y) in row['years_in_scope'] for y in all_years)/len(all_years) if all_years else int(bool(row.get('date_evidence')))
+        centuries=explicit_centuries(row['text'])
+        century_scope=bool(requested_years and any((value-1)*100+1<=max(requested_years) and value*100>=min(requested_years) for value in centuries))
+        direct_use=bool(re.search(r'provision|suppli|supply|safe\s+anchorages?|hideout|shelter|used\s+(?:as|by)|served\s+as|χρησιμ|τροφοδο|εφοδια|προμηθει|ανεφοδια|ορμητηρ|καταφυγ',text))
+        conjecture=bool(re.search(r'θα ηταν δυσκολο|προφανωσ|conjectur|presum|probably|perhaps',text))
         row['sampling_features']={'strong_region_match':regional,'event_and_use_match':event_use,
                                   'in_scope_year_fraction':coherence,'title_period_hint':title_period,
+                                  'in_scope_century_context':century_scope,'direct_use_vocabulary':direct_use,
+                                  'conjecture_context':conjecture,
                                   'role':'SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION'}
-        first=(not regional,not bool(row['years_in_scope'])) if focus.get('kind')=='topic' else (not bool(row['years_in_scope']),False)
-        return (*first,not event_use,not title_period,-coherence,len(row['text']),row['evidence_id'])
+        first=(not regional,not bool(row['years_in_scope'] or century_scope)) if focus.get('kind')=='topic' else (not bool(row['years_in_scope']),False)
+        result=(*first,not direct_use if focus.get('kind')=='topic' else False,conjecture if focus.get('kind')=='topic' else False,not event_use,not title_period,not century_scope if focus.get('kind')=='topic' else False,-coherence,len(row['text']),row['evidence_id'])
+        priorities[row['evidence_id']]=result;return result
     seen.sort(key=priority)
     # Sample across acquired documents before spending more calls on one book.
     # Document hashes are sampling keys, never claims of source independence.
@@ -407,6 +416,27 @@ def explicit_centuries(text):
     numbers.extend(value for word,value in words.items() if re.search(r'\b'+word+r'[\s‑–-]+centur(?:y|ies)\b',str(text),re.I))
     return sorted(set(numbers))
 
+def geographic_claim_hold_reason(claim):
+    """Hold ambiguous human eponyms and use categories absent from the quote.
+
+    A person's name occurring in a harbor discussion is not itself a place
+    mention. Discovery is retained; extraction may repair to a full spatial name.
+    """
+    from research_focus import fold
+    text=fold(claim.get('quote',''))
+    for place in claim.get('places',[]):
+        name=fold(place)
+        if not name:continue
+        for match in re.finditer(r'(?<!\w)'+re.escape(name)+r'(?!\w)',text):
+            prefix=text[max(0,match.start()-100):match.start()]
+            personal=bool(re.search(r'(?:κουρσαρ\w*|πειρατ\w*|συνεργατ\w*|κατορθωματα|corsair|pirate|captain|colleague|companion)\s+(?:(?:του|of|de|del)\s+)?$',prefix))
+            eponym=bool(re.search(r'(?:ονομα|name)\s+(?:του|της|of|of the)\s+$',prefix)
+                        and re.search(r'θανατ|death|died',text[match.end():match.end()+160]))
+            if personal or eponym:return 'PERSON_MENTION_REQUIRES_EXPLICIT_SPATIAL_NAME'
+    if claim.get('usage_type')=='RAID_LOCATION' and not re.search(r'raid|attack|attacc|ataqu|incurs|razzia|επιδρομ|επιθεσ|λεηλασ|καταδρομ|bask[ıi]n|sald[ıi]r|hucum|overval|aanval|uberfall|angriff',text):
+        return 'RAID_LOCATION_NOT_STATED_IN_SELECTED_QUOTE'
+    return None
+
 def valid_synthesis(answer,supported):
     from research_focus import fold
     sections=answer.get('answer_sections') if isinstance(answer,dict) else None
@@ -496,6 +526,10 @@ def validate_items(payload, records, question_kind=None, requested_range=None):
         if question_kind in ('place','topic') and not entities['places']:
             rejected.append({'reason':'GEOGRAPHIC_FINDING_REQUIRES_LITERAL_PLACE',
                              'evidence_id':eid,'proposed_item':item});continue
+        if question_kind in ('place','topic'):
+            reason=geographic_claim_hold_reason({'quote':quote,'places':entities['places'],'usage_type':item.get('usage_type')})
+            if reason:
+                rejected.append({'reason':reason,'evidence_id':eid,'proposed_item':item});continue
         if question_kind=='person' and not entities['actors']:
             rejected.append({'reason':'PERSON_FINDING_REQUIRES_LITERAL_ACTOR',
                              'evidence_id':eid,'proposed_item':item});continue
@@ -683,6 +717,13 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
     pass_seconds=max(1,int(os.getenv('PCT_SEMANTIC_BUDGET_SECONDS','1800')))
     def invoke(role,prompt,response_schema=None):
         nonlocal new_calls
+        # Keep the complete question in a common exact prefix across roles.
+        # llama.cpp can then reuse prefix evaluation instead of repeatedly
+        # processing the long multilingual question before every short review.
+        # Nothing is summarized, translated or removed from the task scope.
+        if prompt.startswith(RULES) and question in prompt[len(RULES):]:
+            body=prompt[len(RULES):].replace(question,'[full research question provided above]',1)
+            prompt=RULES+'\nRESEARCH_QUESTION_JSON:\n'+json.dumps(question,ensure_ascii=False)+'\nROLE_INSTRUCTIONS:\n'+body
         from research_continuation import digest as checkpoint_digest
         prompt_key=checkpoint_digest([role,prompt,response_schema])
         occurrence=response_occurrences.get(prompt_key,0)
@@ -762,6 +803,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         if question_kind=='person':prompt+=' Every item MUST contain a literal actor mention in actors from the selected passages. Select the sentence actually naming that actor. If an event date is absent from those sentences, leave it out of BOTH dates and statement.'
         if question_kind in ('place','topic'):
             prompt+=' Every proposed item MUST contain at least one literal place from the selected passages. If no relevant named-place narrative is available, return an empty items array. Unresolved dates are allowed but must remain unresolved.'
+            prompt+=' Distinguish a human eponym from the full spatial name named after that person. Copy the explicit port/bay/place designation where a personal name is ambiguous. An ambush site or a harbor name is not automatically a raid location. Bind each place, use and date to its own clause; comparisons between different islands must not transfer one island\'s attributes to another.'
         schema=schemas.extraction([r['evidence_id'] for r in group],question_kind)
         cached=queue.load(group)
         payload=cached['payload'] if cached else invoke('evidence_extractor',prompt,schema)

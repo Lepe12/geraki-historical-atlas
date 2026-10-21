@@ -162,7 +162,7 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
     if request_kind!='person' and not geographic.get('findings'):blockers.append('NO_SUPPORTED_PLACE_FINDINGS')
     supported=set((answer.get('review') or {}).get('supported_claim_ids',[]))
     cited={cid for section in answer.get('answer_sections',[]) for cid in section.get('claim_ids',[])}
-    from semantic_research_answer import person_passage_hold_reason, valid_synthesis
+    from semantic_research_answer import person_passage_hold_reason, valid_synthesis, geographic_claim_hold_reason
     # Revalidate stored output with today's content gate. A historical success
     # label and completed model calls do not make placeholder prose an answer.
     if not valid_synthesis(answer, supported):
@@ -177,6 +177,9 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
     quality_rejections=[]
     for claim in answer.get('claims',[]):
         if claim.get('claim_id') not in cited:continue
+        if request_kind in ('place','topic'):
+            geographic_hold=geographic_claim_hold_reason(claim)
+            if geographic_hold:quality_rejections.append({'claim_id':claim['claim_id'],'reason':geographic_hold,'gate':'GEOGRAPHIC_ROLE_OR_USAGE'})
         row=evidence_by_id.get(claim.get('evidence_id'),{})
         title=(row.get('occurrences') or [{}])[0].get('title')
         from historical_source_admissibility import hold_reason
@@ -185,7 +188,8 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
         reason=person_passage_hold_reason(row.get('text',''),title,request,row.get('uncertainties',[]),row.get('source_bibliography'),row.get('years_in_scope'))
         if reason:quality_rejections.append({'claim_id':claim['claim_id'],'reason':reason})
     if any(r.get('gate')=='SOURCE_ADMISSIBILITY' for r in quality_rejections):blockers.append('ANSWER_CITES_NON_HISTORICAL_OR_GENERATED_SOURCE')
-    if any(r.get('gate')!='SOURCE_ADMISSIBILITY' for r in quality_rejections):blockers.append('ANSWER_CONTAINS_UNRESOLVED_PERSON_OR_BIBLIOGRAPHIC_LEADS')
+    if any(r.get('gate')=='GEOGRAPHIC_ROLE_OR_USAGE' for r in quality_rejections):blockers.append('ANSWER_CONFLATES_PERSON_PLACE_OR_UNSUPPORTED_USAGE')
+    if any(r.get('gate') not in ('SOURCE_ADMISSIBILITY','GEOGRAPHIC_ROLE_OR_USAGE') for r in quality_rejections):blockers.append('ANSWER_CONTAINS_UNRESOLVED_PERSON_OR_BIBLIOGRAPHIC_LEADS')
     if request_kind=='person' and not cited.intersection(supported):blockers.append('NO_SUPPORTED_PERSON_RESEARCH_CLAIMS')
     if not any(q.get('output_status')=='MODEL_QUERIES_AVAILABLE' for q in queries):blockers.append('LIVE_MODEL_QUERY_EXPANSION_NOT_DEMONSTRATED')
     violations=[c.get('claim_id') for c in answer.get('claims',[]) if c.get('verified') or c.get('verification_status')=='VERIFIED']
