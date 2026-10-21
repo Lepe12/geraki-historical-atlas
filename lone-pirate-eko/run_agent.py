@@ -44,7 +44,7 @@ def verified_facts(action,result,after_position):
         return []
     facts=[]
     if action in ("Pickup","Place","Touch","Steer","SetSail","Inspect") and re.search(
-        r"^(Picked up|Placed|Touched|Helm adjusted|Sail (raised|furled)|Inspected)\\b",str(result),re.I):
+        r"^(Picked up|Placed|Touched|Helm adjusted|Sail (raised|furled)|Inspected)(?: |$)",str(result),re.I):
         facts.append(str(result)[:300])
     if action=="MoveTo" and isinstance(after_position,list) and len(after_position)==3:
         facts.append("Observed position: "+str(after_position))
