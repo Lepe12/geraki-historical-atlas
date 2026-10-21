@@ -26,18 +26,29 @@ def llm(observation,memory):
     "Steer:{direction:port|starboard|center}, SetSail:{state:raised|furled}. "
     "Use exact world entity names (NOT entityId), and do not issue fixed routes. "
     "No fixed sequence of actions. Use observations and memory to select actions.")
-    payload={"model":MODEL,"messages":[{"role":"system","content":prompt},{"role":"user","content":"MEMORY "+json.dumps(memory[-12:],ensure_ascii=False)+"\nOBSERVATION "+json.dumps(observation,ensure_ascii=False)[:14000]}],"temperature":.8}
-    result=request("https://openrouter.ai/api/v1/chat/completions","POST",payload,{"Authorization":"Bearer "+KEY,"HTTP-Referer":"https://github.com/Lepe12/geraki-historical-atlas","X-Title":"Lone Pirate Eko"},timeout=80)
-    raw=result["choices"][0]["message"]["content"]
-    if isinstance(raw,list): raw="".join(v.get("text","") for v in raw if isinstance(v,dict))
-    raw=raw.strip()
-    if raw.startswith("```"): raw="\n".join(raw.splitlines()[1:-1])
+    entities=[{"id":e.get("id"),"name":e.get("name"),"position":e.get("position")} for e in observation.get("world",{}).get("entities",[])][:90]
+    player=observation.get("player",{})
+    compact={"player_position":player.get("position"),"last_action_result":player.get("attributes",{}).get("LastActionResult"),"entities":entities}
+    usermsg="MEMORY "+json.dumps(memory[-6:],ensure_ascii=False)+"\\nOBSERVATION "+json.dumps(compact,ensure_ascii=False)
+    payload={"model":MODEL,"messages":[{"role":"system","content":prompt+" Example response: {\\\"action\\\":\\\"Inspect\\\",\\\"data\\\":{\\\"target\\\":\\\"Helm\\\"},\\\"reflection\\\":\\\"I am curious about this mechanism\\\",\\\"memory\\\":\\\"I have not inspected the helm yet\\\"}. Never output markdown, reasoning tags, or multiple JSON responses."},{"role":"user","content":usermsg}],"temperature":0.35,"max_tokens":350}
     decoder=json.JSONDecoder()
-    try: obj=json.loads(raw)
-    except json.JSONDecodeError:
-        pos=raw.find("{")
-        if pos<0: raise ValueError("Model did not return JSON")
-        obj,_=decoder.raw_decode(raw[pos:])
+    obj=None
+    last_error=None
+    for attempt in range(3):
+        result=request("https://openrouter.ai/api/v1/chat/completions","POST",payload,{"Authorization":"Bearer "+KEY,"HTTP-Referer":"https://github.com/Lepe12/geraki-historical-atlas","X-Title":"Lone Pirate Eko"},timeout=80)
+        raw=result["choices"][0]["message"].get("content") or ""
+        if isinstance(raw,list): raw="".join(v.get("text","") for v in raw if isinstance(v,dict))
+        raw=raw.strip()
+        if raw.startswith("```"): raw="\\n".join(raw.splitlines()[1:-1])
+        try:
+            pos=raw.find("{")
+            if pos<0: raise ValueError("Model returned no JSON: "+raw[:100])
+            obj,_=decoder.raw_decode(raw[pos:])
+            break
+        except (ValueError,json.JSONDecodeError) as e:
+            last_error=str(e)
+            payload["messages"].append({"role":"user","content":"Your previous response did not contain a valid JSON action. Reply with ONE JSON object only."})
+    if obj is None: raise ValueError("Free model failed JSON after 3 responses: "+str(last_error))
     if not isinstance(obj,dict) or obj.get("action") not in tools or not isinstance(obj.get("data"),dict):
         raise ValueError("Unsupported model action")
     data=obj["data"]
