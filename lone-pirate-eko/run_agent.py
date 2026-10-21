@@ -4,8 +4,8 @@ import json, os, time, urllib.request, urllib.error, sys
 from pathlib import Path
 BASE="http://127.0.0.1:8080"
 OUT=Path("lone-pirate-eko/log.json");OUT.parent.mkdir(exist_ok=True)
-KEY=os.getenv("OPENROUTER_API_KEY","")
-MODEL=os.getenv("OPENROUTER_MODEL","google/gemma-4-26b-a4b-it:free")
+KEY=os.getenv("GROQ_API_KEY","")
+MODEL=os.getenv("GROQ_MODEL","openai/gpt-oss-20b")
 DURATION=min(int(os.getenv("DURATION_MINUTES","30")),240)*60
 MAX_CALLS=min(int(os.getenv("MAX_CALLS","35")),50)
 def request(url,method="GET",body=None,headers=None,timeout=40):
@@ -30,12 +30,12 @@ def llm(observation,memory):
     player=observation.get("player",{})
     compact={"player_position":player.get("position"),"last_action_result":player.get("attributes",{}).get("LastActionResult"),"entities":entities}
     usermsg="MEMORY "+json.dumps(memory[-6:],ensure_ascii=False)+"\\nOBSERVATION "+json.dumps(compact,ensure_ascii=False)
-    payload={"model":MODEL,"messages":[{"role":"system","content":prompt+" Example response: {\\\"action\\\":\\\"Inspect\\\",\\\"data\\\":{\\\"target\\\":\\\"Helm\\\"},\\\"reflection\\\":\\\"I am curious about this mechanism\\\",\\\"memory\\\":\\\"I have not inspected the helm yet\\\"}. Never output markdown, reasoning tags, or multiple JSON responses."},{"role":"user","content":usermsg}],"temperature":0.3,"max_tokens":600,"response_format":{"type":"json_object"}}
+    payload={"model":MODEL,"messages":[{"role":"system","content":prompt+" Example response: {\\\"action\\\":\\\"Inspect\\\",\\\"data\\\":{\\\"target\\\":\\\"Helm\\\"},\\\"reflection\\\":\\\"I am curious about this mechanism\\\",\\\"memory\\\":\\\"I have not inspected the helm yet\\\"}. Never output markdown, reasoning tags, or multiple JSON responses."},{"role":"user","content":usermsg}],"temperature":0.6,"max_completion_tokens":600,"reasoning_effort":"low","reasoning_format":"hidden","response_format":{"type":"json_object"}}
     decoder=json.JSONDecoder()
     obj=None
     last_error=None
     for attempt in range(3):
-        result=request("https://openrouter.ai/api/v1/chat/completions","POST",payload,{"Authorization":"Bearer "+KEY,"HTTP-Referer":"https://github.com/Lepe12/geraki-historical-atlas","X-Title":"Lone Pirate Eko"},timeout=80)
+        result=request("https://api.groq.com/openai/v1/chat/completions","POST",payload,{"Authorization":"Bearer "+KEY},timeout=80)
         raw=result["choices"][0]["message"].get("content") or ""
         if isinstance(raw,list): raw="".join(v.get("text","") for v in raw if isinstance(v,dict))
         raw=raw.strip()
@@ -73,7 +73,7 @@ def main():
     log={"engine":"Clawblox","model":MODEL,"status":"starting","events":[],"decisions":0,"started":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"simulation":True}
     save(log)
     if not KEY:
-        log["status"]="blocked_missing_openrouter_api_key";save(log);print("OPENROUTER_API_KEY absent",file=sys.stderr);return 2
+        log["status"]="blocked_missing_groq_api_key";save(log);print("GROQ_API_KEY absent",file=sys.stderr);return 2
     try:
         access=request(BASE+"/join?name=EkoPirate","POST",{})
         session=access.get("session") or access.get("session_id")
