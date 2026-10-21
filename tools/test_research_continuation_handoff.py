@@ -87,6 +87,20 @@ class HandoffTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'INVALID_BATCH_RECEIPT'):
             state(self.root)
 
+    def test_new_generation_preserves_archived_work_and_continues(self):
+        new_queue = self.queue.parent.parent / 'new-generation/queue.json'
+        self.write(new_queue, json.loads(self.queue.read_text()))
+        self.write(self.root / 'research_continuation/active.json', {'queue': 'new-generation/queue.json'})
+        self.assertEqual(decision(self.root, self.before, '456'),
+                         (True, 'CHECKPOINT_GENERATION_MIGRATED:archived=2:current=2'))
+
+    def test_new_generation_cannot_hide_lost_old_work(self):
+        new_queue = self.queue.parent.parent / 'new-generation/queue.json'
+        self.write(new_queue, json.loads(self.queue.read_text()))
+        self.inventory(['b'])
+        self.write(self.root / 'research_continuation/active.json', {'queue': 'new-generation/queue.json'})
+        self.assertEqual(decision(self.root, self.before, '456'), (False, 'PREVIOUS_GENERATION_WORK_LOST'))
+
     def test_path_escape_is_rejected(self):
         self.write(self.root / 'research_continuation/active.json', {'queue': '../../outside.json'})
         with self.assertRaisesRegex(ValueError, 'UNSAFE_QUEUE_PATH'):

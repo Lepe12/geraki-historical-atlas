@@ -7,12 +7,12 @@ from pathlib import Path
 from research_continuation import digest, effective_citation_backlogs, latest_analysis
 
 
-def state(root):
+def state(root, queue_relative=None):
     root = Path(root)
     active = root / 'research_continuation/active.json'
-    if not active.exists():
+    if queue_relative is None and not active.exists():
         return {'queue': None, 'completed': [], 'responses': []}
-    relative = json.loads(active.read_text())['queue']
+    relative = queue_relative or json.loads(active.read_text())['queue']
     queue_path = (active.parent / relative).resolve()
     if not queue_path.is_relative_to(active.parent.resolve()):
         raise ValueError('UNSAFE_QUEUE_PATH')
@@ -82,7 +82,16 @@ def decision(root, before, run_id):
     if after.get('status') != 'PENDING':
         return False, 'NO_PENDING_SEMANTIC_WORK'
     if before['queue'] is not None and before['queue'] != after['queue']:
-        return False, 'CHECKPOINT_GENERATION_CHANGED_REQUIRES_REASSESSMENT'
+        # Code/configuration changes intentionally create a new cache generation.
+        # Preserve and verify the old one; do not label its work reused under the
+        # new algorithm, or freeze a legitimate migration forever.
+        archived = state(root, before['queue'])
+        if not set(before['completed']) <= set(archived['completed']):
+            return False, 'PREVIOUS_GENERATION_WORK_LOST'
+        if after['completed']:
+            return True, ('CHECKPOINT_GENERATION_MIGRATED:archived=' + str(len(archived['completed'])) +
+                          ':current=' + str(len(after['completed'])))
+        return False, 'NEW_CHECKPOINT_GENERATION_HAS_NO_PROGRESS'
     old = set(before['completed'])
     new = set(after['completed'])
     if not old <= new:
