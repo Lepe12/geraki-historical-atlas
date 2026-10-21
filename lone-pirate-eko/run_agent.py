@@ -15,7 +15,12 @@ def request(url,method="GET",body=None,headers=None,timeout=40):
         with urllib.request.urlopen(urllib.request.Request(url,data=data,headers=h,method=method),timeout=timeout) as r:
             return json.loads(r.read().decode())
     except urllib.error.HTTPError as e:
-        raise RuntimeError("Model provider returned HTTP "+str(e.code)+"; check account model permissions, billing or region") from None
+        try:
+            problem=json.loads(e.read(2000).decode("utf-8","replace")).get("error",{})
+            code=str(problem.get("code") or problem.get("type") or "unknown")
+        except Exception:
+            code="unknown"
+        raise RuntimeError("Groq HTTP "+str(e.code)+" error_code="+code[:90]) from None
 def save(d): OUT.write_text(json.dumps(d,ensure_ascii=False,indent=2))
 def llm(observation,memory):
     tools=["MoveTo","Jump","Stop","Pickup","Place","Inspect","Touch","Steer","SetSail"]
@@ -33,7 +38,7 @@ def llm(observation,memory):
     player=observation.get("player",{})
     compact={"player_position":player.get("position"),"last_action_result":player.get("attributes",{}).get("LastActionResult"),"entities":entities}
     usermsg="MEMORY "+json.dumps(memory[-6:],ensure_ascii=False)+"\\nOBSERVATION "+json.dumps(compact,ensure_ascii=False)
-    payload={"model":MODEL,"messages":[{"role":"system","content":prompt+" Example response: {\\\"action\\\":\\\"Inspect\\\",\\\"data\\\":{\\\"target\\\":\\\"Helm\\\"},\\\"reflection\\\":\\\"I am curious about this mechanism\\\",\\\"memory\\\":\\\"I have not inspected the helm yet\\\"}. Never output markdown, reasoning tags, or multiple JSON responses."},{"role":"user","content":usermsg}],"temperature":0.6,"max_completion_tokens":600,"reasoning_effort":"low","reasoning_format":"hidden","response_format":{"type":"json_object"}}
+    payload={"model":MODEL,"messages":[{"role":"system","content":prompt+" Example response: {\\\"action\\\":\\\"Inspect\\\",\\\"data\\\":{\\\"target\\\":\\\"Helm\\\"},\\\"reflection\\\":\\\"I am curious about this mechanism\\\",\\\"memory\\\":\\\"I have not inspected the helm yet\\\"}. Never output markdown, reasoning tags, or multiple JSON responses."},{"role":"user","content":usermsg}],"temperature":0.6,"max_completion_tokens":600,"reasoning_effort":"low","include_reasoning":false,"response_format":{"type":"json_object"}}
     decoder=json.JSONDecoder()
     obj=None
     last_error=None
