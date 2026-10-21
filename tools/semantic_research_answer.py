@@ -224,18 +224,8 @@ def collect(run_root, provenance_root=None):
     seen.sort(key=priority)
     # Sample across acquired documents before spending more calls on one book.
     # Document hashes are sampling keys, never claims of source independence.
-    sampled=[]
-    # Diversity is subordinate to temporal relevance. Unknown-date name lists
-    # must not displace complete in-scope passages from the same document.
-    for tier in sorted({priority(row)[:2] for row in seen}):
-        leaders=[];followers=[];documents=set()
-        for row in seen:
-            if priority(row)[:2]!=tier:continue
-            document=row['occurrences'][0]['source_text_sha256']
-            if document in documents:followers.append(row)
-            else:leaders.append(row);documents.add(document)
-        sampled.extend(leaders+followers)
-    seen=sampled
+    from research_priority import order
+    seen=order(seen,priority,topic=focus.get('kind')=='topic')
     return seen,excluded
 
 def model_evidence(row):
@@ -652,8 +642,11 @@ class SemanticBudgetReached(Exception):
 
 
 def execute(*args,**kwargs):
-    try:return _execute(*args,**kwargs)
-    except SemanticBudgetReached as error:return error.answer
+    try:answer=_execute(*args,**kwargs)
+    except SemanticBudgetReached as error:answer=error.answer
+    from research_priority import claim_assessment
+    answer['claim_evidence_assessment']=claim_assessment(answer)
+    return answer
 
 
 def _execute(run_root, question, caller=call, config=None, output_root=None, provenance_root=None,resume_reviewed_from=None):
@@ -689,6 +682,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
             deferred.extend({'evidence_id':r['evidence_id'],'reason':'MODEL_CALL_BUDGET'} for r in group)
     queue.inventory(all_records,grouped,deferred)
     selected=[r for b in grouped for r in b]
+    from research_priority import selection_report
     conf=configuration() if config is None else config
     out={'schema':VERSION,'question':question,'request_kind':question_kind,'evidence_hash':digest(all_records),'status':'BLOCKED_CONFIGURATION',
          'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
@@ -697,6 +691,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
          'coverage':{'original_unique_passages':original_passage_count,'unique_passages':len(all_records),'selected_passages':len(selected),
                      'repeated_occurrences':sum(len(r['occurrences'])-1 for r in all_records),'deferred':deferred,'excluded':excluded},
          'evidence':selected,'calls':[],'rejected':[],
+         'selection_priority':selection_report(all_records,selected,question_kind=='topic'),
          'limitations':['MODEL_OUTPUT_REQUIRES_REVIEW','ORIGINAL_INSPECTION_NOT_PERFORMED',
                         'SOURCE_INDEPENDENCE_NOT_ESTABLISHED','BOUNDED_EVIDENCE_COVERAGE'],
          'verified':False,'human_reviewed':False}
@@ -947,6 +942,12 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
 
 def render(out):
     lines=['# Απάντηση έρευνας','',out['question'],'','Κατάσταση: **'+out['status']+'**','']
+    assessments=out.get('claim_evidence_assessment',{}).get('claims',[])
+    if assessments:
+        lines.extend(['## Τεκμηρίωση ανά ισχυρισμό','',
+                      'Η κάλυψη του corpus διαφέρει από την τεκμηρίωση κάθε ισχυρισμού. Ο αριθμός εγγράφων δεν αποδεικνύει ανεξάρτητη επιβεβαίωση.',''])
+        lines.extend('- '+row['claim_id']+': '+row['label_el']+'.' for row in assessments)
+        lines.extend(['','Εκκρεμούν επιθεώρηση πρωτοτύπου, γενεαλογία πηγών, ανεξάρτητη επιβεβαίωση, έλεγχος αντιφάσεων και ανθρώπινη κρίση.',''])
     claims={c['claim_id']:c for c in out['claims']}
     if out['answer_sections']:
         for section in out['answer_sections']:
@@ -1015,4 +1016,5 @@ def main():
     print('SEMANTIC_ANSWER',out['status'],'model_used',out['model_used'],'claims',len(out['claims']))
 
 if __name__=='__main__':main()
+
 
