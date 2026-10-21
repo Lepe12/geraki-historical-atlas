@@ -176,6 +176,10 @@ for position,x in enumerate(items):
     results.append(rec)
     checkpoint(items[position+1:]+deferred)
 checkpoint(deferred)
+from cited_work_acquisition import continue_citations
+continue_citations(pathlib.Path('.'),{**ctx,'lane':os.getenv('PCT_RESEARCH_LANE','travellers')},results,
+                   on_acquired=lambda:checkpoint(deferred))
+checkpoint(deferred)
 print("ACQUISITION",len(results),"acquired",sum(x.get('status') in ('TEXT_ACQUIRED','DIGITAL_METADATA_ACQUIRED') for x in results),"deferred",len(deferred),"held",len(held))
 
 (OUT/'citation_chase_report.json').write_text(json.dumps({'searches':citation_searches,'verification_status':'UNVERIFIED_DISCOVERY','bounded_queries':citation_limit,'per_source_query_limit':citation_source_limit},ensure_ascii=False,indent=2))
@@ -187,3 +191,4 @@ if citation_searches and lane_path.exists():
         for row in search['results']:
             if row.get('url') not in existing:discovery.setdefault('results',[]).append(row);existing.add(row.get('url'))
     lane_path.write_text(json.dumps(discovery,ensure_ascii=False,indent=2))
+
