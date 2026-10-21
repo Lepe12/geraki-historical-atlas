@@ -1,0 +1,76 @@
+name: Lone Pirate Eko — AI experiment
+on:
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: "Experiment runtime in minutes (max 240; GitHub runner max 360)"
+        required: true
+        default: "30"
+      max_calls:
+        description: "Maximum LLM decisions (free model quotas apply)"
+        required: true
+        default: "35"
+permissions:
+  contents: write
+jobs:
+  pirate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 250
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check real model access
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          if [ -z "$OPENROUTER_API_KEY" ]; then
+            echo "::error::Configure repository secret OPENROUTER_API_KEY before running; no fake AI will be used."
+            exit 1
+          fi
+      - name: Install Clawblox
+        run: |
+          curl -fsSL https://clawblox.com/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Start embodied Clawblox world
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          clawblox run lone-pirate-eko --record --record-dir lone-pirate-eko/recordings > /tmp/clawblox.log 2>&1 &
+          echo $! > /tmp/clawblox.pid
+          for n in $(seq 1 60); do
+            if curl -fsS http://localhost:8080/api.md >/dev/null; then echo "Clawblox ready"; exit 0; fi
+            sleep 2
+          done
+          cat /tmp/clawblox.log
+          exit 1
+      - name: Run real LLM-controlled experiment
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL || 'openrouter/free' }}
+          DURATION_MINUTES: ${{ inputs.minutes }}
+          MAX_CALLS: ${{ inputs.max_calls }}
+          PAUSE_SECONDS: "30"
+        run: python lone-pirate-eko/run_agent.py
+      - name: Save experiment record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lone-pirate-experiment
+          path: |
+            lone-pirate-eko/log.json
+            lone-pirate-eko/recordings/
+          if-no-files-found: warn
+      - name: Publish verified run log for website
+        if: always()
+        run: |
+          if [ ! -f lone-pirate-eko/log.json ]; then exit 0; fi
+          mkdir -p lone-pirate
+          cp lone-pirate-eko/log.json lone-pirate/latest.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lone-pirate/latest.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Record Lone Pirate experiment (no simulated data)"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin HEAD:"${GITHUB_REF_NAME}"
