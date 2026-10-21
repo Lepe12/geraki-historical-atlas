@@ -32,11 +32,12 @@ carry("NavigationBook",{3,1,13},{88,42,37})
 carry("WoodBlock",{3,1,-4},{146,90,44})
 carry("Bucket",{-3,1,-13},{106,93,74})
 local held={}
+local routes={}
 local function root(p) return p.Character and p.Character:FindFirstChild("HumanoidRootPart") end
 local function setup(p)
  local c=p.Character;local h=c and c:FindFirstChild("Humanoid");local r=root(p)
  if h then h.WalkSpeed=9;h.JumpPower=27 end
- if r then r.Position=Vector3.new(0,2.4,0) end
+ if r then r.Position=Vector3.new(0,2.4,0);r.Anchored=true end
  if c then c:SetAttribute("ModelUrl","asset://player.glb") end
  p:SetAttribute("LastActionResult","Ready; no goals assigned")
 end
@@ -51,8 +52,12 @@ Input.InputReceived:Connect(function(p,kind,data)
  if not r or not h then return end
  if kind=="MoveTo" and data.position then
   local v=data.position;local x,y,z=tonumber(v[1]),tonumber(v[2]),tonumber(v[3])
-  if x and y and z and math.abs(x)<=6.5 and math.abs(z)<=17.5 and y>=0 and y<5 then h:MoveTo(Vector3.new(x,y,z));p:SetAttribute("LastActionResult","Moving") else p:SetAttribute("LastActionResult","Invalid deck destination") end
- elseif kind=="Stop" then h:CancelMoveTo();p:SetAttribute("LastActionResult","Stopped")
+  if x and y and z and math.abs(x)<=6.5 and math.abs(z)<=17.5 and y>=0 and y<5 then
+   local deckHeight=(z>=10 or z<=-12) and 3.6 or 2.4
+   routes[p]=Vector3.new(x,deckHeight,z)
+   p:SetAttribute("LastActionResult","Moving")
+  else p:SetAttribute("LastActionResult","Invalid deck destination") end
+ elseif kind=="Stop" then routes[p]=nil;p:SetAttribute("LastActionResult","Stopped")
  elseif kind=="Jump" then h.Jump=true;p:SetAttribute("LastActionResult","Jumped")
  elseif kind=="Inspect" then
   local o=get(tostring(data.target or ""));p:SetAttribute("LastActionResult",o and ("Inspected "..o.Name.." at "..tostring(o.Position)) or "Unknown target")
@@ -72,6 +77,20 @@ Input.InputReceived:Connect(function(p,kind,data)
  else p:SetAttribute("LastActionResult","Unknown action") end
 end)
 RunService.Heartbeat:Connect(function(dt)
+ for p,dest in pairs(routes) do
+  local r=root(p)
+  if not r then routes[p]=nil
+  else
+   local pos=r.Position
+   local dx=dest.X-pos.X;local dy=dest.Y-pos.Y;local dz=dest.Z-pos.Z
+   local remaining=math.sqrt(dx*dx+dy*dy+dz*dz)
+   if remaining<.15 then r.Position=dest;routes[p]=nil;p:SetAttribute("LastActionResult","Reached destination")
+   else
+    local stride=math.min(remaining,3*math.min(dt,.2))
+    r.Position=Vector3.new(pos.X+dx/remaining*stride,pos.Y+dy/remaining*stride,pos.Z+dz/remaining*stride)
+   end
+  end
+ end
  for p,o in pairs(held) do local r=root(p);if r and o.Parent then o.Position=r.Position+Vector3.new(0,2,0) end end
  for _,p in ipairs(Players:GetPlayers()) do local r=root(p);if r and r.Position.Y < -5 then r.Position=Vector3.new(0,2.4,0);p:SetAttribute("LastActionResult","Recovered to deck") end end
 end)
