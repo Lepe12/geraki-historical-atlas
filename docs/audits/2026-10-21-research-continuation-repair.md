@@ -37,8 +37,10 @@ and rejection of false green results.
 
 Publication boundary: automatic approval review rejected changes to the main
 research workflow and to the existing production probe, citing repository-write/
-OIDC/secrets publication scope and the existing external credential flow. Those
+OIDC/secrets publication scope, the existing external credential flow, and the
+semantic pipeline's existing ability to send acquired text to a configured LLM. Those
 files and the scheduler/reanalysis workflow changes remain an unapplied local
 patch pending explicit approval. No workaround or production deployment was used.
-The PR contains engine changes and a pure offline report evaluator. Production
+The draft PR contains the coverage acceptance guard, pure checkpoint storage and
+a pure offline report evaluator. The engine integration remains in the full patch. Production
 probe integration and automatic scheduling are not active from this PR alone.
