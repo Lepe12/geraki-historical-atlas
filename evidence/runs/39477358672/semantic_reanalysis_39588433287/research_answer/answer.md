@@ -1,0 +1,25 @@
+# Απάντηση έρευνας
+
+Τοπωνύμια πειρατικών και κουρσάρικων ορμητηρίων στην Ανατολική Μεσόγειο (1600-1700)
+Research scope: Νέα πραγματική αναζήτηση πηγών για ορμητήρια, αγκυροβόλια και καταφύγια πειρατών και κουρσάρων στην Ανατολική Μεσόγειο, 1600–1700. Αναζήτησε σε όλες τις έντεκα οικογένειες πηγών, περιηγητές, portolans, σύγχρονα κείμενα, αρχεία και μεταγενέστερες μελέτες. Απόκτησε τα προσβάσιμα πραγματικά κείμενα. Για κάθε εύρημα δώσε ιστορικό τοπωνύμιο, σύγχρονη ταύτιση και γεωγραφική θέση μόνο όπου τεκμηριώνονται, χρονολογία, χρήστες, είδος χρήσης, ακριβή πηγή, σελίδα ή φύλλο ή αρχειακή αναφορά, ακριβές απόσπασμα, confidence και verification status. Ξεχώρισε αναφορά πηγής, ερμηνεία και υπόθεση, μεταγενέστερη μελέτη από πρωτογενές τεκμήριο και ορμητήριο από τόπο επιδρομής. Μην μετατρέπεις τη χρονολογία του ερωτήματος σε χρονολογία αχρονολόγητου γεγονότος. Δήλωσε απρόσιτα αρχεία και ανεξέταστο υλικό. Καμία αυτόματη ιστορική επαλήθευση. Κάνε νέα πραγματική απόκτηση πηγών. Μην χρησιμοποιήσεις παλιό κείμενο απάντησης. Μην εμφανίσεις εισαγωγικό placeholder ως εύρημα. Κάθε παράγραφος να περιγράφει συγκεκριμένο τόπο και χρήση που αναφέρει το παρατιθέμενο απόσπασμα.
+
+Κατάσταση: **MODEL_ANSWER_PENDING_HUMAN_REVIEW**
+
+Astypalaia served as a safe anchorage and provisioning site for corsairs in the 17th century, according to a secondary source.
+
+- Παραπομπή c-3b7330380fb024c7a959: Γιώργος Κουτζακιώτης, George Koutzakiotis · Occasioned by the death of Creveliers off Astypalaia: The island's role in the raids by Catholic corsairs during the 17th century · έκδοση/μεταδεδομένα: 2023-01-01 · https://helios.eie.gr/helios/bitstream/10442/18865/1/Koutzakiotis%202023.pdf · γραμμές 12–14 · σελίδες PDF (αρίθμηση από 1): 1.
+  Απόσπασμα αποκτημένου κειμένου: 
+At the same time, Astypalaia was an excellent hideout for corsairs, not only because they could ﬁnd provisions there (such as bread, wine, etc.) and stock up with drinking water, but also because the island provided
+plenty of safe anchorages.
+
+## Κενά και αβεβαιότητες
+
+- The exact historical verification status of the claim about Astypalaia's role as a corsair hideout remains pending.
+- The source classification and genealogy of the claim about Astypalaia's role are unresolved.
+
+## Περιορισμοί
+
+Η απάντηση είναι ανάλυση μοντέλου που περιμένει ανθρώπινο έλεγχο. Δεν αποτελεί επαλήθευση ιστορικών γεγονότων.
+Η επιτυχής αντιστοίχιση παραπομπής δεν αποδεικνύει από μόνη της ότι η ερμηνεία του μοντέλου είναι σωστή.
+Η ανεξαρτησία των πηγών και η εξέταση πρωτοτύπων δεν θεωρούνται ολοκληρωμένες.
+Κάλυψη μοντέλου: 21/4174 μοναδικά αποσπάσματα επιλέχθηκαν για ανάλυση. Αυτό δεν σημαίνει ότι όλα τεκμηριώνουν την τελική απάντηση.

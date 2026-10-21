@@ -2,7 +2,7 @@
 
 Νέα πραγματική αναζήτηση πηγών για ορμητήρια, αγκυροβόλια και καταφύγια πειρατών και κουρσάρων στην Ανατολική Μεσόγειο, 1600–1700. Αναζήτησε σε όλες τις έντεκα οικογένειες πηγών, περιηγητές, portolans, σύγχρονα κείμενα, αρχεία και μεταγενέστερες μελέτες. Απόκτησε τα προσβάσιμα πραγματικά κείμενα. Για κάθε εύρημα δώσε ιστορικό τοπωνύμιο, σύγχρονη ταύτιση και γεωγραφική θέση μόνο όπου τεκμηριώνονται, χρονολογία, χρήστες, είδος χρήσης, ακριβή πηγή, σελίδα ή φύλλο ή αρχειακή αναφορά, ακριβές απόσπασμα, confidence και verification status. Ξεχώρισε αναφορά πηγής, ερμηνεία και υπόθεση, μεταγενέστερη μελέτη από πρωτογενές τεκμήριο και ορμητήριο από τόπο επιδρομής. Μην μετατρέπεις τη χρονολογία του ερωτήματος σε χρονολογία αχρονολόγητου γεγονότος. Δήλωσε απρόσιτα αρχεία και ανεξέταστο υλικό. Καμία αυτόματη ιστορική επαλήθευση. Κάνε νέα πραγματική απόκτηση πηγών. Μην χρησιμοποιήσεις παλιό κείμενο απάντησης. Μην εμφανίσεις εισαγωγικό placeholder ως εύρημα. Κάθε παράγραφος να περιγράφει συγκεκριμένο τόπο και χρήση που αναφέρει το παρατιθέμενο απόσπασμα.
 
-Εντοπίστηκαν 79 αποσπάσματα εντός της ζητούμενης περιόδου. Αποδίδονται στις πηγές τους και εκκρεμεί έλεγχος.
+Εντοπίστηκαν 82 αποσπάσματα εντός της ζητούμενης περιόδου. Αποδίδονται στις πηγές τους και εκκρεμεί έλεγχος.
 
 ## 1600 — Vol. 14. The Archaeology of Piracy in Antiquity: Proceedings of the International Hybrid Conference held under the auspices of the Department of History and Archaeology of the University of Athens (October 5-6, 2023)
 
@@ -257,6 +257,16 @@
 Πηγή: https://helios.eie.gr/helios/bitstream/10442/14901/2/IBR_Panopoulou_88_01.pdf; αρχείο 5d2880336532a116e6662c01.txt, γραμμές 42–57.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION.
+
+## 1610 — Depopulation in the Aegean Islands and the Turkish Conquest
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> page 167 note 3  Doc. xxiv (1610). The monastery itself hoisted the flag of S. John when the Maltese galleys appeared (Georgirenes, Samos, 81, Millo). Pirates annoyed it little (Thevet, , Cosm. Univ. 230).Google Scholar
+
+Πηγή: https://www.cambridge.org/core/journals/annual-of-the-british-school-at-athens/article/abs/depopulation-in-the-aegean-islands-and-the-turkish-conquest/73D845E31D87407EB1A092E9BE817855; αρχείο 7fb0bdb1a856aa2f216dddd2.txt, γραμμές 2161–2161.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
 ## 1615 — Όψεις της Ναυτιλιακής κίνησης του Χάνδακα το 17ο αιώνα
 
@@ -574,6 +584,16 @@
 > may also ask whether Knossos, as Athens, Rome and so many important other cities, was located inland with
 
 Πηγή: https://nepub.lib.uoa.gr/index.php/aura/article/download/2979/2345; αρχείο bad2f54f36da12ea92871556.txt, γραμμές 2152–2183.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
+## 1638 — Depopulation in the Aegean Islands and the Turkish Conquest
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> page 154 note 10  A sack of Kimolos by pirates in 1638, mentioned by Thévenot but not in the Isolario, betrays its source by the date.
+
+Πηγή: https://www.cambridge.org/core/journals/annual-of-the-british-school-at-athens/article/abs/depopulation-in-the-aegean-islands-and-the-turkish-conquest/73D845E31D87407EB1A092E9BE817855; αρχείο 7fb0bdb1a856aa2f216dddd2.txt, γραμμές 1009–1009.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
@@ -1542,6 +1562,16 @@
 > Μανέττας είχε αποκτήσει τότε άδειας καταδρομής από τον βασιλιά της Πορτογαλίας.
 
 Πηγή: https://helios.eie.gr/helios/bitstream/10442/18865/1/Koutzakiotis%202023.pdf; αρχείο 18f781280144b88f0b78dfa5.txt, γραμμές 457–468.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
+## 1684 — Depopulation in the Aegean Islands and the Turkish Conquest
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> page 152 note 1  Cf. Struys, J., Voyage (London, 1684), p. 11Google Scholar; Tournefort's descriptions of Melos and Ios; Turner, W., Tour, i. 30Google Scholar; Leake, , N. Greece, iii. 78.Google Scholar The celebrated pirate Capsi was a Melian pilot (Sauger, , Hist. des Ducs, 319).Google Scholar
+
+Πηγή: https://www.cambridge.org/core/journals/annual-of-the-british-school-at-athens/article/abs/depopulation-in-the-aegean-islands-and-the-turkish-conquest/73D845E31D87407EB1A092E9BE817855; αρχείο 7fb0bdb1a856aa2f216dddd2.txt, γραμμές 881–881.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
