@@ -23,6 +23,7 @@ jobs:
           python3 - <<'PY'
           import json,os
           from pathlib import Path
+          from tools.research_continuation import effective_citation_backlogs
           requested=set()
           for marker in Path('research_continuation_requests').glob('*.json'):
               run=str(json.loads(marker.read_text())['run_id'])
@@ -38,7 +39,7 @@ jobs:
               queue=(active.parent/pointer).resolve()
               if not queue.is_relative_to(active.parent.resolve()):raise ValueError('UNSAFE_QUEUE_PATH')
               pending=json.loads(queue.read_text()).get('status')=='PENDING'
-              citations=any((json.loads(p.read_text()).get('pending') or json.loads(p.read_text()).get('deferred')) for p in root.glob('*/library_acquisition/cited_work_continuation.json'))
+              citations=any((json.loads(p.read_text()).get('pending') or json.loads(p.read_text()).get('deferred')) for p in effective_citation_backlogs(root))
               if pending or citations:runs.append(root.name)
           with open(os.environ['GITHUB_OUTPUT'],'a') as out:
               out.write('runs='+json.dumps(runs[:2])+'\n')

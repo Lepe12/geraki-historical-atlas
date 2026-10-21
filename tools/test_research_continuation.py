@@ -121,6 +121,18 @@ class ContinuationTests(unittest.TestCase):
             self.assertTrue(any(c.get('replayed') for c in answers[-1]['calls']))
             self.assertFalse(answers[-1]['verified'])
 
+    def test_completed_continuation_supersedes_original_pending_citations(self):
+        from research_continuation import effective_citation_backlogs
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            original=root/'greek/library_acquisition/cited_work_continuation.json'
+            continued=root/'citation_continuation_greek/library_acquisition/cited_work_continuation.json'
+            original.parent.mkdir(parents=True);continued.parent.mkdir(parents=True)
+            original.write_text(json.dumps({'deferred':[{'query':'work'}]}))
+            continued.write_text(json.dumps({'deferred':[],'unresolved':[]}))
+            self.assertEqual(list(effective_citation_backlogs(root)),[continued])
+            self.assertTrue(json.loads(original.read_text())['deferred'])
+
     def test_public_failure_blocks_otherwise_green_production(self):
         report={'checks':[{'passed':True}], 'oidc_event_auth_negative_control':{'passed':True},
             'public_route_observations':[{'endpoint':'/health','http_status':503}]}

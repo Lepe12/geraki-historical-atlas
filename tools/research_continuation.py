@@ -100,3 +100,14 @@ def latest_analysis(root):
         if hashlib.sha256(validation).hexdigest()!=pointer['validation_sha256']:return None
         return json.loads(answer),json.loads(validation)
     except (OSError,ValueError,KeyError,TypeError):return None
+
+
+def effective_citation_backlogs(root):
+    """Continuation receipts supersede the copied lane, without rewriting it."""
+    root=Path(root)
+    for lane in sorted(root.iterdir()):
+        if not lane.is_dir() or lane.name.startswith('citation_continuation_'):continue
+        original=lane/'library_acquisition/cited_work_continuation.json'
+        continued=root/('citation_continuation_'+lane.name)/'library_acquisition/cited_work_continuation.json'
+        selected=continued if continued.is_file() else original
+        if selected.is_file():yield selected

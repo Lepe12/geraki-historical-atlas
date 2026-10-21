@@ -76,7 +76,10 @@ def continue_citations(root,ctx,results,*,searcher=lookup,reader=acquire,
     seen={x['query_key'] for x in report['searches'] if query_acquired(x) or x.get('attempts',1)>=3}
     prior={x['query_key']:x for x in report['searches']}
     tried={a['url'] for s in report['searches'] for a in s.get('acquisitions',[]) if a.get('status')=='TEXT_ACQUIRED'}
-    acquired_urls={r.get('acquired_source_url') or r.get('url') for r in results if r.get('files')}
+    acquired_urls={r.get('acquired_source_url') or r.get('url') for r in results
+        if r.get('files') and r.get('status')=='TEXT_ACQUIRED'
+        and not (r.get('evidence_level')=='CATALOGUE_METADATA_ONLY'
+            and (r.get('web_acquisition') or {}).get('source_type')=='WEB_PAGE_TEXT')}
     if findings is None:
         from section_extraction import build_findings
         findings=build_findings(root,ctx)['findings']

@@ -148,7 +148,8 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
     coverage=answer.get('coverage') or {}
     if coverage.get('deferred') or coverage.get('selected_passages',0)<coverage.get('unique_passages',0):
         blockers.append('RESEARCH_COVERAGE_PENDING')
-    for backlog in root.glob('*/library_acquisition/cited_work_continuation.json'):
+    from research_continuation import effective_citation_backlogs
+    for backlog in effective_citation_backlogs(root):
         if read(backlog).get('unresolved') or read(backlog).get('deferred'):
             blockers.append('CITATION_FOLLOWUP_PENDING');break
     if reused and not valid_reuse:blockers.append('REUSED_EXTRACTION_RECEIPTS_NOT_VALIDATED')
