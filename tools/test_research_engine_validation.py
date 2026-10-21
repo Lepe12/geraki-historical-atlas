@@ -77,6 +77,21 @@ class ResearchEngineValidationTests(unittest.TestCase):
             self.assertEqual(result['status'],'INCOMPLETE')
             self.assertIn('NO_ACQUIRED_SOURCE_TEXT',result['blockers'])
 
+    def test_legacy_acquisition_cannot_hide_missing_cited_work_identity(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)/'123';dest=root/'citation_continuation_french/library_acquisition'
+            dest.mkdir(parents=True)
+            (root/'french').mkdir()
+            (dest/'cited_work_continuation.json').write_text(json.dumps({
+                'pending':[],'unresolved':[],'searches':[{'query':'Intended historical work',
+                    'query_key':'q','acquisitions':[{'url':'https://example.org/wrong.pdf',
+                    'status':'TEXT_ACQUIRED','basis':'TITLE_MATCH_DISCOVERY_ONLY'}]}]}))
+            result=validation(root,Path(tmp)/'probes')
+            self.assertIn('CITATION_IDENTITY_REVIEW_REQUIRED',result['blockers'])
+            self.assertIn('CITATION_FOLLOWUP_PENDING',result['blockers'])
+            self.assertEqual(result['counts']['citation_identity_review_queries'],1)
+            self.assertEqual(result['citation_identity_holds'][0]['query'],'Intended historical work')
+
     def test_interrupted_model_progress_is_diagnosed_and_never_accepted_as_final(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)/'123';dest=root/'research_answer';dest.mkdir(parents=True)
@@ -88,3 +103,4 @@ class ResearchEngineValidationTests(unittest.TestCase):
             self.assertEqual(result['counts']['model_claims'],1)
             self.assertIn('PARTIAL_PROGRESS_ONLY_NO_FINAL_ANSWER',result['blockers'])
             self.assertEqual(result['semantic_calls'][0]['status'],'RUNNING')
+

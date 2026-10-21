@@ -169,9 +169,17 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
     if coverage.get('deferred') or coverage.get('selected_passages',0)<coverage.get('unique_passages',0):
         blockers.append('RESEARCH_COVERAGE_PENDING')
     from research_continuation import effective_citation_backlogs
+    from cited_work_acquisition import identity_review_holds
+    citation_holds=[]
     for backlog in effective_citation_backlogs(root):
-        if read(backlog).get('unresolved') or read(backlog).get('deferred'):
-            blockers.append('CITATION_FOLLOWUP_PENDING');break
+        citation_report=read(backlog)
+        citation_holds.extend({**item,'receipt_path':str(backlog.relative_to(root))}
+                              for item in identity_review_holds(citation_report))
+        if citation_report.get('unresolved') or citation_report.get('deferred'):
+            if 'CITATION_FOLLOWUP_PENDING' not in blockers:blockers.append('CITATION_FOLLOWUP_PENDING')
+    if citation_holds:
+        blockers.append('CITATION_IDENTITY_REVIEW_REQUIRED')
+        if 'CITATION_FOLLOWUP_PENDING' not in blockers:blockers.append('CITATION_FOLLOWUP_PENDING')
     if reused and not valid_reuse:blockers.append('REUSED_EXTRACTION_RECEIPTS_NOT_VALIDATED')
     if answer_origin!='FINAL_ANSWER_RECORD':blockers.append(answer_origin)
     if not sources:blockers.append('NO_ACQUIRED_SOURCE_TEXT')
@@ -227,6 +235,7 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
                   'model_claims':len(answer.get('claims',[])),
                   'review_supported_claims':len(supported),'answer_cited_claims':len(cited),
                   'candidate_place_findings':len(geographic.get('findings',[])),
+                  'citation_identity_review_queries':len(citation_holds),
                   'verified':0,'rejected_model_items':sum(r.get('reason')!='UNSUPPORTED_DATE_ATTRIBUTE_REMOVED' for r in answer.get('rejected',[])),
                   'rejected_model_attributes':sum(r.get('reason')=='UNSUPPORTED_DATE_ATTRIBUTE_REMOVED' for r in answer.get('rejected',[])),
                   'deferred_passages':len(answer.get('coverage',{}).get('deferred',[]))},
@@ -238,6 +247,7 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
         'connector_endpoint_tests':latest.get('connectors',[]),
         'blockers':blockers,'quality_gate_rejections':quality_rejections,'verification_violations':violations,
         'durable_citation_replays':citation_replays,
+        'citation_identity_holds':citation_holds,
         'excluded_access_challenges':challenge_pages,
         'limits':['BOUNDED_SEARCH_NOT_ALL_RELEVANT_SOURCES','MODEL_ANALYSIS_NOT_HISTORICAL_VERIFICATION',
                   'ORIGINAL_INSPECTION_AND_GENEALOGY_MAY_REMAIN_PENDING',
@@ -251,3 +261,4 @@ if __name__=='__main__':
     (root/'research_answer/validation_report.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
     print('RESEARCH_E2E_VALIDATION',result['status'],json.dumps(result['counts']))
     if a.require_complete and result['status']=='INCOMPLETE':raise SystemExit(1)
+

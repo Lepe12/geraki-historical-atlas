@@ -5,6 +5,9 @@ on:
     paths:
       - 'server/command-center-live/**'
       - 'tools/probe_evidence_production.py'
+      - 'tools/cited_work_acquisition.py'
+      - 'tools/research_validation_report.py'
+      - 'tools/research_priority.py'
       - '.github/workflows/nabou-evidence-production-smoke.yml'
   workflow_dispatch:
 permissions:
@@ -39,3 +42,4 @@ jobs:
           git add "evidence/production_smoke/$GITHUB_RUN_ID"
           git commit -m 'Record observed production evidence HTTP and OIDC results'
           python3 tools/publish_research_outputs.py
+

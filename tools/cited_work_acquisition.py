@@ -12,6 +12,29 @@ import unicodedata
 from web_acquisition import acquire, citation_title_match
 
 
+def candidate_title_match(query, record):
+    """Conservative download triage; keep rejected results as discovery leads.
+
+    Generic congress titles must not substitute geography for Americanists.
+    Full token coverage still does not prove author, edition or downloaded bytes.
+    """
+    def tokens(value):
+        value=''.join(c for c in unicodedata.normalize('NFD',str(value or '').casefold())
+                      if not unicodedata.combining(c))
+        return set(re.findall(r'[^\W\d_]{4,}',value))
+    return citation_title_match(query,record) and tokens(query)<=tokens(record.get('title'))
+
+
+def identity_review_holds(report):
+    """Re-evaluate legacy receipts rather than trusting their old pending list."""
+    return [{'query':s.get('query'),'query_key':s.get('query_key'),
+             'status':'CITATION_IDENTITY_REVIEW_REQUIRED',
+             'candidate_urls':[a.get('url') for a in s.get('acquisitions',[])
+                               if a.get('status')=='TEXT_ACQUIRED']}
+            for s in report.get('searches',[])
+            if any(a.get('status')=='TEXT_ACQUIRED' for a in s.get('acquisitions',[]))]
+
+
 def reference_queries(text):
     """Read citation-only paragraphs, including line-wrapped OCR and containers."""
     text=re.sub(r'(?<=\w)[-\u00ad]\s*\n\s*(?=\w)', '', text)
@@ -109,8 +132,8 @@ def continue_citations(root,ctx,results,*,searcher=lookup,reader=acquire,
     report=json.loads(report_path.read_text()) if report_path.exists() else {
         'schema':'pct-cited-work-continuation-v1','searches':[],
         'original_inspected':False,'verified':False}
-    # Only acquired or explicitly exhausted queries are terminal. A failed
-    # attempt is not a completed citation chase; preserve and retry it.
+    # Stop duplicate downloads, not bibliographic review. A candidate acquisition
+    # is not resolution of the cited work, even when its title is an exact match.
     def query_acquired(search):
         return any(a.get('status')=='TEXT_ACQUIRED' for a in search.get('acquisitions',[]))
     seen={x['query_key'] for x in report['searches'] if query_acquired(x) or x.get('attempts',1)>=3}
@@ -140,8 +163,13 @@ def continue_citations(root,ctx,results,*,searcher=lookup,reader=acquire,
     started=clock();queries=0;documents=0;deferred=[]
     def save():
         pending=[s['query_key'] for s in report['searches'] if not query_acquired(s) and s.get('attempts',1)<3]
-        unresolved=[s['query_key'] for s in report['searches'] if not query_acquired(s)]
+        unresolved=[s['query_key'] for s in report['searches']]
+        for search in report['searches']:
+            search['citation_resolution'] = ('CITATION_IDENTITY_REVIEW_REQUIRED' if query_acquired(search)
+                else 'CITATION_SEARCH_EXHAUSTED' if search.get('attempts',1)>=3
+                else 'CITATION_ACQUISITION_PENDING')
         report.update(deferred=deferred,pending=pending,unresolved=unresolved,budget_seconds=budget,
+                      identity_review_required=[s['query_key'] for s in report['searches'] if query_acquired(s)],
                       rule='ACQUIRED_TEXT_IS_NOT_ORIGINAL_INSPECTION_OR_VERIFICATION')
         report_path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     for finding in findings:
@@ -166,7 +194,10 @@ def continue_citations(root,ctx,results,*,searcher=lookup,reader=acquire,
             except Exception as error:
                 search.update(status='SEARCH_FAILED',error_type=type(error).__name__);save();continue
             search.update(status='SEARCHED',diagnostics=diagnostics,results=rows)
-            matched=[row for row in rows if citation_title_match(query,row)]
+            matched=[row for row in rows if candidate_title_match(query,row)]
+            search['ambiguous_title_candidates']=[{'url':row.get('url'),'title':row.get('title'),
+                'status':'TITLE_VARIANT_REQUIRES_IDENTITY_REVIEW'} for row in rows
+                if citation_title_match(query,row) and not candidate_title_match(query,row)]
             search['title_matched_records']=len(matched)
             for row in matched:
                 urls=[row.get('digital_url'),*[x.get('url') for x in row.get('fulltext_links',[]) if x.get('is_oa') is True],row.get('url')]
@@ -179,7 +210,8 @@ def continue_citations(root,ctx,results,*,searcher=lookup,reader=acquire,
                     if documents>=max_documents or clock()-started>=budget:
                         search['remaining_status']='ACQUISITION_BUDGET_EXHAUSTED';break
                     tried.add(url);documents+=1
-                    receipt={'url':url,'title':row.get('title'),'basis':'TITLE_MATCH_DISCOVERY_ONLY'}
+                    receipt={'url':url,'title':row.get('title'),'basis':'TITLE_MATCH_DISCOVERY_ONLY',
+                             'identity_status':'NOT_ESTABLISHED'}
                     search['acquisitions'].append(receipt);save()
                     try:
                         document=reader(url,out,follow=True)
@@ -206,7 +238,9 @@ def continue_citations(root,ctx,results,*,searcher=lookup,reader=acquire,
                         receipt.update(status='ACCESS_FAILED',http_status=getattr(error,'code',None),
                                        error_type=type(error).__name__)
                     save()
-            if not matched:search['outcome']='CITATION_DEAD_END_IN_SEARCHED_CATALOGUES'
+            if not matched:search['outcome']=('CANDIDATE_TITLE_IDENTITY_REVIEW_REQUIRED'
+                if search['ambiguous_title_candidates'] else 'CITATION_DEAD_END_IN_SEARCHED_CATALOGUES')
             save()
     save()
     return report
+

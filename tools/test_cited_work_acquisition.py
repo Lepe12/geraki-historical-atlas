@@ -76,6 +76,32 @@ class CitationContinuationTests(unittest.TestCase):
         report=continue_citations(self.root,{},[],findings=[other],max_queries=0)
         self.assertEqual(report['deferred'][0]['status'],'BOUNDED_WAVE_DEFERRED')
 
+    def test_generic_congress_title_cannot_close_another_congress_reference(self):
+        finding={**self.finding,'bibliographic_queries':[
+            'Compte rendu du congrès international des Américanistes']}
+        rows=[{'title':'Compte rendu du XIXe Congrès International de Géographie',
+               'url':'https://example.org/geography.pdf'}]
+        report=continue_citations(self.root,{},[],findings=[finding],
+            searcher=lambda *a:([],rows),reader=lambda *a,**k:self.fail('wrong work downloaded'))
+        search=report['searches'][0]
+        self.assertEqual(search['title_matched_records'],0)
+        self.assertEqual(search['ambiguous_title_candidates'][0]['title'],rows[0]['title'])
+        self.assertTrue(report['unresolved'])
+        self.assertEqual(search['outcome'],'CANDIDATE_TITLE_IDENTITY_REVIEW_REQUIRED')
+
+    def test_legacy_acquired_title_is_reopened_for_identity_without_redownload(self):
+        out=self.root/'library_acquisition';out.mkdir()
+        legacy={'query_key':'legacy','attempts':1,'acquisitions':[
+            {'url':'https://example.org/wrong.pdf','status':'TEXT_ACQUIRED',
+             'basis':'TITLE_MATCH_DISCOVERY_ONLY'}]}
+        (out/'cited_work_continuation.json').write_text(json.dumps({'searches':[legacy]}))
+        report=continue_citations(self.root,{},[],findings=[],
+            searcher=lambda *a:self.fail('duplicate search'),reader=lambda *a,**k:self.fail('duplicate acquisition'))
+        self.assertEqual(report['pending'],[])
+        self.assertEqual(report['unresolved'],['legacy'])
+        self.assertEqual(report['identity_review_required'],['legacy'])
+        self.assertEqual(report['searches'][0]['citation_resolution'],'CITATION_IDENTITY_REVIEW_REQUIRED')
+
     def test_internet_archive_text_is_followed_without_web_metadata(self):
         out=self.root/'library_acquisition';out.mkdir()
         text='Captain Example, «'+self.title+'», London 1956, pp. 237–253.'
@@ -118,3 +144,4 @@ class CitationContinuationTests(unittest.TestCase):
 
 
 if __name__=='__main__':unittest.main()
+
