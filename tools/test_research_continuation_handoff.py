@@ -10,6 +10,12 @@ from research_continuation import digest
 
 
 class HandoffTests(unittest.TestCase):
+    def test_worker_completion_does_not_bypass_its_restart_guard(self):
+        # An unconditional workflow_run listener would resubmit a failed worker
+        # even though that worker's own checksum/progress guard correctly held.
+        workflow=(Path(__file__).resolve().parents[1]/'.github/workflows/research-continuation.yml').read_text()
+        self.assertNotIn('  workflow_run:',workflow)
+
     @patch('research_continuation_handoff.subprocess.check_call')
     def test_dispatch_submits_workers_without_waiting_for_completion(self, call):
         dispatch_selected('owner/repo',{'123':{},'456':{}})
