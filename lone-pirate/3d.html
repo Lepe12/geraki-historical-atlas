@@ -13,8 +13,8 @@ a{color:#8ae6fa}button{background:#16364c;color:white;border:1px solid #52839a;p
 </head><body>
 <div id="viewport"></div><aside id="hud"><h1>LONE PIRATE // 3D OBSERVER</h1>
 <div id="status">Φόρτωση τελευταίου επιβεβαιωμένου ημερολογίου…</div>
-<p>Πραγματική περιστρεφόμενη τρισδιάστατη σκηνή. Απεικονίζει τα καταγεγραμμένα γεγονότα της προσομοίωσης Clawblox, <b>όχι ζωντανή βιντεομετάδοση</b>. Το πλοίο παραμένει στατικό στην τωρινή προσομοίωση.</p>
-<button id="refresh">Ανανέωση δεδομένων</button> <button id="replay">▶ Αναπαραγωγή</button> <button id="pause">⏸ Παύση</button><div id="playback" style="margin-top:8px;color:#91b8c8;font:12px monospace">Επιβεβαιωμένες ενέργειες, όχι live stream</div>
+<p>Τρισδιάστατη παρακολούθηση των πραγματικών αποφάσεων του Clawblox. Ενημερώνεται ανά 90 δευτερόλεπτα όταν δημοσιεύονται νέες ενέργειες. Δεν είναι βιντεομετάδοση· οι πραγματικές αποφάσεις λαμβάνονται περίπου ανά 5 λεπτά.</p>
+<button id="refresh">Ανανέωση δεδομένων</button> <button id="replay">▶ Αναπαραγωγή</button> <button id="pause">⏸ Παύση</button><div id="playback" style="margin-top:8px;color:#91b8c8;font:12px monospace">Ενημέρωση από πραγματικές καταγραφές του Clawblox</div>
 <a href="./index.html">Ημερολόγιο ↗</a>
 <div id="events"></div></aside>
 <div id="bottom">Σύρε για περιστροφή · Ροδέλα για zoom · Η κίνηση του πειρατή προβάλλεται μόνο όταν υπάρχει καταγεγραμμένη εντολή MoveTo</div>
@@ -23,7 +23,7 @@ a{color:#8ae6fa}button{background:#16364c;color:white;border:1px solid #52839a;p
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 const v=document.getElementById('viewport'),status=document.getElementById('status'),events=document.getElementById('events');
-let scene,camera,renderer,orbit,pirate,sea,ship,target=null,lastStamp='',history=[],replayIndex=0,replayNext=0,replaying=false,selected=null;
+let scene,camera,renderer,orbit,pirate,sea,ship,target=null,lastStamp='',history=[],replayIndex=0,replayNext=0,replaying=false,selected=null,sourceRun='',receivedAt=0;
 function mesh(g,c,opts={}){const o=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:c,...opts}));scene.add(o);return o}
 function box(n,w,h,d,x,y,z,c,opts={}){const o=mesh(new THREE.BoxGeometry(w,h,d),c,opts);o.name=n;o.position.set(x,y,z);return o}
 function cylinder(n,rt,rb,h,x,y,z,c,opts={}){const o=mesh(new THREE.CylinderGeometry(rt,rb,h,12),c,opts);o.name=n;o.position.set(x,y,z);return o}
@@ -66,6 +66,9 @@ function replayEvent(){
  if(replayIndex>=history.length){replaying=false;document.getElementById('playback').textContent='Ολοκληρώθηκε η αναπαραγωγή';return}
  const e=history[replayIndex++];
  document.getElementById('playback').textContent='Γεγονός '+replayIndex+'/'+history.length+' · '+(e.action||'');
+ applyEvent(e);
+}
+function applyEvent(e){
  if((e.action==='Inspect'||e.action==='Touch')&&e.parameters?.target)highlight(e.parameters.target);
  if(e.action==='MoveTo'&&Array.isArray(e.player_position_after)&&Array.isArray(e.player_position_before)&&/Moving|Reached/i.test(e.result||'')){
    const a=e.player_position_before,b=e.player_position_after;
@@ -75,21 +78,48 @@ function replayEvent(){
  }
  if(e.action==='SetSail'&&/Sail (raised|furled)/.test(e.result||'')){const sail=scene.getObjectByName('Mainsail');if(sail)sail.material.opacity=e.parameters.state==='raised'?.92:.25}
 }
-function display(log){
- status.textContent='Αρχείο: '+(log.status||'unknown')+' · '+(log.decisions||0)+' πραγματικές αποφάσεις · '+(log.model||'');
- history=Array.isArray(log.events)?log.events:[];
+function display(log,origin){
+ const newEvents=Array.isArray(log.events)?log.events:[];
+ const nextStamp=JSON.stringify([log.started,log.stage,log.status,log.decisions]);
+ const freshRun=sourceRun!==String(log.started||'')+'|'+String(log.stage||'');
+ const priorCount=freshRun?0:history.length;
+ const isUpdated=nextStamp!==lastStamp;
+ if(!isUpdated)return;
+ sourceRun=String(log.started||'')+'|'+String(log.stage||'');
+ lastStamp=nextStamp;
+ const secondsSince=Math.round((Date.now()-Date.parse(newEvents.at(-1)?.time||log.started||0))/1000);
+ const fresh=log.status==='running'&&secondsSince>=0&&secondsSince<900;
+ status.textContent=(fresh?'ΕΝΕΡΓΟ · ':'ΑΡΧΕΙΟ · ')+(log.decisions||0)+' αποφάσεις · '+(log.status||'?');
+ history=newEvents;
  events.replaceChildren();
  for(const e of history.slice(-25).reverse()){
    const row=document.createElement('div');
-   const real=(e.action==='MoveTo'&&Array.isArray(e.player_position_after))?' · θέση καταγράφηκε':'';
-   row.textContent=(e.time||'')+' · '+(e.action||'?')+' — '+(e.result||'χωρίς αποτέλεσμα')+real;
+   row.textContent=(e.time||'')+' · '+(e.action||'?')+' — '+(e.result||'χωρίς αποτέλεσμα');
    events.appendChild(row);
  }
- replayIndex=0;replaying=false;
- document.getElementById('playback').textContent='Διαθέσιμα γεγονότα: '+history.length+' · ▶ για αναπαραγωγή';
+ if(!replaying&&history.length>priorCount){
+   const e=history.at(-1);if(e)applyEvent(e);
+ }
+ document.getElementById('playback').textContent=(origin==='github'?'Δεδομένα GitHub ανά 90″':'Δημοσιευμένο αρχείο')+' · '+history.length+' πραγματικά γεγονότα · ▶ για αναπαραγωγή';
 }
 async function load(){
-try{const response=await fetch('./latest.json?v='+Date.now(),{cache:'no-store'});if(!response.ok)throw Error('HTTP '+response.status);const log=await response.json();const stamp=JSON.stringify([log.started,log.status,log.decisions]);if(stamp!==lastStamp){lastStamp=stamp;display(log)}}catch(e){status.textContent='Αναμονή δημοσιευμένου ημερολογίου ('+e.message+')'}}
+ try{
+   const url='https://api.github.com/repos/Lepe12/geraki-historical-atlas/contents/lone-pirate-live/latest.json?ref=main';
+   const response=await fetch(url,{cache:'no-store'});
+   if(!response.ok)throw Error('Live data not published ('+response.status+')');
+   const obj=await response.json();
+   const raw=atob(obj.content.replace(/\\s/g,''));
+   const bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));
+   const log=JSON.parse(new TextDecoder().decode(bytes));
+   receivedAt=Date.now();display(log,'github');
+ }catch(e){
+   try{
+    const response=await fetch('./latest.json?v='+Date.now(),{cache:'no-store'});
+    if(!response.ok)throw Error('HTTP '+response.status);
+    const log=await response.json();display(log,'archive');
+   }catch(err){status.textContent='Δεν υπάρχουν διαθέσιμες καταγραφές ('+err.message+')'}
+ }
 }
-try{build();load();document.getElementById('refresh').onclick=load;document.getElementById('replay').onclick=()=>{replayIndex=0;replaying=history.length>0;replayNext=0;target=null;pirate.position.set(0,1,0)};document.getElementById('pause').onclick=()=>{replaying=false;target=null};setInterval(load,60000)}catch(e){document.getElementById('fallback').style.display='block';status.textContent=String(e)}
+
+try{build();load();document.getElementById('refresh').onclick=load;document.getElementById('replay').onclick=()=>{replayIndex=0;replaying=history.length>0;replayNext=0;target=null;pirate.position.set(0,1,0)};document.getElementById('pause').onclick=()=>{replaying=false;target=null};setInterval(load,90000)}catch(e){document.getElementById('fallback').style.display='block';status.textContent=String(e)}
 </script></body></html>
