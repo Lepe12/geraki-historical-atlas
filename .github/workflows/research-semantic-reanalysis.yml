@@ -1,5 +1,8 @@
 name: Real acquired-source semantic reanalysis
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/research-semantic-reanalysis.yml']
   workflow_call:
     inputs:
       run_id:
@@ -28,14 +31,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        parent_run: ${{ fromJSON(format('["{0}"]', inputs.run_id)) }}
+        parent_run: ${{ fromJSON(inputs.run_id && format('["{0}"]', inputs.run_id) || '["39477358672"]') }}
     env:
       PARENT_RESEARCH_RUN: ${{ matrix.parent_run }}
       PCT_LLM_PROVIDER: local_llama_cpp
       PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen3-8B-GGUF
       PCT_LLM_MODEL: Qwen/Qwen3-8B-GGUF
       PCT_RESUME_REVIEWED_CLAIMS: ${{ inputs.resume_reviewed_claims && '1' || '0' }}
-      PCT_SEMANTIC_BATCHES: '48'
+      PCT_SEMANTIC_BATCHES: '3'
+      PCT_SEMANTIC_PARTIAL_ANSWER: '1'
       PCT_SEMANTIC_CALLS_PER_PASS: '48'
       PCT_SEMANTIC_BUDGET_SECONDS: '1800'
     steps:

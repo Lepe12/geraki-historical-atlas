@@ -186,6 +186,8 @@ def build(repo:Path,run_id:str):
     from research_continuation import latest_analysis
     continuation=latest_analysis(run_root)
     if continuation:semantic_answer,research_validation=continuation
+    from research_validation_report import apply_current_geographic_gate
+    semantic_answer,research_validation=apply_current_geographic_gate(semantic_answer,research_validation)
     discoveries,coverage=discovery_results(run_root,request)
     request_id=request_id_for(run_root)
     try:from .jarvis_state_board import lane_state

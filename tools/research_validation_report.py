@@ -47,6 +47,26 @@ def replay_citations(root, answer, cited):
             results.append(row)
     return results
 
+def apply_current_geographic_gate(answer, report):
+    """Withhold stale invalid paragraphs from published data; preserve originals."""
+    from semantic_research_answer import geographic_claim_hold_reason
+    if answer.get('request_kind') not in ('place','topic'):
+        return answer,report
+    held={c['claim_id']:geographic_claim_hold_reason(c) for c in answer.get('claims',[]) if c.get('claim_id')}
+    held={cid:reason for cid,reason in held.items() if reason}
+    rejected=[section for section in answer.get('answer_sections',[]) if held.keys() & set(section.get('claim_ids',[]))]
+    if not rejected:return answer,report
+    import copy
+    answer=copy.deepcopy(answer);report=copy.deepcopy(report)
+    answer['answer_sections']=[section for section in answer.get('answer_sections',[]) if not held.keys() & set(section.get('claim_ids',[]))]
+    answer['withheld_answer_sections']=rejected
+    answer['current_quality_holds']=[{'claim_id':cid,'reason':reason} for cid,reason in held.items()]
+    if not answer['answer_sections']:answer['status']='FINAL_ANSWER_REVIEW_FAILED'
+    report['status']='INCOMPLETE'
+    report['blockers']=list(dict.fromkeys([*report.get('blockers',[]),'ANSWER_CONFLATES_PERSON_PLACE_OR_UNSUPPORTED_USAGE']))
+    return answer,report
+
+
 def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=None):
     analysis_root=analysis_root or root
     answer=read(analysis_root/'research_answer/answer.json')

@@ -834,13 +834,20 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
             out['coverage']['deferred'].extend({'evidence_id':r['evidence_id'],'reason':'EXTRACTION_RESPONSE_FAILED'} for r in group)
         out['claims'].extend(items)
     queue.inventory(all_records,grouped,out['coverage']['deferred'])
-    if out['coverage']['deferred']:
+    if out['coverage']['deferred'] and not (os.getenv('PCT_SEMANTIC_PARTIAL_ANSWER')=='1' and out['claims']):
         out['status']='EXTRACTION_FAILED_OR_UNSUPPORTED' if not out['claims'] and any(r['reason']=='EXTRACTION_RESPONSE_FAILED' for r in out['coverage']['deferred']) else 'RESEARCH_COVERAGE_PENDING'
         return out
     if not out['claims']:out['status']='EXTRACTION_FAILED_OR_UNSUPPORTED';return out
     # Identical model items are grouped by ID, not counted as corroboration.
     out['claims']=list({c['claim_id']:c for c in out['claims']}.values())
     claims=out['claims']
+    if out['coverage']['deferred']:
+        # A bounded, reviewed answer can be useful while the full corpus remains
+        # pending. Neither this flag nor a faithful quote clears coverage gates.
+        out['answer_scope']='PROVISIONAL_EXAMINED_PASSAGES_ONLY'
+        out['limitations'].append('CORPUS_AND_CITATION_COVERAGE_PENDING')
+        out['coverage']['claims_awaiting_review']=[c['claim_id'] for c in claims[4:]]
+        claims=claims[:4]
     evidence_by_id={r['evidence_id']:r for r in selected}
     review_rules=RULES+'\nQUESTION: '+question+'\nROLE: check whether EVERY source-attributed statement faithfully reports its supplied quotation. This is QUOTATION SUPPORT, not historical truth or verification. Missing original inspection, primary authorship, independent corroboration or human review are limitations, not reasons to reject a faithful attribution to a consulted source. An explicitly attributed source conjecture may be supported AS A HYPOTHESIS, never as an established fact. Do not reject solely because an optional date is unresolved. Flag invented facts, wrong dates, conflated people, a raid falsely called a base, and places demonstrably outside the requested region. Do not invent a geographic identity. Return decisions records with claim_index, reason and decision, plus a limitations list. Explain the actual quotation support or precise mismatch in reason BEFORE choosing the verdict. Return EXACTLY ONE decision for EVERY supplied claim_index. Use SUPPORTED, UNSUPPORTED or UNCERTAIN. Do not output claim IDs. Unsupported PRIMARY_SOURCE classification must remain UNVERIFIED.'
     review_rules+='\nAlso check QUESTION RELEVANCE and passage genre. A faithful quote about a different namesake, a modern minister, an index entry, a bibliographic reference, or unrelated trade/building materials does not answer a historical piracy question. Use UNSUPPORTED for demonstrated irrelevance, UNCERTAIN for unresolved target identity or temporal applicability, and explain that separately from quotation fidelity. Do not require an exact date when the source context supports the requested period; never infer that context from the question itself.'

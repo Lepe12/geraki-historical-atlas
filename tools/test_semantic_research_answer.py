@@ -41,6 +41,19 @@ class SemanticAnswer(unittest.TestCase):
         self.assertEqual(geographic_claim_hold_reason({'quote':quote,'places':['Λιμάνι Creveliers'],'usage_type':'RAID_LOCATION'}),'RAID_LOCATION_NOT_STATED_IN_SELECTED_QUOTE')
         self.assertEqual(geographic_claim_hold_reason({'quote':quote,'places':['Creveliers'],'usage_type':'ANCHORAGE'}),'PERSON_MENTION_REQUIRES_EXPLICIT_SPATIAL_NAME')
 
+    def test_stored_green_paragraph_is_withheld_without_modifying_original_record(self):
+        from research_validation_report import apply_current_geographic_gate
+        original={'request_kind':'topic','status':'MODEL_ANSWER_PENDING_HUMAN_REVIEW',
+                  'claims':[{'claim_id':'wrong','quote':'An ambush near the harbor.','places':['Harbor'],'usage_type':'RAID_LOCATION'}],
+                  'answer_sections':[{'text':'The harbor was raided.','claim_ids':['wrong']}]}
+        report={'status':'PROVISIONAL_RESEARCH_PIPELINE_PASSED','blockers':[]}
+        answer,validation=apply_current_geographic_gate(original,report)
+        self.assertEqual(answer['answer_sections'],[])
+        self.assertEqual(len(answer['withheld_answer_sections']),1)
+        self.assertEqual(validation['status'],'INCOMPLETE')
+        self.assertEqual(len(original['answer_sections']),1)
+        self.assertEqual(report['status'],'PROVISIONAL_RESEARCH_PIPELINE_PASSED')
+
     def test_explicit_anchorages_are_not_suppressed(self):
         quote='Astypalaia provided provisions and plenty of safe anchorages for the corsairs.'
         self.assertIsNone(geographic_claim_hold_reason({'quote':quote,'places':['Astypalaia'],'usage_type':'ANCHORAGE'}))

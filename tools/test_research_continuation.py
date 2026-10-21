@@ -121,6 +121,33 @@ class ContinuationTests(unittest.TestCase):
             self.assertTrue(any(c.get('replayed') for c in answers[-1]['calls']))
             self.assertFalse(answers[-1]['verified'])
 
+    def test_partial_source_supported_answer_keeps_unread_corpus_pending(self):
+        import semantic_research_answer as engine
+        from test_semantic_research_answer import fixture,response,item
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);fixture(root)
+            row=engine.collect(root)[0][0]
+            records=[{**row,'evidence_id':'e'+str(i),'text':row['text']+' '+('context '*500)} for i in range(2)]
+            def caller(role,prompt):
+                if role=='evidence_extractor':return response({'items':[item('e0')]})
+                if role=='synthesis':
+                    value=json.loads(prompt.split('CLAIMS_AND_REVIEW_JSON:\n')[1])
+                    return response({'answer_sections':[{'text':'The consulted source reports that ships attacked the island in 1677.',
+                        'claim_ids':[value['claims'][0]['claim_id']]}]})
+                if 'FINAL_ANSWER_JSON:' in prompt:return response({'supported_section_indexes':[0],'flagged_sections':[]})
+                value=json.loads(prompt.split('CLAIMS_JSON:\n')[1])
+                return response({'supported_claim_ids':[value[0]['claim_id']],'flagged_claims':[]})
+            with patch.object(engine,'collect',return_value=(records,[])),patch.dict('os.environ',
+                    {'PCT_LLM_PROVIDER':'local_llama_cpp','PCT_SEMANTIC_BATCHES':'1','PCT_SEMANTIC_PARTIAL_ANSWER':'1'}):
+                answer=engine.execute(root,'q',caller=caller,config={'configured':True})
+            self.assertEqual(answer['status'],'MODEL_ANSWER_PENDING_HUMAN_REVIEW')
+            self.assertEqual(answer['answer_scope'],'PROVISIONAL_EXAMINED_PASSAGES_ONLY')
+            self.assertTrue(answer['answer_sections'])
+            self.assertEqual(len(answer['coverage']['deferred']),1)
+            queue=next(root.glob('research_continuation/*/queue.json'))
+            self.assertEqual(json.loads(queue.read_text())['status'],'PENDING')
+            self.assertFalse(answer['verified'])
+
     def test_completed_continuation_supersedes_original_pending_citations(self):
         from research_continuation import effective_citation_backlogs
         with tempfile.TemporaryDirectory() as directory:
