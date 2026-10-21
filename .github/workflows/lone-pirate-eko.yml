@@ -53,8 +53,8 @@ jobs:
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL || 'openrouter/free' }}
-          DURATION_MINUTES: ${{ inputs.minutes }}
-          MAX_CALLS: ${{ inputs.max_calls }}
+          DURATION_MINUTES: ${{ inputs.minutes || '10' }}
+          MAX_CALLS: ${{ inputs.max_calls || '5' }}
           PAUSE_SECONDS: "30"
         run: python lone-pirate-eko/run_agent.py
       - name: Save experiment record
