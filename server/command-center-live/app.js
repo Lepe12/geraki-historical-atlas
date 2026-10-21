@@ -34,6 +34,7 @@ let latestLiveRun="";
 
 let baseline=null;
 let baselineFetchedAt=0;
+let baselineRefresh=null;
 const runEvents=new Map();
 const sockets=new Map();
 let jwksCache={at:0,keys:[]};
@@ -50,9 +51,10 @@ function normalizePath(pathname){
 function getJson(url,maxBytes=8_000_000){
   return new Promise((resolve,reject)=>{
     const request=https.get(url,{headers:{"user-agent":"piratecartography-command-center-live/1"}},r=>{
-      let b="";r.setEncoding("utf8");
-      r.on("data",c=>{b+=c;if(Buffer.byteLength(b)>maxBytes){r.destroy();reject(new Error("response_too_large"));}});
-      r.on("end",()=>{if((r.statusCode||500)>=400)return reject(new Error("http_"+r.statusCode));try{resolve(JSON.parse(b))}catch(e){reject(e)}});
+      const chunks=[];let bytes=0;r.setEncoding("utf8");
+      r.on("error",reject);
+      r.on("data",c=>{bytes+=Buffer.byteLength(c);if(bytes>maxBytes){r.destroy();reject(new Error("response_too_large"));return;}chunks.push(c);});
+      r.on("end",()=>{if((r.statusCode||500)>=400)return reject(new Error("http_"+r.statusCode));try{resolve(JSON.parse(chunks.join("")))}catch(e){reject(e)}});
     }).on("error",reject);
     request.setTimeout(10000,()=>request.destroy(new Error("upstream_timeout")));
   });
@@ -87,11 +89,15 @@ function githubWorkflowDispatch(inputs){
 }
 async function refreshBaseline(force=false){
   if(!force && Date.now()-baselineFetchedAt<15000 && baseline)return baseline;
-  try{
-    const d=await getJson(RAW_LATEST,32_000_000);
-    if(d&&d.schema==="pct-command-center-live-v1"){const changed=JSON.stringify(d)!==JSON.stringify(baseline);baseline=d;baselineFetchedAt=Date.now();if(changed)setImmediate(publishSnapshots);}
-  }catch(_){}
-  return baseline;
+  if(baselineRefresh)return baselineRefresh;
+  baselineRefresh=(async()=>{
+    try{
+      const d=await getJson(RAW_LATEST,32_000_000);
+      if(d&&d.schema==="pct-command-center-live-v1"){const changed=JSON.stringify(d)!==JSON.stringify(baseline);baseline=d;baselineFetchedAt=Date.now();if(changed)setImmediate(publishSnapshots);}
+    }catch(_){}
+    return baseline;
+  })();
+  try{return await baselineRefresh;}finally{baselineRefresh=null;}
 }
 function b64url(s){return Buffer.from(s.replace(/-/g,"+").replace(/_/g,"/")+"=".repeat((4-s.length%4)%4),"base64")}
 async function jwks(){
