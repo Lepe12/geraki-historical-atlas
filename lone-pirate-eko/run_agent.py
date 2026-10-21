@@ -114,7 +114,13 @@ def llm(observation,memory,cognition):
     obj=None
     last_error=None
     for attempt in range(3):
-        result=request("https://api.groq.com/openai/v1/chat/completions","POST",payload,{"Authorization":"Bearer "+KEY},timeout=80)
+        try:
+            result=request("https://api.groq.com/openai/v1/chat/completions","POST",payload,{"Authorization":"Bearer "+KEY},timeout=80)
+        except RuntimeError as exc:
+            if "json_validate_failed" not in str(exc): raise
+            payload.pop("response_format",None)
+            payload["messages"].append({"role":"user","content":"Return exactly one JSON object with action and data."})
+            result=request("https://api.groq.com/openai/v1/chat/completions","POST",payload,{"Authorization":"Bearer "+KEY},timeout=80)
         raw=result["choices"][0]["message"].get("content") or ""
         if isinstance(raw,list): raw="".join(v.get("text","") for v in raw if isinstance(v,dict))
         raw=raw.strip()
