@@ -6,7 +6,13 @@ checksum-bound latest answer, validation report and active checkpoint queue.
 It dispatches `research-continuation.yml` using the existing GitHub Actions token
 only after new examined items, or new review/synthesis responses, are durable.
 The workflow therefore needs `actions: write`; no new secret or service is used.
-The global scheduler concurrency group serializes queued passes.
+The coordinator concurrency group serializes queued passes. Before selecting
+work, the coordinator reads active Actions jobs and defers busy parent corpora,
+including jobs started by the previous scheduler. Older unstarted coordinator
+requests on main are coalesced by cancellation; active analyses are never
+cancelled. Completion of a directly launched semantic workflow also wakes the
+coordinator. These controls prevent a different corpus from holding the legacy
+global lock over a corpus whose checkpoint is already ready to continue.
 
 An expected INCOMPLETE result may hand off, but remains INCOMPLETE. A missing
 publication, stale pointer, invalid checksum, failed model call,

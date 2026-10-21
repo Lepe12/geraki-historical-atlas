@@ -2,6 +2,8 @@
 import argparse
 import json
 import os
+import re
+import subprocess
 from pathlib import Path
 
 from research_continuation import digest, effective_citation_backlogs, latest_analysis
@@ -37,7 +39,40 @@ def state(root, queue_relative=None):
             'responses': [p.name for p in responses]}
 
 
-def select(base):
+def gh_pages(path):
+    return json.loads(subprocess.check_output(['gh', 'api', '--paginate', '--slurp', path], text=True))
+
+
+def active_parents(repository, current_run):
+    busy = set()
+    for page in gh_pages('repos/' + repository + '/actions/runs?status=in_progress&per_page=100'):
+        for run in page['workflow_runs']:
+            if str(run['id']) == str(current_run) or run['path'] not in (
+                    '.github/workflows/research-continuation.yml',
+                    '.github/workflows/research-semantic-reanalysis.yml'):
+                continue
+            for jobs in gh_pages('repos/' + repository + '/actions/runs/' + str(run['id']) + '/jobs?per_page=100'):
+                for job in jobs['jobs']:
+                    match = re.search(r'Reanalyse actual sources (\d+)$', job['name'])
+                    if match and job['status'] in ('queued', 'in_progress'):
+                        busy.add(match.group(1))
+    return busy
+
+
+def cancel_superseded_pending(repository, current_run):
+    # Coalesce only older, unstarted coordinator requests, never model work.
+    for status in ('pending', 'queued'):
+        for page in gh_pages('repos/' + repository + '/actions/runs?status=' + status + '&per_page=100'):
+            for run in page['workflow_runs']:
+                if (run['path'] == '.github/workflows/research-continuation.yml' and
+                        run.get('head_branch') == 'main' and
+                        int(run['id']) < int(current_run) and run['status'] in ('pending', 'queued')):
+                    subprocess.check_call(['gh', 'api', '--method', 'POST', 'repos/' + repository +
+                                           '/actions/runs/' + str(run['id']) + '/cancel'])
+                    print('SUPERSEDED_UNSTARTED_COORDINATOR_CANCELLED:' + str(run['id']))
+
+
+def select(base, excluded=()):
     requested = set()
     for path in (base / 'research_continuation_requests').glob('*.json'):
         run = str(json.loads(path.read_text())['run_id'])
@@ -46,6 +81,8 @@ def select(base):
         requested.add(run)
     selected = {}
     for root in sorted((base / 'evidence/runs').glob('*')):
+        if root.name in excluded:
+            continue
         before = state(root)
         citations = any(json.loads(p.read_text()).get('pending') or json.loads(p.read_text()).get('deferred')
                         for p in effective_citation_backlogs(root))
@@ -107,9 +144,17 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('mode', choices=['select', 'handoff'])
     parser.add_argument('--baseline', default='{}')
+    parser.add_argument('--exclude-active', action='store_true')
     args = parser.parse_args()
     if args.mode == 'select':
-        selected = select(Path('.'))
+        busy = set()
+        if args.exclude_active:
+            repository = os.environ['GITHUB_REPOSITORY']
+            current_run = os.environ['GITHUB_RUN_ID']
+            cancel_superseded_pending(repository, current_run)
+            busy = active_parents(repository, current_run)
+            print(json.dumps({'active_parent_runs_deferred': sorted(busy)}))
+        selected = select(Path('.'), busy)
         values = {'runs': list(selected), 'baseline': selected}
     else:
         decisions = {}

@@ -3,8 +3,9 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
-from research_continuation_handoff import decision, select, state
+from research_continuation_handoff import active_parents, cancel_superseded_pending, decision, select, state
 from research_continuation import digest
 
 
@@ -105,6 +106,29 @@ class HandoffTests(unittest.TestCase):
         self.write(self.root / 'research_continuation/active.json', {'queue': '../../outside.json'})
         with self.assertRaisesRegex(ValueError, 'UNSAFE_QUEUE_PATH'):
             state(self.root)
+
+    def test_busy_corpus_is_not_scheduled_twice(self):
+        self.assertEqual(select(self.base, {'123'}), {})
+
+    @patch('research_continuation_handoff.gh_pages')
+    def test_running_jobs_exclude_completed_jobs_and_own_coordinator(self, pages):
+        pages.side_effect = [[{'workflow_runs': [
+            {'id': 1, 'path': '.github/workflows/research-continuation.yml'},
+            {'id': 2, 'path': '.github/workflows/research-continuation.yml'}]}],
+            [{'jobs': [{'name': 'continue (123) / Reanalyse actual sources 123', 'status': 'completed'},
+                       {'name': 'continue (456) / Reanalyse actual sources 456', 'status': 'in_progress'}]}]]
+        self.assertEqual(active_parents('owner/repo', '2'), {'456'})
+
+    @patch('research_continuation_handoff.subprocess.check_call')
+    @patch('research_continuation_handoff.gh_pages')
+    def test_only_older_unstarted_coordinators_are_cancelled(self, pages, call):
+        pages.side_effect = [[{'workflow_runs': [
+            {'id': 1, 'path': '.github/workflows/research-continuation.yml', 'status': 'pending', 'head_branch': 'main'},
+            {'id': 2, 'path': '.github/workflows/research-continuation.yml', 'status': 'in_progress'},
+            {'id': 5, 'path': '.github/workflows/research-continuation.yml', 'status': 'pending'},
+            {'id': 1, 'path': '.github/workflows/research-semantic-reanalysis.yml', 'status': 'queued'}]}], []]
+        cancel_superseded_pending('owner/repo', '3')
+        call.assert_called_once_with(['gh', 'api', '--method', 'POST', 'repos/owner/repo/actions/runs/1/cancel'])
 
 
 if __name__ == '__main__':

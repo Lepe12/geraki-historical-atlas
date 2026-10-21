@@ -6,11 +6,15 @@ on:
     branches: [main]
     paths: ['research_continuation_requests/*.json', '.github/workflows/research-continuation.yml', 'tools/research_continuation_handoff.py']
   workflow_dispatch:
+  workflow_run:
+    workflows: ['Real acquired-source semantic reanalysis']
+    types: [completed]
+    branches: [main]
 permissions:
   contents: write
   actions: write
 concurrency:
-  group: research-continuation
+  group: research-continuation-coordinator
   cancel-in-progress: false
 jobs:
   pending:
@@ -25,7 +29,9 @@ jobs:
       - name: Check restart and failure guards
         run: python3 -m unittest discover -s tools -p test_research_continuation_handoff.py
       - id: queue
-        run: python3 tools/research_continuation_handoff.py select
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/research_continuation_handoff.py select --exclude-active
   continue:
     needs: pending
     if: needs.pending.outputs.runs != '[]'
