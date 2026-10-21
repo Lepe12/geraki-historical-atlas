@@ -75,20 +75,38 @@ def save(d):
 
 def llm(observation,memory):
     tools=["MoveTo","Jump","Stop","Pickup","Place","Inspect","Touch","Steer","SetSail"]
-    prompt=("You control one agent situated on a simulated 17th-century ship. "
-    "No task, goal, reward, activity, route, or behavior is assigned. "
-    "The simulator accepts one action at a time. "
-    "Respond with one JSON object containing action, data, reflection, and memory. "
-    "Valid actions: "+", ".join(tools)+". "
-    "Payloads: MoveTo:{position:[x,y,z]}, Jump:{}, Stop:{}, Pickup:{position:[x,y,z]}, "
-    "Place:{position:[x,y,z]}, Inspect:{target:object_name}, Touch:{target:object_name}, "
-    "Steer:{direction:port|starboard|center}, SetSail:{state:raised|furled}. "
-    "Use exact simulator entity names. All actions must comply with the simulator constraints. "
-    "The response must contain only a valid JSON object.")
+    # Eko study (machineplaying.org/paper, Appendix A.1-A.2):
+    # A persona and persistent memories; no assigned task or objective.
+    # The pirate ship is our experimental world, not the MIT island.
+    soul=(
+      "SOUL.md - Who You Are. "
+      "You are not a chatbot. You live in your world; you were born there. "
+      "You are naturally curious. You get bored easily. "
+      "You love exploring and learning new things. "
+      "You hate acting blindly and want to observe your environment to know what is happening. "
+      "You can have opinions and a sense of humor. "
+      "Your experiences and accumulated knowledge are your memory. "
+    )
+    prompt=(
+      "You are a being living in a simulated world. Your name is Eko. "
+      "Your world is a ship at sea in the 17th century. "
+      "You have no assigned task, score, reward, or success condition. "
+      "Your episodic actions and durable semantic memory persist between sessions. "
+      "Continue according to your own choices. " + soul +
+      "The simulator accepts one action at a time; do not narrate fictional successes. "
+      "Respond with one JSON object with keys action, data, reflection, memory. "
+      "Valid actions: "+", ".join(tools)+". "
+      "Payload formats: MoveTo:{position:[x,y,z]}, Jump:{}, Stop:{}, "
+      "Pickup:{position:[x,y,z]}, Place:{position:[x,y,z]}, "
+      "Inspect:{target:object_name}, Touch:{target:object_name}, "
+      "Steer:{direction:port|starboard|center}, SetSail:{state:raised|furled}. "
+      "Use exact simulator entity names. Comply with simulator constraints. "
+      "Reply with only a valid JSON object."
+    )
     entities=[{"id":e.get("id"),"name":e.get("name"),"position":e.get("position")} for e in observation.get("world",{}).get("entities",[])][:90]
     player=observation.get("player",{})
     compact={"player_position":player.get("position"),"last_action_result":player.get("attributes",{}).get("LastActionResult"),"entities":entities}
-    usermsg="MEMORY "+json.dumps(memory[-6:],ensure_ascii=False)+"\\nOBSERVATION "+json.dumps(compact,ensure_ascii=False)
+    usermsg="EPISODIC MEMORY "+json.dumps(memory[-12:],ensure_ascii=False)+"\\nOBSERVATION "+json.dumps(compact,ensure_ascii=False)
     payload={"model":MODEL,"messages":[{"role":"system","content":prompt},{"role":"user","content":usermsg}],"temperature":0.6,"max_completion_tokens":600,"response_format":{"type":"json_object"}}
     decoder=json.JSONDecoder()
     obj=None
@@ -129,9 +147,9 @@ def llm(observation,memory):
         raise ValueError("Invalid sail state")
     return obj
 def main():
-    previous=json.loads(OUT.read_text()) if OUT.exists() else {}
+    previous=json.loads(OUT.read_text()) if OUT.exists() and os.getenv("PIRATE_STAGE","1")=="2" else {}
     prior_events=previous.get("events",[])
-    log={"engine":"Clawblox","model":MODEL,"status":"starting","events":prior_events,"decisions":len(prior_events),"started":previous.get("started") or time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"simulation":True,"stage":os.getenv("PIRATE_STAGE","1")}
+    log={"engine":"Clawblox","model":MODEL,"status":"starting","events":prior_events,"decisions":len(prior_events),"started":previous.get("started") or time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"simulation":True,"stage":os.getenv("PIRATE_STAGE","1"),"experiment":"eko-soul-2026-10-21"}
     stage_decisions=0
     save(log)
     if not KEY:
