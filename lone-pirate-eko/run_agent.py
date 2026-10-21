@@ -73,7 +73,7 @@ def save(d):
             return
     print("LIVE_WRITE_RETRIES_EXHAUSTED",flush=True)
 
-def llm(observation,memory):
+def llm(observation,memory,cognition):
     tools=["MoveTo","Jump","Stop","Pickup","Place","Inspect","Touch","Steer","SetSail"]
     # Eko study (machineplaying.org/paper, Appendix A.1-A.2):
     # A persona and persistent memories; no assigned task or objective.
@@ -94,7 +94,9 @@ def llm(observation,memory):
       "Your episodic actions and durable semantic memory persist between sessions. "
       "Continue according to your own choices. " + soul +
       "The simulator accepts one action at a time; do not narrate fictional successes. "
-      "Respond with one JSON object with keys action, data, reflection, memory. "
+      "Respond with one JSON object with keys action, data, reflection, memory, intention, plan, knowledge. "
+      "You can formulate and revise your own intentions or plans; none are assigned to you. "
+      "Knowledge must reflect actual observations, not invented successes. "
       "Valid actions: "+", ".join(tools)+". "
       "Payload formats: MoveTo:{position:[x,y,z]}, Jump:{}, Stop:{}, "
       "Pickup:{position:[x,y,z]}, Place:{position:[x,y,z]}, "
@@ -106,7 +108,7 @@ def llm(observation,memory):
     entities=[{"id":e.get("id"),"name":e.get("name"),"position":e.get("position")} for e in observation.get("world",{}).get("entities",[])][:90]
     player=observation.get("player",{})
     compact={"player_position":player.get("position"),"last_action_result":player.get("attributes",{}).get("LastActionResult"),"entities":entities}
-    usermsg="EPISODIC MEMORY "+json.dumps(memory[-12:],ensure_ascii=False)+"\\nOBSERVATION "+json.dumps(compact,ensure_ascii=False)
+    usermsg="LONG_TERM_MEMORY "+json.dumps(cognition,ensure_ascii=False)+"\\nEPISODIC_MEMORY "+json.dumps(memory[-12:],ensure_ascii=False)+"\\nOBSERVATION "+json.dumps(compact,ensure_ascii=False)
     payload={"model":MODEL,"messages":[{"role":"system","content":prompt},{"role":"user","content":usermsg}],"temperature":0.6,"max_completion_tokens":600,"response_format":{"type":"json_object"}}
     decoder=json.JSONDecoder()
     obj=None
@@ -149,7 +151,8 @@ def llm(observation,memory):
 def main():
     previous=json.loads(OUT.read_text()) if OUT.exists() and os.getenv("PIRATE_STAGE","1")=="2" else {}
     prior_events=previous.get("events",[])
-    log={"engine":"Clawblox","model":MODEL,"status":"starting","events":prior_events,"decisions":len(prior_events),"started":previous.get("started") or time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"simulation":True,"stage":os.getenv("PIRATE_STAGE","1"),"experiment":"eko-soul-2026-10-21"}
+    cognition=previous.get("cognition",{"intention":None,"plan":[],"knowledge":[],"self_notes":[]})
+    log={"engine":"Clawblox","model":MODEL,"status":"starting","events":prior_events,"decisions":len(prior_events),"started":previous.get("started") or time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"simulation":True,"stage":os.getenv("PIRATE_STAGE","1"),"experiment":"eko-soul-2026-10-21","cognition":cognition}
     stage_decisions=0
     save(log)
     if not KEY:
@@ -164,7 +167,7 @@ def main():
         log["status"]="running";save(log)
         while time.monotonic()-started<DURATION and stage_decisions<MAX_CALLS:
             obs=request(BASE+"/observe",headers=hdr)
-            try: decision=llm(obs,memory)
+            try: decision=llm(obs,memory,cognition)
             except Exception as e:
                 log["status"]="llm_error";log["error"]=str(e)[:350];break
             try: result=request(BASE+"/input","POST",{"type":decision["action"],"data":decision["data"]},hdr)
@@ -184,6 +187,23 @@ def main():
                 after_position=None
             item={"time":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"action":decision["action"],"parameters":decision["data"],"reflection":decision.get("reflection",""),"memory":decision.get("memory",""),"result":actual,"player_position_before":before_position,"player_position_after":after_position}
             memory.append({"action":item["action"],"result":item["result"],"learning":item["memory"]})
+            # Agent-authored mental state persists between observations and stages.
+            # Hypotheses are NOT verified world facts.
+            if isinstance(decision.get("intention"),str):
+                cognition["intention"]=decision["intention"][:280]
+            if isinstance(decision.get("plan"),list):
+                cognition["plan"]=[str(step)[:180] for step in decision["plan"][:8]]
+            fact=decision.get("knowledge")
+            if isinstance(fact,str) and fact.strip():
+                cognition.setdefault("knowledge",[])
+                if fact not in cognition["knowledge"]:
+                    cognition["knowledge"].append(fact[:350])
+                cognition["knowledge"]=cognition["knowledge"][-40:]
+            note=decision.get("memory")
+            if isinstance(note,str) and note.strip():
+                cognition.setdefault("self_notes",[])
+                cognition["self_notes"].append(note[:350])
+                cognition["self_notes"]=cognition["self_notes"][-40:]
             log["events"].append(item);log["decisions"]+=1;stage_decisions+=1;save(log)
             time.sleep(max(1,int(os.getenv("PAUSE_SECONDS","30"))))
         if log["status"]=="running": log["status"]="completed_decision_budget" if stage_decisions>=MAX_CALLS else "completed_duration"
