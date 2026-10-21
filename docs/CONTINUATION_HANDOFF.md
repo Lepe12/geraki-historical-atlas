@@ -31,3 +31,11 @@ The tests cover durable progress, repeated work, stale or corrupt publication,
 lost items, model failure, review progress, duplicate IDs and path traversal.
 Live automatic dispatch and checkpoint reuse require actual Actions receipts;
 installation and these tests alone do not establish that production succeeded.
+
+## Observed deployment check, 2026-10-21 10:27 UTC
+
+- Repair revision: `46b57474abaff976a92c67dc01d94c125a3efd49`.
+- [Coordinator run 39584433530](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/39584433530): 17 handoff tests passed; active parent `39477358672` was deferred, unstarted superseded coordinator `39582269312` was cancelled, and parent `39377319867` actually started in job `119170429825`. The running legacy analysis was preserved.
+- [Safety run 39584433535](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/39584433535) passed, including the new regression cases.
+- The previously completed parent job `119150396300` in run `39578430849` published 457 files with readback at commit `5398174403cb6340fe197ecf69d9c870507da956`. It was INCOMPLETE, not a crash: 12/3,757 examined items, 3,745 deferred, 9 completed extraction calls, 0 reused batch receipts, 0 VERIFIED claims. Compared with the first execution, 5 examined evidence IDs overlap and 7 are new; algorithm changes created a different cache generation. This does not establish stable-generation reuse.
+- At this checkpoint, the repaired pass is running. Its completion-triggered automatic dispatch and the following pass's checkpoint reuse have **not yet been observed**. The whole original research problem is therefore not declared resolved.
