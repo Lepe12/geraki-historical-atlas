@@ -7,9 +7,9 @@ An isolated experiment unrelated to NABOU. One pirate alone aboard a 17th-centur
 - Clawblox original: https://github.com/nacloos/clawblox
 
 ## Running without installing software
-An OpenRouter API key is required. Configure GitHub repository Actions secret `OPENROUTER_API_KEY` with a key from https://openrouter.ai/keys. **Do not paste it into a chat or commit it to a file.** The workflow explicitly fails without the key; no fake AI will run.
+An Groq API key is required. Configure GitHub repository Actions secret `GROQ_API_KEY` with a key from https://console.groq.com/keys. **Do not paste it into a chat or commit it to a file.** The workflow explicitly fails without the key; no fake AI will run.
 
-Launch the `Lone Pirate Eko — AI experiment` workflow from GitHub Actions, and select duration in minutes (30–240) and the model call budget. The default model `openrouter/free` uses a variable pool of free models and has quota limits. Longer experiments may stop early from these limits. Logs are uploaded as artifacts and an attempted `lone-pirate/latest.json` commit for the public observer page.
+Launch the `Lone Pirate Eko — AI experiment` workflow from GitHub Actions, and select duration in minutes (30–240) and the model call budget. The default model `openai/gpt-oss-20b` uses Groq's free tier with per-minute and per-day request and token quotas. It does not use a variable model pool. Longer experiments may stop early from these limits. Logs are uploaded as artifacts and an attempted `lone-pirate/latest.json` commit for the public observer page.
 
 ## Current limitations
 - No successful real agent run has been verified.
@@ -17,7 +17,7 @@ Launch the `Lone Pirate Eko — AI experiment` workflow from GitHub Actions, and
 - World is in a stationary deck reference frame with surrounding open sea, not a sailing vessel with hydrodynamics.
 - The workflow supports a maximum of 240 minutes per dispatch. Eight-hour continuation, restoring complete world physics and agent state across jobs, is **not** implemented or tested.
 - Agent memory is currently retained within one workflow run. Long-term memory and checkpoint/resume require separate work.
-- No cost is guaranteed for exhausted quotas; do not enable paid routing. `openrouter/free` has zero token pricing but rate limits.
+- No cost is guaranteed for exhausted quotas; do not enable paid routing. `openai/gpt-oss-20b` has zero token pricing but rate limits.
 
 ## Architecture
-`main.lua`: physical ship and action executor. `API.md`: allowed actions and world protocol. `run_agent.py`: /join, /observe, OpenRouter completion, /input, append real observations to log. `.github/workflows/lone-pirate-eko.yml`: server startup and conditional log publishing.
+`main.lua`: physical ship and action executor. `API.md`: allowed actions and world protocol. `run_agent.py`: /join, /observe, Groq completion, /input, append real observations to log. `.github/workflows/lone-pirate-eko.yml`: server startup and conditional log publishing.
