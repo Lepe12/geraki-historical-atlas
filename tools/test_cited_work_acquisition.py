@@ -3,7 +3,7 @@ from pathlib import Path
 import tempfile
 import unittest
 from urllib.error import HTTPError
-from cited_work_acquisition import continue_citations, reference_queries
+from cited_work_acquisition import continue_citations, reference_queries, cited_bibliography_entries
 from web_acquisition import acquire
 
 
@@ -15,6 +15,31 @@ class CitationContinuationTests(unittest.TestCase):
         self.finding={'finding_id':'f1','url':'https://archive.org/details/parent',
                       'evidence_excerpt':'Smith, «'+self.title+'», London 1956, pp. 237–253.',
                       'locator':{'start_char':120,'end_char':230},'source_text_sha256':'parent-hash'}
+
+    def test_unquoted_book_reference_without_page_locator_is_a_discovery_query(self):
+        text='RANDOLPH, B. 1983. The Present State of the Islands in the Archipelago (or\nArches). Sea of Constantinople, and Gulph of Smyrna with the Islands of\nCandia, and Rhodes, Oxford.'
+        self.assertEqual(reference_queries(text),['The Present State of the Islands in the Archipelago (or Arches)'])
+
+    def test_seventeenth_century_book_is_not_excluded_by_publication_date(self):
+        text='SAULGER, R. 1698. Histoire nouvelle des anciens Ducs et autres Souverains de l’Archipel, Paris.'
+        self.assertEqual(reference_queries(text),['Histoire nouvelle des anciens Ducs et autres Souverains de l’Archipel'])
+        self.assertEqual(reference_queries('Smith, «A voyage through the islands of the Archipelago», Oxford 1687, pp. 10–12.'),['A voyage through the islands of the Archipelago'])
+
+    def test_narrative_year_and_unquoted_prose_are_not_bibliography(self):
+        self.assertEqual(reference_queries('In 1698 the captain sailed through the islands to the port.'),[])
+        self.assertEqual(reference_queries('The Present State of the Islands in the Archipelago, 1687.'),[])
+
+    def test_author_year_footnote_follows_unquoted_full_book_title(self):
+        text='Bibliography\nRANDOLPH, B. 1983. The Present State of the Islands in the Archipelago (or\nArches). Sea of Constantinople, Oxford.\nSAULGER, R. 1698. Histoire nouvelle des anciens Ducs et autres Souverains de l’Archipel, Paris.'
+        (self.root/'source.txt').write_text(text)
+        sources=[{'url':'source','files':['source.txt'],'status':'TEXT_ACQUIRED'}]
+        leads=cited_bibliography_entries(self.root,sources,[{'url':'source','evidence_excerpt':'78. RANDOLPH 1983, 10.'}])
+        self.assertEqual(len(leads),1)
+        self.assertEqual(leads[0]['bibliographic_queries'],['The Present State of the Islands in the Archipelago (or Arches)'])
+        loc=leads[0]['locator']
+        self.assertEqual(text[loc['start_char']:loc['end_char']],leads[0]['evidence_excerpt'])
+        self.assertFalse(leads[0]['original_inspected'])
+        self.assertEqual(cited_bibliography_entries(self.root,sources,[{'url':'different source','evidence_excerpt':'RANDOLPH 1983'}]),[])
 
     def test_line_wrapped_reference_and_container(self):
         text='23. A historical article on maritime correspondence, «Collected voy-\nages in the Mediterranean», Athens 1956, 237–253.'

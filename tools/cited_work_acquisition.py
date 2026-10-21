@@ -4,6 +4,7 @@ Uses the existing connectors and reader. Search/acquisition receipts are discove
 provenance; a title match never establishes identity, independence or verification.
 """
 import json
+import hashlib
 from pathlib import Path
 import re
 import time
@@ -15,7 +16,13 @@ def reference_queries(text):
     """Read citation-only paragraphs, including line-wrapped OCR and containers."""
     text=re.sub(r'(?<=\w)[-\u00ad]\s*\n\s*(?=\w)', '', text)
     text=' '.join(text.split())
-    if len(text)>800 or not re.search(r'\b(?:18|19|20)\d{2}\b',text):return []
+    if len(text)>800 or not re.search(r'\b(?:1[5-9]|20)\d{2}\b',text):return []
+    # A full author-initial-year bibliography entry can cite a whole book
+    # without quotation marks or a page range. It remains a discovery lead.
+    entry=re.match(r"^[^\W\d_][^,;\d]{1,70},\s*(?:[^\W\d_]\.\s*){1,4}(?:1[5-9]|20)\d{2}\.\s+(.+)",text)
+    if entry:
+        title=re.split(r'\.\s+|,\s+[^,]{2,50}\.?$',entry[1],maxsplit=1)[0].strip(' .,;')
+        if 20<=len(title)<=240 and len(title.split())>=4 and '…' not in title and '...' not in title:return [title]
     if not re.search(r'(?:\d{1,4}\s*[-–]\s*\d{1,4}|(?:pp?\.|σ\.|σελ\.)\s*\d{1,4})\s*[,.;]?$',text):return []
     quoted=re.findall(r'[«“]([^»”]{20,300})[»”]',text)
     out=[]
@@ -32,6 +39,37 @@ def reference_queries(text):
         prefix=re.split(r',\s*',prefix)[-1]
         if len(prefix)>=20 and len(prefix.split())>=4:out.insert(0,prefix)
     return list(dict.fromkeys(out))[:3]
+
+
+def cited_bibliography_entries(root, results, findings):
+    """Locate full entries only for author-years cited in relevant passages.
+
+    Bibliography discovery is not independent corroboration or edition identity.
+    Original source text and exact character ranges remain unchanged.
+    """
+    root=Path(root).resolve();out=[]
+    prefix=re.compile(r'(?m)^(?P<author>[^\W\d_][^,;\d\n]{1,70}),\s*(?:[^\W\d_]\.[ \t]*){1,4}(?P<year>(?:1[5-9]|20)\d{2})\.\s+')
+    for source in results:
+        url=source.get('acquired_source_url') or source.get('url')
+        contexts='\n'.join(f.get('evidence_excerpt','') for f in findings if f.get('url') in (url,source.get('url'))).casefold()
+        if not contexts:continue
+        for name in dict.fromkeys([*source.get('files',[]),*(source.get('web_acquisition') or {}).get('files',[])]):
+            if not str(name).endswith('.txt'):continue
+            path=(root/name).resolve()
+            if not path.is_relative_to(root) or not path.is_file() or path.stat().st_size>10_000_000:continue
+            raw=path.read_bytes();text=raw.decode('utf-8',errors='replace');entries=list(prefix.finditer(text))
+            for n,entry in enumerate(entries):
+                if not re.search(re.escape(entry['author'].casefold())+r'\s+'+entry['year']+r'(?!\d)',contexts):continue
+                start=entry.start();end=min(entries[n+1].start() if n+1<len(entries) else len(text),start+800)
+                block=text[start:end].strip();queries=reference_queries(block)
+                if not queries:continue
+                out.append({'finding_id':'bibliography-'+hashlib.sha256((str(url)+'\0'+block).encode()).hexdigest()[:20],
+                            'url':url,'evidence_excerpt':block,'bibliographic_queries':queries,
+                            'source_text_sha256':hashlib.sha256(raw).hexdigest(),
+                            'locator':{'start_char':start,'end_char':start+len(block),'offset_unit':'UNICODE_CODE_POINTS'},
+                            'discovery_basis':'AUTHOR_YEAR_CITED_IN_RELEVANT_ACQUIRED_PASSAGE',
+                            'source_independence':'NOT_ESTABLISHED','original_inspected':False})
+    return out
 
 
 def lookup(query,lane):
@@ -84,6 +122,7 @@ def continue_citations(root,ctx,results,*,searcher=lookup,reader=acquire,
         from section_extraction import build_findings
         findings=build_findings(root,ctx)['findings']
     findings=list(findings)
+    findings.extend(cited_bibliography_entries(root,results,findings))
     # Preserve the reader's bibliography leads as well as citation-only
     # paragraphs. A missing locator stays missing; this is discovery, not proof.
     for source in results:
