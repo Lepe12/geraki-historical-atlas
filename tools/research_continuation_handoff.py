@@ -57,8 +57,14 @@ def decision(root, before, run_id):
     if result is None:
         return False, 'INVALID_PUBLISHED_CHECKSUMS'
     answer, validation = result
-    if answer.get('status') not in ('RESEARCH_COVERAGE_PENDING', 'RESEARCH_REVIEW_PENDING',
-                                   'MODEL_ANSWER_PENDING_HUMAN_REVIEW', 'NO_MODEL_SUPPORTED_CLAIMS'):
+    # Valid extraction can yield zero relevant claims; that is not a crash.
+    empty_extraction = (answer.get('status') == 'EXTRACTION_FAILED_OR_UNSUPPORTED' and
+                        answer.get('calls') and not answer.get('claims') and
+                        not any(item.get('reason') == 'EXTRACTION_RESPONSE_FAILED'
+                                for item in answer.get('coverage', {}).get('deferred', [])))
+    if not empty_extraction and answer.get('status') not in (
+            'RESEARCH_COVERAGE_PENDING', 'RESEARCH_REVIEW_PENDING',
+            'MODEL_ANSWER_PENDING_HUMAN_REVIEW', 'NO_MODEL_SUPPORTED_CLAIMS'):
         return False, 'NON_RESUMABLE_ANALYSIS:' + str(answer.get('status'))
     if any(c.get('status') != 'COMPLETED' for c in answer.get('calls', [])):
         return False, 'MODEL_CALL_NOT_COMPLETED'

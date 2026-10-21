@@ -64,6 +64,10 @@ class HandoffTests(unittest.TestCase):
         self.publish(status='EXTRACTION_FAILED_OR_UNSUPPORTED')
         self.assertFalse(decision(self.root, self.before, '456')[0])
 
+    def test_valid_zero_claim_extraction_still_advances(self):
+        self.publish(status='EXTRACTION_FAILED_OR_UNSUPPORTED', calls=[{'status': 'COMPLETED'}])
+        self.assertEqual(decision(self.root, self.before, '456'), (True, 'NEW_EXAMINED_ITEMS:1'))
+
     def test_review_only_progress_can_restart(self):
         before = state(self.root)
         q = json.loads(self.queue.read_text()); q['phase'] = 'REVIEW_AND_SYNTHESIS'
