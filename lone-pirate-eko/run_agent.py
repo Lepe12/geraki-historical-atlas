@@ -92,7 +92,10 @@ def llm(observation,memory):
         raise ValueError("Invalid sail state")
     return obj
 def main():
-    log={"engine":"Clawblox","model":MODEL,"status":"starting","events":[],"decisions":0,"started":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"simulation":True}
+    previous=json.loads(OUT.read_text()) if OUT.exists() else {}
+    prior_events=previous.get("events",[])
+    log={"engine":"Clawblox","model":MODEL,"status":"starting","events":prior_events,"decisions":len(prior_events),"started":previous.get("started") or time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"simulation":True,"stage":os.getenv("PIRATE_STAGE","1")}
+    stage_decisions=0
     save(log)
     if not KEY:
         log["status"]="blocked_missing_groq_api_key";save(log);print("GROQ_API_KEY absent",file=sys.stderr);return 2
@@ -101,9 +104,10 @@ def main():
         session=access.get("session") or access.get("session_id")
         if not session: raise RuntimeError("Clawblox /join did not return session")
         hdr={"X-Session":session}
-        memory=[];started=time.monotonic()
+        memory=[{"action":e.get("action"),"result":e.get("result"),"learning":e.get("memory")} for e in prior_events[-12:]]
+        started=time.monotonic()
         log["status"]="running";save(log)
-        while time.monotonic()-started<DURATION and log["decisions"]<MAX_CALLS:
+        while time.monotonic()-started<DURATION and stage_decisions<MAX_CALLS:
             obs=request(BASE+"/observe",headers=hdr)
             try: decision=llm(obs,memory)
             except Exception as e:
@@ -116,10 +120,10 @@ def main():
             else: actual=str(result)[:300]
             item={"time":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"action":decision["action"],"parameters":decision["data"],"reflection":decision.get("reflection",""),"memory":decision.get("memory",""),"result":actual}
             memory.append({"action":item["action"],"result":item["result"],"learning":item["memory"]})
-            log["events"].append(item);log["decisions"]+=1;save(log)
+            log["events"].append(item);log["decisions"]+=1;stage_decisions+=1;save(log)
             time.sleep(max(1,int(os.getenv("PAUSE_SECONDS","30"))))
-        if log["status"]=="running": log["status"]="completed_decision_budget" if log["decisions"]>=MAX_CALLS else "completed_duration"
-        save(log);print(log["status"],log["decisions"]);return 0 if log["status"].startswith("completed_") and log["decisions"] else 3
+        if log["status"]=="running": log["status"]="completed_decision_budget" if stage_decisions>=MAX_CALLS else "completed_duration"
+        save(log);print(log["status"],log["decisions"]);return 0 if log["status"].startswith("completed_") and stage_decisions else 3
     except Exception as e:
         log["status"]="world_error";log["error"]=str(e)[:450];save(log);raise
 if __name__=="__main__":sys.exit(main())
