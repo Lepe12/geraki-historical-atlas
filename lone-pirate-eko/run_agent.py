@@ -75,24 +75,21 @@ def save(d):
 
 def llm(observation,memory):
     tools=["MoveTo","Jump","Stop","Pickup","Place","Inspect","Touch","Steer","SetSail"]
-    prompt=("You are one pirate alone on a 17th century ship in the open sea. There is no assigned task and no mission. "
-    "Be curious, experiment freely, avoid dangerous actions, and reflect on failed attempts. "
-    "You control actions through a simulation, not prose. Never claim an action succeeded before observing its result. "
-    "Reply ONLY valid JSON {action: one of "+", ".join(tools)+", data: object, reflection: short string, memory: short string}. "
-    "The ONLY valid action payload formats are: "
-    "MoveTo:{position:[x,y,z]}, Jump:{}, Stop:{}, Pickup:{position:[x,y,z]}, "
+    prompt=("You control one agent situated on a simulated 17th-century ship. "
+    "No task, goal, reward, activity, route, or behavior is assigned. "
+    "The simulator accepts one action at a time. "
+    "Respond with one JSON object containing action, data, reflection, and memory. "
+    "Valid actions: "+", ".join(tools)+". "
+    "Payloads: MoveTo:{position:[x,y,z]}, Jump:{}, Stop:{}, Pickup:{position:[x,y,z]}, "
     "Place:{position:[x,y,z]}, Inspect:{target:object_name}, Touch:{target:object_name}, "
     "Steer:{direction:port|starboard|center}, SetSail:{state:raised|furled}. "
-    "Use exact world entity names (NOT entityId), and do not issue fixed routes. "
-    "No fixed sequence of actions. Use observations and memory to select actions. "
-    "Do not stay in one place only inspecting objects: explore by walking on deck, approach objects, interact with sails and helm when physically near, and respond to observations. "
-    "Pick your own destinations safely on deck (x between -5 and 5, z between -15 and 15, y around 1.5). "
-    "An Inspect action reveals information but is not physical exploration; avoid repeating inspections already completed.")
+    "Use exact simulator entity names. All actions must comply with the simulator constraints. "
+    "The response must contain only a valid JSON object.")
     entities=[{"id":e.get("id"),"name":e.get("name"),"position":e.get("position")} for e in observation.get("world",{}).get("entities",[])][:90]
     player=observation.get("player",{})
     compact={"player_position":player.get("position"),"last_action_result":player.get("attributes",{}).get("LastActionResult"),"entities":entities}
     usermsg="MEMORY "+json.dumps(memory[-6:],ensure_ascii=False)+"\\nOBSERVATION "+json.dumps(compact,ensure_ascii=False)
-    payload={"model":MODEL,"messages":[{"role":"system","content":prompt+" Example response: {\\\"action\\\":\\\"Inspect\\\",\\\"data\\\":{\\\"target\\\":\\\"Helm\\\"},\\\"reflection\\\":\\\"I am curious about this mechanism\\\",\\\"memory\\\":\\\"I have not inspected the helm yet\\\"}. Never output markdown, reasoning tags, or multiple JSON responses."},{"role":"user","content":usermsg}],"temperature":0.6,"max_completion_tokens":600,"response_format":{"type":"json_object"}}
+    payload={"model":MODEL,"messages":[{"role":"system","content":prompt},{"role":"user","content":usermsg}],"temperature":0.6,"max_completion_tokens":600,"response_format":{"type":"json_object"}}
     decoder=json.JSONDecoder()
     obj=None
     last_error=None
