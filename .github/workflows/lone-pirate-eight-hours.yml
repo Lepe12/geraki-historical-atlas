@@ -6,11 +6,23 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  actions: write
+concurrency:
+  group: lone-pirate-eight-hours
+  cancel-in-progress: true
 jobs:
   pirate_1:
     runs-on: ubuntu-latest
     timeout-minutes: 255
     steps:
+      - name: Cancel prior pirate experiment runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/lone-pirate-eight-hours.yml/runs?status=in_progress&per_page=30" --jq '.workflow_runs[].id' | while read -r run_id; do
+            [ "$run_id" = "$GITHUB_RUN_ID" ] && continue
+            gh api -X POST "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/cancel" || true
+          done
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
