@@ -6,6 +6,9 @@ import hashlib, ipaddress, json, pathlib, re, socket, subprocess, time, urllib.e
 from html.parser import HTMLParser
 
 SOCIAL=('facebook.com','instagram.com','tiktok.com','youtube.com','linkedin.com')
+# Bounded document reads must accommodate ordinary digitized volumes. The live
+# JSON bridge limit is unrelated to the size of an acquired source PDF.
+MAX_DOCUMENT_BYTES=32_000_000
 def public_url(url,resolve=True):
     p=urllib.parse.urlsplit(str(url))
     if p.scheme not in ('http','https') or not p.hostname or p.username or p.password or p.port not in (None,80,443):
@@ -28,12 +31,12 @@ def fetch(url):
     for attempt in range(3):
         try:
             with urllib.request.build_opener(Redirects()).open(req,timeout=12) as response:
-                data=response.read(12_000_001);ctype=response.headers.get('Content-Type','');final=public_url(response.url)
+                data=response.read(MAX_DOCUMENT_BYTES+1);ctype=response.headers.get('Content-Type','');final=public_url(response.url)
             break
         except urllib.error.HTTPError as error:
             if error.code not in (502,503,504) or attempt==2:raise
             time.sleep(attempt+1)
-    if len(data)>12_000_000:raise ValueError('DOCUMENT_TOO_LARGE')
+    if len(data)>MAX_DOCUMENT_BYTES:raise ValueError('DOCUMENT_TOO_LARGE')
     return data,ctype,final
 
 class Document(HTMLParser):
@@ -187,3 +190,4 @@ def citation_title_match(query, record):
     found=tokens(record.get('title') or '')
     overlap=len(wanted & found)
     return bool(len(wanted)>=3 and overlap>=3 and overlap/len(wanted)>=0.8)
+

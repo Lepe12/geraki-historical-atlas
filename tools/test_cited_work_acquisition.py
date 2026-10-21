@@ -1,0 +1,82 @@
+import json
+from pathlib import Path
+import tempfile
+import unittest
+from urllib.error import HTTPError
+from cited_work_acquisition import continue_citations, reference_queries
+from web_acquisition import acquire
+
+
+class CitationContinuationTests(unittest.TestCase):
+    def setUp(self):
+        self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
+        self.root=Path(self.temp.name)
+        self.title='A historical bibliography of maritime correspondence'
+        self.finding={'finding_id':'f1','url':'https://archive.org/details/parent',
+                      'evidence_excerpt':'Smith, «'+self.title+'», London 1956, pp. 237–253.',
+                      'locator':{'start_char':120,'end_char':230},'source_text_sha256':'parent-hash'}
+
+    def test_line_wrapped_reference_and_container(self):
+        text='23. A historical article on maritime correspondence, «Collected voy-\nages in the Mediterranean», Athens 1956, 237–253.'
+        self.assertEqual(reference_queries(text),['A historical article on maritime correspondence','Collected voyages in the Mediterranean'])
+        self.assertEqual(reference_queries('He said «A historical bibliography of maritime correspondence».'),[])
+
+    def test_failed_pdf_continues_to_alternative_then_enters_normal_page_extraction(self):
+        calls=[];results=[]
+        def search(q,lane):
+            return [],[{'title':self.title,'digital_url':'https://example.org/failed.pdf',
+                        'url':'https://example.org/mirror.txt'}]
+        def read(url,out,follow=True):
+            calls.append(url)
+            if url.endswith('.pdf'):raise HTTPError(url,503,'Unavailable',{},None)
+            return acquire(url,out,fetcher=lambda u:(b'Captain Example sailed to the harbour in 1621. '*4,'text/plain',u))
+        report=continue_citations(self.root,{'target':'Captain Example'},results,findings=[self.finding],searcher=search,reader=read)
+        self.assertEqual(len(calls),2)
+        self.assertEqual(report['searches'][0]['acquisitions'][0]['http_status'],503)
+        self.assertEqual(len(results),1)
+        self.assertEqual(results[0]['parent_finding_id'],'f1')
+        self.assertTrue(Path(results[0]['files'][0]).exists())
+        self.assertFalse(results[0]['original_inspected'])
+        self.assertEqual(results[0]['verification_status'],'NEEDS_EVIDENCE')
+        # Resume does not submit the same public queries or downloads again.
+        continue_citations(self.root,{'target':'Captain Example'},results,findings=[self.finding],searcher=lambda *a:self.fail('duplicate search'),reader=read)
+        self.assertEqual(len(calls),2)
+
+    def test_unrelated_pdf_is_never_downloaded_and_budget_is_recorded(self):
+        rows=[{'title':'Modern company financial report','url':'https://example.org/file.pdf'}]
+        report=continue_citations(self.root,{},[],findings=[self.finding],searcher=lambda *a:([],rows),reader=lambda *a,**k:self.fail('unrelated download'))
+        self.assertEqual(report['searches'][0]['title_matched_records'],0)
+        self.assertEqual(report['searches'][0]['outcome'],'CITATION_DEAD_END_IN_SEARCHED_CATALOGUES')
+        other={**self.finding,'evidence_excerpt':'Smith, «Another historical article about maritime archives», Athens 1956, pp. 237–253.'}
+        report=continue_citations(self.root,{},[],findings=[other],max_queries=0)
+        self.assertEqual(report['deferred'][0]['status'],'BOUNDED_WAVE_DEFERRED')
+
+    def test_internet_archive_text_is_followed_without_web_metadata(self):
+        out=self.root/'library_acquisition';out.mkdir()
+        text='Captain Example, «'+self.title+'», London 1956, pp. 237–253.'
+        (out/'source_djvu.txt').write_text(text)
+        (out/'acquisition_report.json').write_text(json.dumps({'results':[{
+            'title':'Historical bibliography','url':'https://archive.org/details/source',
+            'files':['library_acquisition/source_djvu.txt'],'status':'TEXT_ACQUIRED'}]}))
+        queries=[]
+        report=continue_citations(self.root,{'target':'Captain Example','aliases':[],'date_range':''},[],
+            searcher=lambda q,lane:(queries.append(q) or [],[]))
+        self.assertEqual(queries,[self.title])
+        self.assertEqual(report['searches'][0]['parent_locator']['start_char'],0)
+        self.assertEqual(report['searches'][0]['citation_excerpt'],text)
+
+    def test_pdf_larger_than_old_limit_is_accepted_but_limit_is_enforced(self):
+        from unittest.mock import patch,MagicMock
+        import web_acquisition as web
+        response=MagicMock();response.read.return_value=b'x'*12_047_985
+        response.headers={'Content-Type':'application/pdf'};response.url='https://example.org/book.pdf'
+        opened=MagicMock();opened.__enter__.return_value=response
+        with patch.object(web,'public_url',side_effect=lambda u,**k:u),patch.object(web.urllib.request,'build_opener') as opener:
+            opener.return_value.open.return_value=opened
+            self.assertEqual(len(web.fetch(response.url)[0]),12_047_985)
+            response.read.assert_called_with(web.MAX_DOCUMENT_BYTES+1)
+            with patch.object(web,'MAX_DOCUMENT_BYTES',100):
+                with self.assertRaisesRegex(ValueError,'DOCUMENT_TOO_LARGE'):web.fetch(response.url)
+
+
+if __name__=='__main__':unittest.main()
