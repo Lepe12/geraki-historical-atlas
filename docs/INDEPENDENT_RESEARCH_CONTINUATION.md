@@ -1,0 +1,11 @@
+# Independent research continuation
+
+The previous coordinator owned one long-lived concurrency slot, ran two research parents serially and waited for both before handoff. Even the mixed-result repair could not restart a healthy parent until the other parent's model work finished. This delayed adoption of checkpoint repairs.
+
+The coordinator now performs only selection and non-blocking dispatch to the existing semantic workflow. Its short dispatch lock is separate from the legacy long coordinator lock, so a repair push can launch work for an idle parent while another parent's legacy execution remains active. It still checks active parents and coalesces only older unstarted coordinators; running model work is not cancelled.
+
+Each semantic worker captures its own baseline after checkout, holds a concurrency lock scoped to its parent, publishes its results through the existing conflict-aware publisher, fetches the published parent tree and verifies that parent's checkpoint. It dispatches its own next pass only after checksum-valid advancement. No other parent's completion or failure is a dependency. Repeated samples, invalid receipts, stale pointers and failed publication remain restart holds. INCOMPLETE and historical verification gates are unchanged.
+
+Changing the semantic workflow no longer launches its old default parent as a separate push-triggered analysis. Instead it wakes the short coordinator, which selects actual pending work and avoids parents already running. The workflow's existing dispatch inputs and existing Actions token are used. No credentials, hosting or database changes are made. The semantic implementation is unchanged, so this coordination repair does not intentionally create another extraction generation.
+
+Validation: 110 local tests passed across continuation, handoff, semantic extraction, citation acquisition, research acceptance and ranking. New tests check independent submissions, continued submission after one dispatch fails, and validation of all parent IDs before any dispatch. Both workflow files also parse successfully. These checks establish the scheduling behavior under test; live worker starts and later durable checkpoints must be assessed separately. This repair does not claim full corpus coverage or historical VERIFIED evidence.

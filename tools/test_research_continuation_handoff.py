@@ -5,11 +5,33 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from research_continuation_handoff import active_parents, cancel_superseded_pending, decision, select, state, handoff_outputs
+from research_continuation_handoff import active_parents, cancel_superseded_pending, decision, select, state, handoff_outputs, dispatch_selected
 from research_continuation import digest
 
 
 class HandoffTests(unittest.TestCase):
+    @patch('research_continuation_handoff.subprocess.check_call')
+    def test_dispatch_submits_workers_without_waiting_for_completion(self, call):
+        dispatch_selected('owner/repo',{'123':{},'456':{}})
+        self.assertEqual(call.call_count,2)
+        self.assertEqual(call.call_args_list[0].args[0][-1],'run_id=123')
+        self.assertEqual(call.call_args_list[1].args[0][-1],'run_id=456')
+        self.assertTrue(all('research-semantic-reanalysis.yml' in c.args[0] for c in call.call_args_list))
+
+    @patch('research_continuation_handoff.subprocess.check_call')
+    def test_failed_dispatch_does_not_prevent_other_worker_submission(self, call):
+        import subprocess
+        call.side_effect=[subprocess.CalledProcessError(1,'gh'),None]
+        with self.assertRaisesRegex(SystemExit,'CONTINUATION_DISPATCH_FAILED:123'):
+            dispatch_selected('owner/repo',{'123':{},'456':{}})
+        self.assertEqual(call.call_count,2)
+
+    @patch('research_continuation_handoff.subprocess.check_call')
+    def test_all_parent_ids_validated_before_dispatch(self, call):
+        with self.assertRaisesRegex(ValueError,'NUMERIC_PARENT_RUN_REQUIRED'):
+            dispatch_selected('owner/repo',{'123':{},'bad':{}})
+        call.assert_not_called()
+
     def test_failed_corpus_does_not_freeze_healthy_progress(self):
         result=handoff_outputs({'123':(True,'NEW_EXAMINED_ITEMS:3'),
             '456':(False,'CONTINUATION_RECEIPTS_INVALID')})
@@ -150,4 +172,5 @@ class HandoffTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
 

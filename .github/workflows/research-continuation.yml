@@ -4,7 +4,7 @@ on:
     - cron: '17 * * * *'
   push:
     branches: [main]
-    paths: ['research_continuation_requests/*.json', '.github/workflows/research-continuation.yml', 'tools/research_continuation_handoff.py']
+    paths: ['research_continuation_requests/*.json', '.github/workflows/research-continuation.yml', 'tools/research_continuation_handoff.py', '.github/workflows/research-semantic-reanalysis.yml']
   workflow_dispatch:
     inputs:
       excluded_run_ids:
@@ -20,7 +20,7 @@ permissions:
   contents: write
   actions: write
 concurrency:
-  group: research-continuation-coordinator
+  group: research-continuation-dispatch
   cancel-in-progress: false
 jobs:
   pending:
@@ -38,37 +38,5 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           PCT_CONTINUATION_EXCLUDED_RUNS: ${{ inputs.excluded_run_ids || '[]' }}
-        run: python3 tools/research_continuation_handoff.py select --exclude-active
-  continue:
-    needs: pending
-    if: needs.pending.outputs.runs != '[]'
-    strategy:
-      max-parallel: 1
-      fail-fast: false
-      matrix:
-        run: ${{ fromJSON(needs.pending.outputs.runs) }}
-    uses: ./.github/workflows/research-semantic-reanalysis.yml
-    with:
-      run_id: ${{ matrix.run }}
-
-  handoff:
-    needs: [pending, continue]
-    if: always() && needs.pending.result == 'success' && needs.pending.outputs.runs != '[]'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-      - name: Verify published progress before automatic restart
-        id: checkpoint
-        env:
-          BASELINE: ${{ needs.pending.outputs.baseline }}
-          PCT_CONTINUATION_EXCLUDED_RUNS: ${{ inputs.excluded_run_ids || '[]' }}
-        run: python3 tools/research_continuation_handoff.py handoff --baseline "$BASELINE"
-      - name: Dispatch the next bounded pass using the existing Actions token
-        if: always() && steps.checkpoint.outputs.restart == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          HELD_RUNS: ${{ steps.checkpoint.outputs.held_runs }}
-        run: gh workflow run research-continuation.yml --repo "$GITHUB_REPOSITORY" --ref main -f "excluded_run_ids=$HELD_RUNS"
+        run: python3 tools/research_continuation_handoff.py select --exclude-active --dispatch
 

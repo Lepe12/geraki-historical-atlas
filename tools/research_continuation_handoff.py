@@ -148,14 +148,19 @@ def decision(root, before, run_id):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('mode', choices=['select', 'handoff'])
+    parser.add_argument('mode', choices=['select', 'handoff', 'baseline'])
+    parser.add_argument('--run-id')
+    parser.add_argument('--dispatch', action='store_true')
     parser.add_argument('--baseline', default='{}')
     parser.add_argument('--exclude-active', action='store_true')
     args = parser.parse_args()
     inherited = json.loads(os.getenv('PCT_CONTINUATION_EXCLUDED_RUNS', '[]'))
     if not isinstance(inherited, list) or any(not isinstance(run, str) or not run.isdigit() for run in inherited):
         raise ValueError('NUMERIC_EXCLUDED_RUN_IDS_REQUIRED')
-    if args.mode == 'select':
+    if args.mode == 'baseline':
+        if not args.run_id or not args.run_id.isdigit():raise ValueError('NUMERIC_PARENT_RUN_REQUIRED')
+        values = {'baseline': {args.run_id: state(Path('evidence/runs') / args.run_id)}}
+    elif args.mode == 'select':
         busy = set()
         if args.exclude_active:
             repository = os.environ['GITHUB_REPOSITORY']
@@ -165,6 +170,8 @@ def main():
             print(json.dumps({'active_parent_runs_deferred': sorted(busy)}))
         selected = select(Path('.'), busy | set(inherited))
         values = {'runs': list(selected), 'baseline': selected}
+        if args.dispatch:
+            dispatch_selected(os.environ['GITHUB_REPOSITORY'], selected)
     else:
         decisions = {}
         for run, before in json.loads(args.baseline).items():
@@ -194,6 +201,23 @@ def handoff_outputs(decisions, inherited=()):
             'held_runs': sorted(set(inherited) | held)}
 
 
+def dispatch_selected(repository, selected):
+    """Submit independent workers; never wait for their model work to finish."""
+    if any(not isinstance(run,str) or not run.isdigit() for run in selected):
+        raise ValueError('NUMERIC_PARENT_RUN_REQUIRED')
+    failed=[]
+    for run in selected:
+        try:
+            subprocess.check_call(['gh','workflow','run','research-semantic-reanalysis.yml',
+                '--repo',repository,'--ref','main','-f','run_id='+run])
+            print('INDEPENDENT_CONTINUATION_DISPATCHED:'+run)
+        except subprocess.CalledProcessError:
+            failed.append(run)
+            print('INDEPENDENT_CONTINUATION_DISPATCH_FAILED:'+run)
+    if failed:raise SystemExit('CONTINUATION_DISPATCH_FAILED:'+','.join(failed))
+
+
 if __name__ == '__main__':
     main()
+
 

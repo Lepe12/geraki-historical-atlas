@@ -1,8 +1,5 @@
 name: Real acquired-source semantic reanalysis
 on:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/research-semantic-reanalysis.yml']
   workflow_call:
     inputs:
       run_id:
@@ -23,11 +20,15 @@ on:
         description: Replay existing extraction receipts, then run new reviews and synthesis
 permissions:
   contents: write
+  actions: write
 jobs:
   analyse:
     runs-on: ubuntu-latest
     name: Reanalyse actual sources ${{ matrix.parent_run }}
     timeout-minutes: 60
+    concurrency:
+      group: research-parent-${{ matrix.parent_run }}
+      cancel-in-progress: false
     strategy:
       fail-fast: false
       matrix:
@@ -47,6 +48,9 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+      - name: Capture only this research checkpoint before work
+        id: baseline
+        run: python3 tools/research_continuation_handoff.py baseline --run-id "$PARENT_RESEARCH_RUN"
       - uses: ./.github/actions/research-model
       - name: Install the existing public PDF reader
         run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
@@ -97,3 +101,18 @@ jobs:
           if git diff --cached --quiet; then exit 0; fi
           git commit -m 'Record actual semantic reanalysis with replayed source passages'
           python3 tools/publish_research_outputs.py
+      - name: Check this published checkpoint independently
+        id: checkpoint
+        if: always() && steps.baseline.outcome == 'success'
+        env:
+          BASELINE: ${{ steps.baseline.outputs.baseline }}
+        run: |
+          git fetch origin main
+          git restore --source=origin/main -- "evidence/runs/$PARENT_RESEARCH_RUN"
+          python3 tools/research_continuation_handoff.py handoff --baseline "$BASELINE"
+      - name: Continue this research without waiting for another
+        if: always() && steps.checkpoint.outputs.restart == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run research-semantic-reanalysis.yml --repo "$GITHUB_REPOSITORY" --ref main -f "run_id=$PARENT_RESEARCH_RUN"
+
