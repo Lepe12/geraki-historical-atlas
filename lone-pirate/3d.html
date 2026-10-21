@@ -98,7 +98,23 @@ function display(log,origin){
    events.appendChild(row);
  }
  if(!replaying&&history.length>priorCount){
-   const e=history.at(-1);if(e)applyEvent(e);
+   const e=history.at(-1);
+   if(e){
+     const pos=Array.isArray(e.player_position_after)?e.player_position_after:null;
+     if(pos&&pos.length===3&&pos.every(Number.isFinite)){
+       const next=new THREE.Vector3(pos[0],pos[1],pos[2]);
+       if(freshRun||priorCount===0){pirate.position.copy(next);target=null}
+       else target=next;
+     }
+     if(e.action!=='MoveTo')applyEvent(e);
+     if(e.action==='MoveTo'&&e.player_position_before&&e.player_position_after){
+       const before=e.player_position_before,after=e.player_position_after;
+       if(before.length===3&&after.length===3&&[...before,...after].every(Number.isFinite)&&
+          new THREE.Vector3(...before).distanceTo(new THREE.Vector3(...after))>.1){
+         document.getElementById('playback').textContent='Μετακίνηση επιβεβαιώθηκε: '+after.map(n=>Number(n).toFixed(1)).join(', ');
+       }
+     }
+   }
  }
  document.getElementById('playback').textContent=(origin==='github'?'Δεδομένα GitHub ανά 90″':'Δημοσιευμένο αρχείο')+' · '+history.length+' πραγματικά γεγονότα · ▶ για αναπαραγωγή';
 }
