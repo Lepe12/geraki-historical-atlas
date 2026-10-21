@@ -14,7 +14,7 @@ a{color:#8ae6fa}button{background:#16364c;color:white;border:1px solid #52839a;p
 <div id="viewport"></div><aside id="hud"><h1>LONE PIRATE // 3D OBSERVER</h1>
 <div id="status">Φόρτωση τελευταίου επιβεβαιωμένου ημερολογίου…</div>
 <p>Πραγματική περιστρεφόμενη τρισδιάστατη σκηνή. Απεικονίζει τα καταγεγραμμένα γεγονότα της προσομοίωσης Clawblox, <b>όχι ζωντανή βιντεομετάδοση</b>. Το πλοίο παραμένει στατικό στην τωρινή προσομοίωση.</p>
-<button id="refresh">Ανανέωση δεδομένων</button>
+<button id="refresh">Ανανέωση δεδομένων</button> <button id="replay">▶ Αναπαραγωγή</button> <button id="pause">⏸ Παύση</button><div id="playback" style="margin-top:8px;color:#91b8c8;font:12px monospace">Επιβεβαιωμένες ενέργειες, όχι live stream</div>
 <a href="./index.html">Ημερολόγιο ↗</a>
 <div id="events"></div></aside>
 <div id="bottom">Σύρε για περιστροφή · Ροδέλα για zoom · Η κίνηση του πειρατή προβάλλεται μόνο όταν υπάρχει καταγεγραμμένη εντολή MoveTo</div>
@@ -23,7 +23,7 @@ a{color:#8ae6fa}button{background:#16364c;color:white;border:1px solid #52839a;p
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 const v=document.getElementById('viewport'),status=document.getElementById('status'),events=document.getElementById('events');
-let scene,camera,renderer,orbit,pirate,sea,ship,target=null,lastStamp='';
+let scene,camera,renderer,orbit,pirate,sea,ship,target=null,lastStamp='',history=[],replayIndex=0,replayNext=0,replaying=false,selected=null;
 function mesh(g,c,opts={}){const o=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:c,...opts}));scene.add(o);return o}
 function box(n,w,h,d,x,y,z,c,opts={}){const o=mesh(new THREE.BoxGeometry(w,h,d),c,opts);o.name=n;o.position.set(x,y,z);return o}
 function cylinder(n,rt,rb,h,x,y,z,c,opts={}){const o=mesh(new THREE.CylinderGeometry(rt,rb,h,12),c,opts);o.name=n;o.position.set(x,y,z);return o}
@@ -56,19 +56,40 @@ window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camer
 requestAnimationFrame(render)
 }
 const clock=new THREE.Clock();
-function render(){requestAnimationFrame(render);const t=clock.getElapsedTime();if(sea){sea.position.y=-4+Math.sin(t*.7)*.06}if(target){pirate.position.lerp(target,.018);if(pirate.position.distanceTo(target)<.12)target=null}orbit.update();renderer.render(scene,camera)}
+function render(){requestAnimationFrame(render);const t=clock.getElapsedTime();if(replaying&&t>=replayNext){replayEvent();replayNext=t+3.5}if(sea){sea.position.y=-4+Math.sin(t*.7)*.06}if(target){pirate.position.lerp(target,.018);if(pirate.position.distanceTo(target)<.12)target=null}orbit.update();renderer.render(scene,camera)}
+function highlight(name){
+ if(selected){selected.material.emissive.setHex(0x000000);selected=null}
+ const obj=scene.getObjectByName(name);
+ if(obj&&obj.material){selected=obj;obj.material.emissive.setHex(0x286476);orbit.target.lerp(obj.position,.16)}
+}
+function replayEvent(){
+ if(replayIndex>=history.length){replaying=false;document.getElementById('playback').textContent='Ολοκληρώθηκε η αναπαραγωγή';return}
+ const e=history[replayIndex++];
+ document.getElementById('playback').textContent='Γεγονός '+replayIndex+'/'+history.length+' · '+(e.action||'');
+ if((e.action==='Inspect'||e.action==='Touch')&&e.parameters?.target)highlight(e.parameters.target);
+ if(e.action==='MoveTo'&&Array.isArray(e.player_position_after)&&Array.isArray(e.player_position_before)&&/Moving|Reached/i.test(e.result||'')){
+   const a=e.player_position_before,b=e.player_position_after;
+   if(a.length===3&&b.length===3&&[...a,...b].every(Number.isFinite)){
+     pirate.position.set(a[0],a[1],a[2]);target=new THREE.Vector3(b[0],b[1],b[2]);
+   }
+ }
+ if(e.action==='SetSail'&&/Sail (raised|furled)/.test(e.result||'')){const sail=scene.getObjectByName('Mainsail');if(sail)sail.material.opacity=e.parameters.state==='raised'?.92:.25}
+}
 function display(log){
-status.textContent='Αρχείο: '+(log.status||'unknown')+' · '+(log.decisions||0)+' πραγματικές αποφάσεις · '+(log.model||'');
-events.replaceChildren();
-const actions=log.events||[];
-for(const e of actions.slice(-12).reverse()){const row=document.createElement('div');row.textContent=(e.action||'?')+' — '+(e.result||'χωρίς αποτέλεσμα');events.appendChild(row)}
-const moves=actions.filter(e=>e.action==='MoveTo'&&Array.isArray(e.parameters?.position)&&/moving/i.test(e.result||''));
-if(moves.length){const p=moves[moves.length-1].parameters.position;target=new THREE.Vector3(p[0],Math.max(1,p[1]),p[2])}
-const sailEvents=actions.filter(e=>e.action==='SetSail'&&/Sail (raised|furled)/.test(e.result||''));
-if(sailEvents.length){const last=sailEvents.at(-1);const mesh=scene.getObjectByName('Mainsail');if(mesh)mesh.material.opacity=last.parameters.state==='raised'?.92:.25}
+ status.textContent='Αρχείο: '+(log.status||'unknown')+' · '+(log.decisions||0)+' πραγματικές αποφάσεις · '+(log.model||'');
+ history=Array.isArray(log.events)?log.events:[];
+ events.replaceChildren();
+ for(const e of history.slice(-25).reverse()){
+   const row=document.createElement('div');
+   const real=(e.action==='MoveTo'&&Array.isArray(e.player_position_after))?' · θέση καταγράφηκε':'';
+   row.textContent=(e.time||'')+' · '+(e.action||'?')+' — '+(e.result||'χωρίς αποτέλεσμα')+real;
+   events.appendChild(row);
+ }
+ replayIndex=0;replaying=false;
+ document.getElementById('playback').textContent='Διαθέσιμα γεγονότα: '+history.length+' · ▶ για αναπαραγωγή';
 }
 async function load(){
 try{const response=await fetch('./latest.json?v='+Date.now(),{cache:'no-store'});if(!response.ok)throw Error('HTTP '+response.status);const log=await response.json();const stamp=JSON.stringify([log.started,log.status,log.decisions]);if(stamp!==lastStamp){lastStamp=stamp;display(log)}}catch(e){status.textContent='Αναμονή δημοσιευμένου ημερολογίου ('+e.message+')'}}
 }
-try{build();load();document.getElementById('refresh').onclick=load;setInterval(load,60000)}catch(e){document.getElementById('fallback').style.display='block';status.textContent=String(e)}
+try{build();load();document.getElementById('refresh').onclick=load;document.getElementById('replay').onclick=()=>{replayIndex=0;replaying=history.length>0;replayNext=0;target=null;pirate.position.set(0,1,0)};document.getElementById('pause').onclick=()=>{replaying=false;target=null};setInterval(load,60000)}catch(e){document.getElementById('fallback').style.display='block';status.textContent=String(e)}
 </script></body></html>
