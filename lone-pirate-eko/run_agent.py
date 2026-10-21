@@ -38,7 +38,7 @@ def llm(observation,memory):
     player=observation.get("player",{})
     compact={"player_position":player.get("position"),"last_action_result":player.get("attributes",{}).get("LastActionResult"),"entities":entities}
     usermsg="MEMORY "+json.dumps(memory[-6:],ensure_ascii=False)+"\\nOBSERVATION "+json.dumps(compact,ensure_ascii=False)
-    payload={"model":MODEL,"messages":[{"role":"system","content":prompt+" Example response: {\\\"action\\\":\\\"Inspect\\\",\\\"data\\\":{\\\"target\\\":\\\"Helm\\\"},\\\"reflection\\\":\\\"I am curious about this mechanism\\\",\\\"memory\\\":\\\"I have not inspected the helm yet\\\"}. Never output markdown, reasoning tags, or multiple JSON responses."},{"role":"user","content":usermsg}],"temperature":0.6,"max_completion_tokens":600,"reasoning_effort":"low","include_reasoning":false,"response_format":{"type":"json_object"}}
+    payload={"model":MODEL,"messages":[{"role":"system","content":prompt+" Example response: {\\\"action\\\":\\\"Inspect\\\",\\\"data\\\":{\\\"target\\\":\\\"Helm\\\"},\\\"reflection\\\":\\\"I am curious about this mechanism\\\",\\\"memory\\\":\\\"I have not inspected the helm yet\\\"}. Never output markdown, reasoning tags, or multiple JSON responses."},{"role":"user","content":usermsg}],"temperature":0.6,"max_completion_tokens":600,"reasoning_effort":"low","include_reasoning":False,"response_format":{"type":"json_object"}}
     decoder=json.JSONDecoder()
     obj=None
     last_error=None
