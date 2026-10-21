@@ -11,8 +11,11 @@ MAX_CALLS=min(int(os.getenv("MAX_CALLS","35")),50)
 def request(url,method="GET",body=None,headers=None,timeout=40):
     data=json.dumps(body).encode() if body is not None else None
     h={"Content-Type":"application/json",**(headers or {})}
-    with urllib.request.urlopen(urllib.request.Request(url,data=data,headers=h,method=method),timeout=timeout) as r:
-        return json.loads(r.read().decode())
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url,data=data,headers=h,method=method),timeout=timeout) as r:
+            return json.loads(r.read().decode())
+    except urllib.error.HTTPError as e:
+        raise RuntimeError("Model provider returned HTTP "+str(e.code)+"; check account model permissions, billing or region") from None
 def save(d): OUT.write_text(json.dumps(d,ensure_ascii=False,indent=2))
 def llm(observation,memory):
     tools=["MoveTo","Jump","Stop","Pickup","Place","Inspect","Touch","Steer","SetSail"]
