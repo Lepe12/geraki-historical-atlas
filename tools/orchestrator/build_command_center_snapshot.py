@@ -183,6 +183,9 @@ def build(repo:Path,run_id:str):
     answers=[{'lane':lane,**answer} for lane in LANE_LABELS if (answer:=read(run_root/lane/'research_dossier/answer.json',{}))]
     semantic_answer=read(run_root/'research_answer/answer.json',{})
     research_validation=read(run_root/'research_answer/validation_report.json',{})
+    from research_continuation import latest_analysis
+    continuation=latest_analysis(run_root)
+    if continuation:semantic_answer,research_validation=continuation
     discoveries,coverage=discovery_results(run_root,request)
     request_id=request_id_for(run_root)
     try:from .jarvis_state_board import lane_state

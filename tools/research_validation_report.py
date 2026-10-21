@@ -107,6 +107,15 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
             cached=read(cache_path)
             if cached['source_sha256']!=receipt['source_sha256'] or digest(cached['payload'])!=receipt['payload_sha256']:raise ValueError('CACHE_CHANGED')
         except (ValueError,OSError,KeyError,TypeError):continuation_valid=False
+    for entry in answer.get('calls',[]):
+        if not entry.get('replayed'):continue
+        try:
+            from research_continuation import digest
+            path=(root/entry['response_cache_path']).resolve()
+            if not path.is_relative_to(root.resolve()):raise ValueError('UNSAFE_CACHE_PATH')
+            cached=read(path)
+            if digest(cached['result'])!=entry['response_cache_sha256']:raise ValueError('CACHE_CHANGED')
+        except (ValueError,OSError,KeyError,TypeError):continuation_valid=False
     if answer.get('continuation_replays') and continuation_valid:completed.add('evidence_extractor')
     reused=answer.get('reused_semantic_calls',[]);resume=answer.get('resume_context') or {}
     valid_reuse=False

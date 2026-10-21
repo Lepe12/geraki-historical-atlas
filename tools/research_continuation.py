@@ -56,10 +56,27 @@ class Continuation:
                 'payload_sha256':self.load(group)['payload_sha256'],
                 'historical_verification':False}
 
+    def response_load(self,key):
+        path=self.root/'responses'/(key+'.json')
+        if not path.exists():return None
+        try:
+            row=json.loads(path.read_text())
+            if digest(row['result'])!=row['result_sha256']:return None
+            return row
+        except (ValueError,KeyError,TypeError):return None
+
+    def response_save(self,key,result):
+        atomic(self.root/'responses'/(key+'.json'),{
+            'result':result,'result_sha256':digest(result),'verified':False})
+
+    def pending(self,phase):
+        path=self.root/'queue.json'
+        value=json.loads(path.read_text())
+        atomic(path,{**value,'status':'PENDING','phase':phase})
+
     def inventory(self,records,selected,deferred):
         pending={r['evidence_id']:r['reason'] for r in deferred}
         completed={r['evidence_id'] for group in selected if self.completed(group) for r in group}
-        atomic(self.root.parent/'active.json',{'queue':self.root.name+'/queue.json'})
         atomic(self.root/'queue.json',{'schema':'research-continuation-v1',
             'status':'COMPLETE' if len(completed)==len(records) else ('BLOCKED' if pending and all(v=='PARAGRAPH_EXCEEDS_MODEL_BATCH' for v in pending.values()) else 'PENDING'),
             'total':len(records),'completed':len(completed),
@@ -67,3 +84,19 @@ class Continuation:
                 'status':'EXAMINED' if r['evidence_id'] in completed else 'PENDING',
                 'reason':pending.get(r['evidence_id'],'AWAITING_EXTRACTION') if r['evidence_id'] not in completed else None}
                 for r in records]})
+        atomic(self.root.parent/'active.json',{'queue':self.root.name+'/queue.json'})
+
+
+def latest_analysis(root):
+    """Load only a source-bound continuation published inside its parent run."""
+    root=Path(root).resolve()
+    try:
+        pointer=json.loads((root/'research_continuation/latest.json').read_text())
+        directory=(root/pointer['analysis_path']).resolve()
+        if not directory.is_relative_to(root) or not re.fullmatch(r'semantic_reanalysis_[0-9]+',directory.name):return None
+        answer=(directory/'research_answer/answer.json').read_bytes()
+        validation=(directory/'research_answer/validation_report.json').read_bytes()
+        if hashlib.sha256(answer).hexdigest()!=pointer['answer_sha256']:return None
+        if hashlib.sha256(validation).hexdigest()!=pointer['validation_sha256']:return None
+        return json.loads(answer),json.loads(validation)
+    except (OSError,ValueError,KeyError,TypeError):return None

@@ -5,6 +5,13 @@ on:
       - feat/historical-attestation-foundation-20261019
       - main
     paths:
+      - 'tools/research_continuation.py'
+      - 'tools/cited_work_acquisition.py'
+      - 'tools/continue_citation_acquisition.py'
+      - 'tools/test_research_continuation.py'
+      - 'tools/semantic_research_answer.py'
+      - 'tools/research_validation_report.py'
+      - 'tools/probe_evidence_production.py'
       - 'tools/historical_attestations.py'
       - 'tools/storage/historical_evidence*'
       - 'tools/storage/validate_mariadb_evidence.py'
@@ -25,6 +32,7 @@ on:
       - 'tools/storage/test_evidence_schema_request.php'
       - 'server/command-center-live/**'
       - '.github/workflows/historical-evidence-tests.yml'
+  pull_request:
   workflow_dispatch:
 jobs:
   evidence-integration:
@@ -48,7 +56,7 @@ jobs:
       - name: PDF Learning HTTP integration tests
         run: node server/command-center-live/learning-integration-test.js
       - name: Actual acquired PDF reading order and constrained response protocols
-        run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=.:tools:tools/llm python3 -m unittest -v tools.test_acquired_analysis tools.test_source_acquisition_routes tools.test_research_response_schema tools.test_semantic_research_answer
+        run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=.:tools:tools/llm python3 -m unittest -v tools.test_acquired_analysis tools.test_source_acquisition_routes tools.test_research_response_schema tools.test_semantic_research_answer tools.test_research_continuation
       - name: Actual image-only PDF OCR and bounding boxes
         run: |
           python3 -m pip install 'Pillow==12.0.0'

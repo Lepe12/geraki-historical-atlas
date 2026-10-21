@@ -1,8 +1,13 @@
 name: Real acquired-source semantic reanalysis
 on:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/research-semantic-reanalysis.yml']
+  workflow_call:
+    inputs:
+      run_id:
+        required: true
+        type: string
+      resume_reviewed_claims:
+        type: boolean
+        default: false
   workflow_dispatch:
     inputs:
       run_id:
@@ -23,16 +28,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        parent_run: ${{ fromJSON(inputs.run_id && format('["{0}"]', inputs.run_id) || '["39385248640"]') }}
+        parent_run: ${{ fromJSON(format('["{0}"]', inputs.run_id)) }}
     env:
       PARENT_RESEARCH_RUN: ${{ matrix.parent_run }}
       PCT_LLM_PROVIDER: local_llama_cpp
       PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen3-8B-GGUF
       PCT_LLM_MODEL: Qwen/Qwen3-8B-GGUF
-      PCT_RESUME_REVIEWED_CLAIMS: ${{ github.event_name == 'push' && '1' || inputs.resume_reviewed_claims && '1' || '0' }}
+      PCT_RESUME_REVIEWED_CLAIMS: ${{ inputs.resume_reviewed_claims && '1' || '0' }}
+      PCT_SEMANTIC_BATCHES: '48'
+      PCT_SEMANTIC_CALLS_PER_PASS: '48'
+      PCT_SEMANTIC_BUDGET_SECONDS: '1800'
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
       - uses: ./.github/actions/research-model
       - name: Install the existing public PDF reader
@@ -47,6 +56,9 @@ jobs:
               LlamaGrammar.from_json_schema(json.dumps(schema),verbose=False)
           print('ACTUAL_LLAMA_CPP_SCHEMA_GRAMMARS_PASS; NOT_HISTORICAL_RESEARCH_ACCEPTANCE')
           PYSCHEMA
+      - name: Continue retained bibliography in separate workspaces
+        timeout-minutes: 20
+        run: python3 tools/continue_citation_acquisition.py --run-id "$PARENT_RESEARCH_RUN"
       - name: Derive PDF reading order and run all real semantic stages
         run: |
           if [ "$PCT_RESUME_REVIEWED_CLAIMS" = 1 ]; then
@@ -54,19 +66,30 @@ jobs:
           else
             PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python3 tools/reanalyse_acquired_research.py --run-id "$PARENT_RESEARCH_RUN"
           fi
+      - name: Publish the actual continuation status to the existing snapshot
+        if: always()
+        run: |
+          python3 tools/orchestrator/build_command_center_snapshot.py --run-id "$PARENT_RESEARCH_RUN" --output "command-center/live/runs/$PARENT_RESEARCH_RUN.json" --latest command-center/live/latest.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: semantic-reanalysis-${{ matrix.parent_run }}
-          path: evidence/runs/${{ env.PARENT_RESEARCH_RUN }}/semantic_reanalysis_${{ github.run_id }}/
+          path: |
+            evidence/runs/${{ env.PARENT_RESEARCH_RUN }}/semantic_reanalysis_${{ github.run_id }}/
+            evidence/runs/${{ env.PARENT_RESEARCH_RUN }}/research_continuation/
+            evidence/runs/${{ env.PARENT_RESEARCH_RUN }}/citation_continuation_*/
       - name: Persist actual outcome including failures
         if: always()
         run: |
           set -e
           dest="evidence/runs/$PARENT_RESEARCH_RUN/semantic_reanalysis_$GITHUB_RUN_ID"
-          if [ ! -d "$dest" ]; then exit 0; fi
+          if [ ! -d "evidence/runs/$PARENT_RESEARCH_RUN" ]; then exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add "$dest"
+          for output in "$dest" "evidence/runs/$PARENT_RESEARCH_RUN/research_continuation" "command-center/live/runs/$PARENT_RESEARCH_RUN.json" command-center/live/index.json command-center/live/latest.json; do
+            if [ -e "$output" ]; then git add "$output"; fi
+          done
+          git add "evidence/runs/$PARENT_RESEARCH_RUN"/citation_continuation_* 2>/dev/null || true
+          if git diff --cached --quiet; then exit 0; fi
           git commit -m 'Record actual semantic reanalysis with replayed source passages'
           python3 tools/publish_research_outputs.py

@@ -69,31 +69,51 @@ def continue_citations(root,ctx,results,*,searcher=lookup,reader=acquire,
     report=json.loads(report_path.read_text()) if report_path.exists() else {
         'schema':'pct-cited-work-continuation-v1','searches':[],
         'original_inspected':False,'verified':False}
-    seen={x['query_key'] for x in report['searches']}
-    tried={a['url'] for s in report['searches'] for a in s.get('acquisitions',[])}
+    # Only acquired or explicitly exhausted queries are terminal. A failed
+    # attempt is not a completed citation chase; preserve and retry it.
+    def query_acquired(search):
+        return any(a.get('status')=='TEXT_ACQUIRED' for a in search.get('acquisitions',[]))
+    seen={x['query_key'] for x in report['searches'] if query_acquired(x) or x.get('attempts',1)>=3}
+    prior={x['query_key']:x for x in report['searches']}
+    tried={a['url'] for s in report['searches'] for a in s.get('acquisitions',[]) if a.get('status')=='TEXT_ACQUIRED'}
     acquired_urls={r.get('acquired_source_url') or r.get('url') for r in results if r.get('files')}
     if findings is None:
         from section_extraction import build_findings
         findings=build_findings(root,ctx)['findings']
+    findings=list(findings)
+    # Preserve the reader's bibliography leads as well as citation-only
+    # paragraphs. A missing locator stays missing; this is discovery, not proof.
+    for source in results:
+        acquired=source.get('web_acquisition') or {}
+        if acquired.get('bibliographic_queries'):
+            findings.append({'url':acquired.get('url') or source.get('url'),
+                'bibliographic_queries':acquired['bibliographic_queries'],
+                'source_text_sha256':acquired.get('text_sha256'),
+                'evidence_excerpt':'','locator':None,'finding_id':None})
     started=clock();queries=0;documents=0;deferred=[]
     def save():
-        report.update(deferred=deferred,budget_seconds=budget,
+        pending=[s['query_key'] for s in report['searches'] if not query_acquired(s) and s.get('attempts',1)<3]
+        unresolved=[s['query_key'] for s in report['searches'] if not query_acquired(s)]
+        report.update(deferred=deferred,pending=pending,unresolved=unresolved,budget_seconds=budget,
                       rule='ACQUIRED_TEXT_IS_NOT_ORIGINAL_INSPECTION_OR_VERIFICATION')
         report_path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     for finding in findings:
         if set(finding.get('uncertainties',[])) & {'CONFLICTING_GIVEN_NAME',
                 'LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW','FICTION_OR_BOOK_REVIEW_CONTEXT'}:continue
         excerpt=finding.get('evidence_excerpt') or ''
-        for query in reference_queries(excerpt):
+        for query in finding.get('bibliographic_queries',reference_queries(excerpt)):
             key=''.join(c for c in unicodedata.normalize('NFD',query.casefold()) if not unicodedata.combining(c))
             if key in seen:continue
             if queries>=max_queries or documents>=max_documents or clock()-started>=budget:
                 deferred.append({'query':query,'finding_id':finding.get('finding_id'),'status':'BOUNDED_WAVE_DEFERRED'});continue
             seen.add(key);queries+=1
-            search={'query':query,'query_key':key,'parent_source_url':finding.get('url'),
+            search={'attempts':prior.get(key,{}).get('attempts',0)+1,'query':query,'query_key':key,'parent_source_url':finding.get('url'),
                     'parent_finding_id':finding.get('finding_id'),'parent_locator':finding.get('locator'),
                     'parent_text_sha256':finding.get('source_text_sha256'),
                     'citation_excerpt':excerpt,'acquisitions':[]}
+            if key in prior:
+                report.setdefault('attempt_history',[]).append(prior[key])
+                report['searches']=[s for s in report['searches'] if s['query_key']!=key]
             report['searches'].append(search);save()
             try:diagnostics,rows=searcher(query,ctx.get('lane','travellers'))
             except Exception as error:
@@ -104,7 +124,11 @@ def continue_citations(root,ctx,results,*,searcher=lookup,reader=acquire,
             for row in matched:
                 urls=[row.get('digital_url'),*[x.get('url') for x in row.get('fulltext_links',[]) if x.get('is_oa') is True],row.get('url')]
                 for url in dict.fromkeys(u for u in urls if u):
-                    if url in tried or url in acquired_urls:continue
+                    if url in acquired_urls:
+                        search['acquisitions'].append({'url':url,'status':'TEXT_ACQUIRED',
+                            'basis':'ALREADY_ACQUIRED_SOURCE_RETAINED'})
+                        continue
+                    if url in tried:continue
                     if documents>=max_documents or clock()-started>=budget:
                         search['remaining_status']='ACQUISITION_BUDGET_EXHAUSTED';break
                     tried.add(url);documents+=1

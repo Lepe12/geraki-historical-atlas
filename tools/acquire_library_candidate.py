@@ -43,7 +43,7 @@ completed={key(x) for x in results if x.get('status')!='ACQUISITION_ERROR' and (
 pending=[x for x in items if key(x) not in completed]
 max_items=max(1,int(os.getenv('PCT_MAX_ACQUISITION_CANDIDATES','100')))
 max_batches=max(1,int(os.getenv('PCT_ACQUISITION_BATCHES','3')))
-selected=pending[:max_items*max_batches]
+selected=[] if os.getenv('PCT_CONTINUE_CITATIONS_ONLY')=='1' else pending[:max_items*max_batches]
 deferred=pending[len(selected):]
 started=time.monotonic()
 budget=max(1,int(os.getenv('PCT_ACQUISITION_BUDGET_SECONDS','360')))
@@ -138,22 +138,6 @@ for position,x in enumerate(items):
                         rec['files'].extend(acquired['files'])
                         rec['status']=acquired['status']
                         rec['acquired_source_url']=acquired['url']
-                        for query in acquired.get('bibliographic_queries',[]):
-                            if query in citation_queries_seen or len(citation_queries_seen)>=citation_limit or citation_source_counts.get(acquired['url'],0)>=citation_source_limit or time.monotonic()-started>=budget:continue
-                            citation_queries_seen.add(query)
-                            citation_source_counts[acquired['url']]=citation_source_counts.get(acquired['url'],0)+1
-                            status,leads,diagnostic=search_web('"'+query+'"',os.getenv('PCT_RESEARCH_LANE','travellers'),'Citation Chase')
-                            for lead in leads:
-                                lead.update(parent_source_url=acquired['url'],citation_query=query,
-                                            citation_discovered=True,source_origin='CITATION_CHASE',
-                                            citation_title_match=citation_title_match(query,lead))
-                            citation_searches.append({'query':query,'parent_source_url':acquired['url'],'status':status,'diagnostic':diagnostic,'results':leads})
-                            for lead in [v for v in leads if v.get('citation_title_match') and (v.get('digital_url') or v.get('url'))][:2]:
-                                try:
-                                    cited=acquire_web(lead.get('digital_url') or lead['url'],OUT,follow=False)
-                                    results.append({**lead,'files':cited['files'],'web_acquisition':cited,'status':cited['status'],'original_inspected':False,'verification_status':'NEEDS_EVIDENCE'})
-                                except Exception as exc:
-                                    citation_searches[-1].setdefault('acquisition_failures',[]).append({'url':lead.get('digital_url') or lead.get('url'),'code':type(exc).__name__})
                         for child in acquired.get('linked_documents',[]):
                             linked={**rec,'identifier':child['url'],'url':child['url'],
                                     'title':'Linked document: '+child['url'],'files':child['files'],
@@ -175,9 +159,9 @@ for position,x in enumerate(items):
     results[:]=[old for old in results if key(old)!=key(rec)]
     results.append(rec)
     checkpoint(items[position+1:]+deferred)
-checkpoint(deferred)
 from cited_work_acquisition import continue_citations
 continue_citations(pathlib.Path('.'),{**ctx,'lane':os.getenv('PCT_RESEARCH_LANE','travellers')},results,
+                   budget=max(0,started+budget-time.monotonic()),
                    on_acquired=lambda:checkpoint(deferred))
 checkpoint(deferred)
 print("ACQUISITION",len(results),"acquired",sum(x.get('status') in ('TEXT_ACQUIRED','DIGITAL_METADATA_ACQUIRED') for x in results),"deferred",len(deferred),"held",len(held))
@@ -191,4 +175,3 @@ if citation_searches and lane_path.exists():
         for row in search['results']:
             if row.get('url') not in existing:discovery.setdefault('results',[]).append(row);existing.add(row.get('url'))
     lane_path.write_text(json.dumps(discovery,ensure_ascii=False,indent=2))
-

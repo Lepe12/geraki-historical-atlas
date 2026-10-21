@@ -14,6 +14,7 @@ from pathlib import Path
 import re
 import sys
 import subprocess
+import time
 import unicodedata
 from urllib.parse import urlsplit
 
@@ -273,6 +274,28 @@ def quote_occurrences(row,start,quote):
             if source.get('page_boundaries'):
                 locator['scan_indexes_0_based']=[p['scan_index_0_based'] for p in source['page_boundaries'] if p['end_char']>a and p['start_char']<b]
         output.append({**source,'locator':locator,'context_locator':original})
+    return output
+
+def fit_passages(records,budget):
+    """Split oversized excerpts with exact source offsets and overlapping context."""
+    output=[]
+    for row in records:
+        if len(json.dumps(model_evidence(row),ensure_ascii=False))<=budget:
+            output.append(row);continue
+        text=row['text'];start=0
+        while start<len(text):
+            end=min(len(text),start+max(256,budget//3))
+            while True:
+                excerpt=text[start:end]
+                part={**row,'evidence_id':'e-'+digest([row['evidence_id'],start,end])[:20],
+                      'text':excerpt,'parent_evidence_id':row['evidence_id'],
+                      'occurrences':quote_occurrences(row,start,excerpt)}
+                if len(json.dumps(model_evidence(part),ensure_ascii=False))<=budget or end-start<=128:break
+                end=start+max(128,(end-start)//2)
+            output.append(part)
+            if end==len(text):break
+            # Retain nearby context; exact locators always refer to source bytes.
+            start=max(start+1,end-min(200,(end-start)//4))
     return output
 
 def batches(records,max_batches=3,budget=14000):
@@ -589,7 +612,17 @@ def documentary_answer(out, records, run_root):
     out['documentary_timeline'].sort(key=lambda x:str(x['year']))
     return out
 
-def execute(run_root, question, caller=call, config=None, output_root=None, provenance_root=None,resume_reviewed_from=None):
+class SemanticBudgetReached(Exception):
+    def __init__(self,answer):
+        self.answer=answer
+
+
+def execute(*args,**kwargs):
+    try:return _execute(*args,**kwargs)
+    except SemanticBudgetReached as error:return error.answer
+
+
+def _execute(run_root, question, caller=call, config=None, output_root=None, provenance_root=None,resume_reviewed_from=None):
     from research_focus import decompose
     all_records,excluded=collect(run_root,provenance_root)
     request={}
@@ -603,14 +636,31 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
     if request and question_kind not in ('person','topic'):question_kind='place'
     requested_years=[int(y) for y in re.findall(r'\b(?:1\d{3}|20\d{2})\b',request.get('date_range',''))]
     requested_range=(min(requested_years),max(requested_years)) if requested_years else None
-    grouped,deferred=batches(all_records,budget=6500 if os.getenv('PCT_LLM_PROVIDER')=='local_llama_cpp' else 14000)
+    # Each invocation advances a bounded number of NEW batches. Completed
+    # extractions are replayed through the current validators, never inferred
+    # from a previous green label. The queue lives with the immutable parent run.
+    from research_continuation import Continuation
+    queue=Continuation(Path(provenance_root or run_root)/'research_continuation',
+                       question,Path(__file__).read_bytes(),routing_summary())
+    original_passage_count=len(all_records)
+    model_budget=6500 if os.getenv('PCT_LLM_PROVIDER')=='local_llama_cpp' else 14000
+    all_records=fit_passages(all_records,model_budget)
+    all_groups,deferred=batches(all_records,max_batches=len(all_records)+1,budget=model_budget)
+    grouped=[];new_batches=0
+    for group in all_groups:
+        if queue.completed(group) or new_batches<max(1,int(os.getenv('PCT_SEMANTIC_BATCHES','3'))):
+            grouped.append(group)
+            if not queue.completed(group):new_batches+=1
+        else:
+            deferred.extend({'evidence_id':r['evidence_id'],'reason':'MODEL_CALL_BUDGET'} for r in group)
+    queue.inventory(all_records,grouped,deferred)
     selected=[r for b in grouped for r in b]
     conf=configuration() if config is None else config
     out={'schema':VERSION,'question':question,'request_kind':question_kind,'evidence_hash':digest(all_records),'status':'BLOCKED_CONFIGURATION',
          'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
          'model_configuration':routing_summary(),
          'configuration':conf,'model_used':False,'claims':[],'answer_sections':[],
-         'coverage':{'unique_passages':len(all_records),'selected_passages':len(selected),
+         'coverage':{'original_unique_passages':original_passage_count,'unique_passages':len(all_records),'selected_passages':len(selected),
                      'repeated_occurrences':sum(len(r['occurrences'])-1 for r in all_records),'deferred':deferred,'excluded':excluded},
          'evidence':selected,'calls':[],'rejected':[],
          'limitations':['MODEL_OUTPUT_REQUIRES_REVIEW','ORIGINAL_INSPECTION_NOT_PERFORMED',
@@ -627,7 +677,35 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
     if not conf['configured']:return documentary_answer(out,all_records,run_root)
     if not selected:out['status']='INSUFFICIENT_ACQUIRED_EVIDENCE';return out
     out['status']='RUNNING_SEMANTIC_ANALYSIS'
+    pass_started=time.monotonic();new_calls=0;response_occurrences={}
+    response_cache_enabled=caller is call or os.getenv('PCT_ENABLE_RESPONSE_CACHE')=='1'
+    max_new_calls=max(1,int(os.getenv('PCT_SEMANTIC_CALLS_PER_PASS','48')))
+    pass_seconds=max(1,int(os.getenv('PCT_SEMANTIC_BUDGET_SECONDS','1800')))
     def invoke(role,prompt,response_schema=None):
+        nonlocal new_calls
+        from research_continuation import digest as checkpoint_digest
+        prompt_key=checkpoint_digest([role,prompt,response_schema])
+        occurrence=response_occurrences.get(prompt_key,0)
+        response_occurrences[prompt_key]=occurrence+1
+        response_key=checkpoint_digest([prompt_key,occurrence])
+        cached_response=queue.response_load(response_key) if response_cache_enabled and not resume_reviewed_from else None
+        if cached_response and parse(cached_response['result']) is not None:
+            result=cached_response['result']
+            out['calls'].append({'role':role,'status':'COMPLETED','replayed':True,
+                'response_cache_path':str((queue.root/'responses'/(response_key+'.json')).resolve().relative_to(Path(provenance_root or run_root).resolve())),
+                'response_cache_sha256':cached_response['result_sha256'],
+                'provider':result.get('provider'),'model':result.get('model')})
+            out['model_used']=True
+            return parse(result)
+        if new_calls>=max_new_calls or time.monotonic()-pass_started>=pass_seconds:
+            pending=[{'evidence_id':r['evidence_id'],'reason':'SEMANTIC_PASS_BUDGET'}
+                for group in grouped if not queue.completed(group) for r in group]
+            out['coverage']['deferred'].extend(pending)
+            queue.inventory(all_records,grouped,out['coverage']['deferred'])
+            queue.pending('EXTRACTION' if out['coverage']['deferred'] else 'REVIEW_AND_SYNTHESIS')
+            out['status']='RESEARCH_COVERAGE_PENDING' if out['coverage']['deferred'] else 'RESEARCH_REVIEW_PENDING'
+            raise SemanticBudgetReached(out)
+        new_calls+=1
         destination=Path(output_root or run_root)/'research_answer'
         destination.mkdir(parents=True,exist_ok=True)
         entry={'role':role,'status':'RUNNING','requested_model':route(role).model,
@@ -665,6 +743,7 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
         # Preserve actual calls even if a later role times out or fails.
         (responses/(str(len(out['calls']))+'-'+role+'.json')).write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
         (destination/'progress.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
+        if response_cache_enabled and parse(result) is not None:queue.response_save(response_key,result)
         return parse(result)
     if resume_reviewed_from:
         try:
@@ -684,7 +763,13 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
         if question_kind in ('place','topic'):
             prompt+=' Every proposed item MUST contain at least one literal place from the selected passages. If no relevant named-place narrative is available, return an empty items array. Unresolved dates are allowed but must remain unresolved.'
         schema=schemas.extraction([r['evidence_id'] for r in group],question_kind)
-        payload=invoke('evidence_extractor',prompt,schema)
+        cached=queue.load(group)
+        payload=cached['payload'] if cached else invoke('evidence_extractor',prompt,schema)
+        if cached:
+            # Original raw response and source binding remain in the queue.
+            receipt=queue.receipt(group)
+            receipt['batch_path']=str(queue.path(group).resolve().relative_to(Path(provenance_root or run_root).resolve()))
+            out.setdefault('continuation_replays',[]).append(receipt)
         items,rejected=validate_items(payload or {},group,question_kind,requested_range)
         out['rejected'].extend(rejected)
         if not items and isinstance(payload,dict) and payload.get('items') and rejected:
@@ -698,9 +783,18 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
                    if re.fullmatch(r'1\d{3}|20\d{2}',date) and int(date) in row['years_in_scope'] and date in part['text']]
             repair_prompt+='\nLiteral date search hints, NOT proof of an event date: '+json.dumps(hints[:8],ensure_ascii=False)+'\nSelect the appropriate narrative sentence if it supports the claim, or remove the unsupported date from BOTH statement and dates. A bibliographic or archival reference date alone does not date a narrated event.'
             repaired=invoke('evidence_extractor',repair_prompt,schema)
+            payload=repaired
             items,repair_rejections=validate_items(repaired or {},group,question_kind,requested_range)
             out['rejected'].extend(repair_rejections)
+        if isinstance(payload,dict) and isinstance(payload.get('items'),list):
+            queue.save(group,payload)
+        else:
+            out['coverage']['deferred'].extend({'evidence_id':r['evidence_id'],'reason':'EXTRACTION_RESPONSE_FAILED'} for r in group)
         out['claims'].extend(items)
+    queue.inventory(all_records,grouped,out['coverage']['deferred'])
+    if out['coverage']['deferred']:
+        out['status']='EXTRACTION_FAILED_OR_UNSUPPORTED' if not out['claims'] and any(r['reason']=='EXTRACTION_RESPONSE_FAILED' for r in out['coverage']['deferred']) else 'RESEARCH_COVERAGE_PENDING'
+        return out
     if not out['claims']:out['status']='EXTRACTION_FAILED_OR_UNSUPPORTED';return out
     # Identical model items are grouped by ID, not counted as corroboration.
     out['claims']=list({c['claim_id']:c for c in out['claims']}.values())
@@ -734,7 +828,18 @@ def execute(run_root, question, caller=call, config=None, output_root=None, prov
     if not supported:
         out['status']='REVIEW_FAILED' if review['invalid_review_claim_ids'] else 'REVIEW_INCOMPLETE' if review['missing_claim_ids'] else 'NO_MODEL_SUPPORTED_CLAIMS'
         return out
-    synthesis_claims=[c for c in claims if c['claim_id'] in supported]
+    all_synthesis_claims=[c for c in claims if c['claim_id'] in supported]
+    synthesis_claims=[];summary_size=0
+    for claim in all_synthesis_claims:
+        size=len(json.dumps(model_claim(claim),ensure_ascii=False))
+        if summary_size+size>12000:continue
+        synthesis_claims.append(claim);summary_size+=size
+    out['synthesis_coverage']={'reviewed_supported_claims':len(all_synthesis_claims),
+        'summary_input_claims':len(synthesis_claims),
+        'omitted_from_summary_claim_ids':[c['claim_id'] for c in all_synthesis_claims if c not in synthesis_claims],
+        'rule':'BOUNDED_NARRATIVE_SUMMARY_ALL_REVIEWED_CLAIMS_RETAINED'}
+    if not synthesis_claims:out['status']='SYNTHESIS_CONTEXT_REQUIRES_REVIEW';return out
+    supported={c['claim_id'] for c in synthesis_claims}
     synthesis_rules=RULES+'\nROLE: answer in concise English using ONLY supplied supported claims. Greek translation is a separate unvalidated step; do not translate into Greek here. Use one short paragraph per distinct finding, at most 4 paragraphs. Attribute every statement to the consulted source. The engine separately records that historical verification is pending. Copy personal and place names from the quotations without changing identity. The user supplied aliases are SEARCH HYPOTHESES, not evidence of a shared identity: a Latin namesake must not be equated with the requested Greek person. Preserve every conjecture as a conjecture. The question date range is a FILTER, not evidence that an undated event occurred then. Do not add dates, places, actions, ranks or relationships absent from the quoted evidence. Do not call repetitions independent. Return a JSON object with answer_sections, unknowns and limitations. Each answer section has text and claim_ids. Write a substantive finding naming its source-supported subject and action; do not output an introductory fragment, template text, ellipsis or placeholder. Fill unknowns and limitations with actual gaps, not example labels. Every paragraph must cite only its actual supporting claim IDs. QUESTION: '+question
     # Quarantined claims and their IDs must never become synthesis material.
     # The complete review remains in the durable answer/review receipts.

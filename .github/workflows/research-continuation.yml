@@ -1,0 +1,56 @@
+name: Continue pending research coverage
+on:
+  schedule:
+    - cron: '17 * * * *'
+  push:
+    branches: [main]
+    paths: ['research_continuation_requests/*.json']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: research-continuation
+  cancel-in-progress: false
+jobs:
+  pending:
+    runs-on: ubuntu-latest
+    outputs:
+      runs: ${{ steps.queue.outputs.runs }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: queue
+        run: |
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          requested=set()
+          for marker in Path('research_continuation_requests').glob('*.json'):
+              run=str(json.loads(marker.read_text())['run_id'])
+              if not run.isdigit():raise ValueError('NUMERIC_PARENT_RUN_REQUIRED')
+              requested.add(run)
+          runs=[]
+          for root in sorted(Path('evidence/runs').glob('*')):
+              active=root/'research_continuation/active.json'
+              if not active.exists():
+                  if root.name in requested:runs.append(root.name)
+                  continue
+              pointer=json.loads(active.read_text())['queue']
+              queue=(active.parent/pointer).resolve()
+              if not queue.is_relative_to(active.parent.resolve()):raise ValueError('UNSAFE_QUEUE_PATH')
+              pending=json.loads(queue.read_text()).get('status')=='PENDING'
+              citations=any((json.loads(p.read_text()).get('pending') or json.loads(p.read_text()).get('deferred')) for p in root.glob('*/library_acquisition/cited_work_continuation.json'))
+              if pending or citations:runs.append(root.name)
+          with open(os.environ['GITHUB_OUTPUT'],'a') as out:
+              out.write('runs='+json.dumps(runs[:2])+'\n')
+          PY
+  continue:
+    needs: pending
+    if: needs.pending.outputs.runs != '[]'
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        run: ${{ fromJSON(needs.pending.outputs.runs) }}
+    uses: ./.github/workflows/research-semantic-reanalysis.yml
+    with:
+      run_id: ${{ matrix.run }}
