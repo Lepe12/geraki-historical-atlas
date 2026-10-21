@@ -5,7 +5,7 @@ from pathlib import Path
 BASE="http://127.0.0.1:8080"
 OUT=Path("lone-pirate-eko/log.json");OUT.parent.mkdir(exist_ok=True)
 KEY=os.getenv("GROQ_API_KEY","")
-MODEL=os.getenv("GROQ_MODEL","llama-3.3-70b-versatile")
+MODEL=os.getenv("GROQ_MODEL","openai/gpt-oss-20b")
 DURATION=min(int(os.getenv("DURATION_MINUTES","30")),240)*60
 MAX_CALLS=min(int(os.getenv("MAX_CALLS","35")),50)
 def request(url,method="GET",body=None,headers=None,timeout=40):
@@ -15,12 +15,26 @@ def request(url,method="GET",body=None,headers=None,timeout=40):
         with urllib.request.urlopen(urllib.request.Request(url,data=data,headers=h,method=method),timeout=timeout) as r:
             return json.loads(r.read().decode())
     except urllib.error.HTTPError as e:
+        body=e.read(2500).decode("utf-8","replace")
+        low=body.lower()
+        reason="unclassified"
+        for phrase,kind in [
+            ("country","geographic_restriction"),("region","geographic_restriction"),
+            ("location","geographic_restriction"),("geo","geographic_restriction"),
+            ("blocked","model_or_network_block"),("not allowed","model_or_project_not_allowed"),
+            ("permission","permission_denied"),("invalid api key","invalid_api_key"),
+            ("rate limit","rate_limited"),("cloudflare","edge_access_denied"),
+            ("access denied","access_denied"),("forbidden","forbidden")]:
+            if phrase in low:
+                reason=kind
+                break
         try:
-            problem=json.loads(e.read(2000).decode("utf-8","replace")).get("error",{})
+            problem=json.loads(body).get("error",{})
             code=str(problem.get("code") or problem.get("type") or "unknown")
         except Exception:
-            code="unknown"
-        raise RuntimeError("Groq HTTP "+str(e.code)+" error_code="+code[:90]) from None
+            code="non_json_response"
+        raise RuntimeError("Groq HTTP "+str(e.code)+" error_code="+code[:60]+" category="+reason) from None
+
 def save(d): OUT.write_text(json.dumps(d,ensure_ascii=False,indent=2))
 def llm(observation,memory):
     tools=["MoveTo","Jump","Stop","Pickup","Place","Inspect","Touch","Steer","SetSail"]
