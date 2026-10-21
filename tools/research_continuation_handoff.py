@@ -65,6 +65,8 @@ def decision(root, before, run_id):
     answer, validation = result
     if validation.get('status') not in ('INCOMPLETE', 'PASS'):
         return False, 'VALIDATION_NOT_RESUMABLE:' + str(validation.get('status'))
+    if 'CONTINUATION_RECEIPTS_INVALID' in validation.get('blockers', []):
+        return False, 'CONTINUATION_RECEIPTS_INVALID'
     # Valid extraction can yield zero relevant claims; that is not a crash.
     empty_extraction = (answer.get('status') == 'EXTRACTION_FAILED_OR_UNSUPPORTED' and
                         answer.get('calls') and not answer.get('claims') and
