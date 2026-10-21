@@ -1,5 +1,6 @@
 """Real model reanalysis of immutable acquired sources, separately from discovery."""
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -21,7 +22,7 @@ def main():
     dest.mkdir(exist_ok=False)
     manifests=sorted(parent.glob('*/run_manifest/manifest.json'))
     request=read(manifests[0])['normalized_request']
-    question=request['target']+' ('+request.get('date_range','')+')'
+    question=request['target']+(' ('+request['date_range']+')' if request.get('date_range') else '')
     receipt={'parent_run_id':args.run_id,'analysis_run_id':job,
              'execution_type':'REAL_MODEL_REANALYSIS_OF_ACQUIRED_SOURCES_NOT_NEW_DISCOVERY',
              'software_revision':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
@@ -31,7 +32,7 @@ def main():
     from prepare_acquired_analysis import prepare
     prepared=parent if args.resume_reviewed_claims else dest/'derived_sources'
     if not args.resume_reviewed_claims:prepare(parent,prepared,request)
-    question+='\nResearch scope: '+request.get('purpose','')
+    if request.get('purpose'):question+='\nResearch scope: '+request['purpose']
     answer=execute(prepared,question,output_root=dest,provenance_root=parent,
                    resume_reviewed_from=parent/'research_answer/answer.json' if args.resume_reviewed_claims else None)
     answer['execution_receipt']=receipt
@@ -43,6 +44,11 @@ def main():
     write_bundle(out/'historical_evidence_bundle.json',answer)
     report=validate(parent,analysis_root=dest)
     (out/'validation_report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+    from research_continuation import atomic
+    atomic(parent/'research_continuation/latest.json',{
+        'analysis_path':str(dest.relative_to(parent)),
+        'answer_sha256':hashlib.sha256((out/'answer.json').read_bytes()).hexdigest(),
+        'validation_sha256':hashlib.sha256((out/'validation_report.json').read_bytes()).hexdigest()})
     print(json.dumps({'status':report['status'],'counts':report['counts'],'blockers':report['blockers']}))
     if report['status']=='INCOMPLETE':raise SystemExit(1)
 

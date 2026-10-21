@@ -492,7 +492,9 @@ jobs:
         if: always()
         with:
           name: research-semantic-answer-${{ github.run_id }}
-          path: evidence/runs/${{ github.run_id }}/research_answer/
+          path: |
+            evidence/runs/${{ github.run_id }}/research_answer/
+            evidence/runs/${{ github.run_id }}/research_continuation/
           retention-days: 90
       - name: Commit situation board
         if: always()
@@ -505,11 +507,9 @@ jobs:
           fi
           git config user.name "jarvis-orchestrator[bot]"
           git config user.email "jarvis-orchestrator@users.noreply.github.com"
-          for output in "evidence/runs/$PCT_RUN_ID/JARVIS_STATE_BOARD.json" "evidence/runs/$PCT_RUN_ID/research_answer/" command-center/live/; do
+          for output in "evidence/runs/$PCT_RUN_ID/JARVIS_STATE_BOARD.json" "evidence/runs/$PCT_RUN_ID/research_answer/" "evidence/runs/$PCT_RUN_ID/research_continuation/" command-center/live/; do
             if [ -e "$output" ]; then git add "$output"; fi
           done
           git diff --cached --quiet && exit 0
           git commit -m "JARVIS state board $PCT_RUN_ID"
           python3 tools/research_stage.py --stage publication -- python3 tools/publish_research_outputs.py
-
-

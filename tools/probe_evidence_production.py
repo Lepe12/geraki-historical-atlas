@@ -22,6 +22,8 @@ def request(url, method='GET', body=None, headers=None):
     except (OSError,ValueError):return {'http_status':None,'error':'NETWORK_OR_PROTOCOL_FAILURE'},{}
 
 
+from production_acceptance import acceptance
+
 def main():
     base='https://pct-live.piratecartography.com/pct-api/live'
     report={'schema':'nabou-production-evidence-smoke-v2','run_id':os.environ['GITHUB_RUN_ID'],
@@ -71,7 +73,7 @@ def main():
         oidc.update(result,passed=result['http_status']==200 and data.get('schema')=='nabou-agent-learning-evidence-v1' and data.get('verified_count')==0)
     else:oidc.update(error='GITHUB_OIDC_TOKEN_NOT_ISSUED',http_status=None)
     report['checks'].append(oidc)
-    report['status']='PASS' if all(c['passed'] for c in report['checks']) else 'BLOCKED_PRODUCTION_ACCEPTANCE'
+    report.update(acceptance(report))
     dest=Path('evidence/production_smoke')/report['run_id'];dest.mkdir(parents=True)
     (dest/'report.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report,indent=2))

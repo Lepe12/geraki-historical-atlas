@@ -96,6 +96,27 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
         probes.append(read(p))
     latest=probes[-1] if probes else {}
     completed={c['role'] for c in answer.get('calls',[]) if c.get('status')=='COMPLETED'}
+    # Cached extraction is source-bound and revalidated in execute. Recheck
+    # receipt bytes here; a cache label alone cannot establish extraction.
+    continuation_valid=True
+    for receipt in answer.get('continuation_replays',[]):
+        try:
+            from research_continuation import digest
+            cache_path=(root/receipt['batch_path']).resolve()
+            if not cache_path.is_relative_to(root.resolve()):raise ValueError('UNSAFE_CACHE_PATH')
+            cached=read(cache_path)
+            if cached['source_sha256']!=receipt['source_sha256'] or digest(cached['payload'])!=receipt['payload_sha256']:raise ValueError('CACHE_CHANGED')
+        except (ValueError,OSError,KeyError,TypeError):continuation_valid=False
+    for entry in answer.get('calls',[]):
+        if not entry.get('replayed'):continue
+        try:
+            from research_continuation import digest
+            path=(root/entry['response_cache_path']).resolve()
+            if not path.is_relative_to(root.resolve()):raise ValueError('UNSAFE_CACHE_PATH')
+            cached=read(path)
+            if digest(cached['result'])!=entry['response_cache_sha256']:raise ValueError('CACHE_CHANGED')
+        except (ValueError,OSError,KeyError,TypeError):continuation_valid=False
+    if answer.get('continuation_replays') and continuation_valid:completed.add('evidence_extractor')
     reused=answer.get('reused_semantic_calls',[]);resume=answer.get('resume_context') or {}
     valid_reuse=False
     if reused:
@@ -123,6 +144,14 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
         except (ValueError,OSError,KeyError,IndexError,TypeError):valid_reuse=False
     required={'evidence_extractor','adversarial_reviewer','synthesis'}
     blockers=[]
+    if not continuation_valid:blockers.append('CONTINUATION_RECEIPTS_INVALID')
+    coverage=answer.get('coverage') or {}
+    if coverage.get('deferred') or coverage.get('selected_passages',0)<coverage.get('unique_passages',0):
+        blockers.append('RESEARCH_COVERAGE_PENDING')
+    from research_continuation import effective_citation_backlogs
+    for backlog in effective_citation_backlogs(root):
+        if read(backlog).get('unresolved') or read(backlog).get('deferred'):
+            blockers.append('CITATION_FOLLOWUP_PENDING');break
     if reused and not valid_reuse:blockers.append('REUSED_EXTRACTION_RECEIPTS_NOT_VALIDATED')
     if answer_origin!='FINAL_ANSWER_RECORD':blockers.append(answer_origin)
     if not sources:blockers.append('NO_ACQUIRED_SOURCE_TEXT')
