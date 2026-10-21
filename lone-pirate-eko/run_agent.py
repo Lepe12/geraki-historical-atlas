@@ -5,7 +5,7 @@ from pathlib import Path
 BASE="http://127.0.0.1:8080"
 OUT=Path("lone-pirate-eko/log.json");OUT.parent.mkdir(exist_ok=True)
 KEY=os.getenv("OPENROUTER_API_KEY","")
-MODEL=os.getenv("OPENROUTER_MODEL","openrouter/free")
+MODEL=os.getenv("OPENROUTER_MODEL","google/gemma-4-26b-a4b-it:free")
 DURATION=min(int(os.getenv("DURATION_MINUTES","30")),240)*60
 MAX_CALLS=min(int(os.getenv("MAX_CALLS","35")),50)
 def request(url,method="GET",body=None,headers=None,timeout=40):
@@ -30,7 +30,7 @@ def llm(observation,memory):
     player=observation.get("player",{})
     compact={"player_position":player.get("position"),"last_action_result":player.get("attributes",{}).get("LastActionResult"),"entities":entities}
     usermsg="MEMORY "+json.dumps(memory[-6:],ensure_ascii=False)+"\\nOBSERVATION "+json.dumps(compact,ensure_ascii=False)
-    payload={"model":MODEL,"messages":[{"role":"system","content":prompt+" Example response: {\\\"action\\\":\\\"Inspect\\\",\\\"data\\\":{\\\"target\\\":\\\"Helm\\\"},\\\"reflection\\\":\\\"I am curious about this mechanism\\\",\\\"memory\\\":\\\"I have not inspected the helm yet\\\"}. Never output markdown, reasoning tags, or multiple JSON responses."},{"role":"user","content":usermsg}],"temperature":0.35,"max_tokens":350}
+    payload={"model":MODEL,"messages":[{"role":"system","content":prompt+" Example response: {\\\"action\\\":\\\"Inspect\\\",\\\"data\\\":{\\\"target\\\":\\\"Helm\\\"},\\\"reflection\\\":\\\"I am curious about this mechanism\\\",\\\"memory\\\":\\\"I have not inspected the helm yet\\\"}. Never output markdown, reasoning tags, or multiple JSON responses."},{"role":"user","content":usermsg}],"temperature":0.3,"max_tokens":600,"response_format":{"type":"json_object"}}
     decoder=json.JSONDecoder()
     obj=None
     last_error=None
