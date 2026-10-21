@@ -3,7 +3,7 @@
 Uses a separate Git index. A rejected push rebuilds the tree on the new main.
 The runner checkout and concurrent writers' unrelated files are preserved.
 """
-import json,os,subprocess,tempfile
+import json,os,re,subprocess,tempfile
 from pathlib import Path,PurePosixPath
 from research_execution_policy import from_environment
 
@@ -12,12 +12,31 @@ ALLOWED=('evidence/','command-center/live/','mariadb_storage_queue/','storage_qu
 def git(*args,env=None,input=None):
     return subprocess.check_output(['git',*args],env=env,input=input,stderr=subprocess.PIPE)
 
+def newer_analysis(path, current, proposed):
+    """An older finishing worker cannot roll a parent back to an older analysis."""
+    pointer=bool(re.fullmatch(r'evidence/runs/[0-9]+/research_continuation/latest\.json',path))
+    snapshot=bool(re.fullmatch(r'command-center/live/runs/[0-9]+\.json',path)) or path=='command-center/live/latest.json'
+    if not pointer and not snapshot:return False
+    def number(value):
+        if pointer:
+            match=re.fullmatch(r'semantic_reanalysis_([0-9]+)',str(value.get('analysis_path','')))
+            return int(match[1]) if match else 0
+        value=(value.get('research_answer') or {}).get('execution_receipt') or {}
+        run=str(value.get('analysis_run_id',''))
+        return int(run) if run.isdigit() else 0
+    if snapshot and str(current.get('run_id',''))!=str(proposed.get('run_id','')):return False
+    return number(current)>number(proposed)
+
+
 def shared_output(path,incoming,parent):
     """Preserve a newer live run and merge history when research jobs overlap."""
-    if path not in ('command-center/live/latest.json','command-center/live/index.json'):return incoming
+    shared=path in ('command-center/live/latest.json','command-center/live/index.json') or re.fullmatch(r'evidence/runs/[0-9]+/research_continuation/latest\.json|command-center/live/runs/[0-9]+\.json',path)
+    if not shared:return incoming
     try:current=json.loads(git('show',parent+':'+path))
     except subprocess.CalledProcessError:return incoming
     proposed=json.loads(git('cat-file','blob',incoming))
+    if newer_analysis(path,current,proposed):return None
+    if path not in ('command-center/live/latest.json','command-center/live/index.json'):return incoming
     if path.endswith('/latest.json'):
         old,new=str(current.get('run_id','')),str(proposed.get('run_id',''))
         return None if old.isdigit() and new.isdigit() and int(old)>int(new) else incoming
@@ -67,6 +86,9 @@ def publish(attempts=5):
         for path,mode,oid in applied:
             actual=git('rev-parse',head+':'+path).decode().strip()
             if actual!=oid:
+                if re.fullmatch(r'evidence/runs/[0-9]+/research_continuation/latest\.json|command-center/live/runs/[0-9]+\.json',path) or path=='command-center/live/latest.json':
+                    a=json.loads(git('cat-file','blob',actual));b=json.loads(git('cat-file','blob',oid))
+                    if newer_analysis(path,a,b):continue
                 if path=='command-center/live/latest.json':
                     a=json.loads(git('cat-file','blob',actual));b=json.loads(git('cat-file','blob',oid))
                     if str(a.get('run_id','')).isdigit() and str(b.get('run_id','')).isdigit() and int(a['run_id'])>int(b['run_id']):continue
