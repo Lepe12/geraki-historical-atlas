@@ -4,10 +4,11 @@ on:
     - cron: '17 * * * *'
   push:
     branches: [main]
-    paths: ['research_continuation_requests/*.json']
+    paths: ['research_continuation_requests/*.json', '.github/workflows/research-continuation.yml', 'tools/research_continuation_handoff.py']
   workflow_dispatch:
 permissions:
   contents: write
+  actions: write
 concurrency:
   group: research-continuation
   cancel-in-progress: false
@@ -16,34 +17,13 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       runs: ${{ steps.queue.outputs.runs }}
+      baseline: ${{ steps.queue.outputs.baseline }}
     steps:
       - uses: actions/checkout@v4
+      - name: Check restart and failure guards
+        run: python3 -m unittest discover -s tools -p test_research_continuation_handoff.py
       - id: queue
-        run: |
-          python3 - <<'PY'
-          import json,os
-          from pathlib import Path
-          from tools.research_continuation import effective_citation_backlogs
-          requested=set()
-          for marker in Path('research_continuation_requests').glob('*.json'):
-              run=str(json.loads(marker.read_text())['run_id'])
-              if not run.isdigit():raise ValueError('NUMERIC_PARENT_RUN_REQUIRED')
-              requested.add(run)
-          runs=[]
-          for root in sorted(Path('evidence/runs').glob('*')):
-              active=root/'research_continuation/active.json'
-              if not active.exists():
-                  if root.name in requested:runs.append(root.name)
-                  continue
-              pointer=json.loads(active.read_text())['queue']
-              queue=(active.parent/pointer).resolve()
-              if not queue.is_relative_to(active.parent.resolve()):raise ValueError('UNSAFE_QUEUE_PATH')
-              pending=json.loads(queue.read_text()).get('status')=='PENDING'
-              citations=any((json.loads(p.read_text()).get('pending') or json.loads(p.read_text()).get('deferred')) for p in effective_citation_backlogs(root))
-              if pending or citations:runs.append(root.name)
-          with open(os.environ['GITHUB_OUTPUT'],'a') as out:
-              out.write('runs='+json.dumps(runs[:2])+'\n')
-          PY
+        run: python3 tools/research_continuation_handoff.py select
   continue:
     needs: pending
     if: needs.pending.outputs.runs != '[]'
@@ -55,3 +35,22 @@ jobs:
     uses: ./.github/workflows/research-semantic-reanalysis.yml
     with:
       run_id: ${{ matrix.run }}
+
+  handoff:
+    needs: [pending, continue]
+    if: always() && needs.pending.result == 'success' && needs.pending.outputs.runs != '[]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Verify published progress before automatic restart
+        id: checkpoint
+        env:
+          BASELINE: ${{ needs.pending.outputs.baseline }}
+        run: python3 tools/research_continuation_handoff.py handoff --baseline "$BASELINE"
+      - name: Dispatch the next bounded pass using the existing Actions token
+        if: steps.checkpoint.outputs.restart == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run research-continuation.yml --repo "$GITHUB_REPOSITORY" --ref main
