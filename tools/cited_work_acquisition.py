@@ -68,6 +68,8 @@ def cited_bibliography_entries(root, results, findings):
                             'source_text_sha256':hashlib.sha256(raw).hexdigest(),
                             'locator':{'start_char':start,'end_char':start+len(block),'offset_unit':'UNICODE_CODE_POINTS'},
                             'discovery_basis':'AUTHOR_YEAR_CITED_IN_RELEVANT_ACQUIRED_PASSAGE',
+                            'publication_year_hint':int(entry['year']),
+                            'date_hint_role':'RETRIEVAL_PRIORITY_NOT_EVENT_DATE_OR_PRIMARY_SOURCE_VERIFICATION',
                             'source_independence':'NOT_ESTABLISHED','original_inspected':False})
     return out
 
@@ -122,7 +124,10 @@ def continue_citations(root,ctx,results,*,searcher=lookup,reader=acquire,
         from section_extraction import build_findings
         findings=build_findings(root,ctx)['findings']
     findings=list(findings)
-    findings.extend(cited_bibliography_entries(root,results,findings))
+    book_leads=cited_bibliography_entries(root,results,findings)
+    years=[int(y) for y in re.findall(r'(?<!\d)(?:1\d{3}|20\d{2})(?!\d)',ctx.get('date_range',''))]
+    if years:book_leads.sort(key=lambda row:not min(years)<=row['publication_year_hint']<=max(years))
+    findings=book_leads+findings
     # Preserve the reader's bibliography leads as well as citation-only
     # paragraphs. A missing locator stays missing; this is discovery, not proof.
     for source in results:
