@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """An actual LLM chooses each embodied action; no scripted route, tasks or fabricated successes."""
-import json, os, time, urllib.request, urllib.error, sys
+import json, os, time, urllib.request, urllib.error, sys, base64
 from pathlib import Path
 BASE="http://127.0.0.1:8080"
 OUT=Path("lone-pirate-eko/log.json");OUT.parent.mkdir(exist_ok=True)
@@ -35,7 +35,44 @@ def request(url,method="GET",body=None,headers=None,timeout=40):
             code="non_json_response"
         raise RuntimeError("Groq HTTP "+str(e.code)+" error_code="+code[:60]+" category="+reason) from None
 
-def save(d): OUT.write_text(json.dumps(d,ensure_ascii=False,indent=2))
+def save(d):
+    OUT.write_text(json.dumps(d,ensure_ascii=False,indent=2))
+    token=os.getenv("GH_LIVE_TOKEN","")
+    repository=os.getenv("GITHUB_REPOSITORY","")
+    if not token or not repository:
+        return
+    endpoint="https://api.github.com/repos/"+repository+"/contents/lone-pirate-live/latest.json"
+    headers={"Authorization":"Bearer "+token,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","User-Agent":"LonePirateEko-Live/1.0"}
+    content=base64.b64encode(json.dumps(d,ensure_ascii=False).encode("utf-8")).decode("ascii")
+    for attempt in range(3):
+        sha=None
+        try:
+            req=urllib.request.Request(endpoint,headers=headers)
+            with urllib.request.urlopen(req,timeout=12) as response:
+                sha=json.load(response).get("sha")
+        except urllib.error.HTTPError as exc:
+            if exc.code!=404:
+                print("LIVE_READ_FAILED HTTP",exc.code,flush=True)
+                return
+        except Exception as exc:
+            print("LIVE_READ_FAILED",type(exc).__name__,flush=True)
+            return
+        payload={"message":"Publish verified pirate telemetry: "+str(d.get("decisions",0))+" actions","content":content,"branch":"main"}
+        if sha: payload["sha"]=sha
+        try:
+            req=urllib.request.Request(endpoint,data=json.dumps(payload).encode("utf-8"),headers={**headers,"Content-Type":"application/json"},method="PUT")
+            with urllib.request.urlopen(req,timeout=15) as response:
+                response.read()
+            print("LIVE_PUBLISHED",d.get("status"),d.get("decisions"),flush=True)
+            return
+        except urllib.error.HTTPError as exc:
+            print("LIVE_WRITE_FAILED HTTP",exc.code,flush=True)
+            if exc.code not in (409,422): return
+        except Exception as exc:
+            print("LIVE_WRITE_FAILED",type(exc).__name__,flush=True)
+            return
+    print("LIVE_WRITE_RETRIES_EXHAUSTED",flush=True)
+
 def llm(observation,memory):
     tools=["MoveTo","Jump","Stop","Pickup","Place","Inspect","Touch","Steer","SetSail"]
     prompt=("You are one pirate alone on a 17th century ship in the open sea. There is no assigned task and no mission. "
