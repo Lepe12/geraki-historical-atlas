@@ -10,7 +10,7 @@ DURATION=min(int(os.getenv("DURATION_MINUTES","30")),240)*60
 MAX_CALLS=min(int(os.getenv("MAX_CALLS","35")),50)
 def request(url,method="GET",body=None,headers=None,timeout=40):
     data=json.dumps(body).encode() if body is not None else None
-    h={"Content-Type":"application/json",**(headers or {})}
+    h={"Content-Type":"application/json","User-Agent":"LonePirateEko/0.1.0",**(headers or {})}
     try:
         with urllib.request.urlopen(urllib.request.Request(url,data=data,headers=h,method=method),timeout=timeout) as r:
             return json.loads(r.read().decode())
