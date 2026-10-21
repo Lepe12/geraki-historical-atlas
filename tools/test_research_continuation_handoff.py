@@ -5,11 +5,22 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from research_continuation_handoff import active_parents, cancel_superseded_pending, decision, select, state
+from research_continuation_handoff import active_parents, cancel_superseded_pending, decision, select, state, handoff_outputs
 from research_continuation import digest
 
 
 class HandoffTests(unittest.TestCase):
+    def test_failed_corpus_does_not_freeze_healthy_progress(self):
+        result=handoff_outputs({'123':(True,'NEW_EXAMINED_ITEMS:3'),
+            '456':(False,'CONTINUATION_RECEIPTS_INVALID')})
+        self.assertEqual(result,{'restart':True,'held_runs':['456']})
+
+    def test_failed_corpus_cannot_self_restart_and_holds_are_carried_forward(self):
+        self.assertEqual(handoff_outputs({'456':(False,'NO_CHECKPOINT_PROGRESS')}),
+                         {'restart':False,'held_runs':['456']})
+        self.assertEqual(handoff_outputs({'123':(True,'NEW_EXAMINED_ITEMS:2')},['456']),
+                         {'restart':True,'held_runs':['456']})
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -88,6 +99,12 @@ class HandoffTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'INVALID_BATCH_RECEIPT'):
             state(self.root)
 
+    def test_corrupt_immutable_replay_receipt_is_rejected(self):
+        self.write(self.queue.parent / 'replays/source/incorrect.json',
+            {'source_sha256':'source','payload':{'items':[]},'payload_sha256':'incorrect'})
+        with self.assertRaisesRegex(ValueError,'INVALID_REPLAY_RECEIPT'):
+            state(self.root)
+
     def test_new_generation_preserves_archived_work_and_continues(self):
         new_queue = self.queue.parent.parent / 'new-generation/queue.json'
         self.write(new_queue, json.loads(self.queue.read_text()))
@@ -133,3 +150,4 @@ class HandoffTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+

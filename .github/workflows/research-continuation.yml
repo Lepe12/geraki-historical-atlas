@@ -6,6 +6,12 @@ on:
     branches: [main]
     paths: ['research_continuation_requests/*.json', '.github/workflows/research-continuation.yml', 'tools/research_continuation_handoff.py']
   workflow_dispatch:
+    inputs:
+      excluded_run_ids:
+        description: Parent corpora held out of this automatic dispatch chain
+        type: string
+        required: false
+        default: '[]'
   workflow_run:
     workflows: ['Real acquired-source semantic reanalysis']
     types: [completed]
@@ -31,6 +37,7 @@ jobs:
       - id: queue
         env:
           GH_TOKEN: ${{ github.token }}
+          PCT_CONTINUATION_EXCLUDED_RUNS: ${{ inputs.excluded_run_ids || '[]' }}
         run: python3 tools/research_continuation_handoff.py select --exclude-active
   continue:
     needs: pending
@@ -56,9 +63,12 @@ jobs:
         id: checkpoint
         env:
           BASELINE: ${{ needs.pending.outputs.baseline }}
+          PCT_CONTINUATION_EXCLUDED_RUNS: ${{ inputs.excluded_run_ids || '[]' }}
         run: python3 tools/research_continuation_handoff.py handoff --baseline "$BASELINE"
       - name: Dispatch the next bounded pass using the existing Actions token
-        if: steps.checkpoint.outputs.restart == 'true'
+        if: always() && steps.checkpoint.outputs.restart == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run research-continuation.yml --repo "$GITHUB_REPOSITORY" --ref main
+          HELD_RUNS: ${{ steps.checkpoint.outputs.held_runs }}
+        run: gh workflow run research-continuation.yml --repo "$GITHUB_REPOSITORY" --ref main -f "excluded_run_ids=$HELD_RUNS"
+

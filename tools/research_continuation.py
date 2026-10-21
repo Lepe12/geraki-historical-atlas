@@ -52,8 +52,14 @@ class Continuation:
             'payload_sha256':digest(payload),'verified':False})
 
     def receipt(self,group):
-        return {'batch_path':str(self.path(group)),'source_sha256':self.binding(group),
-                'payload_sha256':self.load(group)['payload_sha256'],
+        # A later model repair can replace the current batch payload. Preserve
+        # the exact replay input before that happens, rather than invalidating
+        # the answer's own provenance by pointing at the mutable current batch.
+        row=self.load(group)
+        snapshot=self.root/'replays'/self.binding(group)/(row['payload_sha256']+'.json')
+        if not snapshot.exists():atomic(snapshot,row)
+        return {'batch_path':str(snapshot),'source_sha256':self.binding(group),
+                'payload_sha256':row['payload_sha256'],
                 'historical_verification':False}
 
     def response_load(self,key):
@@ -111,3 +117,4 @@ def effective_citation_backlogs(root):
         continued=root/('citation_continuation_'+lane.name)/'library_acquisition/cited_work_continuation.json'
         selected=continued if continued.is_file() else original
         if selected.is_file():yield selected
+

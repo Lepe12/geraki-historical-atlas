@@ -8,6 +8,39 @@ from production_acceptance import acceptance
 
 
 class ContinuationTests(unittest.TestCase):
+    def test_repaired_cached_payload_keeps_immutable_replay_input(self):
+        from research_continuation import digest
+        with tempfile.TemporaryDirectory() as directory:
+            queue=Continuation(directory,'question',b'code',{})
+            group=[{'text':'actual text','evidence_id':'e1'}]
+            original={'items':[{'quote':'unsupported model proposal'}]}
+            queue.save(group,original)
+            receipt=queue.receipt(group)
+            queue.save(group,{'items':[]})
+            retained=json.loads(Path(receipt['batch_path']).read_text())
+            self.assertEqual(retained['payload'],original)
+            self.assertEqual(digest(retained['payload']),receipt['payload_sha256'])
+            self.assertEqual(queue.load(group)['payload'],{'items':[]})
+
+    def test_execute_repair_does_not_invalidate_its_own_replay_receipt(self):
+        import semantic_research_answer as engine
+        from test_semantic_research_answer import fixture,response
+        from research_continuation import digest
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);fixture(root)
+            records,_=engine.collect(root)
+            records=engine.fit_passages(records,14000)
+            groups,_=engine.batches(records,max_batches=len(records)+1,budget=14000)
+            queue=Continuation(root/'research_continuation','q',Path(engine.__file__).read_bytes(),engine.routing_summary())
+            queue.save(groups[0],{'items':[{'evidence_id':records[0]['evidence_id'],
+                'quote':'invented words absent from the source','statement':'Unsupported claim','kind':'source_statement'}]})
+            result=engine.execute(root,'q',caller=lambda *a:response({'items':[]}),config={'configured':True})
+            self.assertTrue(result['continuation_replays'])
+            for receipt in result['continuation_replays']:
+                retained=json.loads((root/receipt['batch_path']).read_text())
+                self.assertEqual(digest(retained['payload']),receipt['payload_sha256'])
+            self.assertEqual(queue.load(groups[0])['payload'],{'items':[]})
+
     def test_source_changes_and_corruption_invalidate_cache(self):
         with tempfile.TemporaryDirectory() as directory:
             queue=Continuation(directory,'question',b'code',{})
@@ -171,3 +204,4 @@ class ContinuationTests(unittest.TestCase):
         self.assertNotEqual(acceptance(report)['status'],'PASS')
 
 if __name__=='__main__':unittest.main()
+

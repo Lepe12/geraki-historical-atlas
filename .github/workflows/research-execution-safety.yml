@@ -36,7 +36,7 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: '1'
           PYTHONPATH: tools:tools/orchestrator:tools/llm
-        run: python -m unittest tools.test_research_priority tools.test_research_continuation_handoff tools.test_research_execution_safety tools.test_audit_reference_recall tools.test_citation_search tools.test_cited_work_acquisition tools.test_research_focus tools.test_fulltext_discovery tools.orchestrator.test_research_query tools.test_research_pipeline_repairs tools.test_section_extraction tools.test_research_evidence_package tools.test_semantic_research_answer tools.test_research_topics tools.test_research_engine_validation tools.connectors.test_http_audit -q
+        run: python -m unittest tools.test_research_priority tools.test_research_continuation tools.test_research_continuation_handoff tools.test_research_execution_safety tools.test_audit_reference_recall tools.test_citation_search tools.test_cited_work_acquisition tools.test_research_focus tools.test_fulltext_discovery tools.orchestrator.test_research_query tools.test_research_pipeline_repairs tools.test_section_extraction tools.test_research_evidence_package tools.test_semantic_research_answer tools.test_research_topics tools.test_research_engine_validation tools.connectors.test_http_audit -q
       - name: Verify local PDF replay runtime dependencies
         run: |
           sudo apt-get update -qq
@@ -49,4 +49,5 @@ jobs:
           python -m unittest tools.test_historical_attestations tools.test_research_evidence_bridge tools.storage.test_historical_evidence_store -v
           node server/command-center-live/self-test.js
           node server/command-center-live/learning-integration-test.js
+
 

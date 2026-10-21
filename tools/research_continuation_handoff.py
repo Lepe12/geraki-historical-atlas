@@ -30,6 +30,12 @@ def state(root, queue_relative=None):
                 digest(receipt['payload']) != receipt['payload_sha256'] or
                 not isinstance(receipt['payload'].get('items'), list)):
             raise ValueError('INVALID_BATCH_RECEIPT')
+    for path in queue_path.parent.glob('replays/*/*.json'):
+        receipt = json.loads(path.read_text())
+        if (receipt['source_sha256'] != path.parent.name or
+                receipt['payload_sha256'] != path.stem or
+                digest(receipt['payload']) != receipt['payload_sha256']):
+            raise ValueError('INVALID_REPLAY_RECEIPT')
     for path in responses:
         receipt = json.loads(path.read_text())
         if digest(receipt['result']) != receipt['result_sha256']:
@@ -146,6 +152,9 @@ def main():
     parser.add_argument('--baseline', default='{}')
     parser.add_argument('--exclude-active', action='store_true')
     args = parser.parse_args()
+    inherited = json.loads(os.getenv('PCT_CONTINUATION_EXCLUDED_RUNS', '[]'))
+    if not isinstance(inherited, list) or any(not isinstance(run, str) or not run.isdigit() for run in inherited):
+        raise ValueError('NUMERIC_EXCLUDED_RUN_IDS_REQUIRED')
     if args.mode == 'select':
         busy = set()
         if args.exclude_active:
@@ -154,7 +163,7 @@ def main():
             cancel_superseded_pending(repository, current_run)
             busy = active_parents(repository, current_run)
             print(json.dumps({'active_parent_runs_deferred': sorted(busy)}))
-        selected = select(Path('.'), busy)
+        selected = select(Path('.'), busy | set(inherited))
         values = {'runs': list(selected), 'baseline': selected}
     else:
         decisions = {}
@@ -164,8 +173,7 @@ def main():
             except (OSError, ValueError, KeyError, TypeError) as error:
                 decisions[run] = (False, 'INVALID_OR_MISSING_CHECKPOINT:' + type(error).__name__)
         print(json.dumps({'handoff_decisions': decisions, 'historical_acceptance': False}))
-        values = {'restart': any(value[0] for value in decisions.values()) and
-                  all(value[0] or value[1] == 'NO_PENDING_SEMANTIC_WORK' for value in decisions.values())}
+        values = handoff_outputs(decisions, inherited)
     with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
         for key, value in values.items():
             output.write(key + '=' + json.dumps(value, separators=(',', ':')) + '\n')
@@ -174,5 +182,18 @@ def main():
         raise SystemExit('AUTOMATIC_CONTINUATION_HELD: see handoff_decisions above')
 
 
+def handoff_outputs(decisions, inherited=()):
+    """Continue healthy corpora while keeping failed corpora explicitly held.
+
+    Carry exclusions through this dispatch chain; a later scheduled/manual
+    coordinator can retry them after repair. No failed corpus self-restarts.
+    """
+    held = {run for run, value in decisions.items()
+            if not value[0] and value[1] != 'NO_PENDING_SEMANTIC_WORK'}
+    return {'restart': any(value[0] for value in decisions.values()),
+            'held_runs': sorted(set(inherited) | held)}
+
+
 if __name__ == '__main__':
     main()
+

@@ -805,7 +805,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         if cached:
             # Original raw response and source binding remain in the queue.
             receipt=queue.receipt(group)
-            receipt['batch_path']=str(queue.path(group).resolve().relative_to(Path(provenance_root or run_root).resolve()))
+            receipt['batch_path']=str(Path(receipt['batch_path']).resolve().relative_to(Path(provenance_root or run_root).resolve()))
             out.setdefault('continuation_replays',[]).append(receipt)
         items,rejected=validate_items(payload or {},group,question_kind,requested_range)
         out['rejected'].extend(rejected)
@@ -1016,5 +1016,6 @@ def main():
     print('SEMANTIC_ANSWER',out['status'],'model_used',out['model_used'],'claims',len(out['claims']))
 
 if __name__=='__main__':main()
+
 
 
