@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """An actual LLM chooses each embodied action; no scripted route, tasks or fabricated successes."""
-import json, os, time, urllib.request, urllib.error, sys, base64
+import json, os, time, urllib.request, urllib.error, sys, base64, re
 from pathlib import Path
 BASE="http://127.0.0.1:8080"
 OUT=Path("lone-pirate-eko/log.json");OUT.parent.mkdir(exist_ok=True)
@@ -34,6 +34,21 @@ def request(url,method="GET",body=None,headers=None,timeout=40):
         except Exception:
             code="non_json_response"
         raise RuntimeError("Groq HTTP "+str(e.code)+" error_code="+code[:60]+" category="+reason) from None
+
+def is_failure(result):
+    return bool(re.search(r"failed|invalid|out of reach|unknown|error|denied|cannot",str(result),re.I))
+
+def verified_facts(action,result,after_position):
+    # Facts come from the simulator's confirmed outcome, not the agent's guess.
+    if is_failure(result) or not result:
+        return []
+    facts=[]
+    if action in ("Pickup","Place","Touch","Steer","SetSail","Inspect") and re.search(
+        r"^(Picked up|Placed|Touched|Helm adjusted|Sail (raised|furled)|Inspected)\\b",str(result),re.I):
+        facts.append(str(result)[:300])
+    if action=="MoveTo" and isinstance(after_position,list) and len(after_position)==3:
+        facts.append("Observed position: "+str(after_position))
+    return facts
 
 def save(d):
     OUT.write_text(json.dumps(d,ensure_ascii=False,indent=2))
@@ -113,6 +128,8 @@ def llm(observation,memory,cognition):
     decoder=json.JSONDecoder()
     obj=None
     last_error=None
+    # Retry only transient Groq throttling, without changing the agent's decision.
+    # The enclosing world loop still enforces the overall experiment duration.
     for attempt in range(3):
         try:
             result=request("https://api.groq.com/openai/v1/chat/completions","POST",payload,{"Authorization":"Bearer "+KEY},timeout=80)
@@ -157,7 +174,7 @@ def llm(observation,memory,cognition):
 def main():
     previous=json.loads(OUT.read_text()) if OUT.exists() and os.getenv("PIRATE_STAGE","1")=="2" else {}
     prior_events=previous.get("events",[])
-    cognition=previous.get("cognition",{"intention":None,"plan":[],"knowledge":[],"self_notes":[]})
+    cognition=previous.get("cognition",{"intention":None,"plan":[],"verified_facts":[],"hypotheses":[]})
     log={"engine":"Clawblox","model":MODEL,"status":"starting","events":prior_events,"decisions":len(prior_events),"started":previous.get("started") or time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"simulation":True,"stage":os.getenv("PIRATE_STAGE","1"),"experiment":"eko-soul-2026-10-21","cognition":cognition}
     stage_decisions=0
     save(log)
@@ -173,9 +190,28 @@ def main():
         log["status"]="running";save(log)
         while time.monotonic()-started<DURATION and stage_decisions<MAX_CALLS:
             obs=request(BASE+"/observe",headers=hdr)
-            try: decision=llm(obs,memory,cognition)
+            try:
+                decision=llm(obs,memory,cognition)
+                log.pop("error",None)
             except Exception as e:
-                log["status"]="llm_error";log["error"]=str(e)[:350];break
+                message=str(e)
+                if "rate_limited" in message or "HTTP 429" in message:
+                    cooldown=min(1800,60*2**min(log.get("rate_limit_hits",0),4))
+                    log["rate_limit_hits"]=log.get("rate_limit_hits",0)+1
+                    log["status"]="waiting_rate_limit"
+                    log["last_rate_limit"]=message[:300]
+                    log["retry_after_seconds"]=cooldown
+                    save(log)
+                    print("RATE_LIMIT_WAIT",cooldown,"seconds",flush=True)
+                    remaining=DURATION-(time.monotonic()-started)
+                    if remaining<=cooldown:
+                        log["status"]="completed_duration_rate_limited"
+                        break
+                    time.sleep(cooldown)
+                    log["status"]="running"
+                    save(log)
+                    continue
+                log["status"]="llm_error";log["error"]=message[:350];break
             try: result=request(BASE+"/input","POST",{"type":decision["action"],"data":decision["data"]},hdr)
             except Exception as e: result={"execution_error":str(e)[:300]}
             if isinstance(result,dict):
@@ -192,27 +228,32 @@ def main():
             except Exception:
                 after_position=None
             item={"time":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"action":decision["action"],"parameters":decision["data"],"reflection":decision.get("reflection",""),"memory":decision.get("memory",""),"result":actual,"player_position_before":before_position,"player_position_after":after_position}
-            memory.append({"action":item["action"],"result":item["result"],"learning":item["memory"]})
-            # Agent-authored mental state persists between observations and stages.
-            # Hypotheses are NOT verified world facts.
+            confirmed=verified_facts(item["action"],actual,after_position)
+            item["verified_facts"]=confirmed
+            reported=decision.get("memory")
+            memory.append({"action":item["action"],"result":actual,"verified":confirmed})
+            # Self-authored intention and plan are proposals, not truths.
             if isinstance(decision.get("intention"),str):
                 cognition["intention"]=decision["intention"][:280]
             if isinstance(decision.get("plan"),list):
                 cognition["plan"]=[str(step)[:180] for step in decision["plan"][:8]]
-            fact=decision.get("knowledge")
-            if isinstance(fact,str) and fact.strip():
-                cognition.setdefault("knowledge",[])
-                if fact not in cognition["knowledge"]:
-                    cognition["knowledge"].append(fact[:350])
-                cognition["knowledge"]=cognition["knowledge"][-40:]
-            note=decision.get("memory")
-            if isinstance(note,str) and note.strip():
-                cognition.setdefault("self_notes",[])
-                cognition["self_notes"].append(note[:350])
-                cognition["self_notes"]=cognition["self_notes"][-40:]
+            cognition.setdefault("verified_facts",[])
+            for fact in confirmed:
+                cognition["verified_facts"].append(fact)
+            cognition["verified_facts"]=cognition["verified_facts"][-60:]
+            # Claimed knowledge and notes are explicitly UNVERIFIED hypotheses.
+            cognition.setdefault("hypotheses",[])
+            for hypothesis in (decision.get("knowledge"),reported):
+                if isinstance(hypothesis,list):
+                    hypothesis="; ".join(str(x) for x in hypothesis[:8])
+                if isinstance(hypothesis,str) and hypothesis.strip():
+                    cognition["hypotheses"].append(hypothesis[:350])
+            cognition["hypotheses"]=cognition["hypotheses"][-40:]
+            cognition["knowledge"]=[]  # legacy unverified knowledge must not pose as evidence
+            cognition["self_notes"]=[] # legacy unverified memories must not pose as evidence
             log["events"].append(item);log["decisions"]+=1;stage_decisions+=1;save(log)
             time.sleep(max(1,int(os.getenv("PAUSE_SECONDS","30"))))
-        if log["status"]=="running": log["status"]="completed_decision_budget" if stage_decisions>=MAX_CALLS else "completed_duration"
+        if log["status"] in ("running","waiting_rate_limit"): log["status"]="completed_decision_budget" if stage_decisions>=MAX_CALLS else "completed_duration"
         save(log);print(log["status"],log["decisions"]);return 0 if log["status"].startswith("completed_") and stage_decisions else 3
     except Exception as e:
         log["status"]="world_error";log["error"]=str(e)[:450];save(log);raise
