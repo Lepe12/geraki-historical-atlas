@@ -20,6 +20,8 @@ jobs:
       baseline: ${{ steps.queue.outputs.baseline }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - name: Check restart and failure guards
         run: python3 -m unittest discover -s tools -p test_research_continuation_handoff.py
       - id: queue
