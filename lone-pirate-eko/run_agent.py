@@ -47,7 +47,10 @@ def llm(observation,memory):
     "Place:{position:[x,y,z]}, Inspect:{target:object_name}, Touch:{target:object_name}, "
     "Steer:{direction:port|starboard|center}, SetSail:{state:raised|furled}. "
     "Use exact world entity names (NOT entityId), and do not issue fixed routes. "
-    "No fixed sequence of actions. Use observations and memory to select actions.")
+    "No fixed sequence of actions. Use observations and memory to select actions. "
+    "Do not stay in one place only inspecting objects: explore by walking on deck, approach objects, interact with sails and helm when physically near, and respond to observations. "
+    "Pick your own destinations safely on deck (x between -5 and 5, z between -15 and 15, y around 1.5). "
+    "An Inspect action reveals information but is not physical exploration; avoid repeating inspections already completed.")
     entities=[{"id":e.get("id"),"name":e.get("name"),"position":e.get("position")} for e in observation.get("world",{}).get("entities",[])][:90]
     player=observation.get("player",{})
     compact={"player_position":player.get("position"),"last_action_result":player.get("attributes",{}).get("LastActionResult"),"entities":entities}
@@ -118,7 +121,16 @@ def main():
                 actual=result.get("player",{}).get("attributes",{}).get("LastActionResult")
                 actual=actual or result.get("LastActionResult") or result.get("execution_error") or "No action result returned"
             else: actual=str(result)[:300]
-            item={"time":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"action":decision["action"],"parameters":decision["data"],"reflection":decision.get("reflection",""),"memory":decision.get("memory",""),"result":actual}
+            before_position=obs.get("player",{}).get("position")
+            try:
+                if decision["action"]=="MoveTo": time.sleep(2)
+                after=request(BASE+"/observe",headers=hdr)
+                after_position=after.get("player",{}).get("position")
+                observed_result=after.get("player",{}).get("attributes",{}).get("LastActionResult")
+                if observed_result: actual=observed_result
+            except Exception:
+                after_position=None
+            item={"time":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"action":decision["action"],"parameters":decision["data"],"reflection":decision.get("reflection",""),"memory":decision.get("memory",""),"result":actual,"player_position_before":before_position,"player_position_after":after_position}
             memory.append({"action":item["action"],"result":item["result"],"learning":item["memory"]})
             log["events"].append(item);log["decisions"]+=1;stage_decisions+=1;save(log)
             time.sleep(max(1,int(os.getenv("PAUSE_SECONDS","30"))))
