@@ -1,11 +1,12 @@
 """Export source-constrained place findings, keeping unresolved identities null."""
 def build(answer):
+    from semantic_research_answer import geographic_claim_hold_reason
     records={r['evidence_id']:r for r in answer.get('evidence',[])}
     supported=set((answer.get('review') or {}).get('supported_claim_ids',[]))
     flagged={r['claim_id'] for r in (answer.get('review') or {}).get('flagged_claims',[])}
     findings=[]
     for claim in answer.get('claims',[]):
-        if claim.get('claim_id') not in supported or claim['claim_id'] in flagged:
+        if claim.get('claim_id') not in supported or claim['claim_id'] in flagged or geographic_claim_hold_reason(claim):
             continue
         evidence=records.get(claim.get('evidence_id'),{})
         for place in claim.get('places',[]):

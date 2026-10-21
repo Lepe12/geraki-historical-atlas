@@ -54,6 +54,13 @@ class SemanticAnswer(unittest.TestCase):
         self.assertEqual(len(original['answer_sections']),1)
         self.assertEqual(report['status'],'PROVISIONAL_RESEARCH_PIPELINE_PASSED')
 
+    def test_geographic_export_rechecks_old_supported_claims(self):
+        from research_geographic_findings import build
+        answer={'claims':[{'claim_id':'wrong','evidence_id':'e','quote':'A harbor and an ambush.',
+                           'places':['harbor'],'usage_type':'RAID_LOCATION'}],
+                'review':{'supported_claim_ids':['wrong']},'evidence':[]}
+        self.assertEqual(build(answer)['findings'],[])
+
     def test_explicit_anchorages_are_not_suppressed(self):
         quote='Astypalaia provided provisions and plenty of safe anchorages for the corsairs.'
         self.assertIsNone(geographic_claim_hold_reason({'quote':quote,'places':['Astypalaia'],'usage_type':'ANCHORAGE'}))
