@@ -6,7 +6,7 @@ on:
       - 'acquisition_requests/*.json'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   acquire:
@@ -14,41 +14,56 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - name: Locate newest acquisition request
         id: req
         shell: python
         run: |
-          import os, pathlib
-          files=list(pathlib.Path("acquisition_requests").glob("*.json"))
+          import json, os, pathlib, subprocess
+          changed=subprocess.check_output(['git','diff-tree','--no-commit-id','--name-only','-r','HEAD','--','acquisition_requests/'],text=True).splitlines()
+          files=[p for p in changed if p.endswith('.json') and pathlib.Path(p).is_file()]
           if not files:
               raise SystemExit("No acquisition request files found")
-          newest=max(files,key=lambda p:p.stat().st_mtime)
           with open(os.environ["GITHUB_OUTPUT"],"a",encoding="utf-8") as out:
-              out.write("file="+newest.as_posix()+"\n")
+              out.write("requests="+json.dumps(files)+"\n")
       - name: Validate request and acquire pages
         shell: bash
+        env:
+          REQUESTS: ${{ steps.req.outputs.requests }}
         run: |
           python3 - <<'PY'
-          import json, pathlib, subprocess
-          p=pathlib.Path("${{ steps.req.outputs.file }}")
-          q=json.loads(p.read_text(encoding="utf-8"))
-          required=("manifest","pages")
-          missing=[k for k in required if not q.get(k)]
-          if missing: raise SystemExit("Missing required request fields: "+", ".join(missing))
-          pages=q["pages"]
-          if isinstance(pages,list): pages=",".join(str(x) for x in pages)
-          cmd=["python3","tools/iiif_acquire.py","--manifest",str(q["manifest"]),"--pages",str(pages),"--source-id",str(q.get("source_id","")),"--out","iiif_acquisition"]
-          subprocess.run(cmd,check=True)
+          import json, os, pathlib, subprocess
+          failed=[]
+          for name in json.loads(os.environ['REQUESTS']):
+              p=pathlib.Path(name);q=json.loads(p.read_text(encoding='utf-8'))
+              if not q.get('manifest') or not (q.get('pages') or q.get('canvas_indexes')):
+                  raise SystemExit('Manifest and printed pages or explicit canvas indexes required')
+              dest=pathlib.Path('evidence/source_acquisitions')/os.environ['GITHUB_RUN_ID']/p.stem
+              dest.mkdir(parents=True,exist_ok=True)
+              (dest/'request.json').write_bytes(p.read_bytes())
+              cmd=['python3','tools/iiif_acquire.py','--manifest',q['manifest'],'--source-id',q.get('source_id',''),'--out',str(dest)]
+              for key,flag in [('pages','--pages'),('canvas_indexes','--canvas-indexes')]:
+                  if q.get(key):cmd.extend([flag,','.join(str(x) for x in q[key])])
+              if subprocess.run(cmd).returncode:failed.append(name)
+          if failed:raise SystemExit('ACQUISITION_FAILED:'+','.join(failed))
           PY
-      - name: Preserve request with Citation Chase package
-        if: always()
-        run: |
-          mkdir -p iiif_acquisition
-          cp "${{ steps.req.outputs.file }}" iiif_acquisition/request.json || true
       - name: Upload Citation Chase package
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: citation-chase-auto-${{ github.run_id }}
-          path: iiif_acquisition/
+          path: evidence/source_acquisitions/${{ github.run_id }}/
           if-no-files-found: warn
+      - name: Persist exact pages and checksum receipts
+        if: always()
+        run: |
+          set -e
+          dest="evidence/source_acquisitions/$GITHUB_RUN_ID"
+          if [ ! -d "$dest" ]; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dest"
+          git commit -m 'Preserve acquired primary-source pages and checksum receipts'
+          python3 tools/publish_research_outputs.py
+
