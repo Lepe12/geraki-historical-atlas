@@ -65,6 +65,19 @@ class CitationContinuationTests(unittest.TestCase):
         self.assertEqual(report['searches'][0]['parent_locator']['start_char'],0)
         self.assertEqual(report['searches'][0]['citation_excerpt'],text)
 
+    def test_catalogue_landing_text_does_not_become_cited_article(self):
+        rows=[{'title':self.title,'url':'https://example.org/catalogue',
+               'evidence_level':'CATALOGUE_METADATA_ONLY'}]
+        results=[]
+        def reader(url,out,follow=True):
+            return {'url':url,'status':'TEXT_ACQUIRED','files':[],
+                    'source_type':'WEB_PAGE_TEXT','linked_documents':[]}
+        report=continue_citations(self.root,{},results,findings=[self.finding],
+            searcher=lambda *a:([],rows),reader=reader)
+        self.assertEqual(results,[])
+        self.assertEqual(report['searches'][0]['acquisitions'][0]['status'],
+                         'CATALOGUE_METADATA_ACQUIRED_NOT_CITED_WORK')
+
     def test_pdf_larger_than_old_limit_is_accepted_but_limit_is_enforced(self):
         from unittest.mock import patch,MagicMock
         import web_acquisition as web

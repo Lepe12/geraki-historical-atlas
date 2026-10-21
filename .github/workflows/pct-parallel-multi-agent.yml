@@ -212,7 +212,7 @@ jobs:
         run: |
           python3 tools/orchestrator/jarvis_event_bus.py --run-id "$GITHUB_RUN_ID" --event-type agent_started --agent-id "$PCT_RESEARCH_LANE" --phase "repository discovery" --percent 5 --status RUNNING --detail "JARVIS lane execution started"
       - name: Install browser for public legacy catalogues
-        if: contains(fromJSON('["greek","venetian","italian_states"]'), matrix.lane)
+        if: contains(fromJSON('["greek","travellers","venetian","italian_states"]'), matrix.lane)
         run: |
           python3 -m pip install --quiet playwright
           python3 -m playwright install --with-deps chromium
