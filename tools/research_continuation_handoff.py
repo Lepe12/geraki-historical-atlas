@@ -22,6 +22,12 @@ def state(root):
     if len(ids) != len(set(ids)) or len(ids) != queue['total'] or len(completed) != queue['completed']:
         raise ValueError('INCONSISTENT_QUEUE_COUNTS')
     responses = sorted(queue_path.parent.glob('responses/*.json'))
+    for path in queue_path.parent.glob('batches/*.json'):
+        receipt = json.loads(path.read_text())
+        if (receipt['source_sha256'] != path.stem or
+                digest(receipt['payload']) != receipt['payload_sha256'] or
+                not isinstance(receipt['payload'].get('items'), list)):
+            raise ValueError('INVALID_BATCH_RECEIPT')
     for path in responses:
         receipt = json.loads(path.read_text())
         if digest(receipt['result']) != receipt['result_sha256']:
@@ -57,6 +63,8 @@ def decision(root, before, run_id):
     if result is None:
         return False, 'INVALID_PUBLISHED_CHECKSUMS'
     answer, validation = result
+    if validation.get('status') not in ('INCOMPLETE', 'PASS'):
+        return False, 'VALIDATION_NOT_RESUMABLE:' + str(validation.get('status'))
     # Valid extraction can yield zero relevant claims; that is not a crash.
     empty_extraction = (answer.get('status') == 'EXTRACTION_FAILED_OR_UNSUPPORTED' and
                         answer.get('calls') and not answer.get('claims') and
@@ -105,6 +113,9 @@ def main():
     with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
         for key, value in values.items():
             output.write(key + '=' + json.dumps(value, separators=(',', ':')) + '\n')
+    if args.mode == 'handoff' and any(not value[0] and value[1] != 'NO_PENDING_SEMANTIC_WORK'
+                                      for value in decisions.values()):
+        raise SystemExit('AUTOMATIC_CONTINUATION_HELD: see handoff_decisions above')
 
 
 if __name__ == '__main__':

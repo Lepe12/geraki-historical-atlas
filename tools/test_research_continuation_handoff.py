@@ -81,6 +81,12 @@ class HandoffTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'INCONSISTENT_QUEUE_COUNTS'):
             state(self.root)
 
+    def test_corrupt_batch_receipt_is_rejected(self):
+        self.write(self.queue.parent / 'batches/source.json', {'source_sha256': 'source',
+                   'payload': {'items': []}, 'payload_sha256': 'incorrect'})
+        with self.assertRaisesRegex(ValueError, 'INVALID_BATCH_RECEIPT'):
+            state(self.root)
+
     def test_path_escape_is_rejected(self):
         self.write(self.root / 'research_continuation/active.json', {'queue': '../../outside.json'})
         with self.assertRaisesRegex(ValueError, 'UNSAFE_QUEUE_PATH'):
