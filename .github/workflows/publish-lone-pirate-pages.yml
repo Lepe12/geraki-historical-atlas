@@ -1,0 +1,31 @@
+name: Publish Lone Pirate 3D to Pages
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lone-pirate/**'
+      - '.github/workflows/publish-lone-pirate-pages.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify 3D viewer included
+        run: test -s lone-pirate/3d.html && test -s lone-pirate/index.html
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4
