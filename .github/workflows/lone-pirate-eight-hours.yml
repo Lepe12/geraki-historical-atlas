@@ -1,0 +1,143 @@
+name: Lone Pirate — Eight Hour Autonomous Experiment
+on:
+  push:
+    paths:
+      - 'lone-pirate-eko/EIGHT_HOUR_TRIGGER.txt'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  pirate_1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 255
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Syntax-check agent controller
+        run: python -m py_compile lone-pirate-eko/run_agent.py
+      - name: Check real model access
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          if [ -z "$GROQ_API_KEY" ]; then
+            echo "::error::Configure repository secret GROQ_API_KEY before running; no fake AI will be used."
+            exit 1
+          fi
+      - name: Install Clawblox
+        run: |
+          curl -fsSL https://clawblox.com/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Start embodied Clawblox world
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          clawblox run lone-pirate-eko --record --record-dir lone-pirate-eko/recordings > /tmp/clawblox.log 2>&1 &
+          echo $! > /tmp/clawblox.pid
+          for n in $(seq 1 60); do
+            if curl -fsS http://localhost:8080/api.md >/dev/null; then echo "Clawblox ready"; exit 0; fi
+            sleep 2
+          done
+          cat /tmp/clawblox.log
+          exit 1
+      - name: Run real LLM-controlled experiment
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_MODEL: ${{ vars.GROQ_MODEL || 'openai/gpt-oss-20b' }}
+          DURATION_MINUTES: ${{ '240' }}
+          MAX_CALLS: ${{ '50' }}
+          PAUSE_SECONDS: "300"
+          PIRATE_STAGE: "1"
+        run: python lone-pirate-eko/run_agent.py
+      - name: Save experiment record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lone-pirate-eight-hour-1
+          path: |
+            lone-pirate-eko/log.json
+            lone-pirate-eko/recordings/
+          if-no-files-found: warn
+      - name: Publish verified run log for website
+        if: always()
+        run: |
+          if [ ! -f lone-pirate-eko/log.json ]; then exit 0; fi
+          mkdir -p lone-pirate
+          cp lone-pirate-eko/log.json lone-pirate/latest.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lone-pirate/latest.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Record Lone Pirate experiment (no simulated data)"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin HEAD:"${GITHUB_REF_NAME}"
+  pirate_2:
+    needs: pirate_1
+    runs-on: ubuntu-latest
+    timeout-minutes: 255
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Restore AI memory
+        uses: actions/download-artifact@v4
+        with:
+          name: lone-pirate-eight-hour-1
+          path: lone-pirate-eko
+      - name: Syntax-check agent controller
+        run: python -m py_compile lone-pirate-eko/run_agent.py
+      - name: Check real model access
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          if [ -z "$GROQ_API_KEY" ]; then
+            echo "::error::Configure repository secret GROQ_API_KEY before running; no fake AI will be used."
+            exit 1
+          fi
+      - name: Install Clawblox
+        run: |
+          curl -fsSL https://clawblox.com/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Start embodied Clawblox world
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          clawblox run lone-pirate-eko --record --record-dir lone-pirate-eko/recordings > /tmp/clawblox.log 2>&1 &
+          echo $! > /tmp/clawblox.pid
+          for n in $(seq 1 60); do
+            if curl -fsS http://localhost:8080/api.md >/dev/null; then echo "Clawblox ready"; exit 0; fi
+            sleep 2
+          done
+          cat /tmp/clawblox.log
+          exit 1
+      - name: Run real LLM-controlled experiment
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_MODEL: ${{ vars.GROQ_MODEL || 'openai/gpt-oss-20b' }}
+          DURATION_MINUTES: ${{ '240' }}
+          MAX_CALLS: ${{ '50' }}
+          PAUSE_SECONDS: "300"
+          PIRATE_STAGE: "2"
+        run: python lone-pirate-eko/run_agent.py
+      - name: Save experiment record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lone-pirate-eight-hour-2
+          path: |
+            lone-pirate-eko/log.json
+            lone-pirate-eko/recordings/
+          if-no-files-found: warn
+      - name: Publish verified run log for website
+        if: always()
+        run: |
+          if [ ! -f lone-pirate-eko/log.json ]; then exit 0; fi
+          mkdir -p lone-pirate
+          cp lone-pirate-eko/log.json lone-pirate/latest.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lone-pirate/latest.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Record Lone Pirate experiment (no simulated data)"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin HEAD:"${GITHUB_REF_NAME}"
