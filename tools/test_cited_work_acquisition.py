@@ -46,6 +46,14 @@ class CitationContinuationTests(unittest.TestCase):
         self.assertEqual(reference_queries(text),['A historical article on maritime correspondence','Collected voyages in the Mediterranean'])
         self.assertEqual(reference_queries('He said «A historical bibliography of maritime correspondence».'),[])
 
+    def test_cited_chapter_also_searches_unquoted_containing_book(self):
+        entry='HACKE, W. 1699. “Mr. Roberts’s adventures among the corsairs of the Levant; his account of their way of living; description of the Archipelago islands, taking of Scio, & c.”, στο: W. HACKE (επιμ.), A Collection of Original Voyages, London, 1-53.'
+        queries=reference_queries(entry)
+        self.assertEqual(len(queries),2)
+        self.assertTrue(queries[0].startswith('Mr. Roberts'))
+        self.assertEqual(queries[1],'A Collection of Original Voyages')
+        self.assertEqual(reference_queries(entry.replace('στο:', 'in:').replace('(επιμ.)','(ed.)')),queries)
+
     def test_failed_pdf_continues_to_alternative_then_enters_normal_page_extraction(self):
         calls=[];results=[]
         def search(q,lane):

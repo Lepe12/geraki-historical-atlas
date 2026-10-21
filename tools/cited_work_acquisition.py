@@ -44,6 +44,17 @@ def reference_queries(text):
     # without quotation marks or a page range. It remains a discovery lead.
     entry=re.match(r"^[^\W\d_][^,;\d]{1,70},\s*(?:[^\W\d_]\.\s*){1,4}(?:1[5-9]|20)\d{2}\.\s+(.+)",text)
     if entry:
+        # A cited chapter can be indexed only under the containing book. Keep
+        # both discovery queries; a failed chapter search must not end the chase.
+        article=re.match(r'^[«“\"](.+?)[»”\"]',entry[1])
+        if article:
+            titles=[article[1].strip(' .,;')]
+            container=re.search(r'(?:στο|in)\s*:\s*.*?(?:\((?:επιμ\.?|eds?\.?)\)|\beds?\.)\s*,?\s*(.+)',
+                                entry[1][article.end():],re.I)
+            if container:
+                titles.append(container[1].split(',',1)[0].strip(' .,;'))
+            return list(dict.fromkeys(t for t in titles if 20<=len(t)<=300 and len(t.split())>=4
+                                      and '…' not in t and '...' not in t))[:3]
         title=re.split(r'\.\s+|,\s+[^,]{2,50}\.?$',entry[1],maxsplit=1)[0].strip(' .,;')
         if 20<=len(title)<=240 and len(title.split())>=4 and '…' not in title and '...' not in title:return [title]
     if not re.search(r'(?:\d{1,4}\s*[-–]\s*\d{1,4}|(?:pp?\.|σ\.|σελ\.)\s*\d{1,4})\s*[,.;]?$',text):return []
