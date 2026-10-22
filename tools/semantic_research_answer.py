@@ -22,7 +22,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parent/'llm'))
 from llm_client import call
 from llm_router import route, routing_summary
 import research_response_schema as schemas
-from section_extraction import read_acquired_text
+from section_extraction import read_acquired_text, long_s_variant
 from functools import lru_cache
 
 VERSION='pct-semantic-answer-v3'
@@ -511,10 +511,19 @@ def validate_items(payload, records, question_kind=None, requested_range=None):
                 if any(y not in permitted or int(y) not in row['years_in_scope'] for y in re.findall(r'(?<!\d)(1\d{3}|20\d{2})(?!\d)',statement)):
                     bad=True;break
                 entities[field]=valid_dates;continue
-            actual=[literal_entity_surface(v,quote) for v in vals]
+            actual=[];methods=[]
+            for v in vals:
+                surface=literal_entity_surface(v,quote);method='UNICODE_CASE_AND_WHITESPACE_ONLY'
+                # Early-modern print OCR reads the long s as 'f' (Capsi -> Capfi).
+                # Same bounded variant as section extraction; flagged, never silent.
+                if surface is None and field in ('actors','places') and long_s_variant(v):
+                    surface=literal_entity_surface(long_s_variant(v),quote);method='OCR_LONG_S_VARIANT'
+                actual.append(surface);methods.append(method)
             if any(v is None for v in actual):bad=True;break
             surface_corrections.extend({'field':field,'proposed':v,'source_surface':a,
-                'method':'UNICODE_CASE_AND_WHITESPACE_ONLY'} for v,a in zip(vals,actual) if v!=a)
+                'method':m} for v,a,m in zip(vals,actual,methods) if v!=a)
+            if 'OCR_LONG_S_VARIANT' in methods and 'OCR_LONG_S_NAME_VARIANT' not in field_issues:
+                field_issues.append('OCR_LONG_S_NAME_VARIANT')
             if field=='dates' and any(int(y) not in row['years_in_scope'] for v in vals for y in re.findall(r'(?<!\d)(1\d{3}|20\d{2})(?!\d)',v)):bad=True;break
             entities[field]=actual
         if bad:

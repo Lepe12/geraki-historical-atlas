@@ -12,7 +12,7 @@ from html import unescape
 from html.parser import HTMLParser
 from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, urlopen
-from research_focus import decompose, fold, retrieval_names, name_pattern, extended_name_after
+from research_focus import decompose, fold, retrieval_names, name_pattern, extended_name_after, long_s_variant
 
 IA_FTS='https://be-api.us.archive.org/ia-pub-fts-api'
 GREEK=dict(zip('αβγδεζηθικλμνξοπρστυφχψω',
@@ -279,7 +279,7 @@ def manifest_pool(root,request,discovery):
     return candidates[:6]
 
 
-def iiif_search(source,terms,out,deadline=None):
+def iiif_search(source,terms,out,deadline=None,focus=None):
     deadline=deadline or time.monotonic()+140
     manifest=get_json(source['url']);services=manifest.get('service') or []
     if isinstance(services,dict):services=[services]
@@ -290,7 +290,42 @@ def iiif_search(source,terms,out,deadline=None):
     canvases=(manifest.get('sequences') or [{}])[0].get('canvases') or manifest.get('items') or []
     canvas_map={c.get('@id') or c.get('id'):(i,c) for i,c in enumerate(canvases)}
     title=label(manifest.get('label'));rows={};attempts=[];page_cache={}
-    for term in terms[:6]:
+    queries=list(terms[:6])
+    if focus:
+        # Early-modern print OCR stores the long s as 'f' (MDZ: 'Capfi'), so
+        # also query the bounded long-s form of each Latin-script term.
+        seen={fold(t) for t in queries}
+        for term in terms[:6]:
+            variant=long_s_variant(term)
+            if variant and fold(variant) not in seen:queries.append(variant);seen.add(fold(variant))
+    def page_text_of(canvas_id,canvas):
+        if canvas_id not in page_cache:
+            links=canvas.get('seeAlso') or []
+            if isinstance(links,dict):links=[links]
+            text_url=next((x.get('@id') or x.get('id') for x in links if 'hocr' in str(x).lower() or '/ocr/' in str(x).lower()),None)
+            page_text=''
+            if text_url and time.monotonic()<deadline:
+                try:
+                    raw=get_bytes(text_url,limit=1_000_000);parser=PlainText();parser.feed(raw.decode('utf-8','replace'))
+                    page_text=' '.join(parser.parts);dest=out/('page-'+hashlib.sha256(canvas_id.encode()).hexdigest()[:16]+'.txt');dest.write_text(page_text)
+                except Exception:pass
+            page_cache[canvas_id]=page_text
+        return page_cache[canvas_id]
+    def make_row(canvas_id,index,canvas,excerpt,page_text):
+        printed=label(canvas.get('label'));page=re.match(r'^\s*(\d+)(?:\s|$)',printed)
+        images=canvas.get('images') or []
+        image=((images[0].get('resource') or {}).get('@id') if images else None)
+        publication=re.search(r'\b\d{4}\b',str(metadata(manifest,'date') or ''))
+        return rows.setdefault(canvas_id,{'identifier':canvas_id,'title':title,'date':[metadata(manifest,'date')],
+            'publication_year':int(publication.group()) if publication else None,
+            'url':image or canvas_id,'image_url':image,'manifest_url':source['url'],
+            'source_origin':source['provenance'],'discovery_repository':'IIIF Full Text',
+            'connector_status':'EXECUTED','fulltext_hit':True,'source_type':'OCR_CONTEXT',
+            'evidence_state':'EXACT_PAGE_MAPPED','canvas_id':canvas_id,'scan_index_0_based':index,
+            'printed_page':int(page.group(1)) if page else None,'page_label':printed,
+            'context_excerpt':excerpt,'fulltext_contexts':[page_text or excerpt],'matched_terms':[],
+            'original_inspected':False,'verified':False})
+    for term in queries:
         if time.monotonic()>deadline:
             attempts.append({'query':None,'status':'BUDGET_EXHAUSTED','hits':0,'detail':'Full-text coverage is partial.'});break
         url=service+('&' if '?' in service else '?')+urlencode({'q':term})
@@ -316,36 +351,65 @@ def iiif_search(source,terms,out,deadline=None):
                 index,canvas=canvas_map[canvas_id];printed=label(canvas.get('label'))
                 page=re.match(r'^\s*(\d+)(?:\s|$)',printed)
                 excerpt=unescape(str(hit.get('before',''))+str(hit.get('match',''))+str(hit.get('after','')))
-                if canvas_id not in page_cache:
-                    links=canvas.get('seeAlso') or []
-                    if isinstance(links,dict):links=[links]
-                    text_url=next((x.get('@id') or x.get('id') for x in links if 'hocr' in str(x).lower()),None)
-                    page_text=''
-                    if text_url and time.monotonic()<deadline:
-                        try:
-                            raw=get_bytes(text_url,limit=1_000_000);parser=PlainText();parser.feed(raw.decode('utf-8','replace'))
-                            page_text=' '.join(parser.parts);dest=out/('page-'+hashlib.sha256(canvas_id.encode()).hexdigest()[:16]+'.txt');dest.write_text(page_text)
-                        except Exception:pass
-                    page_cache[canvas_id]=page_text
-                images=canvas.get('images') or []
-                image=((images[0].get('resource') or {}).get('@id') if images else None)
-                page_text=page_cache[canvas_id]
+                page_text=page_text_of(canvas_id,canvas)
                 anchor=re.search(re.escape(str(hit.get('match',''))),page_text,re.I) if hit.get('match') and page_text else None
                 if anchor:excerpt=page_text[max(0,anchor.start()-160):anchor.end()+420]
-                publication=re.search(r'\b\d{4}\b',str(metadata(manifest,'date') or ''))
-                row=rows.setdefault(canvas_id,{'identifier':canvas_id,'title':title,'date':[metadata(manifest,'date')],
-                    'publication_year':int(publication.group()) if publication else None,
-                    'url':image or canvas_id,'image_url':image,'manifest_url':source['url'],
-                    'source_origin':source['provenance'],'discovery_repository':'IIIF Full Text',
-                    'connector_status':'EXECUTED','fulltext_hit':True,'source_type':'OCR_CONTEXT',
-                    'evidence_state':'EXACT_PAGE_MAPPED','canvas_id':canvas_id,'scan_index_0_based':index,
-                    'printed_page':int(page.group(1)) if page else None,'page_label':printed,
-                    'context_excerpt':excerpt,'fulltext_contexts':[page_text or excerpt],'matched_terms':[],
-                    'original_inspected':False,'verified':False})
+                row=make_row(canvas_id,index,canvas,excerpt,page_text)
                 passage=page_text or excerpt
                 if passage not in row['fulltext_contexts']:row['fulltext_contexts'].append(passage)
                 if term not in row['matched_terms']:row['matched_terms'].append(term)
+    if focus and focus.get('kind')=='person':
+        section_continuations(rows,canvases,focus,page_text_of,make_row,deadline,source['url'])
     return list(rows.values()),attempts
+
+
+SECTION_MAX_PAGES=6
+SECTION_UNNAMED_SLACK=2
+
+def _name_forms(name):
+    return [name,*([long_s_variant(name)] if long_s_variant(name) else [])]
+
+def page_names_target(text,focus):
+    """An attested full name (not a mechanical hypothesis) printed on the page."""
+    folded=fold(text)
+    return next((name for name in focus.get('names',[]) if len(name.split())>=2 and
+                 any(re.search(name_pattern(form.split()),folded) for form in _name_forms(name))),None)
+
+def page_has_surname(text,focus):
+    folded=fold(text)
+    surnames={name.split()[-1] for name in focus.get('names',[]) if len(name.split())>=2}
+    return any(re.search(r'(?<!\w)'+re.escape(fold(form))+r'(?!\w)',folded) for s in surnames for form in _name_forms(s))
+
+def section_continuations(rows,canvases,focus,page_text_of,make_row,deadline,manifest_url):
+    """Follow a chapter past the page that names the target in full.
+
+    Book chapters name a person once (heading/first line) and continue with the
+    surname. Pages after such an anchor page in the SAME manifest are kept as
+    leads while they carry the surname; at most SECTION_UNNAMED_SLACK pages
+    without it are bridged, and the walk stops after SECTION_MAX_PAGES. Every
+    such page is marked section_continuation; identity stays provisional and the
+    usual namesake/modern-document gates still apply downstream.
+    """
+    index_of={c.get('@id') or c.get('id'):i for i,c in enumerate(canvases)}
+    anchors=sorted((index_of[cid],cid,name) for cid,row in list(rows.items()) if cid in index_of
+                   for name in [page_names_target(' '.join(row.get('fulltext_contexts') or []),focus)] if name)
+    for start,anchor_id,name in anchors:
+        last_named=start
+        for index in range(start+1,min(len(canvases),start+1+SECTION_MAX_PAGES)):
+            if index-last_named>SECTION_UNNAMED_SLACK or time.monotonic()>deadline:break
+            canvas=canvases[index];cid=canvas.get('@id') or canvas.get('id')
+            text=page_text_of(cid,canvas)
+            if not text:break
+            if page_names_target(text,focus) and cid in rows:break  # next anchor takes over
+            surname=page_has_surname(text,focus)
+            if surname:last_named=index
+            rows_before=cid in rows
+            row=make_row(cid,index,canvas,text[:600],text)
+            if not rows_before:row['matched_terms']=[]
+            row.setdefault('section_continuation',{'anchor_canvas':anchor_id,'anchor_name':name,
+                'manifest_url':manifest_url,'pages_after_anchor':index-start,
+                'basis':'SURNAME_ON_PAGE' if surname else 'UNNAMED_PAGE_BRIDGED_WITHIN_SECTION',
+                'identity_verified':False})
 
 
 def run(root,request,ctx,lane='travellers',ia_enabled=True):
@@ -379,7 +443,7 @@ def run(root,request,ctx,lane='travellers',ia_enabled=True):
     for source in pool:
         if time.monotonic()-started>150:break
         try:
-            rows,queries=iiif_search(source,terms,out,started+150);records.extend(rows)
+            rows,queries=iiif_search(source,terms,out,started+150,focus);records.extend(rows)
             attempts.append({'repository':'IIIF Full Text','status':'EXECUTED' if any(q['status']=='EXECUTED' for q in queries) else 'FULLTEXT_SERVICE_UNAVAILABLE',
                 'hits':len(rows),'base_url':source['url'],'queries':queries})
         except Exception as exc:

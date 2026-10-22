@@ -130,6 +130,53 @@ class FulltextTests(unittest.TestCase):
                        'context_excerpt':'Pedro Lanza appears in this letter.'},identity(req,req))
         self.assertEqual(result['topical_match']['category'],'TARGET_MATCH')
 
+    def _chapter(self,pages,hits):
+        canvases=[{'@id':f'https://example.org/c/{i}','label':str(100+i),'seeAlso':{'@id':f'https://example.org/hocr/{i}','format':'text/vnd.hocr+html'},
+                   'images':[{'resource':{'@id':f'https://example.org/img/{i}.jpg'}}]} for i in range(len(pages))]
+        manifest={'label':'Histoire 1698','service':{'@id':'https://example.org/search','profile':'http://iiif.io/api/search/1/search'},
+                  'sequences':[{'canvases':canvases}]}
+        queried=[]
+        def get_json(url):
+            if url=='https://example.org/manifest':return manifest
+            q=url.split('q=')[1];queried.append(q)
+            found=[i for i in hits.get(q.lower(),[])]
+            return {'resources':[{'@id':f'a{i}','on':f'https://example.org/c/{i}'} for i in found],
+                    'hits':[{'annotations':[f'a{i}'],'match':q} for i in found]}
+        get_bytes=lambda url,limit=None:('<p>'+pages[int(url.rsplit('/',1)[1])]+'</p>').encode()
+        with tempfile.TemporaryDirectory() as td,patch('fulltext_discovery.get_json',side_effect=get_json),patch('fulltext_discovery.get_bytes',side_effect=get_bytes):
+            rows,_=iiif_search({'url':'https://example.org/manifest','provenance':'test'},['Capsi'],Path(td),focus=self.chapter_focus)
+        return {int(r['identifier'].rsplit('/',1)[1]):r for r in rows},queried
+
+    chapter_focus=decompose('Ιωάννης Καψής',['Jean Capsi'])
+
+    def test_long_s_query_variant_and_bounded_section_continuation(self):
+        pages=['Préface','JEAN CAPSI Roi de Milo.','Vive Capfi .','Capſi étoit fi aimé .','trois galéres .',
+               'il fut pendu l\'an 1680 .','Autre chapitre .','Hors chapitre .','Capfi encore .']
+        rows,queried=self._chapter(pages,{'capsi':[1],'capfi':[2,8]})
+        self.assertIn('Capfi',queried)
+        self.assertEqual(sorted(rows),[1,2,3,4,5,8])
+        self.assertNotIn('section_continuation',rows[1])
+        self.assertEqual(rows[3]['section_continuation']['basis'],'SURNAME_ON_PAGE')
+        self.assertEqual(rows[5]['section_continuation']['basis'],'UNNAMED_PAGE_BRIDGED_WITHIN_SECTION')
+        self.assertFalse(rows[5]['section_continuation']['identity_verified'])
+        self.assertNotIn('section_continuation',rows[8])  # distant surname-only hit stays ordinary
+
+    def test_no_continuation_without_full_name_anchor(self):
+        rows,_=self._chapter(['Vive Capfi .','Capfi encore .','suite .'],{'capfi':[0]})
+        self.assertEqual(sorted(rows),[0]);self.assertNotIn('section_continuation',rows[0])
+
+    def test_continuation_page_is_priority_lead_but_namesake_gates_remain(self):
+        req={'target':'Ιωάννης Καψής','aliases':['Jean Capsi'],'type':'person','date_range':'1670-1680'}
+        base={'title':'Histoire 1698','fulltext_hit':True,'manifest_url':'https://example.org/m','context_excerpt':'Capfi fut pendu en 1680.'}
+        mark={'anchor_canvas':'https://example.org/c/1','anchor_name':'Jean Capsi','manifest_url':'https://example.org/m'}
+        self.assertNotEqual(assess(base,identity(req,req))['status'],'PRIORITY')
+        lead=assess({**base,'section_continuation':mark},identity(req,req))
+        self.assertEqual(lead['status'],'PRIORITY')
+        self.assertIn('SECTION_CONTINUATION_OF_NAMED_PAGE_REQUIRES_IDENTITY_REVIEW',lead['reasons'])
+        self.assertNotEqual(assess({**base,'section_continuation':{**mark,'manifest_url':'https://other.org/m'}},identity(req,req))['status'],'PRIORITY')
+        modern={**base,'title':'Capsi Shipping Company annual report','context_excerpt':'Capsi shareholders dividends 1998','section_continuation':mark}
+        self.assertEqual(assess(modern,identity(req,req))['status'],'EXCLUDE_FROM_ACQUISITION')
+
     def test_iiif_preserves_later_passages_on_same_page(self):
         canvas='https://example.org/canvas/42'
         manifest={'label':'Book','service':{'@id':'https://example.org/search','profile':'http://iiif.io/api/search/1/search'},

@@ -226,6 +226,20 @@ def retrieval_names(focus):
     return list(dict.fromkeys(names))
 
 
+def long_s_variant(term):
+    """OCR of early-modern print reads the long s (ſ) as 'f'.
+
+    Saulger's 1698 'Jean Capſi' is OCR'd 'Jean Capfi', so the requested name
+    never matched the body text and only an all-caps heading survived. The
+    variant is a bounded search tolerance for Latin-script names: only a medial
+    lowercase s (the long s was never word-final). It never rewrites the quote,
+    and findings reached only through it carry OCR_LONG_S_NAME_VARIANT.
+    """
+    if re.search(r'[\u0370-\u03ff\u1f00-\u1fff]',str(term)):return None
+    variant=re.sub(r's(?=[^\W\d_])','f',str(term))
+    return variant if variant!=term else None
+
+
 def _token_pattern(name):
     """Bounded Greek inflection tolerance; no first-name-only identity match."""
     n=fold(name)

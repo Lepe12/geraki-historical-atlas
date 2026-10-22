@@ -11,7 +11,7 @@ import re
 from pathlib import Path
 from urllib.parse import urlsplit
 from candidate_context import variants, STRONG, ACTION
-from research_focus import decompose, fold, name_pattern, extended_name_after
+from research_focus import decompose, fold, name_pattern, extended_name_after, long_s_variant
 from research_relevance import contextual_years, later_namesake_requires_review
 
 YEAR = re.compile(r'(?<!\d)(1\d{3}|20\d{2})(?!\d)')
@@ -31,18 +31,11 @@ def matches(text, terms):
     surface=fold(re.sub(r'(?<=\w)[-\u00ad]\s*\r?\n\s*(?=\w)','',text))
     return [term for term in terms if re.search(name_pattern(term.split()),surface)]
 
-def long_s_variant(term):
-    """OCR of early-modern print reads the long s (ſ) as 'f'.
-
-    Saulger's 1698 'Jean Capſi' is OCR'd 'Jean Capfi', so the requested name
-    never matched the body text and only an all-caps heading survived. The
-    variant is a bounded search tolerance for Latin-script names: only a medial
-    lowercase s (the long s was never word-final). It never rewrites the quote,
-    and findings reached only through it carry OCR_LONG_S_NAME_VARIANT.
-    """
-    if re.search(r'[\u0370-\u03ff\u1f00-\u1fff]',str(term)):return None
-    variant=re.sub(r's(?=[^\W\d_])','f',str(term))
-    return variant if variant!=term else None
+def section_continuation(source):
+    value=(source or {}).get('section_continuation')
+    if not isinstance(value,dict) or not value.get('anchor_canvas') or not value.get('anchor_name'):return None
+    if value.get('manifest_url')!=(source or {}).get('manifest_url'):return None
+    return value
 
 def ocr_variant_matches(text, terms, found=()):
     """Terms absent from the surface text but present in their long-s OCR form."""
@@ -118,6 +111,9 @@ def extract_document(text, source, file, ctx):
     host=(urlsplit(str(source.get('url') or '')).hostname or '').lower()
     if any(host==h or host.endswith('.'+h) for h in SOCIAL):return []
     document_named=bool(matches(str(source.get('title') or ''),terms))
+    # Set by full-text discovery only for following pages of the same work after a
+    # page that names the target in full; a surname there stays provisional.
+    continuation=section_continuation(source)
     # A surname is a retrieval/association hypothesis, never established identity.
     surnames=list(dict.fromkeys(t.split()[-1] for t in terms if kind=='person' and len(t.split())>=2))
     year_heading=None
@@ -147,8 +143,8 @@ def extract_document(text, source, file, ctx):
                 body=re.split(r'\([^)]*(?:Θησαυρίσματα|[Bb]ibliograph|[Pp]ublication)',raw,maxsplit=1)[0]
         # A name hundreds of paragraphs earlier cannot identify a bare surname.
         near_topic=bool(topic and start-topic['locator']['end_char']<1600)
-        short=matches(body,surnames) if document_named or near_topic else []
-        if document_named or near_topic:
+        short=matches(body,surnames) if document_named or near_topic or continuation else []
+        if document_named or near_topic or continuation:
             ocr_short=ocr_variant_matches(body,surnames,short)
             ocr_names+=ocr_short;short=short+ocr_short
         other_name=False
@@ -201,7 +197,8 @@ def extract_document(text, source, file, ctx):
         if extended_name:uncertainties.append('EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW')
         if ocr_names:uncertainties.append('OCR_LONG_S_NAME_VARIANT')
         if section_heading:uncertainties.append('NAME_FROM_SECTION_HEADING')
-        if short and not direct and not document_named:uncertainties.append('SURNAME_IDENTITY_UNRESOLVED')
+        if short and not direct and not document_named and not continuation:uncertainties.append('SURNAME_IDENTITY_UNRESOLVED')
+        if short and not direct and continuation and not document_named:uncertainties.append('SURNAME_FROM_ADJACENT_NAMED_PAGE')
         if re.search(r'\b(?:εικαζ\w*|πιθανο\w*|perhaps|possibly|allegedly|hypoth\w*)\b',fold(body)):uncertainties.append('SOURCE_EXPRESSES_UNCERTAINTY')
         cite_pages=re.findall(r'(?:σελ\.|pp?\.)\s*(\d+(?:[-–]\d+)?)',raw,re.I)
         key=hashlib.sha256((file+'|'+str(start)+'|'+str(end)).encode()).hexdigest()[:20]

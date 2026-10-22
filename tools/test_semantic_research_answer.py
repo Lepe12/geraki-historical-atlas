@@ -69,6 +69,22 @@ class SemanticAnswer(unittest.TestCase):
         quote='Astypalaia provided provisions and plenty of safe anchorages for the corsairs.'
         self.assertIsNone(geographic_claim_hold_reason({'quote':quote,'places':['Astypalaia'],'usage_type':'ANCHORAGE'}))
 
+    def test_long_s_ocr_name_variant_is_accepted_only_with_uncertainty(self):
+        text='Le troifiéme fut Jean Capfi , Grec de Milo , qui fe fit Roi en 1677.'
+        row={'evidence_id':'e','text':text,'years_in_scope':[1677],'occurrences':[],'uncertainties':[]}
+        value=item('e',quote=text,statement='Ο Jean Capsi έγινε βασιλιάς το 1677.',actors=['Jean Capsi'],places=['Milo'],dates=['1677'])
+        accepted,rejected=validate_items({'items':[value]},[row],'person')
+        self.assertFalse(rejected);self.assertEqual(accepted[0]['actors'],['Jean Capfi'])
+        self.assertIn('OCR_LONG_S_NAME_VARIANT',accepted[0]['uncertainty'])
+        # A different name, or the variant applied to dates, still fails.
+        for change in ({'actors':['Jean Capsis']},{'actors':['Jean Kapsi']}):
+            self.assertEqual(validate_items({'items':[{**value,**change}]},[row],'person')[1][0]['reason'],'ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE')
+        dated=validate_items({'items':[{**value,'dates':['1678']}]},[row],'person')[0]
+        self.assertFalse(any('1678' in x.get('dates',[]) for x in dated))
+        exact=item('e',quote=text.replace('Capfi','Capsi'),actors=['Jean Capsi'],places=['Milo'],dates=['1677'])
+        plain={**row,'text':exact['quote']}
+        self.assertNotIn('OCR_LONG_S_NAME_VARIANT',validate_items({'items':[exact]},[plain],'person')[0][0]['uncertainty'])
+
     def test_explicit_source_century_outside_question_is_held_without_using_publication_dates(self):
         row={'evidence_id':'e','text':'The consulted source describes Milo as a corsair base in the14th century.',
              'years_in_scope':[],'occurrences':[],'uncertainties':[]}
