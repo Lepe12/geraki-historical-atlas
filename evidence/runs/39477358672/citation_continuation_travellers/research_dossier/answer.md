@@ -2,7 +2,7 @@
 
 Νέα πραγματική αναζήτηση πηγών για ορμητήρια, αγκυροβόλια και καταφύγια πειρατών και κουρσάρων στην Ανατολική Μεσόγειο, 1600–1700. Αναζήτησε σε όλες τις έντεκα οικογένειες πηγών, περιηγητές, portolans, σύγχρονα κείμενα, αρχεία και μεταγενέστερες μελέτες. Απόκτησε τα προσβάσιμα πραγματικά κείμενα. Για κάθε εύρημα δώσε ιστορικό τοπωνύμιο, σύγχρονη ταύτιση και γεωγραφική θέση μόνο όπου τεκμηριώνονται, χρονολογία, χρήστες, είδος χρήσης, ακριβή πηγή, σελίδα ή φύλλο ή αρχειακή αναφορά, ακριβές απόσπασμα, confidence και verification status. Ξεχώρισε αναφορά πηγής, ερμηνεία και υπόθεση, μεταγενέστερη μελέτη από πρωτογενές τεκμήριο και ορμητήριο από τόπο επιδρομής. Μην μετατρέπεις τη χρονολογία του ερωτήματος σε χρονολογία αχρονολόγητου γεγονότος. Δήλωσε απρόσιτα αρχεία και ανεξέταστο υλικό. Καμία αυτόματη ιστορική επαλήθευση. Κάνε νέα πραγματική απόκτηση πηγών. Μην χρησιμοποιήσεις παλιό κείμενο απάντησης. Μην εμφανίσεις εισαγωγικό placeholder ως εύρημα. Κάθε παράγραφος να περιγράφει συγκεκριμένο τόπο και χρήση που αναφέρει το παρατιθέμενο απόσπασμα.
 
-Εντοπίστηκαν 374 αποσπάσματα εντός της ζητούμενης περιόδου. Αποδίδονται στις πηγές τους και εκκρεμεί έλεγχος.
+Εντοπίστηκαν 384 αποσπάσματα εντός της ζητούμενης περιόδου. Αποδίδονται στις πηγές τους και εκκρεμεί έλεγχος.
 
 ## 1600 — Esclaves Chretiens, Maitres Musulmans.
 
@@ -143,6 +143,21 @@
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
+## 1600 — Pirates, Polities and Companies: Global Politics on the Konkan Littoral, c.1690-1756 *
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Gordon, The Marathas 1600-1818. p. 109.
+> Ibid. pp. 123-124.
+> 68
+> Biddulph, "The Pirates of Malabar." p. 38; Anonymous, An Authentick and Faithful
+> History of That Arch-Pyrate Tulagee Angria.. p. 28.
+> 67
+
+Πηγή: https://researchonline.lse.ac.uk/id/eprint/27888/1/WP136.pdf; αρχείο ea1897753b3638be7af05e1a.txt, γραμμές 891–896.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
 ## 1600 — Rodos’un Fethi Öncesinde (1499-1520) Akdeniz’de Hıristiyan Korsanlar
 
 Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
@@ -193,6 +208,35 @@
 Πηγή: https://makale.isam.org.tr/server/api/core/bitstreams/8789a8c9-de5d-4508-acf2-3252ecd15f48/content; αρχείο d662ae36ae6f25434a3b4e8c.txt, γραμμές 1475–1516.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION.
+
+## 1600 — Pirates, Polities and Companies: Global Politics on the Konkan Littoral, c.1690-1756 *
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Grant Duff, A History of the Mahrattas, 3 vols., vol. 1 (London: Longman, Rees,
+> Orme, Brown, & Green, 1826). pp. 416-417.
+> 43
+> For an overview of Maratha federal structures see chapter three in Surendra Nath
+> Sen, "District and Provincial Governments," in Administrative System of the Marathas
+> (Calcutta: University of Calcutta Press, 1923). p. 23; The zamindari system is too
+> complex to be summarised here. For a general overview see S. Nurul Hasan,
+> "Zamindars under the Mughals," in The Mughal State, 1526-1750, ed. Muzaffar Alam
+> and Sanjay Subrahmanyam (New Delhi: Oxford University Press, 2006; reprint, fifth).
+> pp. 284-298.
+> 44
+> Gordon, The Marathas 1600-1818. p. 34.
+> 45
+> H. G. Koenigsberger, "Monarchies and Parliament in Early Modern Europe:
+> Dominium Regale or Dominium Politicum Et Regale," Theory and Society 5, no. 2
+> (1978). p. 202.
+> 46
+> Janice Thomson, Mercenaries, Pirates, and Sovereigns: State-Building and
+> Extraterritorial Violence in Early Modern Europe (Princeton: Princeton University Press,
+> 1996). pp. 14-15.
+
+Πηγή: https://researchonline.lse.ac.uk/id/eprint/27888/1/WP136.pdf; αρχείο ea1897753b3638be7af05e1a.txt, γραμμές 677–696.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
 ## 1600, 1606 — Esclaves Chretiens, Maitres Musulmans.
 
@@ -262,6 +306,47 @@
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
+## 1600, 1613, 1700 — Pirates, Polities and Companies: Global Politics on the Konkan Littoral, c.1690-1756 *
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> ———. 'Indian Merchants and the Decline of Surat C. 1700-1750', in,
+> India and the Indian Ocean World: Trade and Politics, (New Delhi,
+> 2004).
+> ———. 'Malabar in Asian Trade 1740-1800', in, India and the Indian Ocan
+> World: Trade and Politics, (New Delhi, 2004).
+> Duff, G., A History of the Mahrattas. 3 vols. Vol. 1 (London, 1826).
+> Earle, P., The Pirate Wars (London, 2004).
+> Elliott, J. H. 'A Europe of Composite Monarchies', Past and Present 137,
+> no. 1 (1992), pp. 48-71.
+> Ertman, T., Birth of the Leviathan: Building States and Regimes in Early
+> Modern Europe (Cambridge, 1997).
+> Furber, H. 'Rival Empires of Trade in the Orient 1600-1800', in, Maritime
+> India, (New Delhi, 2004).
+> Gordon, S., The Marathas 1600-1818. Vol. II.4, The New Cambridge
+> History of India (Cambridge, 2006).
+> Gosse, P. 'A Pirate's Who's Who Giving Particulars of the Lives and
+> Deaths of Pirates and Buccaneers', in, (New York, Project
+> Gutenberg EBook #19564 edn., 1924).
+> ———, The History of Piracy (New York, 1932). Reprint, Dover 2007.
+> Hasan, S. N. 'Zamindars under the Mughals', in M. Alam and S.
+> Subrahmanyam eds., The Mughal State, 1526-1750, (New Delhi,
+> 2006), pp. 284-298.
+> Hume, D. 'Of the Original Contract', in E. F. Miller ed., Essays, Moral,
+> Political, and Literary, (Indianapolis, EBook edn., 1987).
+> Koenigsberger, H. G. 'Monarchies and Parliament in Early Modern
+> Europe: Dominium Regale or Dominium Politicum Et Regale',
+> Theory and Society 5, no. 2 (1978), pp. 191-217.
+> Low, C. R., History of the Indian Navy (1613-1863). 2 vols. Vol. I (London,
+> 1877).
+> Malgonkar, M., Kanhoji Angrey, Maratha Admiral: An Account of His Life
+> and His Battles with the English (London, 1959).
+> 42
+
+Πηγή: https://researchonline.lse.ac.uk/id/eprint/27888/1/WP136.pdf; αρχείο ea1897753b3638be7af05e1a.txt, γραμμές 1618–1649.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
 ## 1600, 1615, 1630 — Piracy in World History
 
 Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
@@ -290,6 +375,30 @@
 > and Maritime Violence in Southeast Asia (Cambridge: Cambridge University Press, 2019), 27-31.
 
 Πηγή: https://archive.org/details/oapen-20.500.12657-53019; αρχείο oapen-20.500.12657-53019_external_content_djvu.txt, γραμμές 316–318.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
+## 1600, 1700 — Pirates, Polities and Companies: Global Politics on the Konkan Littoral, c.1690-1756 *
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Gordon, The Marathas 1600-1818. p. 105.
+> Ashin Das Gupta, "Indian Merchants and the Decline of Surat C. 1700-1750," in India
+> and the Indian Ocean World: Trade and Politics (New Delhi: Oxford University Press,
+> 2004). pp. 157-159.
+> 53
+> Malgonkar, Kanhoji Angrey, Maratha Admiral. p. 119.
+> 54
+> Sen, Early Career of Kanhoji Angria. p. 27.
+> 55
+> Biddulph, "The Pirates of Malabar." p. 37.
+> 56
+> Downing, A History of the Indian Wars. p. 8.
+> 57
+> Ibid. p. 9.
+> 52
+
+Πηγή: https://researchonline.lse.ac.uk/id/eprint/27888/1/WP136.pdf; αρχείο ea1897753b3638be7af05e1a.txt, γραμμές 766–780.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
@@ -921,6 +1030,41 @@
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
+## 1612 — Pirates, Polities and Companies: Global Politics on the Konkan Littoral, c.1690-1756 *
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> suppliers to relocate to other more secure markets. Furthermore, the tolls
+> charged at sea and on land routes were high which cut into traders’
+> bottom lines. 73 Insecurity on land raised transaction costs and disrupted
+> the economy. Meanwhile competition between polities over sovereignty,
+> expressed politically through the cartaz, also raised transaction costs
+> because merchants had to purchase several passes if they were to trade
+> unmolested.
+> Third, there were personal considerations. Company employees
+> were paid meagre wages that they made up for through the private trade
+> they were allowed to carry out in the Company’s vessels. 74 All levels of
+> employees were active in this kind of trade. For many, especially those in
+> the highest positions, this was how fortunes were made. 75 Considering
+> that Angria’s actions could result in the loss of not only Company, but also
+> of personal trade goods, personnel in all levels of the Company would
+> have wanted to make the coast secure from paying additional duties or
+> from the risk of ship’s seizure, especially if as a result it led to regional
+> maritime hegemony where everyone could possibly partake in the
+> benefits.
+> Politically the English were unwilling to accept the sovereignty of
+> another state over the coastal seas. The Company had been in the region
+> since the establishment of their factory at Surat in 1612. The Company
+> had since effectively squeezed out other European powers, such as the
+> Portuguese, and grown to become the recognised maritime power by the
+> Mughals and other lesser potentates in the region. For example, after a
+> series of depredations by European pirates that included British pirates
+> 73
+
+Πηγή: https://researchonline.lse.ac.uk/id/eprint/27888/1/WP136.pdf; αρχείο ea1897753b3638be7af05e1a.txt, γραμμές 943–968.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
 ## 1612 — Piracy in World History
 
 Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
@@ -931,6 +1075,31 @@
 > of 1612, 1.1, ch. 4, 33.
 
 Πηγή: https://archive.org/details/oapen-20.500.12657-53019; αρχείο oapen-20.500.12657-53019_external_content_djvu.txt, γραμμές 1754–1757.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
+## 1613 — Pirates, Polities and Companies: Global Politics on the Konkan Littoral, c.1690-1756 *
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> For examples see, Duff, History of the Mahrattas, Vol. 1. 1826; Low, History of the
+> Indian Navy (1613-1863), 1877; and Orme, Military Transactions of the British Nation in
+> Indostan, 1861.
+> 8
+> Philip Gosse, "A Pirate's Who's Who Giving Particulars of the Lives and Deaths of
+> Pirates and Buccaneers," (New York: Burt Franklin, 1924). p. 13.
+> 9
+> Philip Gosse, The History of Piracy (New York: Dover, 1932; reprint, Dover 2007). pp.
+> 244-252.
+> 10
+> For example see, Manohar Malgonkar, Kanhoji Angrey, Maratha Admiral: An
+> Account of His Life and His Battles with the English (London: Asia Publishing House,
+> 1959).
+> 11
+> Dilnaz Boga, "I.N.S. Angre to Celebrate Golden Jubilee," in The Times of India
+> (Mumbai: India Times, 4 September 2001).
+
+Πηγή: https://researchonline.lse.ac.uk/id/eprint/27888/1/WP136.pdf; αρχείο ea1897753b3638be7af05e1a.txt, γραμμές 210–225.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
@@ -4626,6 +4795,34 @@
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
+## 1660 — Pirates, Polities and Companies: Global Politics on the Konkan Littoral, c.1690-1756 *
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Secondary Sources
+> Abernathy, D., The Dynamics of Global Dominance: European Overseas
+> Empires, 1415-1980 (New Haven, 2000).
+> Anonymous. 'History of Angria the Pirate', in, The Scots Magazine,
+> (Edinburgh, 1756), pp. 21-25.
+> Benton, L. 'Legal Spaces of Empire: Piracy and the Origins of Ocean
+> Regionalism', Comparative Studies in Society and History 47, no. 4
+> (2005), pp. 700-724.
+> Biddulph, J. 'The Pirates of Malabar, and an Englishwoman in India Two
+> Hundred Years Ago', in, (London, The Project Gutenberg EBook
+> #11399 edn., 1907).
+> Chaudhuri, K. N., The Trading World of Asia and the English East India
+> Company 1660-1760 (Cambridge, 1978).
+> ———, Trade and Civilisation in the Indian Ocean: An Economic History
+> from the Rise of Islam (Cambridge, 1985).
+> Das Gupta, A. 'Some Problems of Reconstructing the History of India's
+> West Coast from European Sources', in, Merchants of Maritime
+> India, 1500-1800, (Aldershot, 1994), pp. 174-182.
+> 41
+
+Πηγή: https://researchonline.lse.ac.uk/id/eprint/27888/1/WP136.pdf; αρχείο ea1897753b3638be7af05e1a.txt, γραμμές 1598–1616.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
 ## 1660 — Piracy in World History
 
 Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
@@ -6755,6 +6952,18 @@
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
+## 1690 — Pirates, Polities and Companies: Global Politics on the Konkan Littoral, c.1690-1756 *
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Pirates, Polities and Companies: Global Politics on the Konkan
+> Littoral, c. 1690-1756
+> Derek L. Elliott
+
+Πηγή: https://researchonline.lse.ac.uk/id/eprint/27888/1/WP136.pdf; αρχείο ea1897753b3638be7af05e1a.txt, γραμμές 1962–1964.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
 ## 1690, 1694, 1698 — Piracy in World History
 
 Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
@@ -6934,6 +7143,40 @@
 > 60  See Arne Bialuschewski, ‘Between Newfoundland and the Malacca strait: a survey of the golden age of piracy, 1695–1725’, Mariner’s Mirror, 90, 2004, pp. 167–86.
 
 Πηγή: https://www.cambridge.org/core/journals/journal-of-global-history/article/abs/even-in-the-remotest-corners-of-the-world-globalized-piracy-and-international-law-15001900/B50A43C944DDB189D7FA2E5FC79B843D; αρχείο b8894a6d308ff9158c262dce.txt, γραμμές 1320–1320.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
+## 1695 — Pirates, Polities and Companies: Global Politics on the Konkan Littoral, c.1690-1756 *
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Henry Every seizing the richly laden Ganj-I Sawai in 1695, the largest
+> ship of the Surat merchant fleet and three years later William Kidd
+> capturing the Quedah Merchant, a high Mughal court official’s ship, a
+> diplomatic debacle ensued that had been brewing for years between the
+> Mughals and the EIC. The end result of which was the agreement that the
+> Company would undertake responsibility for the operation of a convoy in
+> order to ensure the safe passage of Mughal shipping in and out of Surat
+> and the Konkan coastline against the attacks of European pirates.
+> Historian Laura Benton argues that by accepting the agreement the
+> EIC recognised implicitly Mughal regional dominance on terra firma while
+> conversely the Mughals, by utilising the Company for maritime security
+> reciprocally legitimised the Company’s sovereignty on the high seas. 76
+> However, the EIC was not the only polity to be held responsible for the
+> native merchants’ losses, so too was the Dutch East India Company who
+> also operated a factory in Surat. 77 Rather than the Mughals bowing to
+> European naval and military superiority Das Gupta contends that the
+> Mughals considered the Europeans to be of little consequential threat. 78
+> Only five years previously they had trounced the English in a war and
+> perceived no long-term disadvantages in coercing the Europeans to
+> accept trading privileges on Mughal terms. Furthermore, by
+> opportunistically making the European companies absorb the bulk of the
+> price for protecting native ships and trade wares the authorities in Surat
+> externalised partly the transaction costs of their powerful merchant
+> backers. The Mughals would find that they had overplayed their hand.
+> The EIC was able to flex its naval might through a blockade of Surat that
+
+Πηγή: https://researchonline.lse.ac.uk/id/eprint/27888/1/WP136.pdf; αρχείο ea1897753b3638be7af05e1a.txt, γραμμές 982–1006.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
@@ -7321,6 +7564,22 @@
 > end around 1730."
 
 Πηγή: https://archive.org/details/oapen-20.500.12657-53019; αρχείο oapen-20.500.12657-53019_external_content_djvu.txt, γραμμές 935–949.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
+## 1700 — Pirates, Polities and Companies: Global Politics on the Konkan Littoral, c.1690-1756 *
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Lauren Benton, "Legal Spaces of Empire: Piracy and the Origins of Ocean
+> Regionalism," Comparative Studies in Society and History 47, no. 4 (2005). p. 716.
+> 77
+> Das Gupta, "Indian Merchants and the Decline of Surat C. 1700-1750," in India and
+> the Indian Ocean World: Trade and Politics, pp. 113-114.
+> 78
+> Ibid. pp. 74.
+
+Πηγή: https://researchonline.lse.ac.uk/id/eprint/27888/1/WP136.pdf; αρχείο ea1897753b3638be7af05e1a.txt, γραμμές 1010–1016.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
