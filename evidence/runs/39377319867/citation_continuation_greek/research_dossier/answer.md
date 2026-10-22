@@ -2,7 +2,7 @@
 
 Νέα πραγματική αναζήτηση πηγών για ορμητήρια, αγκυροβόλια και καταφύγια πειρατών και κουρσάρων στην Ανατολική Μεσόγειο, 1600–1700. Αναζήτησε σε όλες τις έντεκα οικογένειες πηγών, περιηγητές, portolans, σύγχρονα κείμενα, αρχεία και μεταγενέστερες μελέτες. Απόκτησε τα προσβάσιμα πραγματικά κείμενα. Για κάθε εύρημα δώσε ιστορικό τοπωνύμιο, σύγχρονη ταύτιση και γεωγραφική θέση μόνο όπου τεκμηριώνονται, χρονολογία, χρήστες, είδος χρήσης, ακριβή πηγή, σελίδα ή φύλλο ή αρχειακή αναφορά, ακριβές απόσπασμα, confidence και verification status. Ξεχώρισε αναφορά πηγής, ερμηνεία και υπόθεση, μεταγενέστερη μελέτη από πρωτογενές τεκμήριο και ορμητήριο από τόπο επιδρομής. Μην μετατρέπεις τη χρονολογία του ερωτήματος σε χρονολογία αχρονολόγητου γεγονότος. Δήλωσε απρόσιτα αρχεία και ανεξέταστο υλικό. Καμία αυτόματη ιστορική επαλήθευση.
 
-Εντοπίστηκαν 82 αποσπάσματα εντός της ζητούμενης περιόδου. Αποδίδονται στις πηγές τους και εκκρεμεί έλεγχος.
+Εντοπίστηκαν 86 αποσπάσματα εντός της ζητούμενης περιόδου. Αποδίδονται στις πηγές τους και εκκρεμεί έλεγχος.
 
 ## 1600 — Vol. 14. The Archaeology of Piracy in Antiquity: Proceedings of the International Hybrid Conference held under the auspices of the Department of History and Archaeology of the University of Athens (October 5-6, 2023)
 
@@ -31,6 +31,76 @@
 Πηγή: https://nepub.lib.uoa.gr/index.php/aura/article/download/2979/2345; αρχείο bad2f54f36da12ea92871556.txt, γραμμές 10748–10766.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
+## 1600 — Seafaring and Seafarers in the Bronze Age Eastern Mediterranean
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Prestige and Interest: International Relations in the Near East ca. 1600-1100
+> BC. Padova: Sargon Press.
+> 1998
+> How to kill Abdi-Ashirta. EA 101, once again. In S. Isre’el, I. Singer and R.
+> Zadok (eds), Past Links. Studies in the Languages and Cultures of the Ancient
+> Near East, 387-394. Winona Lake, Indiana: Eisenbrauns.
+> 2001
+> International Relations in the Ancient Near East ca. 1600-1100 BC. New York:
+> Palgrave.
+> 2004
+> Myth and Politics in Ancient Near Eastern Historiography. London: Equinox.
+> 2014
+> The Ancient Near East: History, Society and Economy. London and New York:
+> Routledge.
+> Lolos, Y.G.
+> 1999
+> The cargo of pottery from the Point Iria wreck: character and implications. In
+> W. Phelps, Y. Lolos and Y. Vichos (eds), The Point Iria Wreck: Interconnections
+> in the Mediterranean ca. 1200 BC, 43-58. Athens: Hellenic Institute of
+> Marine Archaeology.
+> López-Bertran, M., A. Garcia-Ventura and M. Krueger
+> 2008
+> Could you take a picture of my boat, please? The use and significance of
+> Mediterranean ship representations. Oxford Journal of Archaeology 27:
+> 341-357.
+> Luraghi, N.
+> 2006
+> Traders, pirates, warriors: the proto-history of Greek mercenary soldiers in
+> the eastern Mediterranean. Phoenix 60: 21-47.
+> McCaslin, D.
+> 1978
+> The 1977 underwater report. Hala Sultan Tekke 4. Studies in Mediterranean
+> Archaeology 45(4): 97-157. Göteborg: P. Åström’s Förlag.
+> 1980
+> Stone Anchors in Antiquity: Coastal Settlements and Maritime Trade-Routes
+> in the Eastern Mediterranean ca.1600-1050 B.C. Studies in Mediterranean
+> Archaeology 61. Göteborg P. Åström’s Förlag.
+> McGeough, K. M.
+> 2007
+> Exchange Relationships at Ugarit. Ancient Near Eastern Studies, Supplement
+> 26. Leuven: Peeters.
+> 2015
+> ‘What is not in my house you must give me’: agents of exchange according to
+> the textual evidence from Ugarit. In B. Eder and R. Pruzsinszky (eds), Policies
+> of Exchange: Political Systems and Modes of Interaction in the Aegean and the
+> Near East in the 2nd Millennium B.C.E. Oriental and European Archaeology
+> 2: 85-96. Vienna: Österreichische Akademie der Wissenschaften.
+> MacGillivray, J.A.
+> 1998
+> Knossos: Pottery Groups of the Old Palace Period. British School at Athens,
+> Studies 5. London: British School at Athens.
+> McGovern, P.E.
+> 1997
+> Wine of Egypt’s golden age: an archaeochemical perspective. Journal of
+> Egyptian Archaeology 83: 69-108.
+> 1998
+> Wine for eternity. Archaeology 51(4): 28-34.
+> 2000
+> The Foreign Relations of the ‘Hyksos’: A Neutron Activation Study of Middle
+> Bronze Age Pottery from the Eastern Mediterranean. British Archaeological
+> Reports, International Series 888. Oxford: Archaeopress.
+
+Πηγή: https://www.sidestone.com/openaccess/9789088905544.pdf; αρχείο 2a6234d51294ba8105a7b7d7.txt, γραμμές 11593–11653.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION.
 
 ## 1600, 1680, 1684, 1690, 1694, 1699 — Aspects de l’intendance des Vénitiens dans l’Archipel au cours de la guerre de Morée (1684-1699)
 
@@ -1398,6 +1468,69 @@
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION.
 
+## 1678, 1689 — Seafaring and Seafarers in the Bronze Age Eastern Mediterranean
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Blue, L.K.
+> 1997
+> Cyprus and Cilicia: the typology and palaeogeography of second millennium
+> harbours. In S. Swiny, R. Hohlfelder and H. W. Swiny (eds), Res Maritimae:
+> Cyprus and the Eastern Mediterranean from Prehistory through the Roman
+> Period. Cyprus American Archaeological Research Institute, Monograph 1:
+> 31-44. Atlanta: ASOR/Scholars Press.
+> Boileau, M.-C., L. Badre, E. Capet, R. Jung and H. Mommsen
+> 2010
+> Foreign ceramic tradition, local clays: the Handmade Burnished Ware of Tell
+> Kazel (Syria). Journal of Archaeological Science 37: 1678–1689.
+> Bolger, D.
+> 2013
+> A matter of choice: Cypriot interactions with the Levantine mainland during
+> the late 4th–3rd millennium BC. Levant 45: 1-18.
+> Bombardieri, L.
+> 2017
+> Erimi-Laonin tou Porakou: A Middle Bronze Age Community in Cyprus.
+> Excavations 2008-2014. Studies in Mediterranean Archaeology 145. Uppsala:
+> Åström Editions.
+> Bonn-Muller, E.
+> 2010
+> First Minoan shipwreck. Archaeology 63(1): 44.
+> Bono, S.
+> 2013
+> Pirateria, guerra e schiavitù nella storia del Mediterraneo. In N. Jaspert and
+> S. Kolditz (eds), Seeraub in Mittelmeerraum: Piraterie, Korsarentum und
+> Maritime Gewalt von der Antike bis zur Neuzeit. Mittelmeerstudien 3: 39-46.
+> Paderborn, Germany: Wilhelm Fink/Ferdinand Schöningh.
+> Bony, G., N. Carayon, C. Flaux, N. Marriner, C. Morhange and S. Fourrier
+> 2016
+> Évolution paléoenvironnementale de la baie de Kition: mise en évidence d’un
+> possible environnement portuaire (Larnaca, Chypre). In C. Sanchez and M.P. Jézégou (eds), Les ports dans l’espace méditerranéen antique: Narbonne et
+> les systèmes portuaires fluvio-lagunaires. Revue Archéologique de Narbonnaise,
+> Supplément 44: 369-379. Montpellier-Lattes: Éditions de l’Association de la
+> Revue archéologique de Narbonnaise.
+> Bordreuil, P. (ed.)
+> 1991
+> Une bibliothéque au sud de la ville. Les textes de la 34e campagne. Ras ShamraOugarit 7. Paris: Éditions Recherche sur les Civilisations.
+> Bordreuil, P., J. and E. Lagarce, A. Bounni and N. Saliby
+> 1984
+> Les découvertes archéologiques et épigraphiques de Ras Ibn Hani (Syrie)
+> en 1983: un lot d’archivs administratives. Académie des Inscriptions et BellesLettres: Comptes-Rendus des Séances (Avril-June): 393-438.
+> Bordreuil, P., D. Pardee and R. Hawley
+> 2012
+> Une bibliothèque au sud de la ville 3. Textes 1994-2002 en cunéiforme
+> alphabétique de la maison d’Ourtenou. Ras Shamra-Ougarit 18. Lyon:
+> Publications de la Maison de l’Orient et de la Méditerranée.
+> Bounni, A.
+> 1991
+> La Syrie, Chypre et l’Égée d’après les fouilles de Ras ibn Hani. In V.
+> Karageorghis (ed.), Proceedings of an International Symposium: The Civilizations
+> of the Aegean and Their Diffusion in Cyprus and the Eastern Mediterranean,
+> 2000-600 BC, 105-110. Larnaca: Pierides Foundation.
+
+Πηγή: https://www.sidestone.com/openaccess/9789088905544.pdf; αρχείο 2a6234d51294ba8105a7b7d7.txt, γραμμές 9738–9791.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION.
+
 ## 1679 — Occasioned by the death of Creveliers off Astypalaia: The island's role in the raids by Catholic corsairs during the 17th century
 
 Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
@@ -1687,6 +1820,58 @@
 > 19 BNF, Fr. 7168, P. de Girardin à Louis XIV, 10 mars 1687, f. 80r.
 
 Πηγή: https://helios.eie.gr/helios/bitstream/10442/18086/1/%ce%93.%ce%9a%ce%bf%cf%85%cf%84%ce%b6%ce%b1%ce%ba%ce%b9%cf%8e%cf%84%ce%b7%cf%82_%ce%b1%cf%81.2.pdf; αρχείο 463fbe5c92be1974a16fca18.txt, γραμμές 330–360.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION.
+
+## 1686, 1688 — Seafaring and Seafarers in the Bronze Age Eastern Mediterranean
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> The site of Tell Kazel, situated today some 3 km inland from the Syrian coast, is
+> strategically located at the only pass between the mountain chains of the Lebanon–
+> anti-Lebanon to the south and Gebel al-Ansariyeh to the north; it thus forms
+> the main passage between inland Syria and the Mediterranean coast. It has been
+> argued that Tell Kazel should be identified with the port town of Ṣumur (Dunand
+> and Saliby 1957; Klengel 1984), a key LB centre in the kingdom of Amurru, which
+> stretched east-west from the Orontes River to the Mediterranean, and north-south
+> at least from Arwad to Tripoli (Moran 1992: 388; cf. Stieglitz 1991; for a more
+> detailed breakdown of the still-controversial extent of the territory of Amurru, see
+> Altman 2014: 13 n.13). Ṣumur is mentioned in Tuthmosis III’s Annals and in the
+> Amarna tablets (EA 98, 104, 105), the latter with reference to ships bound for
+> the port and a naval blockade against it (Moran 1992: 171, 178‑180; see above,
+> Chapter 2—Merchants, Mariners and Pirates). Throughout the fourteenth and
+> early thirteenth centuries BC, the Egyptians and Hittites struggled for control over
+> Amurru, with victory finally passing to the Hittites after the epic battle at Kadesh
+> (Van de Mieroop 2007: 36‑40).
+> Excavations at Tell Kazel have produced a large number (over 4000 sherds—
+> Capet 2006‑07: 187) of imported Cypriot pottery — White Slip, Base-ring,
+> Monochrome, White Shaved, etc. (Badre 2006: 67‑71, 77, 80‑82; 2011: 206‑209,
+> 211‑212, 214) and significant amounts of Late Helladic (LH) IIIA and LH IIIB
+> wares (Badre 2006: 71‑74, 77‑80, 82; 2011: 209‑213, 214‑216; Jung 2006, 2011).
+> I leave aside here any discussion of the contentious origin(s) of two other wares
+> found at the site: Handmade Burnished Ware (Capet 2006‑07; Boileau et al. 2010)
+> and ‘Grey Ware’ (Badre 2006: 87‑88; 2011: 219), the latter defined elsewhere as
+> being of ‘Trojan’, i.e. northwest Anatolian, origin (Allen 1991, 1994; cf. Boileau
+> et al. 2010: 1686‑1688). Mountjoy and Mommsen (2015) have recently assigned
+> Cypriot origins to various vessels found at Tell Kazel, from a jug thought to
+> originate in Sinda to a ‘simple’ style stirrup jar and piriform jar sherds from Kition/
+> Hala Sultan Tekke or Palaipaphos.
+> Although neither the excavators nor the pottery specialists working at Tell
+> Kazel report on any maritime transport containers at the site, Pedrazzi (2007: 368;
+> 2010: 54) argued that fully preserved forms of her Type 4 Canaanite jars (dated
+> to the very end of the LB) are common at Tell Kazel, which may even have been a
+> centre for their production. Moreover, petrographic and chemical analyses (ICPAES and ICP-MS — Inductively coupled plasma-atomic emission and plasmamass spectroscopy) of Canaanite jar sherds from Kom Rabia (near Memphis, at the
+> apex of the Nile Delta), revealed four distinctive compositional groups, the most
+> northerly of which was the area around Tell Kazel and Tell Arqa (Ownby 2010:
+> 178; Ownby and Bourriau 2009: 177‑181; Ownby and Smith 2011). Finally, Late
+> Cypriot pithoi (Groups IB1, II) have been found on shipwrecks and at several
+> sites throughout the Aegean and eastern Mediterranean including, in Syria, at Tell
+> Kazel and Ugarit as well as its port Minet el-Beidha (Pilides 2000: 48‑51; Jeremy
+> Rutter, pers. comm.). Whilst the primary purpose of these pithoi was storage, some
+> may have served at times for the bulk transport of organic materials or liquids
+> (Knapp and Demesticha 2017: 88‑93).
+
+Πηγή: https://www.sidestone.com/openaccess/9789088905544.pdf; αρχείο 2a6234d51294ba8105a7b7d7.txt, γραμμές 5273–5315.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION.
 
@@ -2504,6 +2689,72 @@
 > Ward, A.M. 1975. “Caesar and the Pirates.” CP 70:267–8.
 
 Πηγή: https://nepub.lib.uoa.gr/index.php/aura/article/download/2979/2345; αρχείο bad2f54f36da12ea92871556.txt, γραμμές 13246–13268.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION.
+
+## 1700 — Seafaring and Seafarers in the Bronze Age Eastern Mediterranean
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Raymond, A.
+> 2005
+> Importing culture at Miletus: Minoans and Anatolians at Middle Bronze
+> Age Miletus. In R. Laffineur and E. Greco (eds), Emporia: Aegeans in the
+> Central and Eastern Mediterranean. Aegaeum 25 (1): 185-191. Liège, Austin:
+> Université de Liège, University of Texas at Austin.
+> Redford, D.B.
+> 1997
+> Textual sources for the Hyksos period. In E.D. Oren (ed.), The Hyksos: New
+> Historical and Archaeological Perspectives. University Museum Monograph 96.
+> University Museum Symposium Series 8: 1-44. Philadelphia: University
+> Museum, University of Pennsylvania.
+> 2000
+> Egypt and western Asia in the late New Kingdom: an overview. In E.D.
+> Oren (ed.), The Sea Peoples and Their World: A Reassessment. University
+> Museum Monograph 108. University Museum Symposium Series 11: 1-20.
+> Philadelphia: University Museum, University of Pennsylvania.
+> Rediker, M.
+> 1987
+> Between the Devil and the Deep Blue Sea: Merchants, Seamen, Pirates, and
+> the Anglo-American Maritime World 1700-1750. Cambridge: Cambridge
+> University Press.
+> Reese, D.S., H.K. Mienis and F.R. Woodward
+> 1986
+> On the trade of shells and fish from the Nile River. Bulletin of the American
+> Schools of Oriental Research 264: 79-84.
+> Reese, D., and M.J. Rose
+> 2002
+> Organic remains from the island and adjacent areas. In D. White, Marsa
+> Matruh II: The Objects. Institute for Aegean Prehistory, Monograph 2: 73108. Philadelphia: Institute for Aegean Prehistory Academic Press.
+> Reisner, G. A.
+> 1913
+> Models of Ships and Boats. Cairo: Institut français d’archéologie orientale.
+> Renfrew, A.C.
+> 2003
+> Figuring it Out: The Parallel Visions of Artists and Archaeologists. London:
+> Thames and Hudson.
+> Renson, V., D. Ben-Shlomo, J. Coenaerts, K. Charbit-Nataf, M. Samaes, N.
+> Mattielli, K. Nys and Ph. Claeys
+> 2014
+> Coupling lead isotope analysis and petrography to characterize fabrics of
+> storage and trade containers from Hala Sultan Tekke (Cyprus). Archaeometry
+> 56: 261–278.
+> Rice, P.M.
+> 2015
+> Pottery Analysis: A Sourcebook. Second edition. Chicago: University of Chicago
+> Press.
+> Rich, S., S.W. Manning, P. Degryse, F. Vanhaecke, K. Latruwe and K. Van
+> Lerberghe
+> 2016
+> To put a cedar ship in a bottle: dendroprovenancing three ancient East
+> Mediterranean watercraft with the 87Sr/86Sr isotope ratio. Journal of
+> Archaeological Science: Reports 9: 514-521.
+> Riis, P.J.,
+> 1948
+> Les cimetières à crémation. Hama, fouilles et recherches 1931-1938, vol. 2:3.
+> Copenhagen: Nordisk Verlag.
+
+Πηγή: https://www.sidestone.com/openaccess/9789088905544.pdf; αρχείο 2a6234d51294ba8105a7b7d7.txt, γραμμές 12526–12582.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION.
 
