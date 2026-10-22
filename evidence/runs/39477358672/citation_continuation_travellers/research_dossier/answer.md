@@ -2,7 +2,7 @@
 
 Νέα πραγματική αναζήτηση πηγών για ορμητήρια, αγκυροβόλια και καταφύγια πειρατών και κουρσάρων στην Ανατολική Μεσόγειο, 1600–1700. Αναζήτησε σε όλες τις έντεκα οικογένειες πηγών, περιηγητές, portolans, σύγχρονα κείμενα, αρχεία και μεταγενέστερες μελέτες. Απόκτησε τα προσβάσιμα πραγματικά κείμενα. Για κάθε εύρημα δώσε ιστορικό τοπωνύμιο, σύγχρονη ταύτιση και γεωγραφική θέση μόνο όπου τεκμηριώνονται, χρονολογία, χρήστες, είδος χρήσης, ακριβή πηγή, σελίδα ή φύλλο ή αρχειακή αναφορά, ακριβές απόσπασμα, confidence και verification status. Ξεχώρισε αναφορά πηγής, ερμηνεία και υπόθεση, μεταγενέστερη μελέτη από πρωτογενές τεκμήριο και ορμητήριο από τόπο επιδρομής. Μην μετατρέπεις τη χρονολογία του ερωτήματος σε χρονολογία αχρονολόγητου γεγονότος. Δήλωσε απρόσιτα αρχεία και ανεξέταστο υλικό. Καμία αυτόματη ιστορική επαλήθευση. Κάνε νέα πραγματική απόκτηση πηγών. Μην χρησιμοποιήσεις παλιό κείμενο απάντησης. Μην εμφανίσεις εισαγωγικό placeholder ως εύρημα. Κάθε παράγραφος να περιγράφει συγκεκριμένο τόπο και χρήση που αναφέρει το παρατιθέμενο απόσπασμα.
 
-Εντοπίστηκαν 369 αποσπάσματα εντός της ζητούμενης περιόδου. Αποδίδονται στις πηγές τους και εκκρεμεί έλεγχος.
+Εντοπίστηκαν 374 αποσπάσματα εντός της ζητούμενης περιόδου. Αποδίδονται στις πηγές τους και εκκρεμεί έλεγχος.
 
 ## 1600 — Esclaves Chretiens, Maitres Musulmans.
 
@@ -1969,6 +1969,16 @@
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
+## 1621 — ‘Even in the remotest corners of the world’: globalized piracy and international law, 1500–1900
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> 44  ‘Als piratten en slijmer als zeerovers’: Pieter van den Broecke, ‘Journaal, Oktober 1621’, in W. P. Coolhaas (ed.), Pieter van den Broecke in Azië, vol. 2, The Hague: Martinus Nijhoff, 1963, p. 263.
+
+Πηγή: https://www.cambridge.org/core/journals/journal-of-global-history/article/abs/even-in-the-remotest-corners-of-the-world-globalized-piracy-and-international-law-15001900/B50A43C944DDB189D7FA2E5FC79B843D; αρχείο b8894a6d308ff9158c262dce.txt, γραμμές 1192–1192.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
 ## 1621, 1622, 1628 — The book of pirates
 
 Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
@@ -2029,6 +2039,16 @@
 > Journal of World History 15, no. 4 (2004): 414-444.
 
 Πηγή: https://archive.org/details/oapen-20.500.12657-53019; αρχείο oapen-20.500.12657-53019_external_content_djvu.txt, γραμμές 9387–9389.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
+## 1621, 1662 — ‘Even in the remotest corners of the world’: globalized piracy and international law, 1500–1900
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> 45  See Tonio Andrade, ‘The Company’s Chinese pirates: how the Dutch East India Company tried to lead a coalition of pirates to war against China, 1621–1662’, Journal of World History, 15, 4, 2004, pp. 415–44.
+
+Πηγή: https://www.cambridge.org/core/journals/journal-of-global-history/article/abs/even-in-the-remotest-corners-of-the-world-globalized-piracy-and-international-law-15001900/B50A43C944DDB189D7FA2E5FC79B843D; αρχείο b8894a6d308ff9158c262dce.txt, γραμμές 1200–1200.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
@@ -3637,6 +3657,16 @@
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
+## 1640, 1684 — ‘Even in the remotest corners of the world’: globalized piracy and international law, 1500–1900
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> 55  [Alexandre Exquemelin], Bucaniers of America, London: William Crooke, 1684–85, pp. 33–9. On cooperation between pirates and the native Indian population, see also Ignacio J. Gallup-Diaz, The door of the seas and the key to the universe: Indian politics and imperial rivalry in the Darién, 1640–1750, New York: Columbia University Press, 2005, pp. 53–74.
+
+Πηγή: https://www.cambridge.org/core/journals/journal-of-global-history/article/abs/even-in-the-remotest-corners-of-the-world-globalized-piracy-and-international-law-15001900/B50A43C944DDB189D7FA2E5FC79B843D; αρχείο b8894a6d308ff9158c262dce.txt, γραμμές 1280–1280.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
 ## 1640, 1684 — Piracy in World History
 
 Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
@@ -5241,6 +5271,16 @@
 > 25 - Liste des bâtiments « que les corsaires d’Alger ont pris depuis la rupture » 1673-74 (A.C.C.M
 
 Πηγή: https://archive.org/details/mb.-marine-et-marins-alger; αρχείο mb.-marine-et-marins-alger_MB.Marine_et_Marins_Alger_djvu.txt, γραμμές 23319–23319.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
+## 1674 — ‘Even in the remotest corners of the world’: globalized piracy and international law, 1500–1900
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> 49  Anon., News from sea or, the takeing of the cruel pirate, being a full and true relation how Captain Cewsicke, alias Dixon, alias Smith, an Irish-pyrate took an English ship of 500 tuns called the Saint Anne, London: R. W., 1674, p. 1.
+
+Πηγή: https://www.cambridge.org/core/journals/journal-of-global-history/article/abs/even-in-the-remotest-corners-of-the-world-globalized-piracy-and-international-law-15001900/B50A43C944DDB189D7FA2E5FC79B843D; αρχείο b8894a6d308ff9158c262dce.txt, γραμμές 1232–1232.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
@@ -6884,6 +6924,16 @@
 > Baldwin, 1694).
 
 Πηγή: https://archive.org/details/oapen-20.500.12657-53019; αρχείο oapen-20.500.12657-53019_external_content_djvu.txt, γραμμές 3957–3961.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
+## 1695 — ‘Even in the remotest corners of the world’: globalized piracy and international law, 1500–1900
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> 60  See Arne Bialuschewski, ‘Between Newfoundland and the Malacca strait: a survey of the golden age of piracy, 1695–1725’, Mariner’s Mirror, 90, 2004, pp. 167–86.
+
+Πηγή: https://www.cambridge.org/core/journals/journal-of-global-history/article/abs/even-in-the-remotest-corners-of-the-world-globalized-piracy-and-international-law-15001900/B50A43C944DDB189D7FA2E5FC79B843D; αρχείο b8894a6d308ff9158c262dce.txt, γραμμές 1320–1320.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
