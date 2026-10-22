@@ -1,0 +1,35 @@
+name: Research eval scorer
+on:
+  pull_request:
+    paths:
+      - 'evaluation/**'
+      - '.github/workflows/research-eval-scorer.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'evaluation/**'
+      - '.github/workflows/research-eval-scorer.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scorer-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /evaluation/
+            /command-center/live/runs/39546422037.json
+            /command-center/live/runs/39477311589.json
+            /command-center/live/runs/39240619780.json
+            /command-center/live/runs/39304929906.json
+            /command-center/live/runs/39304933066.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Unit tests (offline, no network, no backend calls)
+        run: python -m unittest discover -s evaluation -p 'test_*.py' -v
