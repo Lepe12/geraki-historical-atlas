@@ -1,0 +1,329 @@
+/* NABOU//X — nautical edition (17th-century portolan / sea-chart look).
+   Loaded after chamber.css and nabou-shell.css: it changes appearance only (textures, type, colour,
+   frames, the chart and its wax seals). Layout rules of the shell are kept. */
+
+@font-face { font-family: "NX Garamond"; src: url(./assets/nautical/fonts/EBGaramond.woff2) format("woff2"); font-weight: 400 800; font-display: swap; size-adjust: 106%; }
+@font-face { font-family: "NX Garamond"; src: url(./assets/nautical/fonts/EBGaramond-Italic.woff2) format("woff2"); font-weight: 400 800; font-style: italic; font-display: swap; size-adjust: 106%; }
+@font-face { font-family: "NX Cinzel"; src: url(./assets/nautical/fonts/Cinzel.woff2) format("woff2"); font-weight: 400 900; font-display: swap; }
+@font-face { font-family: "NX Cinzel Deco"; src: url(./assets/nautical/fonts/CinzelDecorative-Bold.woff2) format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "NX Fell"; src: url(./assets/nautical/fonts/IMFell.woff2) format("woff2"); font-display: swap; }
+@font-face { font-family: "NX Fell"; src: url(./assets/nautical/fonts/IMFell-Italic.woff2) format("woff2"); font-style: italic; font-display: swap; }
+@font-face { font-family: "NX Fell SC"; src: url(./assets/nautical/fonts/IMFellSC.woff2) format("woff2"); font-display: swap; }
+
+:root {
+  /* Cinzel and IM Fell have no Greek: Greek text falls through to EB Garamond. */
+  --nx-body: "NX Garamond", "EB Garamond", Georgia, "Times New Roman", serif;
+  --nx-caps: "NX Cinzel", "NX Garamond", Georgia, serif;
+  --nx-mono: "NX Garamond", Georgia, serif;
+  --nx-fell: "NX Fell", "NX Garamond", Georgia, serif;
+  --oak: #140d08; --leather: #22160e; --leather2: #2c1d12; --leather3: #3a2716;
+  --ink: #2a190e; --ink2: #4a3320;
+  --parch: #ecdfbf; --parch2: #d9c59a; --parch3: #c4ab7a;
+  --brass: #b48d45; --brass2: #e3c57e; --brass3: #7d6030;
+  --verd: #5b8a73; --verd2: #86b19a;
+  --ox: #7b1c17; --ox2: #a3342a; --ox3: #4c0e0b;
+  --txt: #ecdcb6; --dim: #c9b48a;
+  color-scheme: dark;
+}
+body.nxs-active {
+  --surface: #22160e; --border: #5c4327; --text: #ecdcb6; --muted: #cdb88e; --cyan: #e3c57e;
+  font: 16px/1.55 var(--nx-body);
+  font-variant-numeric: oldstyle-nums proportional-nums;
+  background: #0b0705;
+}
+.nxs-active ::selection { background: rgba(163, 52, 42, 0.55); color: #fff6e0; }
+.nxs-active * { scrollbar-color: var(--brass3) rgba(20, 13, 8, 0.6); scrollbar-width: thin; }
+.nxs-active :focus-visible { outline: 2px dashed var(--brass2); outline-offset: 3px; }
+
+/* ---------- table: oak desk under the chart ---------- */
+#app {
+  background:
+    radial-gradient(ellipse 70% 60% at 55% 45%, rgba(150, 95, 40, 0.18), transparent 70%),
+    linear-gradient(rgba(14, 9, 5, 0.55), rgba(10, 6, 4, 0.72)),
+    url(./assets/nautical/img/oak.jpg) center / cover;
+}
+.grain { opacity: 0.06 !important; mix-blend-mode: multiply; }
+.vignette { background: radial-gradient(ellipse at 52% 48%, transparent 55%, rgba(0, 0, 0, 0.55) 100%) !important; pointer-events: none; }
+.lamp-light {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: radial-gradient(ellipse 55% 50% at 55% 45%, rgba(255, 200, 120, 0.07), transparent 70%);
+  animation: lamp 7s ease-in-out infinite alternate;
+}
+@keyframes lamp { from { opacity: 0.7; } to { opacity: 1; } }
+
+/* ---------- chart stage ---------- */
+.chart-stage { position: absolute; inset: 0; z-index: 1; overflow: hidden; cursor: grab; touch-action: none; outline: none; }
+.chart-stage.dragging { cursor: grabbing; }
+.chart-stage:focus-visible { outline: 2px dashed var(--brass2); outline-offset: -6px; }
+.chart-plane {
+  position: absolute; left: 0; top: 0; transform-origin: 0 0; /* no will-change: a permanent layer stalls software rasterisers on small screens */
+  background: #efe3c4;
+  box-shadow: 0 0 0 3px #2a190e, 0 0 0 7px #b48d45, 0 0 0 9px #4c3417, 0 0 0 16px #1d130b, 0 0 0 17px rgba(180, 141, 69, 0.55), 0 30px 80px 20px rgba(0, 0, 0, 0.75);
+}
+.chart-plane svg.chart { display: block; width: 100%; height: 100%; }
+#universe { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; pointer-events: none; background: none !important; }
+#universe:active { cursor: inherit; }
+.chart .seabase { fill: url(#pp); }
+.chart .seawash { fill: #f6efd9; fill-opacity: 0.42; }
+.chart .rh { fill: none; stroke-width: 0.6; }
+.chart .rh.k { stroke: rgba(42, 25, 14, 0.3); }
+.chart .rh.g { stroke: rgba(60, 115, 90, 0.32); }
+.chart .rh.r { stroke: rgba(150, 40, 30, 0.26); }
+.chart .wlines { fill: none; stroke: #3d2714; stroke-width: 1; stroke-linejoin: round; }
+.chart .wlines .ripple { fill: none; }
+.chart .landbase { fill: url(#pl); }
+.chart .coastwash { fill: none; stroke: #6e8a5a; stroke-width: 3.2; stroke-opacity: 0.32; }
+.chart .coast { fill: none; stroke: #24150b; stroke-width: 1; stroke-linejoin: round; }
+.chart .mt { fill: #e2cc9c; fill-opacity: 0.6; stroke: #3a2414; stroke-width: 0.9; }
+.chart .mth { stroke: #3a2414; stroke-width: 0.6; opacity: 0.7; }
+.chart text { font-family: "NX Fell", Georgia, serif; }
+.chart .sea { font-style: italic; font-size: 17px; fill: rgba(42, 25, 14, 0.72); text-anchor: middle; letter-spacing: 1px; }
+.chart .sea.big { font-size: 27px; letter-spacing: 6px; fill: rgba(42, 25, 14, 0.6); }
+.chart .sea.sm { font-size: 14px; }
+.chart .sea.xs { font-size: 11px; }
+.chart .land { font-family: "NX Cinzel", serif; font-weight: 600; font-size: 15px; letter-spacing: 6px; fill: rgba(123, 28, 23, 0.72); text-anchor: middle; }
+.chart .land.sm { font-size: 12.5px; letter-spacing: 4.5px; }
+.chart .land.xs { font-size: 10.5px; letter-spacing: 2.5px; }
+.chart .rring { fill: rgba(236, 223, 191, 0.35); stroke: #2a190e; stroke-width: 0.8; }
+.chart .rring.t { fill: none; stroke-width: 0.5; stroke-dasharray: 1.5 1.5; }
+.chart .pk { fill: #2a190e; } .chart .pk.s { fill: #efe3c4; stroke: #2a190e; stroke-width: 0.5; }
+.chart .pg { fill: #4f7d68; } .chart .pg.s { fill: #a9c6b2; stroke: #2f5242; stroke-width: 0.4; }
+.chart .pr { fill: #7b1c17; } .chart .pr.s { fill: #d28a78; stroke: #5c120e; stroke-width: 0.4; }
+.chart .pg2 { fill: #9a7a3c; } .chart .pg2.s { fill: #e3cf9a; stroke: #6b5228; stroke-width: 0.3; }
+.chart .rhub { fill: #b48d45; stroke: #2a190e; stroke-width: 0.8; }
+.chart .fleur path, .chart .fleur rect { fill: #7b1c17; stroke: #3c0a08; stroke-width: 0.8; }
+.chart .cross path { fill: #2a190e; }
+.chart .pic { opacity: 0.9; }
+.chart .scale .b { fill: #2a190e; } .chart .scale .w { fill: #efe3c4; } .chart .scale .o { fill: none; stroke: #2a190e; stroke-width: 0.7; }
+.chart .sc { font-style: italic; font-size: 13px; fill: #2a190e; text-anchor: middle; }
+.chart .scn { font-size: 10px; fill: #2a190e; text-anchor: middle; }
+.chart .cart-ring { fill: rgba(239, 227, 196, 0.35); stroke: #2a190e; stroke-width: 1.2; }
+.chart .cart-ring.t { fill: none; stroke-width: 0.6; stroke-dasharray: 3 3; }
+.chart .neat { fill: none; stroke: #2a190e; stroke-width: 3; }
+.chart .rose .rose-spin { transform-box: fill-box; transform-origin: center; }
+body[data-core-state="PLANNING"] .chart .core-rose .rose-spin { animation: rose-spin 14s linear infinite; }
+body[data-core-state="ACTIVE"] .chart .core-rose .rose-spin { animation: rose-spin 6s linear infinite; }
+body[data-core-state="BLOCKED"] .chart .core-rose .rhub { fill: #7b1c17; }
+@keyframes rose-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .chart .rose .rose-spin, .lamp-light { animation: none !important; } }
+
+/* ---------- wax seals (one per research lane) ---------- */
+.node-seals { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.nxs-active .node-seal, .nxs-active .core-hit {
+  position: absolute; left: 0; top: 0; pointer-events: auto;
+  min-height: 0; padding: 0; border: 0; background: none; border-radius: 50%;
+}
+.nxs-active .node-seal { width: 30px; height: 30px; margin: -15px 0 0 -15px; }
+.node-seal.offscreen, .core-hit.offscreen { visibility: hidden; }
+.seal-wax {
+  position: absolute; inset: 2px; display: grid; place-items: center;
+  border-radius: 48% 52% 46% 54% / 53% 47% 53% 47%;
+  background: radial-gradient(circle at 36% 30%, #d4614a 0%, #8e231b 45%, #5a110d 82%);
+  box-shadow: 0 2px 4px rgba(40, 10, 5, 0.65), inset 0 -1px 2px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 190, 160, 0.25);
+  transition: transform 0.18s;
+}
+.seal-wax::before { content: ""; position: absolute; inset: 5px; border-radius: 50%; border: 1px solid rgba(40, 6, 4, 0.55); box-shadow: 0 0 0 1px rgba(255, 170, 140, 0.15); }
+.seal-mono { position: relative; font: 700 12px/1 var(--nx-body); color: rgba(255, 222, 200, 0.82); text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.55); }
+.node-seal.science .seal-wax { background: radial-gradient(circle at 36% 30%, #f0d48c 0%, #b48d45 48%, #6e5222 85%); }
+.node-seal.science .seal-mono { color: rgba(60, 36, 10, 0.85); text-shadow: 0 1px 0 rgba(255, 240, 200, 0.4); }
+.node-seal:hover .seal-wax, .node-seal:focus-visible .seal-wax { transform: scale(1.18); }
+.node-seal.selected .seal-wax { transform: scale(1.25); box-shadow: 0 0 0 2px #efe3c4, 0 0 0 4px var(--brass), 0 3px 6px rgba(0, 0, 0, 0.6); }
+.node-seal[data-activity="active"] .seal-wax { animation: wax 1.6s ease-out infinite; }
+.node-seal[data-status="ABSENT"] .seal-wax { filter: grayscale(0.75) brightness(0.9); opacity: 0.7; }
+@keyframes wax { 0% { box-shadow: 0 2px 3px rgba(40, 10, 5, 0.6), 0 0 0 0 rgba(123, 28, 23, 0.8); } 100% { box-shadow: 0 2px 3px rgba(40, 10, 5, 0.6), 0 0 0 16px rgba(123, 28, 23, 0); } }
+.seal-count {
+  position: absolute; right: -9px; top: -7px; min-width: 18px; height: 16px; padding: 0 4px;
+  border-radius: 8px; background: #efe3c4; border: 1px solid #2a190e; color: #2a190e;
+  font: 600 11px/14px var(--nx-body); font-variant-numeric: lining-nums; text-align: center;
+}
+.nxs-active .core-hit { cursor: pointer; }
+.nxs-active .core-hit:hover { box-shadow: 0 0 0 2px rgba(180, 141, 69, 0.6) inset; }
+
+/* ---------- lane labels: small parchment cartouches ---------- */
+.nxs-active #nodeLabels { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.nxs-active .node-label {
+  position: absolute; left: 0; top: 0; transform: none !important; pointer-events: auto;
+  display: block; min-height: 0; width: max-content; max-width: 230px; padding: 3px 9px 4px;
+  text-align: left; white-space: nowrap; border-radius: 2px; opacity: 1;
+  font: 600 13px/1.25 var(--nx-body); letter-spacing: 0.01em; color: var(--ink);
+  background: linear-gradient(rgba(244, 234, 208, 0.95), rgba(232, 218, 182, 0.95));
+  border: 1px solid rgba(42, 25, 14, 0.75);
+  box-shadow: 0 0 0 2px rgba(239, 227, 196, 0.55), 0 2px 5px rgba(20, 10, 4, 0.35);
+}
+.nxs-active .node-label::before { display: none; }
+.nxs-active .node-label.science { border-color: rgba(125, 96, 48, 0.9); }
+.nxs-active .node-label small {
+  display: block; margin-top: 1px; font: italic 500 11px/1.25 var(--nx-body); letter-spacing: 0; color: #5b3f22;
+  text-transform: none;
+}
+.nxs-active .node-label.compact small { display: none; }
+.nxs-active .node-label:hover, .nxs-active .node-label.selected { border-color: var(--ox); background: #fbf3dc; }
+.nxs-active .node-label.selected .nl-name { color: var(--ox); }
+.nxs-active .node-label.active { box-shadow: 0 0 0 2px rgba(163, 52, 42, 0.6), 0 2px 5px rgba(20, 10, 4, 0.35); }
+.nxs-active .node-label.unplaced { visibility: hidden; }
+
+/* ---------- shared panel look: dark leather in brass ---------- */
+.nxs-active .nxs-workspace, .nxs-active .results-drawer, .nxs-active .learning-panel,
+.nxs-active .activity-strip, .nxs-active .detail-panel, .nxs-active .operator-command, .nxs-active .workspace-welcome {
+  background:
+    linear-gradient(180deg, rgba(43, 29, 18, 0.95), rgba(26, 17, 10, 0.97)),
+    url(./assets/nautical/img/oak.jpg) center / 600px;
+  border: 1px solid rgba(180, 141, 69, 0.6);
+  box-shadow: inset 0 0 0 3px rgba(20, 13, 8, 0.9), inset 0 0 0 4px rgba(180, 141, 69, 0.28), 0 14px 34px rgba(0, 0, 0, 0.6);
+  border-radius: 3px;
+  color: var(--txt);
+}
+.nxs-active .nxs-identity, .nxs-active .nxs-dock {
+  background: linear-gradient(rgba(16, 10, 6, 0.9), rgba(24, 16, 10, 0.92)), url(./assets/nautical/img/oak.jpg) center / 700px;
+  border-color: rgba(180, 141, 69, 0.42);
+}
+.nxs-active .nxs-identity { box-shadow: 0 1px 0 rgba(0, 0, 0, 0.8), 0 6px 18px rgba(0, 0, 0, 0.45); }
+.nxs-identity-mark {
+  border-radius: 50% !important; border: 1px solid var(--brass) !important; color: var(--brass2) !important;
+  font: 700 11px var(--nx-caps) !important; letter-spacing: 0.05em;
+  background: radial-gradient(circle at 40% 35%, #3a2716, #140d08);
+  box-shadow: inset 0 0 0 3px #140d08, inset 0 0 0 4px rgba(180, 141, 69, 0.5);
+}
+.nxs-identity strong { font: 700 21px/1.1 "NX Cinzel Deco", var(--nx-caps); letter-spacing: 0.18em !important; color: var(--parch); text-shadow: 0 1px 0 #000, 0 0 14px rgba(227, 197, 126, 0.18); }
+.nxs-identity span { font: italic 14px var(--nx-body) !important; color: var(--dim) !important; letter-spacing: 0.04em; }
+.nxs-status strong { font: 600 14px var(--nx-body) !important; font-variant-numeric: lining-nums tabular-nums; color: var(--parch); }
+.nxs-status small { font-size: 12.5px !important; }
+.nxs-status-dot { background: var(--ox2) !important; box-shadow: 0 0 0 2px rgba(163, 52, 42, 0.25); }
+body[data-research-ui="LIVE"] .nxs-status-dot { background: #6f9a62 !important; box-shadow: 0 0 0 2px rgba(111, 154, 98, 0.3); }
+
+/* Πορεία (activity) opener, beside the clock */
+.nxs-active .nxs-activity-open {
+  position: absolute; z-index: 42; top: 17px; right: 214px; min-height: 40px; padding: 6px 14px;
+  display: inline-flex; align-items: center; gap: 8px;
+  font: 600 14px var(--nx-body); letter-spacing: 0.06em; color: var(--parch);
+  background: linear-gradient(rgba(58, 39, 22, 0.95), rgba(34, 22, 14, 0.95)); border: 1px solid rgba(180, 141, 69, 0.6); border-radius: 3px;
+}
+.nxs-activity-open svg { width: 18px; height: 18px; fill: none; stroke: var(--brass2); stroke-width: 1.6; }
+.nxs-activity-open[aria-current="page"] { border-color: var(--brass2); box-shadow: inset 0 -2px 0 var(--ox2); }
+
+/* ---------- dock ---------- */
+.nxs-active .nxs-dock button { background: transparent; border: 1px solid transparent; border-radius: 3px; color: #d6c296; font: 600 15px var(--nx-body); letter-spacing: 0.04em; }
+.nxs-active .nxs-dock button:hover { background: rgba(58, 39, 22, 0.75); border-color: rgba(180, 141, 69, 0.45); }
+.nxs-active .nxs-dock button[aria-current="page"] {
+  color: var(--parch); border-color: rgba(180, 141, 69, 0.7);
+  background: linear-gradient(90deg, rgba(123, 28, 23, 0.55), rgba(58, 39, 22, 0.6));
+  box-shadow: inset 3px 0 0 var(--ox2), inset 0 0 0 1px rgba(20, 13, 8, 0.8);
+}
+.nxs-active .nxs-dock svg { stroke: var(--brass2) !important; }
+
+/* ---------- welcome cartouche ---------- */
+.nxs-active .workspace-welcome { padding: 14px 18px 12px; background: linear-gradient(rgba(244, 234, 208, 0.94), rgba(229, 214, 177, 0.94)); color: var(--ink); border-color: rgba(42, 25, 14, 0.8); box-shadow: 0 0 0 3px rgba(239, 227, 196, 0.5), 0 8px 22px rgba(0, 0, 0, 0.45); }
+.nxs-active .workspace-welcome > span { color: var(--ox) !important; font: 600 12px var(--nx-body) !important; letter-spacing: 0.22em !important; }
+.nxs-active .workspace-welcome h1 { color: var(--ink) !important; font: 600 27px/1.2 var(--nx-body) !important; letter-spacing: 0.01em; }
+.nxs-active .workspace-welcome p { color: #4d3520 !important; font: italic 16px/1.45 var(--nx-body) !important; }
+
+/* ---------- headings, indices ---------- */
+.nxs-index { font: 700 13px var(--nx-caps) !important; color: var(--brass2) !important; border-color: rgba(180, 141, 69, 0.55) !important; border-radius: 50% !important; }
+.nxs-active .results-head span, .nxs-active .nxs-workspace-title h1, .nxs-active .learning-head strong, .nxs-active .activity-head > div > span, .nxs-active .detail-panel h2 {
+  font-family: var(--nx-body) !important; font-weight: 600 !important; color: var(--parch) !important; letter-spacing: 0.02em;
+}
+.nxs-active .results-head small, .nxs-active .nxs-workspace-title span, .nxs-active .learning-head span, .nxs-active .activity-head small, .nxs-active .detail-type, .nxs-active .detail-head span {
+  font-family: var(--nx-body) !important; color: var(--brass2) !important; letter-spacing: 0.2em !important; font-size: 12px !important;
+}
+.nxs-active h2, .nxs-active h3 { font-family: var(--nx-body); color: var(--parch); }
+
+/* ---------- buttons ---------- */
+.nxs-active button { background: linear-gradient(rgba(58, 39, 22, 0.95), rgba(40, 27, 17, 0.95)); border: 1px solid rgba(180, 141, 69, 0.5); color: var(--txt); border-radius: 3px; }
+.nxs-active button:hover:not(:disabled) { background: linear-gradient(rgba(74, 51, 30, 0.95), rgba(52, 35, 21, 0.95)); border-color: var(--brass2); }
+.nxs-active button[aria-pressed="true"], .nxs-active .nxs-workspace-toolbar button.active { background: linear-gradient(rgba(123, 28, 23, 0.85), rgba(90, 20, 15, 0.9)); border-color: var(--brass2); color: #fff3dc; }
+/* principal actions read as red sealing wax */
+.nxs-active #executeQuery, .nxs-active .detail-action, .nxs-active .learning-analyze, .nxs-active #learningSave, .nxs-active .run-picker button[type="submit"], .nxs-active #exportResults {
+  background: radial-gradient(120% 140% at 35% 25%, #c24a38 0%, #8e231b 50%, #5a110d 100%);
+  border: 1px solid #3c0a08; color: #fff0d8; font-weight: 600; letter-spacing: 0.04em;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.45);
+  box-shadow: 0 2px 5px rgba(30, 6, 3, 0.55), inset 0 1px 0 rgba(255, 190, 160, 0.25), inset 0 -2px 3px rgba(0, 0, 0, 0.35);
+  border-radius: 999px;
+}
+.nxs-active #executeQuery:hover:not(:disabled), .nxs-active .detail-action:hover, .nxs-active .learning-analyze:hover:not(:disabled), .nxs-active #learningSave:hover:not(:disabled), .nxs-active .run-picker button[type="submit"]:hover, .nxs-active #exportResults:hover:not(:disabled) {
+  background: radial-gradient(120% 140% at 35% 25%, #d65a45 0%, #a3342a 50%, #6a150f 100%); border-color: #3c0a08;
+}
+
+/* ---------- inputs: parchment slips with ink ---------- */
+.nxs-active input, .nxs-active select, .nxs-active textarea, .nxs-active #operatorQuery {
+  background: linear-gradient(rgba(246, 238, 216, 0.97), rgba(234, 221, 188, 0.97)) !important;
+  color: var(--ink) !important; border: 1px solid rgba(42, 25, 14, 0.7) !important; border-radius: 2px !important;
+  font-family: var(--nx-body) !important; box-shadow: inset 0 1px 3px rgba(60, 35, 15, 0.25);
+}
+.nxs-active input::placeholder, .nxs-active textarea::placeholder { color: #7a6040 !important; font-style: italic; }
+.nxs-active select option { background: #f3e8cc; color: var(--ink); }
+.nxs-active input[type="file"] { background: transparent !important; color: var(--txt) !important; border: 1px dashed rgba(180, 141, 69, 0.6) !important; box-shadow: none; }
+.nxs-active .learning-file::file-selector-button { font: 600 14px var(--nx-body); color: var(--ink); background: var(--parch2); border: 1px solid var(--ink); border-radius: 2px; padding: 6px 10px; margin-right: 10px; }
+
+/* ---------- composer ---------- */
+.nxs-active .operator-command-label span { color: var(--brass2) !important; font: 600 15px var(--nx-body) !important; letter-spacing: 0.12em; text-transform: uppercase; }
+.nxs-active .operator-command-label small { color: var(--dim) !important; font: italic 14px var(--nx-body) !important; }
+.nxs-active .operator-command.is-error .operator-command-label small { color: #f0a08c !important; }
+.nxs-active .operator-command.is-pending .operator-command-label small { color: var(--brass2) !important; }
+.nxs-active .command-prompt { color: var(--ox2) !important; font-family: var(--nx-fell); }
+.nxs-active .query-help { color: var(--dim) !important; font-style: italic; }
+
+/* ---------- 3D-tools → chart controls ---------- */
+.nxs-active .nxs-3d-tools button {
+  display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #f1dc9e, #b48d45 55%, #6e5222 100%);
+  border: 1px solid #3a2716; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.55), inset 0 0 0 3px rgba(60, 40, 15, 0.35);
+}
+.nxs-active .nxs-3d-tools button svg { width: 24px; height: 24px; fill: none; stroke: #2a190e; stroke-width: 1.7; stroke-linecap: round; }
+.nxs-active .nxs-3d-tools #resetView svg path { fill: #2a190e; stroke: none; }
+.nxs-active .nxs-3d-tools button:hover { background: radial-gradient(circle at 38% 32%, #fbe9b2, #c79d52 55%, #7d6030 100%); }
+.nxs-active .nxs-telemetry { font: italic 13px var(--nx-body) !important; color: var(--dim) !important; font-variant-numeric: lining-nums tabular-nums; }
+.nxs-active .nxs-telemetry b { color: var(--parch) !important; font-style: normal; }
+
+/* ---------- workspaces: lists, results, dossier ---------- */
+.nxs-active .nxs-agent { background: rgba(26, 17, 10, 0.7); border: 1px solid rgba(180, 141, 69, 0.3); border-radius: 3px; }
+.nxs-active .nxs-agent:hover { border-color: var(--brass2); }
+.nxs-active .nxs-agent-name { font-weight: 600; color: var(--parch); }
+.nxs-active .nxs-agent-state { color: var(--dim) !important; font-style: italic; }
+.nxs-active .nxs-agent-signal { background: radial-gradient(circle at 35% 30%, #d4614a, #8e231b 55%, #5a110d) !important; border-radius: 50%; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6); }
+.nxs-active .nxs-agent[data-agent] .nxs-agent-signal { width: 12px; height: 12px; }
+.nxs-active .nxs-agent[data-activity="active"] .nxs-agent-signal { animation: wax 1.6s ease-out infinite; }
+.nxs-active .result-item, .nxs-active .history-entry, .nxs-active .dossier-list > li, .nxs-active .overview-counts > div, .nxs-active .research-overview, .nxs-active .dossier-section, .nxs-active .discovery-detail, .nxs-active .learning-item {
+  background: rgba(20, 13, 8, 0.55); border: 1px solid rgba(180, 141, 69, 0.32); border-radius: 3px;
+}
+.nxs-active .research-overview { background: linear-gradient(rgba(244, 234, 208, 0.96), rgba(229, 214, 177, 0.96)); color: var(--ink); border-color: rgba(42, 25, 14, 0.75); box-shadow: 0 0 0 3px rgba(239, 227, 196, 0.35); }
+.nxs-active .research-overview * { color: var(--ink); }
+.nxs-active .research-overview .overview-heading h2 { font-weight: 600; color: var(--ink); }
+.nxs-active .research-overview .overview-heading > span { color: var(--ox) !important; font-style: italic; }
+.nxs-active .research-overview .overview-counts > div { background: rgba(255, 250, 235, 0.5); border-color: rgba(42, 25, 14, 0.3); }
+.nxs-active .research-overview .overview-counts dd { font: 600 26px var(--nx-body); color: var(--ox) !important; font-variant-numeric: lining-nums; }
+.nxs-active .research-overview dt { color: #5b3f22 !important; }
+.nxs-active .result-item > b, .nxs-active .result-item summary { color: var(--brass2) !important; letter-spacing: 0.08em; font-weight: 600; }
+.nxs-active .result-item > span { color: var(--parch) !important; font-weight: 600; font-size: 16px; }
+.nxs-active .record-evidence blockquote, .nxs-active .result-item blockquote {
+  margin: 8px 0; padding: 10px 14px; color: var(--ink) !important; font: italic 15px/1.6 var(--nx-body);
+  background: linear-gradient(rgba(246, 238, 216, 0.96), rgba(234, 221, 188, 0.96)); border-left: 3px solid var(--ox); border-radius: 2px;
+}
+.nxs-active .record-evidence dt { color: var(--brass2) !important; }
+.nxs-active .record-evidence dd { color: var(--txt) !important; }
+.nxs-active .result-item a, .nxs-active .discovery-source a, .nxs-active .results-tools a, .nxs-active #researchPermalink { color: var(--brass2); }
+.nxs-active .result-item small, .nxs-active .history-entry small, .nxs-active .history-entry span { color: var(--dim) !important; }
+.nxs-active .history-entry[aria-current="true"] { border-color: var(--ox2); box-shadow: inset 3px 0 0 var(--ox2); }
+.nxs-active .result-empty { color: var(--dim); font-style: italic; }
+.nxs-active .dossier-navigation button { font-weight: 600; }
+.nxs-active details > summary { cursor: pointer; }
+.nxs-active .detail-live, .nxs-active .agent-overview { border-color: rgba(180, 141, 69, 0.35) !important; background: rgba(20, 13, 8, 0.5) !important; }
+.nxs-active .detail-live span, .nxs-active .detail-meta span { color: var(--brass2) !important; font: 600 12px var(--nx-body) !important; letter-spacing: 0.12em; }
+.nxs-active .detail-live strong, .nxs-active .detail-meta strong { color: var(--parch) !important; font: 600 14px var(--nx-body) !important; }
+.nxs-active .detail-rule, .nxs-active .learning-rule { background: linear-gradient(90deg, transparent, var(--brass), transparent) !important; height: 1px; }
+.nxs-active .activity-lines > div { border-color: rgba(180, 141, 69, 0.25) !important; font-size: 15px; }
+.nxs-active .activity-lines b { color: var(--brass2); }
+.nxs-active #missionState { color: var(--brass2) !important; font-style: italic; }
+.run-notice { grid-column: 1 / -1; margin: 6px 0 0; padding: 8px 12px; border-radius: 2px; font-size: 15px; line-height: 1.45; color: var(--parch); background: rgba(58, 39, 22, 0.8); border: 1px solid rgba(180, 141, 69, 0.5); }
+.run-notice[data-kind="error"] { color: #fff0e2; background: rgba(110, 24, 18, 0.85); border-color: #c24a38; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 800px) {
+  /* Mobile: the header keeps the connection status; the route opener joins the chart tools column. */
+  .nxs-active .nxs-activity-open { top: 300px; right: 10px; width: 44px; height: 44px; min-height: 0; padding: 0; justify-content: center; border-radius: 50%; font-size: 0; }
+  .nxs-active .nxs-activity-open span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .nxs-active .nxs-activity-open svg { width: 20px; height: 20px; }
+  body:not([data-nxs-view="universe"]) .nxs-activity-open { display: none; }
+  .nxs-identity strong { font-size: 18px; }
+  .nxs-active .node-label { font-size: 13px; }
+  .chart-plane { box-shadow: 0 0 0 2px #2a190e, 0 0 0 5px #b48d45, 0 0 0 10px #1d130b, 0 20px 50px 10px rgba(0, 0, 0, 0.7); }
+}

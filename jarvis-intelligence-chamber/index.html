@@ -1,295 +1,390 @@
 <!doctype html>
 <html lang="el">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#02060d">
-<title>NABOU//X — Research Universe</title>
-<link rel="stylesheet" href="./chamber.css?v=3d-core-20261018">
-<link rel="stylesheet" href="./nabou-shell.css?v=evidence-v5-20261019">
-<script type="importmap">{"imports":{"./live-bridge.js":"./live-bridge.js?v=startup-feedback-20261016-2"}}</script>
-</head>
-<body class="nxs-active">
-<div id="app">
-
-  <!-- PRESERVED 3D CORE -->
-  <canvas id="universe" aria-label="Interactive three-dimensional research intelligence network"></canvas>
-  <div class="grain" aria-hidden="true"></div>
-  <div class="vignette" aria-hidden="true"></div>
-  <div id="nodeLabels"></div>
-
-  <!-- NEW FLOATING IDENTITY / STATUS MODULES -->
-  <section class="nxs-identity" aria-label="NABOU X identity">
-    <div class="nxs-identity-mark">N//X</div>
-    <div>
-      <strong>NABOU//X</strong>
-      <span>Χώρος ιστορικής έρευνας</span>
-    </div>
-  </section>
-
-  <section class="nxs-status" aria-label="System status">
-    <span class="nxs-status-dot"></span>
-    <div>
-      <small>ΩΡΑ UTC</small>
-      <strong id="clock">--:--:-- UTC</strong>
-    </div>
-  </section>
-
-  <section class="workspace-welcome" id="workspaceWelcome"><span>Ο ΧΩΡΟΣ ΕΡΕΥΝΑΣ ΣΑΣ</span><h1>Από το ερώτημα στην πηγή.</h1><p>Πατήστε έναν κόμβο για να δείτε τον ερευνητή του.</p></section>
-  <!-- NEW LEFT WORKSPACE: AGENTS -->
-  <section class="nxs-workspace hidden" id="nxsAgentsPage" aria-hidden="true">
-    <header class="nxs-workspace-head">
-      <div class="nxs-index">01</div>
-      <div class="nxs-workspace-title">
-        <span>ΟΜΑΔΑ ΕΡΕΥΝΑΣ</span>
-        <h1>Ερευνητές</h1>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#140d08" />
+    <meta name="description" content="NABOU//X — χάρτης ιστορικής έρευνας για την πειρατεία και την κουρσάρικη δράση στη Μεσόγειο του 16ου–17ου αιώνα, με αρχειακούς ερευνητές, πηγές και τεκμήρια." />
+    <meta property="og:title" content="NABOU//X — Χάρτης ιστορικής έρευνας" />
+    <meta property="og:description" content="Από το ερώτημα στην πηγή: αρχεία, ευρήματα και τεκμήρια πάνω σε έναν πορτολάνο της Μεσογείου." />
+    <meta property="og:type" content="website" />
+    <title>NABOU//X — Χάρτης ιστορικής έρευνας</title>
+    <link rel="stylesheet" href="./chamber.css?v=3d-core-20261018" />
+    <link rel="stylesheet" href="./nabou-shell.css?v=evidence-v5-20261019" />
+    <link rel="stylesheet" href="./nautical.css?v=portolan-1" />
+    <link rel="preload" href="./assets/nautical/fonts/EBGaramond.woff2" as="font" type="font/woff2" crossorigin />
+    <script type="importmap">
+      { "imports": { "./live-bridge.js": "./live-bridge.js?v=startup-feedback-20261016-2" } }
+    </script>
+  </head>
+  <body class="nxs-active">
+    <div id="app">
+      <!-- PORTOLAN CHART (replaces the 3D network; same research nodes and state) -->
+      <div id="chartStage" class="chart-stage" role="application" aria-roledescription="ναυτικός χάρτης" aria-label="Ναυτικός χάρτης ερευνητών: σύρετε για μετακίνηση, ροδέλα ή + / − για μεγέθυνση, Tab για τις σφραγίδες">
+        <div id="chartPlane" class="chart-plane"></div>
       </div>
-      <button class="nxs-workspace-close" id="nxsCloseAgents" type="button" aria-label="Κλείσιμο ερευνητών">×</button>
-    </header>
-    <div class="nxs-workspace-toolbar" id="nxsAgentTabs">
-      <button class="active" type="button" data-agent-filter="all">Όλα</button>
-      <button type="button" data-agent-filter="archive">Αρχεία</button>
-      <button type="button" data-agent-filter="analysis">Ανάλυση</button>
-    </div>
-    <div class="nxs-workspace-scroll">
-      <div class="nxs-agent-groups" id="nxsAgentGroups"></div>
-    </div>
-  </section>
+      <canvas id="universe" aria-hidden="true"></canvas>
+      <div class="grain" aria-hidden="true"></div>
+      <div class="vignette" aria-hidden="true"></div>
+      <div id="nodeSeals" class="node-seals"></div>
+      <div id="nodeLabels" aria-hidden="true"></div>
 
-  <!-- EXISTING LOGIC ANCHORS, NOT UI -->
-  <button class="nxs-script-anchor" id="resultsToggle" type="button">OPEN RESULTS <span id="resultsCount">0</span></button>
-  <button class="nxs-script-anchor" id="learningToggle" type="button">OPEN PDF</button>
+      <!-- NEW FLOATING IDENTITY / STATUS MODULES -->
+      <section class="nxs-identity" aria-label="NABOU X">
+        <div class="nxs-identity-mark">N//X</div>
+        <div>
+          <strong>NABOU//X</strong>
+          <span>Χώρος ιστορικής έρευνας</span>
+        </div>
+      </section>
 
-  <!-- NEW LEFT WORKSPACE: SOURCES / FINDINGS / HISTORY -->
-  <aside class="results-drawer hidden" id="resultsDrawer" aria-label="Ενιαίος χώρος έρευνας">
-    <header class="results-head">
-      <div class="nxs-index">02</div>
-      <div class="nxs-results-title">
-        <small>Ο ΧΩΡΟΣ ΤΗΣ ΕΡΕΥΝΑΣ ΣΑΣ</small>
-        <span>Η έρευνά μου</span>
-      </div>
-      <button id="closeResults" type="button" aria-label="Κλείσιμο ευρημάτων">×</button>
-    </header>
+      <section class="nxs-status" aria-label="Κατάσταση σύνδεσης">
+        <span class="nxs-status-dot"></span>
+        <div>
+          <small>ΩΡΑ UTC</small>
+          <strong id="clock">--:--:-- UTC</strong>
+        </div>
+      </section>
 
-    <div class="results-summary">
-      <strong id="resultsRun">NO RUN</strong>
-      <a id="researchPermalink" hidden>Σύνδεσμος αυτής της έρευνας</a>
-      <span id="resultsMeta">0 claims · 0 blockers</span>
-    </div>
-
-    <nav class="dossier-navigation" aria-label="Ενότητες επιλεγμένης έρευνας">
-      <button type="button" data-dossier-section="researchOverview">Το ερώτημα</button>
-      <button type="button" data-dossier-section="researchProgress">Πρόοδος</button>
-      <button type="button" data-dossier-section="researchFindings">Ευρήματα & πηγές</button>
-      <button type="button" data-dossier-section="researchPending">Εκκρεμότητες</button>
-      <button type="button" data-dossier-section="researchUpdates">Ενημερώσεις</button>
-    </nav>
-    <section id="researchOverview" tabindex="-1" class="research-overview" aria-label="Σύνοψη έρευνας" aria-live="polite"></section>
-    <div class="dossier-columns">
-      <section id="researchProgress" class="dossier-section" tabindex="-1"><h2>Πρόοδος έρευνας</h2><div id="researchProgressContent"></div></section>
-      <section id="researchPending" class="dossier-section" tabindex="-1"><h2>Τι εκκρεμεί</h2><div id="researchPendingContent"></div></section>
-    </div>
-    <details class="research-history" id="researchHistory">
-      <summary>Προηγούμενες έρευνες</summary>
-      <label for="historySearch">Βρείτε έρευνα με θέμα ή αριθμό</label>
-      <input id="historySearch" type="search" placeholder="π.χ. Λάντζας, Μήλος…">
-      <p id="historyStatus" role="status">Φόρτωση ιστορικού…</p>
-      <div id="historyList"></div>
-      <button id="historyRetry" type="button" hidden>Νέα προσπάθεια φόρτωσης</button>
-    </details>
-    <div class="results-tools" id="researchFindings" tabindex="-1">
-      <h2>Ευρήματα και πηγές</h2>
-      <p><a href="./historical-map-lab.html" title="Ερευνητικό εργαστήριο χαρτογραφίας ιστορικών τεκμηρίων">Ιστορική χαρτογραφία — Map Lab ↗</a></p>
-      <div id="resultTabs" role="group" aria-label="Research output filters">
-        <button type="button" data-result-filter="all" aria-pressed="true">Όλα</button>
-        <button type="button" data-result-filter="claims">Ισχυρισμοί</button>
-        <button type="button" data-result-filter="contradictions">Αντιφάσεις</button>
-        <button type="button" data-result-filter="blockers">Εμπόδια</button>
-      </div>
-
-      <div class="nxs-tool-row">
-        <label for="resultSearch">Αναζήτηση στα ευρήματα</label>
-        <input id="resultSearch" type="search" placeholder="Όνομα, πηγή, τόπος ή λέξη…">
-      </div>
-
-      <details class="result-options">
-        <summary>Ταξινόμηση, εξαγωγή και άνοιγμα με αριθμό</summary>
-        <form id="openResearchRun" class="run-picker">
-          <label for="researchRunId">Αριθμός έρευνας</label>
-          <input id="researchRunId" inputmode="numeric" pattern="[0-9]+" placeholder="π.χ. 123456">
-          <button type="submit">Άνοιγμα</button>
-          <button id="latestResearch" type="button">Πιο πρόσφατη</button>
-        </form>
-
-        <label class="tool-help" for="resultSort">Ταξινόμηση</label>
-        <select id="resultSort">
-          <option value="relevance">Συνάφεια</option>
-          <option value="value">Ερευνητική αξία</option>
-          <option value="confidence">Ωριμότητα τεκμηρίωσης</option>
-          <option value="year">Παλαιότερη έκδοση</option>
-        </select>
-
-        <label class="tool-help" for="exportFormat">Μορφή εξαγωγής</label>
-        <select id="exportFormat">
-          <option value="json">Πλήρης φάκελος έρευνας (JSON)</option>
-          <option value="csv">Όλα τα αποσπάσματα και οι εκκρεμότητες (CSV)</option>
-          <option value="csl">Πηγές σχετικών αποσπασμάτων για Zotero (CSL JSON)</option>
-          <option value="bibtex">Πηγές σχετικών αποσπασμάτων (BibTeX)</option>
-        </select>
-        <button id="exportResults" type="button" disabled>Εξαγωγή δεδομένων ↓</button>
-      </details>
-    </div>
-
-    <section id="discoveryDetail" class="discovery-detail" hidden>
-      <button id="closeDiscovery" type="button" aria-label="Κλείσιμο λεπτομερειών ευρήματος">×</button>
-      <h3></h3>
-      <p></p>
-      <small></small>
-      <div class="discovery-source"></div>
-      <button id="focusDiscovery" type="button">Προβολή ερευνητή</button>
-    </section>
-
-    <div class="results-list" id="resultsList">
-      <div class="result-empty">Τα αποτελέσματα της έρευνας θα εμφανιστούν εδώ.</div>
-    </div>
-
-    <div id="resultsPagination" class="result-pagination" hidden>
-      <button id="resultsPrevious" type="button">← PREVIOUS</button>
-      <span id="resultsPage"></span>
-      <button id="resultsNext" type="button">NEXT →</button>
-    </div>
-    <section id="researchUpdates" class="dossier-section dossier-updates" tabindex="-1"><h2>Τελευταίες ενημερώσεις</h2><div id="researchUpdatesContent"></div></section>
-  </aside>
-
-  <!-- NEW LEFT WORKSPACE: PDF -->
-  <aside class="learning-panel hidden" id="learningPanel" aria-label="NABOU X document intelligence">
-    <header class="learning-head">
-      <div class="nxs-index">03</div>
-      <div>
-        <span>ΑΝΑΓΝΩΣΗ ΚΑΙ ΕΛΕΓΧΟΣ ΠΗΓΩΝ</span>
-        <strong>Έλεγχος PDF</strong>
-      </div>
-      <button id="closeLearning" type="button" aria-label="Κλείσιμο ελέγχου PDF">×</button>
-    </header>
-
-    <div class="learning-source">
-      <label for="learningFile" class="tool-help">1. Επιλέξτε PDF έως 25 MB</label>
-      <input id="learningFile" class="learning-file" type="file" accept="application/pdf,.pdf">
-      <button id="learningAnalyze" class="learning-analyze" type="button" disabled>2. Ανάλυση εγγράφου</button>
-      <div>
-        <b role="status" id="learningState">Έτοιμο</b>
-        <small id="learningSource">Δεν έχει επιλεγεί αρχείο.</small>
-      </div>
-    </div>
-
-    <p class="tool-help">Επιλέξτε έγγραφο, αναλύστε το και ελέγξτε τις προτάσεις πριν τις αποθηκεύσετε.</p>
-    <div class="learning-rule"></div>
-
-    <div class="learning-review-head">
-      <span>3. Έλεγχος προτάσεων</span>
-      <small id="learningSummary">Οι προτάσεις του εγγράφου θα εμφανιστούν εδώ.</small>
-    </div>
-
-    <div class="learning-items" id="learningItems">
-      <div class="learning-empty">Επιλέξτε PDF για να ξεκινήσετε.</div>
-    </div>
-
-    <div class="learning-footer">
-      <span>Αποθηκεύονται μόνο οι προτάσεις που εγκρίνετε. Η έγκριση δεν αποτελεί ιστορική επαλήθευση.</span>
-      <button id="learningSave" type="button" disabled>Αποθήκευση εγκεκριμένων</button>
-    </div>
-  </aside>
-
-  <!-- NEW LEFT WORKSPACE: ACTIVITY -->
-  <section class="activity-strip nxs-script-anchor hidden" id="activityStrip" aria-live="polite">
-    <header class="activity-head">
-      <div class="nxs-index">04</div>
-      <div>
-        <small>ΠΟΡΕΙΑ ΕΡΕΥΝΑΣ</small>
+      <button class="nxs-activity-open" type="button" data-nxs-view="activity" aria-controls="activityStrip">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19c3-1 4-4 7-5s5 1 9-8" /><circle cx="4" cy="19" r="1.6" /><circle cx="20" cy="6" r="1.6" /></svg>
         <span>Πορεία</span>
+      </button>
+
+      <section class="workspace-welcome" id="workspaceWelcome">
+        <span>Ο ΧΩΡΟΣ ΕΡΕΥΝΑΣ ΣΑΣ</span>
+        <h1>Από το ερώτημα στην πηγή.</h1>
+        <p>Πατήστε μια σφραγίδα στον χάρτη για να δείτε τον ερευνητή της.</p>
+      </section>
+      <!-- NEW LEFT WORKSPACE: AGENTS -->
+      <section class="nxs-workspace hidden" id="nxsAgentsPage" aria-hidden="true">
+        <header class="nxs-workspace-head">
+          <div class="nxs-index">01</div>
+          <div class="nxs-workspace-title">
+            <span>ΟΜΑΔΑ ΕΡΕΥΝΑΣ</span>
+            <h1>Ερευνητές</h1>
+          </div>
+          <button
+            class="nxs-workspace-close"
+            id="nxsCloseAgents"
+            type="button"
+            aria-label="Κλείσιμο ερευνητών"
+          >
+            ×
+          </button>
+        </header>
+        <div class="nxs-workspace-toolbar" id="nxsAgentTabs">
+          <button class="active" type="button" data-agent-filter="all">Όλα</button>
+          <button type="button" data-agent-filter="archive">Αρχεία</button>
+          <button type="button" data-agent-filter="analysis">Ανάλυση</button>
+        </div>
+        <div class="nxs-workspace-scroll">
+          <div class="nxs-agent-groups" id="nxsAgentGroups"></div>
+        </div>
+      </section>
+
+      <!-- EXISTING LOGIC ANCHORS, NOT UI -->
+      <button class="nxs-script-anchor" id="resultsToggle" type="button">
+        Άνοιγμα ευρημάτων <span id="resultsCount">0</span>
+      </button>
+      <button class="nxs-script-anchor" id="learningToggle" type="button">Άνοιγμα PDF</button>
+
+      <!-- NEW LEFT WORKSPACE: SOURCES / FINDINGS / HISTORY -->
+      <aside class="results-drawer hidden" id="resultsDrawer" aria-label="Ενιαίος χώρος έρευνας">
+        <header class="results-head">
+          <div class="nxs-index">02</div>
+          <div class="nxs-results-title">
+            <small>Ο ΧΩΡΟΣ ΤΗΣ ΕΡΕΥΝΑΣ ΣΑΣ</small>
+            <span>Η έρευνά μου</span>
+          </div>
+          <button id="closeResults" type="button" aria-label="Κλείσιμο ευρημάτων">×</button>
+        </header>
+
+        <div class="results-summary">
+          <strong id="resultsRun">NO RUN</strong>
+          <a id="researchPermalink" hidden>Σύνδεσμος αυτής της έρευνας</a>
+          <span id="resultsMeta">0 claims · 0 blockers</span>
+        </div>
+
+        <nav class="dossier-navigation" aria-label="Ενότητες επιλεγμένης έρευνας">
+          <button type="button" data-dossier-section="researchOverview">Το ερώτημα</button>
+          <button type="button" data-dossier-section="researchProgress">Πρόοδος</button>
+          <button type="button" data-dossier-section="researchFindings">Ευρήματα & πηγές</button>
+          <button type="button" data-dossier-section="researchPending">Εκκρεμότητες</button>
+          <button type="button" data-dossier-section="researchUpdates">Ενημερώσεις</button>
+        </nav>
+        <section
+          id="researchOverview"
+          tabindex="-1"
+          class="research-overview"
+          aria-label="Σύνοψη έρευνας"
+          aria-live="polite"
+        ></section>
+        <div class="dossier-columns">
+          <section id="researchProgress" class="dossier-section" tabindex="-1">
+            <h2>Πρόοδος έρευνας</h2>
+            <div id="researchProgressContent"></div>
+          </section>
+          <section id="researchPending" class="dossier-section" tabindex="-1">
+            <h2>Τι εκκρεμεί</h2>
+            <div id="researchPendingContent"></div>
+          </section>
+        </div>
+        <details class="research-history" id="researchHistory">
+          <summary>Προηγούμενες έρευνες</summary>
+          <label for="historySearch">Βρείτε έρευνα με θέμα ή αριθμό</label>
+          <input id="historySearch" type="search" placeholder="π.χ. Λάντζας, Μήλος…" />
+          <p id="historyStatus" role="status">Φόρτωση ιστορικού…</p>
+          <div id="historyList"></div>
+          <button id="historyRetry" type="button" hidden>Νέα προσπάθεια φόρτωσης</button>
+        </details>
+        <div class="results-tools" id="researchFindings" tabindex="-1">
+          <h2>Ευρήματα και πηγές</h2>
+          <p>
+            <a href="./historical-map-lab.html" title="Ερευνητικό εργαστήριο χαρτογραφίας ιστορικών τεκμηρίων"
+              >Ιστορική χαρτογραφία — Map Lab ↗</a
+            >
+          </p>
+          <div id="resultTabs" role="group" aria-label="Φίλτρα αποτελεσμάτων έρευνας">
+            <button type="button" data-result-filter="all" aria-pressed="true">Όλα</button>
+            <button type="button" data-result-filter="claims">Ισχυρισμοί</button>
+            <button type="button" data-result-filter="contradictions">Αντιφάσεις</button>
+            <button type="button" data-result-filter="blockers">Εμπόδια</button>
+          </div>
+
+          <div class="nxs-tool-row">
+            <label for="resultSearch">Αναζήτηση στα ευρήματα</label>
+            <input id="resultSearch" type="search" placeholder="Όνομα, πηγή, τόπος ή λέξη…" />
+          </div>
+
+          <p id="runNotice" class="run-notice" role="alert" hidden></p>
+          <details class="result-options">
+            <summary>Ταξινόμηση, εξαγωγή και άνοιγμα με αριθμό</summary>
+            <form id="openResearchRun" class="run-picker" novalidate>
+              <label for="researchRunId">Αριθμός έρευνας</label>
+              <input id="researchRunId" inputmode="numeric" pattern="[0-9]+" placeholder="π.χ. 123456" />
+              <button type="submit">Άνοιγμα</button>
+              <button id="latestResearch" type="button">Πιο πρόσφατη</button>
+            </form>
+
+            <label class="tool-help" for="resultSort">Ταξινόμηση</label>
+            <select id="resultSort">
+              <option value="relevance">Συνάφεια</option>
+              <option value="value">Ερευνητική αξία</option>
+              <option value="confidence">Ωριμότητα τεκμηρίωσης</option>
+              <option value="year">Παλαιότερη έκδοση</option>
+            </select>
+
+            <label class="tool-help" for="exportFormat">Μορφή εξαγωγής</label>
+            <select id="exportFormat">
+              <option value="json">Πλήρης φάκελος έρευνας (JSON)</option>
+              <option value="csv">Όλα τα αποσπάσματα και οι εκκρεμότητες (CSV)</option>
+              <option value="csl">Πηγές σχετικών αποσπασμάτων για Zotero (CSL JSON)</option>
+              <option value="bibtex">Πηγές σχετικών αποσπασμάτων (BibTeX)</option>
+            </select>
+            <button id="exportResults" type="button" disabled>Εξαγωγή δεδομένων ↓</button>
+          </details>
+        </div>
+
+        <section id="discoveryDetail" class="discovery-detail" hidden>
+          <button id="closeDiscovery" type="button" aria-label="Κλείσιμο λεπτομερειών ευρήματος">×</button>
+          <h3></h3>
+          <p></p>
+          <small></small>
+          <div class="discovery-source"></div>
+          <button id="focusDiscovery" type="button">Προβολή ερευνητή</button>
+        </section>
+
+        <div class="results-list" id="resultsList">
+          <div class="result-empty">Τα αποτελέσματα της έρευνας θα εμφανιστούν εδώ.</div>
+        </div>
+
+        <div id="resultsPagination" class="result-pagination" hidden>
+          <button id="resultsPrevious" type="button">← Προηγούμενα</button>
+          <span id="resultsPage"></span>
+          <button id="resultsNext" type="button">Επόμενα →</button>
+        </div>
+        <section id="researchUpdates" class="dossier-section dossier-updates" tabindex="-1">
+          <h2>Τελευταίες ενημερώσεις</h2>
+          <div id="researchUpdatesContent"></div>
+        </section>
+      </aside>
+
+      <!-- NEW LEFT WORKSPACE: PDF -->
+      <aside class="learning-panel hidden" id="learningPanel" aria-label="Έλεγχος εγγράφων PDF">
+        <header class="learning-head">
+          <div class="nxs-index">03</div>
+          <div>
+            <span>ΑΝΑΓΝΩΣΗ ΚΑΙ ΕΛΕΓΧΟΣ ΠΗΓΩΝ</span>
+            <strong>Έλεγχος PDF</strong>
+          </div>
+          <button id="closeLearning" type="button" aria-label="Κλείσιμο ελέγχου PDF">×</button>
+        </header>
+
+        <div class="learning-source">
+          <label for="learningFile" class="tool-help">1. Επιλέξτε PDF έως 25 MB</label>
+          <input id="learningFile" class="learning-file" type="file" accept="application/pdf,.pdf" />
+          <button id="learningAnalyze" class="learning-analyze" type="button" disabled>
+            2. Ανάλυση εγγράφου
+          </button>
+          <div>
+            <b role="status" id="learningState">Έτοιμο</b>
+            <small id="learningSource">Δεν έχει επιλεγεί αρχείο.</small>
+          </div>
+        </div>
+
+        <p class="tool-help">
+          Επιλέξτε έγγραφο, αναλύστε το και ελέγξτε τις προτάσεις πριν τις αποθηκεύσετε.
+        </p>
+        <div class="learning-rule"></div>
+
+        <div class="learning-review-head">
+          <span>3. Έλεγχος προτάσεων</span>
+          <small id="learningSummary">Οι προτάσεις του εγγράφου θα εμφανιστούν εδώ.</small>
+        </div>
+
+        <div class="learning-items" id="learningItems">
+          <div class="learning-empty">Επιλέξτε PDF για να ξεκινήσετε.</div>
+        </div>
+
+        <div class="learning-footer">
+          <span
+            >Αποθηκεύονται μόνο οι προτάσεις που εγκρίνετε. Η έγκριση δεν αποτελεί ιστορική επαλήθευση.</span
+          >
+          <button id="learningSave" type="button" disabled>Αποθήκευση εγκεκριμένων</button>
+        </div>
+      </aside>
+
+      <!-- NEW LEFT WORKSPACE: ACTIVITY -->
+      <section class="activity-strip hidden" id="activityStrip" aria-live="polite">
+        <header class="activity-head">
+          <div class="nxs-index">04</div>
+          <div>
+            <small>ΠΟΡΕΙΑ ΕΡΕΥΝΑΣ</small>
+            <span>Πορεία</span>
+          </div>
+          <strong id="missionState">Έτοιμο</strong>
+          <button
+            class="nxs-workspace-close"
+            id="nxsCloseActivity"
+            type="button"
+            aria-label="Κλείσιμο δραστηριότητας"
+          >
+            ×
+          </button>
+        </header>
+        <div class="activity-lines" id="activityLines">
+          <div>Δεν έχει καταγραφεί δραστηριότητα.</div>
+        </div>
+      </section>
+
+      <!-- NEW SLIM NODE INSPECTOR -->
+      <aside class="detail-panel hidden" id="detailPanel">
+        <div class="detail-head">
+          <span id="detail-number">ΤΟΜΕΑΣ / 00</span>
+          <button id="closeDetail" type="button" aria-label="Κλείσιμο λεπτομερειών">×</button>
+        </div>
+        <div class="detail-type" id="detailType">ΕΡΕΥΝΗΤΙΚΟΣ ΤΟΜΕΑΣ</div>
+        <h2 id="detailTitle">Χάρτης ερευνητών</h2>
+        <div class="detail-rule"></div>
+        <p id="detailDescription">Επιλέξτε μια σφραγίδα για να δείτε τον ρόλο του ερευνητή.</p>
+        <div class="detail-meta">
+          <div><span>ΡΟΛΟΣ</span><strong id="detailRole">Πλοήγηση</strong></div>
+          <div><span>ΚΑΤΑΣΤΑΣΗ</span><strong id="detailState">Έτοιμο</strong></div>
+        </div>
+        <button class="detail-action" id="focusButton" type="button">Προβολή ερευνητή <span>↗</span></button>
+      </aside>
+
+      <!-- NEW FLOATING Νέα έρευνα -->
+      <form class="operator-command" id="operatorCommand" autocomplete="off">
+        <div class="operator-command-label">
+          <span>Νέα έρευνα</span>
+          <small role="status" id="commandState">Έτοιμο</small>
+        </div>
+        <div class="operator-command-row">
+          <span class="command-prompt">›</span>
+          <textarea
+            id="operatorQuery"
+            name="operatorQuery"
+            required
+            rows="2"
+            maxlength="500"
+            spellcheck="false"
+            placeholder="Τι θέλετε να ερευνήσετε;"
+            aria-label="Ιστορικό ερευνητικό ερώτημα"
+            aria-describedby="queryHelp"
+          ></textarea>
+          <button id="executeQuery" type="submit">Έναρξη έρευνας</button>
+        </div>
+        <small class="query-help" id="queryHelp"
+          >Γράψτε πρόσωπο ή τόπο και την περίοδο που σας ενδιαφέρει.</small
+        >
+      </form>
+
+      <!-- NEW VERTICAL 3D CONTROL MODULE -->
+      <div class="nxs-3d-tools">
+        <button id="zoomIn" type="button" aria-label="Μεγέθυνση χάρτη" title="Μεγέθυνση">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7.5v9M7.5 12h9" /></svg>
+        </button>
+        <button id="zoomOut" type="button" aria-label="Σμίκρυνση χάρτη" title="Σμίκρυνση">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M7.5 12h9" /></svg>
+        </button>
+        <button id="resetView" type="button" aria-label="Επαναφορά χάρτη" title="Επαναφορά χάρτη">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 3.5 14 12l-2 8.5L10 12z" /><path d="M3.5 12 12 10l8.5 2-8.5 2z" opacity=".55" /></svg>
+        </button>
       </div>
-      <strong id="missionState">Έτοιμο</strong>
-      <button class="nxs-workspace-close" id="nxsCloseActivity" type="button" aria-label="Κλείσιμο δραστηριότητας">×</button>
-    </header>
-    <div class="activity-lines" id="activityLines">
-      <div>Δεν έχει καταγραφεί δραστηριότητα.</div>
+
+      <div class="nxs-telemetry">
+        <span id="coordinates">—° Β · —° Α</span>
+        <b id="zoomLevel">Κλίμακα ×1.0</b>
+        <span>Ρυθμός <b id="fps">—</b></span>
+        <span>Διαδρομές <b id="linkCount">—</b></span>
+      </div>
+
+      <!-- NEW BOTTOM COMMAND DOCK -->
+      <nav class="nxs-dock" aria-label="Κύρια πλοήγηση">
+        <button type="button" data-nxs-view="universe" aria-current="page">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="7" />
+            <circle cx="12" cy="12" r="2" />
+            <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+          </svg>
+          <span>Χάρτης</span>
+        </button>
+        <button type="button" data-nxs-view="agents">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 18c.6-3.3 2-5 4.3-5 2.2 0 3.6 1.7 4.2 5" />
+            <circle cx="8.3" cy="7.5" r="2.7" />
+            <path d="M13 18c.5-2.6 1.7-4 3.5-4 1.9 0 3 1.4 3.5 4" />
+            <circle cx="16.5" cy="9" r="2.1" />
+          </svg>
+          <span>Ερευνητές</span>
+        </button>
+        <button type="button" data-nxs-view="findings">
+          <svg viewBox="0 0 24 24">
+            <circle cx="10" cy="10" r="5" />
+            <path d="m14 14 5 5M7 10h6M10 7v6" />
+          </svg>
+          <span>Η έρευνά μου</span>
+        </button>
+        <button type="button" data-nxs-view="pdf">
+          <svg viewBox="0 0 24 24">
+            <path d="M6 3h9l3 3v15H6z" />
+            <path d="M15 3v4h4M9 12h6M9 15h6M9 18h4" />
+          </svg>
+          <span>Έγγραφα PDF</span>
+        </button>
+      </nav>
     </div>
-  </section>
 
-  <!-- NEW SLIM NODE INSPECTOR -->
-  <aside class="detail-panel hidden" id="detailPanel">
-    <div class="detail-head">
-      <span id="detail-number">SECTOR / 00</span>
-      <button id="closeDetail" type="button" aria-label="Κλείσιμο λεπτομερειών">×</button>
-    </div>
-    <div class="detail-type" id="detailType">RESEARCH SECTOR</div>
-    <h2 id="detailTitle">Intelligence network</h2>
-    <div class="detail-rule"></div>
-    <p id="detailDescription">Select a luminous node to inspect its function.</p>
-    <div class="detail-meta">
-      <div><span>ROLE</span><strong id="detailRole">NAVIGATION</strong></div>
-      <div><span>STATE</span><strong id="detailState">Έτοιμο</strong></div>
-    </div>
-    <button class="detail-action" id="focusButton" type="button">Προβολή ερευνητή <span>↗</span></button>
-  </aside>
-
-  <!-- NEW FLOATING Νέα έρευνα -->
-  <form class="operator-command" id="operatorCommand" autocomplete="off">
-    <div class="operator-command-label">
-      <span>Νέα έρευνα</span>
-      <small role="status" id="commandState">Έτοιμο</small>
-    </div>
-    <div class="operator-command-row">
-      <span class="command-prompt">›</span>
-      <textarea id="operatorQuery" name="operatorQuery" required rows="2" maxlength="500" spellcheck="false" placeholder="Τι θέλετε να ερευνήσετε;" aria-label="Ιστορικό ερευνητικό ερώτημα" aria-describedby="queryHelp"></textarea>
-      <button id="executeQuery" type="submit">Έναρξη έρευνας</button>
-    </div>
-    <small class="query-help" id="queryHelp">Γράψτε πρόσωπο ή τόπο και την περίοδο που σας ενδιαφέρει.</small>
-  </form>
-
-  <!-- NEW VERTICAL 3D CONTROL MODULE -->
-  <div class="nxs-3d-tools">
-    <button id="zoomIn" type="button" aria-label="Zoom in">+</button>
-    <button id="zoomOut" type="button" aria-label="Zoom out">−</button>
-    <button id="resetView" type="button" aria-label="Reset camera">⌖</button>
-  </div>
-
-  <div class="nxs-telemetry">
-    <span id="coordinates">X 0 / Y 0 / DEPTH 0</span>
-    <b id="zoomLevel">01 / CLUSTER</b>
-    <span>FPS <b id="fps">—</b></span>
-    <span>LINKS <b id="linkCount">—</b></span>
-  </div>
-
-  <!-- NEW BOTTOM COMMAND DOCK -->
-  <nav class="nxs-dock" aria-label="Κύρια πλοήγηση">
-    <button type="button" data-nxs-view="universe" aria-current="page">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
-      <span>Δίκτυο</span>
-    </button>
-    <button type="button" data-nxs-view="agents">
-      <svg viewBox="0 0 24 24"><path d="M4 18c.6-3.3 2-5 4.3-5 2.2 0 3.6 1.7 4.2 5"/><circle cx="8.3" cy="7.5" r="2.7"/><path d="M13 18c.5-2.6 1.7-4 3.5-4 1.9 0 3 1.4 3.5 4"/><circle cx="16.5" cy="9" r="2.1"/></svg>
-      <span>Ερευνητές</span>
-    </button>
-    <button type="button" data-nxs-view="findings">
-      <svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="5"/><path d="m14 14 5 5M7 10h6M10 7v6"/></svg>
-      <span>Η έρευνά μου</span>
-    </button>
-    <button type="button" data-nxs-view="pdf">
-      <svg viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h4M9 12h6M9 15h6M9 18h4"/></svg>
-      <span>Έγγραφα PDF</span>
-    </button>
-  </nav>
-
-</div>
-
-<script src="./chamber.js?v=greek-labels-20261018" defer></script>
-<script src="./gpu-field.js?v=approved-20261014b" defer></script>
-<script src="./operator-command.js?v=dispatch-timeout-20261020" defer></script>
-<script type="module" src="./research-ui.js?v=evidence-package-v10-20261019"></script>
-<script src="./learning-review.js?v=usability-20261016-4" defer></script>
-<script type="module" src="./nabou-shell.js?v=mobile-v4-20261018"></script>
-<script type="module" src="./workspace-insights.js?v=1"></script>
-<script type="module" src="./network-labels.js?v=2"></script>
-</body>
+    <script src="./nautical-i18n.js?v=portolan-1" defer></script>
+    <script src="./nautical-chart.js?v=portolan-1" defer></script>
+    <script src="./chamber.js?v=portolan-1" defer></script>
+    <script src="./gpu-field.js?v=portolan-1" defer></script>
+    <script src="./operator-command.js?v=dispatch-timeout-20261020" defer></script>
+    <script type="module" src="./research-ui.js?v=evidence-package-v10-20261019"></script>
+    <script src="./learning-review.js?v=usability-20261016-4" defer></script>
+    <script type="module" src="./nabou-shell.js?v=mobile-v4-20261018"></script>
+    <script type="module" src="./workspace-insights.js?v=1"></script>
+  </body>
 </html>
