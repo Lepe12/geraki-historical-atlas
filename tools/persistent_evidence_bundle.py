@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 try:from tools.historical_attestations import Attestation, Citation
 except ModuleNotFoundError:from historical_attestations import Attestation, Citation
+try:from tools.derived_source_store import durable_text_path
+except ModuleNotFoundError:from derived_source_store import durable_text_path
 
 
 def build(answer):
@@ -19,6 +21,9 @@ def build(answer):
         for occurrence in claim.get('source_occurrences',[]):
             path=occurrence.get('acquired_text_path');sha=occurrence.get('source_text_sha256')
             if not path or not sha:continue
+            # A reanalysis pass's derived copy is published once by SHA-256;
+            # importers read those durable bytes (same hash) instead.
+            analysis_path=path;path=durable_text_path(path,sha)
             bibliography=occurrence.get('source_bibliography') or {}
             content_key=hashlib.sha256((occurrence['url']+'\0'+sha).encode()).hexdigest()
             metadata={'title':occurrence.get('title'),'bibliography':bibliography,
@@ -36,6 +41,7 @@ def build(answer):
                           'version_rule':'SOURCE_VERSIONS_AND_REPEATED_CONTENT_ARE_NOT_INDEPENDENT_CORROBORATION',
                           'source_pdf':occurrence.get('source_pdf'),
                           'url':occurrence['url'],'text_path':path,'text_sha256':sha,
+                          **({'analysis_text_path':analysis_path} if analysis_path!=path else {}),
                           'source_classification':claim.get('source_classification','UNVERIFIED'),
                           'classification_status':'PROVISIONAL_SOURCE_CRITICISM_PENDING'}
             locator={k:v for k,v in occurrence['locator'].items() if k in (

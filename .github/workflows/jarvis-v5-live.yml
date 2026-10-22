@@ -18,6 +18,14 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
+        with:
+          # This job does not read research evidence; skip the multi-GB
+          # evidence/ tree (see repo_size plan, option A).
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/evidence/
+            !/backups/
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -35,6 +43,14 @@ jobs:
     timeout-minutes: 4
     steps:
       - uses: actions/checkout@v4
+        with:
+          # This job does not read research evidence; skip the multi-GB
+          # evidence/ tree (see repo_size plan, option A).
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/evidence/
+            !/backups/
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
