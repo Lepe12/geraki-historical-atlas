@@ -8,6 +8,9 @@ on:
       resume_reviewed_claims:
         type: boolean
         default: false
+      auto_continue:
+        type: boolean
+        default: true
   workflow_dispatch:
     inputs:
       run_id:
@@ -18,6 +21,10 @@ on:
         type: boolean
         default: false
         description: Replay existing extraction receipts, then run new reviews and synthesis
+      auto_continue:
+        type: boolean
+        default: true
+        description: false = run exactly one pass; no follow-up dispatch and the hourly coordinator holds this corpus
 permissions:
   contents: write
   actions: write
@@ -39,6 +46,7 @@ jobs:
       PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen3-8B-GGUF
       PCT_LLM_MODEL: Qwen/Qwen3-8B-GGUF
       PCT_RESUME_REVIEWED_CLAIMS: ${{ inputs.resume_reviewed_claims && '1' || '0' }}
+      PCT_AUTO_CONTINUE: ${{ inputs.auto_continue == false && 'false' || 'true' }}
       PCT_SEMANTIC_BATCHES: '3'
       PCT_SEMANTIC_PARTIAL_ANSWER: '1'
       PCT_SEMANTIC_CALLS_PER_PASS: '48'
@@ -97,6 +105,14 @@ jobs:
           if [ ! -d "evidence/runs/$PARENT_RESEARCH_RUN" ]; then exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          # auto_continue=false holds this corpus out of every automatic chain
+          # (research_continuation_handoff.select); only an explicit dispatch
+          # with auto_continue=true releases an existing hold.
+          hold="evidence/runs/$PARENT_RESEARCH_RUN/research_continuation/auto_continue.json"
+          if [ "$PCT_AUTO_CONTINUE" = false ] || [ -e "$hold" ]; then
+            mkdir -p "$(dirname "$hold")"
+            printf '{"auto_continue": %s, "set_by_run": "%s"}\n' "$PCT_AUTO_CONTINUE" "$GITHUB_RUN_ID" > "$hold"
+          fi
           for output in "$dest" "evidence/runs/$PARENT_RESEARCH_RUN/sources" "evidence/runs/$PARENT_RESEARCH_RUN/research_continuation" "command-center/live/runs/$PARENT_RESEARCH_RUN.json" command-center/live/index.json command-center/live/latest.json; do
             if [ -e "$output" ]; then git add "$output"; fi
           done
@@ -114,7 +130,7 @@ jobs:
           git restore --source=origin/main -- "evidence/runs/$PARENT_RESEARCH_RUN"
           python3 tools/research_continuation_handoff.py handoff --baseline "$BASELINE"
       - name: Continue this research without waiting for another
-        if: always() && steps.checkpoint.outputs.restart == 'true'
+        if: always() && steps.checkpoint.outputs.restart == 'true' && env.PCT_AUTO_CONTINUE == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run research-semantic-reanalysis.yml --repo "$GITHUB_REPOSITORY" --ref main -f "run_id=$PARENT_RESEARCH_RUN"

@@ -78,6 +78,22 @@ def cancel_superseded_pending(repository, current_run):
                     print('SUPERSEDED_UNSTARTED_COORDINATOR_CANCELLED:' + str(run['id']))
 
 
+def auto_continue_held(root):
+    """A dispatch with auto_continue=false holds this corpus out of automatic chains.
+
+    research-semantic-reanalysis.yml writes research_continuation/auto_continue.json
+    with {"auto_continue": false}. Only a later explicit dispatch with
+    auto_continue=true rewrites it to true; the hourly coordinator never does.
+    """
+    marker = Path(root) / 'research_continuation/auto_continue.json'
+    if not marker.exists():
+        return False
+    try:
+        return json.loads(marker.read_text()).get('auto_continue') is not True
+    except (OSError, ValueError, AttributeError):
+        return True  # an unreadable hold must fail closed
+
+
 def select(base, excluded=()):
     requested = set()
     for path in (base / 'research_continuation_requests').glob('*.json'):
@@ -87,7 +103,7 @@ def select(base, excluded=()):
         requested.add(run)
     selected = {}
     for root in sorted((base / 'evidence/runs').glob('*')):
-        if root.name in excluded:
+        if root.name in excluded or auto_continue_held(root):
             continue
         before = state(root)
         citations = any(json.loads(p.read_text()).get('pending') or json.loads(p.read_text()).get('deferred')
