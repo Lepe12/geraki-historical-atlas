@@ -31,6 +31,61 @@ def matches(text, terms):
     surface=fold(re.sub(r'(?<=\w)[-\u00ad]\s*\r?\n\s*(?=\w)','',text))
     return [term for term in terms if re.search(name_pattern(term.split()),surface)]
 
+def long_s_variant(term):
+    """OCR of early-modern print reads the long s (ſ) as 'f'.
+
+    Saulger's 1698 'Jean Capſi' is OCR'd 'Jean Capfi', so the requested name
+    never matched the body text and only an all-caps heading survived. The
+    variant is a bounded search tolerance for Latin-script names: only a medial
+    lowercase s (the long s was never word-final). It never rewrites the quote,
+    and findings reached only through it carry OCR_LONG_S_NAME_VARIANT.
+    """
+    if re.search(r'[\u0370-\u03ff\u1f00-\u1fff]',str(term)):return None
+    variant=re.sub(r's(?=[^\W\d_])','f',str(term))
+    return variant if variant!=term else None
+
+def ocr_variant_matches(text, terms, found=()):
+    """Terms absent from the surface text but present in their long-s OCR form."""
+    return [t for t in terms if t not in found and long_s_variant(t) and matches(text,[long_s_variant(t)])]
+
+def name_forms(name):
+    return [name,*([long_s_variant(name)] if long_s_variant(name) else [])]
+
+HEADING_SECTION_CHARS=1800
+
+def heading_like(raw):
+    """A one-line, mainly upper-case section heading such as 'JEAN CAPSI.'."""
+    line=raw.strip()
+    letters=[c for c in line if c.isalpha()]
+    return bool('\n' not in line and 0<len(line)<=80 and letters
+                and sum(c.isupper() for c in letters)>=0.6*len(letters))
+
+def name_heading(raw, terms):
+    """A heading that consists of the requested name only (case-insensitive)."""
+    line=raw.strip()
+    if '\n' in line or len(line)>80:return False
+    bare=fold(re.sub(r'[\W\d_]+',' ',line)).strip()
+    names={fold(form) for t in terms for form in name_forms(t)}
+    return heading_like(line) or bare in names
+
+def heading_section_end(text, paras, index):
+    """End offset of the section governed by a name heading.
+
+    The section runs over the following paragraphs up to the next heading or
+    HEADING_SECTION_CHARS. The excerpt is an exact slice of the acquired text,
+    so its offsets stay valid and nothing is paraphrased or invented.
+    """
+    start,end,_=paras[index]
+    stop=end
+    for _,e,raw in paras[index+1:]:
+        if heading_like(raw):break
+        if e-start>HEADING_SECTION_CHARS:
+            cut=text.rfind(' ',stop,start+HEADING_SECTION_CHARS)
+            if stop==end and cut>stop:stop=cut
+            break
+        stop=e
+    return stop
+
 def paragraphs(text):
     """Keep character offsets into the actual acquired text (including CRLF)."""
     for m in re.finditer(r'\S[\s\S]*?(?=\r?\n[ \t\r]*\n|\Z)',text):
@@ -68,7 +123,10 @@ def extract_document(text, source, file, ctx):
     year_heading=None
     topic=None
     findings=[]
-    for start,end,raw in paragraphs(text):
+    paras=list(paragraphs(text))
+    consumed_until=-1
+    for index,(start,end,raw) in enumerate(paras):
+        if end<=consumed_until:continue
         header=re.fullmatch(r'\s*(1\d{3}|20\d{2})\s*',raw)
         if header:
             year_heading={'year':int(header.group(1)),'text':raw,'locator':locator(text,start,end,source,file)}
@@ -77,9 +135,22 @@ def extract_document(text, source, file, ctx):
         # keep the complete raw excerpt and any mediated page citation intact.
         body=re.split(r'\([^)]*(?:Θησαυρίσματα|[Bb]ibliograph|[Pp]ublication)',raw,maxsplit=1)[0]
         direct=matches(body,terms)
+        ocr_names=ocr_variant_matches(body,terms,direct)
+        direct=direct+ocr_names
+        section_heading=False
+        if direct and name_heading(raw,terms):
+            # A bare name heading is not a passage: keep the section it governs.
+            new_end=heading_section_end(text,paras,index)
+            if new_end>end:
+                section_heading=True
+                end=new_end;raw=text[start:end];consumed_until=end
+                body=re.split(r'\([^)]*(?:Θησαυρίσματα|[Bb]ibliograph|[Pp]ublication)',raw,maxsplit=1)[0]
         # A name hundreds of paragraphs earlier cannot identify a bare surname.
         near_topic=bool(topic and start-topic['locator']['end_char']<1600)
         short=matches(body,surnames) if document_named or near_topic else []
+        if document_named or near_topic:
+            ocr_short=ocr_variant_matches(body,surnames,short)
+            ocr_names+=ocr_short;short=short+ocr_short
         other_name=False
         extended_name=False
         normalized_body=re.sub(r'(?<=\w)[-\u00ad]\s*\r?\n\s*(?=\w)','',body)
@@ -87,15 +158,18 @@ def extract_document(text, source, file, ctx):
         for name in short:
             # A different explicit first name must not be collapsed into the
             # requested person merely because a surname is shared.
-            for m in re.finditer(r'\b([^\W\d_]+)\s+'+re.escape(name)+r'\b',normalized_body,re.I):
+            forms='|'.join(re.escape(form) for form in name_forms(name))
+            for m in re.finditer(r'\b([^\W\d_]+)\s+(?:'+forms+r')\b',normalized_body,re.I):
                 before=m.group(1)
-                if before[0].isupper() and fold(before) not in first_names|{'ο','του','τον','η','της','την','the','captain','καπεταν','il','el','le','la','los','les','don','sir'}:other_name=True
+                # A single unpunctuated letter is an OCR'd drop capital, not a given name.
+                if len(before)>1 and before[0].isupper() and fold(before) not in first_names|{'ο','του','τον','η','της','την','the','captain','καπεταν','il','el','le','la','los','les','don','sir'}:other_name=True
         for name in direct:
             # A longer explicitly qualified name may identify a namesake. Do
             # not infer that e.g. "Name Surname di Otherplace" is the target.
-            for hit in re.finditer(name_pattern(name.split()),fold(normalized_body)):
-                if extended_name_after(normalized_body,hit.end()):
-                    extended_name=True
+            for form in name_forms(name):
+                for hit in re.finditer(name_pattern(form.split()),fold(normalized_body)):
+                    if extended_name_after(normalized_body,hit.end()):
+                        extended_name=True
         if direct:topic={'text':raw,'locator':locator(text,start,end,source,file)}
         # Pronouns alone do not establish a person. They remain a section-context
         # lead only where an explicitly named paragraph is adjacent.
@@ -125,6 +199,8 @@ def extract_document(text, source, file, ctx):
         if fiction:uncertainties.append('FICTION_OR_BOOK_REVIEW_CONTEXT')
         if other_name:uncertainties.append('CONFLICTING_GIVEN_NAME')
         if extended_name:uncertainties.append('EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW')
+        if ocr_names:uncertainties.append('OCR_LONG_S_NAME_VARIANT')
+        if section_heading:uncertainties.append('NAME_FROM_SECTION_HEADING')
         if short and not direct and not document_named:uncertainties.append('SURNAME_IDENTITY_UNRESOLVED')
         if re.search(r'\b(?:εικαζ\w*|πιθανο\w*|perhaps|possibly|allegedly|hypoth\w*)\b',fold(body)):uncertainties.append('SOURCE_EXPRESSES_UNCERTAINTY')
         cite_pages=re.findall(r'(?:σελ\.|pp?\.)\s*(\d+(?:[-–]\d+)?)',raw,re.I)
