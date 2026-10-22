@@ -2,12 +2,16 @@ name: NABOU workspace preview
 on:
   pull_request:
     paths:
-      - 'jarvis-intelligence-chamber/workspace-preview*'
+      # The preview also loads shared chamber modules and styles (research-ui.js,
+      # chamber.css, ...), so any chamber change re-runs it.
+      - 'jarvis-intelligence-chamber/**'
       - '.github/workflows/jarvis-workspace-preview.yml'
   push:
     branches: [main]
     paths:
-      - 'jarvis-intelligence-chamber/workspace-preview*'
+      # The preview also loads shared chamber modules and styles (research-ui.js,
+      # chamber.css, ...), so any chamber change re-runs it.
+      - 'jarvis-intelligence-chamber/**'
       - '.github/workflows/jarvis-workspace-preview.yml'
 permissions:
   contents: read
@@ -33,6 +37,8 @@ jobs:
           node --check jarvis-intelligence-chamber/workspace-preview.js
           node --check jarvis-intelligence-chamber/workspace-preview-feed.js
           node --check jarvis-intelligence-chamber/workspace-preview-canvas.js
+          node --check jarvis-intelligence-chamber/workspace-preview-renderer.js
+          node --check jarvis-intelligence-chamber/workspace-preview-field.js
       - name: Install browser
         run: |
           npm install --no-save playwright@1.56.1
