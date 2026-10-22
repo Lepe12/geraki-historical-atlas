@@ -170,6 +170,30 @@ class HandoffTests(unittest.TestCase):
     def test_busy_corpus_is_not_scheduled_twice(self):
         self.assertEqual(select(self.base, {'123'}), {})
 
+    def test_auto_continue_false_holds_corpus_from_coordinator(self):
+        marker = self.root / 'research_continuation/auto_continue.json'
+        self.write(marker, {'auto_continue': False, 'set_by_run': '456'})
+        self.assertEqual(select(self.base), {})
+        marker.write_text('{not json')
+        self.assertEqual(select(self.base), {})  # fail closed
+        self.write(marker, {'auto_continue': True, 'set_by_run': '789'})
+        self.assertIn('123', select(self.base))
+
+    def test_reanalysis_workflow_gates_every_self_dispatch_on_auto_continue(self):
+        # Text check: the coordinator runs this suite without PyYAML.
+        path = Path(__file__).resolve().parents[1] / '.github/workflows/research-semantic-reanalysis.yml'
+        text = path.read_text()
+        self.assertEqual(text.count('      auto_continue:\n        type: boolean\n        default: true\n'), 2)
+        self.assertIn("PCT_AUTO_CONTINUE: ${{ inputs.auto_continue == false && 'false' || 'true' }}", text)
+        steps = text.split('\n      - ')
+        dispatching = [step for step in steps if 'gh workflow run' in step]
+        self.assertTrue(dispatching)
+        for step in dispatching:
+            condition = next(line for line in step.splitlines() if line.strip().startswith('if:'))
+            self.assertIn("env.PCT_AUTO_CONTINUE == 'true'", condition)
+        persist = next(step for step in steps if step.startswith('name: Persist actual outcome'))
+        self.assertIn('research_continuation/auto_continue.json', persist)
+
     @patch('research_continuation_handoff.gh_pages')
     def test_running_jobs_exclude_completed_jobs_and_own_coordinator(self, pages):
         pages.side_effect = [[{'workflow_runs': [
