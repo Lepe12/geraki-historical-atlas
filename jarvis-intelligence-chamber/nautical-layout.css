@@ -326,3 +326,53 @@ body.nx-mock #sidenav .nxs-dock .side-item.dim-current[aria-current="page"]::bef
 body.nx-mock #topbar .nxs-status-dot { display: none !important; }
 @media (max-width: 800px) { body.nx-mock #chartView .nxs-telemetry #coordinates { display: none; } }
 @media (max-width: 800px) { #ddMenu, .nx-pop { z-index: 70 !important; } #ddMenu { max-height: 50vh; } }
+
+/* ---------- v3: decluttered chart labels, lane tooltip, readability ---------- */
+body.nx-mock #chartView .node-label { font: 600 14.5px/1.2 var(--nx-body); padding: 3px 9px 3px; }
+body.nx-mock #chartView .node-label small { display: none !important; }
+.lane-tip { position: absolute; left: 0; top: 0; z-index: 9; max-width: 280px; padding: 8px 12px 9px; pointer-events: none;
+  color: var(--ink); font: 14px/1.35 var(--gar);
+  background: linear-gradient(rgba(255, 248, 230, .2), rgba(150, 110, 60, .14)), url(./assets/nautical/img/parchment.jpg) center/420px;
+  box-shadow: 0 0 0 1px #3d2815, 0 0 0 3px rgba(180, 141, 69, .55), 0 8px 18px rgba(0, 0, 0, .55); }
+.lane-tip[hidden] { display: none; }
+.lane-tip strong { display: block; font: 700 13px var(--cin); letter-spacing: 1.6px; color: var(--ox); }
+.lane-tip span { display: block; margin-top: 2px; font-variant-numeric: lining-nums; }
+.lane-tip em { display: block; margin-top: 3px; font-size: 12.5px; color: #5e4528; }
+/* readability */
+#activityLive .row { height: 34px; }
+#activityLive .t { font-size: 14.5px; color: #c4ab7a; top: 7px; }
+#activityLive .ti { left: 66px; max-width: 220px; font-size: 15.5px; color: #f3e6c6; top: 0; }
+#activityLive .su { left: 66px; max-width: 220px; font-size: 13.5px; top: 18px; color: #cdb78c; }
+#activityLive .row::after { top: 23px; height: 13px; }
+#activityLive .empty { font-size: 15px; color: #b9a47b; }
+.srow .k { font-size: 12px; color: #c4ab7a; }
+.srow .n { font-size: 17px; }
+#cards .card .lbl { font-size: 14px; }
+#cards .card .cnt { font-size: 16px; color: #f1d796; font-style: italic; text-shadow: 0 1px 4px #000, 0 0 8px rgba(0, 0, 0, .8); }
+#cards .card::before { background: linear-gradient(180deg, transparent 35%, rgba(14, 8, 4, .92)); }
+#hero .hq { font-size: 15px; }
+#nodes .nl1 { font-size: 11.5px; } #nodes .nl2 { font-size: 14px; color: #c4ab7a; }
+#moon .mphase { font-size: 12.5px; color: #c4ab7a; }
+#histList .hist { font-size: 12px; color: #b9a47b; }
+#qLabel { font-size: 11.5px; color: #b9a47b; }
+
+/* ---------- ACTIVE NODES: miniature portolan (same coastline/projection as the main chart) ---------- */
+#miniChart { background: #e9dcb8 url(./assets/nautical/img/parchment.jpg) center/300px; box-shadow: inset 0 0 0 1px #2a190e, inset 0 0 0 4px rgba(236, 223, 191, .6), inset 0 0 0 5px rgba(42, 25, 14, .5), inset 0 0 22px rgba(90, 55, 20, .45); }
+#nodes:hover #miniChart { box-shadow: inset 0 0 0 1px var(--ox), inset 0 0 0 4px rgba(236, 223, 191, .6), inset 0 0 0 5px rgba(123, 28, 23, .6), inset 0 0 22px rgba(90, 55, 20, .45); }
+#miniChart .mrh { fill: none; stroke: rgba(42, 25, 14, .22); stroke-width: 2.5; }
+#miniChart .mrh.r { stroke: rgba(150, 40, 30, .2); } #miniChart .mrh.g { stroke: rgba(60, 115, 90, .22); }
+#miniChart .ml { fill: #d3b47a; fill-opacity: .55; stroke: #2a190e; stroke-width: 3.2; stroke-linejoin: round; }
+#miniChart .mn { fill: none; stroke: rgba(42, 25, 14, .5); stroke-width: 3; stroke-dasharray: 10 8; }
+#miniChart .mrose path { fill: #2a190e; } #miniChart .mrose .s { fill: #efe3c4; stroke: #2a190e; stroke-width: 1.5; } #miniChart .mrose circle { fill: none; stroke: #2a190e; stroke-width: 2.5; }
+#miniChart .md { stroke: #2a190e; stroke-width: 3; }
+#miniChart .md.COMPLETED { fill: url(#mwGold); }
+#miniChart .md.ACTIVE { fill: url(#mwRed); animation: mwpulse 1.6s ease-in-out infinite; }
+#miniChart .md.BLOCKED { fill: url(#mwOx); }
+#miniChart .md.IDLE { fill: #efe3c4; stroke-dasharray: 6 4; }
+#miniChart .mx { stroke: #efe3c4; stroke-width: 3.5; stroke-linecap: round; }
+@keyframes mwpulse { 50% { stroke: #a3342a; stroke-width: 9; } }
+#nodes .nl1 { color: var(--parch); }
+#miniChart::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 0 1px #2a190e, inset 0 0 0 4px rgba(236, 223, 191, .7), inset 0 0 0 5px rgba(42, 25, 14, .55), inset 0 0 18px rgba(90, 55, 20, .4); }
+#nodes:hover #miniChart::after { box-shadow: inset 0 0 0 1px var(--ox), inset 0 0 0 4px rgba(236, 223, 191, .7), inset 0 0 0 5px rgba(123, 28, 23, .65), inset 0 0 18px rgba(90, 55, 20, .4); }
+#miniChart svg { display: block; width: 100%; height: 100%; }
+#miniChart .mrh { stroke: rgba(42, 25, 14, .3); } #miniChart .mrh.r { stroke: rgba(150, 40, 30, .3); } #miniChart .mrh.g { stroke: rgba(60, 115, 90, .3); }

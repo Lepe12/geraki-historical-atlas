@@ -313,17 +313,61 @@ function evTime(e) {
   const d = new Date(e.created_utc || e.timestamp || e.at || 0);
   return Number.isNaN(d.valueOf()) || !d.valueOf() ? "—" : d.toLocaleTimeString("el-GR", { hour: "2-digit", minute: "2-digit", hour12: false });
 }
-function renderActivity() {
-  const all = [...(snapshot?.events || [])];
+// RECENT ACTIVITY: informative real events first; repetitive per-lane completions collapse into one line.
+const BLOCK = { REMOTE_ACCESS_BLOCKED: ["αποκλεισμός πρόσβασης", "αποκλεισμοί πρόσβασης"], REMOTE_RATE_LIMITED: ["όριο αιτημάτων", "όρια αιτημάτων"], FAILED: ["αποτυχία", "αποτυχίες"], REMOTE_ERROR: ["σφάλμα πηγής", "σφάλματα πηγής"], ERROR: ["σφάλμα", "σφάλματα"], BLOCKED: ["μπλοκάρισμα", "μπλοκαρίσματα"], UNAVAILABLE: ["μη διαθέσιμη πηγή", "μη διαθέσιμες πηγές"] };
+const latest = (list) => list.reduce((m, e) => (String(e.created_utc || "") > m ? String(e.created_utc || "") : m), "");
+const earliest = (list) => list.reduce((m, e) => (!m || String(e.created_utc || "") < m ? String(e.created_utc || "") : m), "");
+function activityItems() {
+  const s = snapshot;
+  const all = [...(s?.events || [])];
   for (const e of liveEvents) if (!all.some((x) => x.event_id && x.event_id === e.event_id)) all.push(e);
-  all.sort((a, b) => String(b.created_utc || "").localeCompare(String(a.created_utc || "")));
-  const rows = all.slice(0, 5);
+  const items = [];
+  const st = (e) => String(e.status || "").toUpperCase();
+  // live, still-running lane activity (only while something is actually running)
+  const running = all.filter((e) => ACTIVE.includes(st(e)));
+  const finishedLanes = new Set(all.filter((e) => e.event_type === "agent_completed" || laneClass(e.status) === "COMPLETED").map((e) => e.agent_id));
+  const stillRunning = new Map();
+  for (const e of running) if (!finishedLanes.has(e.agent_id)) stillRunning.set(e.agent_id, e);
+  if (stillRunning.size) {
+    const last = [...stillRunning.values()].sort((x, y) => String(y.created_utc || "").localeCompare(String(x.created_utc || "")))[0];
+    items.push({ at: latest([...stillRunning.values()]), title: stillRunning.size === 1 ? laneName(last.agent_id) + " σε εξέλιξη" : stillRunning.size + " γραμμές σε εξέλιξη", sub: GR.status(last.phase ? String(last.phase).toUpperCase() : last.status), cls: "warn", detail: last.detail });
+  }
+  // access problems, grouped by kind
+  const bad = all.filter((e) => BLOCK[st(e)]);
+  if (bad.length) {
+    const by = new Map();
+    for (const e of bad) by.set(st(e), (by.get(st(e)) || 0) + 1);
+    const parts = [...by].sort((x, y) => y[1] - x[1]).map(([k, n]) => n + " " + BLOCK[k][n === 1 ? 0 : 1]);
+    const failed = (by.get("FAILED") || 0) + (by.get("ERROR") || 0) + (by.get("REMOTE_ERROR") || 0);
+    items.push({ at: latest(bad), title: failed ? "Αποτυχίες και εμπόδια πηγών" : "Εμπόδια πρόσβασης σε πηγές", sub: parts.join(" · "), cls: "" });
+  }
+  // completions collapsed
+  const done = all.filter((e) => e.event_type === "agent_completed" || (laneClass(e.status) === "COMPLETED" && e.agent_id));
+  if (done.length) {
+    const lanes = new Set(done.map((e) => e.agent_id));
+    const none = new Set(done.filter((e) => /NO_CANDIDATE/i.test(String(e.phase || "")) || /^0 candidate/.test(String(e.detail || ""))).map((e) => e.agent_id)).size;
+    const sub = none && none < lanes.size ? (lanes.size - none) + " με εγγραφές · " + none + " χωρίς υποψήφια" : none ? "χωρίς υποψήφια γεγονότα προς επαλήθευση" : "";
+    items.push({ at: latest(done), title: lanes.size + (lanes.size === 1 ? " γραμμή ολοκληρώθηκε" : " γραμμές ολοκληρώθηκαν"), sub, cls: "ok" });
+  }
+  if (s) {
+    const related = (s.discoveries || []).filter((d) => ["TARGET_MATCH", "POSSIBLE_TARGET"].includes(d.topical_match?.category)).length;
+    const repos = new Set((s.discoveries || []).map((d) => d.repository).filter(Boolean)).size;
+    const claims = s.claims?.length || 0, contra = Array.isArray(s.contradictions?.records) ? s.contradictions.records.length : 0;
+    const at = s.generated_utc || latest(all);
+    if (contra) items.push({ at, title: contra + (contra === 1 ? " αντίφαση" : " αντιφάσεις"), sub: "καταγράφηκαν στα τεκμήρια", cls: "" });
+    if (claims) items.push({ at, title: claims + (claims === 1 ? " ισχυρισμός" : " ισχυρισμοί"), sub: "για έλεγχο στο πρωτότυπο", cls: "warn" });
+    if (s.discoveries?.length) items.push({ at, title: fmt(related) + " σχετικές αναφορές", sub: "από " + fmt(s.discoveries.length) + " εγγραφές σε " + repos + " πηγές", cls: "warn" });
+    const m = s.mission || {};
+    if (m.status) items.push({ at, title: "Έρευνα #" + (s.run_id || "—") + ": " + GR.status(m.status), sub: m.answer_status ? GR.status(m.answer_status) : m.target || "", cls: laneClass(m.status) === "COMPLETED" ? "ok" : "" });
+  }
+  const starts = all.filter((e) => e.event_type === "agent_started" || e.event_type === "agent_preparing");
+  if (starts.length) items.push({ at: earliest(starts), title: "Έναρξη έρευνας", sub: new Set(all.map((e) => e.agent_id).filter(Boolean)).size + " γραμμές σε δράση", cls: "warn" });
+  return items.sort((x, y) => String(y.at || "").localeCompare(String(x.at || "")) || 0).slice(0, 5);
+}
+function renderActivity() {
+  const rows = activityItems();
   $("activityLive").innerHTML = rows.length
-    ? rows.map((e) => {
-        const cls = laneClass(e.status);
-        const sub = [GR.status(e.status), e.phase ? GR.status(String(e.phase).toUpperCase()) : ""].filter(Boolean).join(" · ");
-        return `<div class="row" title="${esc(e.detail || "")}"><i class="dot ${cls === "COMPLETED" ? "ok" : cls === "ACTIVE" ? "warn" : ""}"></i><span class="t">${esc(evTime(e))}</span><span class="ti">${esc(laneName(e.agent_id))}</span><span class="su">${esc(sub)}</span></div>`;
-      }).join("")
+    ? rows.map((r) => `<div class="row" title="${esc(r.title + (r.sub ? " — " + r.sub : "") + (r.detail ? " — " + r.detail : ""))}"><i class="dot ${r.cls}"></i><span class="t">${esc(evTime({ created_utc: r.at }))}</span><span class="ti">${esc(r.title)}</span><span class="su">${esc(r.sub || "")}</span></div>`).join("")
     : '<div class="empty">Δεν έχει καταγραφεί δραστηριότητα.</div>';
 }
 let miniBuilt = false;
@@ -331,22 +375,40 @@ function renderNodes() {
   const lanes = window.NABOU_LANES || [], C = window.NABOU_CHART;
   if (!lanes.length || !C) return;
   if (!miniBuilt) {
+    // Same coastline (Natural Earth 10m), same Mercator projection and coordinates as the main chart.
     const d = (C.svg.match(/id="bigP" d="([^"]+)"/) || [])[1] || "";
-    const xs = lanes.map((l) => l.x), ys = lanes.map((l) => l.y), pad = 60;
+    const core = C.core, hub = C.analysis;
+    const xs = [...lanes.map((l) => l.x), core[0]], ys = [...lanes.map((l) => l.y), core[1]], pad = 70;
     const x0 = Math.min(...xs) - pad, y0 = Math.min(...ys) - pad, w = Math.max(...xs) - x0 + pad, h = Math.max(...ys) - y0 + pad;
-    const core = C.core;
-    $("miniChart").innerHTML = `<svg viewBox="${x0.toFixed(0)} ${y0.toFixed(0)} ${w.toFixed(0)} ${h.toFixed(0)}" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path class="ml" d="${d}"/>` +
-      `<g class="mnet">${lanes.map((l) => `<path class="mn" d="M${l.x.toFixed(0)},${l.y.toFixed(0)}L${(l.kind === "archive" ? core[0] : C.analysis[0]).toFixed(0)},${(l.kind === "archive" ? core[1] : C.analysis[1]).toFixed(0)}"/>`).join("")}</g>` +
-      lanes.map((l) => `<circle class="md IDLE" data-a="${l.agentId}" cx="${l.x.toFixed(0)}" cy="${l.y.toFixed(0)}" r="24"><title>${esc(l.name)}</title></circle>`).join("") + "</svg>";
+    let rh = "";
+    for (let j = 0; j < 16; j++) {
+      const a = (j * Math.PI) / 8, L = 2400, cls = j % 4 === 0 ? "" : j % 2 ? "r" : "g";
+      rh += `<path class="mrh ${cls}" d="M${core[0].toFixed(0)},${core[1].toFixed(0)}L${(core[0] + Math.cos(a) * L).toFixed(0)},${(core[1] + Math.sin(a) * L).toFixed(0)}"/>`;
+    }
+    const rose = (x, y, r) => `<g class="mrose" transform="translate(${x.toFixed(0)},${y.toFixed(0)})"><circle r="${r}"/>` +
+      [0, 90, 180, 270].map((a) => `<g transform="rotate(${a})"><path d="M0,${-r * 1.25}L${r * 0.22},0L0,0Z"/><path class="s" d="M0,${-r * 1.25}L${-r * 0.22},0L0,0Z"/></g>`).join("") + "</g>";
+    $("miniChart").innerHTML = `<svg viewBox="${x0.toFixed(0)} ${y0.toFixed(0)} ${w.toFixed(0)} ${h.toFixed(0)}" preserveAspectRatio="xMidYMid meet" overflow="visible" aria-hidden="true">` +
+      `<defs><radialGradient id="mwRed" cx=".36" cy=".3"><stop offset="0" stop-color="#cf5a43"/><stop offset=".5" stop-color="#8e231b"/><stop offset="1" stop-color="#5a110d"/></radialGradient>` +
+      `<radialGradient id="mwGold" cx=".36" cy=".3"><stop offset="0" stop-color="#f6e2a4"/><stop offset=".5" stop-color="#b48d45"/><stop offset="1" stop-color="#6e5222"/></radialGradient>` +
+      `<radialGradient id="mwOx" cx=".36" cy=".3"><stop offset="0" stop-color="#7b2a20"/><stop offset=".6" stop-color="#4c0e0b"/><stop offset="1" stop-color="#2a0705"/></radialGradient></defs>` +
+      `<g>${rh}</g><path class="ml" d="${d}"/>` +
+      `<g>${lanes.map((l) => `<path class="mn" d="M${l.x.toFixed(0)},${l.y.toFixed(0)}L${(l.kind === "archive" ? core[0] : hub[0]).toFixed(0)},${(l.kind === "archive" ? core[1] : hub[1]).toFixed(0)}"/>`).join("")}</g>` +
+      rose(core[0], core[1], 40) + rose(hub[0], hub[1], 24) +
+      lanes.map((l, i) => `<g data-i="${i}"><circle class="md IDLE" cx="${l.x.toFixed(0)}" cy="${l.y.toFixed(0)}" r="${l.kind === "archive" ? 22 : 17}"><title>${esc(l.name)}</title></circle>` +
+        `<path class="mx" hidden d="M${(l.x - 9).toFixed(0)},${(l.y - 9).toFixed(0)}l18,18m0,-18l-18,18"/></g>`).join("") + "</svg>";
     miniBuilt = true;
   }
   const agents = snapshot?.agents || [];
   let active = 0;
-  document.querySelectorAll("#miniChart .md").forEach((c) => {
-    const a = agents.find((x) => x.id === c.dataset.a || x.agent_id === c.dataset.a);
+  document.querySelectorAll("#miniChart [data-i]").forEach((g) => {
+    const id = lanes[+g.dataset.i]?.agentId;
+    const a = agents.find((x) => x.id === id || x.agent_id === id);
     const cls = a ? laneClass(a.status) : "IDLE";
     if (cls === "ACTIVE") active++;
+    const c = g.querySelector(".md");
     c.setAttribute("class", "md " + cls);
+    c.querySelector("title").textContent = laneName(id) + " — " + (a ? GR.status(a.status) : "χωρίς δεδομένα");
+    g.querySelector(".mx").toggleAttribute("hidden", cls !== "BLOCKED");
   });
   $("nodeCount").textContent = lanes.length + " NODES" + (snapshot ? " · " + (active ? active + " ενεργοί" : agents.length + " στην έρευνα") : "");
 }

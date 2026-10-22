@@ -68,7 +68,7 @@
   });
   const core = { x: C.core[0], y: C.core[1] };
   // shared with nautical-dashboard.js (ACTIVE NODES mini chart)
-  window.NABOU_LANES = sectors.map((q) => ({ agentId: q.agentId, name: q.name, kind: q.kind, x: q.x, y: q.y, place: q.place }));
+  window.NABOU_LANES = sectors.map((q) => ({ get agentId() { return q.agentId; }, get name() { return q.name; }, kind: q.kind, x: q.x, y: q.y, place: q.place }));
   const analysisHub = { x: C.analysis[0], y: C.analysis[1] };
   // Ink routes: every archive to the core rose, every analysis lane to its rose, and the two roses joined.
   const linkPairs = sectors.map((s, i) => [i, s.kind === "archive" ? -1 : -2]).concat([[-2, -1]]);
@@ -103,8 +103,9 @@
   function setLaneText(sector, text) {
     if (!sector.element) return;
     sector.element.querySelector("small").textContent = text;
+    sector.detail = text;
     sector.seal.setAttribute("aria-label", sector.name + " — " + text);
-    sector.seal.title = sector.name + " — " + text;
+    if (tipFor === sector.id) showTip(sector.id);
     layoutDirty = true;
   }
   function applySnapshot(data) {
@@ -208,6 +209,42 @@
   });
   syncActiveDataset();
 
+  /* ---------- lane tooltip: the chart label shows only the name; status / finds / blockers appear here ---------- */
+  const tip = document.createElement("div");
+  tip.id = "laneTip";
+  tip.className = "lane-tip";
+  tip.setAttribute("role", "tooltip");
+  tip.hidden = true;
+  (host || document.body).appendChild(tip);
+  let tipFor = -1;
+  function showTip(id) {
+    const q = sectors[id];
+    if (!q) return;
+    tipFor = id;
+    tip.innerHTML = "<strong></strong><span></span><em></em>";
+    tip.querySelector("strong").textContent = q.name;
+    tip.querySelector("span").textContent = q.detail || "";
+    tip.querySelector("em").textContent = q.place || "";
+    tip.hidden = false;
+    placeTip();
+  }
+  function hideTip(id) {
+    if (id !== undefined && id !== tipFor) return;
+    tipFor = -1;
+    tip.hidden = true;
+  }
+  function placeTip() {
+    const q = sectors[tipFor];
+    if (!q || tip.hidden) return;
+    if (!q.sealVisible) { tip.style.visibility = "hidden"; return; }
+    tip.style.visibility = "";
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    let x = q.sx - w / 2, y = q.sy - 22 - h;
+    if (y < 4) y = q.sy + 22;
+    x = Math.max(4, Math.min(W - w - 4, x));
+    tip.style.transform = `translate(${x.toFixed(0)}px,${y.toFixed(0)}px)`;
+  }
+
   /* ---------- seals and labels ---------- */
   for (const s of sectors) {
     const seal = document.createElement("button");
@@ -217,8 +254,10 @@
     seal.innerHTML = '<span class="seal-wax" aria-hidden="true"><span class="seal-mono"></span></span><span class="seal-count" aria-hidden="true"></span>';
     seal.querySelector(".seal-mono").textContent = s.name.charAt(0);
     seal.addEventListener("click", () => select(s.id));
-    seal.addEventListener("pointerenter", () => { hover = s.id; layoutDirty = true; });
-    seal.addEventListener("pointerleave", () => { if (hover === s.id) hover = -1; layoutDirty = true; });
+    seal.addEventListener("pointerenter", () => { hover = s.id; layoutDirty = true; showTip(s.id); });
+    seal.addEventListener("pointerleave", () => { if (hover === s.id) hover = -1; layoutDirty = true; hideTip(s.id); });
+    seal.addEventListener("focus", () => showTip(s.id));
+    seal.addEventListener("blur", () => hideTip(s.id));
     seals.appendChild(seal);
     const label = document.createElement("button");
     label.type = "button";
@@ -227,8 +266,8 @@
     label.innerHTML = '<span class="nl-name"></span><small></small>';
     label.querySelector(".nl-name").textContent = s.name;
     label.addEventListener("click", () => select(s.id));
-    label.addEventListener("pointerenter", () => { hover = s.id; layoutDirty = true; });
-    label.addEventListener("pointerleave", () => { if (hover === s.id) hover = -1; layoutDirty = true; });
+    label.addEventListener("pointerenter", () => { hover = s.id; layoutDirty = true; showTip(s.id); });
+    label.addEventListener("pointerleave", () => { if (hover === s.id) hover = -1; layoutDirty = true; hideTip(s.id); });
     labels.appendChild(label);
     s.seal = seal;
     s.element = label;
@@ -312,7 +351,14 @@
     const y0 = Math.min(...pts.map((p) => p[1])) - pad, y1 = Math.max(...pts.map((p) => p[1])) + pad;
     let s = Math.min(r.w / (x1 - x0), r.h / (y1 - y0));
     s = Math.max(s, Math.max(r.w / C.W, r.h / C.H)); // never leave empty margins around the chart
-    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    const cx = (x0 + x1) / 2;
+    let cy = (y0 + y1) / 2;
+    if (s * (y1 - y0) > r.h) {
+      // the frame is too wide/short for every lane at the minimum scale: keep all lane seals in view
+      // (centre on the lanes only) and let the core rose sit nearer the edge instead
+      const ly = sectors.map((q) => q.y);
+      cy = (Math.min(...ly) + Math.max(...ly)) / 2;
+    }
     fitScale = s;
     target = clampView({ s, x: r.left + r.w / 2 - cx * s, y: r.top + r.h / 2 - cy * s });
     if (immediate) view = { ...target };
@@ -484,7 +530,7 @@
     coreHit.style.marginLeft = coreHit.style.marginTop = (-cr).toFixed(0) + "px";
     coreHit.classList.toggle("offscreen", blocks.some((b) => cx > b.left && cx < b.right && cy > b.top && cy < b.bottom) || cx < 0 || cx > W || cy < 0 || cy > H);
     const order = [...sectors].sort((a, b) => {
-      const rank = (s) => (s.id === selected ? 0 : s.id === hover ? 1 : activeAgentIds.has(s.agentId) ? 2 : s.kind === "archive" ? 3 : 4);
+      const rank = (s) => (s.id === selected ? 0 : s.id === hover ? 1 : activeAgentIds.has(s.agentId) || s === sectors[sectors.length - 1] ? 2 : s.kind === "archive" ? 3 : 4);
       return rank(a) - rank(b) || b.found - a.found || a.id - b.id;
     });
     const gap = SEAL_R + 5;
@@ -497,6 +543,9 @@
           [x + gap, y - h / 2], [x - gap - w, y - h / 2], [x - w / 2, y - gap - h], [x - w / 2, y + gap],
           [x + gap - 4, y - h - 6], [x + gap - 4, y + 6], [x - gap - w + 4, y - h - 6], [x - gap - w + 4, y + 6],
           [x + gap + 18, y - h / 2], [x - gap - w - 18, y - h / 2], [x - w / 2, y - gap - h - 16], [x - w / 2, y + gap + 16],
+          [x - w / 2, y - gap - h - 34], [x - w / 2, y + gap + 34], [x + gap - 4, y - h - 26], [x + gap - 4, y + 26],
+          [x - gap - w + 4, y - h - 26], [x - gap - w + 4, y + 26], [x - w * 0.25, y - gap - h], [x - w * 0.75, y - gap - h],
+          [x - w * 0.25, y + gap], [x - w * 0.75, y + gap], [6, y - gap - h], [6, y + gap],
         ];
         for (const [l, t] of candidates) {
           const r = { left: l, top: t, right: l + w, bottom: t + h };
@@ -519,6 +568,7 @@
         s.anchor = null;
       }
     }
+    placeTip();
   }
 
   /* ---------- canvas: ink routes, live pulses, selection rings ---------- */
