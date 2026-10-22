@@ -4,7 +4,8 @@ const $=id=>document.getElementById(id);
 const query=new URLSearchParams(location.search);
 let mode="operations",feedMode="evidence",map,mapLoaded=false,terrainOn=true,socket=null,poller=null;
 let api=(query.get("api")||"https://www.piratecartography.com/pct-api/live").replace(/\/$/,"");
-let currentRun=query.get("run")||"latest",project=query.get("project")||"piratecartography",selected=null;
+const requestedRun=query.get("run")||"latest";
+let currentRun=requestedRun,project=query.get("project")||"piratecartography",selected=null;
 let events=[],claims=[],blockers=[],snapshotMeta=null,liveConnected=false;
 
 const catalog={
@@ -95,8 +96,21 @@ function rebuildFromEvents(){
  for(const e of events){if(!e.agent_id)continue;const d=ensureAgent(e.agent_id);if(e.event_type==="agent_started")d.status="RUNNING";else if(e.event_type==="agent_completed")d.status="COMPLETED";else if(e.event_type==="agent_failed")d.status="FAILED";else if(e.status)d.status=String(e.status).toUpperCase();if(e.phase)d.phase=e.phase;if(e.percent!==undefined&&Number.isFinite(Number(e.percent)))d.percent=Number(e.percent);}
  renderAgents();renderFeed();renderQa();$("run-label").textContent="RUN "+currentRun;
 }
+function renderResearchProgress(snap){
+ const answer=snap.research_answer||{},coverage=answer.coverage||{};
+ const examined=coverage.selected_passages,total=coverage.unique_passages;
+ const pending=Array.isArray(coverage.deferred)?coverage.deferred.length:null;
+ const analysis=answer.execution_receipt?.analysis_run_id;
+ $("research-state").textContent=answer.status||"Δεν υπάρχει αποθηκευμένη ανάλυση";
+ $("research-progress").textContent=Number.isFinite(examined)?("Εξετασμένα αποσπάσματα: "+examined+(Number.isFinite(total)?" / "+total:"")+(pending!==null?" · Εκκρεμούν: "+pending:"")):"Η κάλυψη δεν έχει καταγραφεί.";
+ $("analysis-run").textContent=analysis?"Ανάλυση "+analysis:"Ανάλυση: δεν έχει καταγραφεί";
+ $("snapshot-time").textContent="Αποθηκευμένο στιγμιότυπο: "+(snap.generated_utc?new Date(snap.generated_utc).toLocaleString("el-GR"):"άγνωστος χρόνος");
+ $("research-verification").textContent="Ιστορικά VERIFIED: "+(snap.metrics?.verified_events??0)+" · Η ολοκλήρωση επιμέρους εργασιών δεν σημαίνει ολοκλήρωση της έρευνας.";
+}
 function applySnapshot(snap,transport){
  if(!snap||snap.schema!=="pct-command-center-live-v1")throw Error("Invalid Command Center snapshot");
+ if(requestedRun!=="latest"&&String(snap.run_id)!==requestedRun)throw Error("Το snapshot ανήκει σε διαφορετική έρευνα.");
+ renderResearchProgress(snap);
  snapshotMeta=snap;currentRun=String(snap.run_id||currentRun);claims=Array.isArray(snap.claims)?snap.claims:[];blockers=Array.isArray(snap.blockers)?snap.blockers:[];
  events=Array.isArray(snap.events)?snap.events.slice(-600):[];
  agents=[];agentData.clear();
@@ -108,17 +122,18 @@ function applySnapshot(snap,transport){
 function eventKey(x){return x.event_id||[x.created_utc,x.agent_id,x.event_type,x.phase,x.detail].join("|");}
 function ingest(incoming){
  const seen=new Set(events.map(eventKey));
- for(const e of incoming||[]){if(!e||typeof e!=="object")continue;if(e.schema==="pct-command-center-bootstrap-v1"){if(e.snapshot)applySnapshot(e.snapshot,"backend");if(Array.isArray(e.events))ingest(e.events);continue;}if(!seen.has(eventKey(e))){events.push(e);seen.add(eventKey(e));if(e.run_id)currentRun=String(e.run_id);}}
+ for(const e of incoming||[]){if(!e||typeof e!=="object")continue;if(requestedRun!=="latest"&&e.run_id&&String(e.run_id)!==requestedRun)continue;if(e.schema==="pct-command-center-bootstrap-v1"){if(e.snapshot)applySnapshot(e.snapshot,"backend");if(Array.isArray(e.events))ingest(e.events);continue;}if(!seen.has(eventKey(e))){events.push(e);seen.add(eventKey(e));if(e.run_id)currentRun=String(e.run_id);}}
  events.sort((a,b)=>String(a.created_utc||"").localeCompare(String(b.created_utc||"")));if(events.length>1000)events=events.slice(-1000);rebuildFromEvents();
 }
 async function loadStaticSnapshot(){
- try{const r=await fetch("./live/latest.json",{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);applySnapshot(await r.json(),"snapshot");return true;}catch(err){setConnection("ΧΩΡΙΣ DATA","offline","Δεν βρέθηκε production backend ούτε durable snapshot: "+err.message);return false;}
+ try{const r=await fetch(requestedRun==="latest"?"./live/latest.json":"./live/runs/"+encodeURIComponent(requestedRun)+".json",{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);applySnapshot(await r.json(),"snapshot");return true;}catch(err){setConnection("ΧΩΡΙΣ DATA","offline","Δεν βρέθηκε production backend ούτε durable snapshot: "+err.message);return false;}
 }
 async function fetchSnapshot(){
  const controller=new AbortController();const t=setTimeout(()=>controller.abort(),8000);
  try{
   const r=await fetch(api+"/status/"+encodeURIComponent(project)+"/"+encodeURIComponent(query.get("run")||"latest"),{signal:controller.signal,cache:"no-store"});
   if(!r.ok)throw Error("HTTP "+r.status);const data=await r.json();
+  if(requestedRun!=="latest"&&data.run_id&&String(data.run_id)!==requestedRun)throw Error("Το backend επέστρεψε διαφορετική έρευνα.");
   if(data.snapshot)applySnapshot(data.snapshot,"backend");
   currentRun=String(data.run_id||currentRun);if(Array.isArray(data.events))ingest(data.events);
   setConnection("PRODUCTION LIVE","online","Plesk backend + WebSocket: "+api+" · run "+currentRun);
