@@ -358,7 +358,7 @@ $("resultTabs").addEventListener("click", (e) => {
 });
 $("exportResults").addEventListener("click", () => {
   if (!snapshot) return;
-  const out = exportResearch(snapshot, $("exportFormat").value);
+  const out = exportResearch(snapshot, $("exportFormat")?.value || "json");
   const url = URL.createObjectURL(new Blob([out.text], { type: out.mime }));
   const a = document.createElement("a");
   a.href = url;
@@ -385,10 +385,15 @@ function renderResults() {
   const unmatched = discoveries.filter((r) => !related.includes(r) && !supporting.includes(r));
   count.textContent = related.length + claims.length;
   $("exportResults").disabled = !snapshot;
-  [...$("exportFormat").options].forEach(
-    (o) => (o.disabled = o.value !== "json" && !snapshot?.evidence_package),
-  );
-  if (!snapshot?.evidence_package) $("exportFormat").value = "json";
+  // The format selector exists in the chamber, not in every page that reuses this module
+  // (workspace-preview.html has none); a missing selector means JSON export.
+  const exportFormat = $("exportFormat");
+  if (exportFormat) {
+    [...exportFormat.options].forEach(
+      (o) => (o.disabled = o.value !== "json" && !snapshot?.evidence_package),
+    );
+    if (!snapshot?.evidence_package) exportFormat.value = "json";
+  }
   document
     .querySelectorAll("[data-result-filter]")
     .forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.resultFilter === resultFilter)));
