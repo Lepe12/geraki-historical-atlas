@@ -28,6 +28,18 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
+          # select() reads only continuation queues and citation backlogs of
+          # each parent run; skip the multi-GB acquired sources and passes.
+          # Lane index.json keeps every lane directory present so a
+          # citation_continuation_<lane> receipt is still found for lanes
+          # whose own cited_work_continuation.json does not exist.
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/evidence/runs/
+            /evidence/runs/*/*/index.json
+            /evidence/runs/*/research_continuation/
+            /evidence/runs/*/*/library_acquisition/cited_work_continuation.json
       - name: Check restart and failure guards
         run: python3 -m unittest discover -s tools -p test_research_continuation_handoff.py
       - id: queue

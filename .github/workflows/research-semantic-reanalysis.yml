@@ -78,6 +78,9 @@ jobs:
         if: always()
         run: |
           python3 tools/orchestrator/build_command_center_snapshot.py --run-id "$PARENT_RESEARCH_RUN" --output "command-center/live/runs/$PARENT_RESEARCH_RUN.json" --latest command-center/live/latest.json
+      - name: Store derived inputs once by SHA-256 (idempotent)
+        if: always()
+        run: python3 tools/derived_source_store.py compact --run-id "$PARENT_RESEARCH_RUN" --pass "semantic_reanalysis_$GITHUB_RUN_ID"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -94,7 +97,7 @@ jobs:
           if [ ! -d "evidence/runs/$PARENT_RESEARCH_RUN" ]; then exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          for output in "$dest" "evidence/runs/$PARENT_RESEARCH_RUN/research_continuation" "command-center/live/runs/$PARENT_RESEARCH_RUN.json" command-center/live/index.json command-center/live/latest.json; do
+          for output in "$dest" "evidence/runs/$PARENT_RESEARCH_RUN/sources" "evidence/runs/$PARENT_RESEARCH_RUN/research_continuation" "command-center/live/runs/$PARENT_RESEARCH_RUN.json" command-center/live/index.json command-center/live/latest.json; do
             if [ -e "$output" ]; then git add "$output"; fi
           done
           git add "evidence/runs/$PARENT_RESEARCH_RUN"/citation_continuation_* 2>/dev/null || true

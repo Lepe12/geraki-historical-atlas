@@ -20,6 +20,17 @@ def main():
     parent=Path('evidence/runs')/args.run_id
     dest=parent/('semantic_reanalysis_'+job)
     dest.mkdir(exist_ok=False)
+    try:
+        run(args,job,parent,dest)
+    finally:
+        # Store derived inputs once by SHA-256 instead of a new ~95 MB copy per
+        # pass; also on failure, so a failed pass is published compactly too.
+        if (dest/'derived_sources').is_dir():
+            from derived_source_store import compact
+            print(json.dumps({'derived_source_store':compact(parent,dest)}))
+
+
+def run(args,job,parent,dest):
     manifests=sorted(parent.glob('*/run_manifest/manifest.json'))
     request=read(manifests[0])['normalized_request']
     question=request['target']+(' ('+request['date_range']+')' if request.get('date_range') else '')

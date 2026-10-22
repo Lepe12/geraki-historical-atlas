@@ -64,6 +64,9 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
       - name: Actual extraction, source review, synthesis and paragraph review
         run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python3 tools/reanalyse_acquired_research.py --run-id "$PARENT_RESEARCH_RUN"
+      - name: Store derived inputs once by SHA-256 (idempotent)
+        if: always()
+        run: python3 tools/derived_source_store.py compact --run-id "$PARENT_RESEARCH_RUN" --pass "semantic_reanalysis_$GITHUB_RUN_ID"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -78,5 +81,6 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add "$destination"
+          if [ -d "evidence/runs/$PARENT_RESEARCH_RUN/sources" ]; then git add "evidence/runs/$PARENT_RESEARCH_RUN/sources"; fi
           git commit -m 'Record actual research retry with calibrated free model'
           python3 tools/publish_research_outputs.py

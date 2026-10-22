@@ -24,6 +24,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # This job does not read research evidence; skip the multi-GB
+          # evidence/ tree (see repo_size plan, option A).
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/evidence/runs/
+            !/evidence/specialist_runs/
+            !/backups/
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -47,6 +56,7 @@ jobs:
       - name: Verify historical evidence, agent bridge and PDF Learning HTTP integration
         run: |
           python -m unittest tools.test_historical_attestations tools.test_research_evidence_bridge tools.storage.test_historical_evidence_store -v
+          PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools:tools/orchestrator:tools/llm python -m unittest tools.test_derived_source_store -v
           node server/command-center-live/self-test.js
           node server/command-center-live/learning-integration-test.js
 

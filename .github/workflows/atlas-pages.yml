@@ -39,6 +39,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # This job does not read research evidence; skip the multi-GB
+          # evidence/ tree (see repo_size plan, option A).
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/evidence/
+            !/backups/
 
       - name: Stage atlas
         run: |

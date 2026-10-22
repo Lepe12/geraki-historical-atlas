@@ -27,7 +27,10 @@ def replay_citations(root, answer, cited):
                 file=(base/relative).resolve()
                 if not file.is_relative_to(base):raise ValueError('UNSAFE_DURABLE_TEXT_PATH')
                 if file not in cache:
-                    raw=file.read_bytes();cache[file]=(raw.decode('utf-8',errors='replace'),hashlib.sha256(raw).hexdigest())
+                    # Older passes keep full copies; compacted passes resolve
+                    # the same logical path through their SHA-256 manifest.
+                    from derived_source_store import read_bytes as durable_bytes
+                    raw=durable_bytes(base,relative);cache[file]=(raw.decode('utf-8',errors='replace'),hashlib.sha256(raw).hexdigest())
                 text,sha=cache[file]
                 if sha!=occurrence.get('source_text_sha256'):raise ValueError('SOURCE_TEXT_CHECKSUM_MISMATCH')
                 loc=occurrence.get('locator') or {};a=loc.get('start_char');b=loc.get('end_char')
