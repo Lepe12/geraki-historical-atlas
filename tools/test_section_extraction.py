@@ -164,5 +164,54 @@ class SectionExtraction(unittest.TestCase):
             self.assertEqual(answer['verified_claims'],0)
             self.assertIn('example.org/history',(base/'research_dossier/answer.md').read_text())
 
+class EarlyModernOcr(unittest.TestCase):
+    """Synthetic OCR controls (fictional names, no historical assertions)."""
+    CTX={'target':'Marc Basso','aliases':[],'date_range':'1600-1700'}
+    SRC={'title':'Synthetic 1698 print','url':'https://example.org/scan/12','source_type':'IMAGE_OCR'}
+
+    def extract(self,text):
+        return extract_document(text,self.SRC,'scan.txt',self.CTX)
+
+    def test_long_s_ocr_name_matches_with_recorded_uncertainty(self):
+        from section_extraction import long_s_variant
+        text='Le pilote Marc Baffo commanda la barque en 1650.'
+        rows=self.extract(text)
+        self.assertEqual(len(rows),1)
+        row=rows[0]
+        self.assertIn('OCR_LONG_S_NAME_VARIANT',row['uncertainties'])
+        self.assertEqual(row['evidence_excerpt'],text)
+        loc=row['locator'];self.assertEqual(text[loc['start_char']:loc['end_char']],text)
+        # Plain spelling: no OCR uncertainty. Final s and Greek are never varied.
+        plain=self.extract('Le pilote Marc Basso commanda la barque en 1650.')[0]
+        self.assertNotIn('OCR_LONG_S_NAME_VARIANT',plain['uncertainties'])
+        self.assertEqual(long_s_variant('Jean Capsis'),'Jean Capfis')
+        self.assertIsNone(long_s_variant('Ιωάννης Καψής'))
+        self.assertIsNone(long_s_variant('Pedro Lanza'))
+
+    def test_long_s_tolerance_does_not_match_other_words(self):
+        self.assertEqual(self.extract('Marc Baffi et Marc Bafo commanderent en 1650.'),[])
+
+    def test_name_heading_keeps_the_section_it_governs_as_exact_slice(self):
+        text=('MARC BASSO.\n\nLe troifiéme pilote fut Marc\n\nA Baffo; c\'étoit un Grec de Milo.'
+              '\n\nLIVRE II.\n\nAutre matiere fans rapport.')
+        rows=self.extract(text)
+        self.assertEqual(len(rows),1)
+        row=rows[0];loc=row['locator']
+        self.assertEqual(text[loc['start_char']:loc['end_char']],row['evidence_excerpt'])
+        self.assertTrue(row['evidence_excerpt'].startswith('MARC BASSO.'))
+        self.assertIn('Grec de Milo',row['evidence_excerpt'])
+        self.assertNotIn('LIVRE II',row['evidence_excerpt'])
+        self.assertIn('NAME_FROM_SECTION_HEADING',row['uncertainties'])
+        self.assertEqual(row['target_entity']['association_basis'],'EXPLICIT_NAME')
+        # A heading section is bounded even without a following heading.
+        long=extract_document('MARC BASSO.\n\n'+'mot '*2000,self.SRC,'scan.txt',self.CTX)[0]
+        self.assertLessEqual(len(long['evidence_excerpt']),1800)
+
+    def test_drop_capital_is_not_a_conflicting_given_name(self):
+        rows=self.extract('Marc Basso arriva a Milo.\n\nA Basso commanda le navire en 1650.')
+        self.assertNotIn('CONFLICTING_GIVEN_NAME',rows[1]['uncertainties'])
+        rows=self.extract('Marc Basso arriva a Milo.\n\nPaul Basso commanda le navire en 1650.')
+        self.assertIn('CONFLICTING_GIVEN_NAME',rows[1]['uncertainties'])
+
 if __name__=='__main__':unittest.main()
 
