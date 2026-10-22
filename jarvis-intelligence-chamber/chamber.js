@@ -104,7 +104,7 @@
     if (!sector.element) return;
     sector.element.querySelector("small").textContent = text;
     sector.detail = text;
-    sector.seal.setAttribute("aria-label", sector.name + " — " + text);
+    sector.element.setAttribute("aria-label", sector.name + " — " + text);
     if (tipFor === sector.id) showTip(sector.id);
     layoutDirty = true;
   }
@@ -120,7 +120,7 @@
     thematic.agentId = biography ? "pirate_biography" : "pirate_base";
     thematic.name = biography ? "Βιογραφία πειρατή" : "Πειρατικές βάσεις";
     thematic.desc = biography ? "Συγκεντρώνει βιογραφικά τεκμήρια για το πρόσωπο της έρευνας." : "Ερευνά τόπους, αποδόσεις και υποστηρικτικά τεκμήρια.";
-    if (thematic.element) thematic.element.querySelector(".nl-name").textContent = thematic.name;
+    if (thematic.element) { thematic.element.querySelector(".nl-name").textContent = thematic.name; paintEmblem(thematic); }
     for (const sector of sectors) {
       const agent = data?.agents?.find((a) => a.id === sector.agentId);
       const found = (data?.discoveries || []).filter((d) => (d.lane || d.agent_id) === sector.agentId).length;
@@ -239,8 +239,9 @@
     if (!q.sealVisible) { tip.style.visibility = "hidden"; return; }
     tip.style.visibility = "";
     const w = tip.offsetWidth, h = tip.offsetHeight;
-    let x = q.sx - w / 2, y = q.sy - 22 - h;
-    if (y < 4) y = q.sy + 22;
+    const a = q.anchor, top = Math.min(a ? a.top : q.sy, q.sy - SEAL_R), bottom = Math.max(a ? a.bottom : q.sy, q.sy + SEAL_R);
+    let x = q.sx - w / 2, y = top - 8 - h;
+    if (y < 4) y = bottom + 8;
     x = Math.max(4, Math.min(W - w - 4, x));
     tip.style.transform = `translate(${x.toFixed(0)}px,${y.toFixed(0)}px)`;
   }
@@ -251,26 +252,29 @@
     seal.type = "button";
     seal.className = "node-seal " + s.kind;
     seal.dataset.agent = s.agentId;
+    seal.tabIndex = -1; // the emblem is the keyboard target; the seal marks the exact place and the lane status
+    seal.setAttribute("aria-hidden", "true");
     seal.innerHTML = '<span class="seal-wax" aria-hidden="true"><span class="seal-mono"></span></span><span class="seal-count" aria-hidden="true"></span>';
     seal.querySelector(".seal-mono").textContent = s.name.charAt(0);
     seal.addEventListener("click", () => select(s.id));
     seal.addEventListener("pointerenter", () => { hover = s.id; layoutDirty = true; showTip(s.id); });
     seal.addEventListener("pointerleave", () => { if (hover === s.id) hover = -1; layoutDirty = true; hideTip(s.id); });
-    seal.addEventListener("focus", () => showTip(s.id));
-    seal.addEventListener("blur", () => hideTip(s.id));
     seals.appendChild(seal);
     const label = document.createElement("button");
     label.type = "button";
-    label.tabIndex = -1; // the seal is the keyboard target; the label is a larger pointer target
     label.className = "node-label " + s.kind;
-    label.innerHTML = '<span class="nl-name"></span><small></small>';
+    // heraldic emblem; the name stays in the DOM (screen readers, tests) and appears visually only in the tooltip
+    label.innerHTML = '<span class="nl-emblem" aria-hidden="true"></span><span class="nl-name"></span><span class="nl-count" aria-hidden="true" hidden></span><small></small>';
     label.querySelector(".nl-name").textContent = s.name;
     label.addEventListener("click", () => select(s.id));
     label.addEventListener("pointerenter", () => { hover = s.id; layoutDirty = true; showTip(s.id); });
     label.addEventListener("pointerleave", () => { if (hover === s.id) hover = -1; layoutDirty = true; hideTip(s.id); });
+    label.addEventListener("focus", () => { showTip(s.id); label.classList.add("kbd"); });
+    label.addEventListener("blur", () => { hideTip(s.id); label.classList.remove("kbd"); });
     labels.appendChild(label);
     s.seal = seal;
     s.element = label;
+    paintEmblem(s);
     setLaneText(s, "Αναμονή έρευνας");
   }
   const coreHit = document.createElement("button");
@@ -281,18 +285,39 @@
   seals.appendChild(coreHit);
   setCoreState(coreState);
 
+  function paintEmblem(s) {
+    const lib = window.NABOU_EMBLEMS;
+    if (!lib || !s.element || s.element.dataset.emblem === s.agentId) return;
+    const em = lib.get(s.agentId);
+    s.element.dataset.emblem = s.agentId;
+    if (s.seal) s.seal.dataset.agent = s.agentId;
+    s.element.querySelector(".nl-emblem").innerHTML = em.svg;
+    layoutDirty = true;
+  }
+  const laneState = (st, active) => {
+    st = String(st || "").toUpperCase();
+    if (active || /RUNNING|PREPARING|STARTING|QUEUED|ACTIVE|LIVE/.test(st)) return "active";
+    if (/FAIL|ERROR|BLOCKED|UNAVAILABLE|CANCEL/.test(st)) return "blocked";
+    if (/COMPLETED|DONE|PARTIAL/.test(st)) return "done";
+    if (st === "ABSENT") return "absent";
+    return "idle";
+  };
   function markSeals() {
     for (const s of sectors) {
       if (!s.seal) continue;
       const active = activeAgentIds.has(s.agentId);
       s.seal.dataset.activity = active ? "active" : "idle";
       s.seal.dataset.status = s.status ? s.status.toUpperCase() : "";
+      s.seal.dataset.state = s.element.dataset.state = laneState(s.status, active);
       s.seal.classList.toggle("selected", s.id === selected);
       s.element.classList.toggle("selected", s.id === selected);
       s.element.classList.toggle("active", active);
       const count = s.seal.querySelector(".seal-count");
       count.textContent = s.found ? String(s.found) : "";
       count.hidden = !s.found;
+      const badge = s.element.querySelector(".nl-count");
+      badge.textContent = count.textContent;
+      badge.hidden = !s.found;
     }
     layoutDirty = true;
   }
@@ -486,7 +511,7 @@
   new ResizeObserver(() => { layoutDirty = true; }).observe($("operatorCommand"));
 
   /* ---------- label placement with collision avoidance ---------- */
-  const SEAL_R = 15;
+  const SEAL_R = 8; // small status seal under each emblem
   const overlaps = (a, b, pad = 4) => a.left < b.right + pad && a.right > b.left - pad && a.top < b.bottom + pad && a.bottom > b.top - pad;
   function exclusions() {
     const sel = ["#topbar", "#sidenav", ".nxs-3d-tools", ".nxs-telemetry", "#operatorCommand", "#detailPanel", "#nxsAgentsPage", "#resultsDrawer", "#learningPanel", "#activityStrip", "#ddMenu", "#nxPopover", ".workspace-welcome"];
@@ -540,6 +565,8 @@
       if (s.sealVisible) {
         const w = s.w, h = s.h, x = s.sx, y = s.sy;
         const candidates = [
+          [x - w / 2, y - h - 3], [x - w / 2, y + 3], [x + 5, y - h / 2], [x - 5 - w, y - h / 2],
+          [x + 2, y - h + 4], [x - w - 2, y - h + 4], [x + 2, y - 4], [x - w - 2, y - 4],
           [x + gap, y - h / 2], [x - gap - w, y - h / 2], [x - w / 2, y - gap - h], [x - w / 2, y + gap],
           [x + gap - 4, y - h - 6], [x + gap - 4, y + 6], [x - gap - w + 4, y - h - 6], [x - gap - w + 4, y + 6],
           [x + gap + 18, y - h / 2], [x - gap - w - 18, y - h / 2], [x - w / 2, y - gap - h - 16], [x - w / 2, y + gap + 16],
