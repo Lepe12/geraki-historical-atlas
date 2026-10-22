@@ -2,7 +2,7 @@
 
 Νέα πραγματική αναζήτηση πηγών για ορμητήρια, αγκυροβόλια και καταφύγια πειρατών και κουρσάρων στην Ανατολική Μεσόγειο, 1600–1700. Αναζήτησε σε όλες τις έντεκα οικογένειες πηγών, περιηγητές, portolans, σύγχρονα κείμενα, αρχεία και μεταγενέστερες μελέτες. Απόκτησε τα προσβάσιμα πραγματικά κείμενα. Για κάθε εύρημα δώσε ιστορικό τοπωνύμιο, σύγχρονη ταύτιση και γεωγραφική θέση μόνο όπου τεκμηριώνονται, χρονολογία, χρήστες, είδος χρήσης, ακριβή πηγή, σελίδα ή φύλλο ή αρχειακή αναφορά, ακριβές απόσπασμα, confidence και verification status. Ξεχώρισε αναφορά πηγής, ερμηνεία και υπόθεση, μεταγενέστερη μελέτη από πρωτογενές τεκμήριο και ορμητήριο από τόπο επιδρομής. Μην μετατρέπεις τη χρονολογία του ερωτήματος σε χρονολογία αχρονολόγητου γεγονότος. Δήλωσε απρόσιτα αρχεία και ανεξέταστο υλικό. Καμία αυτόματη ιστορική επαλήθευση. Κάνε νέα πραγματική απόκτηση πηγών. Μην χρησιμοποιήσεις παλιό κείμενο απάντησης. Μην εμφανίσεις εισαγωγικό placeholder ως εύρημα. Κάθε παράγραφος να περιγράφει συγκεκριμένο τόπο και χρήση που αναφέρει το παρατιθέμενο απόσπασμα.
 
-Εντοπίστηκαν 384 αποσπάσματα εντός της ζητούμενης περιόδου. Αποδίδονται στις πηγές τους και εκκρεμεί έλεγχος.
+Εντοπίστηκαν 386 αποσπάσματα εντός της ζητούμενης περιόδου. Αποδίδονται στις πηγές τους και εκκρεμεί έλεγχος.
 
 ## 1600 — Esclaves Chretiens, Maitres Musulmans.
 
@@ -7580,6 +7580,65 @@
 > Ibid. pp. 74.
 
 Πηγή: https://researchonline.lse.ac.uk/id/eprint/27888/1/WP136.pdf; αρχείο ea1897753b3638be7af05e1a.txt, γραμμές 1010–1016.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
+## 1700 — The Pirate and the Emperor: Power and the Law on the Seas, 1450–1850
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Book contents     
+>  Frontmatter
+>  Contents
+>  Acknowledgments
+>  Introduction
+> 1 Institutions, Transaction Costs, and the Rise of Merchant Empires
+> 2 Merchants and States
+> 3 The Rise of Merchant Empires, 1400–1700: A European Counterpoint
+> 4 Europe and the Wider World, 1500–1700: The Military Balance
+> 5 The Pirate and the Emperor: Power and the Law on the Seas, 1450–1850
+> 6 Transport Costs and Long-Range Trade, 1300–1800: Was There a European “Transport Revolution” in the Early Modern Era?
+> 7 Transaction Costs: A Note on Merchant Credit and the Organization of Private Trade
+> 8 Evolution of Empire: The Portuguese in the Indian Ocean During the Sixteenth Century
+> 9 Comparing the Tokagawa Shogunate with Hapsburg Spain: Two Silver-Based Empires in a Global Setting
+> 10 Colonies as Mercantile Investments: The Luso-Brazilian Empire, 1500–1808
+> 11 Reflections on the Organizing Principle of Premodern Trade
+>  Selected Bibliography of Secondary Works
+>  Index
+
+Πηγή: https://www.cambridge.org/core/books/abs/political-economy-of-merchant-empires/pirate-and-the-emperor-power-and-the-law-on-the-seas-14501850/D08510C183BADD464699334B91EDF939; αρχείο 58c53e6afcf5548e12a8b73d.txt, γραμμές 802–819.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
+## 1700 — The Pirate and the Emperor: Power and the Law on the Seas, 1450–1850
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Introduction
+> 1 
+> Institutions, Transaction Costs, and the Rise of Merchant Empires
+> 2 
+> Merchants and States
+> 3 
+> The Rise of Merchant Empires, 1400–1700: A European Counterpoint
+> 4 
+> Europe and the Wider World, 1500–1700: The Military Balance
+> 5 
+> The Pirate and the Emperor: Power and the Law on the Seas, 1450–1850
+> 6 
+> Transport Costs and Long-Range Trade, 1300–1800: Was There a European “Transport Revolution” in the Early Modern Era?
+> 7 
+> Transaction Costs: A Note on Merchant Credit and the Organization of Private Trade
+> 8 
+> Evolution of Empire: The Portuguese in the Indian Ocean During the Sixteenth Century
+> 9 
+> Comparing the Tokagawa Shogunate with Hapsburg Spain: Two Silver-Based Empires in a Global Setting
+> 10 
+> Colonies as Mercantile Investments: The Luso-Brazilian Empire, 1500–1808
+> 11 
+> Reflections on the Organizing Principle of Premodern Trade
+
+Πηγή: https://www.cambridge.org/core/books/abs/political-economy-of-merchant-empires/pirate-and-the-emperor-power-and-the-law-on-the-seas-14501850/D08510C183BADD464699334B91EDF939; αρχείο 58c53e6afcf5548e12a8b73d.txt, γραμμές 748–770.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
