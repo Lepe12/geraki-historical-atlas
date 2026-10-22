@@ -172,6 +172,20 @@ class EarlyModernOcr(unittest.TestCase):
     def extract(self,text):
         return extract_document(text,self.SRC,'scan.txt',self.CTX)
 
+    def test_surname_on_continuation_page_is_provisional_not_unresolved(self):
+        text='Ce petit Regne dura trois ans , & Baffo fut pendu en 1680.'
+        self.assertFalse(self.extract(text))  # ordinary page: surname alone is not enough
+        src={**self.SRC,'manifest_url':'https://example.org/m','section_continuation':{
+            'anchor_canvas':'https://example.org/c/1','anchor_name':'Marc Basso','manifest_url':'https://example.org/m'}}
+        rows=extract_document(text,src,'scan.txt',self.CTX)
+        self.assertTrue(rows)
+        self.assertIn('SURNAME_FROM_ADJACENT_NAMED_PAGE',rows[0]['uncertainties'])
+        self.assertIn('OCR_LONG_S_NAME_VARIANT',rows[0]['uncertainties'])
+        self.assertEqual(rows[0]['decision'],'REVIEW_CONTEXT')
+        # A forged marker from another manifest is ignored.
+        forged={**src,'section_continuation':{**src['section_continuation'],'manifest_url':'https://other.org/m'}}
+        self.assertFalse(extract_document(text,forged,'scan.txt',self.CTX))
+
     def test_long_s_ocr_name_matches_with_recorded_uncertainty(self):
         from section_extraction import long_s_variant
         text='Le pilote Marc Baffo commanda la barque en 1650.'

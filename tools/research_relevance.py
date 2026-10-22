@@ -274,6 +274,17 @@ def assess(record, ident):
             status='PRIORITY';research_score=max(research_score,70)
             reasons.append('FULLTEXT_CONTEXT_REQUIRES_IDENTITY_REVIEW')
 
+    # A later page of the same chapter as a page that prints the attested full
+    # name usually carries only the surname. Acquire it as a provisional lead;
+    # the modern-document, namesake and admissibility gates below still apply.
+    continuation=record.get('section_continuation')
+    if (focus['kind']=='person' and isinstance(continuation,dict) and continuation.get('anchor_canvas')
+            and continuation.get('manifest_url')==record.get('manifest_url')
+            and ('NO_TARGET_IDENTITY_MATCH' in reasons or 'SURNAME_CONTEXT_REQUIRES_IDENTITY_REVIEW' in reasons)
+            and not OFF_TOPIC.search(title) and not (NOISE.search(title) and not (geographic and history))
+            and not MODERN_DOCUMENT.search(title) and not later_namesake_requires_review(context, focus)):
+        status='PRIORITY';research_score=max(research_score,60)
+        reasons.append('SECTION_CONTINUATION_OF_NAMED_PAGE_REQUIRES_IDENTITY_REVIEW')
     # A search-index hit or generic "history" token cannot make corporate,
     # statistical or CV material a priority biography. Keep the lead visible.
     if MODERN_DOCUMENT.search(title) and not name_match:
