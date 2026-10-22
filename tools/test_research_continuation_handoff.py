@@ -179,6 +179,15 @@ class HandoffTests(unittest.TestCase):
         self.write(marker, {'auto_continue': True, 'set_by_run': '789'})
         self.assertIn('123', select(self.base))
 
+    def test_research_run_workflow_can_hold_itself_out_of_coordinator(self):
+        text = (Path(__file__).resolve().parents[1] / '.github/workflows/pct-parallel-multi-agent.yml').read_text()
+        self.assertIn('      auto_continue:\n        description:', text)
+        self.assertIn("PCT_AUTO_CONTINUE: ${{ inputs.auto_continue == false && 'false' || 'true' }}", text)
+        commit = text.split('- name: Commit situation board', 1)[1]
+        self.assertLess(commit.index('research_continuation/auto_continue.json'), commit.index('git add'))
+        self.assertIn('"auto_continue": false', commit)
+        self.assertNotIn('gh workflow run', text)
+
     def test_reanalysis_workflow_gates_every_self_dispatch_on_auto_continue(self):
         # Text check: the coordinator runs this suite without PyYAML.
         path = Path(__file__).resolve().parents[1] / '.github/workflows/research-semantic-reanalysis.yml'
