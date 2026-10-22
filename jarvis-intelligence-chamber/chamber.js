@@ -13,6 +13,7 @@
   const labels = $("nodeLabels"),
     seals = $("nodeSeals"),
     stage = $("chartStage"),
+    host = $("chartView") || document.body,
     plane = $("chartPlane");
   plane.innerHTML = C.svg;
   plane.style.width = C.W + "px";
@@ -66,6 +67,8 @@
     }
   });
   const core = { x: C.core[0], y: C.core[1] };
+  // shared with nautical-dashboard.js (ACTIVE NODES mini chart)
+  window.NABOU_LANES = sectors.map((q) => ({ agentId: q.agentId, name: q.name, kind: q.kind, x: q.x, y: q.y, place: q.place }));
   const analysisHub = { x: C.analysis[0], y: C.analysis[1] };
   // Ink routes: every archive to the core rose, every analysis lane to its rose, and the two roses joined.
   const linkPairs = sectors.map((s, i) => [i, s.kind === "archive" ? -1 : -2]).concat([[-2, -1]]);
@@ -283,55 +286,54 @@
     markSeals();
   }
 
-  /* ---------- view: pan / zoom ---------- */
+  /* ---------- view: pan / zoom ----------
+     The chart lives inside #chartView (a framed box in the scaled 1672×941 artboard on desktop,
+     a block in the stacked page on mobile). All maths is in #chartView's own CSS pixels. */
+  const hostBox = () => {
+    const r = host.getBoundingClientRect();
+    return { r, k: r.width / (host.offsetWidth || r.width || 1) || 1 };
+  };
+  const lp = (e) => {
+    const { r, k } = hostBox();
+    return { x: (e.clientX - r.left) / k, y: (e.clientY - r.top) / k };
+  };
+  const toLocal = (b, hb) => ({ left: (b.left - hb.r.left) / hb.k, right: (b.right - hb.r.left) / hb.k, top: (b.top - hb.r.top) / hb.k, bottom: (b.bottom - hb.r.top) / hb.k });
   const visible = (el) => el && el.getClientRects().length && getComputedStyle(el).visibility !== "hidden" && !el.classList.contains("hidden");
   function freeRegion() {
-    // The part of the screen not covered by fixed chrome (header, dock, composer).
-    let top = 8, left = 8, right = W - 8, bottom = H - 8;
-    const dock = document.querySelector(".nxs-dock"), head = document.querySelector(".nxs-identity"), comp = $("operatorCommand");
-    if (head && visible(head)) top = Math.max(top, head.getBoundingClientRect().bottom + 6);
-    if (dock && visible(dock)) {
-      const r = dock.getBoundingClientRect();
-      if (r.height > r.width) left = Math.max(left, r.right + 8);
-      else top = Math.max(top, r.bottom + 6);
-    }
-    if (comp && visible(comp)) bottom = Math.min(bottom, comp.getBoundingClientRect().top - 8);
+    const left = 6, top = 6, right = W - 6, bottom = H - 6;
     return { left, top, right, bottom, w: right - left, h: bottom - top };
   }
   function fit(immediate) {
+    // Fit the 17 lanes (plus the core rose) into the frame, like the mockup's Mediterranean view.
     const r = freeRegion();
-    const contain = Math.min(r.w / C.W, r.h / C.H) * 0.98;
-    let s = contain, cx = C.W / 2, cy = C.H / 2;
-    if (W <= 800) {
-      // Small screens: show the Mediterranean at a legible scale; the rest is a pan away.
-      s = Math.max(contain, r.h / C.H);
-      const med = project(14, 39.5);
-      cx = med.x;
-    }
-    fitScale = contain;
+    const pts = [...sectors.map((q) => [q.x, q.y]), [core.x, core.y]];
+    const pad = W <= 800 ? 40 : 70;
+    const x0 = Math.min(...pts.map((p) => p[0])) - pad, x1 = Math.max(...pts.map((p) => p[0])) + pad;
+    const y0 = Math.min(...pts.map((p) => p[1])) - pad, y1 = Math.max(...pts.map((p) => p[1])) + pad;
+    let s = Math.min(r.w / (x1 - x0), r.h / (y1 - y0));
+    s = Math.max(s, Math.max(r.w / C.W, r.h / C.H)); // never leave empty margins around the chart
+    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    fitScale = s;
     target = clampView({ s, x: r.left + r.w / 2 - cx * s, y: r.top + r.h / 2 - cy * s });
     if (immediate) view = { ...target };
     viewDirty = layoutDirty = true;
   }
   function clampView(v) {
-    const s = Math.max(fitScale * 0.6, Math.min(fitScale * 9, v.s));
-    const r = freeRegion(), mw = C.W * s, mh = C.H * s, keep = 0.35;
+    const minS = Math.max(W / C.W, H / C.H);
+    const s = Math.max(minS, Math.min(fitScale * 9, v.s));
+    const r = { left: 0, top: 0, right: W, bottom: H, w: W, h: H }, mw = C.W * s, mh = C.H * s, keep = 1;
     const x = Math.min(r.right - Math.min(mw, r.w) * keep, Math.max(r.left + Math.min(mw, r.w) * keep - mw, v.x));
     const y = Math.min(r.bottom - Math.min(mh, r.h) * keep, Math.max(r.top + Math.min(mh, r.h) * keep - mh, v.y));
     return { s, x, y };
   }
   function zoomAt(factor, px, py) {
-    const s = Math.max(fitScale * 0.6, Math.min(fitScale * 9, target.s * factor));
+    const s = Math.max(Math.max(W / C.W, H / C.H), Math.min(fitScale * 9, target.s * factor));
     const k = s / target.s;
     target = clampView({ s, x: px - (px - target.x) * k, y: py - (py - target.y) * k });
     viewDirty = true;
   }
   function regionCenter() {
-    const r = freeRegion();
-    const panel = $("detailPanel");
-    let right = r.right;
-    if (visible(panel) && W > 800) right = Math.min(right, panel.getBoundingClientRect().left - 8);
-    return { x: (r.left + right) / 2, y: (r.top + r.bottom) / 2 };
+    return { x: W / 2, y: H / 2 };
   }
   function aim(i) {
     const p = i < 0 ? core : sectors[i];
@@ -348,14 +350,17 @@
   }
   function resize() {
     DPR = Math.min(devicePixelRatio || 1, 2);
-    W = innerWidth;
-    H = innerHeight;
+    W = host.offsetWidth || innerWidth;
+    H = host.offsetHeight || innerHeight;
     canvas.width = Math.round(W * DPR);
     canvas.height = Math.round(H * DPR);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     fit(true);
   }
   addEventListener("resize", resize);
+  if (host !== document.body) new ResizeObserver(() => { if (host.offsetWidth !== W || host.offsetHeight !== H) resize(); }).observe(host);
+  // the stacked mobile page scrolls: labels must re-avoid the fixed bars
+  document.getElementById("stage")?.addEventListener("scroll", () => { layoutDirty = true; }, { passive: true });
 
   // pointer navigation: drag to pan, wheel / pinch to zoom
   const pointers = new Map();
@@ -363,8 +368,8 @@
   stage.addEventListener("pointerdown", (e) => {
     if (e.target.closest("button")) return;
     stage.setPointerCapture(e.pointerId);
-    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (pointers.size === 1) dragStart = { x: e.clientX, y: e.clientY, vx: target.x, vy: target.y, moved: false };
+    pointers.set(e.pointerId, { x: lp(e).x, y: lp(e).y });
+    if (pointers.size === 1) dragStart = { x: lp(e).x, y: lp(e).y, vx: target.x, vy: target.y, moved: false };
     if (pointers.size === 2) {
       const [a, b] = [...pointers.values()];
       pinchStart = { d: Math.hypot(a.x - b.x, a.y - b.y), s: target.s };
@@ -372,10 +377,10 @@
     stage.classList.add("dragging");
   });
   stage.addEventListener("pointermove", (e) => {
-    const ll = unproject((e.clientX - view.x) / view.s, (e.clientY - view.y) / view.s);
+    const ll = unproject((lp(e).x - view.x) / view.s, (lp(e).y - view.y) / view.s);
     $("coordinates").textContent = Math.abs(ll.lat).toFixed(2) + "° " + (ll.lat >= 0 ? "Β" : "Ν") + " · " + Math.abs(ll.lon).toFixed(2) + "° " + (ll.lon >= 0 ? "Α" : "Δ");
     if (!pointers.has(e.pointerId)) return;
-    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    pointers.set(e.pointerId, { x: lp(e).x, y: lp(e).y });
     if (pointers.size === 2 && pinchStart) {
       const [a, b] = [...pointers.values()];
       const d = Math.hypot(a.x - b.x, a.y - b.y);
@@ -383,7 +388,7 @@
       return;
     }
     if (dragStart) {
-      const dx = e.clientX - dragStart.x, dy = e.clientY - dragStart.y;
+      const dx = lp(e).x - dragStart.x, dy = lp(e).y - dragStart.y;
       if (Math.abs(dx) + Math.abs(dy) > 3) dragStart.moved = true;
       target = clampView({ s: target.s, x: dragStart.vx + dx, y: dragStart.vy + dy });
       view.x = target.x; view.y = target.y;
@@ -402,9 +407,9 @@
   stage.addEventListener("pointercancel", endPointer);
   stage.addEventListener("wheel", (e) => {
     e.preventDefault();
-    zoomAt(Math.exp(-e.deltaY * 0.0015), e.clientX, e.clientY);
+    zoomAt(Math.exp(-e.deltaY * 0.0015), lp(e).x, lp(e).y);
   }, { passive: false });
-  stage.addEventListener("dblclick", (e) => { if (!e.target.closest("button")) zoomAt(1.6, e.clientX, e.clientY); });
+  stage.addEventListener("dblclick", (e) => { if (!e.target.closest("button")) zoomAt(1.6, lp(e).x, lp(e).y); });
   $("zoomIn").onclick = () => { const c = regionCenter(); zoomAt(1.42, c.x, c.y); };
   $("zoomOut").onclick = () => { const c = regionCenter(); zoomAt(1 / 1.42, c.x, c.y); };
   $("resetView").onclick = reset;
@@ -438,14 +443,16 @@
   const SEAL_R = 15;
   const overlaps = (a, b, pad = 4) => a.left < b.right + pad && a.right > b.left - pad && a.top < b.bottom + pad && a.bottom > b.top - pad;
   function exclusions() {
-    const sel = [".nxs-identity", ".nxs-status", ".nxs-activity-open", ".nxs-dock", ".workspace-welcome", ".nxs-3d-tools", ".nxs-telemetry", "#operatorCommand", "#detailPanel", "#nxsAgentsPage", "#resultsDrawer", "#learningPanel", "#activityStrip"];
-    const out = [];
-    for (const s of sel) {
-      const el = document.querySelector(s);
-      if (!el || !visible(el)) continue;
-      if (s === ".workspace-welcome" && getComputedStyle(el).display === "none") continue;
+    const sel = ["#topbar", "#sidenav", ".nxs-3d-tools", ".nxs-telemetry", "#operatorCommand", "#detailPanel", "#nxsAgentsPage", "#resultsDrawer", "#learningPanel", "#activityStrip", "#ddMenu", "#nxPopover", ".workspace-welcome"];
+    const out = [], hb = hostBox();
+    for (const q of sel) {
+      const el = document.querySelector(q);
+      if (!el || !visible(el) || el.hidden || getComputedStyle(el).display === "none") continue;
       const r = el.getBoundingClientRect();
-      if (r.width && r.height) out.push({ left: r.left, right: r.right, top: r.top, bottom: r.bottom });
+      if (!r.width || !r.height) continue;
+      const b = toLocal(r, hb);
+      if (b.right < 0 || b.left > W || b.bottom < 0 || b.top > H) continue;
+      out.push(b);
     }
     return out;
   }
