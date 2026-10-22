@@ -18,7 +18,13 @@ def atomic(path,value):
 
 class Continuation:
     def __init__(self,root,question,code,configuration):
-        self.root=Path(root)/digest([question,hashlib.sha256(code).hexdigest(),configuration])
+        actual=hashlib.sha256(code).hexdigest()
+        registry=Path(__file__).with_name('research_checkpoint_compatibility.json')
+        revisions=json.loads(registry.read_text()).get('raw_extraction_replay',{}) if registry.is_file() else {}
+        previous=revisions.get(actual,{}).get('cache_code_sha256',actual)
+        if not re.fullmatch(r'[a-f0-9]{64}',previous):raise ValueError('INVALID_EXTRACTION_CACHE_CODE_BINDING')
+        self.actual_code_sha256=actual;self.cache_code_sha256=previous
+        self.root=Path(root)/digest([question,previous,configuration])
 
     def binding(self,group):
         # Reanalysis writes new derived files under a new execution ID. Bind to

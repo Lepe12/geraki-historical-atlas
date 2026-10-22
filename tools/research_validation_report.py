@@ -166,6 +166,7 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
     blockers=[]
     if not continuation_valid:blockers.append('CONTINUATION_RECEIPTS_INVALID')
     coverage=answer.get('coverage') or {}
+    if coverage.get('claims_awaiting_review'):blockers.append('CLAIM_REVIEWS_PENDING')
     if coverage.get('deferred') or coverage.get('selected_passages',0)<coverage.get('unique_passages',0):
         blockers.append('RESEARCH_COVERAGE_PENDING')
     from research_continuation import effective_citation_backlogs

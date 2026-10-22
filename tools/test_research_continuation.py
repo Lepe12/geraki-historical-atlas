@@ -41,6 +41,31 @@ class ContinuationTests(unittest.TestCase):
                 self.assertEqual(digest(retained['payload']),receipt['payload_sha256'])
             self.assertEqual(queue.load(groups[0])['payload'],{'items':[]})
 
+    def test_review_budget_advances_past_first_four_and_keeps_prior_decisions(self):
+        import semantic_research_answer as engine
+        from test_semantic_research_answer import fixture,response,item
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);fixture(root);eid=engine.collect(root)[0][0]['evidence_id'];reviewed=[]
+            def caller(role,prompt):
+                if role=='evidence_extractor':return response({'items':[item(eid,statement='The account reports an attack in 1677, observation '+str(i)+'.') for i in range(6)]})
+                if role=='synthesis':
+                    claims=json.loads(prompt.split('CLAIMS_AND_REVIEW_JSON:\n')[1])['claims']
+                    return response({'answer_sections':[{'text':'The consulted source reports that ships attacked the island in 1677.','claim_ids':[claims[0]['claim_id']]}]})
+                if 'FINAL_ANSWER_JSON:' in prompt:return response({'supported_section_indexes':[0],'flagged_sections':[]})
+                claims=json.loads(prompt.split('CLAIMS_JSON:\n')[1]);reviewed.append(claims[0]['claim_id'])
+                return response({'supported_claim_ids':[claims[0]['claim_id']],'flagged_claims':[]})
+            with patch.dict('os.environ',{'PCT_SEMANTIC_PARTIAL_ANSWER':'1','PCT_ENABLE_RESPONSE_CACHE':'1'}):
+                first=engine.execute(root,'q',caller=caller,config={'configured':True})
+                self.assertEqual(len(reviewed),4)
+                self.assertEqual(len(first['coverage']['claims_awaiting_review']),2)
+                second=engine.execute(root,'q',caller=caller,config={'configured':True})
+            self.assertEqual(len(reviewed),6)
+            self.assertEqual(len(set(reviewed)),6)
+            self.assertEqual(second['coverage']['claims_awaiting_review'],[])
+            self.assertEqual(len(second['review']['supported_claim_ids']),6)
+            self.assertTrue(any(c.get('replayed') and c['role']=='adversarial_reviewer' for c in second['calls']))
+            self.assertFalse(second['verified'])
+
     def test_source_changes_and_corruption_invalidate_cache(self):
         with tempfile.TemporaryDirectory() as directory:
             queue=Continuation(directory,'question',b'code',{})

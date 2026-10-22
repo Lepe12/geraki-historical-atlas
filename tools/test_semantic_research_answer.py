@@ -61,6 +61,10 @@ class SemanticAnswer(unittest.TestCase):
                 'review':{'supported_claim_ids':['wrong']},'evidence':[]}
         self.assertEqual(build(answer)['findings'],[])
 
+    def test_corsair_church_is_not_automatically_a_base_and_letters_are_not_anchorages(self):
+        self.assertEqual(geographic_claim_hold_reason({'quote':'The Tuscan corsair built a Catholic church honoring Saint George in Ayionissi in 1695.','places':['Ayionissi'],'usage_type':'BASE'}),'PLACE_USAGE_NOT_STATED_IN_SELECTED_QUOTE')
+        self.assertEqual(geographic_claim_hold_reason({'quote':'The study will also benefit from correspondences of those who served in Izmir.','places':['Izmir'],'usage_type':'ANCHORAGE'}),'METHODOLOGICAL_SOURCE_DESCRIPTION_NOT_HISTORICAL_FINDING')
+
     def test_explicit_anchorages_are_not_suppressed(self):
         quote='Astypalaia provided provisions and plenty of safe anchorages for the corsairs.'
         self.assertIsNone(geographic_claim_hold_reason({'quote':quote,'places':['Astypalaia'],'usage_type':'ANCHORAGE'}))
