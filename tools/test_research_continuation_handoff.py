@@ -115,6 +115,21 @@ class HandoffTests(unittest.TestCase):
         self.write(self.queue.parent / 'responses/new.json', {'result': {}, 'result_sha256': digest({})})
         self.assertEqual(decision(self.root, before, '456'), (True, 'NEW_REVIEW_OR_SYNTHESIS_RESPONSES'))
 
+    def test_completed_review_pass_returning_to_extraction_can_restart(self):
+        q = json.loads(self.queue.read_text()); q['phase'] = 'REVIEW_AND_SYNTHESIS'
+        self.write(self.queue, q)
+        before = state(self.root)
+        q.pop('phase'); self.write(self.queue, q)
+        self.write(self.queue.parent / 'responses/new.json', {'result': {}, 'result_sha256': digest({})})
+        self.assertEqual(decision(self.root, before, '456'), (True, 'REVIEW_AND_SYNTHESIS_PASS_COMPLETED:1'))
+
+    def test_extraction_phase_without_new_items_or_responses_still_holds(self):
+        q = json.loads(self.queue.read_text()); q['phase'] = 'REVIEW_AND_SYNTHESIS'
+        self.write(self.queue, q)
+        before = state(self.root)
+        q.pop('phase'); self.write(self.queue, q)
+        self.assertEqual(decision(self.root, before, '456'), (False, 'NO_CHECKPOINT_PROGRESS'))
+
     def test_duplicate_items_are_rejected(self):
         q = json.loads(self.queue.read_text()); q['items'][2]['evidence_id'] = 'a'
         self.write(self.queue, q)

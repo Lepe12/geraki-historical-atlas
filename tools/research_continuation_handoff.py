@@ -141,8 +141,14 @@ def decision(root, before, run_id):
         return False, 'PREVIOUS_COMPLETED_ITEMS_LOST'
     if new - old:
         return True, 'NEW_EXAMINED_ITEMS:' + str(len(new - old))
-    if after.get('phase') == 'REVIEW_AND_SYNTHESIS' and set(after['responses']) - set(before['responses']):
+    new_responses = set(after['responses']) - set(before['responses'])
+    if after.get('phase') == 'REVIEW_AND_SYNTHESIS' and new_responses:
         return True, 'NEW_REVIEW_OR_SYNTHESIS_RESPONSES'
+    # A pass that finishes review and synthesis rewrites the queue for the
+    # remaining extraction work (phase no longer REVIEW_AND_SYNTHESIS). Its new
+    # content-addressed responses are real progress, not a repeated sample.
+    if before.get('phase') == 'REVIEW_AND_SYNTHESIS' and new_responses:
+        return True, 'REVIEW_AND_SYNTHESIS_PASS_COMPLETED:' + str(len(new_responses))
     return False, 'NO_CHECKPOINT_PROGRESS'
 
 
