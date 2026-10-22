@@ -2,7 +2,7 @@
 
 Νέα πραγματική αναζήτηση πηγών για ορμητήρια, αγκυροβόλια και καταφύγια πειρατών και κουρσάρων στην Ανατολική Μεσόγειο, 1600–1700. Αναζήτησε σε όλες τις έντεκα οικογένειες πηγών, περιηγητές, portolans, σύγχρονα κείμενα, αρχεία και μεταγενέστερες μελέτες. Απόκτησε τα προσβάσιμα πραγματικά κείμενα. Για κάθε εύρημα δώσε ιστορικό τοπωνύμιο, σύγχρονη ταύτιση και γεωγραφική θέση μόνο όπου τεκμηριώνονται, χρονολογία, χρήστες, είδος χρήσης, ακριβή πηγή, σελίδα ή φύλλο ή αρχειακή αναφορά, ακριβές απόσπασμα, confidence και verification status. Ξεχώρισε αναφορά πηγής, ερμηνεία και υπόθεση, μεταγενέστερη μελέτη από πρωτογενές τεκμήριο και ορμητήριο από τόπο επιδρομής. Μην μετατρέπεις τη χρονολογία του ερωτήματος σε χρονολογία αχρονολόγητου γεγονότος. Δήλωσε απρόσιτα αρχεία και ανεξέταστο υλικό. Καμία αυτόματη ιστορική επαλήθευση. Κάνε νέα πραγματική απόκτηση πηγών. Μην χρησιμοποιήσεις παλιό κείμενο απάντησης. Μην εμφανίσεις εισαγωγικό placeholder ως εύρημα. Κάθε παράγραφος να περιγράφει συγκεκριμένο τόπο και χρήση που αναφέρει το παρατιθέμενο απόσπασμα.
 
-Εντοπίστηκαν 386 αποσπάσματα εντός της ζητούμενης περιόδου. Αποδίδονται στις πηγές τους και εκκρεμεί έλεγχος.
+Εντοπίστηκαν 387 αποσπάσματα εντός της ζητούμενης περιόδου. Αποδίδονται στις πηγές τους και εκκρεμεί έλεγχος.
 
 ## 1600 — Esclaves Chretiens, Maitres Musulmans.
 
@@ -208,6 +208,26 @@
 Πηγή: https://makale.isam.org.tr/server/api/core/bitstreams/8789a8c9-de5d-4508-acf2-3252ecd15f48/content; αρχείο d662ae36ae6f25434a3b4e8c.txt, γραμμές 1475–1516.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION.
+
+## 1600 — Lineage Society on the Southeastern Coast of China: The Impact of Japanese Piracy in the 16th Century
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> LCSH : Piracy -- China -- Haining Shi -- History -- 16th century
+> LCSH : Pirates -- Japan -- History -- 16th century
+> LCSH : Kinship -- China -- Haining Shi -- History -- 16th century
+> LCSH : Households -- China -- Haining Shi -- History -- 16th century
+> LCSH : Social change -- China -- Haining Shi -- History -- 16th century
+> LCSH : Haining Shi (China) -- History -- 16th century
+> LCSH : Haining Shi (China) -- Social conditions -- 16th century
+> LCSH : Zhejiang Sheng (China) -- History -- 16th century
+> LCSH : China -- Relations -- Japan
+> LCSH : Japan -- Relations -- China
+> FREE : Geschichte 1500-1600. swd
+
+Πηγή: https://ci.nii.ac.jp:443/ncid/BB16875265; αρχείο 967babfe43b357aabe2bc995.txt, γραμμές 797–807.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
 ## 1600 — Pirates, Polities and Companies: Global Politics on the Konkan Littoral, c.1690-1756 *
 
