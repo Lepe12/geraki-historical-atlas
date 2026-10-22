@@ -73,17 +73,29 @@ jobs:
           if-no-files-found: warn
       - name: Publish verified run log for website
         if: always()
+        continue-on-error: true # Publishing must never prevent stage 2 from starting.
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if [ ! -f lone-pirate-eko/log.json ]; then exit 0; fi
-          mkdir -p lone-pirate
-          cp lone-pirate-eko/log.json lone-pirate/latest.json
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add lone-pirate/latest.json
-          git diff --cached --quiet && exit 0
-          git commit -m "Record Lone Pirate experiment (no simulated data)"
-          git pull --rebase origin "${GITHUB_REF_NAME}"
-          git push origin HEAD:"${GITHUB_REF_NAME}"
+          # Update a single file through GitHub's Contents API, not git pull --rebase.
+          # Concurrent live-log updates can change the file SHA; retry with the new SHA.
+          content=$(base64 -w 0 lone-pirate-eko/log.json)
+          for attempt in 1 2 3 4 5; do
+            sha=$(gh api "repos/${GITHUB_REPOSITORY}/contents/lone-pirate/latest.json?ref=${GITHUB_REF_NAME}" --jq '.sha') || exit 1
+            if gh api -X PUT "repos/${GITHUB_REPOSITORY}/contents/lone-pirate/latest.json" \
+              -f message="Record Lone Pirate experiment (no simulated data)" \
+              -f branch="${GITHUB_REF_NAME}" \
+              -f sha="$sha" \
+              -f content="$content" >/dev/null; then
+              echo "Published verified run log."
+              exit 0
+            fi
+            echo "::warning::Live log changed concurrently; retrying publish (attempt $attempt)."
+            sleep 2
+          done
+          echo "::warning::Publication failed after retries; experiment stages remain independent."
+          exit 1
   pirate_2:
     needs: pirate_1
     runs-on: ubuntu-latest
@@ -144,14 +156,26 @@ jobs:
           if-no-files-found: warn
       - name: Publish verified run log for website
         if: always()
+        continue-on-error: true # Publishing must never prevent stage 2 from starting.
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if [ ! -f lone-pirate-eko/log.json ]; then exit 0; fi
-          mkdir -p lone-pirate
-          cp lone-pirate-eko/log.json lone-pirate/latest.json
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add lone-pirate/latest.json
-          git diff --cached --quiet && exit 0
-          git commit -m "Record Lone Pirate experiment (no simulated data)"
-          git pull --rebase origin "${GITHUB_REF_NAME}"
-          git push origin HEAD:"${GITHUB_REF_NAME}"
+          # Update a single file through GitHub's Contents API, not git pull --rebase.
+          # Concurrent live-log updates can change the file SHA; retry with the new SHA.
+          content=$(base64 -w 0 lone-pirate-eko/log.json)
+          for attempt in 1 2 3 4 5; do
+            sha=$(gh api "repos/${GITHUB_REPOSITORY}/contents/lone-pirate/latest.json?ref=${GITHUB_REF_NAME}" --jq '.sha') || exit 1
+            if gh api -X PUT "repos/${GITHUB_REPOSITORY}/contents/lone-pirate/latest.json" \
+              -f message="Record Lone Pirate experiment (no simulated data)" \
+              -f branch="${GITHUB_REF_NAME}" \
+              -f sha="$sha" \
+              -f content="$content" >/dev/null; then
+              echo "Published verified run log."
+              exit 0
+            fi
+            echo "::warning::Live log changed concurrently; retrying publish (attempt $attempt)."
+            sleep 2
+          done
+          echo "::warning::Publication failed after retries; experiment stages remain independent."
+          exit 1
