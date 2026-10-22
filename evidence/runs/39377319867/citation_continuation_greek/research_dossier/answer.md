@@ -2,7 +2,7 @@
 
 Νέα πραγματική αναζήτηση πηγών για ορμητήρια, αγκυροβόλια και καταφύγια πειρατών και κουρσάρων στην Ανατολική Μεσόγειο, 1600–1700. Αναζήτησε σε όλες τις έντεκα οικογένειες πηγών, περιηγητές, portolans, σύγχρονα κείμενα, αρχεία και μεταγενέστερες μελέτες. Απόκτησε τα προσβάσιμα πραγματικά κείμενα. Για κάθε εύρημα δώσε ιστορικό τοπωνύμιο, σύγχρονη ταύτιση και γεωγραφική θέση μόνο όπου τεκμηριώνονται, χρονολογία, χρήστες, είδος χρήσης, ακριβή πηγή, σελίδα ή φύλλο ή αρχειακή αναφορά, ακριβές απόσπασμα, confidence και verification status. Ξεχώρισε αναφορά πηγής, ερμηνεία και υπόθεση, μεταγενέστερη μελέτη από πρωτογενές τεκμήριο και ορμητήριο από τόπο επιδρομής. Μην μετατρέπεις τη χρονολογία του ερωτήματος σε χρονολογία αχρονολόγητου γεγονότος. Δήλωσε απρόσιτα αρχεία και ανεξέταστο υλικό. Καμία αυτόματη ιστορική επαλήθευση.
 
-Εντοπίστηκαν 86 αποσπάσματα εντός της ζητούμενης περιόδου. Αποδίδονται στις πηγές τους και εκκρεμεί έλεγχος.
+Εντοπίστηκαν 87 αποσπάσματα εντός της ζητούμενης περιόδου. Αποδίδονται στις πηγές τους και εκκρεμεί έλεγχος.
 
 ## 1600 — Vol. 14. The Archaeology of Piracy in Antiquity: Proceedings of the International Hybrid Conference held under the auspices of the Department of History and Archaeology of the University of Athens (October 5-6, 2023)
 
@@ -1576,6 +1576,16 @@
 Πηγή: https://helios.eie.gr/helios/bitstream/10442/18865/1/Koutzakiotis%202023.pdf; αρχείο 18f781280144b88f0b78dfa5.txt, γραμμές 31–37.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
+## 1679 — Με αφορμή τον θάνατο του Creveliers στην Αστυπάλαια. Ο ρόλος του νησιού στις καταδρομικές επιχειρήσεις των καθολικών κουρσάρων κατά τον 17ο αιώνα Occasioned by the death of Creveliers off Astypalaia: The island's role in the raids by Catholic corsairs during the 17th century
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Between shortly before midnight of the 24th and early morning of the 25th of September 1679, the life of French corsair Hugues Creveliers, leader of the most important corsair company active in the Aegean sea in the 1670s, came to an inglorious end off the coast of Astypalaia, due to the blowing up of his ship by a member of his crew. The present study takes a closer look at the details of the event and attempts to portray the role that Astypalaia played in the raids of Catholic privateers against the Ottomans during the seventeenth century; raids which had become a regular occurrence because they could find provisions there (such as bread, wine, etc.) and stock up with drinking water, but also because the island provided plenty of safe anchorages. The names of Astypalaia's havens in French and Italian portolan texts, along with other information of the time (testimonies about corsair contrac ts written on the island and marriages between privateers and local Greek women), attest not only the strong relationship that the corsairs built with Astypalaia, but also the degree of appropriation of the place by them. In the last part of this study we examine the role of the bay of Vathy in the corsair raids, since this is most likely where the explosion of Creveliers' ship took place. This particular bay has similar traits to other anchorages in the Cycladic islands where we know that corsairs repaired their ships, since they had built small forts of batteries at the narrow entrances to these lairs so that no enemy ship could approach. In-situ research conducted by the author on the south side of the narrow straits of Vathy bay led to the discovery of similar built structures which semm to be relevant to the frequent corsair presence there.
+
+Πηγή: https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18865; αρχείο ba1c1b759927e9462f39062a.txt, γραμμές 1149–1149.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION.
 
 ## 1679, 1680 — Occasioned by the death of Creveliers off Astypalaia: The island's role in the raids by Catholic corsairs during the 17th century
 
