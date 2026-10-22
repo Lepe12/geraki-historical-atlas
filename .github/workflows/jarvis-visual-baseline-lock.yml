@@ -1,4 +1,4 @@
-name: JARVIS 3D Core Lock
+name: JARVIS Nautical Core Lock
 
 on:
   push:
@@ -6,11 +6,15 @@ on:
     paths:
       - "jarvis-intelligence-chamber/chamber.js"
       - "jarvis-intelligence-chamber/gpu-field.js"
+      - "jarvis-intelligence-chamber/nautical-chart.js"
+      - "jarvis-intelligence-chamber/nautical-emblems.js"
       - ".github/workflows/jarvis-visual-baseline-lock.yml"
   pull_request:
     paths:
       - "jarvis-intelligence-chamber/chamber.js"
       - "jarvis-intelligence-chamber/gpu-field.js"
+      - "jarvis-intelligence-chamber/nautical-chart.js"
+      - "jarvis-intelligence-chamber/nautical-emblems.js"
       - ".github/workflows/jarvis-visual-baseline-lock.yml"
   workflow_dispatch:
 
@@ -18,21 +22,27 @@ jobs:
   protect-approved-3d:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout full history
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Verify approved JARVIS 3D core
+      - name: Verify approved nautical core
         shell: bash
         run: |
           set -euo pipefail
-          # Startup lifecycle and live agent integration; renderer geometry and GPU layer remain protected.
-          BASELINE="42ed8946877dc66fb21715854f8035300f2b3c74"
-          git cat-file -e "$BASELINE^{commit}"
-          git diff --exit-code "$BASELINE" HEAD --             jarvis-intelligence-chamber/chamber.js             jarvis-intelligence-chamber/gpu-field.js || {
-              echo "::error::JARVIS 3D core is LOCKED. Renderer files differ from canonical commit $BASELINE."
-              echo "::error::Unlock/re-approve the 3D baseline intentionally before changing these files."
+          # Approved nautical (portolan) renderer, approved by the repository owner on 2026-10-22 (PR #70).
+          # The baseline is the SHA-256 of each protected file's content, pinned here in the workflow, so it
+          # stays valid after a squash/rebase merge and can only be moved by an intentional edit of this file.
+          cd jarvis-intelligence-chamber
+          cat > "$RUNNER_TEMP/approved-nautical-core.sha256" <<'SUMS'
+          f6c2dd16a7a11ba4e020999f2b5a628105924f2ac715693891463351cd6a47ee  chamber.js
+          f33d9a99022c4dd2e654c652c006a2dcd8d3919097e5e87ba522ba4b3beba8fc  gpu-field.js
+          a721ed0bbddbaafdc6960ac0ce49fc60efd5378f9220d882cd417b48e8f46930  nautical-chart.js
+          f547fc2835faaf0c9ac5ca2457af819686b22f8f75b70be1dfa78d20f1ee0a63  nautical-emblems.js
+          SUMS
+          sed -i 's/^ *//' "$RUNNER_TEMP/approved-nautical-core.sha256"
+          sha256sum --strict -c "$RUNNER_TEMP/approved-nautical-core.sha256" || {
+              echo "::error::Approved nautical core is LOCKED. Renderer files differ from the approved content hashes."
+              echo "::error::Unlock/re-approve the nautical baseline intentionally (update the hashes in this workflow) before changing these files."
               exit 1
             }
-          echo "JARVIS 3D core matches canonical commit $BASELINE."
+          echo "Approved nautical core matches the pinned content hashes."

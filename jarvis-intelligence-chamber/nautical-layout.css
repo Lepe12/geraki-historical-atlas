@@ -1,0 +1,412 @@
+/* NABOU//X — mockup layout (THEATRUM · MARIS · MEDITERRANEI)
+   Desktop: a fixed 1672×941 artboard scaled to the window (nautical-dashboard.js sets --nx-k).
+   Mobile (≤ 800px): a stacked, scrolling page with a fixed top bar, section strip and query bar.
+   Loaded last: it only positions/dresses the chrome; all research functionality is unchanged. */
+
+:root {
+  --oak: #140d08; --ink: #2a190e; --parch: #ecdfbf; --parch2: #d9c59a; --brass: #b48d45; --brass2: #e3c57e; --brass3: #7d6030;
+  --ox: #7b1c17; --ox2: #a3342a; --ox3: #4c0e0b; --txt: #e8d8b2; --dim: #a38e66; --dim2: #7d6a4c;
+  --fell: "NX Fell", "NX Garamond", Georgia, serif; --fellsc: "NX Fell SC", "NX Fell", Georgia, serif;
+  --cin: "NX Cinzel", "NX Garamond", serif; --deco: "NX Cinzel Deco", "NX Cinzel", serif; --gar: "NX Garamond", Georgia, serif;
+}
+html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0705; }
+body.nx-mock { font-family: var(--fell); color: var(--txt); }
+body.nx-mock button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+body.nx-mock button:focus-visible { outline: 1px dashed var(--brass2); outline-offset: 3px; }
+#viewport { position: fixed; inset: 0; overflow: hidden; background: radial-gradient(ellipse at center, #1a110a 0%, #070403 80%); }
+#stage {
+  position: absolute; left: 0; top: 0; width: 1672px; height: 941px; transform-origin: 0 0; overflow: hidden;
+  transform: translate(var(--nx-x, 0px), var(--nx-y, 0px)) scale(var(--nx-k, 1));
+  font-family: var(--fell); color: var(--txt); -webkit-font-smoothing: antialiased;
+  background: radial-gradient(ellipse 70% 55% at 46% 38%, rgba(150, 95, 40, .16), transparent 70%), linear-gradient(rgba(14, 9, 5, .55), rgba(10, 6, 4, .7)), url(./assets/nautical/img/oak.jpg) center/cover;
+}
+#stage::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 60; box-shadow: inset 0 0 140px 30px rgba(0, 0, 0, .75); }
+.frame::before { content: ""; position: absolute; inset: 0; pointer-events: none; border: 16px solid transparent; border-image: url(./assets/nautical/img/frame-brass.svg) 16 stretch; opacity: .9; z-index: 0; }
+.box { background: linear-gradient(180deg, rgba(40, 27, 17, .92), rgba(24, 16, 10, .94)); box-shadow: 0 6px 18px rgba(0, 0, 0, .55), inset 0 0 30px rgba(0, 0, 0, .5); }
+#stage .sr, #queryHelp { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- top bar ---------- */
+#topbar { position: absolute; left: 0; top: 0; width: 1672px; height: 80px; z-index: 30;
+  background: linear-gradient(180deg, rgba(10, 6, 4, .85), rgba(18, 12, 7, .55)); border-bottom: 1px solid rgba(180, 141, 69, .35); box-shadow: 0 1px 0 rgba(0, 0, 0, .8), 0 8px 20px rgba(0, 0, 0, .35); }
+body.nx-mock #topbar .nxs-identity { position: absolute !important; left: 20px !important; top: 10px !important; width: 330px !important; height: 62px !important; padding: 0 !important; margin: 0 !important; background: none !important; border: 0 !important; box-shadow: none !important; display: block !important; }
+#logo { position: absolute; inset: 0; background: none; border: 0; padding: 0; text-align: left; }
+#logo .mark { position: absolute; left: 2px; top: 4px; width: 52px; height: 52px; overflow: visible; }
+.m-ring { fill: none; stroke: var(--brass); stroke-width: 1.4; } .m-ring.t { stroke-width: .6; stroke-dasharray: 1.4 2.2; }
+.m-star path { fill: var(--brass2); } .m-star .m-d { fill: #6b4c22; } .m-star .m-s { fill: var(--ox2); opacity: .9; }
+.m-hub { fill: #1a110a; stroke: var(--brass2); stroke-width: 1; }
+#logo .lt { position: absolute; left: 66px; top: 5px; font: 700 30px/1.2 var(--deco); letter-spacing: 5px; color: var(--parch); text-shadow: 0 1px 0 #000, 0 0 14px rgba(227, 197, 126, .18); white-space: nowrap; }
+#logo .ls { position: absolute; left: 68px; top: 44px; font: 12.5px/1 var(--fellsc); letter-spacing: 2.4px; color: var(--dim); white-space: nowrap; }
+#logo:hover .lt { color: #fff3d6; }
+#topnav { position: absolute; left: 410px; top: 18px; width: 740px; height: 44px; display: flex; justify-content: space-between; }
+#topnav .nav-item { position: relative; height: 44px; padding: 0 6px; background: none; border: 0; font: 600 13.5px var(--cin); letter-spacing: 3px; color: #bda77c; transition: color .2s; }
+#topnav .nav-item::after { content: ""; position: absolute; left: 50%; bottom: 4px; width: 0; height: 1px; background: var(--ox2); transition: width .25s, left .25s; }
+#topnav .nav-item::before { content: ""; position: absolute; left: 50%; bottom: 1px; width: 7px; height: 7px; margin-left: -3.5px; transform: rotate(45deg) scale(0); background: var(--ox2); box-shadow: 0 0 0 1px #1a0e08; transition: transform .2s; }
+#topnav .nav-item:hover { color: var(--parch); }
+#topnav .nav-item.active { color: #f3e4bf; text-shadow: 0 0 10px rgba(227, 197, 126, .25); }
+#topnav .nav-item.active::after { left: 0; width: 100%; }
+#topnav .nav-item.active::before { transform: rotate(45deg) scale(1); }
+body.nx-mock #topbar .nxs-status { position: absolute !important; left: 1170px !important; right: auto !important; top: 14px !important; width: 280px; height: 52px; display: flex !important; align-items: center; justify-content: flex-end; gap: 10px; padding-right: 16px; border-right: 1px solid rgba(180, 141, 69, .3); pointer-events: none; }
+body.nx-mock #topbar .nxs-status > div { text-align: right; line-height: 1.15; }
+body.nx-mock #topbar .nxs-status small { display: block; max-width: none !important; font: italic 13px var(--gar) !important; letter-spacing: .3px; color: var(--dim) !important; text-transform: none; }
+#clkDate { display: inline-block; font: 12px var(--cin); letter-spacing: 2.2px; color: var(--dim); margin-right: 8px; }
+body.nx-mock #clock { display: inline-block; font: 500 21px var(--gar) !important; letter-spacing: 1px; font-variant-numeric: lining-nums; color: var(--parch) !important; }
+#compass { position: absolute; left: 1466px; top: 12px; width: 56px; height: 56px; border-radius: 50%; background: none; border: 0; padding: 0; }
+#compass svg { position: absolute; left: 0; top: 0; width: 56px; height: 56px; overflow: visible; }
+.c-ring { fill: rgba(20, 12, 7, .6); stroke: var(--brass); stroke-width: 1.5; } .c-ring.t { fill: none; stroke-width: .6; stroke: var(--brass3); }
+.c-ticks line { stroke: var(--brass); stroke-width: .8; }
+.c-needle { transform-origin: 0 0; animation: nxsway 7s ease-in-out infinite; }
+.c-needle .n1 { fill: var(--ox2); } .c-needle .n2 { fill: var(--brass2); } .c-hub { fill: var(--brass2); }
+#compass:hover .c-ring { stroke: var(--brass2); }
+#compass.spin .c-needle { animation: nxspin .9s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes nxsway { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(5deg); } }
+@keyframes nxspin { from { transform: rotate(-340deg); } to { transform: rotate(0); } }
+#topOrn { position: absolute; left: 1540px; top: 38px; width: 112px; height: 6px; }
+#topOrn i { display: inline-block; vertical-align: middle; width: 40px; height: 1px; background: var(--brass3); }
+#topOrn b { display: inline-block; vertical-align: middle; width: 7px; height: 7px; margin: 0 8px; transform: rotate(45deg); background: var(--ox2); }
+
+/* ---------- sidebar (the 4 original dock buttons + mockup sections) ---------- */
+#sidenav { position: absolute; left: 16px; top: 92px; width: 176px; height: 556px; padding: 22px 12px; z-index: 20;
+  display: flex; flex-direction: column; gap: 9px;
+  background: linear-gradient(180deg, rgba(38, 25, 15, .9), rgba(22, 14, 9, .92)); box-shadow: 0 6px 18px rgba(0, 0, 0, .6), inset 0 0 40px rgba(0, 0, 0, .5); }
+body.nx-mock #sidenav .nxs-dock { display: contents !important; }
+body.nx-mock #sidenav .side-item { position: relative !important; z-index: 1; flex: 0 0 56px; width: 152px !important; height: 56px !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; display: block !important;
+  text-align: left; background: none !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; color: #b9a47b !important; transition: background .2s, color .2s; }
+#sidenav [data-order="1"] { order: 1; } #sidenav [data-order="2"] { order: 2; } #sidenav [data-order="3"] { order: 3; } #sidenav [data-order="4"] { order: 4; }
+#sidenav [data-order="5"] { order: 5; } #sidenav [data-order="6"] { order: 6; } #sidenav [data-order="7"] { order: 7; } #sidenav [data-order="8"] { order: 8; }
+body.nx-mock #sidenav .side-item svg { position: absolute !important; left: 14px; top: 17px; width: 22px !important; height: 22px !important; fill: none; stroke: currentColor !important; stroke-width: 1.35; stroke-linecap: round; stroke-linejoin: round; }
+#sidenav .side-item svg .seal { fill: var(--ox); stroke: var(--ox2); }
+body.nx-mock #sidenav .side-item span { position: absolute !important; left: 48px; top: 19px; font: 600 12.2px var(--cin) !important; letter-spacing: 2.2px !important; white-space: nowrap; max-width: none !important; }
+#sidenav .side-item .dot { position: absolute; left: 132px; top: 24px; width: 8px; height: 8px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #d0604a, var(--ox) 60%, var(--ox3)); box-shadow: 0 0 6px rgba(163, 52, 42, .6); }
+#sidenav .side-item .dot[hidden] { display: none; }
+body.nx-mock #sidenav .side-item:hover { color: var(--parch) !important; background: rgba(227, 197, 126, .05) !important; }
+body.nx-mock #sidenav .side-item.active, body.nx-mock #sidenav .side-item[aria-current="page"] { color: #f3e4bf !important; background: linear-gradient(90deg, rgba(123, 28, 23, .45), rgba(123, 28, 23, .08) 75%, transparent) !important; box-shadow: inset 0 1px 0 rgba(180, 141, 69, .25), inset 0 -1px 0 rgba(180, 141, 69, .25) !important; }
+#sidenav .side-item.active::before, #sidenav .side-item[aria-current="page"]::before { content: ""; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; background: linear-gradient(var(--brass2), var(--ox2)); }
+
+#moon { position: absolute; left: 16px; top: 660px; width: 176px; height: 254px; border: 0; padding: 0; text-align: left; z-index: 20;
+  background: radial-gradient(circle at 50% 40%, rgba(60, 40, 22, .9), rgba(18, 12, 8, .95) 70%); box-shadow: 0 6px 18px rgba(0, 0, 0, .6), inset 0 0 40px rgba(0, 0, 0, .6); }
+#moon > span { position: absolute; }
+#moon .astro { left: 13px; top: 12px; width: 150px; height: 150px; transition: transform 1.2s ease; }
+#moon .astro img { width: 150px; height: 150px; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .8)); }
+#moon:hover .astro { transform: rotate(-14deg); }
+#moon .mt1 { left: 20px; top: 180px; font: 700 12px var(--cin); letter-spacing: 1.6px; color: var(--parch); white-space: nowrap; }
+#moon .mt1 b { color: var(--ox2); margin-left: 4px; font-weight: 400; }
+#moon .mt2 { left: 20px; top: 199px; font: italic 13.5px var(--fell); color: var(--dim); letter-spacing: .6px; }
+#moon .mphase { left: 20px; top: 224px; right: 12px; font: 11px var(--gar); letter-spacing: .4px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#moon .mphase::before { content: ""; display: inline-block; width: 18px; height: 2px; background: var(--ox2); margin-right: 8px; vertical-align: middle; }
+
+/* ---------- centre: history list, ribbon, operator query ---------- */
+#histList { position: absolute; left: 206px; top: 98px; width: 190px; height: 80px; z-index: 5; }
+#histList .hist { position: absolute; left: 24px; height: 18px; padding: 0; background: none; border: 0; font: 11.5px var(--cin); letter-spacing: 2.6px; color: var(--dim); white-space: nowrap; transition: color .2s; }
+.hist[data-i="0"] { top: 0; } .hist[data-i="1"] { top: 18px; } .hist[data-i="2"] { top: 36px; } .hist[data-i="3"] { top: 54px; }
+#histList .hist:hover, #histList .hist.on { color: var(--parch); }
+#histDash { position: absolute; left: 0; top: 8px; width: 16px; height: 2px; background: var(--ox2); transition: top .25s ease; }
+#histDash::after { content: ""; position: absolute; right: -3px; top: -2px; width: 5px; height: 5px; transform: rotate(45deg); background: var(--ox2); }
+#banner { position: absolute; left: 560px; top: 96px; width: 600px; height: 70px; opacity: .95; z-index: 5; }
+#banner svg { width: 600px; height: 70px; overflow: visible; }
+.rb-main { fill: #d8c597; stroke: #5a3c1f; stroke-width: 1; } .rb-tail { fill: #bca474; stroke: #5a3c1f; stroke-width: 1; } .rb-fold { fill: #8c7448; stroke: #5a3c1f; stroke-width: 1; }
+.rb-t { font: 700 13px var(--cin); letter-spacing: 3.2px; fill: #3a2414; }
+
+body.nx-mock #operatorCommand { position: absolute !important; left: 432px !important; top: 182px !important; right: auto !important; bottom: auto !important; width: 772px !important; height: 134px !important; max-width: none !important; z-index: 24 !important;
+  margin: 0 !important; padding: 0 !important; transform: none !important; background: none !important; border: 0 !important; box-shadow: none !important; display: block !important; }
+#qRule { position: absolute; left: 0; top: 0; width: 764px; height: 12px; display: flex; align-items: center; }
+#qRule i { flex: 1; height: 1px; background: linear-gradient(90deg, rgba(180, 141, 69, 0), rgba(180, 141, 69, .6)); }
+#qRule i:last-child { background: linear-gradient(90deg, rgba(180, 141, 69, .6), rgba(180, 141, 69, 0)); }
+#qRule b { color: var(--ox2); font-size: 12px; margin: 0 10px; }
+#qLabel { position: absolute; left: 4px; top: 16px; white-space: nowrap; font: 10.5px var(--cin); letter-spacing: 3px; color: var(--dim); }
+body.nx-mock #commandState { position: absolute; right: 70px; top: 13px; max-width: 520px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: italic 13.5px var(--gar) !important; letter-spacing: .2px !important; color: var(--brass2) !important; text-transform: none !important; }
+body.nx-mock #operatorCommand.is-error #commandState { color: #f0a08a !important; }
+#qBox { position: absolute; left: 0; top: 34px; width: 700px; min-height: 48px; z-index: 2;
+  background: linear-gradient(rgba(236, 223, 191, 0), rgba(120, 85, 40, .08)), url(./assets/nautical/img/parchment.jpg) center/420px;
+  box-shadow: 0 0 0 1px #3d2815, 0 0 0 3px rgba(180, 141, 69, .55), 0 0 0 4px #1b120b, 0 4px 14px rgba(0, 0, 0, .6), inset 0 0 18px rgba(110, 70, 30, .35); }
+#qBox:focus-within { box-shadow: 0 0 0 1px #3d2815, 0 0 0 3px var(--brass2), 0 0 0 4px #1b120b, 0 4px 18px rgba(0, 0, 0, .6), 0 0 22px rgba(227, 197, 126, .18), inset 0 0 18px rgba(110, 70, 30, .35); }
+#qBox .quill { position: absolute; left: 12px; top: 12px; width: 24px; height: 24px; color: #5a3c1f; }
+#qBox .quill svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; }
+body.nx-mock #operatorQuery { display: block; width: 100% !important; min-height: 48px !important; max-height: 112px; margin: 0 !important; padding: 10px 14px 8px 46px !important; resize: none; border: 0 !important; outline: none; box-shadow: none !important; border-radius: 0 !important;
+  background: transparent !important; font: 500 21px/1.3 var(--gar) !important; color: #24150b !important; caret-color: var(--ox); overflow: hidden; }
+body.nx-mock #operatorQuery::placeholder { color: rgba(58, 36, 20, .55); font-style: italic; }
+body.nx-mock #executeQuery { position: absolute !important; left: 712px; top: 30px; width: 56px !important; height: 56px !important; min-height: 0 !important; padding: 0 !important; border: 0 !important; border-radius: 50% !important; z-index: 3; font-size: 0 !important;
+  background: radial-gradient(circle at 36% 30%, #c4513d 0%, #8d231b 38%, #5c120e 72%, #3c0a08 100%) !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, .7), inset 0 -3px 6px rgba(0, 0, 0, .4), inset 0 2px 3px rgba(255, 190, 160, .25) !important; transition: transform .15s, filter .15s; }
+#executeQuery::before { content: ""; position: absolute; inset: 6px; border-radius: 50%; border: 1.5px solid rgba(40, 6, 4, .55); box-shadow: inset 0 0 0 1px rgba(255, 170, 140, .18); }
+#executeQuery::after { content: ""; position: absolute; inset: -3px; border-radius: 47% 53% 50% 50%/52% 48% 52% 48%; border: 3px solid rgba(110, 22, 17, .75); }
+#executeQuery svg { position: absolute; left: 16px; top: 16px; width: 24px; height: 24px; fill: none; stroke: #f3d9c2; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+#executeQuery:hover { filter: brightness(1.12); transform: rotate(-8deg); }
+#executeQuery:disabled { filter: grayscale(.4) brightness(.8); cursor: progress; }
+#operatorCommand.is-busy #executeQuery, #operatorCommand.is-sending #executeQuery { animation: nxseal 1s linear infinite; }
+@keyframes nxseal { to { transform: rotate(360deg); } }
+#filters { position: absolute; left: 0; top: 96px; width: 700px; height: 34px; display: flex; gap: 10px; }
+#filters .dd { position: relative; height: 34px; display: flex; align-items: center; padding: 0 30px 0 12px; border: 0; border-radius: 0;
+  background: linear-gradient(180deg, rgba(52, 35, 21, .95), rgba(30, 20, 12, .95)); box-shadow: 0 0 0 1px rgba(180, 141, 69, .45), inset 0 1px 0 rgba(227, 197, 126, .12), 0 3px 8px rgba(0, 0, 0, .5);
+  font: 15px var(--gar); color: var(--parch); white-space: nowrap; flex: 1 1 0; min-width: 0; transition: box-shadow .2s; }
+#filters .dd .v { overflow: hidden; text-overflow: ellipsis; }
+#filters .dd .chev { position: absolute; right: 12px; top: 12px; width: 7px; height: 7px; border-right: 1.4px solid var(--brass); border-bottom: 1.4px solid var(--brass); transform: rotate(45deg); transition: transform .2s; }
+#filters .dd.open .chev { transform: rotate(-135deg); top: 15px; }
+#filters .dd:hover, #filters .dd.open { box-shadow: 0 0 0 1px var(--brass2), inset 0 1px 0 rgba(227, 197, 126, .2), 0 3px 10px rgba(0, 0, 0, .6); }
+#filters .dd.changed { box-shadow: 0 0 0 1px var(--ox2), inset 0 0 0 1px rgba(163, 52, 42, .35), 0 3px 8px rgba(0, 0, 0, .5); }
+#filters .dd.changed .v { color: #f6dcc0; }
+#filters #advBtn { flex: 0 0 118px; padding-right: 12px; }
+#advBtn svg { width: 16px; height: 16px; margin-right: 8px; flex: none; fill: none; stroke: var(--brass); stroke-width: 1.5; stroke-linecap: round; }
+
+/* ---------- chart frame ---------- */
+#chartFrame { position: absolute; left: 198px; top: 330px; width: 1124px; height: 456px; z-index: 6; background: #2a1a0e; box-shadow: 0 10px 30px rgba(0, 0, 0, .75); }
+#chartFrame .rope { position: absolute; inset: 0; border: 8px solid transparent; border-image: url(./assets/nautical/img/rope.svg) 8 round; pointer-events: none; z-index: 8; }
+#chartFrame .bandH { position: absolute; left: 8px; right: 8px; top: 8px; bottom: 8px; background: repeating-linear-gradient(90deg, #2a190e 0 21.9px, #e6d6b0 21.9px 43.8px); }
+#chartFrame .bandV { position: absolute; left: 8px; right: 8px; top: 14px; bottom: 14px; background: repeating-linear-gradient(180deg, #e6d6b0 0 26.1px, #2a190e 26.1px 52.2px); }
+#chartView { position: absolute; left: 14px; top: 14px; right: 14px; bottom: 14px; overflow: hidden; z-index: 2; background: #e9dcb8; box-shadow: inset 0 0 0 1px #2a190e; }
+body.nx-mock #chartView .chart-stage { position: absolute !important; inset: 0 !important; z-index: 1; }
+body.nx-mock #chartView #universe { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; z-index: 2; pointer-events: none; }
+body.nx-mock #chartView .grain { position: absolute; inset: 0; z-index: 2; pointer-events: none; box-shadow: inset 0 0 40px rgba(90, 55, 20, .45); }
+body.nx-mock #chartView .node-seals { position: absolute !important; inset: 0 !important; z-index: 3; }
+body.nx-mock #chartView #nodeLabels { position: absolute !important; inset: 0 !important; z-index: 4; pointer-events: none; overflow: visible; }
+body.nx-mock #chartView #nodeLabels .node-label { pointer-events: auto; }
+body.nx-mock #chartView .nxs-3d-tools { position: absolute !important; right: 10px !important; top: 10px !important; left: auto !important; bottom: auto !important; z-index: 6; display: flex !important; flex-direction: column; gap: 6px; }
+body.nx-mock #chartView .nxs-3d-tools button { width: 38px !important; height: 38px !important; min-height: 0 !important; }
+body.nx-mock #chartView .nxs-3d-tools button svg { width: 20px; height: 20px; }
+body.nx-mock #chartView .nxs-telemetry { position: absolute !important; left: auto !important; right: 10px !important; bottom: 6px !important; top: auto !important; z-index: 6; display: flex !important; gap: 12px; padding: 2px 10px !important; transform: none !important;
+  background: rgba(236, 223, 191, .82) !important; border: 1px solid rgba(42, 25, 14, .4) !important; border-radius: 0 !important; font: italic 12.5px var(--gar) !important; color: #4a3320 !important; }
+body.nx-mock #chartView .nxs-telemetry b { color: #2a190e !important; }
+
+/* ---------- bottom cards ---------- */
+#cards { position: absolute; left: 200px; top: 800px; width: 1122px; height: 112px; display: flex; gap: 14px; z-index: 6; }
+#cards .card { position: relative; flex: 1 1 0; height: 112px; overflow: hidden; padding: 0; border: 0; background: #1a110a; text-align: left;
+  box-shadow: 0 0 0 1px #000, 0 0 0 4px #6e5326, 0 0 0 5px #2a1a0e, 0 6px 16px rgba(0, 0, 0, .7); transition: box-shadow .25s; }
+#cards .card .pic { position: absolute; inset: 0; background-size: cover; background-position: center 45%; filter: sepia(.25) saturate(.9) brightness(.82) contrast(1.05); transition: filter .3s, transform .6s; }
+#cards .card::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, transparent 45%, rgba(14, 8, 4, .88)); box-shadow: inset 0 0 0 1px rgba(227, 197, 126, .35), inset 0 0 30px rgba(0, 0, 0, .6); }
+#cards .card .lbl { position: absolute; left: 14px; bottom: 10px; z-index: 2; font: 700 13px var(--cin); letter-spacing: 3.4px; color: var(--parch); text-shadow: 0 1px 3px #000; }
+#cards .card .lbl::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 10px; transform: rotate(45deg) translateY(-2px); background: var(--ox2); }
+#cards .card .cnt { position: absolute; right: 14px; bottom: 9px; z-index: 2; font: italic 14px var(--gar); color: var(--brass2); text-shadow: 0 1px 3px #000; font-variant-numeric: lining-nums; }
+#cards .card:hover { box-shadow: 0 0 0 1px #000, 0 0 0 4px var(--brass), 0 0 0 5px #2a1a0e, 0 10px 22px rgba(0, 0, 0, .8); }
+#cards .card:hover .pic { filter: sepia(.1) saturate(1) brightness(1) contrast(1.05); transform: scale(1.04); }
+#cards .card.active { box-shadow: 0 0 0 1px #000, 0 0 0 4px var(--ox2), 0 0 0 5px #2a1a0e, 0 10px 22px rgba(0, 0, 0, .8); }
+
+/* ---------- right column ---------- */
+#hero { position: absolute; left: 1338px; top: 92px; width: 314px; height: 180px; overflow: hidden; padding: 0; border: 0; text-align: left; z-index: 6;
+  box-shadow: 0 0 0 1px #000, 0 0 0 4px #7a5c2a, 0 0 0 5px #2a1a0e, 0 6px 16px rgba(0, 0, 0, .7); }
+#hero > span { position: absolute; }
+#hero .pic { inset: 0; background: url(./assets/nautical/img/hero.jpg) 78% 30%/auto 118%; transition: transform 8s ease; }
+#hero::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(0, 0, 0, .05) 30%, rgba(12, 7, 3, .85)); box-shadow: inset 0 0 0 1px rgba(227, 197, 126, .35), inset 0 0 40px rgba(0, 0, 0, .6); }
+#hero:hover .pic { transform: scale(1.08); }
+#hero .ht { left: 16px; top: 112px; z-index: 2; font: 700 25px var(--deco); letter-spacing: 4px; color: var(--parch); text-shadow: 0 2px 6px #000; }
+#hero .hs { left: 17px; top: 147px; z-index: 2; font: 8.6px var(--cin); letter-spacing: 2.1px; color: var(--brass2); white-space: nowrap; text-shadow: 0 1px 3px #000; }
+#hero .hq { left: 16px; right: 16px; top: 12px; z-index: 2; font: italic 14px var(--gar); color: var(--parch); text-shadow: 0 1px 4px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#stage .box > h3 { position: absolute; left: 18px; top: 14px; margin: 0; font: 700 12px var(--cin); letter-spacing: 3px; color: var(--parch); z-index: 1; }
+#stage .box > h3::after { content: ""; position: absolute; left: 0; top: 22px; width: 28px; height: 1px; background: var(--ox2); }
+#status { position: absolute; left: 1338px; top: 284px; width: 314px; height: 162px; z-index: 6; }
+#statRows { position: absolute; left: 16px; top: 44px; width: 282px; height: 108px; z-index: 1; }
+.srow { position: relative; width: 282px; height: 26px; border-bottom: 1px dotted rgba(180, 141, 69, .22); }
+.srow > * { position: absolute; }
+.srow .k { left: 4px; top: 5px; font: 11px var(--cin); letter-spacing: 2px; color: var(--dim); }
+.srow .n { right: 104px; top: 2px; font: 500 16px var(--gar); color: var(--parch); text-align: right; font-variant-numeric: lining-nums tabular-nums; }
+.srow .m { right: 4px; top: 9px; width: 92px; height: 9px; display: flex; gap: 4px; justify-content: flex-end; }
+.srow .m i { position: static; width: 9px; height: 9px; transform: rotate(45deg) scale(.78); background: #3a2617; box-shadow: inset 0 0 0 1px rgba(180, 141, 69, .25); }
+.srow .m i.lit { background: radial-gradient(circle at 35% 30%, #d0604a, #8e231b 55%, #5a110d); box-shadow: 0 0 4px rgba(163, 52, 42, .5); }
+#activityBox { position: absolute; left: 1338px; top: 458px; width: 314px; height: 232px; z-index: 6; }
+body.nx-mock #activityBox .nxs-activity-open { position: absolute !important; right: 14px !important; top: 9px !important; left: auto !important; z-index: 3; display: inline-flex !important; align-items: center; gap: 6px; height: 24px !important; min-height: 0 !important; padding: 0 9px !important;
+  border: 1px solid rgba(180, 141, 69, .5) !important; border-radius: 12px !important; background: rgba(30, 20, 12, .9) !important; font: 600 12.5px var(--gar) !important; letter-spacing: .5px; color: var(--parch) !important; width: auto !important; }
+body.nx-mock #activityBox .nxs-activity-open svg { width: 14px; height: 14px; fill: none; stroke: var(--brass2); stroke-width: 1.6; }
+body.nx-mock #activityBox .nxs-activity-open span { position: static !important; width: auto !important; height: auto !important; clip: auto !important; }
+#activityLive { position: absolute; left: 16px; top: 44px; width: 286px; height: 180px; overflow: hidden; z-index: 1; }
+#activityLive .row { position: relative; width: 282px; height: 36px; }
+#activityLive .row > * { position: absolute; }
+#activityLive .row::after { content: ""; position: absolute; left: 4px; top: 24px; width: 1px; height: 14px; background: rgba(180, 141, 69, .25); }
+#activityLive .row:last-child::after { display: none; }
+#activityLive .dot { left: 0; top: 13px; width: 9px; height: 9px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #d0604a, #8e231b 55%, #5a110d); }
+#activityLive .dot.ok { background: radial-gradient(circle at 35% 30%, #c9dcb6, #5b8a73 55%, #2f5242); }
+#activityLive .dot.warn { background: radial-gradient(circle at 35% 30%, #f1dc9e, #b48d45 55%, #7d6030); }
+#activityLive .t { left: 20px; top: 8px; font: 14px var(--gar); font-variant-numeric: lining-nums; color: var(--dim); }
+#activityLive .ti { left: 70px; top: 2px; max-width: 210px; font: 14.5px var(--gar); color: var(--parch); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#activityLive .su { left: 70px; top: 19px; max-width: 210px; font: italic 12.5px var(--gar); color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#activityLive .empty { padding: 30px 0; text-align: center; font-style: italic; color: var(--dim2); }
+#nodesBox { position: absolute; left: 1338px; top: 702px; width: 314px; height: 212px; z-index: 6; }
+#nodesBox .hdots { position: absolute; right: 40px; top: 11px; color: var(--ox2); font-size: 14px; letter-spacing: 2px; z-index: 1; }
+#nodes { position: absolute; left: 12px; top: 40px; width: 290px; height: 162px; padding: 0; border: 0; background: none; text-align: left; z-index: 1; }
+#nodes > * { position: absolute; }
+#miniChart { left: 0; top: 0; width: 290px; height: 114px; overflow: hidden; background: radial-gradient(ellipse at center, rgba(70, 50, 28, .7), rgba(20, 13, 8, .9)); box-shadow: inset 0 0 0 1px rgba(180, 141, 69, .3); }
+#miniChart svg { width: 290px; height: 114px; display: block; }
+#miniChart .ml { fill: rgba(196, 171, 122, .28); stroke: rgba(227, 197, 126, .55); stroke-width: 2.4; }
+#miniChart .mn { fill: none; stroke: rgba(163, 52, 42, .75); stroke-width: 5; }
+#miniChart .md { stroke: #2a190e; stroke-width: 5; }
+#miniChart .md.COMPLETED { fill: #8fb59a; } #miniChart .md.ACTIVE { fill: #e0705a; } #miniChart .md.BLOCKED { fill: #5a110d; } #miniChart .md.IDLE { fill: #9a8a6a; }
+#nodes:hover #miniChart { box-shadow: inset 0 0 0 1px var(--brass2); }
+#nodes .nl1 { left: 2px; top: 124px; font: 10.5px var(--cin); letter-spacing: 2.4px; color: var(--parch); white-space: nowrap; }
+#nodes .nl2 { left: 2px; top: 140px; font: italic 13px var(--fell); color: var(--dim); white-space: nowrap; }
+#nodes .nbar { right: 2px; top: 150px; width: 60px; height: 2px; background: var(--ox2); }
+
+/* ---------- their panels, placed in the mockup's content region ---------- */
+body.nx-mock #stage .nxs-workspace, body.nx-mock #stage .results-drawer, body.nx-mock #stage .learning-panel, body.nx-mock #stage .activity-strip {
+  position: absolute !important; left: 198px !important; top: 330px !important; right: auto !important; bottom: auto !important; width: 1124px !important; height: 582px !important; max-width: none !important; max-height: none !important; min-width: 0 !important;
+  transform: none !important; z-index: 26 !important; overflow: auto !important; }
+body.nx-mock #stage .nxs-workspace.hidden, body.nx-mock #stage .results-drawer.hidden, body.nx-mock #stage .learning-panel.hidden, body.nx-mock #stage .activity-strip.hidden { display: none !important; }
+body.nx-mock #stage .detail-panel { position: absolute !important; left: 1338px !important; top: 92px !important; right: auto !important; bottom: auto !important; width: 314px !important; height: 822px !important; max-height: none !important; z-index: 27 !important; overflow: auto !important; transform: none !important; }
+body.nx-mock #stage .detail-panel.hidden { display: none !important; }
+body.nx-mock #stage .workspace-welcome { display: none !important; }
+
+/* popovers: dropdown menu, map layers, settings */
+#ddMenu, .nx-pop { position: absolute; z-index: 45; color: var(--ink); font-family: var(--gar);
+  background: linear-gradient(rgba(255, 248, 230, .15), rgba(150, 110, 60, .12)), url(./assets/nautical/img/parchment.jpg) center/520px;
+  box-shadow: 0 0 0 1px #3d2815, 0 0 0 3px rgba(180, 141, 69, .5), 0 10px 24px rgba(0, 0, 0, .8); }
+#ddMenu { padding: 6px 0; max-height: 360px; overflow: auto; min-width: 180px; }
+#ddMenu[hidden], .nx-pop[hidden] { display: none; }
+#ddMenu .opt { display: block; width: 100%; text-align: left; padding: 7px 16px; font: 15.5px var(--gar); color: var(--ink); background: none; border: 0; white-space: nowrap; }
+#ddMenu .opt:hover, #ddMenu .opt:focus-visible { background: rgba(123, 28, 23, .12); outline: none; }
+#ddMenu .opt.cur { color: var(--ox); font-weight: 600; }
+#ddMenu .opt.cur::before { content: "✦ "; font-size: 10px; }
+#ddMenu .opt small { margin-left: 8px; font-style: italic; color: #6d5232; }
+.nx-pop { left: 206px; top: 330px; width: 380px; padding: 18px 22px; }
+.nx-pop h2 { margin: 0 0 4px; font: 700 15px var(--cin); letter-spacing: 3px; }
+.nx-pop p { margin: 4px 0 10px; font-size: 14px; color: #5e4528; font-style: italic; }
+.nx-pop label { display: flex; gap: 10px; align-items: center; padding: 5px 0; font-size: 15px; }
+.nx-pop input[type=checkbox] { accent-color: #7b1c17; width: 15px; height: 15px; }
+.nx-pop .close { position: absolute; right: 12px; top: 12px; width: 28px; height: 28px; border: 0; border-radius: 50%; color: #f2dcc4; background: radial-gradient(circle at 36% 30%, #c4513d, #8e231b 50%, #5a110d); }
+body.nx-mock.nx-no-seals #nodeSeals, body.nx-mock.nx-no-labels #nodeLabels, body.nx-mock.nx-no-routes #universe { visibility: hidden; }
+body.nx-mock.nx-no-rhumbs .chart .rhumbs, body.nx-mock.nx-no-pictures .chart .pic, body.nx-mock.nx-no-names .chart text { display: none; }
+body.nx-mock.nx-no-motion *, body.nx-mock.nx-no-motion *::before, body.nx-mock.nx-no-motion *::after { animation: none !important; transition: none !important; }
+
+/* ================= MOBILE: stacked page ================= */
+@media (max-width: 800px) {
+  #stage { position: absolute; inset: 0; width: auto; height: auto; transform: none; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    display: flex; flex-direction: column; gap: 14px; padding: 132px 10px calc(var(--composer-height, 150px) + 14px); }
+  #stage::after { display: none; }
+  #stage > * { flex: none; }
+  #topbar { position: fixed; left: 0; right: 0; top: 0; width: auto; height: 60px; z-index: 50; }
+  body.nx-mock #topbar .nxs-identity { left: 10px !important; top: 4px !important; width: 220px !important; height: 52px !important; }
+  #logo .mark { width: 42px; height: 42px; top: 5px; left: 0; }
+  #logo .lt { left: 50px; top: 6px; font-size: 21px; letter-spacing: 3px; }
+  #logo .ls { left: 51px; top: 35px; font-size: 10px; letter-spacing: 1.4px; }
+  #topnav, #topOrn, #compass, #clkDate { display: none; }
+  body.nx-mock #topbar .nxs-status { left: auto !important; right: 10px !important; top: 9px !important; width: auto; height: 42px; padding-right: 0; border-right: 0; }
+  body.nx-mock #clock { font-size: 15px !important; }
+  body.nx-mock #topbar .nxs-status small { font-size: 12px !important; max-width: 130px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #sidenav { position: fixed; left: 0; right: 0; top: 60px; width: auto; height: 66px; padding: 4px 6px; z-index: 50; flex-direction: row; gap: 2px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
+    background: linear-gradient(180deg, rgba(30, 20, 12, .98), rgba(20, 13, 8, .98)); border-bottom: 1px solid rgba(180, 141, 69, .35); }
+  #sidenav::-webkit-scrollbar { display: none; }
+  #sidenav.frame::before { display: none; }
+  body.nx-mock #sidenav .side-item { flex: 0 0 78px; width: 78px !important; height: 58px !important; }
+  body.nx-mock #sidenav .side-item svg { left: 28px; top: 7px; width: 21px !important; height: 21px !important; }
+  body.nx-mock #sidenav .side-item span { left: 0; right: 0; top: 35px; text-align: center; font-size: 9.5px !important; letter-spacing: 1px !important; }
+  #sidenav .side-item .dot { left: 54px; top: 6px; }
+  #sidenav .side-item.active::before, #sidenav .side-item[aria-current="page"]::before { left: 8px; right: 8px; top: auto; bottom: 0; width: auto; height: 3px; }
+  #moon { display: none; }
+  #histList { position: relative; left: auto; top: auto; order: 1; width: auto; height: 22px; display: flex; gap: 14px; justify-content: center; }
+  #histList .hist { position: relative; left: auto; top: auto !important; font-size: 10.5px; letter-spacing: 1.6px; }
+  #histDash { display: none; }
+  #banner { position: relative; left: auto; top: auto; order: 0; width: 100%; height: 44px; }
+  #banner svg { width: 100%; height: 44px; }
+  body.nx-mock #operatorCommand { position: fixed !important; left: 0 !important; right: 0 !important; top: auto !important; bottom: 0 !important; width: auto !important; height: auto !important; z-index: 50 !important; padding: 8px 10px 10px !important;
+    background: linear-gradient(180deg, rgba(30, 20, 12, .97), rgba(16, 10, 6, .99)) !important; border-top: 1px solid rgba(180, 141, 69, .45) !important; box-shadow: 0 -8px 20px rgba(0, 0, 0, .6) !important; }
+  #qRule { display: none; }
+  #qLabel { position: static; display: inline-block; font-size: 10px; }
+  body.nx-mock #commandState { position: static; display: inline-block; margin-left: 10px; max-width: 58vw; vertical-align: bottom; font-size: 12.5px !important; }
+  #qBox { position: relative; left: auto; top: auto; width: calc(100% - 58px); margin-top: 6px; min-height: 46px; }
+  body.nx-mock #operatorQuery { font-size: 17px !important; min-height: 46px !important; padding: 11px 10px 8px 40px !important; }
+  #qBox .quill { left: 10px; top: 11px; }
+  body.nx-mock #executeQuery { left: auto; right: 10px; top: 32px; width: 48px !important; height: 48px !important; }
+  #executeQuery svg { left: 12px; top: 12px; }
+  #filters { position: relative; left: auto; top: auto; width: auto; margin-top: 10px; overflow-x: auto; scrollbar-width: none; }
+  #filters::-webkit-scrollbar { display: none; }
+  #filters .dd { flex: 0 0 auto; font-size: 14px; height: 32px; margin: 1px; }
+  #filters #advBtn { flex: 0 0 auto; }
+  #chartFrame { position: relative; left: auto; top: auto; order: 2; width: 100%; height: min(62vh, 480px); }
+  #cards { position: relative; left: auto; top: auto; order: 3; width: 100%; height: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 4px; }
+  #cards .card { height: 92px; }
+  #hero, #status, #activityBox, #nodesBox { position: relative; left: auto; top: auto; width: 100%; }
+  #hero { order: 4; height: 150px; margin: 4px 0; }
+  #hero .ht { top: 86px; font-size: 22px; } #hero .hs { top: 118px; }
+  #status { order: 5; } #statRows, .srow { width: calc(100% - 32px); }
+  #activityBox { order: 6; } #activityLive { width: calc(100% - 32px); } #activityLive .row { width: 100%; } #activityLive .ti, #activityLive .su { max-width: calc(100% - 80px); }
+  #nodesBox { order: 7; }
+  body.nx-mock #stage .nxs-workspace, body.nx-mock #stage .results-drawer, body.nx-mock #stage .learning-panel, body.nx-mock #stage .activity-strip, body.nx-mock #stage .detail-panel {
+    position: fixed !important; left: 6px !important; right: 6px !important; top: 132px !important; bottom: calc(var(--composer-height, 150px) + 6px) !important; width: auto !important; height: auto !important; z-index: 45 !important; }
+  .nx-pop { position: fixed; left: 10px; right: 10px; top: 140px; width: auto; }
+  #ddMenu { position: fixed; }
+}
+.nx-pop .btn-l { padding: 7px 14px; border: 0; color: #f2dcc4; font: 700 11px var(--cin); letter-spacing: 2px; background: radial-gradient(circle at 40% 30%, #b23d2f, #7b1c17 60%, #5a110d); border-radius: 14px 16px 15px 13px; box-shadow: 0 2px 4px rgba(0, 0, 0, .4); }
+body.nx-mock #sidenav .nxs-dock .side-item.dim-current[aria-current="page"] { color: #b9a47b !important; background: none !important; box-shadow: none !important; }
+body.nx-mock #sidenav .nxs-dock .side-item.dim-current[aria-current="page"]::before { display: none; }
+body.nx-mock #topbar .nxs-status-dot { display: none !important; }
+@media (max-width: 800px) { body.nx-mock #chartView .nxs-telemetry #coordinates { display: none; } }
+@media (max-width: 800px) { #ddMenu, .nx-pop { z-index: 70 !important; } #ddMenu { max-height: 50vh; } }
+
+/* ---------- v3: decluttered chart labels, lane tooltip, readability ---------- */
+body.nx-mock #chartView .node-label { font: 600 14.5px/1.2 var(--nx-body); padding: 3px 9px 3px; }
+body.nx-mock #chartView .node-label small { display: none !important; }
+.lane-tip { position: absolute; left: 0; top: 0; z-index: 9; max-width: 280px; padding: 8px 12px 9px; pointer-events: none;
+  color: var(--ink); font: 14px/1.35 var(--gar);
+  background: linear-gradient(rgba(255, 248, 230, .2), rgba(150, 110, 60, .14)), url(./assets/nautical/img/parchment.jpg) center/420px;
+  box-shadow: 0 0 0 1px #3d2815, 0 0 0 3px rgba(180, 141, 69, .55), 0 8px 18px rgba(0, 0, 0, .55); }
+.lane-tip[hidden] { display: none; }
+.lane-tip strong { display: block; font: 700 13px var(--cin); letter-spacing: 1.6px; color: var(--ox); }
+.lane-tip span { display: block; margin-top: 2px; font-variant-numeric: lining-nums; }
+.lane-tip em { display: block; margin-top: 3px; font-size: 12.5px; color: #5e4528; }
+/* readability */
+#activityLive .row { height: 34px; }
+#activityLive .t { font-size: 14.5px; color: #c4ab7a; top: 7px; }
+#activityLive .ti { left: 66px; max-width: 220px; font-size: 15.5px; color: #f3e6c6; top: 0; }
+#activityLive .su { left: 66px; max-width: 220px; font-size: 13.5px; top: 18px; color: #cdb78c; }
+#activityLive .row::after { top: 23px; height: 13px; }
+#activityLive .empty { font-size: 15px; color: #b9a47b; }
+.srow .k { font-size: 12px; color: #c4ab7a; }
+.srow .n { font-size: 17px; }
+#cards .card .lbl { font-size: 14px; }
+#cards .card .cnt { font-size: 16px; color: #f1d796; font-style: italic; text-shadow: 0 1px 4px #000, 0 0 8px rgba(0, 0, 0, .8); }
+#cards .card::before { background: linear-gradient(180deg, transparent 35%, rgba(14, 8, 4, .92)); }
+#hero .hq { font-size: 15px; }
+#nodes .nl1 { font-size: 11.5px; } #nodes .nl2 { font-size: 14px; color: #c4ab7a; }
+#moon .mphase { font-size: 12.5px; color: #c4ab7a; }
+#histList .hist { font-size: 12px; color: #b9a47b; }
+#qLabel { font-size: 11.5px; color: #b9a47b; }
+
+/* ---------- ACTIVE NODES: miniature portolan (same coastline/projection as the main chart) ---------- */
+#miniChart { background: #e9dcb8 url(./assets/nautical/img/parchment.jpg) center/300px; box-shadow: inset 0 0 0 1px #2a190e, inset 0 0 0 4px rgba(236, 223, 191, .6), inset 0 0 0 5px rgba(42, 25, 14, .5), inset 0 0 22px rgba(90, 55, 20, .45); }
+#nodes:hover #miniChart { box-shadow: inset 0 0 0 1px var(--ox), inset 0 0 0 4px rgba(236, 223, 191, .6), inset 0 0 0 5px rgba(123, 28, 23, .6), inset 0 0 22px rgba(90, 55, 20, .45); }
+#miniChart .mrh { fill: none; stroke: rgba(42, 25, 14, .22); stroke-width: 2.5; }
+#miniChart .mrh.r { stroke: rgba(150, 40, 30, .2); } #miniChart .mrh.g { stroke: rgba(60, 115, 90, .22); }
+#miniChart .ml { fill: #d3b47a; fill-opacity: .55; stroke: #2a190e; stroke-width: 3.2; stroke-linejoin: round; }
+#miniChart .mn { fill: none; stroke: rgba(42, 25, 14, .5); stroke-width: 3; stroke-dasharray: 10 8; }
+#miniChart .mrose path { fill: #2a190e; } #miniChart .mrose .s { fill: #efe3c4; stroke: #2a190e; stroke-width: 1.5; } #miniChart .mrose circle { fill: none; stroke: #2a190e; stroke-width: 2.5; }
+#miniChart .md { stroke: #2a190e; stroke-width: 3; }
+#miniChart .md.COMPLETED { fill: url(#mwGold); }
+#miniChart .md.ACTIVE { fill: url(#mwRed); animation: mwpulse 1.6s ease-in-out infinite; }
+#miniChart .md.BLOCKED { fill: url(#mwOx); }
+#miniChart .md.IDLE { fill: #efe3c4; stroke-dasharray: 6 4; }
+#miniChart .mx { stroke: #efe3c4; stroke-width: 3.5; stroke-linecap: round; }
+@keyframes mwpulse { 50% { stroke: #a3342a; stroke-width: 9; } }
+#nodes .nl1 { color: var(--parch); }
+#miniChart::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 0 1px #2a190e, inset 0 0 0 4px rgba(236, 223, 191, .7), inset 0 0 0 5px rgba(42, 25, 14, .55), inset 0 0 18px rgba(90, 55, 20, .4); }
+#nodes:hover #miniChart::after { box-shadow: inset 0 0 0 1px var(--ox), inset 0 0 0 4px rgba(236, 223, 191, .7), inset 0 0 0 5px rgba(123, 28, 23, .65), inset 0 0 18px rgba(90, 55, 20, .4); }
+#miniChart svg { display: block; width: 100%; height: 100%; }
+#miniChart .mrh { stroke: rgba(42, 25, 14, .3); } #miniChart .mrh.r { stroke: rgba(150, 40, 30, .3); } #miniChart .mrh.g { stroke: rgba(60, 115, 90, .3); }
+
+/* ---------- v4: heraldic emblems instead of boxed names; status seal attached under each emblem ---------- */
+body.nx-mock #chartView .node-seals { z-index: 5; }
+body.nx-mock #chartView .node-label {
+  padding: 6px 7px 0; background: none !important; border: 0 !important; box-shadow: none !important; border-radius: 0;
+  font: 600 13px/1 var(--nx-body); max-width: none; cursor: pointer; outline: none;
+}
+body.nx-mock #chartView .node-label .nl-emblem { display: block; line-height: 0; transition: transform .16s; transform-origin: 50% 100%; }
+body.nx-mock #chartView .node-label .nl-emblem svg { display: block; }
+body.nx-mock #chartView .node-label .nl-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+body.nx-mock #chartView .node-label:hover .nl-emblem, body.nx-mock #chartView .node-label.kbd .nl-emblem, body.nx-mock #chartView .node-label.selected .nl-emblem { transform: scale(1.14); }
+body.nx-mock #chartView .node-label.kbd .em-edge, body.nx-mock #chartView .node-label:focus-visible .em-edge { stroke: #fff6dc; stroke-width: 2.6; }
+body.nx-mock #chartView .node-label.selected .em-edge { stroke: var(--ox); stroke-width: 2.4; }
+body.nx-mock #chartView .node-label.active .nl-emblem { animation: emBob 1.6s ease-in-out infinite; }
+@keyframes emBob { 50% { transform: translateY(-2px); } }
+body.nx-mock #chartView .node-label[data-state="absent"] .nl-emblem { opacity: .55; filter: grayscale(.7); }
+body.nx-mock #chartView .nl-count {
+  position: absolute; right: 0; top: 0; min-width: 17px; height: 15px; padding: 0 3px; border-radius: 8px;
+  background: #efe3c4; border: 1px solid #2a190e; color: #2a190e; font: 600 10.5px/13px var(--nx-body); font-variant-numeric: lining-nums; text-align: center;
+}
+body.nx-mock #chartView .nl-count[hidden] { display: none; }
+/* status seal: small wax disc at the exact place, coloured by live status */
+body.nx-mock #chartView .node-seal { width: 16px; height: 16px; margin: -8px 0 0 -8px; }
+body.nx-mock #chartView .node-seal .seal-mono, body.nx-mock #chartView .node-seal .seal-count { display: none; }
+body.nx-mock #chartView .node-seal .seal-wax { inset: 0; border: 1px solid rgba(30, 8, 4, .8); }
+body.nx-mock #chartView .node-seal .seal-wax::before { inset: 3px; }
+body.nx-mock #chartView .node-seal[data-state="done"] .seal-wax { background: radial-gradient(circle at 36% 30%, #f6e2a4 0%, #b48d45 50%, #6e5222 88%); }
+body.nx-mock #chartView .node-seal[data-state="active"] .seal-wax { background: radial-gradient(circle at 36% 30%, #e0725a 0%, #a3342a 48%, #5a110d 86%); animation: wax 1.6s ease-out infinite; }
+body.nx-mock #chartView .node-seal[data-state="blocked"] .seal-wax { background: radial-gradient(circle at 36% 30%, #7b2a20 0%, #4c0e0b 60%, #2a0705 90%); }
+body.nx-mock #chartView .node-seal[data-state="blocked"] .seal-wax::after { content: "×"; position: absolute; inset: 0; display: grid; place-items: center; font: 700 14px/1 var(--nx-body); color: #efe3c4; }
+body.nx-mock #chartView .node-seal[data-state="idle"] .seal-wax { background: #efe3c4; border: 1.5px dashed #2a190e; box-shadow: none; }
+body.nx-mock #chartView .node-seal[data-state="absent"] .seal-wax { background: #b9ad94; box-shadow: none; }
+body.nx-mock #chartView .node-seal:hover .seal-wax { transform: scale(1.2); }
+@media (prefers-reduced-motion: reduce) { body.nx-mock #chartView .node-label.active .nl-emblem { animation: none; } }
