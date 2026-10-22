@@ -31,6 +31,21 @@ carry("RopeCoil",{-3,1,6},{177,137,83})
 carry("NavigationBook",{3,1,13},{88,42,37})
 carry("WoodBlock",{3,1,-4},{146,90,44})
 carry("Bucket",{-3,1,-13},{106,93,74})
+-- Three physical, non-autonomous crew NPCs. They are world entities that Eko
+-- can observe, inspect and touch; they do not issue independent AI actions.
+local crew={
+ {name="CrewMate_Bosun",x=-4,z=-6,shirt={96,53,34}},
+ {name="CrewMate_Sailor",x=4,z=1,shirt={49,78,93}},
+ {name="CrewMate_Gunner",x=-4,z=7,shirt={94,80,52}},
+}
+for _,c in ipairs(crew) do
+ local body=part(c.name,{.85,1.5,.5},{c.x,1.45,c.z},c.shirt,true,false)
+ body:SetAttribute("Role","Crew")
+ body:SetAttribute("Autonomy","stationary NPC; no AI controller")
+ local head=part(c.name.."_Head",{.58,.58,.58},{c.x,2.51,c.z},{190,145,107},true,false)
+ head:SetAttribute("Role","CrewAppearance")
+ part(c.name.."_Hat",{.95,.18,.74},{c.x,2.86,c.z},{43,36,32},true,false)
+end
 local held={}
 local routes={}
 local function root(p) return p.Character and p.Character:FindFirstChild("HumanoidRootPart") end
