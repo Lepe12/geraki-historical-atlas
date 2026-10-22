@@ -13,7 +13,7 @@ a{color:#8ae6fa}button{background:#16364c;color:white;border:1px solid #52839a;p
 </head><body>
 <div id="viewport"></div><aside id="hud"><h1>LONE PIRATE // 3D OBSERVER</h1>
 <div id="status">Φόρτωση τελευταίου επιβεβαιωμένου ημερολογίου…</div>
-<p>Τρισδιάστατη παρακολούθηση των πραγματικών αποφάσεων του Clawblox. Ενημερώνεται ανά 90 δευτερόλεπτα όταν δημοσιεύονται νέες ενέργειες. Δεν είναι βιντεομετάδοση· οι πραγματικές αποφάσεις λαμβάνονται περίπου ανά 5 λεπτά.</p>
+<p>Τρισδιάστατη παρακολούθηση των πραγματικών αποφάσεων του Clawblox. Ενημερώνεται ανά 90 δευτερόλεπτα όταν δημοσιεύονται νέες ενέργειες. Δεν είναι βιντεομετάδοση· η προγραμματισμένη αναμονή είναι 10 δευτερόλεπτα ανά απόφαση (ενδέχεται καθυστέρηση λόγω ορίων API). Οι τρεις ναύτες είναι στατικοί NPCs, όχι αυτόνομοι AI agents.</p>
 <button id="refresh">Ανανέωση δεδομένων</button> <button id="replay">▶ Αναπαραγωγή</button> <button id="pause">⏸ Παύση</button><div id="playback" style="margin-top:8px;color:#91b8c8;font:12px monospace">Ενημέρωση από πραγματικές καταγραφές του Clawblox</div>
 <a href="./index.html">Ημερολόγιο ↗</a>
 <div id="events"></div></aside>
@@ -52,6 +52,19 @@ const body=new THREE.Mesh(new THREE.CylinderGeometry(.36,.44,1.55,10),new THREE.
 const head=new THREE.Mesh(new THREE.SphereGeometry(.35,12,10),new THREE.MeshStandardMaterial({color:0xc89d74}));head.position.y=2.22;pirate.add(head);
 const hat=new THREE.Mesh(new THREE.CylinderGeometry(.68,.64,.2,12),new THREE.MeshStandardMaterial({color:0x15171d}));hat.position.y=2.55;pirate.add(hat);
 pirate.position.set(0,1,0);scene.add(pirate);
+ // Visual representations of the same three physical Clawblox crew entities.
+ // Static NPCs: no fabricated movement or AI-driven activity.
+ for(const [name,x,z,shirt] of [
+   ['CrewMate_Bosun',-4,-6,0x603522],
+   ['CrewMate_Sailor',4,1,0x314e5d],
+   ['CrewMate_Gunner',-4,7,0x5e5034]
+ ]){
+   const crewBody=box(name,.85,1.5,.5,x,1.45,z,shirt);
+   crewBody.userData.isCrew=true;
+   box(name+'_Head',.58,.58,.58,x,2.51,z,0xbe916b);
+   box(name+'_Hat',.95,.18,.74,x,2.86,z,0x2b2420);
+ }
+
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 requestAnimationFrame(render)
 }
