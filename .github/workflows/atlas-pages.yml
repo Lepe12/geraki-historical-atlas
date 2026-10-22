@@ -44,7 +44,16 @@ jobs:
         run: |
           python3 tools/orchestrator/build_research_history.py
           mkdir -p _site/icons
-          rsync -a --exclude '.git' --exclude '.github' --exclude '_site' ./ _site/
+          # Publish only the web site. Research evidence (evidence/, ~14 GB of run
+          # corpora, OCR text and page images) and data backups (backups/) stay in
+          # the repository but are not fetched by any page, so they are not uploaded
+          # to GitHub Pages (artifact limit). Pages read live data from
+          # command-center/live/, which is still published.
+          rsync -a \
+            --exclude '.git' --exclude '.github' --exclude '_site' \
+            --exclude '/evidence/' --exclude '/backups/' \
+            --exclude 'node_modules/' \
+            ./ _site/
 
       - name: Build standalone JARVIS APEX Research Network preview
         shell: bash
@@ -147,6 +156,20 @@ jobs:
             'Original: BnF Gallica btv1b59010993; redistributed via Wikimedia Commons.' \
             'Public Domain Mark 1.0; preview resized from the authentic source.' \
             "$URL" > "$TARGET/OLLive-1662-SOURCE.txt"
+
+      - name: Check Pages artifact size
+        shell: bash
+        run: |
+          set -euo pipefail
+          find _site -type l -print -delete
+          BYTES=$(du -sb _site | cut -f1)
+          echo "PAGES_SITE_BYTES=$BYTES"
+          du -sh _site/* | sort -h | tail -n 10
+          LIMIT=$((1000 * 1000 * 1000))
+          if [ "$BYTES" -gt "$LIMIT" ]; then
+            echo "::error::Pages site is $BYTES bytes, above the 1 GB GitHub Pages limit. Exclude non-web data in the 'Stage atlas' step."
+            exit 1
+          fi
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
