@@ -85,12 +85,13 @@ function createFeed({
     snapshot = null,
     liveSeen = false,
     polling = false,
+    lastSocketMessage = 0,
     revision = "";
   let waitingRequest = "";
   const startupPollMs = 2000;
   const schedulePoll = () => {
     clearInterval(poll);
-    if (!closed) poll = setInterval(refresh, waitingRequest ? startupPollMs : pollMs);
+    if (!closed) poll = setInterval(() => refresh(true), waitingRequest ? startupPollMs : pollMs);
   };
   const completeWaiting = () => {
     waitingRequest = "";
@@ -160,13 +161,18 @@ function createFeed({
     }
     onEvent?.(e);
   }
+  const pageHidden = () => globalThis.document?.visibilityState === "hidden";
   async function fallback() {
     try {
+      // "no-cache" lets the browser revalidate its cached copy with the
+      // raw.githubusercontent ETag (If-None-Match -> 304, no body) instead of
+      // re-downloading the multi-megabyte snapshot on every poll. A custom
+      // If-None-Match header would need a CORS preflight that raw rejects.
       const r = await fetchImpl(
         "https://raw.githubusercontent.com/Lepe12/geraki-historical-atlas/main/command-center/live/" +
           (selectedRun === "latest" ? "latest" : "runs/" + selectedRun) +
           ".json",
-        { cache: "no-store", signal: AbortSignal.timeout(10000) },
+        { cache: "no-cache", signal: AbortSignal.timeout(10000) },
       );
       if (!r.ok) throw Error("snapshot_http_" + r.status);
       const s = await r.json();
@@ -177,9 +183,15 @@ function createFeed({
       if (!connected) status("OFFLINE", String(e.message || e));
     }
   }
-  async function refresh() {
+  async function refresh(scheduled = false) {
     if (closed || polling) return;
+    // Background tabs do not poll; a visible tab refreshes immediately.
+    if (scheduled && pageHidden()) return;
+    // A socket that delivered data within the last poll interval is alive and
+    // already streams snapshots and events; a silent socket is still polled.
+    if (scheduled && connected && !waitingRequest && Date.now() - lastSocketMessage < pollMs) return;
     polling = true;
+    let statusSnapshot = false;
     try {
       const r = await fetchImpl(endpoint + "/status/piratecartography/" + selectedRun, {
         cache: "no-store",
@@ -187,6 +199,7 @@ function createFeed({
       });
       if (!r.ok) throw Error("status_http_" + r.status);
       const d = await r.json();
+      statusSnapshot = validSnapshot(d?.snapshot);
       if (!closed) {
         acceptSnapshot(d.snapshot, "LIVE");
         for (const e of d.events || []) acceptEvent(e, true);
@@ -195,9 +208,15 @@ function createFeed({
       /* Socket state remains independently visible. */
     } finally {
       polling = false;
-      if (!waitingRequest) await fallback();
+      // The durable GitHub snapshot is only needed when the backend status
+      // did not deliver a valid snapshot itself (offline, CORS, error).
+      if (!waitingRequest && !statusSnapshot) await fallback();
     }
   }
+  const onVisibility = () => {
+    if (!pageHidden()) refresh();
+  };
+  globalThis.document?.addEventListener?.("visibilitychange", onVisibility);
   function open() {
     if (closed || !WebSocketImpl) {
       fallback();
@@ -214,6 +233,7 @@ function createFeed({
         status("LIVE", "WebSocket connected");
       };
       socket.onmessage = (e) => {
+        lastSocketMessage = Date.now();
         try {
           ingest(JSON.parse(e.data));
         } catch (_) {
@@ -244,6 +264,7 @@ function createFeed({
     closed = true;
     clearTimeout(retry);
     clearInterval(poll);
+    globalThis.document?.removeEventListener?.("visibilitychange", onVisibility);
     socket?.close();
   };
   stop.selectRun = (run, force = false) => {
