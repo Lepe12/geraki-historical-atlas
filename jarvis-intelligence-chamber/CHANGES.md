@@ -85,6 +85,14 @@
 
 **ACTIVE NODES:** μένουν οι σφραγίδες. Τα εμβλήματα σε μέγεθος περίπου 10px δεν διαβάζονταν.
 
+## Έλεγχος προστασίας: «approved nautical core» (γύρος 5)
+Το workflow `.github/workflows/jarvis-visual-baseline-lock.yml` (job `protect-approved-3d`) κλείδωνε τα `chamber.js` και `gpu-field.js` στο commit `42ed8946…` (τον παλιό 3D renderer). Ο ιδιοκτήτης ενέκρινε τον ναυτικό χάρτη ως νέα βάση, οπότε μετακινήθηκε η βάση **χωρίς να χαλαρώσει η προστασία**:
+- **Τι προστατεύεται:** `chamber.js`, `gpu-field.js`, `nautical-chart.js` (ο χάρτης) και `nautical-emblems.js` (τα εμβλήματα). Το workflow τρέχει σε κάθε push στο main και σε κάθε PR που αγγίζει αυτά τα αρχεία ή το ίδιο το workflow.
+- **Πώς:** αντί για SHA commit, που δεν θα υπάρχει στο main μετά από squash/rebase merge, το workflow περιέχει το **SHA-256 του περιεχομένου** κάθε αρχείου και ελέγχει με `sha256sum --strict -c`. Το ίδιο περιεχόμενο δίνει το ίδιο hash σε οποιονδήποτε κλάδο ή τρόπο merge. Αν λείπει ένα αρχείο ή αλλάξει έστω ένα byte, ο έλεγχος αποτυγχάνει.
+- **Ξεκλείδωμα:** μόνο με σκόπιμη αλλαγή των hashes μέσα στο workflow, όπως πριν με το SHA. Επειδή τα hashes είναι στο ίδιο το workflow και όχι σε ξεχωριστό αρχείο, η μετακίνηση της βάσης απαιτεί αλλαγή στο `.github/workflows`, άρα δικαίωμα `workflow`.
+- Το όνομα του job (`protect-approved-3d`) δεν άλλαξε, ώστε να ισχύει ό,τι κανόνας required check υπάρχει. Το workflow λέγεται πλέον «JARVIS Nautical Core Lock».
+- Για νέα έγκριση: `sha256sum chamber.js gpu-field.js nautical-chart.js nautical-emblems.js` μέσα στο `jarvis-intelligence-chamber/` και αντικατάσταση των τεσσάρων γραμμών στο workflow.
+
 ## Αμετάβλητα
 - Η ζωντανή σύνδεση (WebSocket, polling 15″, εφεδρικό raw.githubusercontent) και τα endpoints. Το γνωστό διπλό fetch του εφεδρικού αρχείου **δεν** διορθώθηκε.
 - Οι ερευνητές, η καρτέλα ερευνητή, ο φάκελος, τα ευρήματα (φίλτρα, αναζήτηση, ταξινόμηση, σελίδες), οι λεπτομέρειες και οι σύνδεσμοι πηγών, το ιστορικό, το `?run=`, η εξαγωγή, η αποστολή, το PDF, το Esc και τα ελληνικά μηνύματα, όπως αυτά για μη έγκυρο ή άγνωστο αριθμό έρευνας.
