@@ -2,7 +2,7 @@
 
 Νέα πραγματική αναζήτηση πηγών για ορμητήρια, αγκυροβόλια και καταφύγια πειρατών και κουρσάρων στην Ανατολική Μεσόγειο, 1600–1700. Αναζήτησε σε όλες τις έντεκα οικογένειες πηγών, περιηγητές, portolans, σύγχρονα κείμενα, αρχεία και μεταγενέστερες μελέτες. Απόκτησε τα προσβάσιμα πραγματικά κείμενα. Για κάθε εύρημα δώσε ιστορικό τοπωνύμιο, σύγχρονη ταύτιση και γεωγραφική θέση μόνο όπου τεκμηριώνονται, χρονολογία, χρήστες, είδος χρήσης, ακριβή πηγή, σελίδα ή φύλλο ή αρχειακή αναφορά, ακριβές απόσπασμα, confidence και verification status. Ξεχώρισε αναφορά πηγής, ερμηνεία και υπόθεση, μεταγενέστερη μελέτη από πρωτογενές τεκμήριο και ορμητήριο από τόπο επιδρομής. Μην μετατρέπεις τη χρονολογία του ερωτήματος σε χρονολογία αχρονολόγητου γεγονότος. Δήλωσε απρόσιτα αρχεία και ανεξέταστο υλικό. Καμία αυτόματη ιστορική επαλήθευση. Κάνε νέα πραγματική απόκτηση πηγών. Μην χρησιμοποιήσεις παλιό κείμενο απάντησης. Μην εμφανίσεις εισαγωγικό placeholder ως εύρημα. Κάθε παράγραφος να περιγράφει συγκεκριμένο τόπο και χρήση που αναφέρει το παρατιθέμενο απόσπασμα.
 
-Εντοπίστηκαν 367 αποσπάσματα εντός της ζητούμενης περιόδου. Αποδίδονται στις πηγές τους και εκκρεμεί έλεγχος.
+Εντοπίστηκαν 369 αποσπάσματα εντός της ζητούμενης περιόδου. Αποδίδονται στις πηγές τους και εκκρεμεί έλεγχος.
 
 ## 1600 — Esclaves Chretiens, Maitres Musulmans.
 
@@ -2513,6 +2513,16 @@
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
+## 1627 — Les corsaires algériens en Islande en 1627
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Notice bibliographique Les corsaires algériens en Islande en 1627 | Accueil | Catalogue général | BnF- Bibliothèque nationale de France
+
+Πηγή: https://catalogue.bnf.fr/ark:/12148/cb45998629w; αρχείο ca73334b759735e3176589dc.txt, γραμμές 94–94.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
 ## 1627 — MB. Marine Et Marins Alger
 
 Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
@@ -2549,6 +2559,16 @@
 > Helgason, op. ch, p, 276; d'Aranda, op. ch , p. 247-249,
 
 Πηγή: https://archive.org/details/esclaveschretiensmaitresmusulmans.; αρχείο esclaveschretiensmaitresmusulmans._Esclaves_chretiens_Maitres_musulmans._djvu.txt, γραμμές 3476–3480.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
+## 1627 — Les corsaires algériens en Islande en 1627
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Titre(s) : Les corsaires algériens en Islande en 1627 [Texte imprimé]
+
+Πηγή: https://catalogue.bnf.fr/ark:/12148/cb45998629w; αρχείο ca73334b759735e3176589dc.txt, γραμμές 272–272.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
