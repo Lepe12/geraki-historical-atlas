@@ -1,0 +1,3446 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "identity_resolution",
+  "label": "Identity Resolution Agent",
+  "assignment_id": "identity_resolution:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "entity_candidates",
+    "variant_names",
+    "same_entity_assessment",
+    "collision_warnings"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "d8a1148719ffaf5e44db2bed5408cc5d2e50988c4ebfeb2b1ef0f7a870403ae2",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "identity_resolution",
+    "assignment_id": "identity_resolution:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:SearchCulture.gr / EKT",
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:OpenArchives.gr / EKT"
+    ],
+    "queries": [
+      "\"Ιωάννης Καψής\"",
+      "\"Ioannis Kapsis\"",
+      "\"Jean Capsis\"",
+      "\"Jean Capsi\"",
+      "\"Juan Capsi\""
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 130,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 102,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ιωάννης Καψής\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 621, \"response_sha256\": \"bef29cf532cd4527543413f6bd9d8127667b794ae13445a84d0c31989281aeaf\", \"elapsed_ms\": 796}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ioannis Kapsis\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Ioannis+Kapsis%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Ioannis+Kapsis%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 999}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Ioannis+Kapsis%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Jean+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Jean+Capsi%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 999}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Jean+Capsi%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Capsis\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Jean+Capsis%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Jean+Capsis%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1079}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Jean+Capsis%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Juan Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Juan+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Juan+Capsi%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1086}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Juan+Capsi%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ioannis Kapsis\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Ioannis+Kapsis+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Ioannis+Kapsis+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 610, \"response_sha256\": \"1773aa99b97ce65ca76875aeceba1246748d9a4afac6d06136e46bb2d1c72cf6\", \"elapsed_ms\": 447}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Ioannis+Kapsis+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Capsis\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jean+Capsis+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jean+Capsis+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 607, \"response_sha256\": \"40f80e1a25e2c119e346c77441ebbf6825137764a57c1fdce127180964bcf42f\", \"elapsed_ms\": 350}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jean+Capsis+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jean+Capsi+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jean+Capsi+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 606, \"response_sha256\": \"03015530801ce014c86eac86ff16ac4ab07441016a1c5e968e3ea61a608782ff\", \"elapsed_ms\": 358}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jean+Capsi+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ioannis Kapsis\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Ioannis+Kapsis%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22Ioannis+Kapsis%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25533, \"response_sha256\": \"fc1a42b37b769c8c24741a969f39069595c842b11c8626f4465a729207e28961\", \"elapsed_ms\": 133}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22Ioannis+Kapsis%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ιωάννης Καψής\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25609, \"response_sha256\": \"72c58f12c5263f30d81d4f6fc807e826567fcf7f4c5e607ed6738be23c7a30a4\", \"elapsed_ms\": 293}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ιωάννης Καψής\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1426}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Capsis\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Jean+Capsis%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22Jean+Capsis%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25529, \"response_sha256\": \"3d492663b99463cd798d616d27e94497bce7d2fa906a073d962f27b513b36857\", \"elapsed_ms\": 101}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22Jean+Capsis%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Juan Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Juan+Capsi%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 145}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Juan+Capsi%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 145}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Jean+Capsi%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22Jean+Capsi%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 31568, \"response_sha256\": \"c962a29925e5898d8ebbf90e40a369cda78a842446c75ed02f6187ea23cf094b\", \"elapsed_ms\": 168}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22Jean+Capsi%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Juan Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Juan+Capsi+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Juan+Capsi+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 606, \"response_sha256\": \"de6830e1a53d7f5536cb45928caf6d70bb98172a5b6a405e6020e073ce7719d8\", \"elapsed_ms\": 510}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Juan+Capsi+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Capsis\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_2409",
+          "title": "Το μάρκετινγκ του Capsis Hotel Thessaloniki",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_2409"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-4422",
+          "title": "Διαχείριση τμήματος food and beverage (F&B) στο Capsis Hotel",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-4422"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEEF/000104-727",
+          "title": "Jean Baruzi. L intelligence Mystique, textes choisis et présentés par Jean - Louis Vieillard - Baron, Paris, L' Ile Vert, Berg International, 1985",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEEF/000104-727"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_20638",
+          "title": "Un Arraché de partout",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_20638"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/apothesis/000099-199270",
+          "title": "Ανιχνεύοντας στοιχεία συγκειμένου της «σκοτεινής κοπέλας»: μια μελέτη στην Αντιγόνη του Άρη Αλεξάνδρου και του Jean Anouilh. Detecting elements of the «dark maiden's» context: a study of the Antigone of Aris Alexandrou and Jean Anouilh.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/apothesis/000099-199270"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_14942",
+          "title": "ΕΝΔΥΜΑΤΑ ΤΖΗΝ",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_14942"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_12102",
+          "title": "ΕΝΔΥΜΑΤΑ ΤΖΗΝ",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_12102"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_12078",
+          "title": "ΕΝΔΥΜΑΤΑ ΤΖΗΝ",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_12078"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_18705",
+          "title": "Ο ρόλος της θρησκείας και του πεπρωμένου στις τραγωδίες του Jean de Rotrou Le role de la religion et du destin dans les tragedies de Jean du Rotrou",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_18705"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Pandemos/000014-123456789_8884",
+          "title": "Η πολιτική σκέψη του Carl Schmitt και οι επιρροές του από τη θεωρία του Κοινωνικού Συμβολαίου του Jean-Jacques Rousseau Political thinking of Carl Schmitt and his influences from the theory of Social Contract of Jean-Jacques Rousseau",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Pandemos/000014-123456789_8884"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-319783",
+          "title": "\"Γράφει το ποίημα του με μια βελόνα / πάνω σε ένα φύλλο από σφεντάμι\". Η ποίηση του Jean-Baptiste Para: Πρόλογος στην ανθολόγηση ποιημάτων του Jean-Baptiste Para Πλάι σε γοργά νερά θα περπατήσω",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-319783"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_10977",
+          "title": "The GLAM airborne campaign across the Mediterranean Basin",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_10977"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/sygkrisi/000091-2835",
+          "title": "The act of reading literature in Pierrot le fou, by jean-Luc Godard",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/sygkrisi/000091-2835"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/synthesis/000116-16522",
+          "title": "Forgetting, Amnesia, Theory: An Interview with Jean-Michel Rabaté",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/synthesis/000116-16522"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEEF/000104-935",
+          "title": "Jean Barbeyrac, Écrits de Droit et de Morale, Παρουσίαση από την Simone Goyard-Fabre, Centre de Philosophie du droit (Paris II-N.R.S.-U.R.A. 956), Paris, 1996",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEEF/000104-935"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4533",
+          "title": "Ευαγγελιστής Ιωάννης - Μωϋσής (πίν. 54-55) Saint Jean l' Évangéliste - Moïse (pl. 54-55)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4533"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_26499",
+          "title": "Pour une nouvelle edition de l' Exegese a l' Iliade de Jean Tzetzes",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_26499"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_37498",
+          "title": "Το θέατρο του Ζαν Ζενέ: από το κείμενο στην παράσταση The theatre of Jean Genet: from the text to the performance",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_37498"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3401953",
+          "title": "Η γεωμετρία των οχυρώσεων ή προστασία χάρη στα μαθηματικά: Διδασκαλία Γεωμετρίας στο Δημοτικό με αξιοποίηση ιστορικών πηγών",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3401953"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-3541",
+          "title": "Μακεδονικὴ δυναστεία καὶ Μεγαλοκομνηνοί. Σχόλια σχετικὰ μὲ τὰ ἱστορικὰ στοιχεῖα στὰ «Θαύματα τοῦ Ἁγίου Εὐγενίου» τοῦ Ἰωάννη-Ἰωσὴφ Λαζαρόπουλου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-3541"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_3660",
+          "title": "Systems medicine approaches for the definition of complex phenotypes in chronic diseases and ageing. From concept to implementation and policies",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_3660"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_6190",
+          "title": "Η Κερασούντα το 1911: εντυπώσεις του Γάλλου Jean Leune",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_6190"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-135491",
+          "title": "Η έννοια της κυριαρχίας στον Thomas Hobbes & τον Jean-Jacques Rousseau",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-135491"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3032884",
+          "title": "Relationship between SARS-CoV-2 infection and the incidence of ventilator-associated lower respiratory tract infections: a European multicenter cohort study (vol 47, pg 188, 2021)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3032884"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/kallipos/000065-11419_13776",
+          "title": "Η Δομή Μεγάλης Κλίμακας The Large Scale Structure",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/kallipos/000065-11419_13776"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Jean+Capsis%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Jean+Capsis%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 1289132, \"response_sha256\": \"34de699de0ca76f9ffa7548ea14a3b51603e31df2697263d745e6258aeff4742\", \"elapsed_ms\": 4228}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Jean+Capsis%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Capsi\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_2409",
+          "title": "Το μάρκετινγκ του Capsis Hotel Thessaloniki",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_2409"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-4422",
+          "title": "Διαχείριση τμήματος food and beverage (F&B) στο Capsis Hotel",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-4422"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEEF/000104-727",
+          "title": "Jean Baruzi. L intelligence Mystique, textes choisis et présentés par Jean - Louis Vieillard - Baron, Paris, L' Ile Vert, Berg International, 1985",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEEF/000104-727"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_20638",
+          "title": "Un Arraché de partout",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_20638"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/apothesis/000099-199270",
+          "title": "Ανιχνεύοντας στοιχεία συγκειμένου της «σκοτεινής κοπέλας»: μια μελέτη στην Αντιγόνη του Άρη Αλεξάνδρου και του Jean Anouilh. Detecting elements of the «dark maiden's» context: a study of the Antigone of Aris Alexandrou and Jean Anouilh.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/apothesis/000099-199270"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_14942",
+          "title": "ΕΝΔΥΜΑΤΑ ΤΖΗΝ",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_14942"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_12102",
+          "title": "ΕΝΔΥΜΑΤΑ ΤΖΗΝ",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_12102"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_12078",
+          "title": "ΕΝΔΥΜΑΤΑ ΤΖΗΝ",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_12078"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_18705",
+          "title": "Ο ρόλος της θρησκείας και του πεπρωμένου στις τραγωδίες του Jean de Rotrou Le role de la religion et du destin dans les tragedies de Jean du Rotrou",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_18705"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Pandemos/000014-123456789_8884",
+          "title": "Η πολιτική σκέψη του Carl Schmitt και οι επιρροές του από τη θεωρία του Κοινωνικού Συμβολαίου του Jean-Jacques Rousseau Political thinking of Carl Schmitt and his influences from the theory of Social Contract of Jean-Jacques Rousseau",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Pandemos/000014-123456789_8884"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-319783",
+          "title": "\"Γράφει το ποίημα του με μια βελόνα / πάνω σε ένα φύλλο από σφεντάμι\". Η ποίηση του Jean-Baptiste Para: Πρόλογος στην ανθολόγηση ποιημάτων του Jean-Baptiste Para Πλάι σε γοργά νερά θα περπατήσω",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-319783"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_10977",
+          "title": "The GLAM airborne campaign across the Mediterranean Basin",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_10977"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/sygkrisi/000091-2835",
+          "title": "The act of reading literature in Pierrot le fou, by jean-Luc Godard",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/sygkrisi/000091-2835"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/synthesis/000116-16522",
+          "title": "Forgetting, Amnesia, Theory: An Interview with Jean-Michel Rabaté",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/synthesis/000116-16522"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEEF/000104-935",
+          "title": "Jean Barbeyrac, Écrits de Droit et de Morale, Παρουσίαση από την Simone Goyard-Fabre, Centre de Philosophie du droit (Paris II-N.R.S.-U.R.A. 956), Paris, 1996",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEEF/000104-935"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4533",
+          "title": "Ευαγγελιστής Ιωάννης - Μωϋσής (πίν. 54-55) Saint Jean l' Évangéliste - Moïse (pl. 54-55)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4533"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_26499",
+          "title": "Pour une nouvelle edition de l' Exegese a l' Iliade de Jean Tzetzes",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_26499"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_37498",
+          "title": "Το θέατρο του Ζαν Ζενέ: από το κείμενο στην παράσταση The theatre of Jean Genet: from the text to the performance",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_37498"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3401953",
+          "title": "Η γεωμετρία των οχυρώσεων ή προστασία χάρη στα μαθηματικά: Διδασκαλία Γεωμετρίας στο Δημοτικό με αξιοποίηση ιστορικών πηγών",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3401953"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-3541",
+          "title": "Μακεδονικὴ δυναστεία καὶ Μεγαλοκομνηνοί. Σχόλια σχετικὰ μὲ τὰ ἱστορικὰ στοιχεῖα στὰ «Θαύματα τοῦ Ἁγίου Εὐγενίου» τοῦ Ἰωάννη-Ἰωσὴφ Λαζαρόπουλου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-3541"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_3660",
+          "title": "Systems medicine approaches for the definition of complex phenotypes in chronic diseases and ageing. From concept to implementation and policies",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_3660"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_6190",
+          "title": "Η Κερασούντα το 1911: εντυπώσεις του Γάλλου Jean Leune",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_6190"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-135491",
+          "title": "Η έννοια της κυριαρχίας στον Thomas Hobbes & τον Jean-Jacques Rousseau",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-135491"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3032884",
+          "title": "Relationship between SARS-CoV-2 infection and the incidence of ventilator-associated lower respiratory tract infections: a European multicenter cohort study (vol 47, pg 188, 2021)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3032884"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/kallipos/000065-11419_13776",
+          "title": "Η Δομή Μεγάλης Κλίμακας The Large Scale Structure",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/kallipos/000065-11419_13776"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Jean+Capsi%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Jean+Capsi%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 1289130, \"response_sha256\": \"2563912c9c533b0c16a50b02c86f4608a3fa757960fab6a5f6e2cd34b34a241f\", \"elapsed_ms\": 4231}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Jean+Capsi%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Juan Capsi\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_2409",
+          "title": "Το μάρκετινγκ του Capsis Hotel Thessaloniki",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_2409"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-4422",
+          "title": "Διαχείριση τμήματος food and beverage (F&B) στο Capsis Hotel",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-4422"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A1908569",
+          "title": "Από την πιστή μετάφραση, στην παράφραση και τέλος στη λογοτεχνική διασκευή. «Τα καθ’ Ηρώ και Λέανδρον»",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A1908569"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Pandemos/000014-123456789_8703",
+          "title": "Θεωρίες της δικτατορίας: από τον Juan Donoso Cortés ως τον Carl Schmitt Theories of dictatorship: from Juan Donoso Cortés to Carl Schmitt",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Pandemos/000014-123456789_8703"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_18750",
+          "title": "Παιδική ηλικία και διαπαιδαγώγηση στην πρώιμη νεότερη Ευρώπη: τα έργα των Juan Luis Vives και Johann Amos Comenius Childhood and education in early modern Europe: the works of Juan Luis Vives and Johann Amos Comenius",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_18750"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_40554",
+          "title": "Θεωρίες της δικτατορίας: από τον Juan Donoso Cortés ως τον Carl Schmitt Theories of dictatorship: from Juan Donoso Cortés to Carl Schmitt",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_40554"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_40669",
+          "title": "Η διηγηματογραφία του Juan Bosch στο ιστορικο-κοινωνικό της περιβάλλον La obra cuentistica de Juan Bosch en su entorno historico social",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_40669"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_1781",
+          "title": "The Telephassa project: interactive instruction modules",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_1781"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3190825",
+          "title": "2019 ESC Guidelines on the Treatment of Patients With Supraventricular Tachycardia",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3190825"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A1327575",
+          "title": "LA OBRA CUENTÍSTICA DE JUAN BOSCH EN SU ENTORNO HISTÓRICO SOCIAL",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A1327575"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hypatia/000061-11400_6880",
+          "title": "Η αναγέννηση της ψυχιατρικής",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hypatia/000061-11400_6880"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_8739",
+          "title": "Η ΚΡΙΤΙΚΗ ΤΗΣ ΠΡΟΣΛΗΨΗΣ ΤΟΥ ΜΥΘΟΥ ΤΟΥ ΔΟΝ ΖΟΥΑΝ ΣΤΟΝ 20Ο ΑΙΩΝΑ LA RECEPTION CRITIQUE DU MYTHE DE DON JUAN AU XXE SIECLE",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_8739"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_7040",
+          "title": "Teoria y experiencia de la verdad",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_7040"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-79645",
+          "title": "Real-time merging traffic control at congested freeway off-ramp areas",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-79645"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-267756",
+          "title": "Δον Ζουάν: Το Πέτρινο Συμπόσιο",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-267756"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psychology/000161-24287",
+          "title": "Teaching thinking skills: The challenge of learning to teach",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psychology/000161-24287"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Pandemos/000014-123456789_8750",
+          "title": "Η κυριαρχία στον Carl Schmitt The concept of sovereignty in Carl Schmitt",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Pandemos/000014-123456789_8750"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-55691",
+          "title": "Complete degradation of the persistent anti-depressant sertraline in aqueous solution by solar photo-Fenton oxidation",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-55691"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hcmr_med_mar_sc/000072-29068",
+          "title": "The “MEDiterranean International Acoustic Survey”: An introduction",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hcmr_med_mar_sc/000072-29068"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/mnimon/000087-7907",
+          "title": "JUAN, JOSÉ ELIODORO BOULIGNY KAI LORENZO MABILI DE BOULIGNY : ΟΙ ΠΡΟΓΟΝΟΙ ΤΟΥ ΜΑΒΙΛΗ ΚΑΙ Η ΔΙΠΛΩΜΑΤΙΚΗ ΤΟΥΣ ΑΛΛΗΛΟΓΡΑΦΙΑ. (ΤΕΛΗ ΙΗ' - ΑΡΧΕΣ ΙΘ' ΑΙΩΝΑ)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/mnimon/000087-7907"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ariadne/000124-20.500.12776_13598",
+          "title": "Αναπτύσσοντας εθνικές πολιτικές για την ανοικτή πρόσβαση στην επιστημονική πληροφορία: Οι εξελίξεις στα κράτη-μέλη: Εισήγηση του Juan Carlos De Martin σε Στρογγυλή Τράπεζα Implementing National Policies for Open Access to Scientific Information: the National Perspectives: Presentation by Carlos De Martinon a round table",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ariadne/000124-20.500.12776_13598"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-264633",
+          "title": "Byron and Casti: Dangerous Liaisons",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-264633"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_57138",
+          "title": "Οι βιογραφίες ξεχωριστών προσωπικοτήτων της Edmonde Charles-Roux Edmonde Charles-Roux et ses biographies de personnages hors du commun",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_57138"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-8773",
+          "title": "REVIEW ARTICLE: JUAN SIGNES CODOÑER, The emperor Theophilos and the East, 829-842.Court and frontier in Byzantium during the last phase of Iconoclasm, Birmingham Byzantine and Ottoman Studies, vol. 13, Ashgate 2014.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-8773"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-47438",
+          "title": "Heterogeneous photo-Fenton oxidation of benzoic acid in water: Effect of operating conditions, reaction by-products and coupling with biological treatment",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-47438"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Juan+Capsi%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Juan+Capsi%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 707623, \"response_sha256\": \"7d63a9ff09d24a3e131375c91518e1a0a352a6c565faac88e1f769f752e433e6\", \"elapsed_ms\": 4425}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Juan+Capsi%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ioannis Kapsis\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/elocus/000018-dlib_6_5_5_metadata-dlib-1507630072-573653-31987.tkl",
+          "title": "Το εγκώμιο της Αθηνάς στους Διθυράμβους του Βακχυλίδη The encomium of Athens in Bacchylides' Dithyrambs",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/elocus/000018-dlib_6_5_5_metadata-dlib-1507630072-573653-31987.tkl"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-12357",
+          "title": "The greek exclusive economic zone",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-12357"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/makedonika/000086-5573",
+          "title": "Το Τάγμα των Λαζαριστών στη Θεσσαλονίκη και η Ουνία. Νέα στοιχεία [Pére IOANNIS MANIKAS, Qulques informations sur l' ordre des Lazaristes et les Uniates à Thessaloniki]",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/makedonika/000086-5573"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_60040",
+          "title": "Οπτικά Δορυφορικά Συστήματα ΜΙΜΟ: Ανάθεση Ισχύος με Κλασικές Μεθόδους Βελτιστοποίησης και με Τεχνικές Βαθιάς Μάθησης MIMO optical satellite systems: Power allocation with classical optimization methods and with Deep Learning Techniques",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_60040"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3037291",
+          "title": "On the relation between the energy and social characteristics of the residential sector",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3037291"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2939786",
+          "title": "The effect of intravitreal anti-vascular endothelial growth factor injections on corneal endothelium in patients with diabetic macular oedema",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2939786"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-16344",
+          "title": "Applications for e-Government : global terrorism analysis",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-16344"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_80171",
+          "title": "Precise Monitoring of Lettuce Functional Responses to Minimal Nutrient Supplementation Identifies Aquaponic System’s Nutrient Limitations and Their Time-Course",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_80171"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2981391",
+          "title": "Carbon Nanotube Selective Membranes with Subnanometer, Vertically Aligned Pores, and Enhanced Gas Transport Properties",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2981391"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-2617",
+          "title": "Μελέτη σκοπιμότητας ίδρυσης εταιρείας ειδικού σκοπού εκτέλεσης δημοσίων συμβάσεων με τη μέθοδο των συμπράξεων δημοσίου & ιδιωτικού τομέα (ΣΔΙΤ) στον τομέα των εκπαιδευτικών υποδομών",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-2617"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_15261",
+          "title": "Συγκριτική ανάλυση κατασκευασμένων γλωσσών Comparative analysis of constructed languages",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_15261"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3020552",
+          "title": "The effect of intravitreal anti-vascular endothelial growth factor injections on corneal endothelium in patients with diabetic macular oedema",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3020552"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-350302",
+          "title": "Precise Monitoring of Lettuce Functional Responses to Minimal Nutrient Supplementation Identifies Aquaponic System’s Nutrient Limitations and Their Time-Course",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-350302"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3414535",
+          "title": "Έρευνα και διάσωση (SAR) στo Αιγαίo και oι πoλιτικές και στρατιωτιές αντιπαραθέσεις Ελλάδας και Τoυρκίας.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3414535"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_7445",
+          "title": "Κατανεμημένες εφαρμογές blockchain στον τομέα της υγείας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_7445"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_17355",
+          "title": "Structural features and catalytic reactivity of [Pd{(Ph2P)2N(CH2)3Si(OCH3)3-κP,P′}I2] and related complexes in hydroalkoxycarbonylation and Suzuki–Miyaura C−C cross-coupling reactions",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_17355"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2866689",
+          "title": "Η αξιοποίηση του ελεύθερου χρόνου από μαθητές δημοτικού σχολείου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2866689"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_39908",
+          "title": "Εντοπισμός του μετώπου Pareto στην πολυκριτηριακή αεροδυναμική βελτιστοποίηση με μέθοδο Newton με αποκοπή Tracing the Pareto front in multi-objective optimization using the truncated Newton method",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_39908"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_26540",
+          "title": "ESG και η εφαρμογή του στον ελληνικό τραπεζικό κλάδο ESG and its application in Greek banking",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_26540"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_39161",
+          "title": "Μεταφορικό Ισοδύναμο στην ελληνική Ακτοπλοϊα. Διερεύνηση της δυνατότητας εφαρμογής στη Γραμμή Πειραιάς-Πάρος-Νάξος-Θήρα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_39161"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_28672",
+          "title": "Πειραματική μελέτη της μεθόδου fenton για την απομάκρυνση υπερφθοροαλκυλιωμένων συστατικών (PFAS) από το νερό Experimental study of the fenton method for the removal of perfluoroalkyl substances (PFAS) from water",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_28672"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-1296",
+          "title": "Έρευνα και κατηγοριοποίηση των ποινών στο γυμνάσιο αρρένων Φλώρινας (1949-1962) Research and categorization of sentences in male high school in Florina (1949-1962)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-1296"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3428414",
+          "title": "Πρόσληψη πρωτεϊνών και μυϊκή δύναμη σε μη ινσουλινοεξαρτώμενους νοσούντες σακχαρώδους διαβήτη τύπου ΙΙ",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3428414"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2974884",
+          "title": "Το ζήτημα των κοινωνικών αναπαραστάσεων των εξαρτήσεων στον ελληνικό τύπο",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2974884"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_46733",
+          "title": "Παγκόσμιο δορυφορικό σύστημα πλοήγησης: υλοποίηση δέκτη με τεχνολογία software defined radio",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_46733"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Ioannis+Kapsis%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Ioannis+Kapsis%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 2617716, \"response_sha256\": \"453d2e0d6c79363f00078ce3547e3d9f149a87407c33702c4d9efcd493355823\", \"elapsed_ms\": 4847}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Ioannis+Kapsis%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ιωάννης Καψής\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_20938",
+          "title": "Απομόνωση και μελέτη των πρωτεϊνών της κάψας του ρετρο\"ιού DLEV (Dicentrarchus labrax encephalitis virus) Isolation and study of DLEV (Dicentrarchus labrax encephalitis virus) coat proteins",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_20938"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-10072",
+          "title": "Μέτρηση της σχετικής αποδοτικότητας δημοσίων οργανισμών, Η μέθοδος Data Envelopment Analysis",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-10072"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/aua/000039-10329_8073",
+          "title": "Επίδραση των λιπασμάτων νέου τύπου στην ανάπτυξη και την απόδοση του λιναριού (Linum usitatissimum L.) Effect of the new type fertilizers in the growth and yield of flax (Linum usitatissimum L.)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/aua/000039-10329_8073"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34323",
+          "title": "Ολυμπιακή Αεροπορία : οριστικό τέλος",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34323"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34336",
+          "title": "Ο τουρισμός του μέλλοντος : αφιέρωμα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34336"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36199",
+          "title": "Νέες υπηρεσίες και προϊόντα για τις γυναίκες",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36199"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34349",
+          "title": "Ελληνικές μεταλλευτικές επιχειρήσεις : νέες επιχειρηματικές συμφωνίες και επέκταση στο εξωτερικό",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34349"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34351",
+          "title": "Entreprpreneur of the Year : ένας καταξιωμένος επιχειρηματικός θεσμός στην Ελλάδα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34351"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36198",
+          "title": "Θετικό, αλλά με πιο βραδείς ρυθμούς ανάπτυξης το 2005 : διεθνής τουρισμός.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36198"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34335",
+          "title": "Επιστροφή στην πραγματικότητα : η ελληνική οικονομία και η παρακαταθήκη των αγώνων",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34335"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34354",
+          "title": "71η Διεθνής Έκθεση Θεσσαλονίκης : το \"αύριο\" στην ελληνική οικονομία: αφιέρωμα.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34354"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34355",
+          "title": "Περισσότερα \"αστέρια\" στη Θεσσαλονίκη : νέες επενδύσεις σε αστικό και συνεδριακό τουρισμό",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34355"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34346",
+          "title": "Κυπριακή απόβαση στην Ελλάδα : διπλασιάστηκαν σε αριθμό οι επενδύσεις την τελευταία πενταετία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34346"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34370",
+          "title": "Ακόμη μια καλή χρονιά για τα ευρωπαϊκά ξενοδοχεία : εντυπωσιακά τα αποτελέσματα και σε παγκόσμιο επίπεδο",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34370"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34350",
+          "title": "Το κοινωνικό πρόσωπο των επιχειρήσεων : η εταιρική κοινωνική ευθύνη και η ελληνική εμπειρία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34350"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34340",
+          "title": "Πέντε προϋποθέσεις για επιχειρηματικά δάνεια : μεγάλο εύρος χρηματοδοτικών προϊόντων προσφέρουν οι τράπεζες στις επιχειρήσεις",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34340"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34368",
+          "title": "Συμφωνίες μαμούθ 2 δισ,. ευρώ : επιχειρηματικά σχέδια, συνεργασίες και πωλήσεις δίνουν πνοή στις εισηγμένες τουριστικές εταιρείες",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34368"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36215",
+          "title": "Δημόσια έργα σε ιδιώτες με συμβάσεις παραχώρησης : αποκλειστική συνέντευξη του υφυπουργού Οικονομίας Χρήστου Φώλια",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36215"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34361",
+          "title": "Θερινές-- μονομαχίες : εταιρείες παραγωγής αναψυκτικών, χυμών και εμφιαλωμένου νερού σε θέσεις μάχης για μεγαλύτερα μερίδια",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34361"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34343",
+          "title": "Έντονο επιχειρηματικό ενδιαφέρον για τον τουρισμό : αναμένονται σημαντικές θεσμικές παρεμβάσεις για θέματα χωροταξίας και πολεοδομίας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34343"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34344",
+          "title": "Ελληνικές επενδύσεις στην Κίνα : αλήθειες και μύθοι: οι μεγάλες ευκαιρίες, τα εμπόδια και οι προκλήσεις",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34344"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34362",
+          "title": "Ευαίσθητες-- επιχειρήσεις : υστερεί η Ελλάδα στην κοινωνική ευθύνη των επιχειρήσεων έναντι του ευρωπαϊκού μέσου όρου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34362"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34359",
+          "title": "Οι 14 αλλαγές στην αγορά πετρελαιοειδών : απελευθερώνεται το ωράριο, πώληση καυσίμων και από σούπερ μάρκετ",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34359"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34341",
+          "title": "Το μετέωρο βήμα των μικρομεσαίων επιχειρήσεων : απειλή οι μεγάλες εταιρείες και οι μικρομεσαίοι των αναπτυσσόμενων χωρών",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34341"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36732",
+          "title": "Πώς θα διατηρηθεί η δυναμική : συνέντευξη της υπουργού Τουριστικής Ανάπτυξης Φάνης Πάλλη-Πετραλιά",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36732"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 2655160, \"response_sha256\": \"274d80a161e57d39f11bb455a5ec40df21ba44918420a352349898ffa8c21769\", \"elapsed_ms\": 5142}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "39849354344",
+    "agent_id": "identity_resolution",
+    "source_leads": [
+      {
+        "id": "lead_3e06e9740ec96852d033451f",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/rep_ihu/000180-123456789_2409",
+        "title": "Το μάρκετινγκ του Capsis Hotel Thessaloniki",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3976e2af9130b73f6fa022ac",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-4422",
+        "title": "Διαχείριση τμήματος food and beverage (F&B) στο Capsis Hotel",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2f581f05feaef3bdd5843e5a",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEEF/000104-727",
+        "title": "Jean Baruzi. L intelligence Mystique, textes choisis et présentés par Jean - Louis Vieillard - Baron, Paris, L' Ile Vert, Berg International, 1985",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8802af053f5ca06761a1503b",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_20638",
+        "title": "Un Arraché de partout",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3558c28da37d45b4593f7ef5",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/apothesis/000099-199270",
+        "title": "Ανιχνεύοντας στοιχεία συγκειμένου της «σκοτεινής κοπέλας»: μια μελέτη στην Αντιγόνη του Άρη Αλεξάνδρου και του Jean Anouilh. Detecting elements of the «dark maiden's» context: a study of the Antigone of Aris Alexandrou and Jean Anouilh.",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_77daaef5009821fe6315e694",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_14942",
+        "title": "ΕΝΔΥΜΑΤΑ ΤΖΗΝ",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0803d02e8ce6eae69299f253",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_12102",
+        "title": "ΕΝΔΥΜΑΤΑ ΤΖΗΝ",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_95e1b0cbdea9801a076261b6",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_12078",
+        "title": "ΕΝΔΥΜΑΤΑ ΤΖΗΝ",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5ade42a4622011a0934ef4db",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_18705",
+        "title": "Ο ρόλος της θρησκείας και του πεπρωμένου στις τραγωδίες του Jean de Rotrou Le role de la religion et du destin dans les tragedies de Jean du Rotrou",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1f952579395916710c5e2f1e",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Pandemos/000014-123456789_8884",
+        "title": "Η πολιτική σκέψη του Carl Schmitt και οι επιρροές του από τη θεωρία του Κοινωνικού Συμβολαίου του Jean-Jacques Rousseau Political thinking of Carl Schmitt and his influences from the theory of Social Contract of Jean-Jacques Rousseau",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f7a2c8498bb0df6802476627",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-319783",
+        "title": "\"Γράφει το ποίημα του με μια βελόνα / πάνω σε ένα φύλλο από σφεντάμι\". Η ποίηση του Jean-Baptiste Para: Πρόλογος στην ανθολόγηση ποιημάτων του Jean-Baptiste Para Πλάι σε γοργά νερά θα περπατήσω",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_79c7c9fead4ba2d972313c73",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_10977",
+        "title": "The GLAM airborne campaign across the Mediterranean Basin",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4f8e55f2c6fd791790cce22d",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/sygkrisi/000091-2835",
+        "title": "The act of reading literature in Pierrot le fou, by jean-Luc Godard",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_025557497017a48c0d56b96d",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/synthesis/000116-16522",
+        "title": "Forgetting, Amnesia, Theory: An Interview with Jean-Michel Rabaté",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8e0e956dbfb113c83c506f61",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEEF/000104-935",
+        "title": "Jean Barbeyrac, Écrits de Droit et de Morale, Παρουσίαση από την Simone Goyard-Fabre, Centre de Philosophie du droit (Paris II-N.R.S.-U.R.A. 956), Paris, 1996",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e7d6d31fa3d4715821a3ffac",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4533",
+        "title": "Ευαγγελιστής Ιωάννης - Μωϋσής (πίν. 54-55) Saint Jean l' Évangéliste - Moïse (pl. 54-55)",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_cc4c0da984d267d16285e241",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_26499",
+        "title": "Pour une nouvelle edition de l' Exegese a l' Iliade de Jean Tzetzes",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fab5edde6c450ab3d3a3fca2",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_37498",
+        "title": "Το θέατρο του Ζαν Ζενέ: από το κείμενο στην παράσταση The theatre of Jean Genet: from the text to the performance",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_22b38b35926fd9d0d3c8ae65",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3401953",
+        "title": "Η γεωμετρία των οχυρώσεων ή προστασία χάρη στα μαθηματικά: Διδασκαλία Γεωμετρίας στο Δημοτικό με αξιοποίηση ιστορικών πηγών",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_789919b0a8f0680330cbe2cb",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-3541",
+        "title": "Μακεδονικὴ δυναστεία καὶ Μεγαλοκομνηνοί. Σχόλια σχετικὰ μὲ τὰ ἱστορικὰ στοιχεῖα στὰ «Θαύματα τοῦ Ἁγίου Εὐγενίου» τοῦ Ἰωάννη-Ἰωσὴφ Λαζαρόπουλου",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9181c37cec3d844aa5265ad1",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_3660",
+        "title": "Systems medicine approaches for the definition of complex phenotypes in chronic diseases and ageing. From concept to implementation and policies",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ec3c39e81486a808cafe428f",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_6190",
+        "title": "Η Κερασούντα το 1911: εντυπώσεις του Γάλλου Jean Leune",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_14736a22a974ac41f9078f55",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-135491",
+        "title": "Η έννοια της κυριαρχίας στον Thomas Hobbes & τον Jean-Jacques Rousseau",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2285fdf9ec01c81ff75f872f",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3032884",
+        "title": "Relationship between SARS-CoV-2 infection and the incidence of ventilator-associated lower respiratory tract infections: a European multicenter cohort study (vol 47, pg 188, 2021)",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1cbdf7769a5a79d657d38aa2",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/kallipos/000065-11419_13776",
+        "title": "Η Δομή Μεγάλης Κλίμακας The Large Scale Structure",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_74ffa29678b2bd24a40ae6a6",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A1908569",
+        "title": "Από την πιστή μετάφραση, στην παράφραση και τέλος στη λογοτεχνική διασκευή. «Τα καθ’ Ηρώ και Λέανδρον»",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e99f6839206499a6ffbb20c9",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Pandemos/000014-123456789_8703",
+        "title": "Θεωρίες της δικτατορίας: από τον Juan Donoso Cortés ως τον Carl Schmitt Theories of dictatorship: from Juan Donoso Cortés to Carl Schmitt",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3d755f38ed17708b2bf24bc4",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_18750",
+        "title": "Παιδική ηλικία και διαπαιδαγώγηση στην πρώιμη νεότερη Ευρώπη: τα έργα των Juan Luis Vives και Johann Amos Comenius Childhood and education in early modern Europe: the works of Juan Luis Vives and Johann Amos Comenius",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2a7189bf550f8e7db2842470",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_40554",
+        "title": "Θεωρίες της δικτατορίας: από τον Juan Donoso Cortés ως τον Carl Schmitt Theories of dictatorship: from Juan Donoso Cortés to Carl Schmitt",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_77cb23e38b19adbbee3677d3",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_40669",
+        "title": "Η διηγηματογραφία του Juan Bosch στο ιστορικο-κοινωνικό της περιβάλλον La obra cuentistica de Juan Bosch en su entorno historico social",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_bd47d611adc1ae413e311a86",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_1781",
+        "title": "The Telephassa project: interactive instruction modules",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_cd46b2608513e1afe0b4cf21",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3190825",
+        "title": "2019 ESC Guidelines on the Treatment of Patients With Supraventricular Tachycardia",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d0fc0f6fecd8ab8a46e51a43",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A1327575",
+        "title": "LA OBRA CUENTÍSTICA DE JUAN BOSCH EN SU ENTORNO HISTÓRICO SOCIAL",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f1365342908de2cdb1ea835a",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hypatia/000061-11400_6880",
+        "title": "Η αναγέννηση της ψυχιατρικής",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8024e3ca8c17b240d573398b",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_8739",
+        "title": "Η ΚΡΙΤΙΚΗ ΤΗΣ ΠΡΟΣΛΗΨΗΣ ΤΟΥ ΜΥΘΟΥ ΤΟΥ ΔΟΝ ΖΟΥΑΝ ΣΤΟΝ 20Ο ΑΙΩΝΑ LA RECEPTION CRITIQUE DU MYTHE DE DON JUAN AU XXE SIECLE",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_98775818ecb3c981bc900445",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_7040",
+        "title": "Teoria y experiencia de la verdad",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_79501ab31cfbeb133c286ea8",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-79645",
+        "title": "Real-time merging traffic control at congested freeway off-ramp areas",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ad47b9ce32816b6dfee53962",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-267756",
+        "title": "Δον Ζουάν: Το Πέτρινο Συμπόσιο",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c3fa67c353b14265da8456ab",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psychology/000161-24287",
+        "title": "Teaching thinking skills: The challenge of learning to teach",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_618385bd3c764d6b2f2c9418",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Pandemos/000014-123456789_8750",
+        "title": "Η κυριαρχία στον Carl Schmitt The concept of sovereignty in Carl Schmitt",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c672a270cebed510721101c8",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-55691",
+        "title": "Complete degradation of the persistent anti-depressant sertraline in aqueous solution by solar photo-Fenton oxidation",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_bb837695273fa57c6ee042ed",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hcmr_med_mar_sc/000072-29068",
+        "title": "The “MEDiterranean International Acoustic Survey”: An introduction",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_dc17b25ef1824a0d0fc5091c",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/mnimon/000087-7907",
+        "title": "JUAN, JOSÉ ELIODORO BOULIGNY KAI LORENZO MABILI DE BOULIGNY : ΟΙ ΠΡΟΓΟΝΟΙ ΤΟΥ ΜΑΒΙΛΗ ΚΑΙ Η ΔΙΠΛΩΜΑΤΙΚΗ ΤΟΥΣ ΑΛΛΗΛΟΓΡΑΦΙΑ. (ΤΕΛΗ ΙΗ' - ΑΡΧΕΣ ΙΘ' ΑΙΩΝΑ)",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d187e86fb7d3cd37a0f33d16",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ariadne/000124-20.500.12776_13598",
+        "title": "Αναπτύσσοντας εθνικές πολιτικές για την ανοικτή πρόσβαση στην επιστημονική πληροφορία: Οι εξελίξεις στα κράτη-μέλη: Εισήγηση του Juan Carlos De Martin σε Στρογγυλή Τράπεζα Implementing National Policies for Open Access to Scientific Information: the National Perspectives: Presentation by Carlos De Martinon a round table",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_37a5c9b81340729c645a0c01",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-264633",
+        "title": "Byron and Casti: Dangerous Liaisons",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5f044f41037c4f7a528e5fbc",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_57138",
+        "title": "Οι βιογραφίες ξεχωριστών προσωπικοτήτων της Edmonde Charles-Roux Edmonde Charles-Roux et ses biographies de personnages hors du commun",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b60464a8476fc071323120a3",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-8773",
+        "title": "REVIEW ARTICLE: JUAN SIGNES CODOÑER, The emperor Theophilos and the East, 829-842.Court and frontier in Byzantium during the last phase of Iconoclasm, Birmingham Byzantine and Ottoman Studies, vol. 13, Ashgate 2014.",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_745d1ba02f58c9fdf0d92a7f",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-47438",
+        "title": "Heterogeneous photo-Fenton oxidation of benzoic acid in water: Effect of operating conditions, reaction by-products and coupling with biological treatment",
+        "query": "\"Juan Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_cddaf1557a97fdbe4d7fc41a",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/elocus/000018-dlib_6_5_5_metadata-dlib-1507630072-573653-31987.tkl",
+        "title": "Το εγκώμιο της Αθηνάς στους Διθυράμβους του Βακχυλίδη The encomium of Athens in Bacchylides' Dithyrambs",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_497dff3161abfe40b9971336",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-12357",
+        "title": "The greek exclusive economic zone",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b931e337194245acf0a5d662",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/makedonika/000086-5573",
+        "title": "Το Τάγμα των Λαζαριστών στη Θεσσαλονίκη και η Ουνία. Νέα στοιχεία [Pére IOANNIS MANIKAS, Qulques informations sur l' ordre des Lazaristes et les Uniates à Thessaloniki]",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_06529045e57f85a1ddc7fd9a",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_60040",
+        "title": "Οπτικά Δορυφορικά Συστήματα ΜΙΜΟ: Ανάθεση Ισχύος με Κλασικές Μεθόδους Βελτιστοποίησης και με Τεχνικές Βαθιάς Μάθησης MIMO optical satellite systems: Power allocation with classical optimization methods and with Deep Learning Techniques",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ff0aa3faf8b3d5e7f5b5438a",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3037291",
+        "title": "On the relation between the energy and social characteristics of the residential sector",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8dc40ffb297eff1fa93fde51",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2939786",
+        "title": "The effect of intravitreal anti-vascular endothelial growth factor injections on corneal endothelium in patients with diabetic macular oedema",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_270d473e7c921b2d376b1d52",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-16344",
+        "title": "Applications for e-Government : global terrorism analysis",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d4d65431e9426ff7394c858f",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_80171",
+        "title": "Precise Monitoring of Lettuce Functional Responses to Minimal Nutrient Supplementation Identifies Aquaponic System’s Nutrient Limitations and Their Time-Course",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_40bf312be32449c838a8f5b7",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2981391",
+        "title": "Carbon Nanotube Selective Membranes with Subnanometer, Vertically Aligned Pores, and Enhanced Gas Transport Properties",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d1b422c1a78fc557fb87fed1",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-2617",
+        "title": "Μελέτη σκοπιμότητας ίδρυσης εταιρείας ειδικού σκοπού εκτέλεσης δημοσίων συμβάσεων με τη μέθοδο των συμπράξεων δημοσίου & ιδιωτικού τομέα (ΣΔΙΤ) στον τομέα των εκπαιδευτικών υποδομών",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_31630194829c1057abfb2df8",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_15261",
+        "title": "Συγκριτική ανάλυση κατασκευασμένων γλωσσών Comparative analysis of constructed languages",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_272d03410a6d7d457d779af2",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3020552",
+        "title": "The effect of intravitreal anti-vascular endothelial growth factor injections on corneal endothelium in patients with diabetic macular oedema",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_29f41c9583d259a897361b68",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-350302",
+        "title": "Precise Monitoring of Lettuce Functional Responses to Minimal Nutrient Supplementation Identifies Aquaponic System’s Nutrient Limitations and Their Time-Course",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_30e27e8e3e4922e8a431aca2",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3414535",
+        "title": "Έρευνα και διάσωση (SAR) στo Αιγαίo και oι πoλιτικές και στρατιωτιές αντιπαραθέσεις Ελλάδας και Τoυρκίας.",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0f46de53ba3d8f68de9dd15f",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_7445",
+        "title": "Κατανεμημένες εφαρμογές blockchain στον τομέα της υγείας",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_80da2984f398d1154ac2ce33",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_17355",
+        "title": "Structural features and catalytic reactivity of [Pd{(Ph2P)2N(CH2)3Si(OCH3)3-κP,P′}I2] and related complexes in hydroalkoxycarbonylation and Suzuki–Miyaura C−C cross-coupling reactions",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4c0a1aa22169a0779e4bcfee",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2866689",
+        "title": "Η αξιοποίηση του ελεύθερου χρόνου από μαθητές δημοτικού σχολείου",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3e2f4ecde14a6aebc7314f43",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_39908",
+        "title": "Εντοπισμός του μετώπου Pareto στην πολυκριτηριακή αεροδυναμική βελτιστοποίηση με μέθοδο Newton με αποκοπή Tracing the Pareto front in multi-objective optimization using the truncated Newton method",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a4b97264138c1fe7828f7ae9",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_26540",
+        "title": "ESG και η εφαρμογή του στον ελληνικό τραπεζικό κλάδο ESG and its application in Greek banking",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_56b334184374aeae344b7a86",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_39161",
+        "title": "Μεταφορικό Ισοδύναμο στην ελληνική Ακτοπλοϊα. Διερεύνηση της δυνατότητας εφαρμογής στη Γραμμή Πειραιάς-Πάρος-Νάξος-Θήρα",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_cb75f93e1db1f030e604f0e4",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_28672",
+        "title": "Πειραματική μελέτη της μεθόδου fenton για την απομάκρυνση υπερφθοροαλκυλιωμένων συστατικών (PFAS) από το νερό Experimental study of the fenton method for the removal of perfluoroalkyl substances (PFAS) from water",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8ba821e54261b8fa377a43f3",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-1296",
+        "title": "Έρευνα και κατηγοριοποίηση των ποινών στο γυμνάσιο αρρένων Φλώρινας (1949-1962) Research and categorization of sentences in male high school in Florina (1949-1962)",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_caf90e396b2e7b8a5ebaffa0",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3428414",
+        "title": "Πρόσληψη πρωτεϊνών και μυϊκή δύναμη σε μη ινσουλινοεξαρτώμενους νοσούντες σακχαρώδους διαβήτη τύπου ΙΙ",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_53d7f29a55a34061ac2ae50a",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2974884",
+        "title": "Το ζήτημα των κοινωνικών αναπαραστάσεων των εξαρτήσεων στον ελληνικό τύπο",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_02ac6c194852a506671b2b3d",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_46733",
+        "title": "Παγκόσμιο δορυφορικό σύστημα πλοήγησης: υλοποίηση δέκτη με τεχνολογία software defined radio",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fde4f552149f5a30d38282ae",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_20938",
+        "title": "Απομόνωση και μελέτη των πρωτεϊνών της κάψας του ρετρο\"ιού DLEV (Dicentrarchus labrax encephalitis virus) Isolation and study of DLEV (Dicentrarchus labrax encephalitis virus) coat proteins",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_83b2e77a216f8b83553b2540",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-10072",
+        "title": "Μέτρηση της σχετικής αποδοτικότητας δημοσίων οργανισμών, Η μέθοδος Data Envelopment Analysis",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_472f5ac064798fe49434a704",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/aua/000039-10329_8073",
+        "title": "Επίδραση των λιπασμάτων νέου τύπου στην ανάπτυξη και την απόδοση του λιναριού (Linum usitatissimum L.) Effect of the new type fertilizers in the growth and yield of flax (Linum usitatissimum L.)",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1f940b6a736c11cdfac7e827",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34323",
+        "title": "Ολυμπιακή Αεροπορία : οριστικό τέλος",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2d7830bdf84eb76c8c00a3ea",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34336",
+        "title": "Ο τουρισμός του μέλλοντος : αφιέρωμα",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7acc7aa382f9664a62e93b05",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36199",
+        "title": "Νέες υπηρεσίες και προϊόντα για τις γυναίκες",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0dd8a57cc79cd5b2c14f3463",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34349",
+        "title": "Ελληνικές μεταλλευτικές επιχειρήσεις : νέες επιχειρηματικές συμφωνίες και επέκταση στο εξωτερικό",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d2918ea1eb64e0cc3b6f8dcd",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34351",
+        "title": "Entreprpreneur of the Year : ένας καταξιωμένος επιχειρηματικός θεσμός στην Ελλάδα",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4ddaf3af9d34ca766994e4de",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36198",
+        "title": "Θετικό, αλλά με πιο βραδείς ρυθμούς ανάπτυξης το 2005 : διεθνής τουρισμός.",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3d0add46064c6bbd3b7d5146",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34335",
+        "title": "Επιστροφή στην πραγματικότητα : η ελληνική οικονομία και η παρακαταθήκη των αγώνων",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ff2c98be6401e3fb45dcf68c",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34354",
+        "title": "71η Διεθνής Έκθεση Θεσσαλονίκης : το \"αύριο\" στην ελληνική οικονομία: αφιέρωμα.",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2d4e3b0d870a9ebf44b47806",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34355",
+        "title": "Περισσότερα \"αστέρια\" στη Θεσσαλονίκη : νέες επενδύσεις σε αστικό και συνεδριακό τουρισμό",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_62dd90ae538d5def4eea36c8",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34346",
+        "title": "Κυπριακή απόβαση στην Ελλάδα : διπλασιάστηκαν σε αριθμό οι επενδύσεις την τελευταία πενταετία",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a9e304226f3e24270f8f5a8d",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34370",
+        "title": "Ακόμη μια καλή χρονιά για τα ευρωπαϊκά ξενοδοχεία : εντυπωσιακά τα αποτελέσματα και σε παγκόσμιο επίπεδο",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0abed2b2bb84173a3231cf6f",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34350",
+        "title": "Το κοινωνικό πρόσωπο των επιχειρήσεων : η εταιρική κοινωνική ευθύνη και η ελληνική εμπειρία",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0450b5453b1c349f83ce3acf",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34340",
+        "title": "Πέντε προϋποθέσεις για επιχειρηματικά δάνεια : μεγάλο εύρος χρηματοδοτικών προϊόντων προσφέρουν οι τράπεζες στις επιχειρήσεις",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b60766fc8a78b0aa1914a8da",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34368",
+        "title": "Συμφωνίες μαμούθ 2 δισ,. ευρώ : επιχειρηματικά σχέδια, συνεργασίες και πωλήσεις δίνουν πνοή στις εισηγμένες τουριστικές εταιρείες",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_249dba4c4707a9b7f616998c",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36215",
+        "title": "Δημόσια έργα σε ιδιώτες με συμβάσεις παραχώρησης : αποκλειστική συνέντευξη του υφυπουργού Οικονομίας Χρήστου Φώλια",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_905c5806681314698c1f21fe",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34361",
+        "title": "Θερινές-- μονομαχίες : εταιρείες παραγωγής αναψυκτικών, χυμών και εμφιαλωμένου νερού σε θέσεις μάχης για μεγαλύτερα μερίδια",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_74bd5c66430b9a3faf5cfe0d",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34343",
+        "title": "Έντονο επιχειρηματικό ενδιαφέρον για τον τουρισμό : αναμένονται σημαντικές θεσμικές παρεμβάσεις για θέματα χωροταξίας και πολεοδομίας",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2b44b4fd5fe6f116772f1eef",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34344",
+        "title": "Ελληνικές επενδύσεις στην Κίνα : αλήθειες και μύθοι: οι μεγάλες ευκαιρίες, τα εμπόδια και οι προκλήσεις",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0690f5e99e819dc001816a65",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34362",
+        "title": "Ευαίσθητες-- επιχειρήσεις : υστερεί η Ελλάδα στην κοινωνική ευθύνη των επιχειρήσεων έναντι του ευρωπαϊκού μέσου όρου",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2cdad49b04a2e298a312c338",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34359",
+        "title": "Οι 14 αλλαγές στην αγορά πετρελαιοειδών : απελευθερώνεται το ωράριο, πώληση καυσίμων και από σούπερ μάρκετ",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_638e470fc1c77cfc4169b7d7",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34341",
+        "title": "Το μετέωρο βήμα των μικρομεσαίων επιχειρήσεων : απειλή οι μεγάλες εταιρείες και οι μικρομεσαίοι των αναπτυσσόμενων χωρών",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ad3fe7db068524089b8ceaf2",
+        "run_id": "39849354344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36732",
+        "title": "Πώς θα διατηρηθεί η δυναμική : συνέντευξη της υπουργού Τουριστικής Ανάπτυξης Φάνης Πάλλη-Πετραλιά",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      }
+    ],
+    "connector_errors": [
+      {
+        "connector_id": "repo:Internet Culturale",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Juan+Capsi%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 145}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      }
+    ],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 125,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}

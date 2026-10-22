@@ -1,0 +1,2902 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "pirate_biography",
+  "label": "Pirate Biography Agent",
+  "assignment_id": "pirate_biography:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "identity",
+    "aliases",
+    "chronology",
+    "ships",
+    "associates",
+    "bases",
+    "operations",
+    "death",
+    "uncertainties"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "8b282d7207a69ef17da5d820ef341fe271f53044f0d8d739e0db378a9f7b8c07",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "pirate_biography",
+    "assignment_id": "pirate_biography:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:PARES / Archivo General de Simancas",
+      "repo:Gallica/BnF",
+      "repo:Biblioteca Digital Hispánica",
+      "repo:Academia.edu Public Research"
+    ],
+    "queries": [
+      "\"Ιωάννης Καψής\"",
+      "\"Ioannis Kapsis\"",
+      "\"Jean Capsis\"",
+      "\"Jean Capsi\"",
+      "\"John Capsi\""
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:PARES / Archivo General de Simancas",
+        "route_type": "repository_dispatch",
+        "repository": "PARES / Archivo General de Simancas",
+        "connector_id": null,
+        "score": 100,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 100,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 90,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Crossref Scholarly Metadata",
+        "route_type": "repository_dispatch",
+        "repository": "Crossref Scholarly Metadata",
+        "connector_id": null,
+        "score": 86,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"Ιωάννης Καψής\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 463}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 463}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"Jean Capsis\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Jean+Capsis%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 478}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Jean+Capsis%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 478}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ιωάννης Καψής\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 621, \"response_sha256\": \"bef29cf532cd4527543413f6bd9d8127667b794ae13445a84d0c31989281aeaf\", \"elapsed_ms\": 505}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"John Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22John+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 523}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22John+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 523}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"Jean Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Jean+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 526}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Jean+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 526}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"Ioannis Kapsis\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Ioannis+Kapsis%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 539}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Ioannis+Kapsis%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 539}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ioannis Kapsis\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Ioannis+Kapsis+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Ioannis+Kapsis+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 610, \"response_sha256\": \"1773aa99b97ce65ca76875aeceba1246748d9a4afac6d06136e46bb2d1c72cf6\", \"elapsed_ms\": 426}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Ioannis+Kapsis+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"John Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+John+Capsi+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+John+Capsi+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 606, \"response_sha256\": \"56a2c8e5c7abd0dc95424ecce81c28314f7eb61a06c221513f21f2aa07ebd64e\", \"elapsed_ms\": 365}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+John+Capsi+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Capsis\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jean+Capsis+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jean+Capsis+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 607, \"response_sha256\": \"40f80e1a25e2c119e346c77441ebbf6825137764a57c1fdce127180964bcf42f\", \"elapsed_ms\": 417}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jean+Capsis+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jean+Capsi+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jean+Capsi+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 606, \"response_sha256\": \"03015530801ce014c86eac86ff16ac4ab07441016a1c5e968e3ea61a608782ff\", \"elapsed_ms\": 388}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jean+Capsi+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ioannis Kapsis\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Ioannis+Kapsis%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Ioannis+Kapsis%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"c849275358ff87410263e59d04da6b240644302af6d8f8a8f3f74f7d2c636db3\", \"elapsed_ms\": 550}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Ioannis+Kapsis%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ιωάννης Καψής\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"c849275358ff87410263e59d04da6b240644302af6d8f8a8f3f74f7d2c636db3\", \"elapsed_ms\": 669}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Jean+Capsi%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Jean+Capsi%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"c849275358ff87410263e59d04da6b240644302af6d8f8a8f3f74f7d2c636db3\", \"elapsed_ms\": 550}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Jean+Capsi%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Capsis\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Jean+Capsis%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Jean+Capsis%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"c849275358ff87410263e59d04da6b240644302af6d8f8a8f3f74f7d2c636db3\", \"elapsed_ms\": 557}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Jean+Capsis%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"John Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22John+Capsi%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22John+Capsi%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"c849275358ff87410263e59d04da6b240644302af6d8f8a8f3f74f7d2c636db3\", \"elapsed_ms\": 559}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22John+Capsi%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Jean Capsis\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Jean+Capsis%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 50}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Jean+Capsis%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 96}, {\"url\": \"https://api.openalex.org/works?search=%22Jean+Capsis%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Jean+Capsis%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 979, \"response_sha256\": \"cf369c69b7f0ae11819cd64f99ff2b3bcc84f13f682ff007612ff491ef0338a6\", \"elapsed_ms\": 271}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Jean+Capsis%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 50}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Jean+Capsis%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 96}, {\"url\": \"https://api.openalex.org/works?search=%22Jean+Capsis%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Jean+Capsis%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 979, \"response_sha256\": \"cf369c69b7f0ae11819cd64f99ff2b3bcc84f13f682ff007612ff491ef0338a6\", \"elapsed_ms\": 271}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Ιωάννης Καψής\"",
+      "records": [
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/18878",
+          "title": "Ιωάννης ΣΤ'Καντακουζηνός",
+          "creator": [
+            "Γρηγόριος Μπαγκαβός"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/18878",
+          "doi": "10.12681/eadd/18878",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/17742",
+          "title": "Ιωάννης Πέζαρος ( 1749 - 1806 )",
+          "creator": [
+            "Μιχαήλ Λαφαζάνης"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/17742",
+          "doi": "10.12681/eadd/17742",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/22408",
+          "title": "Ιωάννης-Ιερόθεος Κομνηνός μητροπολίτης Δρύστρας (1657-1719)",
+          "creator": [
+            "Δημήτριος Πάντος"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/22408",
+          "doi": "10.12681/eadd/22408",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/24209",
+          "title": "Ο Άγιος Ιωάννης ο Λαμπαδιστής",
+          "creator": [
+            "Γεώργιος Κάκκουρας"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/24209",
+          "doi": "10.12681/eadd/24209",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/43861",
+          "title": "Ο Ιωάννης Αργυρόπουλος ως θεολόγος και φιλόσοφος",
+          "creator": [
+            "Πετρούλα Αγαθονικιάδου"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/43861",
+          "doi": "10.12681/eadd/43861",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Το θέμα της διδακτορικής διατριβής αφορά στον λόγιο του 15ου της ύστερης βυζαντινής περιόδου Ιωάννη Αργυρόπουλο. Σκοπός της διατριβής ήταν η μελέτη του βίου και κυρίως του συγγραφικού έργου του λόγιου, με στόχο να διερευνηθεί η σύνδεσή του με τη θεολογία και τη φιλοσοφία. Εξετάσαμε τη δράση του Αργυρόπουλου σε Κωνσταντινούπολη και Ιταλία υπό την επιρροή της παλαιολόγειας, αλλά και της ιταλικής Αναγέννησης. Κατόρθωσε στην Ακαδημία της Φλωρεντίας με τη διδασκαλία του να επηρεάσει τον στοχασμό των ουμανιστών της Αναγέννησης και να τον μετατοπίσει από τη ρητορική στη μεταφυσική φιλοσοφία. Παρουσιάσαμε αναλυτικά τα έργα του με θεολογικό και φιλοσοφικό περιεχόμενο, τους ρητορικούς λόγους του, καθώς και ένα σατιρικό λιβελογράφημα. Ειδικότερα, στην επιστολή του Λύσις αποριών και ζητημάτων διαπιστώσαμε τις απόψεις του για τη δημιουργία, την ελεύθερη βούληση του ανθρώπου, την πτώση των πρωτοπλάστων, τη σωτηρία του ανθρώπου με την ενανθρώπιση του Χριστού. Σε επόμενο έργο του ανασκευάζει την άποψη του Τραπεζούντιου ότι ο Θεός υπό την ουσίαν ανάγεται, διότι σ’ αυτήν την περίπτωση θα ήταν μεθεκτός και προσιτός από τον άνθρωπο κατά την ουσία Του και όχι κατά χάρη λόγω των άκτιστων ενεργειών Του. Με την Αναφορά του στον πάπα Νικόλαο 5ο, ο λόγιος ομολογεί πίστη και αφοσίωση στη ρωμαιοκαθολική εκκλησία. Στο έργο του Περί της του Αγίου Πνεύματος εκπορεύσεως συνοψίζει τις θέσεις του για την Αγία Τριάδα, ενώ ταυτόχρονα υιοθετεί για το Άγιο Πνεύμα τη θεολογική άποψη της Δύσης για το filioque. Με τη Μονωδία στον αυτοκράτορα Ιωάννη τον Παλαιολόγο και τους δύο Παραμυθητικούς λόγους του καταδεικνύει τη συνέχεια της ελληνικής παράδοσης των εθίμων για τον νεκρό, που έχει εγκωμιαστικό χαρακτήρα. Ο Βασιλικός λόγος για τον Κωνσταντίνο 11ο τον Παλαιολόγο εκθειάζει τη μοναρχία ως ιδεατή μορφή εξουσίας και τον αυτοκράτορα ως ιδανικό ηγέτη. Το λιβελογράφημα της Κωμωδίας του Καταβλαττά διακωμωδεί την προσωπικότητα του Καταβλαττά, ενώ αναδεικνύει τη σημασία της ιδιωτικής ζωής για τη διαμόρφωση του δημόσιου βίου. Ένα άλλο θέμα που θίξαμε ήταν η σχέση του Αργυρόπουλου με τον Πλάτωνα και τον Αριστοτέλη. Αντίθετα με άλλους συγκαιρινούς του, αναπτύσσει ισόρροπη σχέση με τους δύο φιλοσόφους, τόσο μέ τη διδασκαλία του, όσο και με τη μετριοπαθή στάση του απέναντι στην αντιπαράθεση Ελλήνων αριστοτελικών και πλατωνικών στη Δύση. Στο συγγραφικό του έργο εντοπίσαμε αναφορές στην Αγία Γραφή, σε Πατέρες της Εκκλησίας, στον Πλάτωνα και τον Αριστοτέλη, στον Ισοκράτη και τον Δημοσθένη, στον Όμηρο, τον Ησίοδο, τον Σοφοκλή, στον Ηρόδοτο και τον Πλούταρχο, στον νεοπλατωνικό Μιχαήλ Ψελλό, και σε άλλους. Χρησιμοποιεί την αλληγορία σε συνδυασμό με αρχαίους μύθους, αποφθέγματα και λαϊκές παραδόσεις. Υπήρξε λαμπρός εκπρόσωπος της παλαιολόγειας αναγέννησης με άρτια κλασική παιδεία και θεολογική κατάρτιση και ως δάσκαλος εργάστηκε για τη μόρφωση των ανθρώπων με σκοπό να μεταλαμπαδεύσει τη διανόηση.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/30921",
+          "title": "Ιωάννης Καρυοφύλλης (ci 1610-1692)",
+          "creator": [
+            "Βασίλειος Χαλαστάνης"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/30921",
+          "doi": "10.12681/eadd/30921",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Ἡ ἐκπονηθεῖσα ἐπὶ διδακτορίᾳ διατριβὴ γιὰ τὸν Ἰωάννη Καρυοφύλλη (ci.1610-1692), γνωστότερο ὡς μέγα λογοθέτη, εἶχε διπλὸ στόχο: α) νὰ ἐξακριβώσει ἂν ὁ τελευταῖος υἱοθέτησε καλβινικὲς ἀπόψεις καὶ β) ἂν εἶλκε τὴν καταγωγὴ ἐξ Ἀγράφων Εὐρυτανίας ἢ ὄχι. Γιὰ τὴν ἐπίτευξη τοῦ ὡς ἄνω στόχου καταβλήθηκε κάθε δυνατὴ προσπάθεια τῆς προσεγγίσεως τοῦ πηγαίου ὑλικοῦ καὶ τῆς συγκεντρώσεώς του μὲ ὅλα τὰ διαθέσιμα μηχανικά, ἠλεκτρονικὰ καὶ μεταφορικὰ μέσα (φίλμς, σι ντι, φωτοτυπίες, ἠλεκτρονικὴ ἀναζήτηση, ἐπιτόπιες προσωπικὲς ἐπισκέψεις). Ἀπὸ τὴν μακρόχρονη μελέτη τοῦ ἀνέκδοτου καὶ ἐκδεδομένου ὑλικοῦ, τὴν ἐνδελεχὴ ἐπανεξέταση ὅλων τῶν γεγονότων τοῦ βίου του, τὴν συστηματικὴ καταγραφὴ τοῦ διασωθέντος συγγραφικοῦ του ἔργου καὶ ἰδιαίτερα τοῦ θεολογικοῦ προέκυψαν ἐν περιλήψει τὰ ἀκόλουθα: α) τὸ ἐπώνυμο Καρυοφύλλης ἦταν οἰκογενειακὸ καὶ τὸ ἔφερε ἀπὸ τὴν περιοχὴ τῶν Ἀγράφων. β) Ἀποσαφηνίστηκε πλήρως ἡ δράση του στὴ διάρκεια τοῦ βίου του: διδασκαλία στὴν Πατριαρχικὴ Σχολή, ἀπουσία στὴ Βλαχία, ἐπάνοδος στὴν ΚΠολη, σχέση μὲ προσωπικότητες τῆς ἐποχῆς, συγκρούσεις καὶ διαμάχες ἰδίως στὸ ζήτημα τῆς μετουσιώσεως στὴ θεία Εὐχαριστία, σύνθεση συγγραφικοῦ ἔργου. γ) Στὸ ζήτημα τῆς μετουσιώσεως παρεξέκλινε ἀπὸ τὴν ὀρθόδοξη παράδοση, ἀρνούμενος τὸν ὅρο καὶ τὸ περιεχόμενο τοῦ ὅρου μετουσίωσις υἱοθετώντας καλβινικὲς ἀπόψεις.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/35294",
+          "title": "Ιωάννης Γεωμέτρης, ιαμβικά ποιήματα",
+          "creator": [
+            "Μαρία Τωμαδάκη"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/35294",
+          "doi": "10.12681/eadd/35294",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Στόχος της παρούσας διδακτορικής διατριβής είναι η κριτική έκδοση, η μετάφραση και ο σχολιασμός 236 ιαμβικών ποιημάτων του Ιωάννη Γεωμέτρη. Τα ποιήματα αυτά αναφέρονται τόσο σε θρησκευτικά όσο και κοσμικά θέματα. Για παράδειγμα, είναι αφιερωμένα στον Χριστό, τη Θεοτόκο, σε αγίους, εικόνες, λείψανα, αλλά και σε Βυζαντινούς αυτοκράτορες, αρχαίους συγγραφείς και φιλοσόφους. Ως προς τη λειτουργία τους, θα μπορούσαν στην πλειονότητά τους να θεωρηθούν εν δυνάμει επιγραφές ή βιβλιακά επιγράμματα, καθώς και εγκωμιαστικά ποιήματα. Η παρούσα έκδοση βασίστηκε στον κώδικα Paris. Suppl. gr. 352 και αποτελείται από τέσσερα μέρη. Το πρώτο μέρος περιλαμβάνει έξι εισαγωγικά κεφάλαια που αναφέρονται στα βιογραφικά στοιχεία του ποιητή, στη θεματολογία, τις μετρικές συνήθειες, τη χειρόγραφη παράδοση των ιαμβικών του ποιημάτων, καθώς και στις αρχές της παρούσας έκδοσης. Στο δεύτερο μέρος περιλαμβάνεται η κριτική έκδοση των κειμένων και η απόδοσή τους στη Νεοελληνική. Στη συνέχεια ακολουθεί ο σχολιασμός των ποιημάτων, στο πλαίσιο του οποίου εξετάζονται ποικίλα φιλολογικά, γλωσσικά, προσωπογραφικά και ιστορικά ζητήματα αλλά και θέματα που αφορούν τη βυζαντινή τέχνη, ενώ το τελευταίο μέρος περιλαμβάνει τρία ευρετήρια (Index nominum, Index verborum notabilium και Index locorum).",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/22652",
+          "title": "Ο Ιωάννης ο Χρυσόστομος για το Imperium Romanun",
+          "creator": [
+            "Κωνσταντίνος Μποζίνης"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/22652",
+          "doi": "10.12681/eadd/22652",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/19826",
+          "title": "Ο Ιωάννης Β' Κομνηνός και η εποχή του (1118-1143)",
+          "creator": [
+            "Αγγελική Παπαγεωργίου"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/19826",
+          "doi": "10.12681/eadd/19826",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/56651",
+          "title": "MIMO optical satellite systems",
+          "creator": [
+            "Θεόδωρος Καψής"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/56651",
+          "doi": "10.12681/eadd/56651",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Τα ασύρματα δίκτυα πέμπτης γενιάς (fifth-generation, 5G) έχουν σχεδιαστεί για να ανταποκρίνονται στις ολοένα και πιο απαιτητικές ανάγκες των διαφορετικών αναδυόμενων υπηρεσιών με ξεχωριστές απαιτήσεις: Ευρυζωνικές υπηρεσίες υψηλής ταχύτητας, ετερογενείς, εξαιρετικά αξιόπιστες, ασφαλείς και χαμηλής καθυστέρησης. Στα ασύρματα δίκτυα πέρα από το 5G (beyond 5G, B5G), οι δορυφορικές επικοινωνίες και γενικά τα μη-επίγεια δίκτυα θεωρούνται τεχνολογίες ενεργοποίησης λόγω της δυνατότητας παροχής παγκόσμιας κάλυψης, της συνδεσιμότητας απομακρυσμένων περιοχών, της επεκτασιμότητας και της ανθεκτικότητάς τους. Οι δορυφορικές τεχνολογίες είναι ήδη αρκετά ώριμες για ζεύξεις υποστήριξης (backhauling) και για εφαρμογές Διαδικτύου των Πραγμάτων κάνοντας χρήση δορυφόρων υψηλής ρυθμαπόδοσης στη ζώνη Ka (20/30 GHz). Επίσης, αρκετές εθνικές και πολυεθνικές διαστημικές υπηρεσίες συμμετέχουν στην εξερεύνηση του βαθέως διαστήματος, κοντά στη Γη, της Σελήνης και του Άρη και σχεδιάζουν και άλλες αποστολές. Η βελτιστοποίηση των δορυφορικών επικοινωνιών είναι ένας ακόμη σημαντικός τομέας στη βιομηχανία του νέου διαστήματος. Λόγω του περιορισμένου διαθέσιμου φάσματος, οι παραδοσιακές ζεύξεις ραδιοεπικοινωνιών (radio frequency, RF) αδυνατούν να παρέχουν τόσο υψηλή ρυθμαπόδοση. Η οπτική επικοινωνία ελευθέρου χώρου (free space optical, FSO) είναι μια εναλλακτική με ποικίλα πλεονεκτήματα έναντι της RF που έχει κερδίσει αυξημένη προσοχή στη δορυφορική κοινότητα. Ωστόσο, η FSO είναι ευάλωτη στις σοβαρές επιπτώσεις των ατμοσφαιρικών στροβιλισμών, των σφαλμάτων στόχευσης και των σπινθηρισμών. Η παρούσα Διατριβή επικεντρώνεται στην μελέτη των οπτικών δορυφορικών συστημάτων επικοινωνιών και ειδικότερα στην μοντελοποίηση του οπτικού διαύλου κάτω ζεύξης (downlink, DL) και στη βελτιστοποίηση της κατανομής ισχύος σε οπτικά δορυφορικά δίκτυα πολλαπλών εισόδων - εξόδων (multi-input multi-output, MIMO). Δίνεται έμφαση στα δυσμενή φαινόμενα που αντιμετωπίζει η δέσμη φωτός κατά τη διάδοση στη γήινη ατμόσφαιρα και στις τεχνικές άμβλυνσης των φαινομένων αυτών. Αρχικά, για την ακριβή πρόβλεψη του σπινθηρισμού έντασης ακτινοβολίας του DL οπτικού καναλιού αναπτύχθηκε μεθοδολογία που παράγει χρονοσειρές με χρήση στοχαστικών διαφορικών εξισώσεων η οποία επικυρώθηκε και επιβεβαιώθηκε ως προς τα στατιστικά πρώτης και δεύτερης τάξης (συνάρτηση πυκνότητας πιθανότητας, αθροιστική συνάρτηση κατανομής, φασματική πυκνότητα ισχύος) με πειραματικά δεδομένα. Στη συνέχεια, εξετάζονται σενάρια αμιγώς οπτικών δορυφορικών συστημάτων ΜΙΜΟ και προτείνονται αλγόριθμοι βέλτιστης και αποδοτικής εκχώρησης ισχύος. Το κύριο πρόβλημα διατυπώνεται ως κυρτό πρόβλημα βελτιστοποίησης με περιορισμούς μέγιστης επιτρεπτής εκπομπής ισχύος με σκοπό την μεγιστοποίηση της χωρητικότητας και κατόπιν αποσυντίθεται σε ανεξάρτητα κυρτά υποπροβλήματα. Η όλη προτεινόμενη μεθοδολογία είναι βασισμένη στον αλγόριθμο υδροπλήρωσης και ικανοποιεί τις συνθήκες Karush-Kuhn-Tucker. Επίσης, διερευνάται ο βέλτιστος έλεγχος ισχύος σε υβριδικά δορυφορικά δίκτυα (χρήση επιγείου relay). Θεωρείται η οπτική DL ζεύξη αποκωδικοποίησης-και-προώθησης διπλής αναπήδησης για μια γεωστατική δορυφορική πηγή. Λαμβάνονται υπόψη η χωρική συσχέτιση, οι μήτρες και συντελεστές συσχέτισης. Ακόμη, το πρόβλημα βελτιστοποίησης ισχύος διατυπώνεται και επιλύεται μη-γραμμικά για σχήματα υβριδικής αυτόματης αίτησης επανεκπομπής σε χαμηλής τροχιάς δορυφόρους. Ακολούθως, το πρόβλημα βελτιστοποίησης ισχύος ενσωματώνει τα σφάλματα στόχευσης και προτείνεται εύρωστη μεθοδολογία για την αντιμετώπιση της αβεβαιότητας της οπτικής διακύμανσης. Τέλος, η Διατριβή ολοκληρώνεται με την μελέτη αλγορίθμων νευρωνικών δικτύων, μηχανικής, βαθιάς και ενισχυτικής μάθησης. Προτείνεται αλγόριθμος χωρίς μοντέλο που με ακρίβεια προβλέπει τη βέλτιστη κατανομή ισχύος σε κάθε οπτικό κανάλι.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/makedonika.1100",
+          "title": "Ιωάννης Ν. Παπαφής",
+          "creator": [
+            "Αλέξανδρος Ν. Λέτσας"
+          ],
+          "date": [
+            "1956-1-1"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.1100",
+          "doi": "10.12681/makedonika.1100",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μακεδονικά"
+          ],
+          "description": "No abstract",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/6654/6388",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/37477",
+          "title": "Φιλοσοφία και Ρητορική στον 15ο αιώνα",
+          "creator": [
+            "Αναστάσιος Μανδραπήλιας"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/37477",
+          "doi": "10.12681/eadd/37477",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Η νεότερη Ευρώπη οικοδομήθηκε πάνω στα θεμέλια της κλασικής αρχαιότητας, η μελέτη και γνώση της οποίας κατέστη εν πολλοίς δυνατή μέσω της συμβολής των Ελλήνων λογίων, οι οποίες παρά τις αντιξοότητες, έθεσαν τον εαυτό τους στην προσπάθεια της πνευματικής καλλιέργειας του υπόδουλου πληθυσμού και στη διάδοση της ελληνικής γλώσσας και φιλοσοφίας στη Δύση με σκοπό να μείνει κτήμα ες αεί στους μεταγενέστερους. Οι Έλληνες λόγιοι του Βυζαντίου, και συγκεκριμένα οι προαναφερθέντες, Ιωάννης Αργυρόπουλος, Ματθαίος Καμαριώτης και Γεώργιος Τραπεζούντιος συνέβαλαν με το έργο τους τα μέγιστα, καθώς οι δύο εξ αυτών εγκαταλείποντας της περιοχές τους, που βρίσκονταν υπό οθωμανική απειλή και πηγαίνοντας ως φυγάδες στη Δύση, μετέφεραν μαζί τους χειρόγραφα αρχαίων Ελλήνων και βυζαντινών συγγραφέων, καθώς και τις ανθρωπιστικές αξίες των κλασικών γραμμάτων και του βυζαντινού πολιτισμού. Το μεταναστευτικό αυτό ρεύμα συνέβαλε αποφασιστικά στην ανάπτυξη του Ουμανισμου στην Ευρώπη και στην πολιτιστική ακμή των Γραμμάτων και των Τεχνών, καθώς πυροδότησε το ενδιαφέρον των Δυτικών για την αρχαία ελληνική γνώση, με αποτέλεσμα πολλοί να αποφασίζουν να διδαχθούν την ελληνική γλώσσα. Ο δε Καμαριωτης έδωσε τον δικό του πνευματικό αγώνα εντός των συνόρων της Οθωμανικης πλέον αυτοκρατορίας προσπαθώντας να περισώσει ότι ήταν δυνατόν είτε αυτό αφορούσε τις έγγραφες πηγές είτε να συνεχίσει με τη διδασκαλία στους εναπομείναντες Ελληνες. Εν μέσω της τραγωδίας του Ελληνισμού στη Δύση είχαν αρχίσει να δημιουργούνται οι συνθήκες που θα έβγαζαν την Ευρώπη από το Μεσαίωνα και θα την οδηγούσαν στην πνευματική Αναγέννηση. Για τον λόγο αυτό είναι σημαντική η εξέταση του συνόλου των δομικών στοιχείων που επέφεραν όλες αυτές τις αλλαγές στην κοινωνία. Η πτώση της Κωνσταντινούπολης υπήρξε ο καταλύτης που επιτάχυνε τις εξελίξεις σε συνδυασμό με την μεταφορά των πολύτιμων Βυζαντινών χειρογράφων και την ανάπτυξη της τυπογραφίας που πυροδότησε πραγματικά την άνοδο των γραμμάτων και τα κατέστησε προσβάσιμα σε όλες τις κοινωνικές τάξεις.Η συνεισφορά των τριών επηρέασε την κατεύθυνση της πνευματικής αναγέννησης που διαφαινόταν λόγω των ευνοϊκών συνθηκών την εποχή εκείνη στη Δυση. Εισήγαγαν την Πλατωνικη Διαλεκτική σε σχέση με την Αριστοτέλεια Λογική γεγονός που επηρέασε άμεσα το κίνημα του ουμανισμού. Η Εκκλησία μετά από αιώνες κυριαρχίας του Αριστοτελικού φιλοσοφικού προτύπου είδε την μείωση της επιρροής της και την υποχώρηση προς τον τον Πλατωνισμο. Στο σκέλος της Ρητορικής η συνεισφορά τους και η επιρροή που άσκησαν είναι τεράστια διότι αναθέρμαναν το ενδιαφέρον των Λατίνων για την Αριστοτέλεια ρητορική η οποία αποτελεί τον ένα βασικό πυλώνα της Βυζαντινής παράδοσης, γεγονός που φάνηκε και από την επιβολή της ως διδακτικό βιβλίο στα σχολεία των Ισουητών μοναχών και επέβαλαν το Ερμογένειο corpus το οποίο κυριαρχούσε για αιώνες στο Ανατολικό τμήμα της αυτοκρατορίας. Ο ζήλος τους φαίνεται στα εκτενή σχόλια και στα εγχειρίδια που συνέταξαν προκειμένου να προωθήσουν την ρητορική τέχνη η οποία είναι άλλωστε άρρηκτα συνδεδεμένη με το φιλοσοφικό υπόβαθρο των αρχαίων Ελλήνων που πέρασε διά μέσω της ύστερα και στους Βυζαντινούς.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/makedonika.162",
+          "title": "Ιωάννης Καλλέρης (1901-1992)",
+          "creator": [
+            "Ιωάννης Τουλουμάκος"
+          ],
+          "date": [
+            "1992-1-1"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.162",
+          "doi": "10.12681/makedonika.162",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μακεδονικά"
+          ],
+          "description": "No abstract",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/5723/5462",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/grsr.876",
+          "title": "Ιωάννης Βαβούρας: οικονομική πολιτική: θεωρητική εισαγωγή",
+          "creator": [
+            "Αγγελική Τσούχλου"
+          ],
+          "date": [
+            "1988-5-1"
+          ],
+          "url": "https://doi.org/10.12681/grsr.876",
+          "doi": "10.12681/grsr.876",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Επιθεώρηση Κοινωνικών Ερευνών"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/ekke/article/viewFile/7674/7392",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/dchae.852",
+          "title": "Ευαγγελιστής Ιωάννης - Μωϋσής (πίν. 54-55)",
+          "creator": [
+            "Ανδρέας ΞΥΓΓΟΠΟΥΛΟΣ"
+          ],
+          "date": [
+            "1976-1-11"
+          ],
+          "url": "https://doi.org/10.12681/dchae.852",
+          "doi": "10.12681/dchae.852",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Δελτίον Χριστιανικής Αρχαιολογικής Εταιρείας"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/deltion/article/viewFile/4533/4309",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/30404",
+          "title": "Ο Ιωάννης Γεννάδιος και η διαμόρφωση της εθνικής πολιτικής της Ελλάδας (1871-1918)",
+          "creator": [
+            "Μαριάννα Χριστοπούλου"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/30404",
+          "doi": "10.12681/eadd/30404",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Η παρούσα διδακτορική διατριβή παρουσιάζει και ερμηνεύει την επαγγελματική δράση του έλληνα διπλωμάτη Ιωάννη Γενναδίου (1844-1932), που υπηρέτησε ως επί το πλείστον στην ελληνική πρεσβεία Λονδίνου κατά το τελευταίο τέταρτο του 19ού αιώνα και το πρώτο, περίπου, τέταρτο του 20ού. Στόχος ήταν διαμέσου της «βιογράφησης» της δράσης του να απαντηθεί ένα ερώτημα διπλωματικής ιστορίας: ο τρόπος που ένας διπλωμάτης μπορεί να υπερβεί τα όρια της διαικπεραίωσης και να συνδιαμορφώσει την εξωτερική πολιτική της χώρας του. Aναλύονται αρχικά η ιδεολογική συγκρότηση του Γενναδίου, οι οικογενειακές και εκπαιδευτικές του καταβολές και οι εμπειρίες της γενιάς του σε σχέση κυρίως με τον βρετανικό παράγοντα. Παρουσιάζονται τα πρώτα δημοσιογραφικά του εγχειρήματα και αναλύεται διεξοδικά το 180σέλιδο κείμενό του για τη σφαγή στο Δήλεσι (1870). Επρόκειτο για κείμενο που αποτύπωσε το στίγμα της ερμηνείας του για τις παθογένειες του ελληνικού κράτους και αποτέλεσε το εφαλτήριο για την ένταξή του στο διπλωματικό σώμα. Το κύριο σώμα της διατριβής αναπτύσσει και ερμηνεύει τη διπλωματική δραστηριότητα του Γενναδίου σε σημαντικές φάσεις της ελληνικής ιστορίας, όπως η Ανατολική Κρίση (1875-1878), η κρίση της Ανατολικής Ρωμυλίας (1885-1886), οι Βαλκανικοί Πόλεμοι (1912-1913) και ο Πρώτος Παγκόσμιος Πόλεμος (1914-1918). Διαμέσου ή παράλληλα με αυτές τις φάσεις αναδεικνύονται και άλλες όχι και τόσο γνωστές πτυχές της συνδρομής του στην ελληνική διπλωματία, όπως οι σχέσεις που ανέπτυξε με το κόμμα των Βρετανών Φιλελευθέρων, η διένεργεια συστηματικής και οργανωμένης προπαγάνδας υπέρ των ελληνικών θέσεων, η διευθέτηση των Δανείων της Ανεξάρτησίας (1878-1880), όπως και του δασμού της ελληνικής σταφίδας στις ΗΠΑ και στη Μεγάλη Βρετανία (1888-1894).",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/makedonika.426",
+          "title": "Ιωάννης Κ. Βασδραβέλλης (1900-1981)",
+          "creator": [
+            "Κωνσταντίνος Αν. Βαβούσκος"
+          ],
+          "date": [
+            "1981-1-1"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.426",
+          "doi": "10.12681/makedonika.426",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μακεδονικά"
+          ],
+          "description": "<p>No abstract</p>",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/5987/5725",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/53634",
+          "title": "Ο Ιωάννης Περμενιάτης και άλλοι Έλληνες ζωγράφοι στη Βενετία κατά το πρώτο μισό του δέκατου έκτου αιώνα",
+          "creator": [
+            "Ελένη Χαρχαρέ"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/53634",
+          "doi": "10.12681/eadd/53634",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Με την παρούσα εργασία επιχειρείται μία συμβολή στη μελέτη του έργου του Ιωάννη Περμενιάτη, ενταγμένου στο σύνολο των Ελλήνων ζωγράφων που έζησαν στη Βενετία το α΄ μισό του 16ου αιώνα, μία περίοδο σπουδαίας καλλιτεχνικής άνθησης για την ιταλική μητρόπολη. Παρουσιάζονται οι αρχειακές και οι καλλιτεχνικές μαρτυρίες που είναι γνωστές μέχρι σήμερα για δεκαπέντε Έλληνες ζωγράφους, εκ των οποίων οι περισσότεροι είναι μέλη της Ελληνικής Αδελφότητας, που ιδρύθηκε στη Βενετία το 1498. Το κύριο μέρος της εργασίας καταλαμβάνει η παρουσίαση του έργου του Ιωάννη Περμενιάτη, ο οποίος μαρτυρείται ως μέλος της Ελληνικής Αδελφότητας το έτος 1523. Τα έργα του, τρία υπογεγραμμένα και τριάντα δύο αποδιδόμενα, εξετάζονται αναλυτικά, ενταγμένα σε εικονογραφικές κατηγορίες. Στόχος της εξέτασης αυτής είναι η ανάδειξη των ποικίλων επιρροών που δέχθηκε ο ζωγράφος, αφενός από τη βυζαντινή παράδοση και αφετέρου από ένα ευρύτατο φάσμα της δυτικοευρωπαϊκής ζωγραφικής, καθώς και ο τρόπος με τον οποίο προχώρησε στη σύνθεση των επιδράσεων αυτών και τη δημιουργία μίας ιδιαίτερης εικαστικής γλώσσας. Επιχειρείται, με άλλα λόγια, να παρουσιασθούν πτυχές της καλλιτεχνικής προσωπικότητας ενός Έλληνα ζωγράφου, που μπόρεσε να ανταποκριθεί στα αιτήματα που έθετε η τέχνη και η θρησκευτικότητα της εποχής του, μέσα στο πλούσιο σε καλλιτεχνικά ερεθίσματα αλλά και απαιτητικό σε επαγγελματικό επίπεδο περιβάλλον της Βενετίας, προσφέροντας ένα έργο στο μεταίχμιο της μεταβυζαντινής και της δυτικής ζωγραφικής.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/er.9143",
+          "title": "Ιωάννης (Ιβάν) Σελιμίνσκι",
+          "creator": [
+            "Ν. Δ. Σωτηράκης"
+          ],
+          "date": [
+            "2016-5-10"
+          ],
+          "url": "https://doi.org/10.12681/er.9143",
+          "doi": "10.12681/er.9143",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "The Gleaner"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/eranistis/article/viewFile/9143/9378",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/makedonika.189",
+          "title": "Ιωάννης Τσικόπουλος: ένας ξεχασμένος Μακεδόνας λόγιος",
+          "creator": [
+            "Δημήτριος Κρήτος"
+          ],
+          "date": [
+            "1994-1-1"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.189",
+          "doi": "10.12681/makedonika.189",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μακεδονικά"
+          ],
+          "description": "<p>No Abstract</p>",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/5750/5489",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 158}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 119714, \"response_sha256\": \"56dd728798d6d92d5cad5c9e72141f6219dd0d7312667b6b75c57ae78e24a9aa\", \"elapsed_ms\": 416}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1227, \"response_sha256\": \"edd0c017a19b5db432906581e530edafe5595e78f0838e7227c8e92ef57fbdc2\", \"elapsed_ms\": 144}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 20, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 158}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 119714, \"response_sha256\": \"56dd728798d6d92d5cad5c9e72141f6219dd0d7312667b6b75c57ae78e24a9aa\", \"elapsed_ms\": 416}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1227, \"response_sha256\": \"edd0c017a19b5db432906581e530edafe5595e78f0838e7227c8e92ef5"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Ioannis Kapsis\"",
+      "records": [
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2307/jj.399511",
+          "title": "Nichols and May",
+          "creator": [],
+          "date": [
+            "2020-10-16"
+          ],
+          "url": "https://doi.org/10.2307/jj.399511",
+          "doi": "10.2307/jj.399511",
+          "type": "monograph",
+          "publisher": "University Press of Mississippi",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783112408629-006",
+          "title": "IOANNIS MALALAE. CHRONOGRAPHIA",
+          "creator": [],
+          "date": [
+            "1831-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9783112408629-006",
+          "doi": "10.1515/9783112408629-006",
+          "type": "book-chapter",
+          "publisher": "De Gruyter",
+          "container_title": [
+            "Ioannis Malalae Chronographia"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783112408629-006/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783112408629-006/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gmo/9781561592630.article.52237",
+          "title": "Sakellarides, Ioannis",
+          "creator": [
+            "Katy Romanou"
+          ],
+          "date": [
+            "2001-1-20"
+          ],
+          "url": "https://doi.org/10.1093/gmo/9781561592630.article.52237",
+          "doi": "10.1093/gmo/9781561592630.article.52237",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Music Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gmo/9781561592630.article.2270872",
+          "title": "Kaimakis, Ioannis",
+          "creator": [
+            "Katerina Levidou"
+          ],
+          "date": [
+            "2014-9-3"
+          ],
+          "url": "https://doi.org/10.1093/gmo/9781561592630.article.2270872",
+          "doi": "10.1093/gmo/9781561592630.article.2270872",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Music Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783112682807-011",
+          "title": "SCHOLIA IN IOANNIS EPISTOLAM",
+          "creator": [],
+          "date": [
+            "1831-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9783112682807-011",
+          "doi": "10.1515/9783112682807-011",
+          "type": "book-chapter",
+          "publisher": "De Gruyter",
+          "container_title": [
+            "Continens Pauli epistolas ad Timotheum, Titum, Philemonem, et hebraeos, epistolam Iacobi, utramque Petri, epistolas Ioannis, epistolam Iudae et Apocalypsin Ioannis"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783112682807-011/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783112682807-011/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783112423127-001",
+          "title": "IOANNIS ZONAßAE EPITOME HISTORIARUM. Part 1",
+          "creator": [],
+          "date": [
+            "1869-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9783112423127-001",
+          "doi": "10.1515/9783112423127-001",
+          "type": "book-chapter",
+          "publisher": "De Gruyter",
+          "container_title": [
+            "Ioannis Zonarae Epitome historiarum Vol. 2"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783112423127-001/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783112423127-001/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.14264/218394",
+          "title": "Application of goal programming to the state purchasing policy",
+          "creator": [
+            "Nicholas Nigel. Kapsis"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.14264/218394",
+          "doi": "10.14264/218394",
+          "type": "dissertation",
+          "publisher": "University of Queensland Library",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783112408728-001",
+          "title": "IOANNIS CANTACUZENI. PART I",
+          "creator": [],
+          "date": [
+            "1832-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9783112408728-001",
+          "doi": "10.1515/9783112408728-001",
+          "type": "book-chapter",
+          "publisher": "De Gruyter",
+          "container_title": [
+            "Ioannis Cantacuzeni Eximperatoris Historiarum Libri IV."
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783112408728-001/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783112408728-001/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gao/9781884446054.article.t002019",
+          "title": "Altamouras, Ioannis",
+          "creator": [
+            "Alkis Charalampidis"
+          ],
+          "date": [
+            "2003"
+          ],
+          "url": "https://doi.org/10.1093/gao/9781884446054.article.t002019",
+          "doi": "10.1093/gao/9781884446054.article.t002019",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Art Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783112423141-002",
+          "title": "IOANNIS ZONARAE EPITOME HISTORIARUM. Part 1",
+          "creator": [],
+          "date": [
+            "1871-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9783112423141-002",
+          "doi": "10.1515/9783112423141-002",
+          "type": "book-chapter",
+          "publisher": "De Gruyter",
+          "container_title": [
+            "Ioannis Zonarae Epitome historiarum Vol. 4"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783112423141-002/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783112423141-002/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783112422489-004",
+          "title": "IOANNIS ZONARAE EPITOME HISTORIARUM. Part 1",
+          "creator": [],
+          "date": [
+            "1868-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9783112422489-004",
+          "doi": "10.1515/9783112422489-004",
+          "type": "book-chapter",
+          "publisher": "De Gruyter",
+          "container_title": [
+            "Ioannis Zonarae Epitome historiarum Vol. 1"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783112422489-004/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783112422489-004/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gao/9781884446054.article.t022436",
+          "title": "Despotopoulos, Ioannis",
+          "creator": [
+            "Alexander Koutamanis"
+          ],
+          "date": [
+            "2003"
+          ],
+          "url": "https://doi.org/10.1093/gao/9781884446054.article.t022436",
+          "doi": "10.1093/gao/9781884446054.article.t022436",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Art Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gmo/9781561592630.article.2270791",
+          "title": "Foustanos, Ioannis",
+          "creator": [
+            "Stella Kourmpana"
+          ],
+          "date": [
+            "2014-9-3"
+          ],
+          "url": "https://doi.org/10.1093/gmo/9781561592630.article.2270791",
+          "doi": "10.1093/gmo/9781561592630.article.2270791",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Music Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783112682807-010",
+          "title": "SCHOLIA IN EPISTOLARI IOANNIS SECUNDAM",
+          "creator": [],
+          "date": [
+            "1831-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9783112682807-010",
+          "doi": "10.1515/9783112682807-010",
+          "type": "book-chapter",
+          "publisher": "De Gruyter",
+          "container_title": [
+            "Continens Pauli epistolas ad Timotheum, Titum, Philemonem, et hebraeos, epistolam Iacobi, utramque Petri, epistolas Ioannis, epistolam Iudae et Apocalypsin Ioannis"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783112682807-010/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783112682807-010/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783112423141-003",
+          "title": "IOANNIS ZONARAE EPITOME HISTORIARUM. Part 2",
+          "creator": [],
+          "date": [
+            "1871-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9783112423141-003",
+          "doi": "10.1515/9783112423141-003",
+          "type": "book-chapter",
+          "publisher": "De Gruyter",
+          "container_title": [
+            "Ioannis Zonarae Epitome historiarum Vol. 4"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783112423141-003/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783112423141-003/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783112408728-002",
+          "title": "IOANNIS CANTACUZENI. PART II",
+          "creator": [],
+          "date": [
+            "1832-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9783112408728-002",
+          "doi": "10.1515/9783112408728-002",
+          "type": "book-chapter",
+          "publisher": "De Gruyter",
+          "container_title": [
+            "Ioannis Cantacuzeni Eximperatoris Historiarum Libri IV."
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783112408728-002/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783112408728-002/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783112682807-013",
+          "title": "SCHOLIA IN APOCALYPSIN IOANNIS",
+          "creator": [],
+          "date": [
+            "1831-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9783112682807-013",
+          "doi": "10.1515/9783112682807-013",
+          "type": "book-chapter",
+          "publisher": "De Gruyter",
+          "container_title": [
+            "Continens Pauli epistolas ad Timotheum, Titum, Philemonem, et hebraeos, epistolam Iacobi, utramque Petri, epistolas Ioannis, epistolam Iudae et Apocalypsin Ioannis"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783112682807-013/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783112682807-013/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783112422489-005",
+          "title": "IOANNIS ZONARAE EPITOME HISTORIARUM. Part 2",
+          "creator": [],
+          "date": [
+            "1868-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9783112422489-005",
+          "doi": "10.1515/9783112422489-005",
+          "type": "book-chapter",
+          "publisher": "De Gruyter",
+          "container_title": [
+            "Ioannis Zonarae Epitome historiarum Vol. 1"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783112422489-005/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783112422489-005/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2307/2577267",
+          "title": "Black Streetcorner Districts",
+          "creator": [
+            "Robert E. Kapsis"
+          ],
+          "date": [
+            "1979-6"
+          ],
+          "url": "https://doi.org/10.2307/2577267",
+          "doi": "10.2307/2577267",
+          "type": "journal-article",
+          "publisher": "Oxford University Press (OUP)",
+          "container_title": [
+            "Social Forces"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783112423127-002",
+          "title": "IOANNIS ZONAßAE EPITOME HISTORIARUM. Part 2",
+          "creator": [],
+          "date": [
+            "1869-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9783112423127-002",
+          "doi": "10.1515/9783112423127-002",
+          "type": "book-chapter",
+          "publisher": "De Gruyter",
+          "container_title": [
+            "Ioannis Zonarae Epitome historiarum Vol. 2"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783112423127-002/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783112423127-002/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "OpenAlex Scholarly Works",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "https://openalex.org/W2580514744",
+          "title": "Great Powers, Counter Secession, and Non-Recognition: Britain and the 1983 Unilateral Declaration of Independence of the “Turkish Republic of Northern Cyprus”",
+          "creator": [
+            "James Ker‐Lindsay"
+          ],
+          "date": [
+            "2017-07-03"
+          ],
+          "url": "https://doi.org/10.1080/09592296.2017.1347445",
+          "doi": "https://doi.org/10.1080/09592296.2017.1347445",
+          "type": "article",
+          "cited_by_count": 15,
+          "description": "The role of Great Powers in processes of secession and recognition has attracted increasing attention from scholars in recent years. This analysis examines how Britain rallied international opposition to the November 1983 unilateral declaration of independence [UDI] of the “Turkish Republic of Northern Cyprus” [TRNC]. The British Government tried hard to prevent the UDI. Once it occurred, Britain led efforts to condemn the move. It resulted in United Nations Security Council Resolution 541, which declared the TRNC illegal and called on states not to recognise it. As well as exploring the diplomacy behind the counter-secession efforts, this examination also answers a long-standing question as to whether any countries aside from Turkey ever recognised the TRNC. It also challenges the widely held view amongst Greek Cypriots that Britain invariably supports the Turkish Cypriots on the Cyprus Problem.",
+          "description_provenance": "OPENALEX_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://eprints.lse.ac.uk/68642/7/Ker-Lindsay_Great%20powers%2C%20counter%20secession.pdf",
+              "is_oa": true,
+              "license": null,
+              "version": "publishedVersion"
+            },
+            {
+              "url": "https://researchonline.lse.ac.uk/id/eprint/68642/7/Ker-Lindsay_Great%20powers%2C%20counter%20secession.pdf",
+              "is_oa": true,
+              "license": null,
+              "version": "submittedVersion"
+            }
+          ],
+          "digital_url": "http://eprints.lse.ac.uk/68642/7/Ker-Lindsay_Great%20powers%2C%20counter%20secession.pdf",
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "OPENALEX_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "OpenAlex Scholarly Works",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "https://openalex.org/W2995108184",
+          "title": "GREEK NATIONALISM VERSUS EUROPEANIZATION: FROM ETHNIC TO CIVIC NATIONALISM?",
+          "creator": [
+            "Gizem Alioğlu Çakmak"
+          ],
+          "date": [
+            "2019-12-10"
+          ],
+          "url": "https://doi.org/10.30903/balkan.657714",
+          "doi": "https://doi.org/10.30903/balkan.657714",
+          "type": "article",
+          "cited_by_count": 0,
+          "description": "Since its emergence in the 19th century, ethnic nationalism has had a significant impact on both state policies and the social sphere in Greece. The Greek Church and education system played a significant role in the consolidation of ethnic nationalist understanding in society and the state apparatus. The constitution also recognizes orthodoxy as an integral part of Greek identity, which makes non-Orthodox Greek citizens a secondary citizen. Also, Article 19 of the Greek citizenship law, which was in force until 1998, divided Greek citizens into two categories: “Greeks” and “non-Greeks”. Since the 1990s, this ethnic nationalist approach has been criticized by Greece's Western European partners and European institutions. In the same period, Greece underwent a rapid Europeanization process, and there were positive developments in minority rights such as the abolishment of Article 19. This study aims to analyze the impact of Europeanization in Greece on ethnic nationalism, which is decisive at the state and social levels. In doing so, it is to analyze the relationship between Greek nationalism and Europeanization within the framework of Kohn’s classification of ethnic-social (civic) nationalism. This study aims to answer the question of whether there is a shift from ethnic nationalism to a civic (inclusive) understanding of nationalism in Greece due to the Europeanization efforts since the second half of the 1990s.",
+          "description_provenance": "OPENALEX_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://dergipark.org.tr/en/download/article-file/880396",
+              "is_oa": true,
+              "license": "cc-by",
+              "version": "publishedVersion"
+            }
+          ],
+          "digital_url": "https://dergipark.org.tr/en/download/article-file/880396",
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "OPENALEX_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "OpenAlex Scholarly Works",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "https://openalex.org/W7208866162",
+          "title": "Guide to the Council of the European Communities I/1987",
+          "creator": [],
+          "date": [
+            "1987-01-01"
+          ],
+          "url": "http://aei.pitt.edu/57769/1/1987.I.pdf",
+          "doi": null,
+          "type": "report",
+          "cited_by_count": 0,
+          "description": "",
+          "description_provenance": "OPENALEX_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://aei.pitt.edu/57769/1/1987.I.pdf",
+              "is_oa": true,
+              "license": null,
+              "version": "submittedVersion"
+            }
+          ],
+          "digital_url": "http://aei.pitt.edu/57769/1/1987.I.pdf",
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "OPENALEX_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Ioannis+Kapsis%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 59}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Ioannis+Kapsis%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Ioannis+Kapsis%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 28624, \"response_sha256\": \"d1b53fd082145b87470a74a535d5b029adf01e7cb09ab42be56407ccc47fee20\", \"elapsed_ms\": 301}, {\"url\": \"https://api.openalex.org/works?search=%22Ioannis+Kapsis%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Ioannis+Kapsis%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 43515, \"response_sha256\": \"f5b8757077d860f9c7b5c6aca9720c67e2f78f4350358f678e96bc55f0589f1a\", \"elapsed_ms\": 181}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 3}]}\", \"result_count\": 23, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Ioannis+Kapsis%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 59}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Ioannis+Kapsis%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Ioannis+Kapsis%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 28624, \"response_sha256\": \"d1b53fd082145b87470a74a535d5b029adf01e7cb09ab42be56407ccc47fee20\", \"elapsed_ms\": 301}, {\"url\": \"https://api.openalex.org/works?search=%22Ioannis+Kapsis%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Ioannis+Kapsis%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 43515, \"response_sha256\": \"f5b8757077d860f9c7b5c6aca9720c67e2f78f4350358f678e96bc55f0589f1a\", \"elapsed_ms\": 181}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Jean Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Jean+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 64}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Jean+Capsi%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 204}, {\"url\": \"https://api.openalex.org/works?search=%22Jean+Capsi%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Jean+Capsi%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 976, \"response_sha256\": \"1bd8290107fc874b1d688ee67497451d0c18ae57934cc578a35394ba586da2bf\", \"elapsed_ms\": 138}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Jean+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 64}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Jean+Capsi%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 204}, {\"url\": \"https://api.openalex.org/works?search=%22Jean+Capsi%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Jean+Capsi%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 976, \"response_sha256\": \"1bd8290107fc874b1d688ee67497451d0c18ae57934cc578a35394ba586da2bf\", \"elapsed_ms\": 138}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"John Capsi\"",
+      "records": [
+        {
+          "discovery_repository": "OpenAlex Scholarly Works",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "https://openalex.org/W1202086377",
+          "title": "Policy Paper 07: Workshop on Arms Control and Security in the Middle East II Summary Report",
+          "creator": [
+            "Paul L. Chrzanowski"
+          ],
+          "date": [
+            "1994-04-01"
+          ],
+          "url": "https://www.escholarship.org/uc/item/68x6j443.pdf;origin=repeccitec",
+          "doi": null,
+          "type": "preprint",
+          "cited_by_count": 1,
+          "description": "The Middle East peace process is now moving more rapidly than ever before. Many actors in the region have displayed a newfound willingness to adopt innovative approaches to resolving persistent conflicts. Though many obstacles remain, the end of the Cold War, the accord signed between Israel and the Palestine Liberation Organization in September 1993, and other recent hopeful developments in the bilateral and multilateral talks have opened the door to real progress in regional security and arms control. The door may quickly shut, however, if promising signs are not translated into concrete, practical, and verifiable agreements.",
+          "description_provenance": "OPENALEX_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://escholarship.org/uc/item/68x6j443",
+              "is_oa": true,
+              "license": null,
+              "version": "submittedVersion"
+            },
+            {
+              "url": "https://www.escholarship.org/uc/item/68x6j443.pdf;origin=repeccitec",
+              "is_oa": false,
+              "license": null,
+              "version": "submittedVersion"
+            },
+            {
+              "url": "http://www.escholarship.org/uc/item/68x6j443",
+              "is_oa": true,
+              "license": null,
+              "version": "submittedVersion"
+            }
+          ],
+          "digital_url": "https://escholarship.org/uc/item/68x6j443",
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "OPENALEX_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22John+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 91}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22John+Capsi%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 170}, {\"url\": \"https://api.openalex.org/works?search=%22John+Capsi%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22John+Capsi%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 17470, \"response_sha256\": \"fd2898ebe82dcd6e8693f2fe3324a48f4cd1e8c2fe1ce831878edba80a23cf05\", \"elapsed_ms\": 218}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 1}]}\", \"result_count\": 1, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22John+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 91}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22John+Capsi%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 170}, {\"url\": \"https://api.openalex.org/works?search=%22John+Capsi%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22John+Capsi%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 17470, \"response_sha256\": \"fd2898ebe82dcd6e8693f2fe3324a48f4cd1e8c2fe1ce831878edba80a23cf05\", \"elapsed_ms\": 218}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 1}]}\", \"result_count\": 1, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "39849354344",
+    "agent_id": "pirate_biography",
+    "source_leads": [
+      {
+        "id": "lead_24410339a14b0431eed48cbe",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/18878",
+        "title": "Ιωάννης ΣΤ'Καντακουζηνός",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e9c2eed41bfb3c51e2ee3373",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/17742",
+        "title": "Ιωάννης Πέζαρος ( 1749 - 1806 )",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_162ebae30ce681e2b49886d4",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/22408",
+        "title": "Ιωάννης-Ιερόθεος Κομνηνός μητροπολίτης Δρύστρας (1657-1719)",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5c18bca7b597d670cb9b7582",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/24209",
+        "title": "Ο Άγιος Ιωάννης ο Λαμπαδιστής",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_561790d6063f5a9adb58b1f8",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/43861",
+        "title": "Ο Ιωάννης Αργυρόπουλος ως θεολόγος και φιλόσοφος",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_773ba02f66d538fe4c94e4aa",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/30921",
+        "title": "Ιωάννης Καρυοφύλλης (ci 1610-1692)",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a7feeca10f4c374c9c36ef86",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/35294",
+        "title": "Ιωάννης Γεωμέτρης, ιαμβικά ποιήματα",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c7157edcd6b2747f533f1373",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/22652",
+        "title": "Ο Ιωάννης ο Χρυσόστομος για το Imperium Romanun",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d1eadd987d93f4c8fc7cbe5c",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/19826",
+        "title": "Ο Ιωάννης Β' Κομνηνός και η εποχή του (1118-1143)",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ab90834052493aae14f1ef44",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/56651",
+        "title": "MIMO optical satellite systems",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c822c9c05849bd8aad20da40",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/makedonika.1100",
+        "title": "Ιωάννης Ν. Παπαφής",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d55d5b4c6387a270a0f43d91",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/37477",
+        "title": "Φιλοσοφία και Ρητορική στον 15ο αιώνα",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ea6b1b29f350fd61d898dc0e",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/makedonika.162",
+        "title": "Ιωάννης Καλλέρης (1901-1992)",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8114dda6fa98d78dd054854b",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/grsr.876",
+        "title": "Ιωάννης Βαβούρας: οικονομική πολιτική: θεωρητική εισαγωγή",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c1d5bc712de45fdcba99c007",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/dchae.852",
+        "title": "Ευαγγελιστής Ιωάννης - Μωϋσής (πίν. 54-55)",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_144912e108d303246bb18863",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/30404",
+        "title": "Ο Ιωάννης Γεννάδιος και η διαμόρφωση της εθνικής πολιτικής της Ελλάδας (1871-1918)",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9e11532dd20f90ae3b3301e3",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/makedonika.426",
+        "title": "Ιωάννης Κ. Βασδραβέλλης (1900-1981)",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0b925b32002b71be1c20a7d8",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/53634",
+        "title": "Ο Ιωάννης Περμενιάτης και άλλοι Έλληνες ζωγράφοι στη Βενετία κατά το πρώτο μισό του δέκατου έκτου αιώνα",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5f41b02e41866890dfd0feac",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/er.9143",
+        "title": "Ιωάννης (Ιβάν) Σελιμίνσκι",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4c72b0491d8e0ddb3d50297e",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/makedonika.189",
+        "title": "Ιωάννης Τσικόπουλος: ένας ξεχασμένος Μακεδόνας λόγιος",
+        "query": "\"Ιωάννης Καψής\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_df028d94b4fa4ab5e15b8af8",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2307/jj.399511",
+        "title": "Nichols and May",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e4ac6dddfa429996c029ea10",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783112408629-006",
+        "title": "IOANNIS MALALAE. CHRONOGRAPHIA",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c4638ad302837fea0469c0ac",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gmo/9781561592630.article.52237",
+        "title": "Sakellarides, Ioannis",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e9646e228dbac8a9efab8bd2",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gmo/9781561592630.article.2270872",
+        "title": "Kaimakis, Ioannis",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_efaffff2f22f4bee52633a3e",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783112682807-011",
+        "title": "SCHOLIA IN IOANNIS EPISTOLAM",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_72378bb042d98d3312f49a24",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783112423127-001",
+        "title": "IOANNIS ZONAßAE EPITOME HISTORIARUM. Part 1",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_481e8caa3f837fd6435e4703",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.14264/218394",
+        "title": "Application of goal programming to the state purchasing policy",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5be39276413513460b3b4476",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783112408728-001",
+        "title": "IOANNIS CANTACUZENI. PART I",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_747c00a5fc1c89f708ca740d",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gao/9781884446054.article.t002019",
+        "title": "Altamouras, Ioannis",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_513663fc095a50cbd82a0c25",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783112423141-002",
+        "title": "IOANNIS ZONARAE EPITOME HISTORIARUM. Part 1",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_248b99dbde2d361027f0477f",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783112422489-004",
+        "title": "IOANNIS ZONARAE EPITOME HISTORIARUM. Part 1",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3279aa108546bf48e606e3a0",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gao/9781884446054.article.t022436",
+        "title": "Despotopoulos, Ioannis",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_584acafa7171623d73f12e9e",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gmo/9781561592630.article.2270791",
+        "title": "Foustanos, Ioannis",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3077bd9e6cbbce37fbc3ecc6",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783112682807-010",
+        "title": "SCHOLIA IN EPISTOLARI IOANNIS SECUNDAM",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7295d374766bda20a9837f90",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783112423141-003",
+        "title": "IOANNIS ZONARAE EPITOME HISTORIARUM. Part 2",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_817bbfb6bc0495c58ff0457f",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783112408728-002",
+        "title": "IOANNIS CANTACUZENI. PART II",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7d6f37ce32250ca203d80ee2",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783112682807-013",
+        "title": "SCHOLIA IN APOCALYPSIN IOANNIS",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b036d614c2bba70a4f528db5",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783112422489-005",
+        "title": "IOANNIS ZONARAE EPITOME HISTORIARUM. Part 2",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3d13c75f8cfba4356c37fda5",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2307/2577267",
+        "title": "Black Streetcorner Districts",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1aeb38825bd6ac3826a79a4d",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783112423127-002",
+        "title": "IOANNIS ZONAßAE EPITOME HISTORIARUM. Part 2",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a1048d36ec1db14b9c97760d",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1080/09592296.2017.1347445",
+        "title": "Great Powers, Counter Secession, and Non-Recognition: Britain and the 1983 Unilateral Declaration of Independence of the “Turkish Republic of Northern Cyprus”",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0b45698547673c29c4710924",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.30903/balkan.657714",
+        "title": "GREEK NATIONALISM VERSUS EUROPEANIZATION: FROM ETHNIC TO CIVIC NATIONALISM?",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a56ce4f7ef4bd3ba4ca170ea",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "http://aei.pitt.edu/57769/1/1987.I.pdf",
+        "title": "Guide to the Council of the European Communities I/1987",
+        "query": "\"Ioannis Kapsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fa34bc02e5e0887ce0759e5a",
+        "run_id": "39849354344",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://www.escholarship.org/uc/item/68x6j443.pdf;origin=repeccitec",
+        "title": "Policy Paper 07: Workshop on Arms Control and Security in the Middle East II Summary Report",
+        "query": "\"John Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      }
+    ],
+    "connector_errors": [
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 463}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Jean+Capsis%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 478}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22John+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 523}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Jean+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 526}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Ioannis+Kapsis%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 539}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Jean+Capsis%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 50}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Jean+Capsis%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 96}, {\"url\": \"https://api.openalex.org/works?search=%22Jean+Capsis%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Jean+Capsis%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 979, \"response_sha256\": \"cf369c69b7f0ae11819cd64f99ff2b3bcc84f13f682ff007612ff491ef0338a6\","
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 158}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 119714, \"response_sha256\": \"56dd728798d6d92d5cad5c9e72141f6219dd0d7312667b6b75c57ae78e24a9aa\", \"elapsed_ms\": 416}, {\"url\": \"https:"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Ioannis+Kapsis%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 59}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Ioannis+Kapsis%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Ioannis+Kapsis%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 28624, \"response_sha256\": \"d1b53fd082145b87470a74a535d5b029adf01e7cb09ab42be56407ccc47fee20\", \"elapsed_ms\": 301}, {\"url\": \"https://api.openalex.org/works?search=%22Ioannis+Kapsis%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Jean+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 64}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Jean+Capsi%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 204}, {\"url\": \"https://api.openalex.org/works?search=%22Jean+Capsi%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Jean+Capsi%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 976, \"response_sha256\": \"1bd8290107fc874b1d688ee67497451d0c18ae57934cc578a35394ba586da2bf\", \"e"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22John+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 91}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22John+Capsi%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 170}, {\"url\": \"https://api.openalex.org/works?search=%22John+Capsi%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22John+Capsi%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 17470, \"response_sha256\": \"fd2898ebe82dcd6e8693f2fe3324a48f4cd1e8c2fe1ce831878edba80a23cf05\", "
+      }
+    ],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 44,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}

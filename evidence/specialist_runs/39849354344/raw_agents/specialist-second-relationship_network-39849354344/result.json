@@ -1,0 +1,624 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "relationship_network",
+  "label": "Relationship Network Agent",
+  "assignment_id": "relationship_network:wave2",
+  "assignment_wave": 2,
+  "requested_outputs": [
+    "persons",
+    "ships",
+    "places",
+    "patrons",
+    "states",
+    "relationship_edges"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "5bb92b37347aa99695b8fdd3066f31ce54b20b9e3bcbc4c6eb4d81d27430a5cc",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "relationship_network",
+    "assignment_id": "relationship_network:wave2",
+    "assignment_wave": 2,
+    "route_ids": [
+      "repo:SearchCulture.gr / EKT",
+      "repo:The National Archives Public Content"
+    ],
+    "queries": [
+      "\"Ιωάννης Καψής\"",
+      "\"Ioannis Kapsis\"",
+      "\"Jean Capsis\"",
+      "\"Jean Capsi\"",
+      "\"Juan Capsi\""
+    ],
+    "operation": "search",
+    "search_budget": 10,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "result_aware_fallback_v1",
+    "routes": [
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 85,
+        "reason": [
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 81,
+        "reason": [
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 80,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 10,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Jean+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Jean+Capsi%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 825}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Jean+Capsi%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ioannis Kapsis\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Ioannis+Kapsis%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Ioannis+Kapsis%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 826}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Ioannis+Kapsis%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ιωάννης Καψής\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 842}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Juan Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Juan+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Juan+Capsi%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 852}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Juan+Capsi%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Capsis\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Jean+Capsis%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Jean+Capsis%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 859}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Jean+Capsis%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Capsis\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"The National Archives Public Content\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Jean+Capsis%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Jean+Capsis%22\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 38090, \"response_sha256\": \"e28c1eee437cac3b7f65df7610e8473877afcef7531719dc203e7222d741ba81\", \"elapsed_ms\": 530}, {\"url\": \"https://www.nationalarchives.gov.uk/education/sessions-and-resources/?time-period=early-modern\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 410, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_410\", \"elapsed_ms\": 642}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 72672, \"response_sha256\": \"d364ee17426239b2b96526442b81bcc2d3cd791d60557a160f364269307cea84\", \"elapsed_ms\": 1209}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 72672, \"response_sha256\": \"d364ee17426239b2b96526442b81bcc2d3cd791d60557a160f364269307cea84\", \"elapsed_ms\": 158}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64632, \"response_sha256\": \"7a2fd19cd45b0e5836c4edb3600cd93c0a49e1b33c0e6f0afc80d6df827f13ea\", \"elapsed_ms\": 190}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64632, \"response_sha256\": \"7a2fd19cd45b0e5836c4edb3600cd93c0a49e1b33c0e6f0afc80d6df827f13ea\", \"elapsed_ms\": 155}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64745, \"response_sha256\": \"dca902cf35d5fc5f7806c33ac1c67fd585649c6d7a0599aa996200fe66477ca1\", \"elapsed_ms\": 1138}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64745, \"response_sha256\": \"dca902cf35d5fc5f7806c33ac1c67fd585649c6d7a0599aa996200fe66477ca1\", \"elapsed_ms\": 116}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64872, \"response_sha256\": \"6ad467550b4550b480c3b52ef8d3d88e539e561b1b6ea8b05e4170fe7cf61bf8\", \"elapsed_ms\": 1164}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64872, \"response_sha256\": \"6ad467550b4550b480c3b52ef8d3d88e539e561b1b6ea8b05e4170fe7cf61bf8\", \"elapsed_ms\": 221}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64813, \"response_sha256\": \"820eb4cf7af8577695a460fe910abb597af1e680e601ba7d0e93e4963e91a122\", \"elapsed_ms\": 1322}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64813, \"response_sha256\": \"820eb4cf7af8577695a460fe910abb597af1e680e601ba7d0e93e4963e91a122\", \"elapsed_ms\": 141}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64280, \"response_sha256\": \"ec2d0a88f0534d1689cbc975b1325ea3294bdb50c8d0e6b6869444b4b20c1725\", \"elapsed_ms\": 184}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64280, \"response_sha256\": \"b479c4828070ecde1e49526577ae11fb4d96c83ef1b367ea0b909c3425526b7e\", \"elapsed_ms\": 743}], \"detail\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Jean+Capsis%22 ; bounded public-content hub crawl\", \"result_count\": 4, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Juan Capsi\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"The National Archives Public Content\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Juan+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Juan+Capsi%22\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 38088, \"response_sha256\": \"ab5372a66c84d6dd829001367f717e2ef4b289dd613520493e89f5b78f7def96\", \"elapsed_ms\": 622}, {\"url\": \"https://www.nationalarchives.gov.uk/education/sessions-and-resources/?time-period=early-modern\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 410, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_410\", \"elapsed_ms\": 635}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 72672, \"response_sha256\": \"4d5972c3edee43fc5b8b4d6a0510152e217cd1508e306039f1f3e4dce7df4dfc\", \"elapsed_ms\": 272}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 72672, \"response_sha256\": \"4d5972c3edee43fc5b8b4d6a0510152e217cd1508e306039f1f3e4dce7df4dfc\", \"elapsed_ms\": 266}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64632, \"response_sha256\": \"7a2fd19cd45b0e5836c4edb3600cd93c0a49e1b33c0e6f0afc80d6df827f13ea\", \"elapsed_ms\": 1337}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64632, \"response_sha256\": \"7a2fd19cd45b0e5836c4edb3600cd93c0a49e1b33c0e6f0afc80d6df827f13ea\", \"elapsed_ms\": 185}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64745, \"response_sha256\": \"93160217b6dc9742b7a50d8ddea21257235498ad6e1c12836a349caf07dd95a8\", \"elapsed_ms\": 1286}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64745, \"response_sha256\": \"93160217b6dc9742b7a50d8ddea21257235498ad6e1c12836a349caf07dd95a8\", \"elapsed_ms\": 203}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64872, \"response_sha256\": \"788098626d9dc4a5b80f028ae2b85daa4f2ce0dc67a6f45c1f7e4b19679536d3\", \"elapsed_ms\": 151}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64872, \"response_sha256\": \"6ad467550b4550b480c3b52ef8d3d88e539e561b1b6ea8b05e4170fe7cf61bf8\", \"elapsed_ms\": 298}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64813, \"response_sha256\": \"820eb4cf7af8577695a460fe910abb597af1e680e601ba7d0e93e4963e91a122\", \"elapsed_ms\": 1457}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64813, \"response_sha256\": \"820eb4cf7af8577695a460fe910abb597af1e680e601ba7d0e93e4963e91a122\", \"elapsed_ms\": 87}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64280, \"response_sha256\": \"ec2d0a88f0534d1689cbc975b1325ea3294bdb50c8d0e6b6869444b4b20c1725\", \"elapsed_ms\": 180}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64280, \"response_sha256\": \"ec2d0a88f0534d1689cbc975b1325ea3294bdb50c8d0e6b6869444b4b20c1725\", \"elapsed_ms\": 150}], \"detail\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Juan+Capsi%22 ; bounded public-content hub crawl\", \"result_count\": 4, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ιωάννης Καψής\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"The National Archives Public Content\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 38118, \"response_sha256\": \"ef27c6f4c9c271636a2464120a642dcbf780ae04ddc903ab71c01cd6e4272b04\", \"elapsed_ms\": 931}, {\"url\": \"https://www.nationalarchives.gov.uk/education/sessions-and-resources/?time-period=early-modern\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 410, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_410\", \"elapsed_ms\": 466}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 72672, \"response_sha256\": \"4d5972c3edee43fc5b8b4d6a0510152e217cd1508e306039f1f3e4dce7df4dfc\", \"elapsed_ms\": 978}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 72672, \"response_sha256\": \"4d5972c3edee43fc5b8b4d6a0510152e217cd1508e306039f1f3e4dce7df4dfc\", \"elapsed_ms\": 262}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64632, \"response_sha256\": \"7a2fd19cd45b0e5836c4edb3600cd93c0a49e1b33c0e6f0afc80d6df827f13ea\", \"elapsed_ms\": 1287}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64632, \"response_sha256\": \"7a2fd19cd45b0e5836c4edb3600cd93c0a49e1b33c0e6f0afc80d6df827f13ea\", \"elapsed_ms\": 165}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64745, \"response_sha256\": \"93160217b6dc9742b7a50d8ddea21257235498ad6e1c12836a349caf07dd95a8\", \"elapsed_ms\": 1311}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64745, \"response_sha256\": \"93160217b6dc9742b7a50d8ddea21257235498ad6e1c12836a349caf07dd95a8\", \"elapsed_ms\": 258}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64872, \"response_sha256\": \"788098626d9dc4a5b80f028ae2b85daa4f2ce0dc67a6f45c1f7e4b19679536d3\", \"elapsed_ms\": 148}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64872, \"response_sha256\": \"6ad467550b4550b480c3b52ef8d3d88e539e561b1b6ea8b05e4170fe7cf61bf8\", \"elapsed_ms\": 287}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64813, \"response_sha256\": \"820eb4cf7af8577695a460fe910abb597af1e680e601ba7d0e93e4963e91a122\", \"elapsed_ms\": 1041}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64813, \"response_sha256\": \"820eb4cf7af8577695a460fe910abb597af1e680e601ba7d0e93e4963e91a122\", \"elapsed_ms\": 111}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64280, \"response_sha256\": \"b479c4828070ecde1e49526577ae11fb4d96c83ef1b367ea0b909c3425526b7e\", \"elapsed_ms\": 1102}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64280, \"response_sha256\": \"b479c4828070ecde1e49526577ae11fb4d96c83ef1b367ea0b909c3425526b7e\", \"elapsed_ms\": 1019}], \"detail\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22 ; bounded public-content hub crawl\", \"result_count\": 4, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ioannis Kapsis\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"The National Archives Public Content\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Ioannis+Kapsis%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Ioannis+Kapsis%22\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 38096, \"response_sha256\": \"bc74757a0a7e234b47bbd17aff9161416849b5729dee250c92d544ef8c2442d9\", \"elapsed_ms\": 689}, {\"url\": \"https://www.nationalarchives.gov.uk/education/sessions-and-resources/?time-period=early-modern\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 410, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_410\", \"elapsed_ms\": 612}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 72672, \"response_sha256\": \"4d5972c3edee43fc5b8b4d6a0510152e217cd1508e306039f1f3e4dce7df4dfc\", \"elapsed_ms\": 248}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 72672, \"response_sha256\": \"4d5972c3edee43fc5b8b4d6a0510152e217cd1508e306039f1f3e4dce7df4dfc\", \"elapsed_ms\": 167}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64632, \"response_sha256\": \"7a2fd19cd45b0e5836c4edb3600cd93c0a49e1b33c0e6f0afc80d6df827f13ea\", \"elapsed_ms\": 910}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64632, \"response_sha256\": \"7a2fd19cd45b0e5836c4edb3600cd93c0a49e1b33c0e6f0afc80d6df827f13ea\", \"elapsed_ms\": 95}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64745, \"response_sha256\": \"dca902cf35d5fc5f7806c33ac1c67fd585649c6d7a0599aa996200fe66477ca1\", \"elapsed_ms\": 1230}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64745, \"response_sha256\": \"dca902cf35d5fc5f7806c33ac1c67fd585649c6d7a0599aa996200fe66477ca1\", \"elapsed_ms\": 127}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64872, \"response_sha256\": \"788098626d9dc4a5b80f028ae2b85daa4f2ce0dc67a6f45c1f7e4b19679536d3\", \"elapsed_ms\": 860}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64872, \"response_sha256\": \"788098626d9dc4a5b80f028ae2b85daa4f2ce0dc67a6f45c1f7e4b19679536d3\", \"elapsed_ms\": 96}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64813, \"response_sha256\": \"a0a16f5f01ecba755d18e11d9f568b7bc4309f84adfb97b7626f35dc4a94dad9\", \"elapsed_ms\": 891}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64813, \"response_sha256\": \"a0a16f5f01ecba755d18e11d9f568b7bc4309f84adfb97b7626f35dc4a94dad9\", \"elapsed_ms\": 104}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64280, \"response_sha256\": \"ec2d0a88f0534d1689cbc975b1325ea3294bdb50c8d0e6b6869444b4b20c1725\", \"elapsed_ms\": 975}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64280, \"response_sha256\": \"ec2d0a88f0534d1689cbc975b1325ea3294bdb50c8d0e6b6869444b4b20c1725\", \"elapsed_ms\": 156}], \"detail\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Ioannis+Kapsis%22 ; bounded public-content hub crawl\", \"result_count\": 4, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Capsi\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "research guide",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"The National Archives Public Content\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Jean+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Jean+Capsi%22\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 38088, \"response_sha256\": \"2aa627e16125398eb7aa18799ed5ed5f1b755b121853cccfa481ff329bafdc58\", \"elapsed_ms\": 600}, {\"url\": \"https://www.nationalarchives.gov.uk/education/sessions-and-resources/?time-period=early-modern\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 410, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_410\", \"elapsed_ms\": 697}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 72672, \"response_sha256\": \"4d5972c3edee43fc5b8b4d6a0510152e217cd1508e306039f1f3e4dce7df4dfc\", \"elapsed_ms\": 250}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 72672, \"response_sha256\": \"4d5972c3edee43fc5b8b4d6a0510152e217cd1508e306039f1f3e4dce7df4dfc\", \"elapsed_ms\": 249}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64632, \"response_sha256\": \"7a2fd19cd45b0e5836c4edb3600cd93c0a49e1b33c0e6f0afc80d6df827f13ea\", \"elapsed_ms\": 1354}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64632, \"response_sha256\": \"7a2fd19cd45b0e5836c4edb3600cd93c0a49e1b33c0e6f0afc80d6df827f13ea\", \"elapsed_ms\": 180}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64745, \"response_sha256\": \"93160217b6dc9742b7a50d8ddea21257235498ad6e1c12836a349caf07dd95a8\", \"elapsed_ms\": 1237}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64745, \"response_sha256\": \"93160217b6dc9742b7a50d8ddea21257235498ad6e1c12836a349caf07dd95a8\", \"elapsed_ms\": 253}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64872, \"response_sha256\": \"788098626d9dc4a5b80f028ae2b85daa4f2ce0dc67a6f45c1f7e4b19679536d3\", \"elapsed_ms\": 182}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64872, \"response_sha256\": \"6ad467550b4550b480c3b52ef8d3d88e539e561b1b6ea8b05e4170fe7cf61bf8\", \"elapsed_ms\": 264}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64813, \"response_sha256\": \"820eb4cf7af8577695a460fe910abb597af1e680e601ba7d0e93e4963e91a122\", \"elapsed_ms\": 1110}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64813, \"response_sha256\": \"820eb4cf7af8577695a460fe910abb597af1e680e601ba7d0e93e4963e91a122\", \"elapsed_ms\": 93}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64280, \"response_sha256\": \"b479c4828070ecde1e49526577ae11fb4d96c83ef1b367ea0b909c3425526b7e\", \"elapsed_ms\": 1313}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 64280, \"response_sha256\": \"b479c4828070ecde1e49526577ae11fb4d96c83ef1b367ea0b909c3425526b7e\", \"elapsed_ms\": 782}], \"detail\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Jean+Capsi%22 ; bounded public-content hub crawl\", \"result_count\": 4, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "39849354344",
+    "agent_id": "relationship_network",
+    "source_leads": [
+      {
+        "id": "lead_ba7405b0473251e6e729d8d9",
+        "run_id": "39849354344",
+        "agent_id": "relationship_network",
+        "connector_id": "repo:The National Archives Public Content",
+        "source_url_or_identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+        "title": "Help using the archive",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7f3ee81d6111e5fcd9c3a721",
+        "run_id": "39849354344",
+        "agent_id": "relationship_network",
+        "connector_id": "repo:The National Archives Public Content",
+        "source_url_or_identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+        "title": "Family history",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4329ea42cd24caa47f12d60b",
+        "run_id": "39849354344",
+        "agent_id": "relationship_network",
+        "connector_id": "repo:The National Archives Public Content",
+        "source_url_or_identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+        "title": "Help with your research",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8c461cf353e374e9ff19c8d9",
+        "run_id": "39849354344",
+        "agent_id": "relationship_network",
+        "connector_id": "repo:The National Archives Public Content",
+        "source_url_or_identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+        "title": "First World War",
+        "query": "\"Jean Capsis\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0b2f67a9369019d699152df3",
+        "run_id": "39849354344",
+        "agent_id": "relationship_network",
+        "connector_id": "repo:The National Archives Public Content",
+        "source_url_or_identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+        "title": "research guide",
+        "query": "\"Jean Capsi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      }
+    ],
+    "connector_errors": [],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 20,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
