@@ -710,6 +710,8 @@ class PassageTriage(unittest.TestCase):
         ranked, report = triage(rows, ['Jean Capsi'])
         signal = {p['evidence_id']: p['identity_signal'] for p in report['passages']}
         self.assertEqual(signal, {'named': 2, 'next-page': 1, 'flagged': 1, 'earlier-page': 0, 'other-book': 0})
+        block = self.row('page-block', self.WORDS, 1698, doc='z', flags=['SECTION_CONTINUATION_PAGE_BLOCK'])
+        self.assertEqual(triage([block], ['Jean Capsi'])[1]['passages'][0]['identity_signal'], 1)
         self.assertEqual([r['evidence_id'] for r in ranked][:3], ['named', 'next-page', 'flagged'])
 
     def test_ocr_quality_breaks_ties_and_stable_order_otherwise(self):

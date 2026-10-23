@@ -18,7 +18,7 @@ from research_topics import normalized
 
 POLICY = 'deterministic-name-early-ocr-triage-v1'
 EARLY_BEFORE = 1800
-CONTINUATION_FLAGS = {'SURNAME_FROM_ADJACENT_NAMED_PAGE'}
+CONTINUATION_FLAGS = {'SURNAME_FROM_ADJACENT_NAMED_PAGE', 'SECTION_CONTINUATION_PAGE_BLOCK'}
 GREEK = r'[\u0370-\u03ff\u1f00-\u1fff]'
 
 
