@@ -109,6 +109,16 @@ class RelevanceFilter(unittest.TestCase):
         self.assertEqual(res['status'], CONTEXTUAL)
         self.assertIn('SAME_PASSAGE_NAMES_SUBJECT', res['reasons'])
 
+    def test_manetas_bays_on_ikaria_or_fournoi_are_in_topic_region(self):
+        # 39304936293/semantic_reanalysis_39372264436, c-0ecde140d07aa9e67f96. Ikaria (Q209576) and the
+        # Fournoi islands (Q608379) are SOURCED Wikidata gazetteer entries.
+        claim = {'claim_id': 'c-0ecde140d07aa9e67f96', 'statement': 'Local traditions suggest that the murder took place '
+                 'either in Ikaria or Phournoi, specifically in the bays of Pano and Kato Maneta.'}
+        res = classify_claim(claim, subject_profile(TOPIC_REQUEST, 'topic'))
+        self.assertEqual(res['status'], CONTEXTUAL)
+        self.assertEqual([p['place_id'] for p in res['evidence']['region_places']], ['gz:Q209576'])
+        self.assertEqual([m['place_ids'] for m in resolve('Nicaria e Furni')], [['gz:Q209576'], ['gz:Q608379']])
+
     def test_azov_is_held_for_topic_question(self):
         self.assertEqual(classify_claim(AZOV, subject_profile(TOPIC_REQUEST, 'topic'))['status'], OFF_TOPIC)
 
