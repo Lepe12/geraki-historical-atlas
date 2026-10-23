@@ -33,6 +33,7 @@ SEEDS = {
     'Patras': [USER], 'İzmir': [USER], 'Alexandria': [USER], 'Venice': [USER], 'Toulon': [EVIDENCE],
     'Bizerte': [CORSAIR_SEED], 'Djerba': [USER], 'Samos': [USER], 'Lesbos': [USER], 'Kos': [USER], 'Patmos': [USER],
     'elwiki:Μύτικας Αιτωλοακαρνανίας': [EVIDENCE], 'elwiki:Κεφαλονιά': [USER],
+    'Ikaria': [EVIDENCE, USER], 'Fournoi Korseon': [EVIDENCE, USER],
 }
 # Names the user listed. Each is kept only if the cited entity carries it;
 # otherwise it is recorded as UNSOURCED and never used for matching.
