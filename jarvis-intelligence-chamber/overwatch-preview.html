@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="el"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NABOU//X — OVERWATCH Intelligence Preview</title>
+<style>
+:root{color-scheme:dark;--bg:#060b10;--line:#203645;--text:#c9d9e3;--muted:#72909f;--cyan:#58c8d6;--panel:#0a131beF}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:13px "Segoe UI",Arial,sans-serif}
+header{position:absolute;z-index:3;inset:0 0 auto;height:58px;display:flex;align-items:center;gap:20px;padding:0 20px;background:#08121bf5;border-bottom:1px solid var(--line)}
+.logo{font-size:18px;font-weight:800;letter-spacing:.2em}.logo b{color:var(--cyan)}.kicker{color:var(--muted);font-size:10px;letter-spacing:.25em}.status{margin-left:auto;color:#89e0ad;font-size:11px;letter-spacing:.13em}
+main{height:100%;padding-top:58px;display:grid;grid-template-columns:220px 1fr 300px}
+nav,aside{background:var(--panel);border-right:1px solid var(--line);z-index:1;padding:18px;overflow:auto}aside{border-left:1px solid var(--line);border-right:0}
+nav h2,aside h2{font-size:11px;color:var(--cyan);letter-spacing:.24em;font-weight:700;margin:12px 0 20px}
+button{font:inherit;cursor:pointer;color:var(--text);display:block;width:100%;text-align:left;background:transparent;border:1px solid transparent;border-left:2px solid transparent;padding:13px;margin:3px 0}
+button:hover,button:focus-visible{background:#10232e;border-left-color:var(--cyan);outline:0}
+.small{font-size:11px;color:var(--muted);letter-spacing:.1em}.section{border-top:1px solid var(--line);padding:17px 0}
+.stage{position:relative;min-width:0;background:#02070b}
+iframe{border:0;width:100%;height:100%;display:block}
+.stage .tag{position:absolute;top:16px;left:18px;background:#071019d9;border:1px solid var(--line);padding:10px 14px;pointer-events:none;font-size:11px;letter-spacing:.18em;color:var(--cyan)}
+.warn{position:absolute;bottom:14px;left:18px;right:18px;padding:10px 12px;color:#b5c5ca;background:#08131bef;border:1px solid var(--line);font-size:11px;pointer-events:none}
+a{color:#86d5e2}.metric{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #1d303b}.metric strong{color:#d5e9f3}
+@media(max-width:900px){main{grid-template-columns:66px 1fr}nav{padding:8px}nav h2,nav .small,aside{display:none}button{font-size:10px;padding:9px 4px}.logo{font-size:13px}header{gap:8px;padding:0 10px}.status{font-size:9px}}
+</style></head>
+<body><header><div class="logo">NABOU<b>//X</b></div><div class="kicker">INTELLIGENCE OPERATIONS / OVERWATCH-INSPIRED SHELL</div><div class="status">● RESEARCH WORKSPACE</div></header>
+<main><nav><h2>OPERATIONS</h2>
+<button data-target="workspaceWelcome">◈ &nbsp; COMMAND CENTER</button>
+<button data-target="nxsAgentsPage">◎ &nbsp; RESEARCH AGENTS</button>
+<button data-target="resultsDrawer">▤ &nbsp; INTELLIGENCE DOSSIERS</button>
+<button data-target="learningDrawer">▧ &nbsp; DOCUMENT ANALYSIS</button>
+<div class="section small">NABOU//X / RESEARCH SYSTEM<br><br>Original live 3D and research logic remain inside the embedded chamber.</div>
+<a href="./index.html">Open original chamber ↗</a></nav>
+<div class="stage"><iframe id="chamber" src="./index.html" title="Original NABOU 3D research chamber"></iframe><div class="tag">MEDITERRANEAN INTELLIGENCE THEATER</div><div class="warn">UI prototype: opens the existing chamber in a frame. Navigation uses its current DOM anchors where available; this is not a verified production integration.</div></div>
+<aside><h2>INTELLIGENCE / CONTROL</h2>
+<div class="metric"><span>INTERFACE</span><strong>PROTOTYPE</strong></div>
+<div class="metric"><span>MAP</span><strong>ORIGINAL 3D</strong></div>
+<div class="metric"><span>DATA</span><strong>EXISTING NABOU</strong></div>
+<div class="metric"><span>DEPLOYMENT</span><strong>NOT LIVE</strong></div>
+<div class="section small">Inspired by the OVERWATCH design approach. No Overwatch map or backend replaces NABOU's existing systems.</div>
+<div class="section"><a href="https://github.com/Deegan4/overwatch" rel="noopener noreferrer" target="_blank">OVERWATCH source (MIT) ↗</a></div>
+</aside></main>
+<script>
+document.querySelectorAll('[data-target]').forEach(b=>b.addEventListener('click',()=>{
+ const w=document.getElementById('chamber').contentWindow;
+ try{
+ const doc=w.document,el=doc.getElementById(b.dataset.target);
+ if(!el){alert('This panel is not exposed in the current chamber.');return}
+ const id=b.dataset.target;
+ if(id==='nxsAgentsPage'){doc.getElementById('nxsCloseAgents')?.click();el.classList.remove('hidden');el.setAttribute('aria-hidden','false')}
+ else if(id==='resultsDrawer'){doc.getElementById('resultsToggle')?.click()}
+ else if(id==='learningDrawer'){doc.getElementById('learningToggle')?.click()}
+ else{doc.getElementById('nxsCloseAgents')?.click();doc.getElementById('closeResults')?.click()}
+ }catch(e){alert('The chamber could not be controlled from this preview.')}
+}));
+</script></body></html>
