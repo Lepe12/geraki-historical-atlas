@@ -1,0 +1,26 @@
+name: OVERWATCH build verification
+on:
+  pull_request:
+    paths:
+      - 'overwatch-original/**'
+      - '.github/workflows/overwatch-build.yml'
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: overwatch-original
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: overwatch-original/package-lock.json
+      - name: Install upstream dependencies
+        run: npm ci
+      - name: Build original OVERWATCH
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+        run: npm run build
