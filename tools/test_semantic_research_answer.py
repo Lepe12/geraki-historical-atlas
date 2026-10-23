@@ -669,6 +669,95 @@ class SemanticAnswer(unittest.TestCase):
             out=call('synthesis','test')
             self.assertEqual(out['error'],'RuntimeError');self.assertNotIn('test-secret',json.dumps(out))
 
+
+class NamesakeGuard(unittest.TestCase):
+    """Record linkage (namesake_guard): >=2 independent attributes and no deal-breaker."""
+    # Verbatim fields of the stored request and OCR passages of run 39902909088.
+    REQUEST = {'target': 'Ιωάννης Καψής', 'aliases': ['Ioannis Kapsis', 'Jean Capsis', 'Jean Capsi', 'Giovanni Capsi'],
+               'date_range': '1600-1700',
+               'purpose': 'Έλεγξε με πραγματικές πηγές την ιστορική ταυτότητα του Ιωάννη Καψή και την αναφορά σε βασιλιά της Μήλου.'}
+    MP = ('α) Ο βουλευτής Ιωάννης Καψής, Πρόεδρος της Ειδικής Κοινοβουλευτικής Επιτροπής Θεσμών και Διαφάνειας, '
+          'β) Ο Χρήστος Πολυζωγόπουλος. ως εκπρόσωπος της Γ.Σ.Ε.Ε.')
+    SAULGER = ("JEAN CAPSI. E troifiéme Aventurier fut Jean A Capfi; c'éroit un Grec de Milo, qui fçavoit tres bien "
+               "la mer , & qui avoit été long-tems pilote far les ναί < feaux du Roi; homme; au refte")
+    DIADROMI = ('Η Μήλος εν µέσω οθωμανικής κυριαρχίας, το 1677 απέ- κτησε πειρατή βασιλιά! Ο Ιωάννης Κάψης µε τα '
+                'αδέρφια του Τροµάρα και Νίκο εξορμούσαν µε δύο γαλέρες')
+    MAYNARD_A = ("Les corsaires chrétiens, qui tenaient les mers du Le- vant et y faisaient une guerre incessante aux Turcs, "
+                 "se donnaient rendez-vous à Milo. L'un d'eux, Jean Capsi, se rendit maître de l'ile entière.")
+    MAYNARD_B = ("Un capitan-pacha, sous prétexte de traiter de la paix, l'attira dans sa galère, et le conduisit, chargé "
+                 "de chaînes, à Constantinople. Quelques jours après, on pendait sire Jean Capsi à la porte du bagne.")
+    GAZETTE = 'ΙΩΑΝΝΗΣ ΚΑΨΗΣ'
+    NAME_LIST = ('Ασσυχίδου Ελισσάβετ του Κυριάκου Γιωτοπούλου Αθανασία του Σωτηρίου - Παντελή Ηλιοπούλου '
+                 'Βενετία του Ιωάννη Καψής Ιωάννης του Παναγιώτη Μπακογιάννη Αικατερίνη του Δημητρίου')
+
+    def row(self, eid, text, year=None, title='t'):
+        return {'evidence_id': eid, 'text': text, 'years_in_scope': [], 'uncertainties': [],
+                'source_bibliography': {'date': [str(year)] if year else []},
+                'occurrences': [{'title': title, 'locator': {'start_char': 0}, 'page_boundaries': []}]}
+
+    def rows(self):
+        return [self.row('mp', self.MP, 1999, 'Greek Government Gazette 1999'),
+                self.row('saulger', self.SAULGER, 1698, 'Saulger, Histoire nouvelle'),
+                self.row('diadromi', self.DIADROMI, None, 'Διαδρομή Ελευθερίας 174'),
+                self.row('maynard-a', self.MAYNARD_A, 1855, 'Impressions de voyage'),
+                self.row('maynard-b', self.MAYNARD_B, 1855, 'Impressions de voyage'),
+                self.row('gazette', self.GAZETTE, 1987, 'Greek Government Gazette 1987'),
+                self.row('name-list', self.NAME_LIST, 1995, 'Greek Government Gazette 1995'),
+                self.row('unnamed', 'Le Capitan Bacha crut qu il falloit ufer d artifice.', 1698, 'Saulger, Histoire nouvelle')]
+
+    def test_classification_records_attributes_and_deal_breakers(self):
+        from namesake_guard import classify
+        rows = self.rows(); before = json.dumps(rows, sort_keys=True)
+        out, report = classify(rows, self.REQUEST)
+        self.assertEqual(json.dumps(rows, sort_keys=True), before)
+        self.assertTrue(report['enforced'])
+        status = {k: v['status'] for k, v in out.items()}
+        self.assertEqual(status['mp'], 'DIFFERENT_PERSON')
+        self.assertEqual(out['mp']['deal_breakers'][0]['deal_breaker'], 'CONFLICTING_MODERN_OFFICE')
+        for eid in ('saulger', 'diadromi', 'maynard-a', 'maynard-b'):
+            self.assertEqual(status[eid], 'LINKED', eid)
+            self.assertGreaterEqual(len(out[eid]['attribute_types_matched']), 2)
+        self.assertEqual({m['attribute'] for m in out['saulger']['matched_attributes']}, {'place', 'role', 'source_date'})
+        self.assertEqual({m['attribute'] for m in out['diadromi']['matched_attributes']}, {'role', 'date'})
+        # The bagne passage names no place or role; they come from the same work, and say so.
+        self.assertEqual({m['scope'] for m in out['maynard-b']['matched_attributes']}, {'same_document'})
+        self.assertEqual(status['gazette'], 'POSSIBLE'); self.assertEqual(out['gazette']['matched_attributes'], [])
+        self.assertEqual(status['name-list'], 'POSSIBLE')
+        self.assertEqual(status['unnamed'], 'NO_TARGET_NAME_IN_PASSAGE')
+        # Attributes come only from the request: no kin is checked unless supplied.
+        self.assertNotIn('kin', report['profile']['attributes'])
+
+    def test_date_far_outside_lifetime_is_a_deal_breaker(self):
+        from namesake_guard import classify
+        out, _ = classify([self.row('late', 'Ο Ιωάννης Καψής στη Μήλο το 1999.', None, 'x')], self.REQUEST)
+        self.assertEqual(out['late']['status'], 'DIFFERENT_PERSON')
+        self.assertEqual(out['late']['deal_breakers'][0]['deal_breaker'], 'DATE_FAR_OUTSIDE_LIFETIME')
+
+    def test_thin_profile_only_applies_deal_breakers(self):
+        from namesake_guard import classify
+        request = {k: v for k, v in self.REQUEST.items() if k != 'purpose'}
+        out, report = classify(self.rows(), request)
+        self.assertFalse(report['enforced'])
+        self.assertEqual(out['gazette']['status'], 'NOT_ENFORCED_PROFILE_TOO_THIN')
+        self.assertEqual(out['mp']['status'], 'DIFFERENT_PERSON')
+
+    def test_only_linked_mentions_support_claims(self):
+        from namesake_guard import classify
+        rows = self.rows(); linkage, _ = classify(rows, self.REQUEST)
+        def claim(eid, quote, actor):
+            return item(eid, quote=quote, statement='Η πηγή αναφέρει τον ' + actor + '.', actors=[actor], places=[], dates=[])
+        cases = [('mp', self.MP, 'Ιωάννης Καψής'), ('name-list', self.NAME_LIST, 'Καψής Ιωάννης'),
+                 ('maynard-a', self.MAYNARD_A, 'Jean Capsi')]
+        results = {eid: validate_items({'items': [claim(eid, q, a)]}, rows, 'person', (1600, 1700),
+                                       ['Ιωάννης Καψής', 'Jean Capsi'], linkage) for eid, q, a in cases}
+        self.assertEqual(results['mp'][1][0]['reason'], 'NAMESAKE_DIFFERENT_PERSON')
+        self.assertEqual(results['name-list'][1][0]['reason'], 'IDENTITY_LINKAGE_ONLY_POSSIBLE')
+        self.assertEqual(results['name-list'][1][0]['identity_linkage']['status'], 'POSSIBLE')
+        accepted = results['maynard-a'][0]
+        self.assertEqual(len(accepted), 1); self.assertEqual(accepted[0]['identity_linkage']['status'], 'LINKED')
+        # Without linkage (old callers) the MP claim is not affected by the guard.
+        self.assertTrue(validate_items({'items': [claim(*cases[0])]}, rows, 'person')[0])
+
 if __name__=='__main__':unittest.main()
 
 
