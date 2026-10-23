@@ -445,12 +445,56 @@ def valid_synthesis(answer,supported):
                     all(isinstance(cid,str) and cid in supported for cid in s['claim_ids']) for s in sections)
             and all(isinstance(answer.get(k,[]),list) and all(isinstance(v,str) for v in answer.get(k,[])) for k in ('unknowns','limitations')))
 
-def validate_items(payload, records, question_kind=None, requested_range=None):
+def _page_of(row, offset):
+    """Scan index holding excerpt offset in EVERY occurrence, or None."""
+    pages=set()
+    for occ in row.get('occurrences') or []:
+        base=(occ.get('locator') or {}).get('start_char')
+        bounds=occ.get('page_boundaries') or []
+        if type(base) is not int or not bounds:return None
+        hit=[b.get('scan_index_0_based') for b in bounds if b.get('start_char',-1)<=base+offset<b.get('end_char',-1)]
+        if len(hit)!=1 or hit[0] is None:return None
+        pages.add(hit[0])
+    return pages.pop() if len(pages)==1 else None
+
+PERSON_PAIR=re.compile(r'(?<![\w])[A-ZÀ-ÞΑ-Ω][a-zß-ÿα-ωά-ώ]+[ \t]+[A-ZÀ-ÞΑ-Ω][a-zß-ÿα-ωά-ώ]+(?![\w])')
+
+def same_passage_identity_anchor(value, row, parts, ids, target_names):
+    """Identity for a sub-passage that omits the target name.
+
+    Only the requested target name (or its bounded long-s OCR form) printed
+    verbatim in the passage immediately before the selection, on the same
+    page as the whole selection, and with no other personal name in that
+    window. The claim quote itself is unchanged.
+    """
+    if not target_names or ids[0]==0:return None
+    names={' '.join(unicodedata.normalize('NFKD',n).casefold().split()) for n in target_names if isinstance(n,str) and n.strip()}
+    if ' '.join(unicodedata.normalize('NFKD',value).casefold().split()) not in names:return None
+    start=parts[ids[0]-1]['start_char'];end=parts[ids[-1]]['end_char'];window=row['text'][start:end]
+    anchor=None
+    for form,method in ((value,'LITERAL'),(long_s_variant(value),'OCR_LONG_S_VARIANT')):
+        surface=literal_entity_surface(form,window) if form else None
+        if surface:
+            at=window.find(surface)
+            if at>=0:anchor=(surface,start+at,method);break
+    if not anchor:return None
+    page=_page_of(row,anchor[1])
+    if page is None or any(_page_of(row,o)!=page for o in (parts[ids[0]]['start_char'],end-1)):return None
+    rest=window
+    for name in target_names:
+        for form in (name,long_s_variant(name)):
+            surface=literal_entity_surface(form,rest) if form else None
+            while surface and surface in rest:rest=rest.replace(surface,' ')
+    if PERSON_PAIR.search(rest):return None
+    return {'anchor_quote':anchor[0],'anchor_offset_in_excerpt':anchor[1],'scan_index_0_based':page,
+            'method':anchor[2],'scope':'PRECEDING_PASSAGE_SAME_PAGE'}
+
+def validate_items(payload, records, question_kind=None, requested_range=None, target_names=None):
     lookup={r['evidence_id']:r for r in records};accepted=[];rejected=[]
     values=payload.get('items') if isinstance(payload,dict) else None
     if not isinstance(values,list):return [],[{'reason':'INVALID_EXTRACTION_SCHEMA'}]
     for item in values[:50]:
-        selected_start=None
+        selected_start=None;selected_ids=None;anchors=[]
         eid=item.get('evidence_id') if isinstance(item,dict) else None
         row=lookup.get(eid) if isinstance(eid,str) else None
         quote=item.get('quote') if isinstance(item,dict) else None
@@ -462,7 +506,7 @@ def validate_items(payload, records, question_kind=None, requested_range=None):
                 ids!=list(range(ids[0],ids[-1]+1))):
                 rejected.append({'reason':'INVALID_PASSAGE_SELECTION'});continue
             replay=row['text'][parts[ids[0]]['start_char']:parts[ids[-1]]['end_char']]
-            selected_start=parts[ids[0]]['start_char']
+            selected_start=parts[ids[0]]['start_char'];selected_ids=(parts,ids)
             if quote is not None and quote!=replay:
                 rejected.append({'reason':'GENERATED_QUOTE_CONFLICTS_WITH_PASSAGE'});continue
             quote=replay
@@ -518,12 +562,19 @@ def validate_items(payload, records, question_kind=None, requested_range=None):
                 # Same bounded variant as section extraction; flagged, never silent.
                 if surface is None and field in ('actors','places') and long_s_variant(v):
                     surface=literal_entity_surface(long_s_variant(v),quote);method='OCR_LONG_S_VARIANT'
+                if surface is None and field=='actors' and question_kind=='person' and selected_ids:
+                    anchor=same_passage_identity_anchor(v,row,*selected_ids,target_names)
+                    if anchor:surface=anchor['anchor_quote'];method='IDENTITY_FROM_SAME_PASSAGE_ANCHOR';anchors.append(anchor)
                 actual.append(surface);methods.append(method)
             if any(v is None for v in actual):bad=True;break
             surface_corrections.extend({'field':field,'proposed':v,'source_surface':a,
                 'method':m} for v,a,m in zip(vals,actual,methods) if v!=a)
             if 'OCR_LONG_S_VARIANT' in methods and 'OCR_LONG_S_NAME_VARIANT' not in field_issues:
                 field_issues.append('OCR_LONG_S_NAME_VARIANT')
+            if anchors and 'IDENTITY_FROM_SAME_PASSAGE_ANCHOR' not in field_issues:
+                field_issues.append('IDENTITY_FROM_SAME_PASSAGE_ANCHOR')
+                if any(a['method']=='OCR_LONG_S_VARIANT' for a in anchors) and 'OCR_LONG_S_NAME_VARIANT' not in field_issues:
+                    field_issues.append('OCR_LONG_S_NAME_VARIANT')
             if field=='dates' and any(int(y) not in row['years_in_scope'] for v in vals for y in re.findall(r'(?<!\d)(1\d{3}|20\d{2})(?!\d)',v)):bad=True;break
             entities[field]=actual
         if bad:
@@ -545,6 +596,7 @@ def validate_items(payload, records, question_kind=None, requested_range=None):
             'statement':statement,'kind':kind,'passage_kind':passage_kind,'evidence_id':row['evidence_id'],'quote':quote,
             'quote_offset_in_excerpt':start,**entities,'source_occurrences':quote_occurrences(row,start,quote),
             'entity_surface_corrections':surface_corrections,
+            **({'identity_anchors':anchors} if anchors else {}),
             'date_evidence':row.get('date_evidence'),'date_basis':row.get('date_basis'),
             'uncertainty':(item.get('uncertainty') if isinstance(item.get('uncertainty'),list) else [])+field_issues,
             'source_uncertainties':row['uncertainties'],'model_analysis':True,'verified':False,
@@ -678,6 +730,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
     # research acceptance contract already requires geographic findings for
     # every non-person request; apply the same requirement during extraction.
     if request and question_kind not in ('person','topic'):question_kind='place'
+    target_names=[n for n in [request.get('target',''),*request.get('aliases',[])] if isinstance(n,str) and n.strip()] if request else []
     requested_years=[int(y) for y in re.findall(r'\b(?:1\d{3}|20\d{2})\b',request.get('date_range',''))]
     requested_range=(min(requested_years),max(requested_years)) if requested_years else None
     # Each invocation advances a bounded number of NEW batches. Completed
@@ -838,7 +891,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
             receipt=queue.receipt(group)
             receipt['batch_path']=str(Path(receipt['batch_path']).resolve().relative_to(Path(provenance_root or run_root).resolve()))
             out.setdefault('continuation_replays',[]).append(receipt)
-        items,rejected=validate_items(payload or {},group,question_kind,requested_range)
+        items,rejected=validate_items(payload or {},group,question_kind,requested_range,target_names)
         out['rejected'].extend(rejected)
         if not items and isinstance(payload,dict) and payload.get('items') and rejected and not review_backlog:
             # A real source can be lost through malformed entity arrays or a
@@ -852,7 +905,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
             repair_prompt+='\nLiteral date search hints, NOT proof of an event date: '+json.dumps(hints[:8],ensure_ascii=False)+'\nSelect the appropriate narrative sentence if it supports the claim, or remove the unsupported date from BOTH statement and dates. A bibliographic or archival reference date alone does not date a narrated event.'
             repaired=invoke('evidence_extractor',repair_prompt,schema)
             payload=repaired
-            items,repair_rejections=validate_items(repaired or {},group,question_kind,requested_range)
+            items,repair_rejections=validate_items(repaired or {},group,question_kind,requested_range,target_names)
             out['rejected'].extend(repair_rejections)
         if isinstance(payload,dict) and isinstance(payload.get('items'),list):
             queue.save(group,payload)
