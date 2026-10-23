@@ -126,6 +126,21 @@ def decompose(target, aliases=(), purpose='', kind='unknown', regions=()):
             kind='person'
     if roles:
         kind='person'
+    # Remove a leading operator instruction only after the role/place split.
+    # The role and location remain search constraints, not historical assertions.
+    if kind == 'person':
+        command = re.match(
+            r'^(?:(?:βρες|ψαξε|αναζητησε)\s+(?:(?:μου|μας)\s+)?'
+            r'(?:(?:πληροφοριες|πηγες|τεκμηρια|στοιχεια)\s+)?'
+            r'(?:για\s+)?|(?:find|search)\s+(?:(?:sources|information)\s+)?'
+            r'(?:about\s+|for\s+)?)(?:(?:τον|την|το|the)\s+)?',
+            fold(person)
+        )
+        if command:
+            # Slice the original string by matching folded-character offsets.
+            folded_offsets = [i for i, c in enumerate(person) for _ in fold(c)]
+            if command.end() < len(folded_offsets):
+                person = person[folded_offsets[command.end()]:].strip()
     words=_words(person)
     # A bare two/three-word name is only a retrieval hypothesis. Avoid treating
     # arbitrary prose as a person. Explicit place/event types always win.
