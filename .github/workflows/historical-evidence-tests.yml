@@ -56,7 +56,7 @@ jobs:
       - name: PDF Learning HTTP integration tests
         run: node server/command-center-live/learning-integration-test.js
       - name: Actual acquired PDF reading order and constrained response protocols
-        run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=.:tools:tools/llm python3 -m unittest -v tools.test_acquired_analysis tools.test_source_acquisition_routes tools.test_research_response_schema tools.test_semantic_research_answer tools.test_claim_fidelity_guard tools.test_research_continuation
+        run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=.:tools:tools/llm python3 -m unittest -v tools.test_acquired_analysis tools.test_source_acquisition_routes tools.test_research_response_schema tools.test_semantic_research_answer tools.test_claim_fidelity_guard tools.test_relevance_filter tools.test_research_continuation
       - name: Actual image-only PDF OCR and bounding boxes
         run: |
           python3 -m pip install 'Pillow==12.0.0'

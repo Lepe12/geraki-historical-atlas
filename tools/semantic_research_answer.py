@@ -946,6 +946,11 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
     # undated action). Claims are only annotated; flagged ones never enter synthesis.
     from claim_fidelity_guard import apply as fidelity_apply, check_sections as fidelity_sections, FLAGGED as FIDELITY_FLAGGED
     out['claim_fidelity']=fidelity_apply(claims)
+    # Relevance filter (deterministic, model-free): a claim that names neither the
+    # subject, nor an in-scope place/period, nor the requested topic is kept but held
+    # out of synthesis; CONTEXTUAL claims are passed to synthesis labelled as context.
+    from relevance_filter import apply as relevance_apply, check_sections as relevance_sections, synthesis_label, OFF_TOPIC as RELEVANCE_OFF
+    out['relevance_filter']=relevance_apply(claims,request,question_kind,identity_linkage,{r['evidence_id']:r for r in selected})
     if out['coverage']['deferred']:
         # A bounded, reviewed answer can be useful while the full corpus remains
         # pending. Neither this flag nor a faithful quote clears coverage gates.
@@ -992,7 +997,8 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         out['status']='REVIEW_FAILED' if review['invalid_review_claim_ids'] else 'REVIEW_INCOMPLETE' if review['missing_claim_ids'] else 'NO_MODEL_SUPPORTED_CLAIMS'
         return out
     fidelity_held=[c['claim_id'] for c in claims if c['claim_id'] in supported and c.get('fidelity_status') in FIDELITY_FLAGGED]
-    all_synthesis_claims=[c for c in claims if c['claim_id'] in supported and c['claim_id'] not in fidelity_held]
+    relevance_held=[c['claim_id'] for c in claims if c['claim_id'] in supported and c['claim_id'] not in fidelity_held and c.get('relevance_status')==RELEVANCE_OFF]
+    all_synthesis_claims=[c for c in claims if c['claim_id'] in supported and c['claim_id'] not in fidelity_held and c['claim_id'] not in relevance_held]
     all_synthesis_claims.sort(key=lambda c:c['claim_id'] not in fresh_supported)
     synthesis_claims=[];summary_size=0
     for claim in all_synthesis_claims:
@@ -1003,14 +1009,17 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         'summary_input_claims':len(synthesis_claims),
         'omitted_from_summary_claim_ids':[c['claim_id'] for c in all_synthesis_claims if c not in synthesis_claims],
         'fidelity_held_claim_ids':fidelity_held,
+        'relevance_held_claim_ids':relevance_held,
         'rule':'BOUNDED_NARRATIVE_SUMMARY_ALL_REVIEWED_CLAIMS_RETAINED'}
     if fidelity_held:out['limitations'].append('CLAIM_FIDELITY_HELD_CLAIMS_EXCLUDED_FROM_SYNTHESIS')
+    if relevance_held:out['limitations'].append('OFF_TOPIC_CLAIMS_HELD_FROM_SYNTHESIS_BY_RELEVANCE_FILTER')
     if not synthesis_claims:out['status']='SYNTHESIS_CONTEXT_REQUIRES_REVIEW';return out
     supported={c['claim_id'] for c in synthesis_claims}
     synthesis_rules=RULES+'\nROLE: answer in concise English using ONLY supplied supported claims. Greek translation is a separate unvalidated step; do not translate into Greek here. Use one short paragraph per distinct finding, at most 4 paragraphs. Attribute every statement to the consulted source. The engine separately records that historical verification is pending. Copy personal and place names from the quotations without changing identity. The user supplied aliases are SEARCH HYPOTHESES, not evidence of a shared identity: a Latin namesake must not be equated with the requested Greek person. Preserve every conjecture as a conjecture. The question date range is a FILTER, not evidence that an undated event occurred then. Do not add dates, places, actions, ranks or relationships absent from the quoted evidence. Do not call repetitions independent. Return a JSON object with answer_sections, unknowns and limitations. Each answer section has text and claim_ids. Write a substantive finding naming its source-supported subject and action; do not output an introductory fragment, template text, ellipsis or placeholder. Fill unknowns and limitations with actual gaps, not example labels. Every paragraph must cite only its actual supporting claim IDs. QUESTION: '+question
     # Quarantined claims and their IDs must never become synthesis material.
     # The complete review remains in the durable answer/review receipts.
-    synthesis_context={'claims':[model_claim(c) for c in synthesis_claims]}
+    synthesis_context={'claims':[{**model_claim(c),'relevance':synthesis_label(c)} for c in synthesis_claims]}
+    synthesis_rules+=' A claim whose relevance is CONTEXT_ONLY_NOT_A_FACT_ABOUT_THE_SUBJECT is background: present it explicitly as context, never as a finding about the requested subject, and keep it in its own paragraph.'
     synthesis_rules+='\nDo not discuss rejected, absent or uncited claims, internal claim IDs, or review procedures in answer prose. Verification state is supplied separately by the engine; keep historical prose limited to the cited source attribution. Put research gaps in unknowns and limitations.'
     synthesis_rules+=' Unresolved identity establishes NEITHER that two name forms are the same person NOR that they are distinct individuals. Do not assert either relationship without a supported claim explicitly establishing it. Keep each paragraph to one short finding, at most35 words.'
     synthesis_rules+=' Do not pad the answer with gap paragraphs. Put every gap in unknowns or limitations. Do not repeat a date or century from a claim unless that temporal statement occurs in its actual quotation; leave dates supplied only by context unresolved in the answer prose.'
@@ -1070,6 +1079,19 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         out['limitations'].append('ANSWER_PARAGRAPHS_HELD_BY_CLAIM_FIDELITY_GUARD')
         if not sections:
             out['status']='CLAIM_FIDELITY_HELD';out['answer_sections']=[];return out
+    # Relevance of the accepted paragraphs: an OFF_TOPIC paragraph is moved (not
+    # deleted) to excluded_answer_sections; a CONTEXTUAL one is labelled as context.
+    out['answer_section_relevance']=relevance_sections(sections,claims,request,question_kind)
+    off={r['section_index'] for r in out['answer_section_relevance'] if r['status']==RELEVANCE_OFF}
+    for r in out['answer_section_relevance']:
+        sections[r['section_index']]={**sections[r['section_index']],'relevance_status':r['status']}
+    if off:
+        out.setdefault('excluded_answer_sections',[]).extend({'section_index':i,'section':sections[i],'reason':'RELEVANCE_OFF_TOPIC','relevance':r}
+                                                             for i,r in enumerate(out['answer_section_relevance']) if i in off)
+        sections=[x for i,x in enumerate(sections) if i not in off]
+        out['limitations'].append('ANSWER_PARAGRAPHS_HELD_BY_RELEVANCE_FILTER')
+        if not sections:
+            out['status']='RELEVANCE_HELD';out['answer_sections']=[];return out
     out.update(status='MODEL_ANSWER_PENDING_HUMAN_REVIEW',answer_sections=sections,
                unknowns=answer.get('unknowns',[]),model_limitations=answer.get('limitations',[]))
     return out
@@ -1085,6 +1107,7 @@ def render(out):
     claims={c['claim_id']:c for c in out['claims']}
     if out['answer_sections']:
         for section in out['answer_sections']:
+            if section.get('relevance_status')=='CONTEXTUAL':lines.append('_Πλαίσιο: δεν αφορά άμεσα το ζητούμενο θέμα· δεν είναι εύρημα για το ίδιο._')
             lines.append(section['text']);lines.append('')
             for cid in section['claim_ids']:
                 c=claims[cid];src=c['source_occurrences'][0];loc=src['locator']
