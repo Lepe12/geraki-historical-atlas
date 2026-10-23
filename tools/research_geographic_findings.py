@@ -5,6 +5,7 @@ def build(answer):
     supported=set((answer.get('review') or {}).get('supported_claim_ids',[]))
     flagged={r['claim_id'] for r in (answer.get('review') or {}).get('flagged_claims',[])}
     findings=[]
+    from place_resolver import resolve, base_label
     for claim in answer.get('claims',[]):
         if claim.get('claim_id') not in supported or claim['claim_id'] in flagged or geographic_claim_hold_reason(claim):
             continue
@@ -26,6 +27,10 @@ def build(answer):
                      'text_locator':s.get('locator'),
                      'mediated_archival_reference':s.get('reported_archival_reference')}
                     for s in claim.get('source_occurrences',[])],
+                # Identification aid from the sourced gazetteer; the fields
+                # above stay null because no source statement identifies them.
+                'gazetteer_link':next((m for m in resolve(place) if m['start']==0),None),
+                'base_label':base_label(claim,supported),
                 'excerpt':claim['quote'],'excerpt_type':'ACQUIRED_TEXT_NOT_ORIGINAL_INSPECTION',
                 'confidence':{'level':'Guessing','basis':'MODEL_REVIEWED_SOURCE_PASSAGE; HISTORICAL_IDENTITY_AND_BASE_USAGE_UNVERIFIED'},
                 'verification_status':'UNVERIFIED','verified':False,
