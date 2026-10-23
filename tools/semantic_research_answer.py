@@ -276,6 +276,31 @@ def quote_occurrences(row,start,quote):
         output.append({**source,'locator':locator,'context_locator':original})
     return output
 
+def demote_different_person(records,identity_linkage):
+    """Evidence ids the namesake guard classified DIFFERENT_PERSON (read last)."""
+    return {r['evidence_id'] for r in records
+            if ((identity_linkage or {}).get(r['evidence_id']) or {}).get('status')=='DIFFERENT_PERSON'}
+
+def plan_batches(records,namesake_ids,budget):
+    """Batches of readable passages first; DIFFERENT_PERSON passages in their own trailing batches."""
+    readable=[r for r in records if (r.get('parent_evidence_id') or r['evidence_id']) not in namesake_ids]
+    namesakes=[r for r in records if (r.get('parent_evidence_id') or r['evidence_id']) in namesake_ids]
+    groups,deferred=batches(readable,max_batches=len(readable)+1,budget=budget)
+    namesake_groups,namesake_deferred=batches(namesakes,max_batches=len(namesakes)+1,budget=budget)
+    return groups+namesake_groups,deferred+namesake_deferred,{id(g) for g in namesake_groups}
+
+def select_groups(groups,namesake_group_ids,batch_limit,completed):
+    """Completed batches replay free; new batches within the limit; the rest is recorded, never dropped."""
+    grouped=[];skipped=[];new_batches=0
+    for group in groups:
+        if completed(group) or new_batches<batch_limit:
+            grouped.append(group)
+            if not completed(group):new_batches+=1
+        else:
+            reason='NAMESAKE_DIFFERENT_PERSON_SKIPPED_FOR_BUDGET' if id(group) in namesake_group_ids else 'MODEL_CALL_BUDGET'
+            skipped.extend({'evidence_id':r['evidence_id'],'reason':reason} for r in group)
+    return grouped,skipped
+
 def fit_passages(records,budget):
     """Split oversized excerpts with exact source offsets and overlapping context."""
     output=[]
@@ -489,7 +514,125 @@ def same_passage_identity_anchor(value, row, parts, ids, target_names):
     return {'anchor_quote':anchor[0],'anchor_offset_in_excerpt':anchor[1],'scan_index_0_based':page,
             'method':anchor[2],'scope':'PRECEDING_PASSAGE_SAME_PAGE'}
 
-def validate_items(payload, records, question_kind=None, requested_range=None, target_names=None, identity_linkage=None):
+# Surname-only mention anchored by the full name earlier in the same work.
+# Rule SURNAME_WITH_SECTION_ANCHOR (conservative; this comment is the specification):
+#  * the proposed actor is exactly a requested target name (or its long-s OCR
+#    form) with a given name and a surname of >=4 letters;
+#  * the selected quote contains the surname (or its long-s form) as a whole
+#    word, or glued by OCR to ONE short common function word that follows it
+#    ("Capfiles" = "Capfi"+"les"); nothing else is accepted as run-together;
+#  * the full name is printed earlier in the same evidence row, or on a
+#    contiguous preceding page (at most SECTION_ANCHOR_MAX_PAGES back) of the
+#    same work (same title and same IIIF/document URL apart from the page
+#    number), and every page in between is available as whole-page text
+#    (at most SECTION_ANCHOR_EDGE_TOLERANCE unseen characters at a page edge);
+#  * in that whole span no other person bears the surname: every surname
+#    occurrence is preceded by the target's given name, a lower-case word or
+#    a listed article/title; any other capitalised word rejects the anchor.
+# Dates are not affected: a date must still be printed in the quote itself.
+SECTION_ANCHOR_MAX_PAGES=5
+# Page edges outside an excerpt (OCR trailing newline/form feed). Two
+# characters cannot hold another '<Given> <surname>' mention.
+SECTION_ANCHOR_EDGE_TOLERANCE=2
+RUN_TOGETHER_SUFFIXES=('les','le','la','de','des','du','et','en','il','ils','qui','que','au','aux','ne','se','sa','son','ses')
+SURNAME_PREFIX_WORDS={'le','la','les','de','du','des','sire','sieur','monsieur','seigneur','capitaine','capitan','captain','roi','roy','et','mais','que','a','à'}
+
+def _single_page(row):
+    """(document key, scan index, excerpt start, excerpt end, page start, page end) or None."""
+    keys=set()
+    for occ in row.get('occurrences') or []:
+        loc=occ.get('locator') or {};bounds=occ.get('page_boundaries') or []
+        scans=loc.get('scan_indexes_0_based') or [b.get('scan_index_0_based') for b in bounds]
+        if len(bounds)!=1 or len(scans)!=1 or type(scans[0]) is not int:return None
+        b=bounds[0];start,end=loc.get('start_char'),loc.get('end_char')
+        if not all(type(v) is int for v in (start,end,b.get('start_char'),b.get('end_char'))):return None
+        url=str(occ.get('url') or '');page=scans[0]
+        # The page number (scan or scan+1) is the only URL part allowed to differ.
+        doc=re.sub(r'(?<!\d)0*('+str(page)+'|'+str(page+1)+r')(?!\d)','#',url,count=1)
+        if doc==url:return None
+        keys.add((str(occ.get('title') or ''),doc,page,start,end,b['start_char'],b['end_char']))
+    if len(keys)!=1:return None
+    title,doc,page,start,end,pstart,pend=keys.pop()
+    return (title,doc),page,start,end,pstart,pend
+
+def _surname_hits(text,forms):
+    """Whole-word surname, or surname glued to one listed function word."""
+    hits=[]
+    for form in forms:
+        pattern=r'(?<![^\W\d_])('+re.escape(form)+r')((?:'+'|'.join(RUN_TOGETHER_SUFFIXES)+r')?)(?![^\W\d_])'
+        for m in re.finditer(pattern,text,re.I):hits.append((m.start(1),m.end(1),m.group(1),m.group(2) or None))
+    return sorted(set(hits))
+
+def _other_namesake(text,forms,given):
+    for start,_end,_surface,_suffix in _surname_hits(text,forms):
+        before=re.findall(r'[^\W\d_]+',text[max(0,start-40):start])
+        if not before:continue
+        word=before[-1]
+        if word.casefold() in given or word.casefold() in SURNAME_PREFIX_WORDS or not word[0].isupper():continue
+        return word
+    return None
+
+def section_surname_anchor(value, row, quote_start, quote, records, target_names):
+    from research_focus import long_s_variant as ls
+    if not target_names or not isinstance(value,str):return None
+    def key(v):return ' '.join(unicodedata.normalize('NFKD',v).casefold().split())
+    target=None
+    for name in target_names:
+        if isinstance(name,str) and key(value) in {key(name),key(ls(name) or name)}:target=name;break
+    if not target:return None
+    tokens=target.split()
+    if len(tokens)<2 or len(tokens[-1])<4:return None
+    surname=tokens[-1];forms=[surname]+([ls(surname)] if ls(surname) else [])
+    given={t.casefold() for t in tokens[:-1]}|{(ls(t) or t).casefold() for t in tokens[:-1]}
+    hits=_surname_hits(quote,forms)
+    if not hits:return None
+    here=_single_page(row)
+    if not here:return None
+    doc,page,start,end,pstart,pend=here
+    pages={}
+    for other in records or []:
+        info=_single_page(other)
+        if info and info[0]==doc:pages.setdefault(info[1],[]).append((other,info))
+    full=[f for f in (target,ls(target)) if f]
+    def find_full(text):
+        best=None
+        for form in full:
+            surface=literal_entity_surface(form,text)
+            if surface:
+                at=text.rfind(surface)
+                if at>=0 and (best is None or at>best[0]):best=(at,surface)
+        return best
+    span=[row['text'][:quote_start+len(quote)]]
+    found=find_full(row['text'][:quote_start]);anchor_row=row;anchor_page=page
+    if not found:
+        if start-pstart>SECTION_ANCHOR_EDGE_TOLERANCE:return None  # text before this excerpt on the page is unseen
+        for back in range(1,SECTION_ANCHOR_MAX_PAGES+1):
+            candidates=pages.get(page-back) or []
+            # whole-page rows only, so the namesake check sees the whole span
+            whole=[(r,i) for r,i in candidates if i[5]-i[3]<=SECTION_ANCHOR_EDGE_TOLERANCE]
+            if not whole:return None
+            anchor_row,info=max(whole,key=lambda x:x[1][3]-x[1][2])
+            found=find_full(anchor_row['text'])
+            if found:
+                anchor_page=page-back;span.insert(0,anchor_row['text'][found[0]:]);break
+            if info[2]-info[4]>SECTION_ANCHOR_EDGE_TOLERANCE:return None
+            span.insert(0,anchor_row['text'])
+        if not found:return None
+    else:
+        span=[row['text'][found[0]:quote_start+len(quote)]]
+    other=_other_namesake('\n'.join(span),forms,given)
+    if other:return None
+    hit=hits[0]
+    return {'method':'SURNAME_WITH_SECTION_ANCHOR','anchor_quote':found[1],
+            'anchor_evidence_id':anchor_row['evidence_id'],'anchor_offset_in_excerpt':found[0],
+            'anchor_scan_index_0_based':anchor_page,'scan_index_0_based':page,
+            'span_scan_indexes_0_based':list(range(anchor_page,page+1)),
+            'surname_surface':hit[2],'surname_offset_in_quote':hit[0],'run_together_suffix':hit[3],
+            'ocr_long_s_variant':hit[2].casefold()!=surname.casefold(),
+            'scope':'SAME_PASSAGE' if anchor_page==page and anchor_row is row else 'SAME_WORK_CONTIGUOUS_PRECEDING_PAGES',
+            'rule':'FULL_TARGET_NAME_EARLIER_IN_SAME_WORK_NO_OTHER_PERSON_WITH_SURNAME_IN_SPAN'}
+
+def validate_items(payload, records, question_kind=None, requested_range=None, target_names=None, identity_linkage=None, section_records=None):
     lookup={r['evidence_id']:r for r in records};accepted=[];rejected=[]
     values=payload.get('items') if isinstance(payload,dict) else None
     if not isinstance(values,list):return [],[{'reason':'INVALID_EXTRACTION_SCHEMA'}]
@@ -565,13 +708,21 @@ def validate_items(payload, records, question_kind=None, requested_range=None, t
                 if surface is None and field=='actors' and question_kind=='person' and selected_ids:
                     anchor=same_passage_identity_anchor(v,row,*selected_ids,target_names)
                     if anchor:surface=anchor['anchor_quote'];method='IDENTITY_FROM_SAME_PASSAGE_ANCHOR';anchors.append(anchor)
+                if surface is None and field=='actors' and question_kind=='person' and target_names:
+                    qstart=selected_start if selected_start is not None else row['text'].find(quote)
+                    anchor=section_surname_anchor(v,row,qstart,quote,section_records if section_records is not None else records,target_names)
+                    if anchor:surface=anchor['surname_surface'];method='SURNAME_WITH_SECTION_ANCHOR';anchors.append(anchor)
+                    if anchor and anchor['ocr_long_s_variant'] and 'OCR_LONG_S_NAME_VARIANT' not in field_issues:
+                        field_issues.append('OCR_LONG_S_NAME_VARIANT')
                 actual.append(surface);methods.append(method)
             if any(v is None for v in actual):bad=True;break
             surface_corrections.extend({'field':field,'proposed':v,'source_surface':a,
                 'method':m} for v,a,m in zip(vals,actual,methods) if v!=a)
             if 'OCR_LONG_S_VARIANT' in methods and 'OCR_LONG_S_NAME_VARIANT' not in field_issues:
                 field_issues.append('OCR_LONG_S_NAME_VARIANT')
-            if anchors and 'IDENTITY_FROM_SAME_PASSAGE_ANCHOR' not in field_issues:
+            if any(a.get('method')=='SURNAME_WITH_SECTION_ANCHOR' for a in anchors) and 'IDENTITY_FROM_SURNAME_WITH_SECTION_ANCHOR' not in field_issues:
+                field_issues.append('IDENTITY_FROM_SURNAME_WITH_SECTION_ANCHOR')
+            if any(a.get('method')!='SURNAME_WITH_SECTION_ANCHOR' for a in anchors) and 'IDENTITY_FROM_SAME_PASSAGE_ANCHOR' not in field_issues:
                 field_issues.append('IDENTITY_FROM_SAME_PASSAGE_ANCHOR')
                 if any(a['method']=='OCR_LONG_S_VARIANT' for a in anchors) and 'OCR_LONG_S_NAME_VARIANT' not in field_issues:
                     field_issues.append('OCR_LONG_S_NAME_VARIANT')
@@ -603,6 +754,7 @@ def validate_items(payload, records, question_kind=None, requested_range=None, t
             'quote_offset_in_excerpt':start,**entities,'source_occurrences':quote_occurrences(row,start,quote),
             'entity_surface_corrections':surface_corrections,
             **({'identity_anchors':anchors} if anchors else {}),
+            **({'identity_anchor':'SURNAME_WITH_SECTION_ANCHOR'} if any(a.get('method')=='SURNAME_WITH_SECTION_ANCHOR' for a in anchors) else {}),
             **({'identity_linkage':linkage} if linkage else {}),
             'date_evidence':row.get('date_evidence'),'date_basis':row.get('date_basis'),
             'uncertainty':(item.get('uncertainty') if isinstance(item.get('uncertainty'),list) else [])+field_issues,
@@ -758,11 +910,21 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         # are recorded per mention; records themselves are not modified.
         from namesake_guard import classify
         identity_linkage,linkage_report=classify(all_records,request)
+    # A passage the namesake guard marks DIFFERENT_PERSON cannot support a claim
+    # (validate_items rejects it), so it must not take a reading slot from the
+    # requested person. It is moved after every other passage and batched
+    # separately: read only when budget remains, otherwise recorded as skipped.
+    # Never deleted; it stays in the queue inventory and the coverage report.
+    namesake_ids=demote_different_person(all_records,identity_linkage)
+    if namesake_ids:
+        all_records=[r for r in all_records if r['evidence_id'] not in namesake_ids]+[r for r in all_records if r['evidence_id'] in namesake_ids]
+        if triage_report is not None:
+            triage_report['different_person_read_last']=[{'evidence_id':r['evidence_id'],'reason':'NAMESAKE_GUARD_DIFFERENT_PERSON_READ_LAST'}
+                                                         for r in all_records if r['evidence_id'] in namesake_ids]
     original_passage_count=len(all_records)
     model_budget=6500 if os.getenv('PCT_LLM_PROVIDER')=='local_llama_cpp' else 14000
     all_records=fit_passages(all_records,model_budget)
-    all_groups,deferred=batches(all_records,max_batches=len(all_records)+1,budget=model_budget)
-    grouped=[];new_batches=0
+    all_groups,deferred,namesake_group_ids=plan_batches(all_records,namesake_ids,model_budget)
     batch_limit=max(1,int(os.getenv('PCT_SEMANTIC_BATCHES','3')))
     from research_continuation import latest_analysis
     previous=latest_analysis(provenance_root or run_root)
@@ -772,12 +934,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         and previous[0].get('coverage',{}).get('claims_awaiting_review')
         and any(queue.completed(group) for group in all_groups))
     if review_backlog:batch_limit=0
-    for group in all_groups:
-        if queue.completed(group) or new_batches<batch_limit:
-            grouped.append(group)
-            if not queue.completed(group):new_batches+=1
-        else:
-            deferred.extend({'evidence_id':r['evidence_id'],'reason':'MODEL_CALL_BUDGET'} for r in group)
+    grouped,skipped=select_groups(all_groups,namesake_group_ids,batch_limit,queue.completed);deferred.extend(skipped)
     queue.inventory(all_records,grouped,deferred)
     selected=[r for b in grouped for r in b]
     from research_priority import selection_report
@@ -912,7 +1069,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
             receipt=queue.receipt(group)
             receipt['batch_path']=str(Path(receipt['batch_path']).resolve().relative_to(Path(provenance_root or run_root).resolve()))
             out.setdefault('continuation_replays',[]).append(receipt)
-        items,rejected=validate_items(payload or {},group,question_kind,requested_range,target_names,identity_linkage)
+        items,rejected=validate_items(payload or {},group,question_kind,requested_range,target_names,identity_linkage,section_records=all_records)
         out['rejected'].extend(rejected)
         if not items and isinstance(payload,dict) and payload.get('items') and rejected and not review_backlog:
             # A real source can be lost through malformed entity arrays or a
@@ -926,7 +1083,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
             repair_prompt+='\nLiteral date search hints, NOT proof of an event date: '+json.dumps(hints[:8],ensure_ascii=False)+'\nSelect the appropriate narrative sentence if it supports the claim, or remove the unsupported date from BOTH statement and dates. A bibliographic or archival reference date alone does not date a narrated event.'
             repaired=invoke('evidence_extractor',repair_prompt,schema)
             payload=repaired
-            items,repair_rejections=validate_items(repaired or {},group,question_kind,requested_range,target_names,identity_linkage)
+            items,repair_rejections=validate_items(repaired or {},group,question_kind,requested_range,target_names,identity_linkage,section_records=all_records)
             out['rejected'].extend(repair_rejections)
         if isinstance(payload,dict) and isinstance(payload.get('items'),list):
             queue.save(group,payload)
