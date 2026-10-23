@@ -275,6 +275,13 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ "$PCT_AUTO_CONTINUE" != "true" ]; then
+            # Hold before the first lane output reaches main: the hourly
+            # coordinator must never see this corpus without its marker.
+            mkdir -p "evidence/runs/$PCT_RUN_ID/research_continuation"
+            printf '{"auto_continue": false, "set_by_run": "%s"}\n' "$PCT_RUN_ID" > "evidence/runs/$PCT_RUN_ID/research_continuation/auto_continue.json"
+            git add "evidence/runs/$PCT_RUN_ID/research_continuation/auto_continue.json"
+          fi
           git add "evidence/runs/$PCT_RUN_ID/$PCT_RESEARCH_LANE/"
           git diff --cached --quiet && exit 0
           git commit -m "Preserve evidence: run $PCT_RUN_ID lane $PCT_RESEARCH_LANE"

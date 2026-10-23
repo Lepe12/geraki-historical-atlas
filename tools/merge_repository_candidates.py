@@ -22,7 +22,7 @@ for x in d.get("results",[]):
       "description":x.get("description"),"subject":x.get("subject"),"context_excerpt":x.get("context_excerpt"),"mediatype":x.get("mediatype"),
       "metadata_text":x.get("metadata_text"),"snippet":x.get("snippet"),
       **{k:x[k] for k in ('description_provenance','fulltext_links','search_providers','search_provider_attempts','search_query','discovery_route','acquisition_policy') if k in x},
-      **{k:x.get(k) for k in ('publication_year','fulltext_hit','fulltext_contexts','source_type','evidence_state','printed_page','canvas_id','scan_index_0_based','image_url','manifest_url','matched_terms','fulltext_query','reported_page_numbers','locator_status','source_origin') if x.get(k) is not None},
+      **{k:x.get(k) for k in ('publication_year','fulltext_hit','fulltext_contexts','source_type','evidence_state','printed_page','canvas_id','scan_index_0_based','image_url','manifest_url','matched_terms','fulltext_query','reported_page_numbers','locator_status','source_origin','section_continuation') if x.get(k) is not None},
       "date":x.get("date"),
       "repository":repo,
       "discovery_repository":repo,
