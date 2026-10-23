@@ -187,6 +187,9 @@ class HandoffTests(unittest.TestCase):
         self.assertLess(commit.index('research_continuation/auto_continue.json'), commit.index('git add'))
         self.assertIn('"auto_continue": false', commit)
         self.assertNotIn('gh workflow run', text)
+        lane = text.split('- name: Preserve durable evidence in GitHub', 1)[1].split('- name:', 1)[0]
+        self.assertLess(lane.index('research_continuation/auto_continue.json'), lane.index('git commit'))
+        self.assertIn('if [ "$PCT_AUTO_CONTINUE" != "true" ]', lane)
 
     def test_reanalysis_workflow_gates_every_self_dispatch_on_auto_continue(self):
         # Text check: the coordinator runs this suite without PyYAML.

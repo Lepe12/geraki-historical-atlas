@@ -59,6 +59,26 @@ class ResultIntegrityTests(unittest.TestCase):
         self.assertEqual(rows[0]['fulltext_links'][0]['access_status'],'UNVERIFIED')
         self.assertNotIn('digital_url',rows[0])
 
+    def test_section_continuation_marker_survives_candidate_merge(self):
+        script=Path(__file__).resolve().parent/'merge_repository_candidates.py'
+        mark={'anchor_canvas':'https://example.org/c/1','anchor_name':'Jean Capsi','manifest_url':'https://example.org/m',
+              'pages_after_anchor':2,'basis':'SURNAME_ON_PAGE','identity_verified':False}
+        row={'identifier':'https://example.org/c/3','title':'Histoire 1698','fulltext_hit':True,'context_excerpt':'Capfi fut pendu.',
+             'manifest_url':'https://example.org/m','discovery_repository':'IIIF Full Text','section_continuation':mark}
+        with tempfile.TemporaryDirectory() as td:
+            previous=Path.cwd()
+            try:
+                os.chdir(td);Path('lane_discovery').mkdir()
+                Path('lane_discovery/greek.json').write_text(json.dumps({'results':[row]}))
+                with patch.dict(os.environ,{'PCT_TARGET':'Ιωάννης Καψής','PCT_RESEARCH_LANE':'greek','PCT_ALIASES':'Jean Capsi'}):
+                    runpy.run_path(str(script),run_name='__main__')
+                saved=json.loads(Path('citation_chase_candidates/repository_candidates.json').read_text())
+            finally:os.chdir(previous)
+        rows=[*saved.get('selected',[]),*saved.get('rejected',[]),*saved.get('results',[])]
+        found=[r for r in rows if r.get('identifier')=='https://example.org/c/3']
+        self.assertTrue(found)
+        self.assertEqual(found[0]['section_continuation'],mark)
+
     def test_scholarly_context_and_links_survive_real_candidate_merge_and_inventory(self):
         script=Path(__file__).resolve().parent/'merge_repository_candidates.py'
         row={'identifier':'https://openalex.org/W1','title':'Historical letters',
