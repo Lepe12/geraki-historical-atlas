@@ -10,6 +10,9 @@ on:
       - 'tools/continue_citation_acquisition.py'
       - 'tools/test_research_continuation.py'
       - 'tools/semantic_research_answer.py'
+      - 'tools/test_surname_section_anchor.py'
+      - 'tools/fixtures/kapsis_saulger_336_340.json'
+      - 'tools/research_relevance.py'
       - 'tools/research_validation_report.py'
       - 'tools/probe_evidence_production.py'
       - 'tools/historical_attestations.py'
@@ -56,7 +59,7 @@ jobs:
       - name: PDF Learning HTTP integration tests
         run: node server/command-center-live/learning-integration-test.js
       - name: Actual acquired PDF reading order and constrained response protocols
-        run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=.:tools:tools/llm python3 -m unittest -v tools.test_acquired_analysis tools.test_source_acquisition_routes tools.test_research_response_schema tools.test_semantic_research_answer tools.test_claim_fidelity_guard tools.test_relevance_filter tools.test_research_continuation
+        run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=.:tools:tools/llm python3 -m unittest -v tools.test_acquired_analysis tools.test_source_acquisition_routes tools.test_research_response_schema tools.test_semantic_research_answer tools.test_claim_fidelity_guard tools.test_relevance_filter tools.test_research_continuation tools.test_surname_section_anchor
       - name: Actual image-only PDF OCR and bounding boxes
         run: |
           python3 -m pip install 'Pillow==12.0.0'

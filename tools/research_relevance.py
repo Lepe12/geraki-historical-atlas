@@ -159,6 +159,9 @@ def evidence_class(record, topical):
             'basis':'CONTENT_ASSESSMENT_REQUIRED'}
 
 
+GLUED_TEMPORAL_YEAR = re.compile(r"(?:(?<![\w])|(?<=['’]))(?:an|anno|ano|ann[eé]e|en|in|nel|year)(1\d{3}|20\d{2})(?!\w)")
+
+
 def contextual_years(text):
     """Possible years, excluding explicit addresses, identifiers and page numbers.
 
@@ -167,6 +170,11 @@ def contextual_years(text):
     """
     value = fold(str(text))
     years = []
+    # OCR often glues a year to its temporal preposition ("l'an1680",
+    # "anno1680", "in1680"). Only these short temporal words are accepted as a
+    # glued prefix; any other letter-glued number stays excluded.
+    for match in GLUED_TEMPORAL_YEAR.finditer(value):
+        years.append(int(match.group(1)))
     for match in re.finditer(r'(?<![\w.])(1\d{3}|20\d{2})(?!\w)', value):
         prefix = value[max(0, match.start()-160):match.start()]
         temporal=bool(re.search(r'\b(?:in|nel|nell.anno|anno|year|το|ετος|en el ano)\s*$', prefix))
