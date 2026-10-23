@@ -718,7 +718,8 @@ class NamesakeGuard(unittest.TestCase):
             self.assertEqual(status[eid], 'LINKED', eid)
             self.assertGreaterEqual(len(out[eid]['attribute_types_matched']), 2)
         self.assertEqual({m['attribute'] for m in out['saulger']['matched_attributes']}, {'place', 'role', 'source_date'})
-        self.assertEqual({m['attribute'] for m in out['diadromi']['matched_attributes']}, {'role', 'date'})
+        # 'Η Μήλος' matches through the sourced gazetteer variant Μήλος of the target's place.
+        self.assertEqual({m['attribute'] for m in out['diadromi']['matched_attributes']}, {'place', 'role', 'date'})
         # The bagne passage names no place or role; they come from the same work, and say so.
         self.assertEqual({m['scope'] for m in out['maynard-b']['matched_attributes']}, {'same_document'})
         self.assertEqual(status['gazette'], 'POSSIBLE'); self.assertEqual(out['gazette']['matched_attributes'], [])
@@ -757,6 +758,99 @@ class NamesakeGuard(unittest.TestCase):
         self.assertEqual(len(accepted), 1); self.assertEqual(accepted[0]['identity_linkage']['status'], 'LINKED')
         # Without linkage (old callers) the MP claim is not affected by the guard.
         self.assertTrue(validate_items({'items': [claim(*cases[0])]}, rows, 'person')[0])
+
+
+class PlaceResolver(unittest.TestCase):
+    """Sourced gazetteer (Wikidata, CC0) and place-mention resolver."""
+    RUN = Path(__file__).resolve().parent.parent / 'evidence/runs/39902909088'
+
+    @classmethod
+    def setUpClass(cls):
+        from place_resolver import load
+        cls.g = load()
+        cls.by_title = {p['seed_title']: p['id'] for p in cls.g['doc']['places']}
+
+    def first(self, text):
+        from place_resolver import resolve
+        hits = resolve(text)
+        self.assertTrue(hits, text)
+        return hits[0]
+
+    def test_every_place_and_variant_is_sourced(self):
+        doc = self.g['doc']
+        self.assertIn('CC0', doc['licences']['wikidata'])
+        for p in doc['places']:
+            src = 'https://www.wikidata.org/wiki/' + p['wikidata']
+            self.assertTrue(p['coordinates'] and p['coordinates']['source'] == src + '#P625', p['id'])
+            for v in p['variants']:
+                self.assertEqual((v['status'], v['source']), ('SOURCED', src))
+            self.assertNotIn('corsair_base', p)
+            if 'corsair_base_candidate' in p:
+                self.assertEqual(p['corsair_base_candidate']['status'], 'CANDIDATE_ONLY_NOT_A_FACT')
+        for u in doc['unsourced_variants']:
+            self.assertEqual(u['status'], 'UNSOURCED')
+
+    def test_historical_and_foreign_variants_resolve(self):
+        cases = {'Grec de Milo': 'Milos', 'de Cerigo': 'Kythira', 'à Zante': 'Zakynthos', 'de Negroponte': 'Euboea',
+                 'Napoli di Romania': 'Nafplio', 'Alger': 'Algiers', 'Argel': 'Algiers', 'Sapienza': 'Sapientza',
+                 'Itilo': 'Oitylo', 'Smyrne': 'İzmir', 'Santa Maura': 'Lefkada', 'Lepanto': 'Nafpaktos',
+                 'στη Μήλο': 'Milos', 'τον Μύτικα της Αιτωλοακαρνανίας': 'elwiki:Μύτικας Αιτωλοακαρνανίας'}
+        for text, title in cases.items():
+            hit = self.first(text)
+            self.assertEqual((hit['status'], hit['place_ids']), ('RESOLVED', [self.by_title[title]]), text)
+            self.assertTrue(hit['candidates'][0]['variant_source'].startswith('https://www.wikidata.org/wiki/Q'))
+        # Long-s OCR and line-break hyphenation.
+        hit = self.first('à Con- ftantinople')
+        self.assertEqual(hit['place_ids'], [self.by_title['Constantinople']])
+        self.assertEqual(hit['candidates'][0]['method'], 'LONG_S_OCR')
+        self.assertEqual(self.first('de Marfeille')['place_ids'], [self.by_title['Marseille']])
+
+    def test_ambiguous_and_unsourced_names_are_not_guessed(self):
+        from place_resolver import resolve
+        candia = self.first('à Candia')
+        self.assertEqual(candia['status'], 'AMBIGUOUS')
+        self.assertEqual(set(candia['place_ids']), {self.by_title['Crete'], self.by_title['Heraklion']})
+        self.assertEqual(self.first('Tripoli')['status'], 'AMBIGUOUS')
+        self.assertEqual(self.first('Thera')['status'], 'AMBIGUOUS')
+        self.assertIn('COMMON_WORD_COLLISION', self.first('Sale et Milo')['reasons'])
+        self.assertEqual(self.first('Salé')['status'], 'RESOLVED')
+        unsourced = {u['name'] for u in self.g['doc']['unsourced_variants']}
+        for name in ('Argentiera', 'Vitylo', 'Mili'):
+            self.assertIn(name, unsourced); self.assertEqual(resolve(name), [])
+        self.assertEqual(resolve('une mile de la ville'), [])
+
+    def test_base_label_needs_supported_cited_claim(self):
+        from place_resolver import base_label
+        claim = {'claim_id': 'c-1', 'usage_type': 'BASE', 'source_occurrences': [{'url': 'u'}]}
+        self.assertEqual(base_label(claim, {'c-1'}), {'label': 'BASE_PER_SUPPORTED_CITED_CLAIM', 'claim_id': 'c-1'})
+        self.assertIsNone(base_label(claim, set()))
+        self.assertIsNone(base_label({**claim, 'usage_type': 'OTHER'}, {'c-1'}))
+        self.assertIsNone(base_label({**claim, 'source_occurrences': []}, {'c-1'}))
+
+    def test_annotate_records_links_on_passages_and_claims(self):
+        from place_resolver import annotate
+        answer = {'evidence': [{'evidence_id': 'e', 'text': "L'un d'eux, Jean Capsi, se rendit maître de Milo."}],
+                  'claims': [{'claim_id': 'c', 'quote': 'maître de Milo'}]}
+        annotate(answer)
+        self.assertEqual(answer['place_links']['passages']['e'][0]['place_ids'], [self.by_title['Milos']])
+        self.assertEqual(answer['claims'][0]['place_links'][0]['surface'], 'Milo')
+
+    def test_namesake_profile_uses_gazetteer_variants(self):
+        from namesake_guard import profile
+        prof = profile({'target': 'Ιωάννης Καψής', 'date_range': '1600-1700', 'purpose': 'αναφορά σε βασιλιά της Μήλου.'})
+        self.assertIn('melos', prof['attributes']['place'])
+
+    @unittest.skipUnless((RUN / 'travellers/library_acquisition/diadromi_174_diadromi_174_djvu.txt').is_file(), 'stored run not checked out')
+    def test_replay_stored_kapsis_passages(self):
+        from place_resolver import resolve
+        files = {'diadromi': 'travellers/library_acquisition/diadromi_174_diadromi_174_djvu.txt',
+                 'saulger_336': 'italian_states/library_acquisition/51a1e91aae26bdbdb49d6796.txt',
+                 'saulger_340': 'italian_states/library_acquisition/389a2a55a389b0891fab65ff.txt'}
+        found = {k: {pid for m in resolve((self.RUN / f).read_text(encoding='utf-8')) if m['status'] == 'RESOLVED'
+                     for pid in m['place_ids']} for k, f in files.items()}
+        self.assertTrue({self.by_title['Milos'], self.by_title['elwiki:Μύτικας Αιτωλοακαρνανίας']} <= found['diadromi'])
+        self.assertIn(self.by_title['Milos'], found['saulger_336'])
+        self.assertTrue({self.by_title['Milos'], self.by_title['Constantinople']} <= found['saulger_340'])
 
 if __name__=='__main__':unittest.main()
 

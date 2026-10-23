@@ -1121,6 +1121,8 @@ def main():
     out=execute(root,question or 'Historical research')
     out['research_run_id']=args.run_id
     dest=root/'research_answer';dest.mkdir(exist_ok=True)
+    from place_resolver import annotate as annotate_places
+    annotate_places(out)
     (dest/'answer.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (dest/'answer.md').write_text(render(out),encoding='utf-8')
     from persistent_evidence_bundle import write as write_bundle

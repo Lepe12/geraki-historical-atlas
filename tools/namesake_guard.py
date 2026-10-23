@@ -73,6 +73,11 @@ def profile(request):
         place_terms.extend(_norm(x) for x in spelling_hypotheses(place, True))
         if re.search(r'[α-ω]', p) and len(p) >= 5:
             place_terms.append(p[:-2])  # Greek inflection: 'μηλου' -> 'μηλ' (Μήλος, Μήλο)
+        # Sourced gazetteer variants of an unambiguous place (e.g. Μήλου -> Milo, Melos).
+        from place_resolver import lookup, variants_for
+        hit = lookup(place)
+        if hit and hit['status'] == 'RESOLVED':
+            place_terms.extend(_norm(v) for v in variants_for(hit['place_ids'][0]))
     years = [int(y) for y in re.findall(r'(?<!\d)(1\d{3}|20\d{2})(?!\d)', str(request.get('date_range', '')))]
     attrs = {'place': place_terms, 'role': role_terms,
              'kin': [str(x) for x in extra.get('kin', []) or []],
