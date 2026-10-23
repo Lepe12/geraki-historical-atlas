@@ -632,6 +632,33 @@ def section_surname_anchor(value, row, quote_start, quote, records, target_names
             'scope':'SAME_PASSAGE' if anchor_page==page and anchor_row is row else 'SAME_WORK_CONTIGUOUS_PRECEDING_PAGES',
             'rule':'FULL_TARGET_NAME_EARLIER_IN_SAME_WORK_NO_OTHER_PERSON_WITH_SURNAME_IN_SPAN'}
 
+# First words of capitalised pairs that are not people (ADJACENT_SENTENCE guard).
+NON_PERSON_PAIR_HEADS={'grand','grande','grands','le','la','les','saint','sainte','st','san','santa','santo',
+    'mont','monte','cap','capo','cape','isle','ifle','ile','île','golfe','porte','mer','port','porto'}
+
+def adjacent_identity_ok(row, parts, ids, cand, target_names):
+    """Guards for ADJACENT_SENTENCE identity (conservative):
+    the cited sentences and the one adjacent sentence lie on the same page;
+    the cited sentences name no other person (capitalised name pair, apart
+    from the target names and listed non-person heads such as 'Grand Bagne');
+    the adjacent sentence names no other bearer of the target surname."""
+    from research_focus import long_s_variant as ls
+    eids=sorted(ids+[cand]);a0=parts[eids[0]]['start_char'];a1=parts[eids[-1]]['end_char']
+    page=_page_of(row,a0)
+    if page is None or _page_of(row,a1-1)!=page:return False
+    cited=row['text'][parts[ids[0]]['start_char']:parts[ids[-1]]['end_char']]
+    for name in target_names or []:
+        for form in (name,ls(name)):
+            surface=literal_entity_surface(form,cited) if form else None
+            while surface and surface in cited:cited=cited.replace(surface,' ')
+    if any(m.group(0).split()[0].casefold() not in NON_PERSON_PAIR_HEADS for m in PERSON_PAIR.finditer(cited)):return False
+    forms=set();given=set()
+    for name in target_names or []:
+        toks=name.split() if isinstance(name,str) else []
+        if len(toks)<2:continue
+        forms.update({toks[-1],ls(toks[-1]) or toks[-1]});given.update(t.casefold() for t in toks[:-1])
+    return not (forms and _other_namesake(parts[cand]['text'],sorted(forms),given))
+
 def validate_items(payload, records, question_kind=None, requested_range=None, target_names=None, identity_linkage=None, section_records=None):
     lookup={r['evidence_id']:r for r in records};accepted=[];rejected=[]
     values=payload.get('items') if isinstance(payload,dict) else None
@@ -681,7 +708,7 @@ def validate_items(payload, records, question_kind=None, requested_range=None, t
                              'passage_kind':passage_kind,'proposed_item':item});continue
         if kind not in ('source_statement','inference','hypothesis'):
             rejected.append({'reason':'MISSING_STATEMENT_KIND'});continue
-        entities={};bad=False;field_issues=[];surface_corrections=[]
+        entities={};bad=False;field_issues=[];surface_corrections=[];adjacent={}
         for field in ('actors','places','dates'):
             vals=item.get(field,[])
             if field=='dates' and isinstance(vals,list):
@@ -699,21 +726,49 @@ def validate_items(payload, records, question_kind=None, requested_range=None, t
                     bad=True;break
                 entities[field]=valid_dates;continue
             actual=[];methods=[]
-            for v in vals:
-                surface=literal_entity_surface(v,quote);method='UNICODE_CASE_AND_WHITESPACE_ONLY'
+            def actor_surface(v,q,qstart,sel):
+                """Identity checks for one value against quote q (unchanged rules)."""
+                found=[];surface=literal_entity_surface(v,q);method='UNICODE_CASE_AND_WHITESPACE_ONLY'
                 # Early-modern print OCR reads the long s as 'f' (Capsi -> Capfi).
                 # Same bounded variant as section extraction; flagged, never silent.
                 if surface is None and field in ('actors','places') and long_s_variant(v):
-                    surface=literal_entity_surface(long_s_variant(v),quote);method='OCR_LONG_S_VARIANT'
-                if surface is None and field=='actors' and question_kind=='person' and selected_ids:
-                    anchor=same_passage_identity_anchor(v,row,*selected_ids,target_names)
-                    if anchor:surface=anchor['anchor_quote'];method='IDENTITY_FROM_SAME_PASSAGE_ANCHOR';anchors.append(anchor)
+                    surface=literal_entity_surface(long_s_variant(v),q);method='OCR_LONG_S_VARIANT'
+                if surface is None and field=='actors' and question_kind=='person' and sel:
+                    anchor=same_passage_identity_anchor(v,row,*sel,target_names)
+                    if anchor:surface=anchor['anchor_quote'];method='IDENTITY_FROM_SAME_PASSAGE_ANCHOR';found.append(anchor)
                 if surface is None and field=='actors' and question_kind=='person' and target_names:
-                    qstart=selected_start if selected_start is not None else row['text'].find(quote)
-                    anchor=section_surname_anchor(v,row,qstart,quote,section_records if section_records is not None else records,target_names)
-                    if anchor:surface=anchor['surname_surface'];method='SURNAME_WITH_SECTION_ANCHOR';anchors.append(anchor)
-                    if anchor and anchor['ocr_long_s_variant'] and 'OCR_LONG_S_NAME_VARIANT' not in field_issues:
-                        field_issues.append('OCR_LONG_S_NAME_VARIANT')
+                    qs=qstart if qstart is not None else row['text'].find(q)
+                    anchor=section_surname_anchor(v,row,qs,q,section_records if section_records is not None else records,target_names)
+                    if anchor:surface=anchor['surname_surface'];method='SURNAME_WITH_SECTION_ANCHOR';found.append(anchor)
+                return surface,method,found
+            for v in vals:
+                surface,method,found=actor_surface(v,quote,selected_start,selected_ids)
+                # ADJACENT_SENTENCE (identity only): when the cited sentences do not
+                # name the actor, the ONE immediately preceding or following sentence
+                # of the same passage may supply the name, through the same rules as
+                # above. Never more than one sentence; every actor must use the same
+                # one. Dates and places are still checked against the cited sentences
+                # only; the adjacent sentence is then added to the quote shown.
+                # Guards: same page, no other person in the cited sentences, no
+                # other bearer of the surname in the adjacent sentence.
+                if surface is None and field=='actors' and selected_ids and not adjacent.get('failed'):
+                    parts_,ids_=selected_ids
+                    choices=[adjacent['passage_id']] if 'passage_id' in adjacent else [ids_[0]-1,ids_[-1]+1]
+                    for cand in choices:
+                        if not 0<=cand<len(parts_) or not adjacent_identity_ok(row,parts_,ids_,cand,target_names):continue
+                        eids=sorted(ids_+[cand]);a0=parts_[eids[0]]['start_char']
+                        equote=row['text'][a0:parts_[eids[-1]]['end_char']]
+                        surface,method,found=actor_surface(v,equote,a0,(parts_,eids))
+                        if surface is not None:
+                            adjacent.update(passage_id=cand,cited_passage_ids=list(ids_),quote_passage_ids=eids,
+                                            quote=equote,start=a0,position='PRECEDING' if cand<ids_[0] else 'FOLLOWING',
+                                            sentence=parts_[cand]['text'])
+                            for a in found:a['identity_anchor_detail']='ADJACENT_SENTENCE'
+                            break
+                    if surface is None:adjacent['failed']=True
+                anchors.extend(found)
+                if any(a.get('method')=='SURNAME_WITH_SECTION_ANCHOR' and a.get('ocr_long_s_variant') for a in found) and 'OCR_LONG_S_NAME_VARIANT' not in field_issues:
+                    field_issues.append('OCR_LONG_S_NAME_VARIANT')
                 actual.append(surface);methods.append(method)
             if any(v is None for v in actual):bad=True;break
             surface_corrections.extend({'field':field,'proposed':v,'source_surface':a,
@@ -732,6 +787,11 @@ def validate_items(payload, records, question_kind=None, requested_range=None, t
             rejected.append({'reason':'ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE','evidence_id':eid,
                              'field':field,'proposed_values':item.get(field),
                              'selected_passage_ids':item.get('passage_ids')});continue
+        if adjacent.get('quote'):
+            # Identity came from the adjacent sentence: show it to the reader.
+            adjacent['cited_quote']=quote
+            quote=adjacent['quote'];selected_start=adjacent['start']
+            field_issues.append('IDENTITY_FROM_ADJACENT_SENTENCE')
         if question_kind in ('place','topic') and not entities['places']:
             rejected.append({'reason':'GEOGRAPHIC_FINDING_REQUIRES_LITERAL_PLACE',
                              'evidence_id':eid,'proposed_item':item});continue
@@ -755,6 +815,7 @@ def validate_items(payload, records, question_kind=None, requested_range=None, t
             'entity_surface_corrections':surface_corrections,
             **({'identity_anchors':anchors} if anchors else {}),
             **({'identity_anchor':'SURNAME_WITH_SECTION_ANCHOR'} if any(a.get('method')=='SURNAME_WITH_SECTION_ANCHOR' for a in anchors) else {}),
+            **({'identity_anchor_detail':'ADJACENT_SENTENCE','identity_adjacent_sentence':{k:adjacent[k] for k in ('passage_id','position','cited_passage_ids','quote_passage_ids','sentence','cited_quote')}} if adjacent.get('quote') else {}),
             **({'identity_linkage':linkage} if linkage else {}),
             'date_evidence':row.get('date_evidence'),'date_basis':row.get('date_basis'),
             'uncertainty':(item.get('uncertainty') if isinstance(item.get('uncertainty'),list) else [])+field_issues,
@@ -1153,7 +1214,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
     if not supported:
         out['status']='REVIEW_FAILED' if review['invalid_review_claim_ids'] else 'REVIEW_INCOMPLETE' if review['missing_claim_ids'] else 'NO_MODEL_SUPPORTED_CLAIMS'
         return out
-    fidelity_held=[c['claim_id'] for c in claims if c['claim_id'] in supported and c.get('fidelity_status') in FIDELITY_FLAGGED]
+    fidelity_held=[c['claim_id'] for c in claims if c['claim_id'] in supported and (c.get('fidelity_status') in FIDELITY_FLAGGED or (c.get('place_fidelity') or {}).get('status')=='PLACE_NOT_IN_QUOTE')]
     relevance_held=[c['claim_id'] for c in claims if c['claim_id'] in supported and c['claim_id'] not in fidelity_held and c.get('relevance_status')==RELEVANCE_OFF]
     all_synthesis_claims=[c for c in claims if c['claim_id'] in supported and c['claim_id'] not in fidelity_held and c['claim_id'] not in relevance_held]
     all_synthesis_claims.sort(key=lambda c:c['claim_id'] not in fresh_supported)

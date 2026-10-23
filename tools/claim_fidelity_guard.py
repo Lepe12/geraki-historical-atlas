@@ -13,6 +13,8 @@ own cited quotation. For every year written in the claim statement or its
   past-perfect form of the reported action ("had built", aveva, avait, había,
   είχε) is recorded as an additional signal: the action is earlier and undated.
 * OK                 - every claimed year is used in the quote's own role.
+* PLACE_NOT_IN_QUOTE - (separate place_fidelity field) the statement names a
+  gazetteer place that the quotation does not contain.
 
 Flagged claims are never deleted or rewritten. They are marked and held out of
 the narrative synthesis so they are not presented as a verified fact. A
@@ -215,15 +217,79 @@ def check(statement, quote, dates=None):
     return result
 
 
+# ---------------------------------------------------------------------------
+# Place fidelity: a claim statement may not name a place its quote does not.
+# Only gazetteer place names (data/gazetteer, all sourced variants, >= 4
+# letters) written capitalised in the statement are checked; a name counts as
+# present if the accent-folded quote contains it, its long-s OCR form (s->f),
+# or it after joining OCR line-break hyphens. Flag only, never deletion.
+PLACE_NOT_IN_QUOTE = 'PLACE_NOT_IN_QUOTE'
+_GAZETTEER_NAMES = None
+
+
+def gazetteer_place_names(path=None):
+    global _GAZETTEER_NAMES
+    if path is None and _GAZETTEER_NAMES is not None:
+        return _GAZETTEER_NAMES
+    from pathlib import Path
+    path = Path(path or Path(__file__).resolve().parents[1] / 'data' / 'gazetteer' / 'mediterranean_gazetteer.v1.json')
+    names = set()
+    try:
+        data = json.loads(path.read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        data = {}
+    for place in data.get('places') or []:
+        values = list((place.get('modern_name') or {}).values()) + [v.get('name') for v in place.get('variants') or []]
+        for value in values:
+            if isinstance(value, str) and len(fold(value).replace(' ', '')) >= 4:
+                names.add(value)
+    _GAZETTEER_NAMES = sorted(names, key=len, reverse=True)
+    return _GAZETTEER_NAMES
+
+
+def _quote_has_place(folded_quote, folded_name):
+    joined = re.sub(r'-\s+', '', folded_quote)
+    forms = {folded_name, re.sub(r's(?=\w)', 'f', folded_name)}
+    return any(re.search(r'(?<!\w)' + re.escape(f) + r'(?!\w)', q) for f in forms for q in (folded_quote, joined))
+
+
+def place_check(statement, quote, names=None):
+    """Places named in the statement but absent from the quote. Pure function."""
+    statement = statement or ''
+    fq = fold(quote)
+    missing = []
+    for name in names if names is not None else gazetteer_place_names():
+        fn = fold(name)
+        for m in re.finditer(r'(?<!\w)' + re.escape(fn) + r'(?!\w)', fold(statement)):
+            surface = statement[m.start():m.end()] if len(fold(statement)) == len(statement) else name
+            if not surface[:1].isupper():
+                continue
+            if not _quote_has_place(fq, fn) and fn not in [fold(x) for x in missing]:
+                missing.append(surface)
+            break
+    return {'policy': POLICY, 'status': PLACE_NOT_IN_QUOTE if missing else OK, 'places_not_in_quote': missing}
+
+
 def apply(claims):
     """Annotate claims in place (adds fields only). Returns a report dict."""
     report = {'policy': POLICY, 'checked': 0, 'flagged_claim_ids': [], 'by_status': {}}
     for claim in claims or []:
-        res = check(claim.get('statement'), claim.get('quote'), claim.get('dates'))
+        # When an adjacent sentence was added only to show the person's name,
+        # dates and places are judged against the cited sentences alone.
+        quote = (claim.get('identity_adjacent_sentence') or {}).get('cited_quote') or claim.get('quote')
+        res = check(claim.get('statement'), quote, claim.get('dates'))
         report['checked'] += 1
         report['by_status'][res['status']] = report['by_status'].get(res['status'], 0) + 1
         claim['fidelity_status'] = res['status']
         claim['claim_fidelity'] = res
+        places = place_check(claim.get('statement'), quote)
+        if places['status'] == PLACE_NOT_IN_QUOTE:
+            claim['place_fidelity'] = places
+            report['place_flagged_claim_ids'] = report.get('place_flagged_claim_ids', []) + [claim.get('claim_id')]
+            unc = claim.get('uncertainty')
+            if isinstance(unc, list) and PLACE_NOT_IN_QUOTE not in unc:
+                unc.append(PLACE_NOT_IN_QUOTE)
+            claim['fidelity_hold'] = 'HELD_FROM_SYNTHESIS_NOT_A_VERIFIED_FACT'
         if res['status'] in FLAGGED:
             report['flagged_claim_ids'].append(claim.get('claim_id'))
             claim['fidelity_hold'] = 'HELD_FROM_SYNTHESIS_NOT_A_VERIFIED_FACT'
