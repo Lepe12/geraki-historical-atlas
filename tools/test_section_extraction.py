@@ -186,6 +186,39 @@ class EarlyModernOcr(unittest.TestCase):
         forged={**src,'section_continuation':{**src['section_continuation'],'manifest_url':'https://other.org/m'}}
         self.assertFalse(extract_document(text,forged,'scan.txt',self.CTX))
 
+    def continuation_src(self):
+        return {**self.SRC,'manifest_url':'https://example.org/m','section_continuation':{
+            'anchor_canvas':'https://example.org/c/1','anchor_name':'Marc Basso','manifest_url':'https://example.org/m'}}
+
+    def test_continuation_page_is_kept_as_one_verbatim_block_even_without_the_name(self):
+        text=('Les Turcs vinrent avec leurs galéres.\n\nCe petit Regne dura trois ans , & auroit duré davantage.\n\n'
+              'Il fut pendu à un arbre devant la porte du Grand Bagne l’an1680. Depuis la mort de Baffoles Turcs veillent.')
+        self.assertFalse(self.extract(text))  # ordinary page: unchanged, nothing without a name
+        rows=extract_document(text,self.continuation_src(),'scan.txt',self.CTX)
+        self.assertEqual(len(rows),1);row=rows[0]
+        self.assertEqual(row['evidence_excerpt'],text)  # verbatim, whole page
+        self.assertEqual((row['locator']['start_char'],row['locator']['end_char']),(0,len(text)))
+        for flag in ('SECTION_CONTINUATION_PAGE_BLOCK','NO_TARGET_NAME_ON_CONTINUATION_PAGE','IDENTITY_ASSOCIATION_PROVISIONAL'):
+            self.assertIn(flag,row['uncertainties'])
+        self.assertEqual(row['target_entity']['association_basis'],'SECTION_CONTINUATION_PAGE_UNNAMED')
+        self.assertEqual(row['target_entity']['observed_names'],[])
+        self.assertEqual(row['decision'],'REVIEW_CONTEXT')
+
+    def test_continuation_block_is_capped_and_later_paragraphs_keep_the_name_rule(self):
+        import section_extraction as se
+        filler=('Mot '*150).strip()+'.'
+        text='\n\n'.join([filler]*6+['Le pilote Baffo revint.','Rien ici.'])
+        rows=extract_document(text,self.continuation_src(),'scan.txt',self.CTX)
+        block=rows[0]
+        self.assertLessEqual(len(block['evidence_excerpt']),se.CONTINUATION_PAGE_CHARS)
+        self.assertEqual(text[block['locator']['start_char']:block['locator']['end_char']],block['evidence_excerpt'])
+        self.assertEqual(len(rows),2)
+        self.assertEqual(rows[1]['evidence_excerpt'],'Le pilote Baffo revint.')
+        self.assertIn('SURNAME_FROM_ADJACENT_NAMED_PAGE',rows[1]['uncertainties'])
+        # A forged marker from another manifest is still ignored.
+        forged={**self.continuation_src(),'section_continuation':{**self.continuation_src()['section_continuation'],'manifest_url':'https://other.org/m'}}
+        self.assertFalse(extract_document(text,forged,'scan.txt',self.CTX))
+
     def test_long_s_ocr_name_matches_with_recorded_uncertainty(self):
         from section_extraction import long_s_variant
         text='Le pilote Marc Baffo commanda la barque en 1650.'

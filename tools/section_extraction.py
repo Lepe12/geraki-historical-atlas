@@ -45,6 +45,24 @@ def name_forms(name):
     return [name,*([long_s_variant(name)] if long_s_variant(name) else [])]
 
 HEADING_SECTION_CHARS=1800
+# A following page of a named section (section_continuation) is read as one
+# verbatim block up to this many characters, instead of only name-centred
+# paragraphs: such pages continue the story with pronouns, abbreviated or
+# OCR-fused names. Identity stays provisional; text beyond the cap keeps the
+# ordinary paragraph rule.
+CONTINUATION_PAGE_CHARS=2400
+
+def continuation_block(text, paras):
+    """(start,end,raw) exact slice over whole paragraphs, bounded by the cap."""
+    if not paras:return None
+    start=paras[0][0];end=paras[0][1]
+    for _,e,_ in paras[1:]:
+        if e-start>CONTINUATION_PAGE_CHARS:break
+        end=e
+    if end-start>CONTINUATION_PAGE_CHARS:
+        cut=text.rfind(' ',start,start+CONTINUATION_PAGE_CHARS)
+        end=cut if cut>start else start+CONTINUATION_PAGE_CHARS
+    return start,end,text[start:end]
 
 def heading_like(raw):
     """A one-line, mainly upper-case section heading such as 'JEAN CAPSI.'."""
@@ -120,6 +138,10 @@ def extract_document(text, source, file, ctx):
     topic=None
     findings=[]
     paras=list(paragraphs(text))
+    page_block=None
+    if kind=='person' and continuation and not document_named:
+        page_block=continuation_block(text,paras)
+        if page_block:paras=[page_block,*[p for p in paras if p[0]>=page_block[1]]]
     consumed_until=-1
     for index,(start,end,raw) in enumerate(paras):
         if end<=consumed_until:continue
@@ -171,7 +193,8 @@ def extract_document(text, source, file, ctx):
         # lead only where an explicitly named paragraph is adjacent.
         continuity=bool(topic and not direct and not short and start-topic['locator']['end_char']<1600
                         and re.match(r'\s*(?:Στις αρχές|Το έτος αυτό|Αυτός|Εκείνος|He\b|Il\b|Egli\b)',raw,re.I))
-        if not(direct or short or continuity):continue
+        block=bool(page_block and start==page_block[0])
+        if not(direct or short or continuity or block):continue
         predicates=sorted(set(PREDICATE.findall(fold(body))))
         predicates+=sorted(set(m.group(0) for m in STRONG.finditer(body)))
         predicates+=sorted(set(m.group(0) for m in ACTION.finditer(body)))
@@ -181,7 +204,7 @@ def extract_document(text, source, file, ctx):
         scoped=[y for y in dates if lo<=y<=hi]
         if not dates and year_heading and lo<=year_heading['year']<=hi:scoped=[year_heading['year']]
         fiction=bool(FICTION.search(fold(body)))
-        name_basis='EXPLICIT_NAME' if direct else 'SURNAME_IN_NAMED_CONTEXT' if short else 'ADJACENT_TOPIC_UNRESOLVED'
+        name_basis='EXPLICIT_NAME' if direct else 'SURNAME_IN_NAMED_CONTEXT' if short else 'SECTION_CONTINUATION_PAGE_UNNAMED' if block else 'ADJACENT_TOPIC_UNRESOLVED'
         later_identity=kind=='person' and not (ranges and lo>=1750) and later_namesake_requires_review(body+' '+ ' '.join(str(y) for y in scoped),focus)
         candidate=bool(not later_identity and scoped and predicates and not fiction and not continuity and not other_name and not extended_name
                        and (direct or document_named))
@@ -197,6 +220,8 @@ def extract_document(text, source, file, ctx):
         if extended_name:uncertainties.append('EXTENDED_NAME_REQUIRES_IDENTITY_REVIEW')
         if ocr_names:uncertainties.append('OCR_LONG_S_NAME_VARIANT')
         if section_heading:uncertainties.append('NAME_FROM_SECTION_HEADING')
+        if block:uncertainties.append('SECTION_CONTINUATION_PAGE_BLOCK')
+        if block and not(direct or short):uncertainties.append('NO_TARGET_NAME_ON_CONTINUATION_PAGE')
         if short and not direct and not document_named and not continuation:uncertainties.append('SURNAME_IDENTITY_UNRESOLVED')
         if short and not direct and continuation and not document_named:uncertainties.append('SURNAME_FROM_ADJACENT_NAMED_PAGE')
         if re.search(r'\b(?:εικαζ\w*|πιθανο\w*|perhaps|possibly|allegedly|hypoth\w*)\b',fold(body)):uncertainties.append('SOURCE_EXPRESSES_UNCERTAINTY')
