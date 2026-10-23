@@ -40,3 +40,9 @@ python3 -m unittest discover -s evaluation -p 'test_*.py'
 Matching is substring-based on accent-, case- and final-sigma-normalised text. Each matcher is a list of groups, and every group needs one hit. It is deliberately conservative. A synthesised answer in different wording will be missed unless the matcher lists that wording, so extend the matchers rather than loosen the pass criteria.
 
 **Item types:** 4 identity, 3 fact-with-citation, 3 contradiction, 3 negative/trap, 2 synthesis. The final target question is `SY-01`: «Ερεύνησε τη δραστηριότητα πειρατών στη Μήλο μεταξύ 1660 και 1680».
+
+## Υπό έγκριση: `research_eval_set.v2.pending.json` / Pending v2 draft
+
+**Ελληνικά.** Πρόχειρη επέκταση σε 28 ερωτήματα (τα 15 του v1 + 9 νέα με πηγή + 4 χωρίς απάντηση). Κάθε ερώτημα έχει `review_status`: `PROPOSED` (η απάντηση στηρίζεται σε πηγή που ανοίχτηκε και περιμένει έγκριση από τον ιστορικό) ή `NEEDS_HISTORIAN` (μόνο ερώτηση, χωρίς απάντηση, `scorable: false`). Το `score_run.py` **δεν** διαβάζει αυτό το αρχείο από προεπιλογή· διαβάζει μόνο το v1. Μετά την έγκριση, τα εγκεκριμένα περνάνε σε `research_eval_set.v2.json`.
+
+**English.** Draft expansion to 28 items. `score_run.py` keeps `DEFAULT_EVAL = research_eval_set.v1.json`; this file is used only with `--eval evaluation/research_eval_set.v2.pending.json`. `NEEDS_HISTORIAN` items have no gold and must not be counted (they trivially "pass"). New sources: Tournefort 1718 OCR (Argentiere, Antimilo, Siphanto, Capuchins), Osborne collection vol. 2 (Cerigo), AURA Suppl. 14 (Koutsouflakis on Manetas/Phournoi; Pantzouris quoting Roberts/Hacke 1699). Page numbers marked "~" are from OCR running heads and must be checked on the page images.
