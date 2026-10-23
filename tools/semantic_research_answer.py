@@ -489,7 +489,7 @@ def same_passage_identity_anchor(value, row, parts, ids, target_names):
     return {'anchor_quote':anchor[0],'anchor_offset_in_excerpt':anchor[1],'scan_index_0_based':page,
             'method':anchor[2],'scope':'PRECEDING_PASSAGE_SAME_PAGE'}
 
-def validate_items(payload, records, question_kind=None, requested_range=None, target_names=None):
+def validate_items(payload, records, question_kind=None, requested_range=None, target_names=None, identity_linkage=None):
     lookup={r['evidence_id']:r for r in records};accepted=[];rejected=[]
     values=payload.get('items') if isinstance(payload,dict) else None
     if not isinstance(values,list):return [],[{'reason':'INVALID_EXTRACTION_SCHEMA'}]
@@ -591,12 +591,19 @@ def validate_items(payload, records, question_kind=None, requested_range=None, t
         if question_kind=='person' and not entities['actors']:
             rejected.append({'reason':'PERSON_FINDING_REQUIRES_LITERAL_ACTOR',
                              'evidence_id':eid,'proposed_item':item});continue
+        # Namesake guard: a mention that is a different person, or only a
+        # possible match, stays in the evidence but supports no claim.
+        linkage=(identity_linkage or {}).get(eid) if question_kind=='person' else None
+        if linkage and linkage.get('status') in ('DIFFERENT_PERSON','POSSIBLE'):
+            rejected.append({'reason':'NAMESAKE_DIFFERENT_PERSON' if linkage['status']=='DIFFERENT_PERSON' else 'IDENTITY_LINKAGE_ONLY_POSSIBLE',
+                             'evidence_id':eid,'identity_linkage':linkage,'proposed_item':item});continue
         start=selected_start if selected_start is not None else row['text'].find(quote)
         accepted.append({'claim_id':'c-'+digest([row['evidence_id'],statement,quote])[:20],
             'statement':statement,'kind':kind,'passage_kind':passage_kind,'evidence_id':row['evidence_id'],'quote':quote,
             'quote_offset_in_excerpt':start,**entities,'source_occurrences':quote_occurrences(row,start,quote),
             'entity_surface_corrections':surface_corrections,
             **({'identity_anchors':anchors} if anchors else {}),
+            **({'identity_linkage':linkage} if linkage else {}),
             'date_evidence':row.get('date_evidence'),'date_basis':row.get('date_basis'),
             'uncertainty':(item.get('uncertainty') if isinstance(item.get('uncertainty'),list) else [])+field_issues,
             'source_uncertainties':row['uncertainties'],'model_analysis':True,'verified':False,
@@ -609,7 +616,7 @@ def validate_items(payload, records, question_kind=None, requested_range=None, t
             'verification_status':'UNVERIFIED'})
     return accepted,rejected
 
-def resume_reviewed_claims(path,question,records,question_kind,requested_range,root):
+def resume_reviewed_claims(path,question,records,question_kind,requested_range,root,identity_linkage=None):
     """Replay real extractor receipts and source bytes; never inherit a verdict."""
     root=Path(root).resolve();path=Path(path).resolve()
     if not path.is_relative_to(root):raise ValueError('RESUME_PATH_OUTSIDE_RESEARCH_RUN')
@@ -626,7 +633,7 @@ def resume_reviewed_claims(path,question,records,question_kind,requested_range,r
         item={k:claim.get(k) for k in ('statement','evidence_id','quote','kind','actors','places','dates','uncertainty')}
         item.update(passage_kind=claim.get('passage_kind','NARRATIVE_EVIDENCE'),
                     source_type=claim.get('model_proposed_source_classification') or claim.get('source_classification','UNVERIFIED'))
-        accepted,issues=validate_items({'items':[item]},[row],question_kind,requested_range);rejected.extend(issues)
+        accepted,issues=validate_items({'items':[item]},[row],question_kind,requested_range,None,identity_linkage);rejected.extend(issues)
         if not accepted:continue
         offset=claim.get('quote_offset_in_excerpt')
         if type(offset) is not int or row['text'][offset:offset+len(claim['quote'])]!=claim['quote']:
@@ -642,7 +649,7 @@ def resume_reviewed_claims(path,question,records,question_kind,requested_range,r
         if not response_file.is_file():continue
         body=response_file.read_bytes();response=json.loads(body)
         if digest(response)!=entry.get('response_sha256'):raise ValueError('RESUME_RESPONSE_RECEIPT_HASH_MISMATCH')
-        items,_=validate_items(parse(response) or {},records,question_kind,requested_range)
+        items,_=validate_items(parse(response) or {},records,question_kind,requested_range,None,identity_linkage)
         matched=ids.intersection(c['claim_id'] for c in items)
         if not matched:continue
         covered.update(matched)
@@ -745,6 +752,12 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         # then early or primary sources, then OCR quality. Nothing is dropped.
         from passage_triage import triage
         all_records,triage_report=triage(all_records,target_names)
+    identity_linkage=None;linkage_report=None
+    if question_kind=='person' and target_names and all_records:
+        # Record-linkage guard (namesake_guard): attributes and deal-breakers
+        # are recorded per mention; records themselves are not modified.
+        from namesake_guard import classify
+        identity_linkage,linkage_report=classify(all_records,request)
     original_passage_count=len(all_records)
     model_budget=6500 if os.getenv('PCT_LLM_PROVIDER')=='local_llama_cpp' else 14000
     all_records=fit_passages(all_records,model_budget)
@@ -778,6 +791,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
          'evidence':selected,'calls':[],'rejected':[],
          'selection_priority':selection_report(all_records,selected,question_kind=='topic'),
          'passage_triage':triage_report,
+         'identity_linkage':linkage_report,
          'limitations':['MODEL_OUTPUT_REQUIRES_REVIEW','ORIGINAL_INSPECTION_NOT_PERFORMED',
                         'SOURCE_INDEPENDENCE_NOT_ESTABLISHED','BOUNDED_EVIDENCE_COVERAGE'],
          'verified':False,'human_reviewed':False}
@@ -874,7 +888,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         return parse(result)
     if resume_reviewed_from:
         try:
-            resumed,rejections,receipts,context=resume_reviewed_claims(resume_reviewed_from,question,selected,question_kind,requested_range,provenance_root or run_root)
+            resumed,rejections,receipts,context=resume_reviewed_claims(resume_reviewed_from,question,selected,question_kind,requested_range,provenance_root or run_root,identity_linkage)
         except (ValueError,OSError) as error:
             code=str(error)
             out.update(status='BLOCKED_RESUME_PROVENANCE',resume_error_type=type(error).__name__,
@@ -898,7 +912,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
             receipt=queue.receipt(group)
             receipt['batch_path']=str(Path(receipt['batch_path']).resolve().relative_to(Path(provenance_root or run_root).resolve()))
             out.setdefault('continuation_replays',[]).append(receipt)
-        items,rejected=validate_items(payload or {},group,question_kind,requested_range,target_names)
+        items,rejected=validate_items(payload or {},group,question_kind,requested_range,target_names,identity_linkage)
         out['rejected'].extend(rejected)
         if not items and isinstance(payload,dict) and payload.get('items') and rejected and not review_backlog:
             # A real source can be lost through malformed entity arrays or a
@@ -912,7 +926,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
             repair_prompt+='\nLiteral date search hints, NOT proof of an event date: '+json.dumps(hints[:8],ensure_ascii=False)+'\nSelect the appropriate narrative sentence if it supports the claim, or remove the unsupported date from BOTH statement and dates. A bibliographic or archival reference date alone does not date a narrated event.'
             repaired=invoke('evidence_extractor',repair_prompt,schema)
             payload=repaired
-            items,repair_rejections=validate_items(repaired or {},group,question_kind,requested_range,target_names)
+            items,repair_rejections=validate_items(repaired or {},group,question_kind,requested_range,target_names,identity_linkage)
             out['rejected'].extend(repair_rejections)
         if isinstance(payload,dict) and isinstance(payload.get('items'),list):
             queue.save(group,payload)
