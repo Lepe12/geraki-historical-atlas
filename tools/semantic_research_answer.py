@@ -739,6 +739,12 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
     from research_continuation import Continuation
     queue=Continuation(Path(provenance_root or run_root)/'research_continuation',
                        question,Path(__file__).read_bytes(),routing_summary())
+    triage_report=None
+    if question_kind=='person' and target_names and all_records:
+        # Deterministic, model-free reading order: named/continuation pages,
+        # then early or primary sources, then OCR quality. Nothing is dropped.
+        from passage_triage import triage
+        all_records,triage_report=triage(all_records,target_names)
     original_passage_count=len(all_records)
     model_budget=6500 if os.getenv('PCT_LLM_PROVIDER')=='local_llama_cpp' else 14000
     all_records=fit_passages(all_records,model_budget)
@@ -771,6 +777,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
                      'repeated_occurrences':sum(len(r['occurrences'])-1 for r in all_records),'deferred':deferred,'excluded':excluded},
          'evidence':selected,'calls':[],'rejected':[],
          'selection_priority':selection_report(all_records,selected,question_kind=='topic'),
+         'passage_triage':triage_report,
          'limitations':['MODEL_OUTPUT_REQUIRES_REVIEW','ORIGINAL_INSPECTION_NOT_PERFORMED',
                         'SOURCE_INDEPENDENCE_NOT_ESTABLISHED','BOUNDED_EVIDENCE_COVERAGE'],
          'verified':False,'human_reviewed':False}

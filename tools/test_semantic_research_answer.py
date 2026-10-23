@@ -671,3 +671,53 @@ class SemanticAnswer(unittest.TestCase):
 
 if __name__=='__main__':unittest.main()
 
+
+
+class PassageTriage(unittest.TestCase):
+    """Deterministic pre-model reading order: no model calls, nothing dropped."""
+    WORDS = ' '.join(['mot'] * 30)
+
+    def row(self, eid, text, year=None, scan=None, doc='d', flags=()):
+        bounds = [{'scan_index_0_based': scan, 'start_char': 0, 'end_char': len(text)}] if scan is not None else []
+        return {'evidence_id': eid, 'text': text, 'uncertainties': list(flags),
+                'source_bibliography': {'date': [str(year)] if year else [], 'source_type': 'OCR_CONTEXT'},
+                'occurrences': [{'source_text_sha256': doc, 'page_boundaries': bounds}]}
+
+    def test_named_early_primary_passages_lead_without_dropping_or_mutating(self):
+        from passage_triage import triage
+        rows = [self.row('modern-unnamed', self.WORDS, 1999, doc='m1'),
+                self.row('modern-named', 'Ο Ιωάννης Κάψη ήταν πειρατής. ' + self.WORDS, 2018, doc='m2'),
+                self.row('early-unnamed', self.WORDS, 1698, doc='s'),
+                self.row('early-named', 'Le troifiéme fut Jean Capfi; ' + self.WORDS, 1698, scan=336, doc='s')]
+        before = json.dumps(rows, sort_keys=True)
+        ranked, report = triage(rows, ['Ιωάννης Καψής', 'Jean Capsi'])
+        self.assertEqual([r['evidence_id'] for r in ranked], ['early-named', 'modern-named', 'early-unnamed', 'modern-unnamed'])
+        self.assertEqual(json.dumps(rows, sort_keys=True), before)
+        self.assertEqual(report['model_calls'], 0); self.assertEqual(report['dropped'], 0)
+        self.assertEqual(sorted(p['evidence_id'] for p in report['passages']), sorted(r['evidence_id'] for r in rows))
+        first = report['passages'][0]
+        self.assertEqual((first['rank'], first['previous_rank']), (0, 3))
+        self.assertIn('TARGET_NAME_OR_LONG_S_VARIANT_IN_PASSAGE', first['reasons'])
+        self.assertIn('PUBLICATION_METADATA_BEFORE_1800', first['reasons'])
+
+    def test_section_continuation_only_from_flag_or_following_scan_of_same_document(self):
+        from passage_triage import triage
+        rows = [self.row('other-book', self.WORDS, 1698, scan=338, doc='x'),
+                self.row('earlier-page', self.WORDS, 1698, scan=335, doc='s'),
+                self.row('next-page', self.WORDS, 1698, scan=338, doc='s'),
+                self.row('flagged', self.WORDS, 1900, doc='y', flags=['SURNAME_FROM_ADJACENT_NAMED_PAGE']),
+                self.row('named', 'JEAN CAPSI. ' + self.WORDS, 1698, scan=336, doc='s')]
+        ranked, report = triage(rows, ['Jean Capsi'])
+        signal = {p['evidence_id']: p['identity_signal'] for p in report['passages']}
+        self.assertEqual(signal, {'named': 2, 'next-page': 1, 'flagged': 1, 'earlier-page': 0, 'other-book': 0})
+        self.assertEqual([r['evidence_id'] for r in ranked][:3], ['named', 'next-page', 'flagged'])
+
+    def test_ocr_quality_breaks_ties_and_stable_order_otherwise(self):
+        from passage_triage import ocr_quality, triage
+        noisy = ' '.join(['m0t', '|;', 'fe', '{{', 'x'] * 6)
+        rows = [self.row('a', noisy, 1999), self.row('b', self.WORDS, 1999), self.row('c', self.WORDS, 1999),
+                self.row('short', 'ΙΩΑΝΝΗΣ ΚΑΨΗΣ', 1999)]
+        self.assertEqual(ocr_quality('ΙΩΑΝΝΗΣ ΚΑΨΗΣ'), 0.0)
+        self.assertGreater(ocr_quality(self.WORDS), ocr_quality(noisy))
+        ranked, _ = triage(rows, ['Jean Capsi'])
+        self.assertEqual([r['evidence_id'] for r in ranked], ['b', 'c', 'a', 'short'])
