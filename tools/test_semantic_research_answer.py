@@ -85,6 +85,60 @@ class SemanticAnswer(unittest.TestCase):
         plain={**row,'text':exact['quote']}
         self.assertNotIn('OCR_LONG_S_NAME_VARIANT',validate_items({'items':[exact]},[plain],'person')[0][0]['uncertainty'])
 
+    ANCHOR_TEXT=('Le troifiéme Aventurier fut Marc Baffo; c\'étoit un Grec de Milo, qui fçavoit la mer, '
+                 '& avoit été long-tems pilote fur les vaiffeaux du Roi. Aprés s\'être rendu fameux par quantité de courfes; '
+                 'il hazarda de fe faire le Maitre de l\'Ifle, & fa tentative réuffit.')
+
+    def anchor_row(self,text=None,split=None):
+        text=text or self.ANCHOR_TEXT
+        bounds=[{'scan_index_0_based':40,'start_char':100,'end_char':100+len(text)+1}]
+        if split is not None:
+            bounds=[{'scan_index_0_based':40,'start_char':100,'end_char':100+split},
+                    {'scan_index_0_based':41,'start_char':100+split,'end_char':100+len(text)+1}]
+        return {'evidence_id':'e','text':text,'years_in_scope':[],'uncertainties':[],
+                'occurrences':[{'locator':{'start_char':100},'page_boundaries':bounds}]}
+
+    def anchor_ids(self,row,first,last):
+        from semantic_research_answer import passages
+        parts=passages(row['text']);segment=lambda i:row['text'][parts[i]['start_char']:parts[i]['end_char']]
+        a=next(i for i in range(len(parts)) if first in segment(i));b=next(i for i in range(len(parts)) if last in segment(i))
+        return list(range(a,b+1))
+
+    def anchored(self,row,ids,statement='Ο Marc Basso ήταν Έλληνας από τη Μήλο και πιλότος.'):
+        value=item('e',quote=None,statement=statement,actors=['Marc Basso'],places=[],dates=[],passage_ids=ids)
+        value.pop('quote')
+        return validate_items({'items':[value]},[row],'person',(1600,1700),['Μάρκος Μπάσσος','Marc Basso'])
+
+    def test_identity_anchor_in_preceding_passage_on_same_page(self):
+        row=self.anchor_row();ids=self.anchor_ids(row,'Grec de Milo','pilote')
+        accepted,rejected=self.anchored(row,ids)
+        self.assertFalse(rejected);claim=accepted[0]
+        self.assertNotIn('Basso',claim['quote']);self.assertNotIn('Baffo',claim['quote'])
+        self.assertIn(claim['quote'],row['text'])
+        self.assertIn('IDENTITY_FROM_SAME_PASSAGE_ANCHOR',claim['uncertainty'])
+        self.assertIn('OCR_LONG_S_NAME_VARIANT',claim['uncertainty'])
+        anchor=claim['identity_anchors'][0]
+        self.assertEqual(anchor['anchor_quote'],'Marc Baffo');self.assertEqual(anchor['scan_index_0_based'],40)
+        self.assertEqual(row['text'][anchor['anchor_offset_in_excerpt']:].split(';')[0],'Marc Baffo')
+        # Without target names (old callers) nothing changes.
+        value=item('e',quote=None,actors=['Marc Basso'],places=[],dates=[],passage_ids=ids);value.pop('quote')
+        self.assertEqual(validate_items({'items':[value]},[row],'person')[1][0]['reason'],'ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE')
+
+    def test_identity_anchor_never_reaches_distant_passage_or_other_page(self):
+        row=self.anchor_row();ids=self.anchor_ids(row,'hazarda','réuffit')
+        self.assertEqual(self.anchored(row,ids)[1][0]['reason'],'ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE')
+        split=self.ANCHOR_TEXT.index('c\'étoit')
+        paged=self.anchor_row(split=split);ids=self.anchor_ids(paged,'Grec de Milo','pilote')
+        self.assertEqual(self.anchored(paged,ids)[1][0]['reason'],'ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE')
+
+    def test_identity_anchor_rejected_when_another_person_is_named(self):
+        text=self.ANCHOR_TEXT.replace('c\'étoit un Grec','Pierre Durand étoit un Grec')
+        row=self.anchor_row(text);ids=self.anchor_ids(row,'Grec de Milo','pilote')
+        self.assertEqual(self.anchored(row,ids)[1][0]['reason'],'ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE')
+        given=self.ANCHOR_TEXT.replace('fut Marc Baffo;','fut Marc Baffo, frere de Jacques Baffo;')
+        row=self.anchor_row(given);ids=self.anchor_ids(row,'Grec de Milo','pilote')
+        self.assertEqual(self.anchored(row,ids)[1][0]['reason'],'ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE')
+
     def test_explicit_source_century_outside_question_is_held_without_using_publication_dates(self):
         row={'evidence_id':'e','text':'The consulted source describes Milo as a corsair base in the14th century.',
              'years_in_scope':[],'occurrences':[],'uncertainties':[]}
