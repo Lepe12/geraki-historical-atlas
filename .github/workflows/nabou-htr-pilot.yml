@@ -9,6 +9,10 @@ on:
       - 'server/command-center-live/test_pdf_htr_pilot.py'
       - '.github/workflows/nabou-htr-pilot.yml'
       - 'tools/htr_server_preflight.py'
+      - 'jarvis-intelligence-chamber/learning-review.js'
+      - 'jarvis-intelligence-chamber/learning-review-htr.test.cjs'
+      - 'server/command-center-live/app.js'
+      - 'server/command-center-live/learning-integration-test.js'
   workflow_dispatch:
 
 permissions:
@@ -30,3 +34,8 @@ jobs:
           python3 tools/test_ftps_deployment.py -v
           python3 -m py_compile tools/htr_server_preflight.py
           python3 tools/htr_server_preflight.py
+      - name: Browser learning-review scanned PDF regression (no live request)
+        run: |
+          node --check jarvis-intelligence-chamber/learning-review.js
+          node --check jarvis-intelligence-chamber/learning-review-htr.test.cjs
+          node jarvis-intelligence-chamber/learning-review-htr.test.cjs
