@@ -69,10 +69,14 @@ python3 server/command-center-live/test_pdf_htr_pilot.py -v
 3. Transcribe a small real scanned document (10–20 pages); compare against
    human diplomatic transcription and report Character Error Rate (CER) and
    Word Error Rate (WER). Synthetic stub results are **not** accuracy tests.
-4. Design a guarded server preview/review endpoint for image-only PDFs and
-   integrate it with the browser PDF Learning interface. Currently the browser
-   refuses to generate review proposals for PDFs with no text layer, even
-   though server OCR exists. **This PR does not change that behavior.**
+4. **Implemented in branch, NOT DEPLOYED:** guarded `POST /knowledge/preview` accepts
+   only an authenticated source ID previously uploaded to the knowledge store;
+   it replays the original PDF server-side and returns per-page PDF/OCR/HTR
+   transcription with source SHA256, never a historically VERIFIED claim.
+   The browser PDF Learning now calls this route when a scanned PDF has no
+   text layer and displays UNREVIEWED passages for manual selection.
+   End-to-end production remains UNVERIFIED until the host and UI deploy.
+   Upload, preview, and review require an authenticated operator session.
 5. Confirm source lineage, page identifiers, exact quote checking, operator
    review and `historically_verified: false` before production rollout.
 6. Test FTPS artifact list (now includes `htr_kraken.py`) and validate a
@@ -114,3 +118,13 @@ A successful report on a GitHub Actions runner is **not evidence** of
 availability on the Plesk server. No production preflight was executed
 at the time of this PR update because no Plesk-authenticated session or
 host command access was available to the integration.
+
+## Branch-level integration added
+- `server/command-center-live/app.js`: authenticated `/knowledge/preview` bound to original uploaded PDF, with checksum verification and no historical VERIFIED promotion.
+- `jarvis-intelligence-chamber/learning-review.js`: scanned-page fallback to server preview, sends session credentials, explicitly reports 401/404/OCR errors and keeps human review in place.
+- `server/command-center-live/learning-integration-test.js`: rejects unauthenticated, unknown or malformed source IDs and proves fabricated client-page text cannot alter original source preview.
+- `jarvis-intelligence-chamber/learning-review-htr.test.cjs`: simulated no-text-layer PDF triggers upload → server preview → human review and checks UNREVIEWED HTR provenance.
+
+**Scope boundary:** UI currently invokes server preview when the entire local PDF has negligible text; mixed digital/scanned PDFs will be handled in a separate extension. The normal PDF text path remains unchanged.
+
+No Kraken executable, model, storage schema, web server, or 3D rendering change has been deployed to Plesk by this branch. Do not mark production HTR ready until a live read-only host preflight, compatible real handwritten model trial and measured CER/WER are available.
