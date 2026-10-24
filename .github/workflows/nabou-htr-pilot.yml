@@ -8,6 +8,7 @@ on:
       - 'server/command-center-live/test_htr_kraken.py'
       - 'server/command-center-live/test_pdf_htr_pilot.py'
       - '.github/workflows/nabou-htr-pilot.yml'
+      - 'tools/htr_server_preflight.py'
   workflow_dispatch:
 
 permissions:
@@ -27,3 +28,5 @@ jobs:
           python3 server/command-center-live/test_htr_kraken.py -v
           python3 server/command-center-live/test_pdf_htr_pilot.py -v
           python3 tools/test_ftps_deployment.py -v
+          python3 -m py_compile tools/htr_server_preflight.py
+          python3 tools/htr_server_preflight.py
