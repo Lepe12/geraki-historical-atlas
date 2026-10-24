@@ -25,7 +25,9 @@ def run(args, timeout=30):
 
 def extract(filename):
     # Preserve 768 MiB parser limit while allowing a separately bounded Kraken child.
-    resource.setrlimit(resource.RLIMIT_AS, (768 * 1024**2, 6144 * 1024**2))
+    _, hard_limit = resource.getrlimit(resource.RLIMIT_AS)
+    soft_limit = min(768 * 1024**2, hard_limit) if hard_limit != resource.RLIM_INFINITY else 768 * 1024**2
+    resource.setrlimit(resource.RLIMIT_AS, (soft_limit, hard_limit))
     resource.setrlimit(resource.RLIMIT_FSIZE, (64 * 1024**2, 64 * 1024**2))
     resource.setrlimit(resource.RLIMIT_CPU, (120, 120))
     raw = Path(filename).read_bytes()
@@ -40,7 +42,10 @@ def extract(filename):
     pages = []
     ocr_count = 0
     htr_status, htr_model = htr_configuration()
-    htr_budget = max(1, min(3, int(os.environ.get('PCT_HTR_MAX_PAGES', '2'))))
+    try:
+        htr_budget = max(1, min(3, int(os.environ.get('PCT_HTR_MAX_PAGES', '2'))))
+    except ValueError:
+        htr_budget = 2
     htr_attempts = 0
     with tempfile.TemporaryDirectory(prefix='nabou-pdf-') as tmp:
         available = None
