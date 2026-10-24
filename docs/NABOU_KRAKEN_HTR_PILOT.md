@@ -99,3 +99,18 @@ https://kraken.re/main/user_guide/inference.html
 
 No Zenodo model is bundled with this PR. Do not auto-download models during
 ordinary PDF Learning requests.
+
+## Read-only server preflight
+The repository now includes `tools/htr_server_preflight.py`.
+Run it **inside the actual Plesk Python host environment** to observe
+availability of Poppler, Tesseract, Kraken, and model readability,
+without printing tokens, passwords, or configured model paths.
+
+```shell
+python3 tools/htr_server_preflight.py
+```
+
+A successful report on a GitHub Actions runner is **not evidence** of
+availability on the Plesk server. No production preflight was executed
+at the time of this PR update because no Plesk-authenticated session or
+host command access was available to the integration.
