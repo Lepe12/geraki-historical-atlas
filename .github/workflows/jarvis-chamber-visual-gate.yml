@@ -34,11 +34,16 @@ jobs:
         run: |
           node --check jarvis-intelligence-chamber/chamber.js
           node --check jarvis-intelligence-chamber/gpu-field.js
+          node --check jarvis-intelligence-chamber/mediterranean-3d.js
+          node --check jarvis-intelligence-chamber/cited-voyage-routes.js
+          node --check jarvis-intelligence-chamber/mediterranean-coast.js
           grep -q 'src="./chamber.js' jarvis-intelligence-chamber/index.html
+          grep -q 'src="./vendor/three-0.160.0.min.js' jarvis-intelligence-chamber/index.html
+          grep -q 'src="./cited-voyage-routes.js' jarvis-intelligence-chamber/index.html
           grep -q 'src="./gpu-field.js' jarvis-intelligence-chamber/index.html
           ! grep -q 'src="./world3d.js"' jarvis-intelligence-chamber/index.html
       - name: Verify source content search and research state
-        run: node --test jarvis-intelligence-chamber/source-search.test.cjs jarvis-intelligence-chamber/live-bridge.test.cjs jarvis-intelligence-chamber/research-export.test.cjs
+        run: node --test jarvis-intelligence-chamber/source-search.test.cjs jarvis-intelligence-chamber/live-bridge.test.cjs jarvis-intelligence-chamber/research-export.test.cjs jarvis-intelligence-chamber/cited-voyage-routes.test.cjs
       - name: Install browser
         run: |
           npm install --no-save playwright@1.56.1
@@ -49,6 +54,8 @@ jobs:
         run: node jarvis-intelligence-chamber/historical-map-review-browser.test.cjs
       # The current four-destination workspace replaces the legacy cinematic and voice shell.
       # Each browser suite starts its own isolated server and never dispatches production work.
+      - name: Verify the cited 3D chart draws only sourced segments
+        run: node jarvis-intelligence-chamber/cited-3d-map.test.cjs
       - name: Verify renderer, workspace navigation and responsive layout
         env:
           NABOU_SCREENSHOT_DIR: jarvis-intelligence-chamber/screenshots
