@@ -53,11 +53,13 @@ def recognize(image, model_path, timeout=45):
             return 'KRAKEN_NOT_INSTALLED', ''
         except subprocess.TimeoutExpired:
             return 'TIMEOUT', ''
-        except (OSError, ValueError):
+        except (OSError, ValueError, subprocess.SubprocessError):
             return 'EXECUTION_ERROR', ''
         if result.returncode != 0:
             return 'KRAKEN_FAILED', ''
         if not dest.is_file():
             return 'NO_OUTPUT', ''
+        if dest.stat().st_size > 1024 * 1024:
+            return 'OUTPUT_TOO_LARGE', ''
         value = dest.read_text(encoding='utf-8', errors='replace').strip()
         return ('OK', value) if value else ('EMPTY_RESULT', '')
