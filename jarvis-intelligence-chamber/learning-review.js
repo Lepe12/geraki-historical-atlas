@@ -320,10 +320,10 @@
         if (!current.pages.some(p => p.text.trim().length >= 35)) {
           current.items = [];
           setState("OCR / HTR — NO USABLE TRANSCRIPTION", "error");
+          render();
           summary.textContent =
             "Το αρχείο αναλύθηκε στον server, αλλά δεν προέκυψε επαρκές κείμενο. " +
             "Ελέγξτε την ποιότητα σάρωσης και τη διαθεσιμότητα κατάλληλου μοντέλου χειρογράφων.";
-          render();
           return;
         }
       }
