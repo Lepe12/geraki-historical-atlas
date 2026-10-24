@@ -95,7 +95,7 @@ async function main() {
   assert.equal(calls.length,2,"scanned PDF must upload and preview");
   assert.match(els.learningItems.innerHTML,/1677/);
   assert.match(els.learningSummary.textContent,/Kraken HTR/);
-  assert.notMatch(els.learningItems.innerHTML,/VERIFIED/);
+  assert.doesNotMatch(els.learningItems.innerHTML,/VERIFIED/);
   const card={dataset:{i:"0"},querySelector(){return null;}};
   const btn={dataset:{act:"accept"}};
   els.learningItems.fire("click",{target:{closest(sel){
