@@ -80,3 +80,22 @@ python3 server/command-center-live/test_pdf_htr_pilot.py -v
 
 Official CLI documentation:
 https://kraken.re/main/user_guide/inference.html
+
+## Candidate recognition model researched (not installed)
+- **McCATMuS_nfd_nofix_V1.mlmodel** — Zenodo DOI
+  https://doi.org/10.5281/zenodo.13788177, 16.2 MB.
+- The record documents a mixture of *handwritten, printed and typewritten*
+  European Latin-script material, spanning the sixteenth through twenty-first
+  centuries and including Italian and Spanish. Model metadata lists license
+  **CC-BY-4.0**, NFD normalization, and a published training-set accuracy
+  value **not transferable to seventeenth-century Venetian manuscripts**.
+- The model was trained with **Kraken 4.3.13**. Verify compatibility with
+  the installed Kraken release before enabling, and validate with diplomatic
+  ground-truth from our target archival hand.
+- Link to metadata:
+  https://zenodo.org/records/13788177/files/metadata.json?download=1
+- **Greek and Ottoman scripts are out of scope for this candidate model.**
+  They require dedicated script-appropriate models and independent testing.
+
+No Zenodo model is bundled with this PR. Do not auto-download models during
+ordinary PDF Learning requests.
