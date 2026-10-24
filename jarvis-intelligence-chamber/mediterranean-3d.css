@@ -1,0 +1,119 @@
+/* Cited-route 3D view. Off until #cited3dToggle is pressed, so the 2D portolan stays the default. */
+#cited3d {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  display: block;
+  visibility: hidden;
+  pointer-events: none;
+  touch-action: none;
+}
+body.nx-cited-3d #cited3d {
+  visibility: visible;
+  pointer-events: auto;
+}
+body.nx-cited-3d #chartView .chart-stage,
+body.nx-cited-3d #chartView #universe,
+body.nx-cited-3d #chartView .grain,
+body.nx-cited-3d #chartView .node-seals,
+body.nx-cited-3d #chartView #nodeLabels {
+  visibility: hidden !important;
+}
+
+#cited3dLabels {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  overflow: hidden;
+}
+#cited3dLabels[hidden] { display: none !important; }
+.cited3d-place {
+  position: absolute;
+  transform: translate(-50%, -130%);
+  padding: 2px 7px;
+  border: 1px solid #2a190e;
+  background: rgba(251, 243, 220, 0.92);
+  color: #2a190e;
+  font: 600 13px/1.2 var(--nx-body, Georgia, serif);
+  white-space: nowrap;
+}
+.cited3d-place[hidden] { display: none !important; }
+
+#cited3dPanel {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  bottom: 48px;
+  width: min(400px, calc(100% - 72px));
+  z-index: 7;
+  overflow: auto;
+  padding: 12px 14px 16px;
+  background: rgba(251, 243, 220, 0.96);
+  color: #2a190e;
+  border: 1px solid #2a190e;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+  font: 15px/1.45 var(--nx-body, Georgia, serif);
+}
+#cited3dPanel[hidden] { display: none !important; }
+#cited3dPanel h2 {
+  margin: 0 0 6px;
+  font: 600 20px/1.25 var(--nx-body, Georgia, serif);
+}
+#cited3dPanel p { margin: 0 0 8px; }
+#cited3dPanel blockquote {
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  border-left: 3px solid #7b1c17;
+  background: rgba(255, 255, 255, 0.45);
+}
+#cited3dPanel blockquote p { margin: 0; }
+.cited3d-kicker {
+  margin: 0 0 4px;
+  font: 600 11px/1.3 var(--nx-body, Georgia, serif);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7b1c17;
+}
+.cited3d-vessel { font-style: italic; }
+.cited3d-note { font-size: 13px; }
+.cited3d-path {
+  font: 12px/1.35 ui-monospace, monospace;
+  word-break: break-all;
+  color: #4a3320;
+}
+.cited3d-choices { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+.cited3d-choices button {
+  text-align: left;
+  padding: 6px 8px;
+  border: 1px solid #2a190e;
+  background: #f4ead0;
+  color: #2a190e;
+  font: 600 14px/1.3 var(--nx-body, Georgia, serif);
+  cursor: pointer;
+}
+.cited3d-choices button[aria-pressed="true"] {
+  background: #7b1c17;
+  color: #fbf3dc;
+}
+#cited3dPanel details { margin-top: 8px; }
+#cited3dPanel li { margin: 0 0 10px; }
+#cited3dPanel a { color: #7b1c17; }
+
+#cited3dToggle[aria-pressed="true"] {
+  background: #7b1c17 !important;
+}
+#cited3dToggle[aria-pressed="true"] svg { stroke: #fbf3dc; }
+
+@media (max-width: 800px) {
+  #cited3dPanel {
+    top: auto;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: auto;
+    max-height: 32%;
+  }
+}
