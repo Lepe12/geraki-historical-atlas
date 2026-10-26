@@ -1,0 +1,130 @@
+# NABOU//X — Kraken historical handwriting (HTR) pilot
+
+## Scope (2026-10-24)
+This is an **opt-in server-side pilot**, not a production HTR success claim.
+It extends `server/command-center-live/pdf-evidence.py` for image-only/low-text
+PDF pages. It does **not** alter 3D/UI, agent orchestration, database,
+historical verification gates, or the browser's PDF Learning upload flow.
+
+Existing behavior remains the default when `PCT_HTR_ENABLED` is unset:
+PDF text -> Poppler, image-only pages -> Tesseract OCR.
+
+## When enabled
+- Convert a low-text PDF page to PNG using the existing Poppler path.
+- Invoke a **locally installed** Kraken 7.x binary with an **explicit, local,
+  historically appropriate recognition model** (no auto-download).
+- Preserve per-page `method: KRAKEN_HTR`, `htr_status`, `text_sha256`,
+  `transcription_review: UNREVIEWED`, and top-level
+  `historically_verified: false`.
+- If Kraken is absent, times out, fails, or has no output, fall back to the
+  existing Tesseract OCR where available. Record the HTR error per page.
+- The first 2 low-text pages are eligible (at most 3 with configuration).
+  This protects a synchronous backend parser; it is **not** bulk HTR.
+
+## Prerequisites — NOT verified on the current Plesk server
+- Python environment and available RAM/CPU sufficient for installed Kraken.
+- `kraken` command on the Python worker's PATH.
+- Readable and licensed HTR model for the **specific script and period**.
+- Poppler (`pdfinfo`, `pdftotext`, `pdftoppm`), as currently required.
+- Adequate timeouts and operational isolation before production enablement.
+
+Environment variables (for **staging only** until infrastructure and model
+are proven):
+
+```shell
+PCT_HTR_ENABLED=1
+PCT_HTR_MODEL=/absolute/path/to/a-validated-script-model.mlmodel
+PCT_HTR_MAX_PAGES=2
+PCT_HTR_MEMORY_MB=4096
+```
+
+Do not store HTR models in Git; do not add any credential to the repository.
+CLI (Kraken official syntax):
+
+```shell
+kraken -i scanned-page.png page.txt --device cpu segment -bl ocr -m /absolute/path/to/model.mlmodel
+```
+
+## Verification performed
+- Local contract tests with **fake Kraken executable**, checking disabled
+  defaults, missing-model behavior, argv and output.
+- Local image-only PDF integration test: Poppler renders page, controlled mock
+  Kraken produces unreviewed transcription, source SHA remains attached.
+- These tests prove code wiring only, **not handwriting recognition accuracy**,
+  server resources, or end-to-end production UI operation.
+
+Run again:
+
+```shell
+python3 server/command-center-live/test_htr_kraken.py -v
+python3 server/command-center-live/test_pdf_htr_pilot.py -v
+```
+
+## Gates before claiming a working HTR feature
+1. Plesk read-only diagnostics: CPU, RAM, Python environment and background
+   job capacity. Do not enable HTR blindly on Passenger's synchronous request.
+2. Install Kraken in an isolated environment and license-check a recognition
+   model compatible with 16th–17th century Greek/Italian/Spanish handwriting.
+   Ottoman scripts require separately qualified models/evaluation.
+3. Transcribe a small real scanned document (10–20 pages); compare against
+   human diplomatic transcription and report Character Error Rate (CER) and
+   Word Error Rate (WER). Synthetic stub results are **not** accuracy tests.
+4. **Implemented in branch, NOT DEPLOYED:** guarded `POST /knowledge/preview` accepts
+   only an authenticated source ID previously uploaded to the knowledge store;
+   it replays the original PDF server-side and returns per-page PDF/OCR/HTR
+   transcription with source SHA256, never a historically VERIFIED claim.
+   The browser PDF Learning now calls this route when a scanned PDF has no
+   text layer and displays UNREVIEWED passages for manual selection.
+   End-to-end production remains UNVERIFIED until the host and UI deploy.
+   Upload, preview, and review require an authenticated operator session.
+5. Confirm source lineage, page identifiers, exact quote checking, operator
+   review and `historically_verified: false` before production rollout.
+6. Test FTPS artifact list (now includes `htr_kraken.py`) and validate a
+   real production deployment **only after explicit enablement approval**.
+
+Official CLI documentation:
+https://kraken.re/main/user_guide/inference.html
+
+## Candidate recognition model researched (not installed)
+- **McCATMuS_nfd_nofix_V1.mlmodel** — Zenodo DOI
+  https://doi.org/10.5281/zenodo.13788177, 16.2 MB.
+- The record documents a mixture of *handwritten, printed and typewritten*
+  European Latin-script material, spanning the sixteenth through twenty-first
+  centuries and including Italian and Spanish. Model metadata lists license
+  **CC-BY-4.0**, NFD normalization, and a published training-set accuracy
+  value **not transferable to seventeenth-century Venetian manuscripts**.
+- The model was trained with **Kraken 4.3.13**. Verify compatibility with
+  the installed Kraken release before enabling, and validate with diplomatic
+  ground-truth from our target archival hand.
+- Link to metadata:
+  https://zenodo.org/records/13788177/files/metadata.json?download=1
+- **Greek and Ottoman scripts are out of scope for this candidate model.**
+  They require dedicated script-appropriate models and independent testing.
+
+No Zenodo model is bundled with this PR. Do not auto-download models during
+ordinary PDF Learning requests.
+
+## Read-only server preflight
+The repository now includes `tools/htr_server_preflight.py`.
+Run it **inside the actual Plesk Python host environment** to observe
+availability of Poppler, Tesseract, Kraken, and model readability,
+without printing tokens, passwords, or configured model paths.
+
+```shell
+python3 tools/htr_server_preflight.py
+```
+
+A successful report on a GitHub Actions runner is **not evidence** of
+availability on the Plesk server. No production preflight was executed
+at the time of this PR update because no Plesk-authenticated session or
+host command access was available to the integration.
+
+## Branch-level integration added
+- `server/command-center-live/app.js`: authenticated `/knowledge/preview` bound to original uploaded PDF, with checksum verification and no historical VERIFIED promotion.
+- `jarvis-intelligence-chamber/learning-review.js`: scanned-page fallback to server preview, sends session credentials, explicitly reports 401/404/OCR errors and keeps human review in place.
+- `server/command-center-live/learning-integration-test.js`: rejects unauthenticated, unknown or malformed source IDs and proves fabricated client-page text cannot alter original source preview.
+- `jarvis-intelligence-chamber/learning-review-htr.test.cjs`: simulated no-text-layer PDF triggers upload → server preview → human review and checks UNREVIEWED HTR provenance.
+
+**Scope boundary:** UI currently invokes server preview when the entire local PDF has negligible text; mixed digital/scanned PDFs will be handled in a separate extension. The normal PDF text path remains unchanged.
+
+No Kraken executable, model, storage schema, web server, or 3D rendering change has been deployed to Plesk by this branch. Do not mark production HTR ready until a live read-only host preflight, compatible real handwritten model trial and measured CER/WER are available.

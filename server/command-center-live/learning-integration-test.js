@@ -49,6 +49,22 @@ async function main(){
       "content-length":String(pdf.length)});
     assert.equal(uploaded.status,201);
     const id=uploaded.json.source_id;
+    const previewDenied=await request(port,"POST","/knowledge/preview",JSON.stringify({source_id:id}),{"content-type":"application/json"});
+    assert.equal(previewDenied.status,401,"PDF preview must require operator/session authorization");
+    const previewInvalid=await request(port,"POST","/knowledge/preview",JSON.stringify({source_id:"../unsafe"}),{...auth,"content-type":"application/json"});
+    assert.equal(previewInvalid.status,400);
+    const previewMissing=await request(port,"POST","/knowledge/preview",JSON.stringify({source_id:"src-not-present"}),{...auth,"content-type":"application/json"});
+    assert.equal(previewMissing.status,404);
+    const preview=await request(port,"POST","/knowledge/preview",JSON.stringify({source_id:id,pages:[{page:1,text:"FORGED"}]}),{...auth,"content-type":"application/json"});
+    assert.equal(preview.status,200,"Authenticated preview must replay original PDF");
+    assert.equal(preview.json.schema,"nabou-pdf-preview-v1");
+    assert.equal(preview.json.source_id,id);
+    assert.equal(preview.json.historically_verified,false);
+    assert.equal(preview.json.transcription_review,"UNREVIEWED");
+    assert.equal(preview.json.pages[0].method,"PDF_TEXT");
+    assert.ok(preview.json.pages[0].text.includes("The ship anchored at Milo in 1674."));
+    assert.ok(!preview.json.pages[0].text.includes("FORGED"));
+    assert.equal(preview.json.source_sha256,uploaded.json.source_sha256||require("node:crypto").createHash("sha256").update(pdf).digest("hex"));
     const review={source_id:id,pages:[{page:1,text:"Forged browser text: invented assertion at Milo."}],
       items:[{id:"e1",type:"toponym",text:"Milo",page:1,status:"accepted"},
              {id:"e2",type:"claim",text:"Unquoted invented statement",page:1,status:"accepted"}]};

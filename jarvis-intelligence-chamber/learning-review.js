@@ -126,6 +126,7 @@
   async function uploadPdf(file) {
     const r = await fetch(endpoint + "/knowledge/upload", {
       method: "POST",
+      credentials: "include",
       headers: { "content-type": "application/pdf", "x-file-name": encodeURIComponent(file.name) },
       body: file,
     });
@@ -138,6 +139,40 @@
       e.status = r.status;
       throw e;
     }
+    return data;
+  }
+
+  async function previewScannedPdf(file) {
+    // Only server-replayed text is eligible for source-bound review.
+    if (!current.source_id) {
+      setState("UPLOADING SCANNED PDF", "working");
+      const uploaded = await uploadPdf(file);
+      current.source_id = uploaded.source_id;
+    }
+    setState("SERVER OCR / KRAKEN HTR", "working");
+    const response = await fetch(endpoint + "/knowledge/preview", {
+      method: "POST",
+      credentials: "include",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ source_id: current.source_id }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const error = new Error(data.error || "preview_http_" + response.status);
+      error.status = response.status;
+      throw error;
+    }
+    if (data.schema !== "nabou-pdf-preview-v1" ||
+        data.source_id !== current.source_id ||
+        data.historically_verified !== false ||
+        !Array.isArray(data.pages)) {
+      throw new Error("UNEXPECTED_PREVIEW_SCHEMA");
+    }
+    current.pages = data.pages.map(page => ({
+      page: Number(page.page), text: String(page.text || ""),
+      method: page.method, htr_status: page.htr_status,
+      transcription_review: page.transcription_review,
+    }));
     return data;
   }
 
@@ -190,7 +225,10 @@
           pdf_page: page,
           printed_page: null,
           confidence,
-          extraction_method: "text_layer_heuristic",
+          extraction_method: pages.find(p => p.page === page)?.method === "KRAKEN_HTR"
+            ? "server_htr_unreviewed_heuristic"
+            : pages.find(p => p.page === page)?.method === "TESSERACT_OCR"
+              ? "server_ocr_unreviewed_heuristic" : "text_layer_heuristic",
           verification_status: "UNREVIEWED",
           status: "pending",
           editing: false,
@@ -276,14 +314,18 @@
       setState("READING PDF LOCALLY", "working");
       current.pages = await extractPages(file);
       const textChars = current.pages.reduce((n, p) => n + String(p.text || "").trim().length, 0);
+      let preview = null;
       if (textChars < 40) {
-        current.items = [];
-        setState("NO TEXT LAYER — OCR REQUIRED", "error");
-        summary.textContent =
-          "Το PDF φαίνεται σαρωμένο ή μόνο εικόνα. Απαιτείται OCR πριν από την εξαγωγή στοιχείων.";
-        list.innerHTML =
-          '<div class="learning-empty">Δεν βρέθηκε αναγνώσιμο κείμενο στο PDF. Απαιτείται OCR πριν εξαχθούν προτάσεις.</div>';
-        return;
+        preview = await previewScannedPdf(file);
+        if (!current.pages.some(p => p.text.trim().length >= 35)) {
+          current.items = [];
+          setState("OCR / HTR — NO USABLE TRANSCRIPTION", "error");
+          render();
+          summary.textContent =
+            "Το αρχείο αναλύθηκε στον server, αλλά δεν προέκυψε επαρκές κείμενο. " +
+            "Ελέγξτε την ποιότητα σάρωσης και τη διαθεσιμότητα κατάλληλου μοντέλου χειρογράφων.";
+          return;
+        }
       }
       setState("BUILDING REVIEW", "working");
       current.items = proposals(current.pages);
@@ -295,9 +337,15 @@
       );
       render();
       summary.textContent +=
+        (preview ? " · Αποτέλεσμα server: " + (preview.htr_pages || 0) +
+          " σελίδες Kraken HTR, υπόλοιπες από PDF ή OCR." : "") +
         " · Αυτόματες προτάσεις και αποσπάσματα· απαιτείται έλεγχος OCR και ιστορική επαλήθευση.";
     } catch (e) {
-      setState("Αποτυχία ανάγνωσης — δοκιμάστε ξανά ή επιλέξτε άλλο PDF", "error");
+      setState(e.status === 401 ? "ΑΠΑΙΤΕΙΤΑΙ ΣΥΝΔΕΣΗ ΧΕΙΡΙΣΤΗ ΣΤΟ PDF LEARNING" :
+        e.status === 503 ? "Ο SERVER ΕΙΝΑΙ ΑΠΑΣΧΟΛΗΜΕΝΟΣ — ΕΠΑΝΑΛΗΨΗ" :
+        e.status === 404 ? "Ο SERVER ΔΕΝ ΕΧΕΙ ΑΚΟΜΗ ΤΗ ΛΕΙΤΟΥΡΓΙΑ OCR PREVIEW" :
+        e.status === 422 ? "ΣΦΑΛΜΑ OCR / HTR: " + e.message :
+        "Αποτυχία ανάγνωσης: " + e.message, "error");
     } finally {
       analyze.disabled = false;
       input.disabled = false;
@@ -366,11 +414,13 @@
       setState("SAVING APPROVED MEMORY", "working");
       const r = await fetch(endpoint + "/knowledge/review", {
         method: "POST",
+        credentials: "include",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ source_id: current.source_id, pages: current.pages, items: accepted }),
       });
       const data = await r.json().catch(() => ({}));
       if (!r.ok) throw Object.assign(new Error(data.error || "save_http_" + r.status), { status: r.status });
+      if (data.accepted_items !== accepted.length) throw new Error("Ασυμφωνία μεταγραφής και πρωτότυπου PDF: " + data.accepted_items + " / " + accepted.length);
       accepted.forEach((x) => (x.saved = true));
       setState("Αποθηκεύτηκαν " + data.accepted_items + " στοιχεία", "learned");
       source.textContent = (source.textContent || "Πηγή") + " · Αποθηκεύτηκε";

@@ -130,7 +130,7 @@ class FtpsDeploymentTests(unittest.TestCase):
         self.assertNotIn('PRIVATE_FIXTURE',str(report))
 
     def test_file_upload_success_is_not_database_or_research_acceptance(self):
-        runner=Mock(return_value=SimpleNamespace(returncode=0,stdout='DEPLOYED: four verified backend files'))
+        runner=Mock(return_value=SimpleNamespace(returncode=0,stdout='DEPLOYED: five verified backend files'))
         report=module.execute({name:'PRIVATE_FIXTURE' for name in module.REQUIRED},runner)
         self.assertTrue(report['production_changed'])
         self.assertFalse(report['database_migration_executed'])

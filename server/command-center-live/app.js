@@ -269,6 +269,26 @@ const server=http.createServer(async(req,res)=>{
       writeKnowledgeIndex(index);
       return json(res,201,{status:"UPLOADED",source_id:sourceId,original_name:original,size:raw.length});
     }
+    if(req.method==="POST"&&p==="/knowledge/preview"){
+      if(!knowledgeMutationAuthorized(req))return json(res,401,{error:"operator_authorization_required"});
+      const body=JSON.parse(await readBody(req,4096));
+      const sourceId=String(body?.source_id||"");
+      if(!/^src-[A-Za-z0-9-]+$/.test(sourceId))return json(res,400,{error:"invalid_source_id"});
+      const meta=readKnowledgeIndex().find(x=>x.source_id===sourceId);
+      if(!meta)return json(res,404,{error:"source_not_found"});
+      let replay;
+      try{replay=await replayPdf(path.join(KNOWLEDGE_UPLOAD_DIR,sourceId+".pdf"));}
+      catch(error){return json(res,error.message==="PDF_PARSER_BUSY"?503:422,{error:error.message,historically_verified:false});}
+      if(meta.source_sha256&&meta.source_sha256!==replay.source_sha256)
+        return json(res,409,{error:"SOURCE_CHECKSUM_MISMATCH"});
+      return json(res,200,{schema:"nabou-pdf-preview-v1",source_id:sourceId,
+        source_sha256:replay.source_sha256,original_name:meta.original_name,
+        pages:replay.pages.map(page=>({page:page.page,text:page.text,method:page.method,
+          text_sha256:page.text_sha256,htr_status:page.htr_status,
+          transcription_review:page.transcription_review,ocr_confidence:page.ocr_confidence})),
+        htr_status:replay.htr_status,htr_pages:replay.htr_pages||0,
+        historically_verified:false,transcription_review:"UNREVIEWED"});
+    }
     if(req.method==="POST"&&p==="/knowledge/review"){
       if(!knowledgeMutationAuthorized(req))return json(res,401,{error:"operator_authorization_required"});
       const body=JSON.parse(await readBody(req,8*1024*1024));

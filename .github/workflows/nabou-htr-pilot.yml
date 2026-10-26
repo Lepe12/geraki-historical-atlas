@@ -1,0 +1,41 @@
+name: NABOU Kraken HTR pilot checks
+
+on:
+  pull_request:
+    paths:
+      - 'server/command-center-live/htr_kraken.py'
+      - 'server/command-center-live/pdf-evidence.py'
+      - 'server/command-center-live/test_htr_kraken.py'
+      - 'server/command-center-live/test_pdf_htr_pilot.py'
+      - '.github/workflows/nabou-htr-pilot.yml'
+      - 'tools/htr_server_preflight.py'
+      - 'jarvis-intelligence-chamber/learning-review.js'
+      - 'jarvis-intelligence-chamber/learning-review-htr.test.cjs'
+      - 'server/command-center-live/app.js'
+      - 'server/command-center-live/learning-integration-test.js'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  htr-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Poppler (isolated CI only)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+      - name: Check Python syntax and adapter contract
+        run: |
+          python3 -m py_compile server/command-center-live/htr_kraken.py server/command-center-live/pdf-evidence.py
+          python3 server/command-center-live/test_htr_kraken.py -v
+          python3 server/command-center-live/test_pdf_htr_pilot.py -v
+          python3 tools/test_ftps_deployment.py -v
+          python3 -m py_compile tools/htr_server_preflight.py
+          python3 tools/htr_server_preflight.py
+      - name: Browser learning-review scanned PDF regression (no live request)
+        run: |
+          node --check jarvis-intelligence-chamber/learning-review.js
+          node --check jarvis-intelligence-chamber/learning-review-htr.test.cjs
+          node jarvis-intelligence-chamber/learning-review-htr.test.cjs

@@ -23,7 +23,7 @@ def execute(env=None, runner=subprocess.run):
     if not all(report['bindings_present'].values()):
         report['status']='BLOCKED_FTPS_BINDINGS_NOT_BOUND';return report
     root=Path(__file__).resolve().parents[2]
-    names=('historical-evidence.js','pdf-evidence.py','pdf-evidence.js','app.js')
+    names=('historical-evidence.js','pdf-evidence.py','htr_kraken.py','pdf-evidence.js','app.js')
     report['local_payload_sha256']={name:hashlib.sha256((root/'server/command-center-live'/name).read_bytes()).hexdigest() for name in names}
     storage=env.get('PCT_FTPS_PAYLOAD')=='evidence_storage'
     if storage:
@@ -54,7 +54,7 @@ def execute(env=None, runner=subprocess.run):
     if result.returncode==0 and storage and 'STORAGE_FILES_STAGED_AWAITING_EXISTING_HOST_LOCAL_CRON' in output:
         report.update(status='STORAGE_FILES_STAGED_AWAITING_HOST_LOCAL_MIGRATION',production_changed=True,
                       uploaded_files_hash_checked=True,passenger_restart_requested=False)
-    elif result.returncode==0 and 'DEPLOYED: four verified backend files' in output:
+    elif result.returncode==0 and 'DEPLOYED: five verified backend files' in output:
         report.update(status='FILES_INSTALLED_HTTP_AND_DATABASE_VALIDATION_REQUIRED',production_changed=True,
                       uploaded_files_hash_checked=True,passenger_restart_requested=True)
     else:

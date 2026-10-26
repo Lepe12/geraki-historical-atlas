@@ -19,7 +19,7 @@ import uuid
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = Path("server/command-center-live")
-FILES = ("historical-evidence.js", "pdf-evidence.py", "pdf-evidence.js", "app.js")
+FILES = ("historical-evidence.js", "pdf-evidence.py", "htr_kraken.py", "pdf-evidence.js", "app.js")
 REMOTE = (os.getenv("PCT_FTPS_APP_ROOT") or "/").rstrip("/") or "/"
 HOST = os.environ["PCT_FTPS_HOST"]
 USER = os.environ["PCT_FTPS_USER"]
@@ -137,7 +137,7 @@ try:
         marker = "tmp/restart.txt"
         phase = 'RESTART'
         ftp.storbinary("STOR " + marker, io.BytesIO(b""))
-        print("DEPLOYED: four verified backend files and issued Passenger restart marker.")
+        print("DEPLOYED: five verified backend files and issued Passenger restart marker.")
     else:
         print('STORAGE_FILES_STAGED_AWAITING_EXISTING_HOST_LOCAL_CRON')
     print("Existing files were retained as remote .nabou-before-* recovery copies.")

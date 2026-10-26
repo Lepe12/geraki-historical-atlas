@@ -17,7 +17,7 @@ with tempfile.TemporaryDirectory(prefix='nabou-ocr-check-') as tmp:
     assert 'MILO HARBOUR 1674' in page['text'].upper(),page
     assert page['words'] and all(w['bbox'][2]>0 for w in page['words'])
     assert result['historically_verified'] is False
-    assert result['htr_status']=='UNSUPPORTED_NO_HANDWRITING_MODEL'
+    assert result['htr_status']=='DISABLED'
     assert hashlib.sha256(page['text'].encode()).hexdigest()==page['text_sha256']
     print(json.dumps({'status':'PASS','test':'REAL_IMAGE_PDF_OCR_NOT_HISTORICAL_RESEARCH',
                       'method':page['method'],'ocr_confidence':page['ocr_confidence'],
