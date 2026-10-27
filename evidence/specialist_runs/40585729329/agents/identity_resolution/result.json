@@ -1,0 +1,3250 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "identity_resolution",
+  "label": "Identity Resolution Agent",
+  "assignment_id": "identity_resolution:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "entity_candidates",
+    "variant_names",
+    "same_entity_assessment",
+    "collision_warnings"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "b097535e52d2488ad2e878a68792a2daf30bbd55c1af9ff52bb8ac0b7d7345ff",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "identity_resolution",
+    "assignment_id": "identity_resolution:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:SearchCulture.gr / EKT",
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:OpenArchives.gr / EKT"
+    ],
+    "queries": [
+      "corsairs Νάουσα Πάρου",
+      "voyages Νάουσα Πάρου",
+      "corsairs",
+      "corsairs harbours Νάουσα Πάρου"
+    ],
+    "operation": "search",
+    "search_budget": 16,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 130,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 102,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 4,
+    "total_search_budget": 16,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "voyages Νάουσα Πάρου",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=voyages+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=voyages+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 937}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=voyages+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "voyages Νάουσα Πάρου",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22voyages+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22voyages+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 625, \"response_sha256\": \"bac901bdfa5f637db2e5c73d735153ec8b051c327a15a84668f407856dcff526\", \"elapsed_ms\": 1162}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22voyages+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "corsairs Νάουσα Πάρου",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22corsairs+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22corsairs+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 626, \"response_sha256\": \"94b673bb5dec56da28bfa823e7306ac452503b5a88548345c9be9be247318e3d\", \"elapsed_ms\": 1164}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22corsairs+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "corsairs Νάουσα Πάρου",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=corsairs+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=corsairs+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1268}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=corsairs+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "corsairs harbours Νάουσα Πάρου",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=corsairs+harbours+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=corsairs+harbours+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1372}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=corsairs+harbours+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "corsairs Νάουσα Πάρου",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=corsairs+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=corsairs+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25605, \"response_sha256\": \"ba72a85498d9a0ee4efce010cadbb69e34593ffc98bb76cecdb3c33c5d6b7946\", \"elapsed_ms\": 327}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=corsairs+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "voyages Νάουσα Πάρου",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=voyages+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=voyages+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25605, \"response_sha256\": \"943c342ce1b82072fa0b67125006a0da78b1864792b6aae0cca02959f9092d5f\", \"elapsed_ms\": 228}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=voyages+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "corsairs",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=corsairs&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=corsairs&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25517, \"response_sha256\": \"14f3d0240f6e16fc04c92e195e41370c3e478a364a9d7dbb79665d0de00ac6d4\", \"elapsed_ms\": 123}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=corsairs&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "corsairs harbours Νάουσα Πάρου",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22corsairs+harbours+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22corsairs+harbours+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 635, \"response_sha256\": \"6cf94f716a96d85fe7f339618005325b4892bc3d37bf2b2eda64e89e450662fe\", \"elapsed_ms\": 462}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22corsairs+harbours+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "corsairs harbours Νάουσα Πάρου",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=corsairs+harbours+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=corsairs+harbours+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 31568, \"response_sha256\": \"c962a29925e5898d8ebbf90e40a369cda78a842446c75ed02f6187ea23cf094b\", \"elapsed_ms\": 169}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=corsairs+harbours+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "corsairs",
+      "records": [
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb442264590",
+          "title": "Pirates vs corsairs : Davy Jones' gold / developed by Little worlds studio ; Mzone studio",
+          "creator": [
+            "Little worlds studio. Développeur",
+            "Mzone Studio. Développeur"
+          ],
+          "date": [
+            "2014"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb442264590",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb442264590"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb44226842c",
+          "title": "Pirates vs corsairs : Davy Jones' gold / developed by Little worlds studio ; Mzone studio",
+          "creator": [
+            "Little worlds studio. Développeur",
+            "Mzone Studio. Développeur"
+          ],
+          "date": [
+            "2014"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb44226842c",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb44226842c"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30166671d",
+          "title": "The Story of Africa and its explorers, by Robert Brown,...",
+          "creator": [
+            "Brown, Robert (1842-1895). Auteur du texte"
+          ],
+          "date": [
+            "1892"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30166671d",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30166671d"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb31024957b",
+          "title": "The Corsairs of France, by C. B. Norman,...",
+          "creator": [
+            "Norman, Charles Boswell. Auteur du texte"
+          ],
+          "date": [
+            "1887"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb31024957b",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb31024957b"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb47043456q",
+          "title": "Corsairs, captives, converts in early modernity : narrating barbary captivity in german-speaking Europe and the world, 1558-1807 / Robert Spindler",
+          "creator": [
+            "Spindler, Robert (1984-....). Auteur du texte"
+          ],
+          "date": [
+            "2020"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb47043456q",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb47043456q",
+            "ISBN 9783826070860"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb34213927q",
+          "title": "The Corsairs of France , by C. B. Norman,... With portraits and a map",
+          "creator": [
+            "Norman, C.-B.. Auteur du texte"
+          ],
+          "date": [
+            "1887"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb34213927q",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb34213927q"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb32106828v",
+          "title": "A Captive of the corsairs, by John Finnemore,...",
+          "creator": [
+            "Finnemore, John (1863-1915). Auteur du texte"
+          ],
+          "date": [],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb32106828v",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb32106828v"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb342140562",
+          "title": "The Corsairs of France , by C. B. Norman. Foreword and illustrations by Edward C. Caswell",
+          "creator": [
+            "Norman, C. B.. Auteur du texte"
+          ],
+          "date": [
+            "1929"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb342140562",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb342140562"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb310043636",
+          "title": "A Particular narrative of the burning in the port of Tripoli, four men of war belonging to those corsairs, by Sir John Narborough,... On the 14th. of January 1675/6...",
+          "creator": [
+            "Narborough, John (1640?-1688). Auteur du texte"
+          ],
+          "date": [
+            "1676"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb310043636",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb310043636"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb31712105d",
+          "title": "Our navy and the Barbary corsairs , by Gardner W. Allen",
+          "creator": [
+            "Allen, Gardner Weld. Auteur du texte"
+          ],
+          "date": [
+            "1905"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb31712105d",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb31712105d"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb44227025t",
+          "title": "Corsairs gold / Microïds",
+          "creator": [
+            "Microïds. Développeur"
+          ],
+          "date": [
+            "2014"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb44227025t",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb44227025t"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb31135885x",
+          "title": "The Barbary corsairs, by Stanley Lane Poole,... With additions by Lieut. J. D. J. Kelley,...",
+          "creator": [
+            "Lane-Poole, Stanley (1854-1931). Auteur du texte"
+          ],
+          "date": [
+            "1890"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb31135885x",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb31135885x"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb32490480s",
+          "title": "The Corsairs of France , by C. B. Norman. Foreword and illustrations by Edward C. Caswell",
+          "creator": [
+            "Norman, Charles Boswell. Auteur du texte"
+          ],
+          "date": [
+            "1929"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb32490480s",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb32490480s"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb45789801r",
+          "title": "The British Navy in the Mediterranean / John D. Grainger",
+          "creator": [
+            "Grainger, John D. (1939-....). Auteur du texte"
+          ],
+          "date": [
+            "2017"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb45789801r",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb45789801r",
+            "ISBN 9781783272310"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb47062142c",
+          "title": "British slaves and Barbary corsairs, 1580-1750 / Bernard Capp",
+          "creator": [
+            "Capp, Bernard. Auteur du texte"
+          ],
+          "date": [
+            "2022"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb47062142c",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb47062142c",
+            "ISBN 9780192857378"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb42167087r",
+          "title": "Pirates of Barbary : corsairs, conquests and captivity in the seventeenth-century Mediterranean / Adrian Tinniswood",
+          "creator": [
+            "Tinniswood, Adrian. Auteur du texte"
+          ],
+          "date": [
+            "2010"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb42167087r",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb42167087r",
+            "ISBN 9780224085267"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb385731583",
+          "title": "Corsairs gold",
+          "creator": [],
+          "date": [
+            "1999"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb385731583",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb385731583"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb38636010w",
+          "title": "Corsairs gold",
+          "creator": [],
+          "date": [
+            "2002"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb38636010w",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb38636010w"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb468455692",
+          "title": "The corsairs of Saint-Malo : network organization of a merchant elite under the Ancien Régime / Henning Hillmann",
+          "creator": [
+            "Hillmann, Henning. Auteur du texte"
+          ],
+          "date": [
+            "2021"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb468455692",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb468455692",
+            "ISBN 9780231180382"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb45469880z",
+          "title": "The corsairs' longest voyage : the Turkish raid in Iceland 1627 / by Þorsteinn Helgason ; translated by Anna Yates, Jóna Ann Pétursdóttir",
+          "creator": [
+            "Þorsteinn Helgason (1946-....). Auteur du texte"
+          ],
+          "date": [
+            "2018"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb45469880z",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb45469880z",
+            "ISBN 9789004284876"
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22corsairs%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22corsairs%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 34559, \"response_sha256\": \"8dd8c8cb5dc022786abf933626dbf81b8ea925f7e1b0279d36936ded64973e81\", \"elapsed_ms\": 745}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22corsairs%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 20, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "corsairs Νάουσα Πάρου",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=corsairs+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=corsairs+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 67095, \"response_sha256\": \"5a688e2f9a19b8d5c065f03c805b824f83e61e4dad05083e919c6b189eee87cc\", \"elapsed_ms\": 790}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=corsairs+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "corsairs",
+      "records": [
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-115476",
+          "title": "Συναυλία της Συμφωνικής Ορχήστρας της Βαμβέργης (115476) Concert of the Bamberg Symphony Orchestra (115476)",
+          "date": [
+            "1979 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-115476",
+          "digital_url": "https://exhibition.aefdigital.gr/exhibits/115476/",
+          "rights": "http://creativecommons.org/licenses/by-sa/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-115476\", \"dc_title\": [\"Συναυλία της Συμφωνικής Ορχήστρας της Βαμβέργης (115476)\", \"Concert of the Bamberg Symphony Orchestra (115476)\"], \"ekt_type\": [\"Συναυλία\"], \"ekt_subject\": [\"Μουσική\"], \"ekt_place\": [\"Ωδείο Ηρώδου Αττικού\"], \"ekt_chronology\": [\"1979 \"], \"dc_creator\": [\"Bamberg Symphony Orchestra [Bamberger Symphoniker]\", \"Συμφωνική Ορχήστρα της Βαμβέργης [Bamberger Symphoniker]\"], \"dc_contributor\": [\"Brahns, Johannes [Συμφωνία αρ. 2 σε Ρε μείζονα, op. 73]\", \"Strauss, Richard [Last Four Songs]\", \"Brahns, Johannes [Symphony No. 2 in D major, Op. 73]\", \"Composer: Berlioz, Hector [The Corsair / Le Corsaire: overture, Op. 21]\", \"Music Director: Loughran, James\", \"Μουσική σύνθεση: Berlioz, Hector [Ο Κουρσάρος / Le Corsaire: εισαγωγή, op. 21]\", \"Σολίστ: Moser, Edda [υψίφωνος]\", \"Strauss, Richard [Τέσσερα Τελευταία Τραγούδια]\", \"Μουσική διεύθυνση: Loughran, James\", \"Soloist: Moser, Edda [soprano]\"], \"edm_rights\": \"http://creativecommons.org/licenses/by-sa/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-115476\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ελληνικό Φεστιβάλ Α.Ε.\", \"collection\": \"Εικονικό Μουσείου Φεστιβάλ Αθηνών Επιδαύρου\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"https://exhibition.aefdigital.gr/exhibits/115476/\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-115476",
+            "dc_title": [
+              "Συναυλία της Συμφωνικής Ορχήστρας της Βαμβέργης (115476)",
+              "Concert of the Bamberg Symphony Orchestra (115476)"
+            ],
+            "ekt_type": [
+              "Συναυλία"
+            ],
+            "ekt_subject": [
+              "Μουσική"
+            ],
+            "ekt_place": [
+              "Ωδείο Ηρώδου Αττικού"
+            ],
+            "ekt_chronology": [
+              "1979 "
+            ],
+            "dc_creator": [
+              "Bamberg Symphony Orchestra [Bamberger Symphoniker]",
+              "Συμφωνική Ορχήστρα της Βαμβέργης [Bamberger Symphoniker]"
+            ],
+            "dc_contributor": [
+              "Brahns, Johannes [Συμφωνία αρ. 2 σε Ρε μείζονα, op. 73]",
+              "Strauss, Richard [Last Four Songs]",
+              "Brahns, Johannes [Symphony No. 2 in D major, Op. 73]",
+              "Composer: Berlioz, Hector [The Corsair / Le Corsaire: overture, Op. 21]",
+              "Music Director: Loughran, James",
+              "Μουσική σύνθεση: Berlioz, Hector [Ο Κουρσάρος / Le Corsaire: εισαγωγή, op. 21]",
+              "Σολίστ: Moser, Edda [υψίφωνος]",
+              "Strauss, Richard [Τέσσερα Τελευταία Τραγούδια]",
+              "Μουσική διεύθυνση: Loughran, James",
+              "Soloist: Moser, Edda [soprano]"
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by-sa/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-115476",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ελληνικό Φεστιβάλ Α.Ε.",
+            "collection": "Εικονικό Μουσείου Φεστιβάλ Αθηνών Επιδαύρου",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "https://exhibition.aefdigital.gr/exhibits/115476/"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_321952",
+          "title": "Pas de deux - Pas d' esclave (Le Corsaire)",
+          "date": [
+            "01/04/1998 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_321952",
+          "digital_url": "http://eliaserver.elia.org.gr/lselia/rec.aspx?id=321952",
+          "rights": "http://creativecommons.org/licenses/by/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_321952\", \"dc_title\": [\"Pas de deux - Pas d' esclave (Le Corsaire)\"], \"ekt_type\": [\"Θεατρική παράσταση\", \"Πρόγραμμα\"], \"ekt_subject\": [\"Θέατρο\", \"Χορός\"], \"ekt_chronology\": [\"01/04/1998 \"], \"dc_creator\": [\"Εθνική Λυρική Σκηνή   Αθήνα\"], \"dc_contributor\": [\"Petipa, Marius\", \"Ντε Πιαν, Λεωνίδας\", \"Adam, Adolphe Charles\", \"Ολύμπια    Αθήνα, Ακαδημίας\"], \"edm_rights\": \"http://creativecommons.org/licenses/by/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_321952\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ελληνικό Λογοτεχνικό και Ιστορικό Αρχείο (ΕΛΙΑ)- Μορφωτικό Ίδρυμα Εθνικής Τραπέζης (ΜΙΕΤ)\", \"collection\": \"Ψηφιοποιημένες Συλλογές του Ελληνικού Λογοτεχνικού και Ιστορικού Αρχείου (ΕΛΙΑ)\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"http://eliaserver.elia.org.gr/lselia/rec.aspx?id=321952\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_321952",
+            "dc_title": [
+              "Pas de deux - Pas d' esclave (Le Corsaire)"
+            ],
+            "ekt_type": [
+              "Θεατρική παράσταση",
+              "Πρόγραμμα"
+            ],
+            "ekt_subject": [
+              "Θέατρο",
+              "Χορός"
+            ],
+            "ekt_chronology": [
+              "01/04/1998 "
+            ],
+            "dc_creator": [
+              "Εθνική Λυρική Σκηνή   Αθήνα"
+            ],
+            "dc_contributor": [
+              "Petipa, Marius",
+              "Ντε Πιαν, Λεωνίδας",
+              "Adam, Adolphe Charles",
+              "Ολύμπια    Αθήνα, Ακαδημίας"
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_321952",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ελληνικό Λογοτεχνικό και Ιστορικό Αρχείο (ΕΛΙΑ)- Μορφωτικό Ίδρυμα Εθνικής Τραπέζης (ΜΙΕΤ)",
+            "collection": "Ψηφιοποιημένες Συλλογές του Ελληνικού Λογοτεχνικού και Ιστορικού Αρχείου (ΕΛΙΑ)",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "http://eliaserver.elia.org.gr/lselia/rec.aspx?id=321952"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-115314",
+          "title": "Συναυλία της Βασιλικής Φιλαρμονικής Ορχήστρας του Λονδίνου (115314) Concert of the Royal Philharmonic Orchestra of London (115314)",
+          "date": [
+            "1975 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-115314",
+          "digital_url": "https://exhibition.aefdigital.gr/exhibits/115314/",
+          "rights": "http://creativecommons.org/licenses/by-sa/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-115314\", \"dc_title\": [\"Συναυλία της Βασιλικής Φιλαρμονικής Ορχήστρας του Λονδίνου (115314)\", \"Concert of the Royal Philharmonic Orchestra of London (115314)\"], \"ekt_type\": [\"Συναυλία\"], \"ekt_subject\": [\"Μουσική\"], \"ekt_place\": [\"Ωδείο Ηρώδου Αττικού\"], \"ekt_chronology\": [\"1975 \"], \"dc_creator\": [\"Βασιλική Φιλαρμονική Ορχήστρα του Λονδίνου [Royal Philharmonic Orchestra]\"], \"dc_contributor\": [\"van Beethoven, Ludwig [Κοντσέρτο αρ. 5 για πιάνο και ορχήστρα σε Μι ύφεση μείζονα, op. 73 \\\"Το Αυτοκρατορικόν\\\"]\", \"Music Director: Davis, Colin (sir)\", \"van Beethoven, Ludwig [Piano Concerto No. 5 in E-flat major, Op. 73 \\\"Emperor\\\"]\", \"Sibelius, Jean [Symphony No. 1 in E minor, Op. 39]\", \"Composer: Berlioz, Hector [Le corsaire: overture, Op. 21]\", \"Μουσική διεύθυνση: Davis, Colin (sir)\", \"Σολίστ: Bachauer, Gina [πιάνο]\", \"Soloist: Bachauer, Gina [piano]\", \"Sibelius, Jean [Συμφωνία αρ. 1 σε Μι ελάσσονα, op. 39]\", \"Μουσική σύνθεση: Berlioz, Hector [Ο κουρσάρος / Le corsaire: εισαγωγή, op. 21]\"], \"edm_rights\": \"http://creativecommons.org/licenses/by-sa/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-115314\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ελληνικό Φεστιβάλ Α.Ε.\", \"collection\": \"Εικονικό Μουσείου Φεστιβάλ Αθηνών Επιδαύρου\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"https://exhibition.aefdigital.gr/exhibits/115314/\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-115314",
+            "dc_title": [
+              "Συναυλία της Βασιλικής Φιλαρμονικής Ορχήστρας του Λονδίνου (115314)",
+              "Concert of the Royal Philharmonic Orchestra of London (115314)"
+            ],
+            "ekt_type": [
+              "Συναυλία"
+            ],
+            "ekt_subject": [
+              "Μουσική"
+            ],
+            "ekt_place": [
+              "Ωδείο Ηρώδου Αττικού"
+            ],
+            "ekt_chronology": [
+              "1975 "
+            ],
+            "dc_creator": [
+              "Βασιλική Φιλαρμονική Ορχήστρα του Λονδίνου [Royal Philharmonic Orchestra]"
+            ],
+            "dc_contributor": [
+              "van Beethoven, Ludwig [Κοντσέρτο αρ. 5 για πιάνο και ορχήστρα σε Μι ύφεση μείζονα, op. 73 \"Το Αυτοκρατορικόν\"]",
+              "Music Director: Davis, Colin (sir)",
+              "van Beethoven, Ludwig [Piano Concerto No. 5 in E-flat major, Op. 73 \"Emperor\"]",
+              "Sibelius, Jean [Symphony No. 1 in E minor, Op. 39]",
+              "Composer: Berlioz, Hector [Le corsaire: overture, Op. 21]",
+              "Μουσική διεύθυνση: Davis, Colin (sir)",
+              "Σολίστ: Bachauer, Gina [πιάνο]",
+              "Soloist: Bachauer, Gina [piano]",
+              "Sibelius, Jean [Συμφωνία αρ. 1 σε Μι ελάσσονα, op. 39]",
+              "Μουσική σύνθεση: Berlioz, Hector [Ο κουρσάρος / Le corsaire: εισαγωγή, op. 21]"
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by-sa/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-115314",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ελληνικό Φεστιβάλ Α.Ε.",
+            "collection": "Εικονικό Μουσείου Φεστιβάλ Αθηνών Επιδαύρου",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "https://exhibition.aefdigital.gr/exhibits/115314/"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-51643",
+          "title": "Προμετωπίδα: Εικονογράφηση για το ποίημα του Λόρδου Βύρωνα \"The Corsair\".",
+          "date": [
+            "1849 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-51643",
+          "digital_url": "https://el.travelogues.gr/item.php?view=51643",
+          "rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/travelogues/000116-51643\", \"dc_title\": [\"Προμετωπίδα: Εικονογράφηση για το ποίημα του Λόρδου Βύρωνα \\\"The Corsair\\\".\"], \"ekt_type\": [\"Εικονογράφηση\"], \"ekt_chronology\": [\"1849 \"], \"edm_rights\": \"http://creativecommons.org/licenses/by-nc/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/travelogues/000116-51643\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ίδρυμα Αικατερίνης Λασκαρίδη\", \"collection\": \"Travelogues\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"https://el.travelogues.gr/item.php?view=51643\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-51643",
+            "dc_title": [
+              "Προμετωπίδα: Εικονογράφηση για το ποίημα του Λόρδου Βύρωνα \"The Corsair\"."
+            ],
+            "ekt_type": [
+              "Εικονογράφηση"
+            ],
+            "ekt_chronology": [
+              "1849 "
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-51643",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ίδρυμα Αικατερίνης Λασκαρίδη",
+            "collection": "Travelogues",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "https://el.travelogues.gr/item.php?view=51643"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_326154",
+          "title": "Κουρσάρος, ο Le corsaire",
+          "date": [
+            "1939 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_326154",
+          "digital_url": "http://eliaserver.elia.org.gr/lselia/rec.aspx?id=326154",
+          "rights": "http://creativecommons.org/licenses/by/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_326154\", \"dc_title\": [\"Κουρσάρος, ο\", \"Le corsaire\"], \"ekt_type\": [\"Θεατρική παράσταση\", \"Πρόγραμμα\"], \"ekt_person_creator\": [\"Κοτοπούλη Μαρίκα\"], \"ekt_chronology\": [\"1939 \"], \"dc_creator\": [\"Κοτοπούλη Μαρίκας   Αθήνα\"], \"dc_contributor\": [\"Χέλμης, Γεώργιος\", \"Κουν, Κάρολος\", \"Achard, Marcel\", \"Αγγελόπουλος, Μάριος\", \"Κοτοπούλη-Rex   Αθήνα, Πανεπιστημίου 48\", \"Παππάς, Γιώργος\"], \"edm_rights\": \"http://creativecommons.org/licenses/by/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_326154\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ελληνικό Λογοτεχνικό και Ιστορικό Αρχείο (ΕΛΙΑ)- Μορφωτικό Ίδρυμα Εθνικής Τραπέζης (ΜΙΕΤ)\", \"collection\": \"Ψηφιοποιημένες Συλλογές του Ελληνικού Λογοτεχνικού και Ιστορικού Αρχείου (ΕΛΙΑ)\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"http://eliaserver.elia.org.gr/lselia/rec.aspx?id=326154\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_326154",
+            "dc_title": [
+              "Κουρσάρος, ο",
+              "Le corsaire"
+            ],
+            "ekt_type": [
+              "Θεατρική παράσταση",
+              "Πρόγραμμα"
+            ],
+            "ekt_person_creator": [
+              "Κοτοπούλη Μαρίκα"
+            ],
+            "ekt_chronology": [
+              "1939 "
+            ],
+            "dc_creator": [
+              "Κοτοπούλη Μαρίκας   Αθήνα"
+            ],
+            "dc_contributor": [
+              "Χέλμης, Γεώργιος",
+              "Κουν, Κάρολος",
+              "Achard, Marcel",
+              "Αγγελόπουλος, Μάριος",
+              "Κοτοπούλη-Rex   Αθήνα, Πανεπιστημίου 48",
+              "Παππάς, Γιώργος"
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_326154",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ελληνικό Λογοτεχνικό και Ιστορικό Αρχείο (ΕΛΙΑ)- Μορφωτικό Ίδρυμα Εθνικής Τραπέζης (ΜΙΕΤ)",
+            "collection": "Ψηφιοποιημένες Συλλογές του Ελληνικού Λογοτεχνικού και Ιστορικού Αρχείου (ΕΛΙΑ)",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "http://eliaserver.elia.org.gr/lselia/rec.aspx?id=326154"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_332602",
+          "title": "Α΄ πρόγραμμα: Ο κουρσάρος (pas de deux) Le corsaire (pas de deux)",
+          "date": [
+            "07/07/1966 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_332602",
+          "digital_url": "http://eliaserver.elia.org.gr/lselia/rec.aspx?id=332602",
+          "rights": "http://creativecommons.org/licenses/by/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_332602\", \"dc_title\": [\"Α΄ πρόγραμμα: Ο κουρσάρος (pas de deux)\", \"Le corsaire (pas de deux)\"], \"ekt_type\": [\"Θεατρική παράσταση\", \"Πρόγραμμα\"], \"ekt_subject\": [\"Θέατρο\", \"Χορός\"], \"ekt_chronology\": [\"07/07/1966 \"], \"dc_creator\": [\"Μπαλέτα Κίροφ   Ρωσία\"], \"dc_contributor\": [\"Drigo, Riccardo\", \"Παρασκευάδης, Ι.\", \"Ελληνικός Οργανισμός Τουρισμού\", \"Ωδείο Ηρώδου του Αττικού    Αθήνα\", \"Τσεκρίγκιν, Α.\"], \"edm_rights\": \"http://creativecommons.org/licenses/by/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_332602\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ελληνικό Λογοτεχνικό και Ιστορικό Αρχείο (ΕΛΙΑ)- Μορφωτικό Ίδρυμα Εθνικής Τραπέζης (ΜΙΕΤ)\", \"collection\": \"Ψηφιοποιημένες Συλλογές του Ελληνικού Λογοτεχνικού και Ιστορικού Αρχείου (ΕΛΙΑ)\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"http://eliaserver.elia.org.gr/lselia/rec.aspx?id=332602\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_332602",
+            "dc_title": [
+              "Α΄ πρόγραμμα: Ο κουρσάρος (pas de deux)",
+              "Le corsaire (pas de deux)"
+            ],
+            "ekt_type": [
+              "Θεατρική παράσταση",
+              "Πρόγραμμα"
+            ],
+            "ekt_subject": [
+              "Θέατρο",
+              "Χορός"
+            ],
+            "ekt_chronology": [
+              "07/07/1966 "
+            ],
+            "dc_creator": [
+              "Μπαλέτα Κίροφ   Ρωσία"
+            ],
+            "dc_contributor": [
+              "Drigo, Riccardo",
+              "Παρασκευάδης, Ι.",
+              "Ελληνικός Οργανισμός Τουρισμού",
+              "Ωδείο Ηρώδου του Αττικού    Αθήνα",
+              "Τσεκρίγκιν, Α."
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_332602",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ελληνικό Λογοτεχνικό και Ιστορικό Αρχείο (ΕΛΙΑ)- Μορφωτικό Ίδρυμα Εθνικής Τραπέζης (ΜΙΕΤ)",
+            "collection": "Ψηφιοποιημένες Συλλογές του Ελληνικού Λογοτεχνικού και Ιστορικού Αρχείου (ΕΛΙΑ)",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "http://eliaserver.elia.org.gr/lselia/rec.aspx?id=332602"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_335018",
+          "title": "Κουρσάρος Corsaire",
+          "date": [
+            "12/10/1979 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_335018",
+          "digital_url": "http://eliaserver.elia.org.gr/lselia/rec.aspx?id=335018",
+          "rights": "http://creativecommons.org/licenses/by/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_335018\", \"dc_title\": [\"Κουρσάρος\", \"Corsaire\"], \"ekt_type\": [\"Θεατρική παράσταση\", \"Πρόγραμμα\"], \"ekt_subject\": [\"Θέατρο\", \"Χορός\"], \"ekt_chronology\": [\"12/10/1979 \"], \"dc_creator\": [\"Κλασικό Μπαλλέτο Μόσχας   Ρωσία, Μόσχα\"], \"dc_contributor\": [\"Petipa, Marius\", \"Δήμος Θεσσαλονίκης\", \"Εταιρείας Μακεδονικών Σπουδών    Θεσσαλονίκη, Εθνικής Αμύνης 2\", \"Adam, Adolphe Charles\", \"Παπαγιαννόπουλος, Απόστολος\"], \"edm_rights\": \"http://creativecommons.org/licenses/by/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_335018\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ελληνικό Λογοτεχνικό και Ιστορικό Αρχείο (ΕΛΙΑ)- Μορφωτικό Ίδρυμα Εθνικής Τραπέζης (ΜΙΕΤ)\", \"collection\": \"Ψηφιοποιημένες Συλλογές του Ελληνικού Λογοτεχνικού και Ιστορικού Αρχείου (ΕΛΙΑ)\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"http://eliaserver.elia.org.gr/lselia/rec.aspx?id=335018\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_335018",
+            "dc_title": [
+              "Κουρσάρος",
+              "Corsaire"
+            ],
+            "ekt_type": [
+              "Θεατρική παράσταση",
+              "Πρόγραμμα"
+            ],
+            "ekt_subject": [
+              "Θέατρο",
+              "Χορός"
+            ],
+            "ekt_chronology": [
+              "12/10/1979 "
+            ],
+            "dc_creator": [
+              "Κλασικό Μπαλλέτο Μόσχας   Ρωσία, Μόσχα"
+            ],
+            "dc_contributor": [
+              "Petipa, Marius",
+              "Δήμος Θεσσαλονίκης",
+              "Εταιρείας Μακεδονικών Σπουδών    Θεσσαλονίκη, Εθνικής Αμύνης 2",
+              "Adam, Adolphe Charles",
+              "Παπαγιαννόπουλος, Απόστολος"
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_335018",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ελληνικό Λογοτεχνικό και Ιστορικό Αρχείο (ΕΛΙΑ)- Μορφωτικό Ίδρυμα Εθνικής Τραπέζης (ΜΙΕΤ)",
+            "collection": "Ψηφιοποιημένες Συλλογές του Ελληνικού Λογοτεχνικού και Ιστορικού Αρχείου (ΕΛΙΑ)",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "http://eliaserver.elia.org.gr/lselia/rec.aspx?id=335018"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_333222",
+          "title": "Le corsaire Ο κουρσάρος",
+          "date": [
+            "18/07/1974 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_333222",
+          "digital_url": "http://eliaserver.elia.org.gr/lselia/rec.aspx?id=333222",
+          "rights": "http://creativecommons.org/licenses/by/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_333222\", \"dc_title\": [\"Le corsaire\", \"Ο κουρσάρος\"], \"ekt_type\": [\"Θεατρική παράσταση\", \"Πρόγραμμα\"], \"ekt_subject\": [\"Θέατρο\", \"Χορός\"], \"ekt_chronology\": [\"18/07/1974 \"], \"dc_creator\": [\"Harkness Ballet ΗΠΑ, Νέα Υόρκη\"], \"dc_contributor\": [\"Drigo, Riccardo\", \"Ελληνικός Οργανισμός Τουρισμού\", \"Ωδείο Ηρώδου του Αττικού    Αθήνα\", \"Κωστόπουλος, Νίκος\", \"Martin-Viscount, Bill\"], \"edm_rights\": \"http://creativecommons.org/licenses/by/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_333222\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ελληνικό Λογοτεχνικό και Ιστορικό Αρχείο (ΕΛΙΑ)- Μορφωτικό Ίδρυμα Εθνικής Τραπέζης (ΜΙΕΤ)\", \"collection\": \"Ψηφιοποιημένες Συλλογές του Ελληνικού Λογοτεχνικού και Ιστορικού Αρχείου (ΕΛΙΑ)\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"http://eliaserver.elia.org.gr/lselia/rec.aspx?id=333222\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_333222",
+            "dc_title": [
+              "Le corsaire",
+              "Ο κουρσάρος"
+            ],
+            "ekt_type": [
+              "Θεατρική παράσταση",
+              "Πρόγραμμα"
+            ],
+            "ekt_subject": [
+              "Θέατρο",
+              "Χορός"
+            ],
+            "ekt_chronology": [
+              "18/07/1974 "
+            ],
+            "dc_creator": [
+              "Harkness Ballet ΗΠΑ, Νέα Υόρκη"
+            ],
+            "dc_contributor": [
+              "Drigo, Riccardo",
+              "Ελληνικός Οργανισμός Τουρισμού",
+              "Ωδείο Ηρώδου του Αττικού    Αθήνα",
+              "Κωστόπουλος, Νίκος",
+              "Martin-Viscount, Bill"
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_333222",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ελληνικό Λογοτεχνικό και Ιστορικό Αρχείο (ΕΛΙΑ)- Μορφωτικό Ίδρυμα Εθνικής Τραπέζης (ΜΙΕΤ)",
+            "collection": "Ψηφιοποιημένες Συλλογές του Ελληνικού Λογοτεχνικού και Ιστορικού Αρχείου (ΕΛΙΑ)",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "http://eliaserver.elia.org.gr/lselia/rec.aspx?id=333222"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_332856",
+          "title": "Κουρσάρος: Pas de deux Le corsaire: Pas de deux",
+          "date": [
+            "17/07/1971 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_332856",
+          "digital_url": "http://eliaserver.elia.org.gr/lselia/rec.aspx?id=332856",
+          "rights": "http://creativecommons.org/licenses/by/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_332856\", \"dc_title\": [\"Κουρσάρος: Pas de deux\", \"Le corsaire: Pas de deux\"], \"ekt_type\": [\"Θεατρική παράσταση\", \"Πρόγραμμα\"], \"ekt_subject\": [\"Θέατρο\", \"Χορός\"], \"ekt_chronology\": [\"17/07/1971 \"], \"dc_creator\": [\"London Festival Ballet   Ηνωμένο Βασίλειο: Λονδίνο\"], \"dc_contributor\": [\"Klavin\", \"Drigo, Riccardo\", \"Ελληνικός Οργανισμός Τουρισμού\", \"Ωδείο Ηρώδου του Αττικού    Αθήνα\", \"Κωστόπουλος, Νίκος\", \"Farmer, Peter\"], \"edm_rights\": \"http://creativecommons.org/licenses/by/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_332856\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ελληνικό Λογοτεχνικό και Ιστορικό Αρχείο (ΕΛΙΑ)- Μορφωτικό Ίδρυμα Εθνικής Τραπέζης (ΜΙΕΤ)\", \"collection\": \"Ψηφιοποιημένες Συλλογές του Ελληνικού Λογοτεχνικού και Ιστορικού Αρχείου (ΕΛΙΑ)\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"http://eliaserver.elia.org.gr/lselia/rec.aspx?id=332856\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_332856",
+            "dc_title": [
+              "Κουρσάρος: Pas de deux",
+              "Le corsaire: Pas de deux"
+            ],
+            "ekt_type": [
+              "Θεατρική παράσταση",
+              "Πρόγραμμα"
+            ],
+            "ekt_subject": [
+              "Θέατρο",
+              "Χορός"
+            ],
+            "ekt_chronology": [
+              "17/07/1971 "
+            ],
+            "dc_creator": [
+              "London Festival Ballet   Ηνωμένο Βασίλειο: Λονδίνο"
+            ],
+            "dc_contributor": [
+              "Klavin",
+              "Drigo, Riccardo",
+              "Ελληνικός Οργανισμός Τουρισμού",
+              "Ωδείο Ηρώδου του Αττικού    Αθήνα",
+              "Κωστόπουλος, Νίκος",
+              "Farmer, Peter"
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_332856",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ελληνικό Λογοτεχνικό και Ιστορικό Αρχείο (ΕΛΙΑ)- Μορφωτικό Ίδρυμα Εθνικής Τραπέζης (ΜΙΕΤ)",
+            "collection": "Ψηφιοποιημένες Συλλογές του Ελληνικού Λογοτεχνικού και Ιστορικού Αρχείου (ΕΛΙΑ)",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "http://eliaserver.elia.org.gr/lselia/rec.aspx?id=332856"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_333458",
+          "title": "Κουρσάρος, ο Le corsaire: Pax de deux",
+          "date": [
+            "27/08/1980 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_333458",
+          "digital_url": "http://eliaserver.elia.org.gr/lselia/rec.aspx?id=333458",
+          "rights": "http://creativecommons.org/licenses/by/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_333458\", \"dc_title\": [\"Κουρσάρος, ο\", \"Le corsaire: Pax de deux\"], \"ekt_type\": [\"Θεατρική παράσταση\", \"Πρόγραμμα\"], \"ekt_subject\": [\"Θέατρο\", \"Χορός\"], \"ekt_chronology\": [\"27/08/1980 \"], \"dc_creator\": [\"Μπαλλέτο του Ισραήλ   Ισραήλ\"], \"dc_contributor\": [\"Petipa, Marius\", \"Drigo, Riccardo\", \"Ελληνικός Οργανισμός Τουρισμού\", \"Ωδείο Ηρώδου του Αττικού    Αθήνα\"], \"edm_rights\": \"http://creativecommons.org/licenses/by/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_333458\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ελληνικό Λογοτεχνικό και Ιστορικό Αρχείο (ΕΛΙΑ)- Μορφωτικό Ίδρυμα Εθνικής Τραπέζης (ΜΙΕΤ)\", \"collection\": \"Ψηφιοποιημένες Συλλογές του Ελληνικού Λογοτεχνικού και Ιστορικού Αρχείου (ΕΛΙΑ)\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"http://eliaserver.elia.org.gr/lselia/rec.aspx?id=333458\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_333458",
+            "dc_title": [
+              "Κουρσάρος, ο",
+              "Le corsaire: Pax de deux"
+            ],
+            "ekt_type": [
+              "Θεατρική παράσταση",
+              "Πρόγραμμα"
+            ],
+            "ekt_subject": [
+              "Θέατρο",
+              "Χορός"
+            ],
+            "ekt_chronology": [
+              "27/08/1980 "
+            ],
+            "dc_creator": [
+              "Μπαλλέτο του Ισραήλ   Ισραήλ"
+            ],
+            "dc_contributor": [
+              "Petipa, Marius",
+              "Drigo, Riccardo",
+              "Ελληνικός Οργανισμός Τουρισμού",
+              "Ωδείο Ηρώδου του Αττικού    Αθήνα"
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_333458",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ελληνικό Λογοτεχνικό και Ιστορικό Αρχείο (ΕΛΙΑ)- Μορφωτικό Ίδρυμα Εθνικής Τραπέζης (ΜΙΕΤ)",
+            "collection": "Ψηφιοποιημένες Συλλογές του Ελληνικού Λογοτεχνικού και Ιστορικού Αρχείου (ΕΛΙΑ)",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "http://eliaserver.elia.org.gr/lselia/rec.aspx?id=333458"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-51652",
+          "title": "Εικονογράφηση για το ποίημα του Λόρδου Βύρωνα \"The Corsair\": Ελληνίδα σκλάβα.",
+          "date": [
+            "1849 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-51652",
+          "digital_url": "https://el.travelogues.gr/item.php?view=51652",
+          "rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/travelogues/000116-51652\", \"dc_title\": [\"Εικονογράφηση για το ποίημα του Λόρδου Βύρωνα \\\"The Corsair\\\": Ελληνίδα σκλάβα.\"], \"ekt_type\": [\"Εικονογράφηση\"], \"ekt_subject\": [\"Γυναίκες\", \"Ένδυση\", \"Πορτραίτο\", \"Επίπλωση\", \"Ελλάδα\", \"Εσωτερική αρχιτεκτονική\", \"Μουσικά όργανα\", \"Εθνοτικές ομάδες\", \"Πρόσωπο\"], \"ekt_place\": [\"Ελλάδα\"], \"ekt_chronology\": [\"1849 \"], \"edm_rights\": \"http://creativecommons.org/licenses/by-nc/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/travelogues/000116-51652\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ίδρυμα Αικατερίνης Λασκαρίδη\", \"collection\": \"Travelogues\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"https://el.travelogues.gr/item.php?view=51652\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-51652",
+            "dc_title": [
+              "Εικονογράφηση για το ποίημα του Λόρδου Βύρωνα \"The Corsair\": Ελληνίδα σκλάβα."
+            ],
+            "ekt_type": [
+              "Εικονογράφηση"
+            ],
+            "ekt_subject": [
+              "Γυναίκες",
+              "Ένδυση",
+              "Πορτραίτο",
+              "Επίπλωση",
+              "Ελλάδα",
+              "Εσωτερική αρχιτεκτονική",
+              "Μουσικά όργανα",
+              "Εθνοτικές ομάδες",
+              "Πρόσωπο"
+            ],
+            "ekt_place": [
+              "Ελλάδα"
+            ],
+            "ekt_chronology": [
+              "1849 "
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-51652",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ίδρυμα Αικατερίνης Λασκαρίδη",
+            "collection": "Travelogues",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "https://el.travelogues.gr/item.php?view=51652"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-51653",
+          "title": "Εικονογράφηση για το ποίημα του Λόρδου Βύρωνα \"The Corsair\": Ελληνίδα σκλάβα μπροστά σε Οθωμανό Πασά.",
+          "date": [
+            "1849 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-51653",
+          "digital_url": "https://el.travelogues.gr/item.php?view=51653",
+          "rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/travelogues/000116-51653\", \"dc_title\": [\"Εικονογράφηση για το ποίημα του Λόρδου Βύρωνα \\\"The Corsair\\\": Ελληνίδα σκλάβα μπροστά σε Οθωμανό Πασά.\"], \"ekt_type\": [\"Εικονογράφηση\"], \"ekt_subject\": [\"Τάπητες\", \"Γυναίκες\", \"Ένδυση\", \"Διακυβέρνηση\", \"Επίπλωση\", \"Ελλάδα\", \"Εσωτερική αρχιτεκτονική\", \"Εθνοτικές ομάδες\", \"Μεσαίωνας\", \"Πρόσωπο\"], \"ekt_place\": [\"Ελλάδα\"], \"ekt_chronology\": [\"1849 \"], \"edm_rights\": \"http://creativecommons.org/licenses/by-nc/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/travelogues/000116-51653\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ίδρυμα Αικατερίνης Λασκαρίδη\", \"collection\": \"Travelogues\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"https://el.travelogues.gr/item.php?view=51653\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-51653",
+            "dc_title": [
+              "Εικονογράφηση για το ποίημα του Λόρδου Βύρωνα \"The Corsair\": Ελληνίδα σκλάβα μπροστά σε Οθωμανό Πασά."
+            ],
+            "ekt_type": [
+              "Εικονογράφηση"
+            ],
+            "ekt_subject": [
+              "Τάπητες",
+              "Γυναίκες",
+              "Ένδυση",
+              "Διακυβέρνηση",
+              "Επίπλωση",
+              "Ελλάδα",
+              "Εσωτερική αρχιτεκτονική",
+              "Εθνοτικές ομάδες",
+              "Μεσαίωνας",
+              "Πρόσωπο"
+            ],
+            "ekt_place": [
+              "Ελλάδα"
+            ],
+            "ekt_chronology": [
+              "1849 "
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-51653",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ίδρυμα Αικατερίνης Λασκαρίδη",
+            "collection": "Travelogues",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "https://el.travelogues.gr/item.php?view=51653"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-117087",
+          "title": "Concert of the Vienna Tonkünstler Orchestra (117087) Συναυλία της Ορχήστρας “Tonkünstler” της Βιέννης (117087)",
+          "date": [
+            "1983 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-117087",
+          "digital_url": "https://exhibition.aefdigital.gr/exhibits/117087/",
+          "rights": "http://creativecommons.org/licenses/by-sa/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-117087\", \"dc_title\": [\"Concert of the Vienna Tonkünstler Orchestra (117087)\", \"Συναυλία της Ορχήστρας “Tonkünstler” της Βιέννης (117087)\"], \"ekt_type\": [\"Συναυλία\"], \"ekt_subject\": [\"Μουσική\"], \"ekt_place\": [\"Ωδείο Ηρώδου Αττικού\"], \"ekt_chronology\": [\"1983 \"], \"dc_creator\": [\"Vienna Tonkünstler Orchestra [Tonkünstler-Orchester Niederösterreich]\", \"Ορχήστρα &quot;Tonkünstler&quot; Βιέννης [Tonkünstler orchester]\"], \"dc_contributor\": [\"Haydn, Joseph [Κοντσέρτο σε Μι ύφεση μείζονα για τρομπέτα και ορχήστρα]\", \"8 in B Minor, D\", \"Μουσική σύνθεση: Καλομοίρης, Μανώλης [Μηνάς ο Ρέμπελος, Κουρσάρος στο Αιγαίο]\", \"Mahler, Gustav [Συμφωνία αρ. 10, σε Φα δίεση μείζονα, Ημιτελής]\", \"Schubert, Franz [Symphony No\", \"Soloist: Dawn Reinhart, Carole [trumpet]\", \"Music Director: Karydis, Miltiadis\", \"10 in F-Sharp major \\\"Unfinished\\\"]\", \"Schubert, Franz [Συμφωνία αρ. 8 σε Σι ελάσσονα, D. 759, Ημιτελής]\", \"Σολίστ: Dawn Reinhart, Carole [τρομπέτα]\", \"Haydn, Joseph [Trumpet Concerto in E-flat major]\", \"Composer: Kalomiris, Manolis [Minas the Rebel, Corsair of the Aegean]\", \"Mahler, Gustav [Symphony No\", \"759 \\\"Unfinished\\\"]\", \"Μουσική διεύθυνση: Καρύδης, Μιλτιάδης\"], \"edm_rights\": \"http://creativecommons.org/licenses/by-sa/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-117087\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ελληνικό Φεστιβάλ Α.Ε.\", \"collection\": \"Εικονικό Μουσείου Φεστιβάλ Αθηνών Επιδαύρου\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"https://exhibition.aefdigital.gr/exhibits/117087/\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-117087",
+            "dc_title": [
+              "Concert of the Vienna Tonkünstler Orchestra (117087)",
+              "Συναυλία της Ορχήστρας “Tonkünstler” της Βιέννης (117087)"
+            ],
+            "ekt_type": [
+              "Συναυλία"
+            ],
+            "ekt_subject": [
+              "Μουσική"
+            ],
+            "ekt_place": [
+              "Ωδείο Ηρώδου Αττικού"
+            ],
+            "ekt_chronology": [
+              "1983 "
+            ],
+            "dc_creator": [
+              "Vienna Tonkünstler Orchestra [Tonkünstler-Orchester Niederösterreich]",
+              "Ορχήστρα &quot;Tonkünstler&quot; Βιέννης [Tonkünstler orchester]"
+            ],
+            "dc_contributor": [
+              "Haydn, Joseph [Κοντσέρτο σε Μι ύφεση μείζονα για τρομπέτα και ορχήστρα]",
+              "8 in B Minor, D",
+              "Μουσική σύνθεση: Καλομοίρης, Μανώλης [Μηνάς ο Ρέμπελος, Κουρσάρος στο Αιγαίο]",
+              "Mahler, Gustav [Συμφωνία αρ. 10, σε Φα δίεση μείζονα, Ημιτελής]",
+              "Schubert, Franz [Symphony No",
+              "Soloist: Dawn Reinhart, Carole [trumpet]",
+              "Music Director: Karydis, Miltiadis",
+              "10 in F-Sharp major \"Unfinished\"]",
+              "Schubert, Franz [Συμφωνία αρ. 8 σε Σι ελάσσονα, D. 759, Ημιτελής]",
+              "Σολίστ: Dawn Reinhart, Carole [τρομπέτα]",
+              "Haydn, Joseph [Trumpet Concerto in E-flat major]",
+              "Composer: Kalomiris, Manolis [Minas the Rebel, Corsair of the Aegean]",
+              "Mahler, Gustav [Symphony No",
+              "759 \"Unfinished\"]",
+              "Μουσική διεύθυνση: Καρύδης, Μιλτιάδης"
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by-sa/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-117087",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ελληνικό Φεστιβάλ Α.Ε.",
+            "collection": "Εικονικό Μουσείου Φεστιβάλ Αθηνών Επιδαύρου",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "https://exhibition.aefdigital.gr/exhibits/117087/"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_625006",
+          "title": "Ο κουρσάρος: Pas de deux / Pas d'esclave",
+          "date": [
+            "1997 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_625006",
+          "digital_url": "http://eliaserver.elia.org.gr/lselia/rec.aspx?id=625006",
+          "rights": "http://creativecommons.org/licenses/by/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_625006\", \"dc_title\": [\"Ο κουρσάρος: Pas de deux / Pas d'esclave\"], \"ekt_type\": [\"Θεατρική παράσταση\", \"Πρόγραμμα\"], \"ekt_subject\": [\"Θέατρο\", \"Χορός\"], \"ekt_chronology\": [\"1997 \"], \"dc_creator\": [\"Εθνική Λυρική Σκηνή   Αθήνα\"], \"dc_contributor\": [\"Petipa, Marius\", \"Ρίζος, Μιχάλης\", \"Ντε Πιαν, Λεωνίδας\", \"Adam, Adolphe Charles\", \"Ολύμπια    Αθήνα, Ακαδημίας\"], \"edm_rights\": \"http://creativecommons.org/licenses/by/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_625006\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ελληνικό Λογοτεχνικό και Ιστορικό Αρχείο (ΕΛΙΑ)- Μορφωτικό Ίδρυμα Εθνικής Τραπέζης (ΜΙΕΤ)\", \"collection\": \"Ψηφιοποιημένες Συλλογές του Ελληνικού Λογοτεχνικού και Ιστορικού Αρχείου (ΕΛΙΑ)\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"http://eliaserver.elia.org.gr/lselia/rec.aspx?id=625006\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_625006",
+            "dc_title": [
+              "Ο κουρσάρος: Pas de deux / Pas d'esclave"
+            ],
+            "ekt_type": [
+              "Θεατρική παράσταση",
+              "Πρόγραμμα"
+            ],
+            "ekt_subject": [
+              "Θέατρο",
+              "Χορός"
+            ],
+            "ekt_chronology": [
+              "1997 "
+            ],
+            "dc_creator": [
+              "Εθνική Λυρική Σκηνή   Αθήνα"
+            ],
+            "dc_contributor": [
+              "Petipa, Marius",
+              "Ρίζος, Μιχάλης",
+              "Ντε Πιαν, Λεωνίδας",
+              "Adam, Adolphe Charles",
+              "Ολύμπια    Αθήνα, Ακαδημίας"
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_625006",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ελληνικό Λογοτεχνικό και Ιστορικό Αρχείο (ΕΛΙΑ)- Μορφωτικό Ίδρυμα Εθνικής Τραπέζης (ΜΙΕΤ)",
+            "collection": "Ψηφιοποιημένες Συλλογές του Ελληνικού Λογοτεχνικού και Ιστορικού Αρχείου (ΕΛΙΑ)",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "http://eliaserver.elia.org.gr/lselia/rec.aspx?id=625006"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/KEINE/000133-172499",
+          "title": "Old Navarino",
+          "date": [
+            "1840 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/KEINE/000133-172499",
+          "digital_url": "https://repo.academyofathens.gr/archive/item/172499",
+          "rights": "http://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/KEINE/000133-172499\", \"dc_title\": [\"Old Navarino\"], \"ekt_type\": [\"Ζωγραφικό σχέδιο / Σκίτσο\"], \"ekt_subject\": [\"Τοπιογραφία\", \"Νεότερη Ελληνική Ιστορία\"], \"ekt_place\": [\"Πύλος\"], \"ekt_chronology\": [\"1840 \"], \"edm_rights\": \"http://creativecommons.org/licenses/by-nc-sa/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/KEINE/000133-172499\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ακαδημία Αθηνών\", \"collection\": \"Κέντρον Ερεύνης της Ιστορίας του Νεωτέρου Ελληνισμού (ΚΕΙΝΕ)\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"https://repo.academyofathens.gr/archive/item/172499\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/KEINE/000133-172499",
+            "dc_title": [
+              "Old Navarino"
+            ],
+            "ekt_type": [
+              "Ζωγραφικό σχέδιο / Σκίτσο"
+            ],
+            "ekt_subject": [
+              "Τοπιογραφία",
+              "Νεότερη Ελληνική Ιστορία"
+            ],
+            "ekt_place": [
+              "Πύλος"
+            ],
+            "ekt_chronology": [
+              "1840 "
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by-nc-sa/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/KEINE/000133-172499",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ακαδημία Αθηνών",
+            "collection": "Κέντρον Ερεύνης της Ιστορίας του Νεωτέρου Ελληνισμού (ΚΕΙΝΕ)",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "https://repo.academyofathens.gr/archive/item/172499"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/tsagaris/000200-40744",
+          "title": "Άποψη της Ύδρας από τη θάλασσα.",
+          "date": [
+            "1950 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/tsagaris/000200-40744",
+          "digital_url": "https://laskaridisfoundationarchives.org/profile/40744",
+          "rights": "http://creativecommons.org/licenses/by/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/tsagaris/000200-40744\", \"dc_title\": [\"Άποψη της Ύδρας από τη θάλασσα.\"], \"ekt_type\": [\"Φωτογραφία\"], \"ekt_subject\": [\"Οικισμοί και χρήση γης\"], \"ekt_place\": [\"Νήσος Ύδρα\", \"Σαρωνικός Κόλπος\"], \"ekt_chronology\": [\"1950 \"], \"dc_contributor\": [\"Μιχάλης Τσάγκαρης\"], \"edm_rights\": \"http://creativecommons.org/licenses/by/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/tsagaris/000200-40744\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ίδρυμα Αικατερίνης Λασκαρίδη\", \"collection\": \"Φωτογραφική Συλλογή Μιχάλη Τσάγκαρη\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"https://laskaridisfoundationarchives.org/profile/40744\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/tsagaris/000200-40744",
+            "dc_title": [
+              "Άποψη της Ύδρας από τη θάλασσα."
+            ],
+            "ekt_type": [
+              "Φωτογραφία"
+            ],
+            "ekt_subject": [
+              "Οικισμοί και χρήση γης"
+            ],
+            "ekt_place": [
+              "Νήσος Ύδρα",
+              "Σαρωνικός Κόλπος"
+            ],
+            "ekt_chronology": [
+              "1950 "
+            ],
+            "dc_contributor": [
+              "Μιχάλης Τσάγκαρης"
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/tsagaris/000200-40744",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ίδρυμα Αικατερίνης Λασκαρίδη",
+            "collection": "Φωτογραφική Συλλογή Μιχάλη Τσάγκαρη",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "https://laskaridisfoundationarchives.org/profile/40744"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/national_theatre/000184-pub_1673",
+          "title": "Εις το Βασιλικόν, \"Ένα ποτήρι νερό\" του Σκριμπ. Εις της Κοτοπούλη, \"Ο Κουρσάρος\" του Μ. Ασάρ At the Royal Theatre, Scrib's \"The Glass of Water\". In Kotopouli Theatre M. Asar's \"The Corsair\"",
+          "date": [
+            "25/02/1940 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/national_theatre/000184-pub_1673",
+          "digital_url": "https://www.nt-archive.gr/pub/1673",
+          "rights": "http://creativecommons.org/licenses/by-nd/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/national_theatre/000184-pub_1673\", \"dc_title\": [\"Εις το Βασιλικόν, \\\"Ένα ποτήρι νερό\\\" του Σκριμπ. Εις της Κοτοπούλη, \\\"Ο Κουρσάρος\\\" του Μ. Ασάρ\", \"At the Royal Theatre, Scrib's \\\"The Glass of Water\\\". In Kotopouli Theatre M. Asar's \\\"The Corsair\\\"\"], \"ekt_type\": [\"Άρθρο\", \"Απόκομμα\"], \"ekt_subject\": [\"Βορειοαμερικανική τέχνη\", \"Κωμωδία\", \"Νεότερη Ελληνική Ιστορία\", \"Γαλλία\", \"Κριτική της τέχνης\", \"Νεότερη ιστορία\", \"Τύπος\"], \"ekt_chronology\": [\"25/02/1940 \"], \"dc_creator\": [\"Polymeros Moschovitis\", \"Πολύμερος Μοσχοβίτης\"], \"edm_rights\": \"http://creativecommons.org/licenses/by-nd/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/national_theatre/000184-pub_1673\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Εθνικό Θέατρο\", \"collection\": \"Ψηφιακό Αρχείο Εθνικού Θεάτρου\", \"edm_type\": \"TEXT\", \"edm_isShownAt\": \"https://www.nt-archive.gr/pub/1673\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/national_theatre/000184-pub_1673",
+            "dc_title": [
+              "Εις το Βασιλικόν, \"Ένα ποτήρι νερό\" του Σκριμπ. Εις της Κοτοπούλη, \"Ο Κουρσάρος\" του Μ. Ασάρ",
+              "At the Royal Theatre, Scrib's \"The Glass of Water\". In Kotopouli Theatre M. Asar's \"The Corsair\""
+            ],
+            "ekt_type": [
+              "Άρθρο",
+              "Απόκομμα"
+            ],
+            "ekt_subject": [
+              "Βορειοαμερικανική τέχνη",
+              "Κωμωδία",
+              "Νεότερη Ελληνική Ιστορία",
+              "Γαλλία",
+              "Κριτική της τέχνης",
+              "Νεότερη ιστορία",
+              "Τύπος"
+            ],
+            "ekt_chronology": [
+              "25/02/1940 "
+            ],
+            "dc_creator": [
+              "Polymeros Moschovitis",
+              "Πολύμερος Μοσχοβίτης"
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by-nd/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/national_theatre/000184-pub_1673",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Εθνικό Θέατρο",
+            "collection": "Ψηφιακό Αρχείο Εθνικού Θεάτρου",
+            "edm_type": "TEXT",
+            "edm_isShownAt": "https://www.nt-archive.gr/pub/1673"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163629",
+          "title": "Οικόσημο οίκου Γκατελούζι Coat-of-arms of the house of Gattilusio",
+          "date": [
+            "1355  - 1462 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163629",
+          "digital_url": "http://pandektis.ekt.gr/pandektis/handle/10442/163629",
+          "rights": "http://rightsstatements.org/vocab/InC/1.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163629\", \"dc_title\": [\"Οικόσημο οίκου Γκατελούζι\", \"Coat-of-arms of the house of Gattilusio\"], \"ekt_type\": [\"Εραλδικό μνημείο\"], \"ekt_subject\": [\"Εραλδική\", \"Ελλάδα\", \"Ιστορικά μνημεία\", \"Φραγκοκρατία\"], \"ekt_place\": [\"Μυτιλήνη\"], \"ekt_chronology\": [\"1355  - 1462 \"], \"dc_contributor\": [\"Institute of Neohellenic Research/ National Hellenic Research Foundation\", \"Leonidas Kallivretakis\", \"Ινστιτούτο Νεοελληνικών Ερευνών/ Εθνικό Ίδρυμα Ερευνών\", \"Λεωνίδας Καλλιβρετάκης\"], \"edm_rights\": \"http://rightsstatements.org/vocab/InC/1.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163629\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ινστιτούτο Ιστορικών Ερευνών (ΙΙΕ/ΕΙΕ)\", \"collection\": \"Πανδέκτης: Θησαυρός Ελληνικής Ιστορίας & Πολιτισμού - Αρχείο Εραλδικών Μνημείων του Ελλαδικού Χώρου\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"http://pandektis.ekt.gr/pandektis/handle/10442/163629\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163629",
+            "dc_title": [
+              "Οικόσημο οίκου Γκατελούζι",
+              "Coat-of-arms of the house of Gattilusio"
+            ],
+            "ekt_type": [
+              "Εραλδικό μνημείο"
+            ],
+            "ekt_subject": [
+              "Εραλδική",
+              "Ελλάδα",
+              "Ιστορικά μνημεία",
+              "Φραγκοκρατία"
+            ],
+            "ekt_place": [
+              "Μυτιλήνη"
+            ],
+            "ekt_chronology": [
+              "1355  - 1462 "
+            ],
+            "dc_contributor": [
+              "Institute of Neohellenic Research/ National Hellenic Research Foundation",
+              "Leonidas Kallivretakis",
+              "Ινστιτούτο Νεοελληνικών Ερευνών/ Εθνικό Ίδρυμα Ερευνών",
+              "Λεωνίδας Καλλιβρετάκης"
+            ],
+            "edm_rights": "http://rightsstatements.org/vocab/InC/1.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163629",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ινστιτούτο Ιστορικών Ερευνών (ΙΙΕ/ΕΙΕ)",
+            "collection": "Πανδέκτης: Θησαυρός Ελληνικής Ιστορίας & Πολιτισμού - Αρχείο Εραλδικών Μνημείων του Ελλαδικού Χώρου",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "http://pandektis.ekt.gr/pandektis/handle/10442/163629"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163454",
+          "title": "Οικόσημο οίκου Γκατελούζι Coat-of-arms of the house of Gattilusio",
+          "date": [
+            "1355  - 1462 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163454",
+          "digital_url": "http://pandektis.ekt.gr/pandektis/handle/10442/163454",
+          "rights": "http://rightsstatements.org/vocab/InC/1.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163454\", \"dc_title\": [\"Οικόσημο οίκου Γκατελούζι\", \"Coat-of-arms of the house of Gattilusio\"], \"ekt_type\": [\"Εραλδικό μνημείο\"], \"ekt_subject\": [\"Εραλδική\", \"Ελλάδα\", \"Ιστορικά μνημεία\", \"Φραγκοκρατία\"], \"ekt_place\": [\"Μυτιλήνη\"], \"ekt_chronology\": [\"1355  - 1462 \"], \"dc_contributor\": [\"Institute of Neohellenic Research/ National Hellenic Research Foundation\", \"Leonidas Kallivretakis\", \"Ινστιτούτο Νεοελληνικών Ερευνών/ Εθνικό Ίδρυμα Ερευνών\", \"Λεωνίδας Καλλιβρετάκης\"], \"edm_rights\": \"http://rightsstatements.org/vocab/InC/1.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163454\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ινστιτούτο Ιστορικών Ερευνών (ΙΙΕ/ΕΙΕ)\", \"collection\": \"Πανδέκτης: Θησαυρός Ελληνικής Ιστορίας & Πολιτισμού - Αρχείο Εραλδικών Μνημείων του Ελλαδικού Χώρου\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"http://pandektis.ekt.gr/pandektis/handle/10442/163454\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163454",
+            "dc_title": [
+              "Οικόσημο οίκου Γκατελούζι",
+              "Coat-of-arms of the house of Gattilusio"
+            ],
+            "ekt_type": [
+              "Εραλδικό μνημείο"
+            ],
+            "ekt_subject": [
+              "Εραλδική",
+              "Ελλάδα",
+              "Ιστορικά μνημεία",
+              "Φραγκοκρατία"
+            ],
+            "ekt_place": [
+              "Μυτιλήνη"
+            ],
+            "ekt_chronology": [
+              "1355  - 1462 "
+            ],
+            "dc_contributor": [
+              "Institute of Neohellenic Research/ National Hellenic Research Foundation",
+              "Leonidas Kallivretakis",
+              "Ινστιτούτο Νεοελληνικών Ερευνών/ Εθνικό Ίδρυμα Ερευνών",
+              "Λεωνίδας Καλλιβρετάκης"
+            ],
+            "edm_rights": "http://rightsstatements.org/vocab/InC/1.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163454",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ινστιτούτο Ιστορικών Ερευνών (ΙΙΕ/ΕΙΕ)",
+            "collection": "Πανδέκτης: Θησαυρός Ελληνικής Ιστορίας & Πολιτισμού - Αρχείο Εραλδικών Μνημείων του Ελλαδικού Χώρου",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "http://pandektis.ekt.gr/pandektis/handle/10442/163454"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163497",
+          "title": "Οικόσημο οίκου Γκατελούζι Coat-of-arms of the house of Gattilusio",
+          "date": [
+            "1355  - 1462 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163497",
+          "digital_url": "http://pandektis.ekt.gr/pandektis/handle/10442/163497",
+          "rights": "http://rightsstatements.org/vocab/InC/1.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163497\", \"dc_title\": [\"Οικόσημο οίκου Γκατελούζι\", \"Coat-of-arms of the house of Gattilusio\"], \"ekt_type\": [\"Εραλδικό μνημείο\"], \"ekt_subject\": [\"Εραλδική\", \"Ελλάδα\", \"Ιστορικά μνημεία\", \"Φραγκοκρατία\"], \"ekt_place\": [\"Μυτιλήνη\"], \"ekt_chronology\": [\"1355  - 1462 \"], \"dc_contributor\": [\"Institute of Neohellenic Research/ National Hellenic Research Foundation\", \"Leonidas Kallivretakis\", \"Ινστιτούτο Νεοελληνικών Ερευνών/ Εθνικό Ίδρυμα Ερευνών\", \"Λεωνίδας Καλλιβρετάκης\"], \"edm_rights\": \"http://rightsstatements.org/vocab/InC/1.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163497\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ινστιτούτο Ιστορικών Ερευνών (ΙΙΕ/ΕΙΕ)\", \"collection\": \"Πανδέκτης: Θησαυρός Ελληνικής Ιστορίας & Πολιτισμού - Αρχείο Εραλδικών Μνημείων του Ελλαδικού Χώρου\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"http://pandektis.ekt.gr/pandektis/handle/10442/163497\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163497",
+            "dc_title": [
+              "Οικόσημο οίκου Γκατελούζι",
+              "Coat-of-arms of the house of Gattilusio"
+            ],
+            "ekt_type": [
+              "Εραλδικό μνημείο"
+            ],
+            "ekt_subject": [
+              "Εραλδική",
+              "Ελλάδα",
+              "Ιστορικά μνημεία",
+              "Φραγκοκρατία"
+            ],
+            "ekt_place": [
+              "Μυτιλήνη"
+            ],
+            "ekt_chronology": [
+              "1355  - 1462 "
+            ],
+            "dc_contributor": [
+              "Institute of Neohellenic Research/ National Hellenic Research Foundation",
+              "Leonidas Kallivretakis",
+              "Ινστιτούτο Νεοελληνικών Ερευνών/ Εθνικό Ίδρυμα Ερευνών",
+              "Λεωνίδας Καλλιβρετάκης"
+            ],
+            "edm_rights": "http://rightsstatements.org/vocab/InC/1.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163497",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ινστιτούτο Ιστορικών Ερευνών (ΙΙΕ/ΕΙΕ)",
+            "collection": "Πανδέκτης: Θησαυρός Ελληνικής Ιστορίας & Πολιτισμού - Αρχείο Εραλδικών Μνημείων του Ελλαδικού Χώρου",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "http://pandektis.ekt.gr/pandektis/handle/10442/163497"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163710",
+          "title": "Οικόσημο οικογένειας Βιτάλη Coat-of-arms of the Vitali family",
+          "date": [
+            "1692 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163710",
+          "digital_url": "http://pandektis.ekt.gr/pandektis/handle/10442/163710",
+          "rights": "http://rightsstatements.org/vocab/InC/1.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163710\", \"dc_title\": [\"Οικόσημο οικογένειας Βιτάλη\", \"Coat-of-arms of the Vitali family\"], \"ekt_type\": [\"Εραλδικό μνημείο\"], \"ekt_subject\": [\"Εραλδική\", \"Ελλάδα\", \"Ιστορικά μνημεία\", \"Φραγκοκρατία\"], \"ekt_place\": [\"Τήνος\"], \"ekt_chronology\": [\"1692 \"], \"dc_contributor\": [\"Institute of Neohellenic Research/ National Hellenic Research Foundation\", \"Leonidas Kallivretakis\", \"Ινστιτούτο Νεοελληνικών Ερευνών/ Εθνικό Ίδρυμα Ερευνών\", \"Λεωνίδας Καλλιβρετάκης\"], \"edm_rights\": \"http://rightsstatements.org/vocab/InC/1.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163710\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ινστιτούτο Ιστορικών Ερευνών (ΙΙΕ/ΕΙΕ)\", \"collection\": \"Πανδέκτης: Θησαυρός Ελληνικής Ιστορίας & Πολιτισμού - Αρχείο Εραλδικών Μνημείων του Ελλαδικού Χώρου\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"http://pandektis.ekt.gr/pandektis/handle/10442/163710\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163710",
+            "dc_title": [
+              "Οικόσημο οικογένειας Βιτάλη",
+              "Coat-of-arms of the Vitali family"
+            ],
+            "ekt_type": [
+              "Εραλδικό μνημείο"
+            ],
+            "ekt_subject": [
+              "Εραλδική",
+              "Ελλάδα",
+              "Ιστορικά μνημεία",
+              "Φραγκοκρατία"
+            ],
+            "ekt_place": [
+              "Τήνος"
+            ],
+            "ekt_chronology": [
+              "1692 "
+            ],
+            "dc_contributor": [
+              "Institute of Neohellenic Research/ National Hellenic Research Foundation",
+              "Leonidas Kallivretakis",
+              "Ινστιτούτο Νεοελληνικών Ερευνών/ Εθνικό Ίδρυμα Ερευνών",
+              "Λεωνίδας Καλλιβρετάκης"
+            ],
+            "edm_rights": "http://rightsstatements.org/vocab/InC/1.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163710",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ινστιτούτο Ιστορικών Ερευνών (ΙΙΕ/ΕΙΕ)",
+            "collection": "Πανδέκτης: Θησαυρός Ελληνικής Ιστορίας & Πολιτισμού - Αρχείο Εραλδικών Μνημείων του Ελλαδικού Χώρου",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "http://pandektis.ekt.gr/pandektis/handle/10442/163710"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163561",
+          "title": "Οικόσημο οίκου Γκατελούζι Coat-of-arms of the house of Gattilusio",
+          "date": [
+            "1355  - 1462 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163561",
+          "digital_url": "http://pandektis.ekt.gr/pandektis/handle/10442/163561",
+          "rights": "http://rightsstatements.org/vocab/InC/1.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163561\", \"dc_title\": [\"Οικόσημο οίκου Γκατελούζι\", \"Coat-of-arms of the house of Gattilusio\"], \"ekt_type\": [\"Εραλδικό μνημείο\"], \"ekt_subject\": [\"Εραλδική\", \"Ελλάδα\", \"Ιστορικά μνημεία\", \"Φραγκοκρατία\"], \"ekt_place\": [\"Μυτιλήνη\"], \"ekt_chronology\": [\"1355  - 1462 \"], \"dc_contributor\": [\"Institute of Neohellenic Research/ National Hellenic Research Foundation\", \"Leonidas Kallivretakis\", \"Ινστιτούτο Νεοελληνικών Ερευνών/ Εθνικό Ίδρυμα Ερευνών\", \"Λεωνίδας Καλλιβρετάκης\"], \"edm_rights\": \"http://rightsstatements.org/vocab/InC/1.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163561\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ινστιτούτο Ιστορικών Ερευνών (ΙΙΕ/ΕΙΕ)\", \"collection\": \"Πανδέκτης: Θησαυρός Ελληνικής Ιστορίας & Πολιτισμού - Αρχείο Εραλδικών Μνημείων του Ελλαδικού Χώρου\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"http://pandektis.ekt.gr/pandektis/handle/10442/163561\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163561",
+            "dc_title": [
+              "Οικόσημο οίκου Γκατελούζι",
+              "Coat-of-arms of the house of Gattilusio"
+            ],
+            "ekt_type": [
+              "Εραλδικό μνημείο"
+            ],
+            "ekt_subject": [
+              "Εραλδική",
+              "Ελλάδα",
+              "Ιστορικά μνημεία",
+              "Φραγκοκρατία"
+            ],
+            "ekt_place": [
+              "Μυτιλήνη"
+            ],
+            "ekt_chronology": [
+              "1355  - 1462 "
+            ],
+            "dc_contributor": [
+              "Institute of Neohellenic Research/ National Hellenic Research Foundation",
+              "Leonidas Kallivretakis",
+              "Ινστιτούτο Νεοελληνικών Ερευνών/ Εθνικό Ίδρυμα Ερευνών",
+              "Λεωνίδας Καλλιβρετάκης"
+            ],
+            "edm_rights": "http://rightsstatements.org/vocab/InC/1.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163561",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ινστιτούτο Ιστορικών Ερευνών (ΙΙΕ/ΕΙΕ)",
+            "collection": "Πανδέκτης: Θησαυρός Ελληνικής Ιστορίας & Πολιτισμού - Αρχείο Εραλδικών Μνημείων του Ελλαδικού Χώρου",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "http://pandektis.ekt.gr/pandektis/handle/10442/163561"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163625",
+          "title": "Οικόσημο οίκου Γκατελούζι Coat-of-arms of the house of Gattilusio",
+          "date": [
+            "1373 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163625",
+          "digital_url": "http://pandektis.ekt.gr/pandektis/handle/10442/163625",
+          "rights": "http://rightsstatements.org/vocab/InC/1.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163625\", \"dc_title\": [\"Οικόσημο οίκου Γκατελούζι\", \"Coat-of-arms of the house of Gattilusio\"], \"ekt_type\": [\"Εραλδικό μνημείο\"], \"ekt_subject\": [\"Εραλδική\", \"Ελλάδα\", \"Ιστορικά μνημεία\", \"Φραγκοκρατία\"], \"ekt_place\": [\"Μυτιλήνη\"], \"ekt_chronology\": [\"1373 \"], \"dc_contributor\": [\"Institute of Neohellenic Research/ National Hellenic Research Foundation\", \"Leonidas Kallivretakis\", \"Ινστιτούτο Νεοελληνικών Ερευνών/ Εθνικό Ίδρυμα Ερευνών\", \"Λεωνίδας Καλλιβρετάκης\"], \"edm_rights\": \"http://rightsstatements.org/vocab/InC/1.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163625\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ινστιτούτο Ιστορικών Ερευνών (ΙΙΕ/ΕΙΕ)\", \"collection\": \"Πανδέκτης: Θησαυρός Ελληνικής Ιστορίας & Πολιτισμού - Αρχείο Εραλδικών Μνημείων του Ελλαδικού Χώρου\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"http://pandektis.ekt.gr/pandektis/handle/10442/163625\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163625",
+            "dc_title": [
+              "Οικόσημο οίκου Γκατελούζι",
+              "Coat-of-arms of the house of Gattilusio"
+            ],
+            "ekt_type": [
+              "Εραλδικό μνημείο"
+            ],
+            "ekt_subject": [
+              "Εραλδική",
+              "Ελλάδα",
+              "Ιστορικά μνημεία",
+              "Φραγκοκρατία"
+            ],
+            "ekt_place": [
+              "Μυτιλήνη"
+            ],
+            "ekt_chronology": [
+              "1373 "
+            ],
+            "dc_contributor": [
+              "Institute of Neohellenic Research/ National Hellenic Research Foundation",
+              "Leonidas Kallivretakis",
+              "Ινστιτούτο Νεοελληνικών Ερευνών/ Εθνικό Ίδρυμα Ερευνών",
+              "Λεωνίδας Καλλιβρετάκης"
+            ],
+            "edm_rights": "http://rightsstatements.org/vocab/InC/1.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163625",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ινστιτούτο Ιστορικών Ερευνών (ΙΙΕ/ΕΙΕ)",
+            "collection": "Πανδέκτης: Θησαυρός Ελληνικής Ιστορίας & Πολιτισμού - Αρχείο Εραλδικών Μνημείων του Ελλαδικού Χώρου",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "http://pandektis.ekt.gr/pandektis/handle/10442/163625"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163623",
+          "title": "Οικόσημο οίκου Γκατελούζι Coat-of-arms of the house of Gattilusio",
+          "date": [
+            "1355  - 1462 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163623",
+          "digital_url": "http://pandektis.ekt.gr/pandektis/handle/10442/163623",
+          "rights": "http://rightsstatements.org/vocab/InC/1.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163623\", \"dc_title\": [\"Οικόσημο οίκου Γκατελούζι\", \"Coat-of-arms of the house of Gattilusio\"], \"ekt_type\": [\"Εραλδικό μνημείο\"], \"ekt_subject\": [\"Εραλδική\", \"Ελλάδα\", \"Ιστορικά μνημεία\", \"Φραγκοκρατία\"], \"ekt_place\": [\"Μυτιλήνη\"], \"ekt_chronology\": [\"1355  - 1462 \"], \"dc_contributor\": [\"Institute of Neohellenic Research/ National Hellenic Research Foundation\", \"Leonidas Kallivretakis\", \"Ινστιτούτο Νεοελληνικών Ερευνών/ Εθνικό Ίδρυμα Ερευνών\", \"Λεωνίδας Καλλιβρετάκης\"], \"edm_rights\": \"http://rightsstatements.org/vocab/InC/1.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163623\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ινστιτούτο Ιστορικών Ερευνών (ΙΙΕ/ΕΙΕ)\", \"collection\": \"Πανδέκτης: Θησαυρός Ελληνικής Ιστορίας & Πολιτισμού - Αρχείο Εραλδικών Μνημείων του Ελλαδικού Χώρου\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"http://pandektis.ekt.gr/pandektis/handle/10442/163623\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163623",
+            "dc_title": [
+              "Οικόσημο οίκου Γκατελούζι",
+              "Coat-of-arms of the house of Gattilusio"
+            ],
+            "ekt_type": [
+              "Εραλδικό μνημείο"
+            ],
+            "ekt_subject": [
+              "Εραλδική",
+              "Ελλάδα",
+              "Ιστορικά μνημεία",
+              "Φραγκοκρατία"
+            ],
+            "ekt_place": [
+              "Μυτιλήνη"
+            ],
+            "ekt_chronology": [
+              "1355  - 1462 "
+            ],
+            "dc_contributor": [
+              "Institute of Neohellenic Research/ National Hellenic Research Foundation",
+              "Leonidas Kallivretakis",
+              "Ινστιτούτο Νεοελληνικών Ερευνών/ Εθνικό Ίδρυμα Ερευνών",
+              "Λεωνίδας Καλλιβρετάκης"
+            ],
+            "edm_rights": "http://rightsstatements.org/vocab/InC/1.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163623",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ινστιτούτο Ιστορικών Ερευνών (ΙΙΕ/ΕΙΕ)",
+            "collection": "Πανδέκτης: Θησαυρός Ελληνικής Ιστορίας & Πολιτισμού - Αρχείο Εραλδικών Μνημείων του Ελλαδικού Χώρου",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "http://pandektis.ekt.gr/pandektis/handle/10442/163623"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/digma/000113-58658",
+          "title": "Μηνάς ο Ρέμπελος, κουρσάρος στο Αιγαίο",
+          "date": [
+            "1940 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/digma/000113-58658",
+          "digital_url": "https://repository.mmb.org.gr/digma/handle/58658",
+          "rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/digma/000113-58658\", \"dc_title\": [\"Μηνάς ο Ρέμπελος, κουρσάρος στο Αιγαίο\"], \"ekt_type\": [\"Παρτιτούρα\", \"Χειρόγραφο\"], \"ekt_subject\": [\"Ορχήστρες\"], \"ekt_person_creator\": [\"Καλομοίρης Μανώλης\"], \"ekt_chronology\": [\"1940 \"], \"dc_creator\": [\"Καλομοίρης, Μανώλης\"], \"dc_contributor\": [\"Μπαστιάς, Κωστής (ομώνυμο μυθιστόρημά πάνω στο οποίο βασίζεται το συμφωνικό ποίημα)\"], \"edm_rights\": \"http://creativecommons.org/licenses/by-nc/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/digma/000113-58658\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Μεγάλη Μουσική Βιβλιοθήκη της Ελλάδας «Λίλιαν Βουδούρη» - Σύλλογος Οι Φίλοι της Μουσικής\", \"collection\": \"Ψηφιοποιημένο Αρχείο Ελληνικής Μουσικής\", \"edm_type\": \"TEXT\", \"edm_isShownAt\": \"https://repository.mmb.org.gr/digma/handle/58658\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/digma/000113-58658",
+            "dc_title": [
+              "Μηνάς ο Ρέμπελος, κουρσάρος στο Αιγαίο"
+            ],
+            "ekt_type": [
+              "Παρτιτούρα",
+              "Χειρόγραφο"
+            ],
+            "ekt_subject": [
+              "Ορχήστρες"
+            ],
+            "ekt_person_creator": [
+              "Καλομοίρης Μανώλης"
+            ],
+            "ekt_chronology": [
+              "1940 "
+            ],
+            "dc_creator": [
+              "Καλομοίρης, Μανώλης"
+            ],
+            "dc_contributor": [
+              "Μπαστιάς, Κωστής (ομώνυμο μυθιστόρημά πάνω στο οποίο βασίζεται το συμφωνικό ποίημα)"
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/digma/000113-58658",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Μεγάλη Μουσική Βιβλιοθήκη της Ελλάδας «Λίλιαν Βουδούρη» - Σύλλογος Οι Φίλοι της Μουσικής",
+            "collection": "Ψηφιοποιημένο Αρχείο Ελληνικής Μουσικής",
+            "edm_type": "TEXT",
+            "edm_isShownAt": "https://repository.mmb.org.gr/digma/handle/58658"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/digma/000113-58659",
+          "title": "Μηνάς ο Ρέμπελος",
+          "date": [
+            "1952 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/digma/000113-58659",
+          "digital_url": "https://repository.mmb.org.gr/digma/handle/58659",
+          "rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/digma/000113-58659\", \"dc_title\": [\"Μηνάς ο Ρέμπελος\"], \"ekt_type\": [\"Παρτιτούρα\"], \"ekt_subject\": [\"Ορχήστρες\"], \"ekt_person_creator\": [\"Καλομοίρης Μανώλης\"], \"ekt_chronology\": [\"1952 \"], \"dc_creator\": [\"Καλομοίρης, Μανώλης\"], \"dc_contributor\": [\"[Μπαστιάς, Κωστής (ομώνυμο μυθιστόρημά πάνω στο οποίο βασίζεται το συμφωνικό ποίημα)]\"], \"edm_rights\": \"http://creativecommons.org/licenses/by-nc/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/digma/000113-58659\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Μεγάλη Μουσική Βιβλιοθήκη της Ελλάδας «Λίλιαν Βουδούρη» - Σύλλογος Οι Φίλοι της Μουσικής\", \"collection\": \"Ψηφιοποιημένο Αρχείο Ελληνικής Μουσικής\", \"edm_type\": \"TEXT\", \"edm_isShownAt\": \"https://repository.mmb.org.gr/digma/handle/58659\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/digma/000113-58659",
+            "dc_title": [
+              "Μηνάς ο Ρέμπελος"
+            ],
+            "ekt_type": [
+              "Παρτιτούρα"
+            ],
+            "ekt_subject": [
+              "Ορχήστρες"
+            ],
+            "ekt_person_creator": [
+              "Καλομοίρης Μανώλης"
+            ],
+            "ekt_chronology": [
+              "1952 "
+            ],
+            "dc_creator": [
+              "Καλομοίρης, Μανώλης"
+            ],
+            "dc_contributor": [
+              "[Μπαστιάς, Κωστής (ομώνυμο μυθιστόρημά πάνω στο οποίο βασίζεται το συμφωνικό ποίημα)]"
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/digma/000113-58659",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Μεγάλη Μουσική Βιβλιοθήκη της Ελλάδας «Λίλιαν Βουδούρη» - Σύλλογος Οι Φίλοι της Μουσικής",
+            "collection": "Ψηφιοποιημένο Αρχείο Ελληνικής Μουσικής",
+            "edm_type": "TEXT",
+            "edm_isShownAt": "https://repository.mmb.org.gr/digma/handle/58659"
+          }
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=corsairs\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=corsairs\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 32383, \"response_sha256\": \"2633e4c90b39126f05f80c1015ad76b3a2f90b75accb71489149ba47ada4c119\", \"elapsed_ms\": 2372}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=corsairs\", \"result_count\": 26, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "voyages Νάουσα Πάρου",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=voyages+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=voyages+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 67093, \"response_sha256\": \"6eb975a300af59a182a765a394d9af3d71c44fb992bae2107b960da3d0cd6188\", \"elapsed_ms\": 1019}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=voyages+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "corsairs harbours Νάουσα Πάρου",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=corsairs+harbours+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=corsairs+harbours+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 67113, \"response_sha256\": \"037b0ed00efa9ac76c0219bf3008a6f1a906b98789d8d64615f023eec0b8490d\", \"elapsed_ms\": 1072}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=corsairs+harbours+%CE%9D%CE%AC%CE%BF%CF%85%CF%83%CE%B1+%CE%A0%CE%AC%CF%81%CE%BF%CF%85&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "corsairs",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18865",
+          "title": "Με αφορμή τον θάνατο του Creveliers στην Αστυπάλαια. Ο ρόλος του νησιού στις καταδρομικές επιχειρήσεις των καθολικών κουρσάρων κατά τον 17ο αιώνα Occasioned by the death of Creveliers off Astypalaia: The island's role in the raids by Catholic corsairs during the 17th century",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18865"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_75581",
+          "title": "War for profit: English corsairs, institutions and decentralised strategy",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_75581"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/mnimon/000087-8346",
+          "title": "Eric R. Dursteler, Renegade Women: Gender, Identity and Boundaries in the Early Modern Mediterranean, Βαλτιμόρη 2011 / Gillian Weiss, Captives and Corsairs: France and Slavery in the Early Modern Mediterranean, Stanford CA, 2011",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/mnimon/000087-8346"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-350766",
+          "title": "Η πειρατεία στο Ιόνιο και στο Αιγαίο πέλαγος από τη βενετική οπτική (16ος -18ος αιώνας)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-350766"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18068",
+          "title": "Corsaires and pirates in the Eastern Mediterranean, Fifteenth-Nineteenth centuries",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18068"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_17881",
+          "title": "Pirates during Revolution: The many faces of piracy and the reaction of local communities",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_17881"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/mnimon/000087-8512",
+          "title": "«ΑΓΟΡΑ ΤΟΥΡΚΟΥ ΣΚΛΑΒΟΥ» ΣΤΗ ΣΙΦΝΟ (17ΟΣ ΑΙ.). Η ΑΠΟΣΠΑΣΜΑΤΙΚΟΤΗΤΑ ΤΩΝ ΠΗΓΩΝ",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/mnimon/000087-8512"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/historein/000053-24937",
+          "title": "Mount Lebanon and Greece: Mediterranean Crosscurrents, 1821–1841",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/historein/000053-24937"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-97605",
+          "title": "Ανάλυση ικανοποίησης πελατών στις Leisure Airlines με χρήση διαδικτυακών αξιολογήσεων Analysis of customer satisfaction in Leisure Airlines using online reviews",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-97605"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-3371",
+          "title": "Συμβολὴ στὴν ἱστορία τοῦ νοτιοανατολικοῦ Αἱγαίου (μὲ ἀφορμὴ τὰ Πατμιακὰ φιρμάνια τῶν ἐτῶν 1454-1522)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-3371"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/apothesis/000099-218330",
+          "title": "Ποινική Επιλεκτικότητα και Κρατικά Εγκλήματα: Η υπόθεση Μαξ Μέρτεν Criminal Selectivity and State Crimes: The Max Merten Case",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/apothesis/000099-218330"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2967796",
+          "title": "«Το Υπερατλαντικό Δουλεμπόριο και η σχέση του με την οικονομία, την αποικιακή πολιτική και την επέκταση της Αγγλίας/Βρετανίας στην Καραϊβική, 1660 - 1739»",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2967796"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_58378",
+          "title": "Η καταλανο-αραγωνική παρουσία στην ανατολική Μεσόγειο, 1261–1460: μια πολιτικο-οικονομική, νομισματική και στρατιωτική θεώρηση La presència catalanoaragonesa a la Mediterrània oriental, 1261-1460: una visió politicoeconòmica, numismàtica i militar",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_58378"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=corsairs&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=corsairs&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 252780, \"response_sha256\": \"ebeaae2ee541f72cd803250fef5ec0a5c3a229a67b78f2b34f287324acda26e6\", \"elapsed_ms\": 1602}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=corsairs&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 13, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "40585729329",
+    "agent_id": "identity_resolution",
+    "source_leads": [
+      {
+        "id": "lead_5ade20b824240e659be6ca65",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb442264590",
+        "title": "Pirates vs corsairs : Davy Jones' gold / developed by Little worlds studio ; Mzone studio",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_535efbc987090636666446ac",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb44226842c",
+        "title": "Pirates vs corsairs : Davy Jones' gold / developed by Little worlds studio ; Mzone studio",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e9c2fd81db5522214b39e246",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb30166671d",
+        "title": "The Story of Africa and its explorers, by Robert Brown,...",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0768d0d7f25f5309712f0431",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb31024957b",
+        "title": "The Corsairs of France, by C. B. Norman,...",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_370daad7c5f54a17428da74c",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb47043456q",
+        "title": "Corsairs, captives, converts in early modernity : narrating barbary captivity in german-speaking Europe and the world, 1558-1807 / Robert Spindler",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9cbe8dc6d26046539f8681e5",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb34213927q",
+        "title": "The Corsairs of France , by C. B. Norman,... With portraits and a map",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_702c5159f3a0893eff2a74f2",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb32106828v",
+        "title": "A Captive of the corsairs, by John Finnemore,...",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1c7b6d0a6ae6f1db1a7f9a16",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb342140562",
+        "title": "The Corsairs of France , by C. B. Norman. Foreword and illustrations by Edward C. Caswell",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0b0710c11fb04e344b24f100",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb310043636",
+        "title": "A Particular narrative of the burning in the port of Tripoli, four men of war belonging to those corsairs, by Sir John Narborough,... On the 14th. of January 1675/6...",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1f20975c4ef399782b69e51d",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb31712105d",
+        "title": "Our navy and the Barbary corsairs , by Gardner W. Allen",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b3e15e107de6a0a11023ace4",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb44227025t",
+        "title": "Corsairs gold / Microïds",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1838e9e58501bda5ceabe711",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb31135885x",
+        "title": "The Barbary corsairs, by Stanley Lane Poole,... With additions by Lieut. J. D. J. Kelley,...",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c7bc4ed5274bd91800eaccd3",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb32490480s",
+        "title": "The Corsairs of France , by C. B. Norman. Foreword and illustrations by Edward C. Caswell",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ea3855dbd326b209aa0c87bc",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb45789801r",
+        "title": "The British Navy in the Mediterranean / John D. Grainger",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_37fcb6a41d062ab7234032fe",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb47062142c",
+        "title": "British slaves and Barbary corsairs, 1580-1750 / Bernard Capp",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_dd1ffff20b6d57a57e57f1f9",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb42167087r",
+        "title": "Pirates of Barbary : corsairs, conquests and captivity in the seventeenth-century Mediterranean / Adrian Tinniswood",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_515a75ad80d961732e3d410c",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb385731583",
+        "title": "Corsairs gold",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9424e2612da8c42fc0f8f333",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb38636010w",
+        "title": "Corsairs gold",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_aa425f6fe65e870c84ea9ff6",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb468455692",
+        "title": "The corsairs of Saint-Malo : network organization of a merchant elite under the Ancien Régime / Henning Hillmann",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_20e5b1b8a5c134e142bfa8fc",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb45469880z",
+        "title": "The corsairs' longest voyage : the Turkish raid in Iceland 1627 / by Þorsteinn Helgason ; translated by Anna Yates, Jóna Ann Pétursdóttir",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_19588086a2ea55ab2d46d303",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-115476",
+        "title": "Συναυλία της Συμφωνικής Ορχήστρας της Βαμβέργης (115476) Concert of the Bamberg Symphony Orchestra (115476)",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2309ee6998cd8fa7229ef856",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_321952",
+        "title": "Pas de deux - Pas d' esclave (Le Corsaire)",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ebe88f88b421897ad3b5bb2a",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-115314",
+        "title": "Συναυλία της Βασιλικής Φιλαρμονικής Ορχήστρας του Λονδίνου (115314) Concert of the Royal Philharmonic Orchestra of London (115314)",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_896d785ddbf5d01d4966802e",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-51643",
+        "title": "Προμετωπίδα: Εικονογράφηση για το ποίημα του Λόρδου Βύρωνα \"The Corsair\".",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_59c5cb79955ee8005efacfa8",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_326154",
+        "title": "Κουρσάρος, ο Le corsaire",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_98b0c3388cfe244d20d587f8",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_332602",
+        "title": "Α΄ πρόγραμμα: Ο κουρσάρος (pas de deux) Le corsaire (pas de deux)",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e4ee2af0bd01c72fb5ac9ef3",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_335018",
+        "title": "Κουρσάρος Corsaire",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f4560bbd6a3abdf1354fbf9f",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_333222",
+        "title": "Le corsaire Ο κουρσάρος",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_299d84ef27541d143bbceadd",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_332856",
+        "title": "Κουρσάρος: Pas de deux Le corsaire: Pas de deux",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_489c7b2cda00a67f38ba773b",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_333458",
+        "title": "Κουρσάρος, ο Le corsaire: Pax de deux",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f5377091607f5fd2d57e35b6",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-51652",
+        "title": "Εικονογράφηση για το ποίημα του Λόρδου Βύρωνα \"The Corsair\": Ελληνίδα σκλάβα.",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a72da792590e82b06584cdb4",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-51653",
+        "title": "Εικονογράφηση για το ποίημα του Λόρδου Βύρωνα \"The Corsair\": Ελληνίδα σκλάβα μπροστά σε Οθωμανό Πασά.",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_143b66efb12b2435b1709b06",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/DigAthensFestival/000185-117087",
+        "title": "Concert of the Vienna Tonkünstler Orchestra (117087) Συναυλία της Ορχήστρας “Tonkünstler” της Βιέννης (117087)",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6fede9328bdcbf223f1c3e4e",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/ELIA/000100-29_625006",
+        "title": "Ο κουρσάρος: Pas de deux / Pas d'esclave",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_890538b4ccbd2e943d16db2c",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/KEINE/000133-172499",
+        "title": "Old Navarino",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1d8180ada30f008011933a86",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/tsagaris/000200-40744",
+        "title": "Άποψη της Ύδρας από τη θάλασσα.",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_13ebbdad5f8d9787a049ec8c",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/national_theatre/000184-pub_1673",
+        "title": "Εις το Βασιλικόν, \"Ένα ποτήρι νερό\" του Σκριμπ. Εις της Κοτοπούλη, \"Ο Κουρσάρος\" του Μ. Ασάρ At the Royal Theatre, Scrib's \"The Glass of Water\". In Kotopouli Theatre M. Asar's \"The Corsair\"",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_366d1e8c60f0fe4b4064c705",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163629",
+        "title": "Οικόσημο οίκου Γκατελούζι Coat-of-arms of the house of Gattilusio",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5e49e6703fff8b9dafbda82c",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163454",
+        "title": "Οικόσημο οίκου Γκατελούζι Coat-of-arms of the house of Gattilusio",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1866cddba460a12bf0413a7e",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163497",
+        "title": "Οικόσημο οίκου Γκατελούζι Coat-of-arms of the house of Gattilusio",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5ae1f2182fa857b1c6e2c270",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163710",
+        "title": "Οικόσημο οικογένειας Βιτάλη Coat-of-arms of the Vitali family",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4f573cc790e8d2601a034d76",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163561",
+        "title": "Οικόσημο οίκου Γκατελούζι Coat-of-arms of the house of Gattilusio",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d19989b049ff004baf584c60",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163625",
+        "title": "Οικόσημο οίκου Γκατελούζι Coat-of-arms of the house of Gattilusio",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_300e0a03697ea6eecd8690f3",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/pandektis_eraldika/000081-10442_163623",
+        "title": "Οικόσημο οίκου Γκατελούζι Coat-of-arms of the house of Gattilusio",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a0f4e24242de3253291a8a2f",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/digma/000113-58658",
+        "title": "Μηνάς ο Ρέμπελος, κουρσάρος στο Αιγαίο",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_72f7ce0533501042de6c37d3",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/digma/000113-58659",
+        "title": "Μηνάς ο Ρέμπελος",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_dea0615ce6b28f2c73686782",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18865",
+        "title": "Με αφορμή τον θάνατο του Creveliers στην Αστυπάλαια. Ο ρόλος του νησιού στις καταδρομικές επιχειρήσεις των καθολικών κουρσάρων κατά τον 17ο αιώνα Occasioned by the death of Creveliers off Astypalaia: The island's role in the raids by Catholic corsairs during the 17th century",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1c5e7d61b9c2669ced52513d",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_75581",
+        "title": "War for profit: English corsairs, institutions and decentralised strategy",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ede0f0255fe4fc10674f5b24",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/mnimon/000087-8346",
+        "title": "Eric R. Dursteler, Renegade Women: Gender, Identity and Boundaries in the Early Modern Mediterranean, Βαλτιμόρη 2011 / Gillian Weiss, Captives and Corsairs: France and Slavery in the Early Modern Mediterranean, Stanford CA, 2011",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_86420d43d9da55c23e09ea53",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-350766",
+        "title": "Η πειρατεία στο Ιόνιο και στο Αιγαίο πέλαγος από τη βενετική οπτική (16ος -18ος αιώνας)",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_88c0ceec45877186b5ebbc45",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18068",
+        "title": "Corsaires and pirates in the Eastern Mediterranean, Fifteenth-Nineteenth centuries",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f19fabd497bf705584910e54",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_17881",
+        "title": "Pirates during Revolution: The many faces of piracy and the reaction of local communities",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_96a53142f4997d94768569ee",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/mnimon/000087-8512",
+        "title": "«ΑΓΟΡΑ ΤΟΥΡΚΟΥ ΣΚΛΑΒΟΥ» ΣΤΗ ΣΙΦΝΟ (17ΟΣ ΑΙ.). Η ΑΠΟΣΠΑΣΜΑΤΙΚΟΤΗΤΑ ΤΩΝ ΠΗΓΩΝ",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_62f263ba47170d7c5057a432",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/historein/000053-24937",
+        "title": "Mount Lebanon and Greece: Mediterranean Crosscurrents, 1821–1841",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e1884b895fa48f136e3faad4",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-97605",
+        "title": "Ανάλυση ικανοποίησης πελατών στις Leisure Airlines με χρήση διαδικτυακών αξιολογήσεων Analysis of customer satisfaction in Leisure Airlines using online reviews",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_73116745eeb6ceabd49d7cd2",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-3371",
+        "title": "Συμβολὴ στὴν ἱστορία τοῦ νοτιοανατολικοῦ Αἱγαίου (μὲ ἀφορμὴ τὰ Πατμιακὰ φιρμάνια τῶν ἐτῶν 1454-1522)",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4d3a3d11590d2b9445b0ba30",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/apothesis/000099-218330",
+        "title": "Ποινική Επιλεκτικότητα και Κρατικά Εγκλήματα: Η υπόθεση Μαξ Μέρτεν Criminal Selectivity and State Crimes: The Max Merten Case",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8183f257d3691b5f319749d1",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2967796",
+        "title": "«Το Υπερατλαντικό Δουλεμπόριο και η σχέση του με την οικονομία, την αποικιακή πολιτική και την επέκταση της Αγγλίας/Βρετανίας στην Καραϊβική, 1660 - 1739»",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3cb520778e5658d85a4bf900",
+        "run_id": "40585729329",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_58378",
+        "title": "Η καταλανο-αραγωνική παρουσία στην ανατολική Μεσόγειο, 1261–1460: μια πολιτικο-οικονομική, νομισματική και στρατιωτική θεώρηση La presència catalanoaragonesa a la Mediterrània oriental, 1261-1460: una visió politicoeconòmica, numismàtica i militar",
+        "query": "corsairs",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      }
+    ],
+    "connector_errors": [],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 59,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}

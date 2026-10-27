@@ -1,0 +1,205 @@
+{
+  "schema": "pct-specialist-agent-plan-v2",
+  "routing_authority": "JARVIS_PLANNER",
+  "target": "Πειρατικά ορμητήρια στη Νάουσα Πάρου, 1600–1700",
+  "aliases": [],
+  "target_type": "topic",
+  "research_focus": {
+    "schema": "pct-research-focus-v2",
+    "kind": "topic",
+    "entity": "Πειρατικά ορμητήρια στη Νάουσα Πάρου, 1600–1700",
+    "names": [],
+    "roles": [],
+    "places": [
+      "Νάουσα Πάρου"
+    ],
+    "topic_concepts": [
+      "maritime_piracy"
+    ],
+    "base_usage_requested": true,
+    "region_concepts": [],
+    "interpretation": "RETRIEVAL_CONCEPTS_NOT_HISTORICAL_ASSERTIONS"
+  },
+  "date_range": "1600-1700",
+  "purpose": "Πειρατικά ορμητήρια στη Νάουσα Πάρου, 1600–1700",
+  "source_limit_per_agent": 4,
+  "fallback_limit_per_agent": 4,
+  "total_query_budget_per_agent": 20,
+  "parallel_agent_count": 1,
+  "verified_promotion_allowed": false,
+  "memory_context": [],
+  "memory_policy": "Persistent memory is retrieval/routing assistance only; it never verifies a historical claim.",
+  "rule": "JARVIS alone assigns second-wave fallback sources after evaluating first-wave outcomes.",
+  "assignment_wave": 2,
+  "agents": [
+    {
+      "agent_id": "relationship_network",
+      "label": "Relationship Network Agent",
+      "queries": [
+        "corsairs Νάουσα Πάρου",
+        "voyages Νάουσα Πάρου",
+        "corsairs",
+        "corsairs harbours Νάουσα Πάρου"
+      ],
+      "outputs": [
+        "persons",
+        "ships",
+        "places",
+        "patrons",
+        "states",
+        "relationship_edges"
+      ],
+      "source_routes": [
+        "repo:PARES / Archivo General de Simancas",
+        "repo:Archives diplomatiques France",
+        "registry:moreveneto_browser",
+        "repo:Internet Culturale",
+        "repo:The National Archives Public Content",
+        "repo:Nationaal Archief"
+      ],
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2,
+      "assigned_sources": [
+        {
+          "route_id": "repo:SearchCulture.gr / EKT",
+          "route_type": "repository_dispatch",
+          "repository": "SearchCulture.gr / EKT",
+          "connector_id": null,
+          "score": 85,
+          "reason": [
+            "context:greek_aegean"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        },
+        {
+          "route_id": "repo:The National Archives Public Content",
+          "route_type": "repository_dispatch",
+          "repository": "The National Archives Public Content",
+          "connector_id": null,
+          "score": 84,
+          "reason": [
+            "agent_profile"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        }
+      ],
+      "fallback_sources": [
+        {
+          "route_id": "repo:OpenArchives.gr / EKT",
+          "route_type": "repository_dispatch",
+          "repository": "OpenArchives.gr / EKT",
+          "connector_id": null,
+          "score": 81,
+          "reason": [
+            "context:greek_aegean"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        },
+        {
+          "route_id": "repo:Nationaal Archief",
+          "route_type": "repository_dispatch",
+          "repository": "Nationaal Archief",
+          "connector_id": null,
+          "score": 80,
+          "reason": [
+            "agent_profile"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        }
+      ],
+      "assigned_queries": [
+        "corsairs Νάουσα Πάρου",
+        "voyages Νάουσα Πάρου",
+        "corsairs",
+        "corsairs harbours Νάουσα Πάρου"
+      ],
+      "query_budget": {
+        "total": 8,
+        "max_total": 8,
+        "queries_per_source": 4
+      },
+      "routing_decision": {
+        "authority": "JARVIS_PLANNER",
+        "strategy": "result_aware_fallback_v1",
+        "selected_route_ids": [
+          "repo:SearchCulture.gr / EKT",
+          "repo:The National Archives Public Content"
+        ],
+        "fallback_route_ids": [
+          "repo:OpenArchives.gr / EKT",
+          "repo:Nationaal Archief"
+        ],
+        "trigger": "RECOVERY_REPLAN",
+        "recovery_action": "REPLAN",
+        "recovery_reason": "zero candidates without explicit access blocker",
+        "first_wave_status_counts": {
+          "FAILED": 4,
+          "EXECUTED": 8,
+          "REMOTE_RATE_LIMITED": 4
+        },
+        "first_wave_records": 0,
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    }
+  ],
+  "reassignment_decisions": [
+    {
+      "agent_id": "pirate_base",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 46
+    },
+    {
+      "agent_id": "identity_resolution",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 59
+    },
+    {
+      "agent_id": "timeline",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 60
+    },
+    {
+      "agent_id": "relationship_network",
+      "reassign": true,
+      "reason": "RECOVERY_REPLAN",
+      "recovery_action": "REPLAN",
+      "recovery_reason": "zero candidates without explicit access blocker",
+      "assigned": [
+        "repo:SearchCulture.gr / EKT",
+        "repo:The National Archives Public Content"
+      ]
+    },
+    {
+      "agent_id": "contradiction",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 97
+    },
+    {
+      "agent_id": "source_genealogy",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 90
+    }
+  ]
+}
