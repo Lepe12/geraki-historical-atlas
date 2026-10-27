@@ -12,6 +12,12 @@ class ExplicitPlaceTests(unittest.TestCase):
         self.assertFalse(strong_region_matches('Πειρατές στη Νάουσα της Μακεδονίας', focus))
         self.assertFalse(strong_region_matches('Pirates in Newfoundland and Patmos', focus))
 
+    def test_compound_with_article_is_not_reduced_to_the_ambiguous_first_name(self):
+        focus = topic_focus('Πειρατικά ορμητήρια στη Νάουσα της Πάρου, 1600–1700')
+        self.assertEqual(focus['places'], ['Νάουσα της Πάρου'])
+        self.assertTrue(strong_region_matches('Πειρατές στη Νάουσα Πάρου', focus))
+        self.assertFalse(strong_region_matches('Πειρατές στη Νάουσα της Μακεδονίας', focus))
+
     def test_general_mediterranean_scope_remains_unchanged(self):
         focus = topic_focus('Πειρατικά ορμητήρια στην Ανατολική Μεσόγειο')
         self.assertEqual(focus['places'], [])

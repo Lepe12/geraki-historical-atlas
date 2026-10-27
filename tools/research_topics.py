@@ -41,7 +41,7 @@ def explicit_topic_places(target):
     such as «Νάουσα Πάρου» stays together to avoid treating another Ναουσα as
     a match merely because it has the same name.
     """
-    pattern = r'(?i:\b(?:στην|στη|στον|στο|στις|στα|σε)\s+)([Α-ΩΆΈΉΊΌΎΏA-Z][α-ωάέήίόύώϊϋΐΰa-z]+(?:\s+[Α-ΩΆΈΉΊΌΎΏA-Z][α-ωάέήίόύώϊϋΐΰa-z]+){0,2})'
+    pattern = r'(?i:\b(?:στην|στη|στον|στο|στις|στα|σε)\s+)([Α-ΩΆΈΉΊΌΎΏA-Z][α-ωάέήίόύώϊϋΐΰa-z]+(?:\s+(?:(?i:της|του)\s+)?[Α-ΩΆΈΉΊΌΎΏA-Z][α-ωάέήίόύώϊϋΐΰa-z]+){0,2})'
     return list(dict.fromkeys(m.group(1) for m in re.finditer(pattern, str(target))))
 
 def topic_focus(target, kind='unknown', regions=()):
@@ -111,7 +111,7 @@ def strong_region_matches(text,focus):
     # article between its components. Keep both components mandatory: a bare
     # «Νάουσα» must not be silently identified with the one on Paros.
     for term in focus.get('places', []):
-        parts = normalized(term).split()
+        parts = [part for part in normalized(term).split() if part not in {'τησ', 'του'}]
         if len(parts) == 2:
             pattern = r'(?<!\w)' + re.escape(parts[0]) + r'\s+(?:τησ\s+|του\s+)?' + re.escape(parts[1]) + r'(?!\w)'
             if re.search(pattern, value) and term not in matches:
