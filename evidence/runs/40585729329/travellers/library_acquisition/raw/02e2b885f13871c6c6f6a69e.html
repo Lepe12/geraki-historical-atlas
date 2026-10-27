@@ -1,0 +1,347 @@
+
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Digiviewer V 0.6.5</title>		
+        <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+		<meta name="robots" content="noindex,nofollow,noarchive"/>
+<link rel="stylesheet" href="http://digipool.bib-bvb.de/res/font-awesome-4.7.0/css/font-awesome.min.css"/>
+<link rel="stylesheet" type="text/css" href="/view/bvb_custom/theme/jquery-ui-custom.min.css" />
+<link rel="stylesheet" type="text/css" href="css/layout-default-latest.css" />
+<link rel="stylesheet" type="text/css" href="js/themes/default/style.min.css"/> 
+<link rel="stylesheet" type="text/css" href="css/viewer_styles.0.6.5.css" />
+<link rel="stylesheet" type="text/css" href="/view/bvb_custom/DE-29_viewer.css"/> 
+<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>-->
+<script type="text/javascript" src="http://digipool.bib-bvb.de/res/DataTables/jQuery-1.12.4/jquery-1.12.4.min.js"></script>
+
+<script type="text/javascript" src="http://digipool.bib-bvb.de/res/jstree/jstree.min.js"></script>
+<script type="text/javascript" src="http://digipool.bib-bvb.de/res/jquery-ui-1.11.4.min.js"></script>
+<script type="text/javascript" src="http://digipool.bib-bvb.de/res/jquery.layout-latest.1.3.0.min.js"></script>
+<script src="http://digipool.bib-bvb.de/res/jquery.fileDownload.js"></script>
+<script type="text/javascript">
+/* <![CDATA[ */ 
+/* Initialisation from Server Side: URL-Pattern, I18N for messages and tooltips */
+var test="null";
+var CopyrightsDisplayFile="null";
+var childpid="null";
+var metspid="18171497";
+var adminUnit="BAY01";
+var branding="DE-29";
+var hasThumbs=true;
+var hasDownload=true;
+var desc_mid="5097415";
+var desc_urn="5097416";
+var hasDFG = ("DFG"=="");
+var isZeitung = ("ZEITUNG"=="");
+var lang="en";
+var isIndexed=false;
+var myLayout;
+var search_terms="";
+var adj=""; 
+var partitiona="DE-29";
+var solrSearch=true;
+var pdfDownload="";
+/* URLs */
+function getURL(param,context,op1,op2){
+	switch (context){ 
+    case 'thumb': //Thumbnail-Stream: direkter Weg ohne Eintrag in HDEACCESSLOG. Nur erlaubt, wenn Werk frei ist
+			    
+			   return "http://digipool.bib-bvb.de/bvb/extdeliv/thumb/"+param;
+			   //return 'http://digital.bib-bvb.de/webclient/DeliveryManager?custom_att_2=thumbnailstream&pid='+pid 
+			   	
+		case 'view_main': //Delivery-URL
+		           if (op1){
+				   return '/webclient/DeliveryManager?custom_att_3=fwd_ref&hideLogo=true&custom_att_2=simple_viewer&pid='+param+"&search_terms="+op1+'&locale='+lang;
+				   }
+				   return '/webclient/DeliveryManager?custom_att_3=fwd_ref&hideLogo=true&custom_att_2=simple_viewer&pid='+param+'&locale='+lang;
+		case 'structMap': 
+		           return "getStructMap.jsp?pid=18171497&parta=DE-29&au=BAY01";
+		case 'metadata' : 
+		           return "http://digipool.bib-bvb.de/bvb/delivery/metadata/dtlmets?pid=18171497&mid="+desc_mid+"&unit="+adminUnit+"&urn="+desc_urn+"&partitiona=DE-29&lang="+lang+"&eod=true";
+    case 'solranfrage' :
+               return "http://digipool.bib-bvb.de/bvb/SolrOpenAPI/anfrage" ;
+		case 'DFG' : 
+		           return "http://digipool.bib-bvb.de/bvb/DFGViewer/service.pl?svc=dfgviewer&partitiona=DE-29&pid=18171497";
+		case 'singleUrn': 
+		           return "http://digipool.bib-bvb.de/bvb/delivery/getDescMd.fpl?pid="+param+"&au=BAY01&urn_only=1";
+		case 'deeplinkingURL' :
+		           return location.protocol + "//"+ location.hostname + "/webclient/DeliveryManager?custom_att_2=simple_viewer&pid=18171497&childpid="+param;
+		case 'deliveryURL': 
+		           return location.protocol + "//"+ location.hostname + "/webclient/DeliveryManager?custom_att_2=simple_viewer&pid=18171497";
+		case 'URN-URL' : 
+		           return "https://nbn-resolving.org/"+param;
+		case 'search':
+                   return "http://digipool.bib-bvb.de/bvb/delivery/fulltext_search.pl?pid=18171497&search="+param+"&fuzzy="+op2+'&adj='+op1	;	
+		case 'switchLanguage':
+                   return "../custom/bvb_switch_locale.jsp?locale="+param;	
+		case 'copyright':
+                   return "../general/DisplayDeliveryCopyrights.jsp?bvb_expand=1&copyrights="+CopyrightsDisplayFile;	
+		case 'dictionary':
+                   return "../bvb_custom/bvb_custom/dictionary.json";	
+		/* wird nicht mehr benoetigt?
+		case 'creativecommons' : 
+		           return "http://digipool.bib-bvb.de/bvb/delivery/nutzung.pl?code=" + encodeURIComponent(param) + "&pid=18171497";
+		
+		case 'gnd':
+		           func=(op1 == 'personal')?'seealso/pnd':'seemore/gnd';
+                   return "http://beacon.findbuch.de/"+ func +"-aks?format=sources&id="+param;	
+		*/		   
+	} 
+}
+/* ]]> */
+</script>
+<script type="text/javascript" src="js/viewer.0.6.5_solr.js"></script> 
+</head>
+<body class="ui-layout-container">
+   <div  class="ui-layout-center" id="viewport">
+       <div id="navigation" >
+		    <a id="but_3" title="First page" href="#" onclick="pagestep('first');return false;"><i class="fa fa-step-backward  fa-fw" aria-hidden="true"></i></a>
+		    <a id="but_2"  title="Previous page" href="#" onclick="pagestep('-1');return false;"><i class="fa fa-play  fa-flip-horizontal fa-fw" aria-hidden="true"></i></a>
+  		    <a id="ico_bookmark" title="bookmark" href="#" onclick='displayBookmark4SinglePage();return false;' ><i class="fa fa-chain fa-lg   fa-fw" aria-hidden="true"></i></a>
+		    <a id="but_1"  title="Previous page" href="#" onclick="pagestep('1');return false;"><i class="fa fa-play fa-fw" aria-hidden="true"></i></a>
+		    <a id="but_4" title="Last page" href="#" onclick="pagestep('last');return false;"><i class="fa fa-step-forward   fa-fw" aria-hidden="true"></i></a>
+      </div>
+	  <div id="viewport_bookmark_page"></div>	
+      <div id="viewport_singlepage">
+	    <iframe src="http://digipool.bib-bvb.de/res/spinner.gif" id="frame_singlepage" width="100%">
+           <p>Ihr Browser kann leider keine eingebetteten Frames anzeigen.</p>
+        </iframe>
+      </div>
+   </div>  
+  <div class="ui-layout-west" id="left">	
+	<div id="branding"><a title="Link zur Homepage" id="logo" href="test" target="_blank">&nbsp;</a></div>
+    <div id="icons" style="display:none;">
+	<div >
+  			<a class="myico myico-en de switchLanguage" title="switch language" href="#" onclick="toggle_lang();return false;"></a>
+  			<a class="myico myico-de en switchLanguage" title="switch language" href="#" onclick="toggle_lang();return false;"></a>
+			  <a id="ico_mail" title="Get in contact with us!" href="#" onclick="kontakt();return false;"><i class="fa fa-envelope" aria-hidden="true"></i></a>
+		    <a id="ico_DFG" class="myico myico-dfg" title="Show this work in DFG Viewer" href="#" onclick="winOpen('DFG',metspid);return false;"></a>
+	 </div>
+	 </div>
+    <!--<div style="clear:both;"></div> wahr wohl überflüssig? -->
+     <div id="menue">
+ 	   <ul style="list-style-type:none;">
+		   <li><a href="#descriptiveMetadata" id="showDescriptive"></a></li>
+		   <li><a href="#thumbs" id="showThumbnails"></a></li>
+		   <li><a href="#structMap" id="showstructMap"></a></li>
+		   <li><a href="#download" id="showDownload"></a></li>
+		   <li><a href="#search" id="showSearch"></a></li>
+	    </ul>
+		<div id="structMap" ></div>
+		<div id="download" >
+		   
+		   <div class="request ui-tabs-panel ui-widget">
+			  <button  id="download_all" class="ui-button ui-widget ui-corner-all" onclick="download(root);"> 
+			    <span >Alle Seiten herunterladen</span> 
+			  </button>
+			  <button id="download_selected" class="ui-button ui-widget ui-corner-all" onclick="download();">
+			   <span>ausgewählte Seiten / Kapitel herunterladen</span> 
+			  </button>
+			</div>
+			<form method="post" action="http://digipool.bib-bvb.de/mojo/metsprint"  class="fileDownloadForm" target="_blank" >
+				<input type="hidden" id="metsid" name='pid' value='18171497'/>
+				<input type="hidden" name='branding' value='DE-29'/>
+				<input type="hidden" id="identifiers" name='identifiers' value=""/>
+        <input type="hidden" id="all_pages" name='all_pages' value=""/>
+			</form>
+ 
+		     <div id="downloadTree"></div>
+		    
+		
+		</div>
+		<div id="descriptiveMetadata"></div>
+		
+		<div class="copyrights" style="display:none;"> 
+			<input type="button" class="button but_copyrights" value="copyrights" style="clear:both;" onclick="winOpen('copyright',current_pid);" />
+			</div>
+		<div id="thumbs" style="display:none;">
+		   <div id="viewport_thumbs"> </div>
+		   <input type="button" class="button" value="more Thumbnails" id="but_more_Thumbnails" style="clear:both;" onclick="appendThumbs(thumbs_shown);" />
+		</div>
+		<div id="search" style="display:none;">
+		 <div id="txt_search_content_only" style="display:none;">Sie können hier den Inhalt durchsuchen</div>  
+	    <form id="searchform" action="" onsubmit="this.startSearch.click();return false;">
+		  <div><input type="text" id="searchBox" name="search" value=""/></div>
+		  <div>
+			  <select name="opt" size="1">
+				<option id="txt_search_or" value="or" selected="selected"> </option>
+				<option id="txt_search_and" value="and"> </option>
+				<option id="txt_search_phrase" value="phrase"> </option>
+				</select>
+			    <input type="button" class="button" value="suchen" name="startSearch" id="but_search" style="clear:both;" onclick="ft_search(this.form.search.value,this.form.opt.value);" />
+ 	      </div>
+		</form>
+		<div id="searchresult">
+            <div id="search_status"  > 
+				 <div id="searching" class="searchstatus" style="display:none;"><img  src="http://digipool.bib-bvb.de/res/spinner.gif" alt="requesting..."/></div>
+				 <div id="search_noresults" class="searchstatus" style="display:none;"> 
+                    <div id="txt_search_noresults">Keine Ergebnisse</div>
+				    <!--<button type="button" class="button" name="startSearch" id="txt_search_fuzzy" onclick="ft_search($('#searchBox').val(),$('#searchform select').val(),'fuzzy');"></button>-->
+				 </div>	
+				 <div id="search_timeout" class="searchstatus" style="display:none;"> </div>
+                 <div id="resultrowtemplate"><div><a href="#" onclick="ft_link(event,$(this));return(false);"> </a><ul></ul></div></div>
+			</div>
+			<div id="search_resultlist" class="searchresults" >
+			</div>
+ 		</div>
+	</div><!-- end search -->
+   
+	</div>	
+  </div>	
+   <div id="display_bookmarks"  class="modalcontent" title="blub"  data-en="Bookmarks and Citation" data-de="Lesezeichen und Zitierweise" data-close-en="Close popup" data-close-de="Dieses Fenster schließen" class="bookmark" style="display:none;">
+		  <div id="bm_whole_work" class="par">
+         <span lang="de">Um dieses Werk zu verlinken, verwenden Sie bitte folgende Adresse:</span>
+         <span lang="en">To link to this work, please use the following address:</span>
+			   <div>&nbsp;&nbsp;<a href="#" class="www" target="_blank" ></a></div>
+      </div>
+ 		  <div id="bm_deeplinkingURL" class="par" >
+         <span lang="de">Um die aktuelle Seite dieses Werks zu verlinken, verwenden Sie bitte folgende Adresse:</span>
+         <span lang="en">To link to the current page within this work, please use the following address:</span>
+			   <div>&nbsp;&nbsp;<a href="#" class="www" target="_blank"></a></div>
+		  </div>
+  </div>
+   <div id="permalink" class="modalcontent" title="blub"  data-en="Persistent Reference to This Work" data-de="Persistenter Verweis zu diesem Werk" style="display:none;">
+  <div >
+        <p>
+          <span lang="de">Um dieses Werk zu verlinken, verwenden Sie bitte folgenden</span>
+          <span lang="en">To link to this work, please use the following</span>
+          <a href="http://de.wikipedia.org/wiki/Persistent_Uniform_Resource_Locator" target="_blank" rel="noopener" class="www">Persistent Uniform Resource Locator (PURL)</a>:
+       </p>
+      <div class="input-group mb-3">
+        <input readonly="readonly" type="text" class="form-control resolving urn text-left pointer" />
+        <button type="button" title="Kopieren" class="btn btn-outline-secondary" onclick="copyinput($(this).prev('input'))"><span class="fa fa-clipboard"/></button>
+      </div>
+        <p>
+            <span lang="de">Um dieses Werk zu zitieren, verwenden Sie bitte folgenden</span>
+            <span lang="en">To quote this work, please use the following</span>
+            <a href="http://de.wikipedia.org/wiki/Uniform_Resource_Name" target="_blank" rel="noopener" class="www">Uniform Resource Name (URN)</a>:
+         </p>
+         <div class="input-group mb-3">
+            <input readonly="readonly" type="text" class="form-control resolving urn text-left pointer" />
+                <button type="button" title="Kopieren" class="btn btn-outline-secondary"  onclick="copyinput($(this).prev('input'))">
+                  <span class="fa fa-clipboard"></span>
+                </button>
+            </div>
+         <hr />
+         <p>
+           <span lang="de">Der Einsatz eines Persistent Identifier (hier: URN) ermöglicht die stabile, weltweit eindeutige und ortsunabhängige Referenzierung elektronischer Dokumente und bietet so auch bei einem sich ändernden</span>
+           <span lang="en">Using a Persistent Identifier (here: URN) allows electronic documents to be referenced in a stable, globally unambiguous and non-location-dependent manner. It guarantees reliability in citing sources even if the</span>
+           <a href="https://de.wikipedia.org/wiki/Uniform_Resource_Locator" target="_blank" rel="noopener" class="www">Uniform Resource Locator (URL)</a>
+           <span lang="de"> Zitationssicherheit. Daher eignen sich URNs zur dauerhaft sichergestellten Zitation in wissenschaftlichen Arbeiten.</span>
+           <span lang="en"> changes. This is why URNs are suitable for permanently guaranteed citation in scientific papers.</span>
+         </p>
+         <p>
+            <span lang="de">URNs können nicht direkt im Browser aufgerufen werden, sondern werden mittels eines Resolvingdienstes in URLs übersetzt. Die persistente Auflösung dieses Links erfolgt hier durch den</span>
+            <span lang="en">URNs cannot be called up directly in a browser but are translated into URLs by a resolving service. The persistent resolution of these links is carried out by the</span>
+            <a href="https://nbn-resolving.org" target="_blank" rel="“noopener“" class="www">
+              <span lang="de">URN-Resolver der Deutschen Nationalbibliothek</span>
+              <span style="display: none;" lang="en">URN Resolver of the German National Library</span>
+            </a>.
+          </p>
+          <hr />
+          <p>
+            <span lang="de">Sollte die PURL-Auflösung nicht funktionieren, schreiben Sie uns bitte eine</span>
+            <span lang="en">In case the PURL resolution doesn't work, please contact us via</span>
+            <a href="mailto:dtl@bib-bvb.de?subject=PURL-Auflösung" class="www">
+              <span lang="de">E-Mail</span>
+              <span lang="en">email</span>
+            </a>.<br/>
+              <span lang="de">Zwischenzeitlich verwenden Sie folgenden nicht-persistenten</span>
+              <span lang="en">In the meantime you may use the following non-persistent </span>
+              <a href="http://de.wikipedia.org/wiki/URL" target="_blank" rel="noopener" class="www">Uniform Resource Locator(URL)</a>:
+          </p>
+        <div class="input-group mb-3">
+          <input readonly="readonly" type="text" class="form-control resolving urn text-left pointer" val=""/>
+          <button type="button" title="Kopieren" class="btn btn-outline-secondary"  onclick="copyinput($(this).prev('input'))">
+                <span class="fa fa-clipboard"></span>
+          </button>
+       </div>
+  </div>
+  </div>
+
+<div id="kontakt"  class="modalcontent"  title="blub"  data-en="Ask the Library" data-de="Anfrage an die Bibliothek" style="display:none;">	
+		<div>
+			<p><span lang="de">Bitte schicken Sie Ihre Anfrage per E-Mail an an den Bibliotheksverbund Bayern - Verbundzentrale unter </span>
+      <span lang="en">Please send your request by mail to the Bavarian Library Network Head Office</span>
+      </p>
+      <a href="mailto:dtl@bib-bvb.de"><b>dtl@bib-bvb.de</b></a>.
+			
+			<p><span lang="de">Damit wir Ihnen gezielt helfen können, fügen Sie bitte in Ihre E-Mail folgende Zeile ein:</span>
+      <span lang="en">In order to provide you best possible help, please add the following line to your mail:</span>
+			<input readonly="readonly" type="text" />
+      <button type="button" title="Kopieren" class="btn btn-outline-secondary"  onclick="copyinput($(this).prev('input'))"><span class="fa fa-clipboard"></span></button>
+			</p>
+			<p><span lang="de">Vielen Dank</span><span lang="en">Thank you very much</span><br/>
+			</p>
+		</div>	
+</div>
+
+
+<div class="preparing-file-modal en" title="PDF Download" style="display: none;">
+    Preparing download, please wait.
+    <div class="ui-progressbar-value ui-corner-left ui-corner-right" style="width: 100%; height:22px; margin-top: 20px;"></div>
+</div>
+<div class="preparing-file-modal de" title="PDF-Download" style="display: none;">
+    Herunterladen wird vorbereitet, bitte warten.
+    <div class="ui-progressbar-value ui-corner-left ui-corner-right" style="width: 100%; height:22px; margin-top: 20px;"></div>
+</div>
+<div class="done-modal de" title="PDF wird aktuell auf Ihren Rechner übertragen" style="display: none;">
+    Datei wird gerade im Hintergrund auf ihren Rechner übertragen. Bitte gedulden Sie sich noch ein wenig und schauen Sie in den Download-Ordner Ihres Browsers.
+    <div class="ui-progressbar-value ui-corner-left ui-corner-right" style="width: 100%; height:22px; margin-top: 20px;"></div>
+</div>
+<div class="done-modal en" title="Transfering PDF to your computer ..." style="display: none;">
+    The file is being downloaded to your computer in background. Please be patient for a while and have a look into the download folder of your browser.
+    <div class="ui-progressbar-value ui-corner-left ui-corner-right" style="width: 100%; height:22px; margin-top: 20px;"></div>
+</div>
+ 
+<div class="error-modal en" title="Error" style="display: none;">
+    There was a problem generating the download, please try again.
+</div>
+<div class="error-modal de" title="Fehler" style="display: none;">
+    Leider gab es ein technisches Problem beim Herunterladen.
+</div>
+<div class="check-modal en" title="No file selected" style="display: none;">
+    Please choose chapters, pages or the entire work by selecting the checkboxes in the table of contents.
+</div>
+<div class="check-modal de" title="Keine Datei ausgewählt" style="display: none;">
+    Bitte wählen Sie Kapitel, Seiten oder das Gesamte Werk über die Checkbox im Inhaltsverzeichnis aus.
+</div>
+<div class="urn-modal" title="" data-en="" style="display: none;">
+   
+</div>
+
+
+
+<template id="resultrow-toc">
+  <div class="item-searchresult-toc">
+    <a href="#"></a>
+  </div>
+</template>
+<template id="resultrow-fulltext">
+  <div class="item-searchresult-ft">
+    <a href="#"></a>
+	<ul></ul>
+  </div>
+</template>
+  </body>
+</html>

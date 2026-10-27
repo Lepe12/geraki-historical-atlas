@@ -1,0 +1,447 @@
+
+
+
+<!DOCTYPE html>
+<html lang="el" dir="ltr" data-bs-theme="light">
+
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
+    <link rel="dns-prefetch" href="//code.jquery.com" />
+    <link rel="preconnect" href="//code.jquery.com" />
+    <title>Αρχείο Εθνικού Θεάτρου</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+    <meta name="title" content="Αρχείο Εθνικού Θεάτρου - Διαχείρηση">
+    <meta name="author" content="Athena R.C.">
+    <meta name="description" content="Αρχείο Εθνικού Θεάτρου">
+    <meta name="keywords" content="θέατρο, αρχείο">
+    <link rel="canonical" href="https://nt-archive.gr/">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nt-archive.gr/">
+    <meta property="og:title" content="Αρχείο Εθνικού Θεάτρου">
+    <meta property="og:description" content="Αρχείο Εθνικού Θεάτρου">
+    <meta property="og:image" content="/assets/img/intro1.jpg">
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://nt-archive.gr/">
+    <meta property="twitter:title" content="Αρχείο Εθνικού Θεάτρου">
+    <meta property="twitter:description" content="Αρχείο Εθνικού Θεάτρου">
+    <meta property="twitter:image" content="/assets/img/intro1.jpg">
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="120x120" href="/media/favicon.ico">
+    <link rel="icon" type="image/svg+xml" sizes="32x32" href="/media/favicon.ico">
+    <link rel="icon" type="image/svg+xml" sizes="16x16" href="/media/favicon.ico">
+    <!-- <link rel="manifest" href="<? //= $config['app_path']
+    ?>/assets/img/favicon/site.webmanifest"> -->
+    <link rel="mask-icon" href="/media/favicon.ico" color="#ffffff">
+    <meta name="msapplication-TileColor" content="#002F49">
+    <meta name="theme-color" content="#002F49">
+
+    <!-- Bootstrap CSS
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <link type="text/css" href="/vendor/bootstrap-5.1.3-dist/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Fontawesome -->
+    <!-- <link type="text/css" href="/vendor/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">-->
+    <link type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.css" rel="stylesheet" >
+      <!-- <link rel="stylesheet" href="/vendor/fontawesome-free-6.5.0-web/css/all.css" rel="stylesheet">-->
+  
+
+
+    <!--Datepicker bootstrap-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.css" rel="stylesheet" />
+
+    <!-- Font -->
+    <link href='https://fonts.googleapis.com/css?family=Manrope' rel='stylesheet'>
+
+    <!--Timeline-->
+    <link href="/vendor/timeline/jtimeline.css" rel="stylesheet">
+
+    <!--yearpicker-->
+    <link href="/css/yearpicker.css" rel="stylesheet">
+
+    <!-- pdf.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.css" integrity="sha512-tze+o/xG0w3yxxE8xe32piisVvI/LfcEuf6LW7lFLUxhio2SfFQ9mQ0TqB0avvonmxUXT7/l8+fnWkR03u85fQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Datatables-->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+
+    <!-- 360 image rotator-->
+    <link rel="preload" href="/vendor/imagerotator/html/css/basic.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link type="text/css" rel="stylesheet" href="/vendor/imagerotator/html/css/basic.css"/>
+    </noscript>
+
+    <!-- SELECT2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <!-- Our own -->
+    <link type="text/css" href="/css/style.css" rel="stylesheet">
+</head>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(event) {
+        $("li.nav-item")
+            .on("mouseover", function() {
+                //console.log($(this).children(1).hasClass("active"));
+                if($(this).children(1).hasClass("active")===false){                   
+                    $(this).children(1).addClass('pseudo_hover_border');
+                }else{                   
+                }
+            })
+            .on("mouseout", function() {
+                    $(this).children(1).removeClass('pseudo_hover_border');
+            });
+
+        let cur_lang;
+        let found = window.location.href.match(/lang=(\w+)/);
+
+        if (found != null) {
+            cur_lang = localStorage.getItem('cur_lang');
+            if (cur_lang != found[1]) {
+                localStorage.setItem('is_lang_changed', 'true');
+                localStorage.setItem('cur_lang', found[1]);
+
+            } else {
+                localStorage.setItem('is_lang_changed', 'false');
+            }
+        } else {
+            localStorage.setItem('is_lang_changed', 'false');
+        }
+    })
+</script>
+
+
+<body id="pub"  tabindex="0">
+<!--<div class="text-center">-->
+<!--   -->
+<!--</div>-->
+<nav id="menu" class="ntnavbar navbar-expand-lg" aria-label="navbar">
+
+    <div class="container">
+
+        <div class="row mt-1">
+            <div class="col-md-2 col-sm-12">
+                    <a class="navbar-brand" href="/">
+                        <img src="/media/logo_ntarchive.png" alt="Logo">
+                    </a>
+            </div>
+            <div class="col-md-10 col-sm-12 text-end">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"><i class="fas fa-bars"></i></span>
+                </button>
+                <div class="collapse navbar-collapse horizontal_border" id="navbarMenu">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 nt_mtop text-uppercase">
+                        <li class="nav-item">
+                            <a class="firstnav nav-link py-1" href="/plays">Παραστασεις</a>
+                            <p class="firstpseudo remove_hover_border"></p>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link py-1" href="/works">Εργα</a>
+                            <p class="remove_hover_border"></p>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link py-1" href="/people">Προσωπα</a>
+                            <p class="remove_hover_border"></p>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link py-1" href="/roles">Ρολοι</a>
+                            <p class="remove_hover_border"></p>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link  py-1" href="/stages">Σκηνες</a>
+                            <p class="remove_hover_border"></p>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link py-1" href="/places">Θεατρα</a>
+                            <p class="remove_hover_border"></p>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle  py-1" href="#" data-bs-toggle="dropdown" aria-expanded="false">Συλλογές</a>
+                            <ul class="dropdown-menu">
+                                <li><a title="Προγραμματα" class="dropdown-item" href="/programs">Προγράμματα</a></li>
+                                <li><a title="Δημοσιευματα" class="dropdown-item" href="/publications">Δημοσιεύματα</a></li>
+                                <li><a title="Φωτογραφιες" class="dropdown-item" href="/photos">Φωτογραφίες</a></li>
+                                <li><a title="Ηχοι" class="dropdown-item" href="/sounds">Ήχοι</a></li>
+                                <li><a title="Βιντεο" class="dropdown-item" href="/videos">Βίντεο</a></li>
+                                <li><a title="Αφισες" class="dropdown-item" href="/posters">Αφίσες</a></li>
+                                <li><a title="Κοστουμια" class="dropdown-item" href="/costumes">Κοστούμια</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <form class="nav-right" role="search">
+                        <!-- <input class="form-control" type="search" placeholder="Search" aria-label="Search"> -->
+                        <ul class="navbar-nav mb-xl-4 mb-lg-3  nt_mtop text-uppercase">
+                            <li class="nav-item">
+                                <a href="/search" class="search d-lg-flex ">
+                                    <img class="search_header" src="/media/header_search_icon.png" title="search" alt="search"/><small class="px-2" style="font-size:11px;vertical-align: sub;">ΣΥΝΘΕΤΗ ΑΝΑΖΗΤΗΣΗ</small>
+                                </a>
+                            </li>
+
+                                                            <li class="nav-item">
+                                    <button type="button" class="search d-lg-flex like_btn pt-2" data-bs-toggle="modal" data-bs-target="#loginModal" title="Σύνδεση χρήστη">
+                                        <img src="/media/header_login_icon.png" title="login" alt="login"/>
+                                    </button>
+                                </li>
+                                                      
+                            <li class="nav-item dropdown language pt-1">
+                                <a title="Γλώσσα" class="nav-link dropdown-toggle" href="#" id="navbarDropdownLang" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    ΕΛ                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownLang">
+                                    <li><a title="EN" class="dropdown-item" href="1673?lang=en">EN</a></li>                                </ul>
+                            </li>
+                        </ul>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</nav>
+    <div class="container mb-5">
+    <div class="row mt-3 mb-5">
+        <div class="col-2"></div>
+        <div class="col-10">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Αρχική</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><span class="breadCurrent">Δημοσίευμα</span>
+                        &nbsp;&nbsp;
+                                            </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+            <div class="row">
+            <div class="col-12 text-end"><a class="btn btn-red btn-sm" target="_blank" href="https://rdf.nt-archive.gr/pub/1673">XML/RDF</a></div>
+        </div>
+                <div class="row">
+                        <div class="col-2"></div>
+                <div class="col-lg-5 col-md-12 col-sm-12">
+                            <dl>
+                    <dt  class="samewidth ">Τίτλος δημοσιεύματος :</dt>
+                    <dd>Εις το Βασιλικόν, "Ένα ποτήρι νερό" του Σκριμπ. Εις της Κοτοπούλη, "Ο Κουρσάρος" του Μ. Ασάρ</dd>
+                                            <dt  class="samewidth">Συντάκτης:</dt><dd><a href="/person/5945" title="Πηγαίνετε στο πρόσωπο">Πολύμερος Μοσχοβίτης</a></dd>
+                                        <dt  class="samewidth">Μέσο δημοσίευσης :</dt>
+                    <dd>Περιοδικό</dd>
+                                            <dt  class="samewidth">Τίτλος μέσου :</dt>
+                        <dd>Εργασία</dd>
+                                    </dl>
+            </div>
+                                     <div class="col-lg-5 col-md-12 col-sm-12">
+                    <div class="col-lg-5 col-md-12 col-sm-12">
+                                        <dl>
+                                            <dt  class="samewidth">Ημερομηνία :</dt>
+                        <dd>25/02/1940</dd>
+                                        <dt  class="samewidth">Είδος δημοσιεύματος :</dt>
+                    <dd>Κριτική</dd>
+                                            <dt  class="samewidth">Στήλη:</dt>
+                        <dd>Το θέατρό μας: Κριτικό σημείωμα</dd>
+                                    </dl>
+            </div>
+                    </div>
+            </div>
+        <div class="row">
+                            <div class="col-0 col-lg-2"></div>
+                <div class="col-12 col-lg-10">
+                         <div class="modalPlayhr"></div>
+                <dl>                
+                    <dt class="samewidth">Παράσταση:</dt>
+                    <dd><a href="\play\87" alt="Δείτε τη παράσταση" title="Δείτε τη παράσταση">Ένα ποτήρι νερό</a>&nbsp;(1940)</dd>
+                    <dd>20/02/1940                        -03/03/1940, Εθνικό Θέατρο: Κτήριο Τσίλλερ - Κεντρική Σκηνή, Αγίου Κωνσταντίνου 22-24                    </dd>
+                </dl>
+            </div>
+        </div>
+
+
+                <div class="row mb-1 p-0 m-0">
+            <div class="col-12">
+                <iframe src="/vendor/pdfjs/web/viewer.html?file=/collections/screen/publications/YE1940_02_CR004.pdf" style="width: 100%; height: 85vh; border: 1px solid #ccc; min-height: 600px;" border="0">
+                </iframe>
+            </div>
+        </div>
+         </div>
+        
+    </div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(event) {
+        
+    })
+</script>
+<!-- Chatbot button -->
+<button class="chatbot-button" id="chatbot-button" data-bs-toggle="tooltip" data-bs-placement="left" title="Ask me anything">
+    <span class="chatbot-icon"><img src="/media/Chat_Bot_icon_60x60.png"></span>
+</button>
+
+<!-- Chatbot window (styled with Bootstrap) -->
+<div id="chatbot-window">
+    <h5 class="p-2" style="margin-left:2px;background-color: #fff;">
+        <!-- <span class="navbar-toggler-icon" style="padding: 3px 0 2px 15px"><i class="fa fa-ellipsis-vertical"></i></span> -->
+        <img src="/media/Chat_Bot_ethniko_icon_50x27.png" style="margin-left:5px;">
+        <div id="cclose-button" class=" chatclose-button cclose-button" aria-label="Close" style="float: right;margin-right: 15px;margin-top: -5px;"><i class="fas fa-window-minimize fa-lg"></i></div>
+        <!--        <button type="button" id="cclose-button" class=" chatclose-button cclose-button" aria-label="Close" style="float: right;"></button>-->
+    </h5>
+    <!-- Conversation box for displaying messages -->
+    <div class="conversation-box" id="conversation-box">
+        <!-- initial help text -->
+        <div class="bot-message"><img class="bot-icon" src="/media/Chat_Bot_icon_30x30.png"><span class="bot-message1"><div id="typing-text"></div></span></div>
+    </div>
+
+    <!-- Message input field and send button -->
+    <div class="input-group chat-input" style="padding: 0 0 0 15px;">
+        <input type="text" class="form-control" id="message" placeholder="Type your message...">
+        <button class="btn btn-default" id="send-button">
+            <span class="chatbot-icon"><img src="/media/Chat_Bot_send_icon_20x15.png"></span>
+        </button>
+    </div>
+</div>
+
+<a id="top_button"><i class="fas fa-chevron-up"></i></i></a>
+<div id="alerts"></div>
+    <div id="cookieConsent">
+        <div id="closeCookieConsent" onclick="$('#cookieConsent').hide()">x</div>
+        <span style="padding-left:50px">Αυτός ο ιστότοπος χρησιμοποιεί cookies για να σας προσφέρει την καλύτερη εμπειρία χρήσης. Θεωρούμε ότι αποδέχεστε την αποθήκευση όλων των cookies.</span><br/><a title="cookieConsentOK" alt="cookieConsentOK" class="cookieConsentOK">Κλείσιμο</a>
+    </div>
+    </main>
+<div id="Modal" class="modal fade" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+<footer class="footer mt-auto">
+    <div class="dark-footer h-75 ">
+        <div class="container py-4">
+            <div class="row dark-footer ">
+                <div class=" col-lg-4 col-md-4 col-sm-12  vertical-line-right text-lg-start text-sm-center py-2">
+                    <p class="pt-4"><a href="https://n-t.gr" alt="Εθνικο Θέατρο" title="Εθνικο Θέατρο"><img src="/media/footer_logo.png"></a></p>
+                    <div class="footerLink pt-1">
+                        <p>Εθνικό Θέατρο</p>
+                        <p><small>Αγίου Κωνσταντίνου 22-24</br>
+                        10437, Αθήνα</br>
+                        Τηλ. κέντρο 210 5288100</br>
+                        <a class="plainlink" href="mailto:archive@n-t.gr" title="contact us" alt="contact mail">archive@n-t.gr</a></small></p>                     </div>
+                </div>
+
+                <div class=" col-lg-4 col-md-4 col-sm-12 vertical-line-right text-lg-start text-sm-center pt-4">
+                    <ul class="no-style footerTitle text-center">
+                        <li>Εφαρμογές</li>
+                    </ul>
+                    <ul class="no-style pt-1">
+                        <li class="my-2 appFont"><img class="footerImg" src="/media/virtual_costumes_icon.png" alt="costume" title="costume"  /><a target="_blank" class="footerLink px-2" title="Εικονική περιήγηση κοστουμιών" href="https://virtualmuseum.nt-archive.gr/">Εικονική περιήγηση κοστουμιών</a></li>
+                        <li class="my-3 appFont"><img class="footerImg"  src="/media/virtual_tour_icon.png" alt="virtual tour" title="virtual tour"><a target="_blank" class="footerLink px-2" title="Εικονική ξενάγηση" href="https://vt.nt-archive.gr/app">Εικονική ξενάγηση</a></li>
+                        
+                        <li class="my-3 appFont"><img class="footerImg"  src="/media/travel_through_theatre_icon.png" alt="travel through theatre" title="travel through theatre"><a target="_blank" class="footerLink px-2" title="Travel Through Theatre" href="https://n-t.gr/aerodromio/?lang=el">Travel Through Theatre</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-sm-12 text-lg-start text-sm-center pt-4">
+                    <ul class="no-style footerTitle text-center ">
+                        <li>Χρηματοδότηση</li>
+                                                <li ><a href="https://www.espa.gr/el/Pages/Default.aspx" title="Financing" alt="Financing" target="_blank">
+                                <img alt="Χρηματοδότηση" title="Χρηματοδότηση" src="/media/e-banner_orizontio60X468.jpg" class="mt-5 img-fluid">
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="small_hr"></div>
+        <div class="container">
+            <div class="row dark-footer  mt-3 py-1 ">
+                <div class="col-lg-4 col-md-4 col-sm-12 text-start"><span>&#169; Εθνικό Θέατρο 2023</span><span class="px-2">|</span>
+                    <a class="footerLink" href="/projectteam" alt="Συντελεστές" title="Συντελεστές">
+                        Συντελεστές                    </a>
+                    <span class="px-2">|</span>
+                    <a class="footerLink" href="mailto:info@nt-archive.gr" alt="Επικοινωνία" title="Επικοινωνία">
+                        Επικοινωνία                    </a>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12"></div>
+                <div class="col-lg-4 col-md-4 col-sm-12 text-end">
+                    <a alt="Creative Commons" title="Creative Commons" href="https://creativecommons.org/licenses/by-nc-nd/4.0/">
+                        <img src="/media/cc.png" alt="Creative Commons " title="Creative Commons " /></a> <span class="px-2">|</span>
+                    <a class="footerLink" href="/terms" title="Όροι χρήσης">Όροι χρήσης</a>  <span class="px-2">|</span>
+                    <a class="footerLink" href="/policy" title="Πολιτική προστασίας">Πολιτική προστασίας</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script src="/vendor/bootstrap-5.1.3-dist/js/bootstrap.bundle.min.js"></script>
+<!-- Datatables -->
+<!-- jquery Datatables-->
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<!-- showdown markdown to html -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js" integrity="sha512-LhccdVNGe2QMEfI3x4DVV3ckMRe36TfydKss6mJpdHjNFiV07dFpS2xzeZedptKZrwxfICJpez09iNioiSZ3hA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<!-- Timeline -->
+<script src="/vendor/timeline/jtimeline.js"></script>
+<script src="/vendor/yearpicker.js"></script>
+<!-- jquery-ui -->
+<script src="https://code.jquery.com/ui/1.9.1/jquery-ui.js"></script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!--Umami tracker-->
+<script defer src="https://umami.athenarc.gr:8443/script.js" data-website-id="ac1cacd4-c6b1-471b-b122-7b3e0cfac485"></script>
+<!----------------->
+
+
+
+<script src="/js/main.js?v=1"></script>
+<script src="/js/chat.js?v=1"></script>
+<script src="https://cdn.jsdelivr.net/gh/mickidum/acc_toolbar/acctoolbar/acctoolbar.min.js"></script>
+</body>
+
+</html><!-- Modal -->
+<div class="modal logint fade" id="loginModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header my-0 " style="border-bottom: 0px!important;">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+            </div>
+
+            <div class="modal-body px-5 pt-0">
+                <form  action="/?p=user&act=login&page=pub" method="POST">
+                    <h5 class="modal-title text-uppercase" id="exampleModalLabel">Σύνδεση </h5>
+                    <hr class="modalhr pt-0 mt-1"/>
+                    <div class="form-group my-4">
+                        <label for="ulogname" class="small fw-bold">Όνομα χρήστη</label>
+                        <input placeholder="εισάγετε ένα έγκυρο όνομα χρήστη" type="text" class="small my-1 px-0 form-control" id="ulogname" name="ulogname" autofocus="" required="" autocomplete="off" value="">
+                    </div>
+                    <div class="form-group">
+                        <div class="form-group mb-4"><label for="password" class="small fw-bold">Κωδικός</label>
+                            <input placeholder="εισάγετε κωδικό πρόσβασης" type="password" class="small my-1  px-0 form-control" id="password" name="password" required="" autocomplete="off">
+                        </div>
+                        <div class="text-start mb-4">
+                           <a href="/forgot_pass" class="small text-right ">Υπενθύμιση κωδικού</a>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="text-uppercase btn btn-red px-4" style="border-radius: 0;">Είσοδος</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer no-modal-border px-5">
+                <div class="d-flex justify-content-center align-items-center mt-4">
+                    <span class="small">Δεν έχετε λογαριασμό; <a href="/register" >Εγγραφή</a></span>
+ <!--                   <span class="small"><?//= _noAccount ?> <a id="spanreg" href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#registerModal"><?//=_Register ?></a></span>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
