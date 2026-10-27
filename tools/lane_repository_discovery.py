@@ -46,6 +46,20 @@ def bsb(q):
 terms=list(plan.get("expanded_queries") or [])
 if not terms:
     terms=[str(plan.get("target","")).strip()]
+# Optional, fail-closed reuse of evaluated procedural skills. Default behavior unchanged.
+# Skills modify query terms ONLY, never source evidence or verification states.
+skill_id=os.getenv("PCT_ARCHIVE_SKILL_ID","").strip()
+if skill_id:
+    try:
+        from agent_skills.registry import load as load_skill_registry, query_variants
+        skill_registry=load_skill_registry(os.getenv("PCT_ARCHIVE_SKILLS_REGISTRY","data/agent_skills/registry.json"))
+        skill=skill_registry["skills"][skill_id]
+        if skill["lane"]!=lane:
+            raise ValueError("SKILL_LANE_MISMATCH")
+        terms=list(dict.fromkeys(terms+query_variants(skill_registry,skill_id)))
+    except Exception as exc:
+        raise SystemExit("ARCHIVE_SKILL_GATE_BLOCKED: "+str(exc))
+
 limit=int(os.getenv("PCT_REPOSITORY_QUERY_LIMIT","0"))
 if limit>0: terms=terms[:limit]
 results=[]
