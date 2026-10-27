@@ -1,0 +1,14 @@
+{
+  "schema": "nabou-voyages-v1",
+  "description": "Cited voyage legs for the NABOU//X 3D voyage view. Coordinates are never stored here: every endpoint is a gazetteer_id from data/gazetteer/mediterranean_gazetteer.v1.json. A leg is shown and animated only when review_status is USER_APPROVED (approved by the historian). Lines between ports are SCHEMATIC, not the real course.",
+  "rules": {
+    "endpoints": "from/to must carry a gazetteer_id present in data/gazetteer/mediterranean_gazetteer.v1.json and the name as written in the source",
+    "citation": "every leg needs run_id, claim_ids and a citation with title, page, url and verbatim quote; the source must state a movement from A to B",
+    "date": "date_in_source, when given, must appear verbatim in the quote",
+    "certainty": "STATED = solid line (the source says it explicitly); UNCERTAIN = dashed line",
+    "review_status": "PENDING_REVIEW legs are never drawn; only USER_APPROVED legs are drawn and animated",
+    "geometry": "SCHEMATIC only; waypoints are cartographic aids (cartographic_aid: true), never historical claims",
+    "gaps": "never fill missing legs; two places mentioned one after the other are not joined"
+  },
+  "voyages": []
+}

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NABOU//X · Διαδρομές 3D (προεπισκόπηση)</title>
+  <link rel="stylesheet" href="./voyage-3d.css">
+  <!-- three.js pinned to one version; used only by this preview page. -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.184.0/examples/jsm/"
+    }
+  }
+  </script>
+  <!-- Read-only: the generated Natural Earth chart (same lon/lat window as the 2D map). -->
+  <script src="./nautical-chart.js"></script>
+  <script type="module" src="./voyage-3d.js"></script>
+</head>
+<body>
+  <div id="v3d-stage" aria-label="Τρισδιάστατος χάρτης της Μεσογείου"></div>
+
+  <header class="v3d-top">
+    <a class="v3d-back" href="./">← NABOU//X</a>
+    <h1>Διαδρομές 3D <span>προεπισκόπηση</span></h1>
+  </header>
+
+  <div id="v3d-demo" class="v3d-demo" hidden>
+    Δοκιμαστική διαδρομή — όχι ιστορικό δεδομένο
+    <small>Δεν υπάρχει ακόμα εγκεκριμένο σκέλος με πηγή. Τα σημεία Δ1–Δ3 είναι τυχαία σημεία στη θάλασσα, μόνο για δοκιμή της εικόνας.</small>
+  </div>
+
+  <aside class="v3d-legend" aria-label="Υπόμνημα">
+    <h2>Υπόμνημα</h2>
+    <p><i class="ln solid"></i> Συνεχής: η πηγή το λέει ρητά</p>
+    <p><i class="ln dashed"></i> Διακεκομμένη: αβέβαιο</p>
+    <p class="note">Οι γραμμές ανάμεσα σε λιμάνια είναι <b>σχηματικές</b>, όχι η πραγματική πορεία. Το καράβι και το ανάγλυφο δεν είναι σε κλίμακα.</p>
+    <p class="note">Το καράβι κινείται μόνο σε σκέλη που έχει εγκρίνει ο ιστορικός.</p>
+    <p id="v3d-status" class="status">Φόρτωση…</p>
+  </aside>
+
+  <div id="v3d-info" class="v3d-info" role="dialog" aria-live="polite" hidden>
+    <button type="button" class="close" aria-label="Κλείσιμο">×</button>
+    <div class="body"></div>
+  </div>
+
+  <div id="v3d-nogl" class="v3d-nogl" hidden>
+    Ο περιηγητής σου δεν υποστηρίζει WebGL, γι' αυτό ο τρισδιάστατος χάρτης δεν μπορεί να εμφανιστεί.
+    <a href="./">Επιστροφή στον χάρτη</a>
+  </div>
+  <script>
+    // If the pinned 3D library cannot load (offline / blocked CDN), say so instead of a blank page.
+    setTimeout(function () {
+      if (!window.__v3dReady) {
+        var n = document.getElementById("v3d-nogl");
+        n.firstChild.textContent = "Η βιβλιοθήκη 3D δεν φόρτωσε (σύνδεση ή μπλοκάρισμα). Ο τρισδιάστατος χάρτης δεν μπορεί να εμφανιστεί.";
+        n.hidden = false;
+      }
+    }, 15000);
+  </script>
+</body>
+</html>
