@@ -54,4 +54,12 @@ class ResearchQueryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"CONFLICTING"):
             split_research_query("Find sources about Rhodes 1600-1700","1500-1550")
 
+    def test_topic_query_keeps_question_and_explicit_trailing_range(self):
+        q='Πειρατικά ορμητήρια στη Νάουσα Πάρου, 1600–1700'
+        self.assertEqual(split_research_query(q), (q, '1600-1700', q))
+        with self.assertRaisesRegex(ValueError, 'CONFLICTING'):
+            split_research_query(q, '1500-1550')
+        self.assertEqual(split_research_query('Unknown prose with dates 1600-1700')[1], '')
+
 if __name__=="__main__":unittest.main()
+
