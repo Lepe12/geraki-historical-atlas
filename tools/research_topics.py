@@ -34,6 +34,16 @@ VOCAB = {
     'north_african': ('corsaires', 'ports', 'voyage'),
 }
 
+def explicit_topic_places(target):
+    """Preserve capitalized place phrases explicitly supplied after a Greek preposition.
+
+    These are query constraints, not resolved geographic identities. A compound
+    such as «Νάουσα Πάρου» stays together to avoid treating another Ναουσα as
+    a match merely because it has the same name.
+    """
+    pattern = r'(?i:\b(?:στην|στη|στον|στο|στις|στα|σε)\s+)([Α-ΩΆΈΉΊΌΎΏA-Z][α-ωάέήίόύώϊϋΐΰa-z]+(?:\s+[Α-ΩΆΈΉΊΌΎΏA-Z][α-ωάέήίόύώϊϋΐΰa-z]+){0,2})'
+    return list(dict.fromkeys(m.group(1) for m in re.finditer(pattern, str(target))))
+
 def topic_focus(target, kind='unknown', regions=()):
     text = normalized(target)
     words = re.findall(r'[^\W\d_]+', text)
@@ -43,8 +53,9 @@ def topic_focus(target, kind='unknown', regions=()):
         return None
     piracy = bool(re.search(PIRACY, text))
     scopes = [key for key, value in REGIONS.items() if re.search(value['pattern'], text)]
+    explicit_places = explicit_topic_places(target) if not scopes else []
     return {'schema': 'pct-research-focus-v2', 'kind': 'topic', 'entity': target,
-            'names': [], 'roles': [], 'places': list(regions),
+            'names': [], 'roles': [], 'places': list(dict.fromkeys([*regions, *explicit_places])),
             'topic_concepts': ['maritime_piracy'] if piracy else [],
             'base_usage_requested': bool(re.search(BASES, text)),
             'region_concepts': scopes,
@@ -96,7 +107,17 @@ def strong_region_matches(text,focus):
     value=normalized(text)
     ambiguous={'archipelago','archipel','arcipelago'}
     matches=[term for term in region_terms(focus,True) if normalized(term) not in ambiguous and normalized(term) in value]
+    # A compound place supplied by the researcher may appear with a Greek
+    # article between its components. Keep both components mandatory: a bare
+    # «Νάουσα» must not be silently identified with the one on Paros.
+    for term in focus.get('places', []):
+        parts = normalized(term).split()
+        if len(parts) == 2:
+            pattern = r'(?<!\w)' + re.escape(parts[0]) + r'\s+(?:τησ\s+|του\s+)?' + re.escape(parts[1]) + r'(?!\w)'
+            if re.search(pattern, value) and term not in matches:
+                matches.append(term)
     for key in focus.get('region_concepts',[]):
         if re.search(REGIONS[key]['pattern'],value) and REGIONS[key]['forms'][0] not in matches:
             matches.append(REGIONS[key]['forms'][0])
     return matches
+
