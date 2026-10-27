@@ -51,6 +51,13 @@ def split_research_query(target, date_range="", purpose=""):
         dates=DATES.search(original)
         head=original[:dates.start()].strip() if dates else ''
         words=re.findall(r'[^\W\d_]+',head,re.UNICODE)
+        # Thematic questions are not person names. Preserve their entire
+        # wording while retaining an explicit trailing range as a filter.
+        if dates and not original[dates.end():].strip(' .;,:?') and re.search(r'πειρατ|κουρσαρ|pirat|corsair|corsar', command_text(head)[0]):
+            supplied=DATES.fullmatch(str(date_range).strip()) if date_range else None
+            if supplied and supplied.groups()!=dates.groups():
+                raise ValueError('CONFLICTING_EXPLICIT_DATE_RANGES')
+            return original, str(date_range).strip() or '-'.join(dates.groups()), str(purpose).strip() or original
         if not (dates and not original[dates.end():].strip(' .;,:?') and 1<=len(words)<=4 and all(w[0].isupper() for w in words)):
             return original, str(date_range).strip(), str(purpose).strip()
         value=original
@@ -72,3 +79,4 @@ def split_research_query(target, date_range="", purpose=""):
     if not value:
         raise ValueError("RESEARCH_QUERY_REQUIRES_TARGET")
     return value, str(date_range).strip(), str(purpose).strip() or original
+
