@@ -78,6 +78,7 @@ export function dossierMarkup(snapshot) {
       updates: "<p>Δεν υπάρχει επιλεγμένη έρευνα.</p>",
     };
   const p = progressInfo(snapshot);
+  const provisional = !Array.isArray(snapshot.discoveries) && String(snapshot.mission?.status || '').toUpperCase() === 'RUNNING';
   const agents = p.agents.map((a) => {
     const percent = Number(a.percent),
       valid =
@@ -139,7 +140,7 @@ export function dossierMarkup(snapshot) {
     "<p>" +
     (leads
       ? "Οι αναφορές και οι ισχυρισμοί χρειάζονται έλεγχο του πρωτοτύπου, της σελίδας και της ανεξαρτησίας των πηγών."
-      : "Δεν έχουν καταγραφεί σχετικές αναφορές ή ισχυρισμοί προς έλεγχο.") +
+      : provisional ? "Τα τελικά στοιχεία δεν έχουν ακόμη δημοσιευτεί." : "Δεν έχουν καταγραφεί σχετικές αναφορές ή ισχυρισμοί προς έλεγχο.") +
     "</p>" +
     (contradictions.length
       ? "<p>" +
@@ -152,7 +153,7 @@ export function dossierMarkup(snapshot) {
         ')</h3><ul class="dossier-list">' +
         expandable(blockers, 3, "Περισσότερα εμπόδια") +
         "</ul>"
-      : "<p>Δεν έχουν καταγραφεί εμπόδια πρόσβασης. Αυτό δεν επιβεβαιώνει ότι εξετάστηκαν όλες οι πηγές.</p>");
+      : provisional ? "<p>Τα εμπόδια δεν είναι ακόμη διαθέσιμα στον τελικό φάκελο. Δείτε τις ενημερώσεις για όσα αναφέρονται κατά την εκτέλεση.</p>" : "<p>Δεν έχουν καταγραφεί εμπόδια πρόσβασης. Αυτό δεν επιβεβαιώνει ότι εξετάστηκαν όλες οι πηγές.</p>");
   const events = Array.isArray(snapshot.events) ? snapshot.events : [];
   const updates = [...events]
     .reverse()
@@ -188,3 +189,4 @@ export function dossierMarkup(snapshot) {
       : "<p>Δεν υπάρχουν καταγεγραμμένες ενημερώσεις για αυτή την έρευνα.</p>",
   };
 }
+

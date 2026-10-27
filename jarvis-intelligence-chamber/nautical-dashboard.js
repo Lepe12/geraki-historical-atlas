@@ -291,6 +291,7 @@ function meter(lit) {
 const logMeter = (n) => (n > 0 ? Math.min(7, Math.ceil(Math.log10(n + 1) * 2.4)) : 0);
 function renderStatus() {
   const s = snapshot;
+  const provisional = Boolean(s && !Array.isArray(s.discoveries) && String(s.mission?.status || "").toUpperCase() === "RUNNING");
   const agents = s?.agents || [];
   const done = agents.filter((a) => laneClass(a.status) === "COMPLETED").length;
   const act = agents.filter((a) => laneClass(a.status) === "ACTIVE").length;
@@ -302,9 +303,9 @@ function renderStatus() {
   const rows = [
     ["AGENTS", s ? (act ? act + " / " : "") + done + " / " + agents.length : "—", agents.length ? (7 * (done + act)) / agents.length : 0,
       s ? `${done} ολοκληρωμένοι, ${act} ενεργοί, ${agents.length} ερευνητές συνολικά` : "Δεν υπάρχει φορτωμένη έρευνα"],
-    ["SOURCES", s && nRepos ? fmt(nRepos) : "—", nRepos ? (7 * reposHit.size) / nRepos : 0, s ? `${nRepos} αποθετήρια ερωτήθηκαν · ${reposHit.size} με αποτελέσματα` : ""],
-    ["RECORDS", fmt(records), logMeter(records), s ? `${s.discoveries?.length || 0} καταγεγραμμένες πηγές · ${s.claims?.length || 0} ισχυρισμοί` : ""],
-    ["CONFLICTS", fmt(conflicts), Math.min(7, conflicts || 0), s ? `${conflicts} καταγεγραμμένες αντιφάσεις · ${s.blockers?.length || 0} εμπόδια πρόσβασης` : ""],
+    ["SOURCES", s && nRepos ? fmt(nRepos) : "—", nRepos ? (7 * reposHit.size) / nRepos : 0, provisional ? "Τα συγκεντρωτικά δεδομένα δεν έχουν δημοσιευτεί ακόμη" : s ? `${nRepos} αποθετήρια ερωτήθηκαν · ${reposHit.size} με αποτελέσματα` : ""],
+    ["RECORDS", provisional ? "—" : fmt(records), provisional ? 0 : logMeter(records), provisional ? "Τα τελικά ευρήματα δεν έχουν δημοσιευτεί ακόμη" : s ? `${s.discoveries?.length || 0} καταγεγραμμένες πηγές · ${s.claims?.length || 0} ισχυρισμοί` : ""],
+    ["CONFLICTS", provisional ? "—" : fmt(conflicts), provisional ? 0 : Math.min(7, conflicts || 0), provisional ? "Οι αντιφάσεις και τα εμπόδια δεν έχουν συγκεντρωθεί ακόμη" : s ? `${conflicts} καταγεγραμμένες αντιφάσεις · ${s.blockers?.length || 0} εμπόδια πρόσβασης` : ""],
   ];
   $("statRows").innerHTML = rows.map(([k, n, lit, title]) => `<div class="srow" title="${esc(title)}"><span class="k">${k}</span><span class="n">${esc(n)}</span>${meter(lit)}</div>`).join("");
   $("agentsDot").hidden = !act;
@@ -459,3 +460,4 @@ connectResearchFeed({
 renderAll();
 // lanes are published by chamber.js (deferred classic script); refresh the mini chart once they exist
 if (!window.NABOU_LANES) addEventListener("load", renderAll, { once: true });
+

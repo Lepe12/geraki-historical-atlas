@@ -165,9 +165,9 @@ connectResearchFeed({
       "</h2><span>" +
       escape(data.status) +
       '</span></div><dl class="dossier-question"><div><dt>Το ερώτημά σας</dt><dd>' +
-      escape(snapshot.mission?.purpose || snapshot.mission?.target || "Δεν καταγράφηκε αρχικό ερώτημα.") +
+      escape(snapshot.mission?.purpose || snapshot.mission?.target || (snapshot.mission?.status === "RUNNING" ? "Το ερώτημα δεν είναι ακόμη διαθέσιμο στα δεδομένα της έρευνας." : "Δεν καταγράφηκε αρχικό ερώτημα.")) +
       "</dd></div><div><dt>Περίοδος</dt><dd>" +
-      escape(snapshot.mission?.date_range || "Δεν ορίστηκε περίοδος") +
+      escape(snapshot.mission?.date_range || (snapshot.mission?.status === "RUNNING" ? "Η περίοδος δεν είναι ακόμη διαθέσιμη." : "Δεν ορίστηκε περίοδος")) +
       "</dd></div></dl><p>" +
       escape(data.message) +
       '</p><dl class="overview-counts">' +
@@ -196,3 +196,4 @@ window.addEventListener("jarvis:dispatch-accepted", () => {
   renderHistory();
 });
 loadHistory();
+

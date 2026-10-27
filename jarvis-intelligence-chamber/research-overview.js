@@ -14,6 +14,9 @@ export const statusLabel = (status) =>
     IDLE: "Ανενεργή",
   })[String(status || "").toUpperCase()] || "Άγνωστη κατάσταση";
 export function overview(snapshot) {
+  // A live-event-only snapshot has no finalized evidence package yet. Its
+  // empty placeholder arrays must not be presented as measured zeroes.
+  const provisional = Boolean(snapshot && !Array.isArray(snapshot.discoveries) && String(snapshot.mission?.status || '').toUpperCase() === 'RUNNING');
   const discoveries = Array.isArray(snapshot?.discoveries) ? snapshot.discoveries : [];
   const related = discoveries.filter((d) =>
     ["TARGET_MATCH", "POSSIBLE_TARGET"].includes(d.topical_match?.category),
@@ -40,10 +43,10 @@ export function overview(snapshot) {
   const hasEvidence = related + claims > 0;
   return {
     title,
-    related,
-    claims,
-    blockers,
-    contradictions,
+    related: provisional ? '—' : related,
+    claims: provisional ? '—' : claims,
+    blockers: provisional ? '—' : blockers,
+    contradictions: provisional ? '—' : contradictions,
     message:
       !terminal && active
         ? "Η έρευνα βρίσκεται σε εξέλιξη. Τα αποτελέσματα ενημερώνονται καθώς καταγράφονται."
@@ -84,3 +87,4 @@ export function mergeHistory(...collections) {
       : b.run_id.length - a.run_id.length,
   );
 }
+
