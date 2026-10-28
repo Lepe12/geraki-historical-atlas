@@ -2,7 +2,7 @@
 
 Πειρατικά ορμητήρια στη Νάουσα Πάρου, 1600–1700
 
-Εντοπίστηκαν 754 αποσπάσματα εντός της ζητούμενης περιόδου. Αποδίδονται στις πηγές τους και εκκρεμεί έλεγχος.
+Εντοπίστηκαν 756 αποσπάσματα εντός της ζητούμενης περιόδου. Αποδίδονται στις πηγές τους και εκκρεμεί έλεγχος.
 
 ## 1000 — The corsairs of France; with portraits and a map
 
@@ -536,6 +536,44 @@
 > French tutelage.
 
 Πηγή: https://archive.org/details/in.ernet.dli.2015.45732; αρχείο in.ernet.dli.2015.45732_2015.45732.The-Barbary-Corsairs--Ed-4_djvu.txt, γραμμές 1372–1380.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
+## 1200, 1972, 1999, 2008, 2009 — Social Contract, public choice and fiscal repercussions in Athenian Democracy
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> turned into a revolt against the rich and their wealth, was gradually fading away. The fact that
+> the theorika payments safeguarded the cohesion of the Athenian society and the survival of
+> the political regime, made the Athenian orator and politician Demades, an important figure of
+> that period to characterize all these compensatory system from the rich to the poor citizens, as
+> “the glue of Democracy” (Sakellariou, 1972, pp. 40-41).
+> The expansionary fiscal policy program that introduced by Eubulus lasted up to 340
+> BC. During the 355-340 BC period state revenue increased from 130 talents to 400 talents,
+> almost four times higher than the year 340. The grand strategy of the Athenian state which
+> was based on reaping the rewards of peace, through the impressive increase in international
+> trade and social reconciliation was abandoned only when the geopolitical expansionism of
+> Macedonia under king Philip become extremely difficult to be ignored while in the meantime
+> the belligerent passionate speeches of Demosthenes were “adding fuel to the fire” in favour of
+> the war.6
+> After the battle of Chaeronea that took place in 338 BC., were the coalition of armies
+> from Athens, Thebes and their allies defeated by the Macedonians, Lycurgus, another
+> Athenian statesman and orator implemented another similar compromise-social contract to
+> that of Eubulus (who probably had died before 340 BC). The new contract-agreement which
+> adopted by the Assembly was based on the same institutional framework as its predecessor.
+> Lycurgus plan brought the brightest period of peace in the history of the Athenian democracy,
+> which lasted to 322 BC. (Lycurgus died in 323 BC, the same year as Alexander the Great). By
+> the mid of 330’s BC. public revenue had been increased to 1200 talents per year (Ober, 2008).
+> Lycurgus political program was highly successful for a variety of reasons: Firstly,
+> Lycurgus program guaranteed stable employment and revenues for the majority of the poorer
+> Athenians in a series of public work programs. Being inspired by his mentor Eubulus,
+> Lycurgus launched a vast public works program, second only to that of Pericles, which it may
+> be interpreted, in modern terms, as an expansionary fiscal policy program of Keynesian
+> inspiration. The public works program included the new sewage system for Piraeus,
+> monuments such as the theatre of Dionysius beneath the Acropolis, and the extension of the
+> Pnyx. (Hansen, 1999; Kyriazis, 2009). Other monuments also built including a prominent
+
+Πηγή: https://mpra.ub.uni-muenchen.de/43498/1/MPRA_paper_43498.pdf; αρχείο e82574c490932ffd4fe82955.txt, γραμμές 633–661.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
@@ -23010,6 +23048,41 @@
 > extirpate the infamous nest of sea rovers at Algiers”. Greg Bak, Barbary Pirate, Stroud 2006, p. 47.
 
 Πηγή: https://dergipark.org.tr/tr/download/article-file/1149039; αρχείο 44464bd1c6af8e72dc6e3740.txt, γραμμές 300–303.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
+
+## 2008, 2011 — Social Contract, public choice and fiscal repercussions in Athenian Democracy
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> water clock, the Lyceum, the Telesterion at Eleusis7, as well as the construction of local
+> theaters in some demes. The agora (the “centre” of the city were the most financial transaction
+> were taking place) was provided with new temples and law court facilities, In addition, new
+> shipsheds for warships and an arsenal for naval stores were constructed at Piraeus. City walls
+> were modernized and enhanced. Finally, a new Panathenaic stadium indented for sport
+> activities was constructed (Ober, 2008, pp. 68-69).
+> Secondly, Lycurgus followed his predecessor Eubulus doctrine to focus on
+> “international” trade as a means of increasing public revenues. Thus, Lycurgus passed a
+> commercial law, which allowed metics and perhaps even slaves to litigate over contracts on
+> equal terms with citizens. Through enkteseis he also offered special grants to non-citizens to
+> own real estate whereas some foreigners that were accustomed to overseas trade were granted
+> full citizenship by special decrees of the assembly. The efficient exploitation of trade
+> transactions was also guaranteed by the use of the navy so as to suppress piracy. For this
+> purpose, a naval station was also established on the Adriatic sea (ibid., pp. 68-69). This
+> necessary prerequisite to safeguard trade transactions approves that trade activity, if
+> manipulated smoothly and with insight, it could also have some positive feedbacks on the
+> economy, in our case here, by increasing employment on the navy in order to exterminate
+> piracy and by performing public works to create a naval base to keep the seas open and safe.
+> Thirdly, another way of increasing public revenues it seems to had come from an
+> increase of the sacred revenues. Revenues from temples are estimated to have been analogous
+> to more than 2% of the annual state income (Papazarkadas, 2011). Finally, in 354/3 BC.
+> Lycurgus introduced more aggressive measures to safeguard the soundness of the highlyesteemed Athenian coins, the so called “Athenian owls”. In parallel he drastically took
+> measures to face coin forgery. In the meantime, he introduced a massive new issue of money
+> in the market (Ober, 2008, pp. 68-69). This may seem that except from of an extensive
+> expansionary fiscal policy, Lycurgus also introduced for some period a monetary
+> expansionary policy too in parallel.
+
+Πηγή: https://mpra.ub.uni-muenchen.de/43498/1/MPRA_paper_43498.pdf; αρχείο e82574c490932ffd4fe82955.txt, γραμμές 672–697.
 Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
 Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, TOPONYM_AND_USAGE_REQUIRE_SEMANTIC_EXTRACTION, REGIONAL_SCOPE_REQUIRES_REVIEW.
 
