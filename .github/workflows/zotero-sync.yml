@@ -1,0 +1,65 @@
+name: Zotero sync (manual)
+# Exports the sources cited in NABOU//X published research outputs to the
+# owner's Zotero library. Manual only: no schedule, no push trigger.
+# Dry run by default; writes only when dry_run is false. Never calls pct-live.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (report only, no writes to Zotero)'
+        type: boolean
+        default: true
+      case:
+        description: 'Limit to one case (mission target, exact text). Empty = all cases.'
+        type: string
+        default: ''
+permissions:
+  contents: read
+concurrency:
+  group: zotero-sync
+  cancel-in-progress: false
+jobs:
+  zotero-sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/zotero_sync.py
+            /tools/test_zotero_sync.py
+            /command-center/live/
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Unit tests (mocked HTTP)
+        run: python -m unittest discover -s tools -p 'test_zotero_sync.py' -v
+      - name: Sync
+        env:
+          ZOTERO_API_KEY: ${{ secrets.ZOTERO_API_KEY }}
+          ZOTERO_USER_ID: ${{ secrets.ZOTERO_USER_ID }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          CASE: ${{ inputs.case }}
+        run: |
+          args=(--live-dir command-center/live --report zotero_sync_report.json)
+          if [ "$DRY_RUN" = "false" ]; then args+=(--apply); else args+=(--dry-run); fi
+          if [ -n "$CASE" ]; then args+=(--case "$CASE"); fi
+          python tools/zotero_sync.py "${args[@]}" > /dev/null
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          r = json.load(open('zotero_sync_report.json'))
+          print(f"## Zotero sync ({r['mode']})\n")
+          print('| Case | Sources | New items | Existing items | New notes |')
+          print('|---|---|---|---|---|')
+          for case, c in r['cases'].items():
+              print(f"| {case} | {c['sources']} | {c['items_to_create']} | {c['items_existing']} | {c['notes_to_create']} |")
+          print(f"\nTotals: `{json.dumps(r['totals'])}`")
+          print(f"\nSources with thin metadata: {len(r['thin_metadata'])}")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zotero-sync-report
+          path: zotero_sync_report.json
+          if-no-files-found: ignore
