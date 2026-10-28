@@ -231,6 +231,67 @@ class EvalSetIntegrity(unittest.TestCase):
             self.assertEqual(rep["reports"][0]["item_id"], "ID-01-lantzas-aliases")
 
 
+V2_PENDING = HERE / "research_eval_set.v2.pending.json"
+
+
+class V2HistorianReview(unittest.TestCase):
+    """Historian review of the v2 draft (2026-10-28): statuses, provenance and the two corrections."""
+
+    def setUp(self):
+        self.ev = s.load_eval(V2_PENDING)
+        self.items = {i["id"]: i for i in self.ev["items"]}
+
+    def test_every_item_has_review_record(self):
+        allowed = set(self.ev["review"]["statuses"])
+        counts = {}
+        for n, i in enumerate(self.ev["items"], 1):
+            self.assertIn(i["review_status"], allowed, i["id"])
+            hr = i["human_review"]
+            self.assertEqual(hr["sheet_no"], n)
+            self.assertTrue(hr["reviewer"] and hr["review_date"] and hr["verdict"], i["id"])
+            if i["review_status"] == "USER_CORRECTED":
+                self.assertTrue(hr.get("correction"), i["id"])
+            if i["review_status"] == "NEEDS_HISTORIAN":
+                self.assertIs(i.get("scorable"), False, i["id"])
+            else:
+                self.assertNotEqual(i.get("scorable"), False, i["id"])
+            counts[i["review_status"]] = counts.get(i["review_status"], 0) + 1
+        self.assertEqual(counts, self.ev["review"]["counts"])
+
+    def test_sources_resolve(self):
+        srcs = self.ev["sources"]
+        for i in self.ev["items"]:
+            for c in i["expected_claims"]:
+                for sid in c["sources"]:
+                    self.assertIn(sid, srcs, (i["id"], sid))
+            for side in ("side_a", "side_b"):
+                for sid in (i.get("contradiction") or {}).get(side, {}).get("sources", []):
+                    self.assertIn(sid, srcs, (i["id"], sid))
+
+    def test_kapsis_dates_saulger_only(self):
+        it = self.items["CT-03-kapsis-dates"]
+        self.assertNotIn("contradiction", it)
+        self.assertNotIn("George Kapsis", it["entity"]["aliases"])
+        used = {sid for c in it["expected_claims"] for sid in c["sources"]}
+        self.assertEqual(used, {"SAULGER1698"})
+        cited = {sid for i in self.ev["items"] for c in i["expected_claims"] for sid in c["sources"]}
+        cited |= {sid for i in self.ev["items"] for sd in ("side_a", "side_b")
+                  for sid in (i.get("contradiction") or {}).get(sd, {}).get("sources", [])}
+        self.assertNotIn("GREEKA", cited)
+        self.assertNotIn("CT-03-kapsis-dates", self.items["SY-02-kapsis-kingdom"]["pass_criteria"]["contradictions_expected"])
+
+    def test_armeni_correction(self):
+        it = self.items["SY-02-kapsis-kingdom"]
+        ids = {c["id"] for c in it["expected_claims"]}
+        self.assertIn("armeni-daughter-married", ids)
+        self.assertNotIn("armeni-secured", ids)
+        married = [c for c in it["expected_claims"] if c["id"] == "armeni-daughter-married"][0]
+        self.assertTrue(s.matches(s.norm("Ο Καψής παντρεύτηκε την κόρη του Αρμένη"), married["match"]))
+        forb = [f for f in it["forbidden_claims"] if f["id"] == "armeni-neutralised"][0]
+        self.assertTrue(s.matches(s.norm("Capsi neutralised the notable Armeni"), forb["match"]))
+        self.assertFalse(s.matches(s.norm("Ο Καψής παντρεύτηκε την κόρη του Αρμένη"), forb["match"]))
+
+
 class RealRunRegression(unittest.TestCase):
     """Pins the published baselines when the run snapshots are present in the checkout."""
 

@@ -1,6 +1,6 @@
 {
   "schema": "nabou-research-eval-set-v1",
-  "version": "2.0.0-pending",
+  "version": "2.0.0-reviewed",
   "created_utc": "2026-10-23",
   "scope": "17th-century Mediterranean piracy and corsairs; identity, cited claims, contradictions, honest insufficiency",
   "rules": [
@@ -8,7 +8,7 @@
     "Matchers are accent-, case- and final-sigma-insensitive substring groups: a claim matches when every group has at least one hit.",
     "Only cited claims (research_answer.claims with a source occurrence) count for must_find; uncited prose does not.",
     "Confidence is about the expected answer, not about the historical event: secondary/tertiary sources are marked LOW.",
-    "review_status PROPOSED = sourced gold awaiting approval; NEEDS_HISTORIAN = no gold, item is skipped from scoring (scorable=false)."
+    "review_status USER_VALIDATED = historian judged the gold correct; USER_CORRECTED = historian judged it wrong and the gold was corrected as he said; NEEDS_HISTORIAN = no gold, item is skipped from scoring (scorable=false); PROPOSED = not yet reviewed. Each item's human_review records verdict, reviewer and date."
   ],
   "sources": {
     "SAULGER1698": {
@@ -83,7 +83,8 @@
       "inspection": "page read 2026-10-22",
       "detect": [
         "greeka.com/cyclades/milos/history"
-      ]
+      ],
+      "note": "Historian review 2026-10-28 removed Greeka from the CT-03 gold; no item cites it any more. Entry kept only for provenance."
     },
     "RUN_NAMESAKE_RECORDS": {
       "citation": "Bibliographic records found by earlier NABOU//X runs (metadata only): «Pietro Lanza Di Scalea alle origini degli studi del gioiello siciliano» (http://hdl.handle.net/10447/96156); «La querela di parte nei delitti di violenza carnale e di corruzione di minorenni» (archive.org laquereladipart00lanzgoog, 1897); a Pietro Lanza passage dated Palermo 1837 (docs/audits/2026-10-19-lantzas-live-validation.md); Greek Government Gazette (ΦΕΚ) 1987-1999 issues that matched «Καψής» in run 39304929906",
@@ -136,6 +137,13 @@
         "pantzouris",
         "hacke"
       ]
+    },
+    "HISTORIAN_REVIEW_2026_10_28": {
+      "citation": "Historian review of the v2 eval sheet by the project historian (Lepe12), 2026-10-28: correction to SY-02 (Kapsis married Armeni's daughter; did not neutralise him)",
+      "url": "https://github.com/Lepe12/geraki-historical-atlas/pull/86",
+      "kind": "HISTORIAN_CORRECTION (to be tied to a Saulger 1698 page, pp. 319-323)",
+      "inspection": "recorded 2026-10-28",
+      "detect": []
     }
   },
   "items": [
@@ -282,8 +290,17 @@
         "max_hallucinated_citations": 0,
         "unresolved_pairs_must_not_be_asserted": true
       },
-      "review_status": "PROPOSED",
-      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22"
+      "review_status": "USER_VALIDATED",
+      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22",
+      "human_review": {
+        "sheet_no": 1,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "ID-02-lanza-namesakes",
@@ -401,8 +418,17 @@
         "max_hallucinated_citations": 0,
         "unresolved_pairs_must_not_be_asserted": true
       },
-      "review_status": "PROPOSED",
-      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22"
+      "review_status": "USER_VALIDATED",
+      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22",
+      "human_review": {
+        "sheet_no": 2,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "ID-03-kapsis-aliases",
@@ -503,8 +529,17 @@
         "max_forbidden": 0,
         "max_hallucinated_citations": 0
       },
-      "review_status": "PROPOSED",
-      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22"
+      "review_status": "USER_VALIDATED",
+      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22",
+      "human_review": {
+        "sheet_no": 3,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "ID-04-creveliers-aliases",
@@ -624,8 +659,17 @@
         "max_forbidden": 0,
         "max_hallucinated_citations": 0
       },
-      "review_status": "PROPOSED",
-      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22"
+      "review_status": "USER_VALIDATED",
+      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22",
+      "human_review": {
+        "sheet_no": 4,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "FC-01-capsi-hanged-1680",
@@ -763,8 +807,17 @@
           ]
         }
       ],
-      "review_status": "PROPOSED",
-      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22"
+      "review_status": "USER_VALIDATED",
+      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22",
+      "human_review": {
+        "sheet_no": 5,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "FC-02-creveliers-petra-1676",
@@ -815,8 +868,17 @@
         "max_forbidden": 0,
         "max_hallucinated_citations": 0
       },
-      "review_status": "PROPOSED",
-      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22"
+      "review_status": "USER_VALIDATED",
+      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22",
+      "human_review": {
+        "sheet_no": 6,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "FC-03-lantzas-1596-arrest",
@@ -866,8 +928,17 @@
         "max_forbidden": 0,
         "max_hallucinated_citations": 0
       },
-      "review_status": "PROPOSED",
-      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22"
+      "review_status": "USER_VALIDATED",
+      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22",
+      "human_review": {
+        "sheet_no": 7,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "CT-01-creveliers-death-date",
@@ -947,8 +1018,17 @@
         "max_forbidden": 0,
         "max_hallucinated_citations": 0
       },
-      "review_status": "PROPOSED",
-      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22"
+      "review_status": "USER_VALIDATED",
+      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22",
+      "human_review": {
+        "sheet_no": 8,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "CT-02-kapsis-origin",
@@ -1032,28 +1112,36 @@
           ]
         }
       ],
-      "review_status": "PROPOSED",
-      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22"
+      "review_status": "USER_VALIDATED",
+      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22",
+      "human_review": {
+        "sheet_no": 9,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "CT-03-kapsis-dates",
-      "type": "contradiction",
+      "type": "fact_with_citation",
       "query_el": "Ποια χρόνια κυβέρνησε τη Μήλο ο Καψής;",
       "query_en": "In which years did Kapsis rule Milos?",
       "entity": {
         "canonical": "Ιωάννης Καψής",
         "aliases": [
           "Ιωάννης Καψής",
-          "George Kapsis",
           "Jean Capsi",
           "Capsi",
           "Kapsis"
         ]
       },
-      "contradiction": {
-        "topic": "Dates of Kapsis' rule",
-        "side_a": {
-          "desc": "Hanged in 1680 after a three-year reign (Saulger), i.e. about 1677-1680 (Stoukas 2018: 1677-1680)",
+      "expected_claims": [
+        {
+          "id": "capsi-rule-1677-1680-saulger",
+          "desc": "Per Saulger 1698, Capsi's 'little reign' lasted three years and he was hanged in 1680, i.e. about 1677-1680",
           "match": [
             [
               "capsi",
@@ -1065,38 +1153,18 @@
             ]
           ],
           "sources": [
-            "SAULGER1698",
-            "STOUKAS2018"
+            "SAULGER1698"
           ],
-          "quote": "pendu ... l'an 1680; Ce petit Regne dura trois ans"
-        },
-        "side_b": {
-          "desc": "Arrived 1675, arrested 1678 (Greeka; also calls him George)",
-          "match": [
-            [
-              "kapsi",
-              "καψ",
-              "capsi"
-            ],
-            [
-              "1675",
-              "1678"
-            ]
-          ],
-          "sources": [
-            "GREEKA"
-          ],
-          "quote": "In 1675, a local pirate, George Kapsis, came to Milos ... The Ottomans arrested him in 1678"
-        },
-        "agreed": "Both give a short reign of about three years ending in capture and hanging in Constantinople."
-      },
-      "expected_claims": [],
+          "quote": "pendu ... l'an 1680; Ce petit Regne dura trois ans",
+          "confidence": "HIGH"
+        }
+      ],
       "forbidden_claims": [],
       "pass_criteria": {
-        "contradiction_both_sides": true,
+        "min_must_find_recall": 1.0,
         "max_forbidden": 0,
         "max_hallucinated_citations": 0,
-        "note": "A run that reports only the 1680 side with the near-contemporary source and flags uncertainty is acceptable (partial)."
+        "note": "Historian review 2026-10-28: gold is Saulger 1698 only; the Greeka version (1675/1678, 'George') is no longer part of the gold. Id kept unchanged for stability (no longer a contradiction item)."
       },
       "namesake_markers": [
         {
@@ -1112,8 +1180,18 @@
           ]
         }
       ],
-      "review_status": "PROPOSED",
-      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22"
+      "review_status": "USER_CORRECTED",
+      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22",
+      "human_review": {
+        "sheet_no": 10,
+        "previous_status": "PROPOSED",
+        "verdict": "INCORRECT",
+        "verdict_el": "Λάθος",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)",
+        "correction": "Keep only Saulger 1698 (about 1677-1680; hanged 1680 after three years of rule). The Greeka version (arrived 1675, arrested 1678, called 'George') and the Greeka source are removed from the gold answer. / Κρατάμε μόνο Saulger 1698· αφαιρείται η Greeka."
+      }
     },
     {
       "id": "NG-01-lantzas-milos-premise",
@@ -1155,8 +1233,17 @@
         "honest_insufficiency": true,
         "max_hallucinated_citations": 0
       },
-      "review_status": "PROPOSED",
-      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22"
+      "review_status": "USER_VALIDATED",
+      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22",
+      "human_review": {
+        "sheet_no": 11,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "NG-02-kapsis-morosini-battle",
@@ -1216,8 +1303,17 @@
         "honest_insufficiency": true,
         "max_hallucinated_citations": 0
       },
-      "review_status": "PROPOSED",
-      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22"
+      "review_status": "USER_VALIDATED",
+      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22",
+      "human_review": {
+        "sheet_no": 12,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "NG-03-fictional-zerphalon",
@@ -1252,8 +1348,17 @@
         "honest_insufficiency": true,
         "max_hallucinated_citations": 0
       },
-      "review_status": "PROPOSED",
-      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22"
+      "review_status": "USER_VALIDATED",
+      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22",
+      "human_review": {
+        "sheet_no": 13,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "SY-01-milos-1660-1680",
@@ -1430,8 +1535,17 @@
         "max_forbidden": 0,
         "max_hallucinated_citations": 0
       },
-      "review_status": "PROPOSED",
-      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22"
+      "review_status": "USER_VALIDATED",
+      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22",
+      "human_review": {
+        "sheet_no": 14,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "SY-02-kapsis-kingdom",
@@ -1485,18 +1599,31 @@
           "confidence": "HIGH"
         },
         {
-          "id": "armeni-secured",
-          "desc": "He secured three or four leading islanders not favourable to him, above all one Armeni, the most powerful Greek on Milos (p.320)",
+          "id": "armeni-daughter-married",
+          "desc": "Kapsis did not neutralise the notable Armeni; he married Armeni's daughter (historian correction 2026-10-28; exact page to be confirmed in Saulger 1698 pp. 319-323; the marriage is also reported by Stoukas 2018)",
           "match": [
             [
               "armeni",
               "αρμεν"
+            ],
+            [
+              "daughter",
+              "fille",
+              "κορη",
+              "marri",
+              "epous",
+              "παντρε",
+              "γαμ",
+              "συζυγ",
+              "wife",
+              "femme"
             ]
           ],
           "sources": [
-            "SAULGER1698"
+            "HISTORIAN_REVIEW_2026_10_28",
+            "STOUKAS2018"
           ],
-          "confidence": "HIGH"
+          "confidence": "MEDIUM (historian's correction; Saulger page not yet confirmed)"
         },
         {
           "id": "guards",
@@ -1555,6 +1682,27 @@
               "μοροζιν"
             ]
           ]
+        },
+        {
+          "id": "armeni-neutralised",
+          "desc": "Claiming Kapsis neutralised / eliminated / imprisoned Armeni (rejected by the historian 2026-10-28)",
+          "match": [
+            [
+              "armeni",
+              "αρμεν"
+            ],
+            [
+              "neutralis",
+              "neutraliz",
+              "εξουδετερ",
+              "eliminat",
+              "εξοντω",
+              "imprison",
+              "arrest",
+              "φυλακ",
+              "συνελαβ"
+            ]
+          ]
         }
       ],
       "pass_criteria": {
@@ -1562,8 +1710,7 @@
         "max_forbidden": 0,
         "max_hallucinated_citations": 0,
         "contradictions_expected": [
-          "CT-02-kapsis-origin",
-          "CT-03-kapsis-dates"
+          "CT-02-kapsis-origin"
         ]
       },
       "namesake_markers": [
@@ -1580,13 +1727,23 @@
           ]
         }
       ],
-      "review_status": "PROPOSED",
-      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22"
+      "review_status": "USER_CORRECTED",
+      "gold_source_check": "inherited from v1 (#76): sources opened 2026-10-22",
+      "human_review": {
+        "sheet_no": 15,
+        "previous_status": "PROPOSED",
+        "verdict": "INCORRECT",
+        "verdict_el": "Λάθος",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)",
+        "correction": "Kapsis did NOT neutralise the notable Armeni; on the contrary he married Armeni's daughter. The rest (pilot from Milos, recognised by bishop Camillo, bodyguards, hanged 1680) is not disputed. Provenance: historian's correction; exact page to be confirmed in Saulger 1698 pp. 319-323. / Δεν εξουδετέρωσε τον Armeni· παντρεύτηκε την κόρη του."
+      }
     },
     {
       "id": "PN-01-argentiere",
       "type": "fact_with_citation",
-      "review_status": "PROPOSED",
+      "review_status": "USER_VALIDATED",
       "query_el": "Ποιο νησί λέγεται «Argentiere» στους παλιούς ταξιδιώτες και τι ρόλο είχε για τους κουρσάρους;",
       "query_en": "Which island is 'Argentiere' in early modern travellers and what was its role for corsairs?",
       "entity": {
@@ -1669,12 +1826,21 @@
         "max_forbidden": 0,
         "max_hallucinated_citations": 0
       },
-      "gold_source_check": "source opened 2026-10-23 (see sources dict locator)"
+      "gold_source_check": "source opened 2026-10-23 (see sources dict locator)",
+      "human_review": {
+        "sheet_no": 16,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "PN-02-antimilo",
       "type": "fact_with_citation",
-      "review_status": "PROPOSED",
+      "review_status": "USER_VALIDATED",
       "query_el": "Τι είναι το «Antimilo» και πού βρίσκεται σε σχέση με τη Μήλο;",
       "query_en": "What is 'Antimilo' and where is it relative to Milos?",
       "entity": {
@@ -1714,12 +1880,21 @@
         "min_must_find_recall": 1.0,
         "max_hallucinated_citations": 0
       },
-      "gold_source_check": "source opened 2026-10-23 (see sources dict locator)"
+      "gold_source_check": "source opened 2026-10-23 (see sources dict locator)",
+      "human_review": {
+        "sheet_no": 17,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "PN-03-cerigo",
       "type": "fact_with_citation",
-      "review_status": "PROPOSED",
+      "review_status": "USER_VALIDATED",
       "query_el": "Ποιο νησί είναι το «Cerigo» των ταξιδιωτών και σε ποιον ανήκε;",
       "query_en": "Which island is the travellers' 'Cerigo' and to whom did it belong?",
       "entity": {
@@ -1796,12 +1971,21 @@
         "max_forbidden": 0,
         "max_hallucinated_citations": 0
       },
-      "gold_source_check": "source opened 2026-10-23 (see sources dict locator)"
+      "gold_source_check": "source opened 2026-10-23 (see sources dict locator)",
+      "human_review": {
+        "sheet_no": 18,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "PN-04-gadronise-agathonisi",
       "type": "identity_resolution",
-      "review_status": "PROPOSED",
+      "review_status": "USER_VALIDATED",
       "query_el": "Το «Gadronise» / Γαϊδουρονήσι των πειρατικών πηγών του 17ου αιώνα: ποιο νησί είναι σήμερα;",
       "query_en": "'Gadronise' / Gaidouronisi in 17th-century pirate sources: which island is it today?",
       "entity": {
@@ -1848,12 +2032,21 @@
         "min_must_find_recall": 1.0,
         "max_hallucinated_citations": 0
       },
-      "gold_source_check": "source opened 2026-10-23 (see sources dict locator)"
+      "gold_source_check": "source opened 2026-10-23 (see sources dict locator)",
+      "human_review": {
+        "sheet_no": 19,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "FC-04-pirate-season-milos",
       "type": "fact_with_citation",
-      "review_status": "PROPOSED",
+      "review_status": "USER_VALIDATED",
       "query_el": "Σύμφωνα με τον Anthony Roberts (αιχμάλωτος πειρατών το 1692), πού ξεχειμώνιαζαν οι πειρατές και πού πήγαιναν την άνοιξη;",
       "query_en": "According to Anthony Roberts (captured by pirates in 1692), where did pirates winter and where did they go in spring?",
       "entity": {
@@ -1894,12 +2087,21 @@
         "min_must_find_recall": 1.0,
         "max_hallucinated_citations": 0
       },
-      "gold_source_check": "source opened 2026-10-23 (see sources dict locator)"
+      "gold_source_check": "source opened 2026-10-23 (see sources dict locator)",
+      "human_review": {
+        "sheet_no": 20,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "FC-05-capuchins-milo",
       "type": "fact_with_citation",
-      "review_status": "PROPOSED",
+      "review_status": "USER_VALIDATED",
       "query_el": "Γιατί κατεδαφίστηκε το μοναστήρι των Καπουτσίνων στη Μήλο;",
       "query_en": "Why was the Capuchin convent on Milos demolished?",
       "entity": {
@@ -1967,12 +2169,21 @@
           ],
           "confidence": "MEDIUM (summary only)"
         }
-      ]
+      ],
+      "human_review": {
+        "sheet_no": 21,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "FC-06-siphanto-provencal-corsair",
       "type": "fact_with_citation",
-      "review_status": "PROPOSED",
+      "review_status": "USER_VALIDATED",
       "query_el": "Τι έκανε ο Προβηγκιανός κουρσάρος της Μήλου για λογαριασμό των Σιφνίων, και πότε;",
       "query_en": "What did the Provençal corsair at Milo do for the people of Siphnos, and when?",
       "entity": {
@@ -2039,12 +2250,21 @@
         "max_forbidden": 0,
         "max_hallucinated_citations": 0
       },
-      "gold_source_check": "source opened 2026-10-23 (see sources dict locator)"
+      "gold_source_check": "source opened 2026-10-23 (see sources dict locator)",
+      "human_review": {
+        "sheet_no": 22,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "NG-04-manetas-phournoi-base",
       "type": "negative_trap",
-      "review_status": "PROPOSED",
+      "review_status": "USER_VALIDATED",
       "query_el": "Αποδεικνύεται ότι ο Στάθης Ρωμανός Μανέτας είχε ορμητήριο στους Φούρνους το 1694–1695;",
       "query_en": "Is it documented that Stathis Romanos Manetas used Phournoi as his base in 1694-1695?",
       "entity": {
@@ -2090,12 +2310,21 @@
         "honest_insufficiency": true,
         "max_hallucinated_citations": 0
       },
-      "gold_source_check": "source opened 2026-10-23 (see sources dict locator)"
+      "gold_source_check": "source opened 2026-10-23 (see sources dict locator)",
+      "human_review": {
+        "sheet_no": 23,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "CT-04-manetas-legend-place",
       "type": "contradiction",
-      "review_status": "PROPOSED",
+      "review_status": "USER_VALIDATED",
       "query_el": "Πού παντρεύτηκε και πού σκότωσε τη γυναίκα του ο Μανέτας, κατά την παράδοση; Συμφωνούν οι εκδοχές;",
       "query_en": "Where, according to tradition, did Manetas marry and kill his wife? Do the versions agree?",
       "entity": {
@@ -2177,7 +2406,16 @@
         "max_forbidden": 0,
         "max_hallucinated_citations": 0
       },
-      "gold_source_check": "source opened 2026-10-23 (see sources dict locator)"
+      "gold_source_check": "source opened 2026-10-23 (see sources dict locator)",
+      "human_review": {
+        "sheet_no": 24,
+        "previous_status": "PROPOSED",
+        "verdict": "CORRECT",
+        "verdict_el": "Σωστό",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)"
+      }
     },
     {
       "id": "NH-01-kapsis-wife-saulger",
@@ -2187,11 +2425,21 @@
       "scorable": false,
       "query_el": "Πώς λεγόταν η γυναίκα του Καψή σύμφωνα με τον Saulger;",
       "query_en": "What was the name of Kapsis' wife according to Saulger?",
-      "why_no_gold": "Only Stoukas 2018 (popular) mentions a marriage to Armenis' daughter (v1 dropped list). Nobody has checked all Saulger pp.319-323 for a wife's name, so we cannot say whether the right answer is 'Saulger does not say'.",
+      "why_no_gold": "Historian review 2026-10-28 (item 15): the wife was the daughter of the notable Armeni (also reported by Stoukas 2018); her name is unknown. Nobody has checked all Saulger pp.319-323 for a name, so we cannot say whether the right answer is 'Saulger does not say'.",
       "expected_claims": [],
       "forbidden_claims": [],
       "pass_criteria": {
         "max_hallucinated_citations": 0
+      },
+      "human_review": {
+        "sheet_no": 25,
+        "previous_status": "NEEDS_HISTORIAN",
+        "verdict": "DONT_KNOW",
+        "verdict_el": "Δεν ξέρω",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)",
+        "note": "Historian did not know the answer; item stays unscored (scorable=false)."
       }
     },
     {
@@ -2207,6 +2455,16 @@
       "forbidden_claims": [],
       "pass_criteria": {
         "max_hallucinated_citations": 0
+      },
+      "human_review": {
+        "sheet_no": 26,
+        "previous_status": "NEEDS_HISTORIAN",
+        "verdict": "DONT_KNOW",
+        "verdict_el": "Δεν ξέρω",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)",
+        "note": "Historian did not know the answer; item stays unscored (scorable=false)."
       }
     },
     {
@@ -2222,6 +2480,16 @@
       "forbidden_claims": [],
       "pass_criteria": {
         "max_hallucinated_citations": 0
+      },
+      "human_review": {
+        "sheet_no": 27,
+        "previous_status": "NEEDS_HISTORIAN",
+        "verdict": "DONT_KNOW",
+        "verdict_el": "Δεν ξέρω",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)",
+        "note": "Historian did not know the answer; item stays unscored (scorable=false)."
       }
     },
     {
@@ -2237,6 +2505,16 @@
       "forbidden_claims": [],
       "pass_criteria": {
         "max_hallucinated_citations": 0
+      },
+      "human_review": {
+        "sheet_no": 28,
+        "previous_status": "NEEDS_HISTORIAN",
+        "verdict": "DONT_KNOW",
+        "verdict_el": "Δεν ξέρω",
+        "reviewer": "Lepe12 (project historian)",
+        "review_date": "2026-10-28",
+        "method": "one-by-one review in chat of the Greek summary sheet (eval_review_GR.md)",
+        "note": "Historian did not know the answer; item stays unscored (scorable=false)."
       }
     }
   ],
@@ -2247,7 +2525,7 @@
     },
     {
       "topic": "Kapsis' marriage to the daughter of the notable Armenis and his brothers Nikos and 'Kapetan Tromaras'",
-      "reason": "Only in the popular article (Stoukas 2018); Saulger instead names Armeni as a notable Capsi neutralised. Not used as an expected fact."
+      "reason": "Only in the popular article (Stoukas 2018); Saulger instead names Armeni as a notable Capsi neutralised. Not used as an expected fact. UPDATE 2026-10-28: the historian confirmed the marriage to Armeni's daughter and rejected 'neutralised'; now used in SY-02 (armeni-daughter-married). The brothers are still not used."
     },
     {
       "topic": "Hocquincourt's battle at Porto Delfino (Chios) 27 Nov 1665",
@@ -2263,11 +2541,20 @@
     }
   ],
   "review": {
-    "state": "PENDING_HISTORIAN_REVIEW",
-    "note": "Draft. score_run.py does NOT read this file by default (DEFAULT_EVAL is research_eval_set.v1.json). Use --eval evaluation/research_eval_set.v2.pending.json only for trial scoring. After the historian approves, approved items move to v2 and review_status becomes APPROVED.",
+    "state": "HISTORIAN_REVIEWED_2026_10_28",
+    "reviewer": "Lepe12 (project historian)",
+    "review_date": "2026-10-28",
+    "note": "All 28 items were reviewed one by one on 2026-10-28. score_run.py still does NOT read this file by default (DEFAULT_EVAL is research_eval_set.v1.json); use --eval evaluation/research_eval_set.v2.pending.json. Scorable items are USER_VALIDATED and USER_CORRECTED; NEEDS_HISTORIAN items must not be counted.",
+    "counts": {
+      "USER_VALIDATED": 22,
+      "USER_CORRECTED": 2,
+      "NEEDS_HISTORIAN": 4
+    },
     "statuses": {
-      "PROPOSED": "gold answer quoted from a real source; awaits historian approval",
-      "NEEDS_HISTORIAN": "question only; no gold answer could be sourced; must not be scored until the historian supplies a sourced answer"
+      "USER_VALIDATED": "historian judged the sourced gold answer correct",
+      "USER_CORRECTED": "historian judged the gold wrong; corrected per his instructions (see human_review.correction)",
+      "NEEDS_HISTORIAN": "question only; no gold answer; must not be scored until the historian supplies a sourced answer",
+      "PROPOSED": "gold answer quoted from a real source; awaits historian approval"
     }
   }
 }
