@@ -79,8 +79,8 @@ for repo_index,r in enumerate(plan["repositories"]):
             focused.append(f'"{n}" corsair')
             if ys: focused.append(f'"{n}" {ys[0]}')
         repo_terms=list(dict.fromkeys(focused))[:int(os.getenv("PCT_TRAVELLERS_REPO_QUERY_LIMIT","16"))]
-    if name=="David Rumsey Map Collection":
-        # Map titles name places, not pirates: query place names only, plus the
+    if name in ("David Rumsey Map Collection","Gallica (BnF digitized)","Europeana","HathiTrust Digital Library"):
+        # Map and catalogue titles name places, not pirates: query place names only, plus the
         # sourced historical variants from the gazetteer/knowledge file (e.g. Milo, Cerigo).
         names=[str(plan.get("target") or "").strip()]+[str(x).strip() for x in plan.get("aliases",[]) if str(x).strip()]
         try:

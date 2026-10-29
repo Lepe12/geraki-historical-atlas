@@ -13,7 +13,7 @@ _receipts=ContextVar('connector_http_receipts',default=None)
 
 def safe_url(url):
     parsed=urllib.parse.urlsplit(str(url))
-    params=[(k,'REDACTED' if re.search(r'^(?:api_?key|access_token|token|secret|password|jsessionid)$',k,re.I) else v)
+    params=[(k,'REDACTED' if re.search(r'^(?:api_?key|wskey|access_token|token|secret|password|jsessionid)$',k,re.I) else v)
             for k,v in urllib.parse.parse_qsl(parsed.query,keep_blank_values=True)]
     return urllib.parse.urlunsplit((parsed.scheme,parsed.hostname or '',parsed.path,urllib.parse.urlencode(params),''))
 

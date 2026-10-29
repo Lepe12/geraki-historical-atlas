@@ -1,0 +1,1199 @@
+Implicit-explicit time integration method for fractional
+advection-reaction-diffusion equations
+
+arXiv:2301.06507v1 [math.NA] 16 Jan 2023
+
+D. Ghosha , T. Chauhana , S. Sircara,∗
+a Department of Mathematics, IIIT Delhi, 110020, India
+
+Abstract
+We propose a novel family of asymptotically stable, implicit-explicit, adaptive,
+time integration method (denoted with the θ -method) for the solution of the
+fractional advection-diffusion-reaction (FADR) equations. This family of time
+integration method generalized the computationally explicit L1 -method adopted
+by Brunner (J. Comput. Phys. 229 6613-6622 (2010)) as well as the fully implicit
+method proposed by Jannelli (Comm. Nonlin. Sci. Num. Sim., 105, 106073
+(2022)). The spectral analysis of the method (involving the group velocity and the
+phase speed) indicates a region of favorable dispersion for a limited range of Peclet
+number. The numerical inversion of the coefficient matrix is avoided by exploiting
+the sparse structure of the matrix in the iterative solver for the Poisson equation.
+The accuracy and the efficacy of the method is benchmarked using (a) the twodimensional (2D) fractional diffusion equation, originally proposed by Brunner,
+and (b) the incompressible, subdiffusive dynamics of a planar viscoelastic channel
+flow of the Rouse chain melts (FADR equation with fractional time-derivative of
+order α = 1/2) and the Zimm chain solution (α = 2/3). Numerical simulations of the
+viscoelastic channel flow effectively capture the non-homogeneous regions of high
+viscosity at low fluid inertia (or the so-called ‘spatiotemporal macrostructures’),
+experimentally observed in the flow-instability transition of subdiffusive flows.
+Keywords: Caputo derivative, IMEX time integration, Upwind difference
+scheme, Rouse polymer melt, Zimm chain solution
+
+∗ Corresponding Author: sarthok@iiitd.ac.in
+
+Preprint submitted to Journal of Computational Physics
+
+January 18, 2023
+
+1. Introduction
+Fractional partial differential equations (FPDE) have emerged as a powerful
+tool for modeling the multiphysics and multiscale processes in numerical simulations ranging from physics [10, 11, 12], biology [18] to quantitative finance [5].
+For example, some of the most significant and profoundly published experimental
+results in random flow environments, such as the cytosol and the plasma membrane
+of biological cells [25], crowded complex fluids and polymer solutions [19], dense
+colloidal suspensions [17] and single-file diffusion in colloidal systems [16], are
+better rationalized within the fractional calculus framework. The growing number
+of applications of fractional derivatives in various fields of science and engineering indicate that there is a significant demand for better numerical algorithms.
+However, such algorithms are predominantly designed for one-dimensional (1D)
+problems [20], due to the severe memory restrictions imposed by these derivatives,
+a challenge which we alleviate in Section 2.2.
+The individual physics or scale components in FPDE have very different properties that are reflected in their discretization, for example, in Fractional Advection
+Diffusion Reaction (FADR) systems [13], the discrete advection has a relatively
+slow (or ‘nonstiff’) dynamics while the diffusion is a fast (or ‘stiff’) evolving
+process. Implicit-Explicit (IMEX) integrators have been proposed as an attractive alternative (compared with the fully explicit or fully implicit time integration
+methods) where one combines the explicit (implicit) integration for the slow (fast)
+scale [6]. In an IMEX scheme the system of equations assume the form [2],
+∂αΦ
+= f(Φ) + ηg(Φ),
+∂t α
+
+(1)
+
+where the superscript, α, denotes order of the fractional derivative and η is a
+nonnegative parameter. In Equation (1), the terms collected in f(Φ) are on a
+slow time scale. Because they are (possibly) nonlinear, the implementation of a
+fully implicit integration scheme faces performance challenges, either from a poor
+performance of iterative solvers or from a complex Jacobian matrix associated with
+the problem. Therefore, it makes sense to solve this term explicitly. The terms
+in g(Φ), however, are on a fast time scale, and their explicit solution may require
+excessively small time steps in order to maintain numerical stability. Being usually
+linear in nature, they can be solved implicitly without further complications. The
+stability of such methods is still bounded by the Courant-Friedrichs-Lewy (CFL)
+condition, but because the fast terms are treated implicitly, these conditions are
+less strict when compared to a fully explicit scheme of similar formal order of
+2
+
+accuracy. A class of such an asymptotically stable IMEX method is introduced in
+Section 2.
+We have limited our focus in this work, on the development, analysis and
+applicability of a novel family of spatiotemporal discretization method for the
+numerical solution of the 1D and 2D FADR systems. In the knowledge of the
+present authors, a detailed analysis of the numerical methods for FADR equation,
+in the finite difference framework, is absent. Such analysis is available for the
+fraction diffusion equation [3] and the advection-diffusion equation [1]. Section 2
+describes this method. Using the 1D linear FADR equation, the time-asymptotic
+stability analysis and the spectral analysis for the method is outlined in Section 3.
+The numerical method is benchmarked using the test cases for the 2D fraction
+diffusion equation, proposed by Brunner [3], in Section 4. The numerical results
+of the subdiffusive dynamics of the viscoelastic channel flow is delineated in
+section 5. Section 6 concludes with a brief discussion of the implication of these
+results in future studies.
+2. Methodology
+Let Γ be a bounded domain in R2 with sufficiently smooth boundary ∂ Γ. We
+present the numerical method for an initial-boundary value problem for the timedependent FADR equation with fractional time-derivative of order α ∈ (0, 1), as
+follows,
+∂ α u(x,t)
++ K1 (x,t)∇ · u(x,t) = K2 (x,t)∇2 u(x,t) + f (x,t),
+∂t α
+u(x, 0) = u0 (x), x ∈ Γ,
+∂ u(x, 0) = g0 (x), x ∈ ∂ Γ, t ∈ (0, T ),
+
+x ∈ Γ,
+
+t ∈ (0, T ),
+(2)
+
+α
+
+u(x,t)
+denotes the Caputo fractional derivative of order α [22] with respect
+where ∂ ∂t
+α
+to t defined by
+
+∂ α u(x,t)
+1
+=
+α
+∂t
+Γ(1 − α)
+
+dt 0 ∂ u(x,t)
+,
+0 α
+∂t 0
+0 (t − t )
+
+Z t
+
+0 < α < 1,
+
+(3)
+
+and the operators ∇(·) and ∇2 (·) in equation (2), are the (integer order) gradient and the Laplacian operator in R2 . The FADR equation is related with the
+non-Markovian continuous-time random walk and is a model for anomalous diffusional flow-fields such as polymer melts [4], flows of liquid crystals [32] as well
+as biological flows including mucus [31] and cartilage [29]. In the next three
+3
+
+sections, we propose the numerical method for the spatiotemporal discretization
+of equation (2).
+2.1. Time integration
+The Caputo fractional time derivative in equations (2, 3) is discretized using
+the difference approximation, discussed in [22]. Suppose the time interval [0, T ]
+is discretized uniformly into n subintervals, define tk = k∆t, k = 0, 1, . . . , n, where
+∆t = T /n is the time-step. Let u(x, tk ) be the exact value of a function u(x,t) at
+time step tk . Then, the fractional derivative can be approximated as follows,
+k u(x, t
+1
+∂ α u(x,t)
+j+1 ) − u(x, t j )
+≈
+∑
+α
+∂t
+Γ(1 − α) j=0
+∆t
+
+Z ( j+1)∆t
+
+k u(x, t
+1
+j+1 ) − u(x, t j )
+=
+∑
+Γ(1 − α) j=0
+∆t
+
+Z (k− j)∆t
+
+j∆t
+
+t 0−α dt 0
+
+(k− j+1)∆t
+
+k u(x, t
+1
+k+1− j ) − u(x, tk− j )
+=
+∑
+Γ(1 − α) j=0
+∆t
+
+=
+
+dt 0
+(tk+1 − t 0 )α
+
+Z ( j+1)∆t
+
+t 0−α dt 0
+
+j∆t
+
+(∆t)1−α k u(x, tk+1− j ) − u(x, tk− j ) α
+rj ,
+∑
+Γ(2 − α) j=0
+∆t
+
+(4)
+
+
+
+where the weight, rαj = ( j + 1)1−α − j1−α . Following an earlier work by the
+authors which utilized a standard integer-order advection-reaction-diffusion (ADR)
+equations [28], we retain ‘IMEX method philosophy’ by explicitly discretizing the
+advection and the reaction term (i. e., ‘K1 ∇ · u(x,t)’ term and ‘ f (x,t)’ term,
+respectively in equation (2)), while the diffusive term (i. e., ‘K2 (x,t)∇2 u(x,t)’
+term in equation (2)) is treated semi-implicitly, as follows,
+K2 (x,t)∇2 u(x,t) ≈ θ K2 (x,t)∇2 u(x,t)|tk + (1 − θ )K2 (x,t)∇2 u(x,t)|tk−1 .
+
+(5)
+
+This family of time integration method (referred to as the θ −method in subsequent
+discussion), generalizes the computationally explicit L1-method by Brunner [3] as
+well as the fully implicit method recently proposed by Jannelli [13].
+2.2. Adaptive time stepping
+When the simulation time is long, the size of ‘memory’ in the fractional
+derivative approximation becomes enormously large. However, according to the
+‘fading memory property’ [7], for long times, the solution of the FADR systems
+4
+
+change more slowly than the standard integer-order ADR processes. Hence, it
+^
+makes sense to employ a large time step at longer times. Let u(·,
+tk ) be the
+numerical approximation for u(·, tk ). To detect this change, we define a measure
+between the numerical solutions of two consecutive time steps by,
+∆utk =
+
+^
+^
+ku(·,
+tk ) − u(·,
+tk−1 )kl 2
+,
+||u(·,^
+tk−1 )|| 2
+
+k = 1, . . . , n.
+
+(6)
+
+l
+
+For some user-defined relaxation parameter δ , if ∆utk < δ , then the time spacing
+is geometrically increased (i. e., ∆t → 2∆t), upto some prefixed value ∆tmax .
+2.3. Spatial approximation
+The gradients and Laplacian in equation (2) are spatially approximated using the upwind difference scheme (UDS) and the second order central difference
+scheme (CDS), respectively. Recall that the CDS approximation of the convective
+terms in equation (2) does not model the flow-physics accurately [28]. Furthermore, a first order upwind scheme is too diffusive, thereby necessitating the use of
+higher order upwind schemes. For example,
+!
+uki+1, j − uki−1, j
+∂u
+− +
+≈ K1i j
++ q(K1+ u−
+(7)
+K1 (x,t)
+x + K1 ux ),
+∂x
+2∆x
+where
+K1− = min(K1i j , 0) K1+ = max(K1i j , 0),
+u−
+x =
+
+uki−2, j − 3uki−1, j + 3uki, j − uki+1, j
+
+u+
+x =
+
+3∆x
+
+uki−1, j − 3uki, j + 3uki+1, j − uki+2, j
+3∆x
+
+,
+(8)
+
+where the parameter q = 0.5 represents the third-order accurate upwind formula
+(UD3) and which is utilized for the interior stencil points. The use of ghost points
+are avoided by setting q = 0 for grid points immediately adjacent to the boundary,
+leading to a second order accurate method (UD2) at these points. Since the focus
+of the present work is on the development of the time integration method, we retain
+same the spatial approximation, outlined above, in all the subsequent test cases.
+
+5
+
+3. Asymptotic stability and spectral analysis: linear 1D FADR equation
+The linear 1D FADR equation (2) (with K1 = c, K2 = γ, f (x,t) = λ u(x,t)
+for x ∈ (−∞, ∞), where c, γ and λ are constants specifying the advection speed,
+coefficient of diffusion and coefficient of reaction, respectively) serves as a model
+for FPDE replicating multi-scale processes.
+3.1. Asymptotic stability analysis
+First, we show that the solution of the linear 1D FADR equation, coupled with
+periodic boundary conditions and discretized using the numerical method outlined
+in Section 2.1-2.3, is asymptotically stable for a limited range of CFL and Peclet
+numbers. The discretization of the linear 1D FADR equation, using the θ -method,
+is as follows,
+(
+!
+)
+n−1
+n−1
+
+
+n 
+u
+−
+u
+(∆t)−α
+j+1
+n− j
+i+1
+i−1
+− ui
++
++c
+∑ j(1−α) − ( j − 1)(1−α) un−
+i
+Γ(2 − α) j=1
+2∆x
+!
+n−1
+n−1
+n−1
+−
+3u
++
+3u
+−
+u
+un−1
+i
+i−2
+i−1
+i+1
+qc
+3∆x
+= γθ
+
+n−1
++ un−1
+un−1
+uni+1 − 2uni + uni−1
+i+1 − 2ui
+i−1
++
+γ(1
+−
+θ
+)
++ λ un−1
+,
+i
+(∆x)2
+(∆x)2
+
+(9)
+
+where, n/i, denote the temporal / spatial index and we set the parameter, q = 0.5.
+Introducing the following non-dimensional parameters: the CFL number, Nc ,
+Peclet number, Pe and Damköhler number, Da, where
+Nc =
+
+c(∆t)α
+,
+∆x
+
+Pe =
+
+γ(∆t)α
+,
+(∆x)2
+
+Da =
+
+λ (∆x)
+,
+c
+
+(10)
+
+and rearranging the terms in equation (9), we arrive at the following equation,
+(1+2Peθ Γ(2−α)) uni −Peθ Γ(2−α)uni+1 −Peθ Γ(2−α)uni−1 = (1 − qNc Γ(2−α)
+
+Γ(2 − α)
+Γ(2 − α)
+n−1
+−2Pe(1−θ )Γ(2−α) + DaNc Γ(2 − α)) ui + − Nc
++ qNc
+2
+3
+
+
+
+Γ(2−α)
+n−1
++ Pe(1−θ )Γ(2−α) ui+1 + Nc
++ qNc Γ(2−α)+Pe(1 − θ )Γ(2 − α)
+2
+
+
+n 
+Γ(2 − α) n−1
+n− j+1
+n− j
+n−1
+(1−α)
+(1−α)
+ui−1 − qNc
+ui−2 + ∑ j
+− ( j − 1)
+ui
+− ui
+. (11)
+3
+j=2
+6
+
+If ueni be the (numerically) approximate solution of equation (11), then the round-off
+error, εin = uni − ueni (i = 0, . . . , M), identically satisfies the same equation. Due
+to periodic boundary conditions, we have,
+n
+ε0n = εM
+
+n = 1, 2, ......, T.
+
+(12)
+
+Assuming the round-off error has the following form,
+εin = ξn eIk(ih) ,
+
+(13)
+
+√
+where ξn = |εin |, I = −1, h = ∆x and k = 2πl
+L (l: index, and L: Spatial domain
+length). We substitute the above relation in the equation for the round-off error, to
+arrive at the following form,
+n
+
+µ1 ξn = µ2 ξn−1 + ∑ rαj ξn− j+1 − ξn− j ,
+
+(14)
+
+j=2
+
+where
+µ1 = 1 + 2Peθ Γ(2 − α)(1 − cos(kh)),
+
+
+
+2
+µ2 = 1 − Nc q 1 − cos(kh) + 2Pe(1 − θ )(1 − cos(kh)) − DaNc + INc sin(kh)
+3
+
+
+Nc q
+−Ikh
+−2Ikh
+−
+2e
+−e
+Γ(2 − α),
+3
+rαj = j(1−α) − ( j − 1)(1−α) .
+
+(15)
+
+Next we prove the result that the finite difference scheme (14-15) is asymptotically
+stable, in the form of the following theorem.
+Theorem 3.1. The approximate solution to the 1D linear FADR equation using
+the θ -method (14) with α ∈ (0, 1), on the finite domain x ∈ [−L, L] with periodic
+boundary conditions is asymptotically stable for all t ≥ 0.
+Proof. It suffices for us to show that the time-amplification factor, ξn (equation (14)), obey the inequality,
+ξn ≤ ξn−1 ≤ ξn−2 ≤ . . . ≤ ξ1 ≤ ξ0 .
+
+(16)
+
+• For n = 1 in equation (14,15), we observe the µ1 ≥ 1 while µ2 ≤ 1 for
+sufficiently small Nc , and Pe, thereby leading us towards the conclusion that
+ξ1 ≤ ξ0 .
+7
+
+• Using induction hypothesis, we assume that ξn−1 ≤ ξn−2 ≤ . . . ≤ ξ1 ≤ ξ0 .
+Next we show that ξn ≤ ξn−1 .
+• Since µ1 ≥ 1 and µ2 ≤ 1, equation (14) can be replaced with the following
+inequality,
+n
+
+
+ξn ≤ ξn−1 + ∑ rαj ξn− j+1 − ξn− j ≤ ξn−1 .
+
+(17)
+
+j=2
+
+The second inequality in equation (17) is because,
+i) rαj is positive and
+ii) rαj > rαj+1 , and
+iii) ξn− j+1 − ξn− j ≤ 0 (via the induction hypothesis),
+which completes the proof.
+
+We emphasize that while the θ -method is not unconditionally stable, it is
+time-asymptotically stable for a restricted range of Nc and Pe.
+3.2. Spectral analysis
+Although the θ -method is asymptotically stable, the presence of dispersion
+errors (through negative group velocity and large phase speed errors) would invalidate the long time integration results [27]. Hence we couple the result in
+Section 3.1 along with the toolset of spectral analysis to deduce the relevant range
+of the parameters, Nc , Pe and Da, for an accurate representation of the numerical
+solution of the 1D FADR equation.
+Using the spectral (Fourier) representation
+of the approximate solution of
+√
+0
+I(ikh)
+n
+e
+equation (11), we have ui = ξn e
+(I = −1, k = 2πl
+L ). We define the numerical
+n
+uei
+ξn0
+n−1
+=
+time-amplification factor, G
+=
+. Dividing equation (11) with ug
+,
+num
+
+0
+ξn−1
+
+n−1
+ug
+i
+
+i
+
+we arrive at the equation governing Gnum ,
+n
+
+C0 Gnnum +C1 Gn−1
+num +
+
+j+1
+j
+− Gn−
+∑ rαj Gn−
+num
+num = 0,
+
+
+
+j=2
+
+8
+
+(18)
+
+where the coefficients,
+C0 =1 + 2Peθ Γ(2 − α)(1 − cos(kh))
+
+
+1
+4
+C1 = − 1 + qNc Γ(2 − α) 1 − cos(kh) + cos(2kh) +2Pe(1 − θ )Γ(2 − α)(1−
+3
+3
+
+
+2
+q
+cos(kh))−DaNc Γ(2−α)+INc Γ(2 − α) sin(kh) + q sin(kh) − sin(2kh) .
+3
+3
+(19)
+We remark that the order ‘n’ of the polynomial (18) is fixed at n = 75 in subsequent
+analysis, since our numerical studies have shown that an increase in the polynomial
+order by one, shifts the contours of the spectral variables by less that 0.001%.
+Next, transforming the exact solution
+of the linear 1D FADR equation, using
+RR
+Fourier-Laplace transform as u(x,t) =
+Û(k, ω)eI(kx−ωt) , we arrive at the exact
+dispersion relation,
+1
+
+ωexact = ω = I(λ − γk2 − cIk) α .
+
+(20)
+
+Similarly, we have a corresponding numerical dispersion relation for the approximate equation (11),
+1
+
+ωnum = I(λ N − γ N k2 − cN Ik) α ,
+
+(21)
+
+where the superscript ‘N’ denotes the corresponding numerical values of the
+parameters. Since
+Gnum =
+
+u(k,t + ∆t) eI(kx−ωnum (t+∆t))
+=
+= e−Iωnum ∆t = eIβ ,
+I(kx−ω
+t)
+num
+u(k,t)
+e
+
+and the numerical phase speed is given by, cnum = ωnum
+k , we find that,
+
+
+β
+1
+−1 (Gnum )Imag
+cnum = −
+=−
+tan
+,
+k∆t
+k∆t
+(Gnum )Re
+
+(22)
+
+(23)
+
+where the subscript ‘Imag’ / ‘Re’ denote the imaginary / real values, respecand the
+tively. Using the expression for the exact phase speed, cexact = ωexact
+k
+non-dimensional parameters described in equation (11), we find the ratio of the
+phase speeds,
+cnum
+−Iβ
+=
+(24)
+1 ,
+cexact
+(DaNc − (kh)2 Pe − I(kh)Nc ) α
+9
+
+Figure 1: Group velocity ratio contours, Vg , at θ = 0.5, α = 0.9 and (a) Pe = 0.001, Da =
+−0.01, (b) Pe = 0.001, Da = 0.0, (c) Pe = 0.001, Da = 0.01, (d) Pe = 0.01, Da = −0.01, (e)
+Pe = 0.01, Da = 0.0, (f) Pe = 0.01, Da = 0.01, (g) Pe = 1.0, Da = −0.01, (h) Pe = 1.0, Da = 0.0
+and (i) Pe = 1.0, Da = 0.01.
+
+10
+
+Finally, the expression for the numerical and the exact group velocities are
+given by,
+
+
+
+  
+
+β
+∂
+∂
+h dβ
+(ωnum )
+Vg num =
+=
+=
+∂k
+∂ k ∆t Re
+∆t d(kh) Re
+Re
+
+  
+
+  1
+1
+∂
+∂
+1−α
+2
+α
+Vg exact =
+(ωexact ) =
+= (c−2kγI)(−Iω)
+I(λ −γk −cIk)
+.
+∂k
+∂k
+α
+Re
+Re
+Re
+(25)
+Hence,
+
+
+
+
+  dβ 
+
+(Vg )num
+α
+
+
+
+=
+,
+
+1−α
+1−α
+(Vg )exact  Nc r
+ d(kh) Re
+(∆t)
+cos (1 − α)φ
+
++ 2kh r1−α (∆t)1−α sin (1 − α)φ Pe
+π
+
+(26)
+
+where ω = reI(φ + 2 ) .
+h
+i
+Vg,num
+The contour plots for the group velocity ratio, Vg = Vg,exact , for Peclet
+Re
+numbers, Pe = 0.001, 0.01 and 1.0, and Damköhler numbers, Da = −0.01, 0.0
+and 0.01, are presented for two values of θ , namely, θ = 0.5 (in figure 1) and
+θ = 1.0 (in figure 2) in the (Nc , kh)-plane. The corresponding contour plots for
+num
+| are shown in figure 3 and figure 4
+the absolute phase speed error, ∆c = |1 − ccexact
+for θ = 0.5 and θ = 1.0, respectively. Regions of favorable spectral properties
+(Vg > 0 and ∆c ≤ 0.1) are highlighted with grey color.
+We outline the spectral properties, namely, the group velocity ratio and the
+absolute phase speed error, for a specific case of the fractional order, α = 0.9. In
+general, we find that in the limit of vanishingly small values of kh, the numerical
+method has favorable spectral properties (i. e., Vg > 0 and ∆c ≤ 0.1 in the limit,
+kh → 0). The region of positive group velocities (Vg > 0) indicate a region
+where the numerical solution travels in the correct direction and the numerical
+instabilities in the form of q-waves are avoided [28]. Figure 1 and 2 indicate
+that this favorable region is restricted to smaller values of kh with larger values
+of Pe as well as with smaller values of θ . While the former observation can
+be attributed to the fact that a stiff diffusive term (i. e., larger ‘K2 (x,t)∇2 u(x,t)’
+term in equation (2) can be correctly approximated with smaller grid-size, h; the
+latter observation can be explained through a numerical stabilization due to the
+implicit treatment of fast time scale term (in this case, the diffusive term). Both
+of these observations are in congruence with the corresponding analysis of the
+11
+
+Figure 2: Group velocity ratio contours, Vg , at θ = 1.0, α = 0.9 and (a) Pe = 0.001, Da =
+−0.01, (b) Pe = 0.001, Da = 0.0, (c) Pe = 0.001, Da = 0.01, (d) Pe = 0.01, Da = −0.01, (e)
+Pe = 0.01, Da = 0.0, (f) Pe = 0.01, Da = 0.01, (g) Pe = 1.0, Da = −0.01, (h) Pe = 1.0, Da = 0.0
+and (i) Pe = 1.0, Da = 0.01.
+
+12
+
+Figure 3: Absolute phase speed error contours, ∆c at θ = 0.5, α = 0.9 and (a) Pe = 0.001, Da =
+−0.01, (b) Pe = 0.001, Da = 0.0, (c) Pe = 0.001, Da = 0.01, (d) Pe = 0.01, Da = −0.01, (e)
+Pe = 0.01, Da = 0.0, (f) Pe = 0.01, Da = 0.01, (g) Pe = 1.0, Da = −0.01, (h) Pe = 1.0, Da = 0.0
+and (i) Pe = 1.0, Da = 0.01.
+
+13
+
+integer order ADR equations [28]. Similarly, the absolute phase error contours
+highlight spectrally favorable region (∆c ≤ 0.1, equivalently the phase errors are
+restricted to 10% of the exact phase speed, see figures 3, 4) at lower values of Pe
+and at lower values of θ , indicating the fact that the phase errors in this numerical
+method can be reduced by introducing finer grids [26].
+We summarize our discussion by indicating two sources of error which are
+particularly perplexing in the Direct Numerical Simulations (DNS) of FADR
+equations. The first source of error is the existence of q−waves for those set of
+numerical parameters for which the spatiotemporal discretization is asymptotically
+stable. In such a situation, the q−waves do not attenuate and have to be eliminated
+by deploying an explicit filter [33]. Another aspect of spectral error is related
+to the Gibbs’ phenomenon which occurs as a consequence of sharp discontinuity
+in the solution and which causes fictitious oscillations, a problem which can be
+remedied using high accuracy dispersion relation preserving schemes (which has
+atleast shown promise in integer order partial differential equations) [27].
+4. Method validation: 2D fractional diffusion equation
+Using the spectrally relevant parameter values discussed in section 3.2, the
+θ -method is verified by solving the 2D fractional diffusion equation (K1 = f = 0
+and K2 = 1 in equation (2)), originally proposed by Brunner [3], for the case of
+(a) zero Dirichlet boundary conditions and (b) zero Neumann conditions, over the
+square domain, (x, y) ∈ Γ = [−1, 1]2 . The initial condition for the two test cases
+can be outlined as follows,
+
+
+i) Dirichlet case: u0 (x, y) = cos π2 x cos π2 y ,
+
+
+ii) Neumann case: u0 (x, y) = sin π2 x sin π2 y ,
+and the exact solution for both cases is given by
+
+
+1 2α
+uExact (x, y,t) = Eα − π t u0 (x, y),
+4
+k
+
+(27)
+
+z
+where Eα (z) = ∑∞
+k=0 Γ(αk+1) , α > 0, is the one-parameter Mittag-Leffler function.
+The domain, Γ ∪ ∂ Γ, is discretized using 51 × 51 points and the relative error
+Exact k2
+in l2 − norm, keuku−uExact
+k2 , versus discretization time, ∆t, is shown in figure 5. The
+total computation time is fixed at T = 0.35, for all cases. We note that slope of the
+
+14
+
+Figure 4: Absolute phase speed error contours, ∆c at θ = 1.0, α = 0.9 and (a) Pe = 0.001, Da =
+−0.01, (b) Pe = 0.001, Da = 0.0, (c) Pe = 0.001, Da = 0.01, (d) Pe = 0.01, Da = −0.01, (e)
+Pe = 0.01, Da = 0.0, (f) Pe = 0.01, Da = 0.01, (g) Pe = 1.0, Da = −0.01, (h) Pe = 1.0, Da = 0.0
+and (i) Pe = 1.0, Da = 0.01.
+
+15
+
+Figure 5: Relative error for the solution of the 2D fractional diffusion equation at simulation time
+T = 0.35, at α = 1.0, θ = 1.0 (?); α = 0.9, θ = 1.0 (); α = 0.67, θ = 1.0 (◦); α = 0.5, θ = 1.0
+(4); α = 1.0, θ = 0.6 (∗); α = 0.9, θ = 0.6 (); α = 0.67, θ = 0.6 (•); α = 0.5, θ = 0.6 (+); and
+for (a) Dirichlet boundary conditions, and (b) Neumann boundary conditions.
+
+error curves at α = 1.0 is one (highlighted with solid curves in figure 5a,b). This
+observation can be explained since at this value of α, the θ -method reduces to the
+standard, integer order, Euler method, which is first order accurate. Further, note
+that the slope of the error curves for α < 1.0 is sub-linear, indicating that for the
+fractional-order diffusion equation, the θ -method has sub-linear order of accuracy.
+5. Numerical simulation: 2D fractional viscoelastic channel flow
+Next, we describe the incompressible, subdiffusive dynamics of a planar (2D)
+viscoelastic channel flow for polymer melts and present the numerical solution
+using the θ -method. In an earlier work [4], the authors have derived of the
+mathematical model (which is a nonlinear 2D coupled FADR equation) and the
+linear stability of the incompressible, subdiffusive dynamics of such flows. Using
+the following scales for non-dimensionalizing the governing equations: the height
+of the channel H for length, the timescale T corresponding to maximum base flow
+velocity (i. e., T = (H/U0 )1/α ) for time and ρU02 for pressure and stresses (where
+ρ, U0 is the density and the velocity scale, respectively), we summarize the model
+
+16
+
+in streamfunction-vorticity formulation as follows,
+ α
+
+∂ Ω
+Re
++ v · ∇Ω = ν∇2 Ω + (1 − ν)∇ × ∇ · (A + F),
+∂t α
+∇2 Ψ = −Ω,
+D−A
+∂αA
++ v · ∇A − (∇v)T A − A∇v =
+,
+α
+∂t
+We
+
+(28a)
+(28b)
+(28c)
+
+where the variables t, Ψ, v = (u, v) = ( ∂∂Ψy , − ∂∂Ψx ), A, Ω = ∇×v denote time, streamµ
+function, velocity, elastic stress tensor and vorticity, respectively. F = 1−ν
+(E : ET )
+1
+
+is the finger tensor and E = et(∇v) α is the deformation gradient tensor (the operator ( : ) represents the tensor inner product). The term ‘(∇ × ∇ · F)’ represents the
+external body force. The parameters ηs , η p , η0 = ηs + η p , ν = ηs /η0 and µ are
+the solvent viscosity, the polymeric contribution to the shear viscosity, the total
+viscosity, the viscous contribution to the total viscosity of the fluid and strength
+of the body force, respectively. The dimensionless groups characterizing inertia and elasticity are Reynolds number, Re = ρUη00 H , and Weissenberg number,
+
+We = λ HU0 , respectively. The parameter, λ , is the polymer relaxation time. Note
+that equation (28c) represents fractional version of the regular Oldroyd-B model
+for viscoelastic fluids [30], derived in a recently reported work [4]. Two specific
+cases of the fractional derivative are considered, namely, monomer diffusion in
+Rouse chain melts (α = 1/2) [24], and in Zimm chain solution (α = 2/3) [36].
+α
+
+5.1. Initial and boundary conditions
+Initial conditions:. A rectilinear coordinate system is used with x, y denoting the
+channel flow direction and the transverse direction, respectively. The origin of
+this coordinate system is chosen at the left end of the lower wall of the channel.
+Initially, we assume that the flow is a plane (2D) Poiseuille flow with its variation
+entirely in the transverse direction, namely,
+U0 = (y − y2 )ex ,
+
+(29)
+
+where ex is the unit vector along x-direction. The base state elastic stress tensor,
+A0 = [A0 i j ], is chosen as,
+A0 11 = 0,
+A0 12 = A0 21 = 1 − 2y,
+A0 22 = 2We(1 − 2y)2 ,
+17
+
+(30)
+
+Boundary conditions:. In order to imitate an infinitely long channel, periodic
+boundary conditions are assumed at the flow inlet and outlet. No-slip (i. e.,
+u = v = 0) and zero tangential conditions (i. e., ∂∂ ux = ∂∂ xv = 0) are imposed on
+the lower wall (y = 0) and the upper wall (y = 1.0) of the channel, respectively.
+Further, incompressibility constraint provides an additional condition on the walls:
+∂v
+∂ y = 0. Since the flow is parallel to the channel walls, the walls may be treated
+as streamline. Thus, the streamfunction value, Ψ, on the wall is set as a constant.
+That constant (which may be different on the lower and the upper wall) is found
+from the no-slip condition. Zero tangential condition imply that all tangential
+derivatives of streamfunction vanish on the wall. Thus, the boundary condition
+for vorticity is found from the Poisson equation (28b),
+∂ 2Ψ
+|wall = −Ωwall .
+∂ y2
+
+(31)
+
+Finally, the boundary conditions for the elastic stress tensor is constructed from
+equation (28c), coupled with the no-slip and zero tangential conditions, as follows,
+A11 = 0,
+∂ α A12 ∂ u
+= 0,
+−
+∂t α
+∂y
+
+ α
+∂ A22
+∂u
+A22 +We
+− 2 A12 = 0.
+∂t α
+∂y
+A12 +We
+
+(32)
+
+5.2. Algorithmic details
+The size of the domain is chosen to be (x, y) ∈ [0, 5] × [0, 1]. The domain is
+discretized using 76 × 51 points, such that the discrete points are equally spaced
+5
+1
+and ∆y = 50
+(excluding the boundary points, where the Dirichlet
+at ∆x = 75
+boundary conditions are imposed) in the x− and the y− directions, respectively.
+The variable in the θ -method is fixed at θ = 1.0. The minimum and the maximum
+time-step are chosen as ∆tmin = 10−3 and ∆tmax = 1.6 × 10−2 , respectively. The
+time-step in the simulation is increased adaptively using the technique outlined
+in Section 2.2. The Poisson equation (28b) is iteratively solved using the GaussSiedal iteration technique. Assuming (N + 1) (or (M + 1)) points in the x (or y)
+direction, the size of the coefficient matrix is N(M − 1) × N(M − 1). Hence, due to
+size constraints, the numerical inversion of this coefficient matrix imposes severe
+memory restrictions. Instead, we note that the coefficient matrix has the following
+
+18
+
+block diagonal structure with (M − 1) blocks,
+
+
+D1 D2 0 · · · 0
+.. 
+
+.
+.
+D 2 . . . .
+. 
+
+
+ 0 ... ... ... 0 
+
+
+ .
+
+.
+.
+.
+.
+.
+ .
+.
+. D2 
+0 · · · 0 D2 D1
+
+(33)
+
+where D1 , D2 are N × N tridiagonal and diagonal matrices, respectively, such
+that D1 = Tridiag(r1 , R, r1 ) and D2 = Diag (r2 ) and r1 = (∆x)−2 , r2 = (∆y)−2 and
+R = −2(r1 + r2 ). Since the exact location of the non-zero entries are known, the
+invocation of the entire coefficient matrix in the Guass-Siedal iteration is avoided.
+The solution is updated by utilizing the non-zero entries of each row on a caseby-case basis. The row diagonal dominance of the matrix (33) insures that the
+iteration converges in finite number of steps. Similarly, the vorticity equation (28a)
+involves another Laplacian term and its discretization involves a coefficient matrix
+identical to the form (33) (with r1 = −νθ (dx)−2 , r2 = −νθ (dy)−2 , R = −2(r1 +
+−α
+r2 ) + Re(∆t)
+Γ(2−α) ). Thus, the Laplacian term in equation (28a) is treated identically
+as above.
+5.3. Numerical results
+The Zimm’s model [36] predicts the (‘shear rate and polymer concentration
+independent’) viscosity of the polymer solution by calculating the hydrodynamic
+interaction of flexible polymers (an idea which was originally proposed by Kirkwood [15]) by approximating the chains using a bead-spring setup. In contrast,
+the Rouse model [24] predicts that the viscoelastic properties of the polymer chain
+via a generalized Maxwell model, where the elasticity is governed by a single
+relaxation time, which is independent of the number of Maxwell elements (or the
+so-called ‘submolecules’). Since we do not wish to study the effects of elasticity,
+the Weissenberg number is fixed at We = 10.0. The value of µ is fixed at µ = 10−2
+such that the body force term in equation (28a) behaves as a perturbative term for
+the system which is initially at steady state (29, 30). Two different values of ν are
+considered: ν = 0.3 (elastic stress dominated case) and ν = 0.6 (viscous stress
+dominated case).
+Zimm’s model:. The vorticity contours for the Zimm’s model are represented via
+figures 6 and 7, for the elastic stress dominated case and the viscous stress dominated case, respectively. Observe that the ‘flow structures’ are larger in size and
+19
+
+magnitude for the elastic stress dominated case (i. e., compare the range of the
+contour values in both figures). Also, observe that the structures appearing in the
+Zimm’s model are significantly smaller in magnitude than the Rouse model (figures 8 and 9). Physically, the formation of these ‘spatiotemporal macrostructures’
+are associated with the entanglement of the polymer chains at microscale [25],
+leading to localized, non-homogeneous regions with higher viscosity. Flows with
+parameter values, ν < 0.5 (or the elastic stress dominated case), are those associated with higher concentration of polymers per unit volume. Experiments [9]
+have shown that non-Newtonian fluids with a larger polymer concentration, have
+a greater tendency (for the polymer strands) to agglomerate, the so-called ‘overcrowding effect’ [8].
+Further, notice (on the right hand side column in figure 6 and 7) the disappearance of the structures at larger Reynolds number. This observation can be
+attributed to the fact that the macrostructures are ‘washed out’ of the channel at
+higher flow velocities. In an earlier work, we had shown how the spatiotemporal
+phase diagram indicated regions of ‘temporal stability’ at larger values of Re [4].
+In this work, we associate these regions of temporal stability with regions devoid
+of flow structures.
+Rouse model:. The Rouse model represents ‘thicker’ fluid, or fluids with slower
+diffusion (figures 8 and 9). After comparing the respective range of vorticity
+contours at lower as well as higher values of Re, we find that the macrostructures are
+more prominent (both in size and magnitude) in the Rouse model (in comparison
+with the Zimm’s model). Even within the Rouse model, we find that the elastic
+stress dominated case (ν = 0.3, figure 8) exhibits formation of larger structures,
+than the viscous stress dominated case (figure 9). Again, we note that the structure
+formation is conspicuously absent at larger values of Re (i. e., notice the plots on
+the right hand side columns in figures 8 and 9).
+We summarize our discussion by noting that for the selected values of the
+parameters, ν, α and We: (a) The Rouse model is comparatively more unstable
+than the Zimm’s model at low fluid inertia (or low values of Re), (b) The elastic
+stress dominated case (ν < 0.5 case) is comparatively more unstable than the
+viscous stress dominated case, and (c) Temporal stability is achieved at higher
+values of Re, irrespective of the model or the polymer concentration.
+A notably ‘abnormal’ feature in our numerical simulations is the presence
+of temporal stability at high inertia. While the in silico studies of the classical Oldroyd-B channel flows indicate the appearance of temporal instability for
+Reynolds number as low as Re ∼ 50 [14], temporal stability at high fluid inertia
+20
+
+Figure 6: Vorticity contours for the elastic stress-dominated (ν = 0.3) Zimm model (α = 0.67)
+case, shown at parameter values, We = 10.0 and Re = 70 (left column) versus Re = 1000 (right
+column).
+
+21
+
+Figure 7: Vorticity contours for the viscous stress-dominated (ν = 0.6) Zimm model (α = 0.67)
+case, shown at parameter values, We = 10.0 and Re = 70 (left column) versus Re = 1000 (right
+column).
+
+22
+
+Figure 8: Vorticity contours for the elastic stress-dominated (ν = 0.3) Rouse model (α = 0.5) case,
+shown at parameter values, We = 10.0 and Re = 70 (left column) versus Re = 1000 (right column).
+
+23
+
+for viscoelastic flows is only recognized in experimental realizations (until now).
+For example, Riley [23] reported an elasticity induced flow stabilization of viscoelastic fluids coated over complaint surfaces at a fairly high Reynolds number
+(Re ∼ 4000). In a separate study involving ethanol gel fuels, elastic stabilization at a high shear rate was attributed due to an abnormally high second normal
+stress difference [21]. Viscoelastic flow stabilization at higher values of Re, in
+tapered microchannels, was explained due to the presence of wall effects [34]. In
+another in vitro study, a biofilm deacidification created a non-homogeneous environment for molecular diffusion, leading to a ‘subdiffusive effect’ with hindered
+flow rates [35]. These in vitro studies not only corroborate our numerical outcome,
+especially establishing the emergence of temporally stable region at high inertia,
+but also highlight the potential of FPDE in effectively capturing the flow-instability
+transition in subdiffusive flows.
+6. Conclusion
+This investigation addresses the development as well as the asymptotic and
+spectral stability of a novel class of numerical method for the spatiotemporal discretization of FPDE. Section 2 presented the method, including the time integration
+(section 2.1) and the spatial discretization (section 2.3). Using 1D linear FADR
+equation, the asymptotic stability and spectral analysis was outlined in section 3.
+The method was validated using the test cases for the 2D fraction diffusion equation, in section 4. Section 5 described the numerical results of the subdiffusive
+dynamics of the viscoelastic channel flow. We conclude our discussion with a
+remark that the focus of this present work was on the development of the numerical method and not on the physical description of the subdiffusive flow dynamics.
+Hence, a comprehensive study on the mechanics of subdiffusive channel flow,
+using the numerical method developed in this work, is reported elsewhere.
+Declaration of competing interest The authors declare that they have no known
+competing financial interests or personal relationships that could have appeared to
+influence the work reported in this paper.
+References
+[1] Al-Khaled, K., Momani, S., 2005. An approximate solution for a fractional
+diffusion-wave equation using the decomposition method. Applied Mathematics and Computation 165, 473–483.
+
+24
+
+Figure 9: Vorticity contours for the viscous stress-dominated (ν = 0.6) Rouse model (α = 0.5)
+case, shown at parameter values, We = 10.0 and Re = 70 (left column) versus Re = 1000 (right
+column).
+
+25
+
+[2] Ascher, U.M., Ruuth, S.J., Wetton, B.T.R., 1995. Implicit-explicit methods
+for time-dependent partial differential equations. SIAM Journal on Numerical
+Analysis 32, 797–823.
+[3] Brunner, H., Ling, L., Yamamoto, M., 2010. Numerical simulations of 2D
+fractional subdiffusion problems. Journal of Computational Physics 229,
+6613–6622.
+[4] Chauhan, T., Bansal, D., Sircar, S., . Spatiotemporal linear stability of viscoelastic subdiffusive channel flows: a fractional calculus framework URL:
+https://arxiv.org/abs/2301.02078. arXive.org.
+[5] Coffey, W.T., Kalmykov, Y.P., Waldron, J.T., 2004. The Langevin Equation:
+With Applications to Stochastic Problems in Physics, Chemistry and Electrical Engineering. volume 14 of World Scientific Series in Contemporary
+Chemical Physics. 2nd ed., World Scientific Publishing Company.
+[6] Crouzeix, M., 1980. Une méthode multipas implicite-explicite pour
+l’approximation des équations d’évolution paraboliques. Numerische Mathematik 35, 257–276.
+[7] Diethelm, K., Freed, A., 2006. An efficient algorithm for the evaluation
+of convolution integrals. Computers & Mathematics with Applications 51,
+51–72.
+[8] Doi, M., 1996. An Introduction to Polymer Physics. Clarendon Press.
+[9] Fogelson, A.L., Neeves, K.B., 2015. Fluid Mechanics of Blood Clot Formation. Annual Review of Fluid Mechanics 47, 377–403.
+[10] Goychuk, I., Kharchenko, V.O., Metzler, R., 2017. Persistent Sinai-type
+diffusion in Gaussian random potentials with decaying spatial correlations.
+Physical Review E 96, 052134.
+[11] Goychuk, I., Pöschel, T., 2020. Hydrodynamic memory can boost enormously
+driven nonlinear diffusion and transport. Physical Review E 102, 012139.
+[12] Goychuk, I., Pöschel, T., 2021. Fingerprints of viscoelastic subdiffusion in
+random environments: Revisiting some experimental data and their interpretations. Physical Review E 104, 034125.
+
+26
+
+[13] Jannelli, A., 2022. Adaptive numerical solutions of time-fractional advection–diffusion–reaction equations. Communications in Nonlinear Science
+and Numerical Simulation 105, 106073.
+[14] Khalid, M., Chaudhary, I., Garg, P., Shankar, V., Subramanian, G., 2021.
+The centre-mode instability of viscoelastic plane Poiseuille flow. Journal of
+Fluid Mechanics 915, A43.
+[15] Kirkwood, J.G., 1954. The general theory of irreversible processes in solutions of macromolecules. Journal of Polymer Science 12, 1–14.
+[16] Kou, S.C., Xie, X.S., 2004. Generalized Langevin Equation with Fractional
+Gaussian Noise: Subdiffusion within a Single Protein Molecule. Physical
+Review Letters 93, 180603.
+[17] Kremer, K., Grest, G.S., 1990. Dynamics of entangled linear polymer melts:
+A molecular-dynamics simulation. The Journal of Chemical Physics 92,
+5057–5086.
+[18] Lai, S.K., Wang, Y.Y., Cone, R., Wirtz, D., Hanes, J., 2009. Altering Mucus
+Rheology to “Solidify” Human Mucus at the Nanoscale. PLoS ONE 4,
+e4294.
+[19] Levine, A.J., Lubensky, T.C., 2001. Response function of a sphere in a
+viscoelastic two-fluid medium. Physical Review E 63, 041510.
+[20] Murio, D.A., 2008. Implicit finite difference approximation for time fractional diffusion equations. Computers & Mathematics with Applications 56,
+1138–1145.
+[21] Nandagopalan, P., John, J., Baek, S.W., Miglani, A., Ardhianto, K., 2018.
+Shear-flow rheology and viscoelastic instabilities of ethanol gel fuels. Experimental Thermal and Fluid Science 99, 181–189.
+[22] Podlubny, I., 1999. Fractional differential equations: an introduction to
+fractional derivatives, fractional differential equations, to methods of their
+solution and some of their applications. Number v. 198 in Mathematics in
+science and engineering, Academic Press, San Diego.
+[23] Riley, J.J., Gad-el Hak, M., Metcalfe, R.W., 1988. Complaint Coatings.
+Annual Review of Fluid Mechanics 20, 393–420.
+27
+
+[24] Rouse, P.E., 1953. A Theory of the Linear Viscoelastic Properties of Dilute
+Solutions of Coiling Polymers. The Journal of Chemical Physics 21, 1272–
+1280.
+[25] Rubenstein, M., Colby, R.H., 2003. Polymer Physics. Oxford Univ. Press,
+New York.
+[26] Sengupta, T.K., Bhumkar, Y.G., Rajpoot, M.K., Suman, V., Saurabh, S.,
+2012. Spurious waves in discrete computation of wave phenomena and flow
+problems. Applied Mathematics and Computation 218, 9035–9065.
+[27] Sengupta, T.K., Sircar, S.K., Dipankar, A., 2006. High Accuracy Schemes
+for DNS and Acoustics. Journal of Scientific Computing 26, 151–193.
+[28] Singh, S., Bansal, D., Kaur, G., Sircar, S., 2020. Implicit-explicit-compact
+methods for advection diffusion reaction equations. Computers & Fluids 212,
+104709.
+[29] Sircar, S., Aisenbrey, E., Bryant, S., Bortz, D., 2015. Determining equilibrium osmolarity in poly(ethylene glycol)/chondrotin sulfate gels mimicking
+articular cartilage. Journal of Theoretical Biology 364, 397–406.
+[30] Sircar, S., Bansal, D., 2019. Spatiotemporal linear stability of viscoelastic
+free shear flows: Dilute regime. Physics of Fluids 31, 084104.
+[31] Sircar, S., Roberts, A.J., 2016. Surface deformation and shear flow in ligand
+mediated cell adhesion. Journal of Mathematical Biology 73, 1035–1052.
+[32] Sircar, S., Wang, Q., 2010. Transient rheological responses in sheared biaxial
+liquid crystals. Rheologica Acta 49, 699–717.
+[33] Visbal, M.R., Gaitonde, D.V., 2002. On the Use of Higher-Order FiniteDifference Schemes on Curvilinear and Deforming Meshes. Journal of
+Computational Physics 181, 155–185.
+[34] Zarabadi, M., 2019. Development of a Robust Microfluidic Electrochemical
+Cell for Biofilm Study in Controlled Hydrodynamic Conditions. Ph.D. thesis.
+Univ. Laval,.
+[35] Zarabadi, M.P., Charette, S.J., Greener, J., 2018. Flow-Based Deacidification
+of Geobacter sulfurreducens Biofilms Depends on Nutrient Conditions: a
+Microfluidic Bioelectrochemical Study. ChemElectroChem 5, 3645–3653.
+28
+
+[36] Zimm, B.H., 1956. Dynamics of Polymer Molecules in Dilute Solution:
+Viscoelasticity, Flow Birefringence and Dielectric Loss. The Journal of
+Chemical Physics 24, 269–278.
+
+29
+
+

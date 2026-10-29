@@ -1,0 +1,3277 @@
+{
+  "schema": "pct-semantic-answer-v3",
+  "question": "Κίμωλος\nResearch scope: Ποιο νησί λέγεται «Argentiere» στους παλιούς ταξιδιώτες και τι ρόλο είχε για τους κουρσάρους;",
+  "request_kind": "place",
+  "evidence_hash": "487d6f6f0895da60213c92d94f4e70c326df0fc61adb00ced4a0a6ec76513f59",
+  "status": "RUNNING_SEMANTIC_ANALYSIS",
+  "generated_utc": "2026-10-29T08:10:44.532127+00:00",
+  "model_configuration": {
+    "schema": "pct-llm-routing-summary-v1",
+    "prompt_version": "2026-10-20.1",
+    "routes": {
+      "planner": {
+        "role": "planner",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "fast",
+        "temperature": 0.1,
+        "max_output_tokens": 1800,
+        "fallback": "deterministic_planner",
+        "requires_evidence": false,
+        "prompt_version": "2026-10-20.1"
+      },
+      "query_expander": {
+        "role": "query_expander",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "fast",
+        "temperature": 0.2,
+        "max_output_tokens": 1600,
+        "fallback": "deterministic_query_expander",
+        "requires_evidence": false,
+        "prompt_version": "2026-10-20.1"
+      },
+      "evidence_extractor": {
+        "role": "evidence_extractor",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "precise",
+        "temperature": 0.0,
+        "max_output_tokens": 2600,
+        "fallback": "source_first_extractor",
+        "requires_evidence": true,
+        "prompt_version": "2026-10-20.1"
+      },
+      "synthesis": {
+        "role": "synthesis",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "reasoning",
+        "temperature": 0.1,
+        "max_output_tokens": 4200,
+        "fallback": "source_first_report",
+        "requires_evidence": true,
+        "prompt_version": "2026-10-20.1"
+      },
+      "adversarial_reviewer": {
+        "role": "adversarial_reviewer",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "reasoning",
+        "temperature": 0.1,
+        "max_output_tokens": 3200,
+        "fallback": "deterministic_gap_review",
+        "requires_evidence": true,
+        "prompt_version": "2026-10-20.1"
+      },
+      "replanner": {
+        "role": "replanner",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "reasoning",
+        "temperature": 0.1,
+        "max_output_tokens": 2200,
+        "fallback": "registered_route_replan",
+        "requires_evidence": false,
+        "prompt_version": "2026-10-20.1"
+      }
+    },
+    "verified_promotion_allowed": false
+  },
+  "configuration": {
+    "configured": true,
+    "missing": []
+  },
+  "model_used": true,
+  "claims": [
+    {
+      "claim_id": "c-16ac45810c2c27fdf14c",
+      "statement": "The consulted source reports that Kimolos Island is mentioned as «Argentara» by medieval cartographers.",
+      "kind": "source_statement",
+      "passage_kind": "NARRATIVE_EVIDENCE",
+      "evidence_id": "e-b8fa0da4461cbb7c44e8",
+      "quote": "  IX, \nhg.  6)  in  die  zwei  Inseln  «Quimäno“  und  «Argentara“  auf- \ngelöst.",
+      "quote_offset_in_excerpt": 510,
+      "actors": [],
+      "places": [
+        "Argentara"
+      ],
+      "dates": [],
+      "source_occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/dieinselgruppevo00ehre",
+          "title": "Die Inselgruppe von Milos [microform]. Versuch einer geologisch-geographischen Beschreibung der Eilande Milos, Kimolos, Polivos und Erimomilos auf grund eigener Anschauung",
+          "source_bibliography": {
+            "creator": "Ehrenburg, Karl",
+            "date": null,
+            "source_type": null,
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "travellers/library_acquisition/dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+          "finding_id": "finding-af83dd2cb8ab934d4421",
+          "locator": {
+            "url": "https://archive.org/details/dieinselgruppevo00ehre",
+            "source_file": "dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+            "start_char": 11654,
+            "end_char": 11735,
+            "start_line": 489,
+            "end_line": 491,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false,
+            "offset_unit": "UNICODE_CODE_POINTS",
+            "span_semantics": "EXACT_QUOTE"
+          },
+          "source_text_sha256": "05dc1c2f0ab3e1e1f3781d09c5d0f3ee428fbf5428a8f0be27e96210e64acca0",
+          "page_boundaries": [],
+          "reported_archival_reference": null,
+          "context_locator": {
+            "url": "https://archive.org/details/dieinselgruppevo00ehre",
+            "source_file": "dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+            "start_char": 11144,
+            "end_char": 11813,
+            "start_line": 482,
+            "end_line": 492,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false
+          }
+        },
+        {
+          "lane": "venetian",
+          "url": "https://archive.org/details/dieinselgruppevo00ehre",
+          "title": "Die Inselgruppe von Milos [microform]. Versuch einer geologisch-geographischen Beschreibung der Eilande Milos, Kimolos, Polivos und Erimomilos auf grund eigener Anschauung",
+          "source_bibliography": {
+            "creator": "Ehrenburg, Karl",
+            "date": [
+              "1889-01-01T00:00:00Z"
+            ],
+            "source_type": null,
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "venetian/library_acquisition/dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+          "finding_id": "finding-af83dd2cb8ab934d4421",
+          "locator": {
+            "url": "https://archive.org/details/dieinselgruppevo00ehre",
+            "source_file": "dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+            "start_char": 11654,
+            "end_char": 11735,
+            "start_line": 489,
+            "end_line": 491,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false,
+            "offset_unit": "UNICODE_CODE_POINTS",
+            "span_semantics": "EXACT_QUOTE"
+          },
+          "source_text_sha256": "05dc1c2f0ab3e1e1f3781d09c5d0f3ee428fbf5428a8f0be27e96210e64acca0",
+          "page_boundaries": [],
+          "reported_archival_reference": null,
+          "context_locator": {
+            "url": "https://archive.org/details/dieinselgruppevo00ehre",
+            "source_file": "dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+            "start_char": 11144,
+            "end_char": 11813,
+            "start_line": 482,
+            "end_line": 492,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false
+          }
+        }
+      ],
+      "entity_surface_corrections": [],
+      "date_evidence": null,
+      "date_basis": "EXPLICIT_PARAGRAPH",
+      "uncertainty": [
+        "ACTION_UNRESOLVED"
+      ],
+      "source_uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "model_analysis": true,
+      "verified": false,
+      "source_classification": "UNVERIFIED",
+      "model_proposed_source_classification": "UNVERIFIED",
+      "classification_status": "MODEL_PROVISIONAL_REQUIRES_SOURCE_CRITICISM",
+      "usage_type": "UNRESOLVED",
+      "assertion_class": "SOURCE_STATEMENT",
+      "verification_status": "UNVERIFIED"
+    },
+    {
+      "claim_id": "c-58dfb9218298836b3cbd",
+      "statement": "The consulted source reports that Kimolos Island was referred to as «Argentara» in the 1318 map by Petrus Visconti.",
+      "kind": "source_statement",
+      "passage_kind": "NARRATIVE_EVIDENCE",
+      "evidence_id": "e-b8fa0da4461cbb7c44e8",
+      "quote": "  So  ist \nz.  B.  die  Insel  Kimolos  auf  der  Karte  des  Petrus  Visconti \n1318  (Jomard,  Les  monuments  de  la  geographie,  pl.  IX, \nhg.  6)  in  die  zwei  Inseln  «Quimäno“  und  «Argentara“  auf- \ngelöst.",
+      "quote_offset_in_excerpt": 374,
+      "actors": [],
+      "places": [
+        "Argentara"
+      ],
+      "dates": [
+        "1318"
+      ],
+      "source_occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/dieinselgruppevo00ehre",
+          "title": "Die Inselgruppe von Milos [microform]. Versuch einer geologisch-geographischen Beschreibung der Eilande Milos, Kimolos, Polivos und Erimomilos auf grund eigener Anschauung",
+          "source_bibliography": {
+            "creator": "Ehrenburg, Karl",
+            "date": null,
+            "source_type": null,
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "travellers/library_acquisition/dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+          "finding_id": "finding-af83dd2cb8ab934d4421",
+          "locator": {
+            "url": "https://archive.org/details/dieinselgruppevo00ehre",
+            "source_file": "dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+            "start_char": 11518,
+            "end_char": 11735,
+            "start_line": 487,
+            "end_line": 491,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false,
+            "offset_unit": "UNICODE_CODE_POINTS",
+            "span_semantics": "EXACT_QUOTE"
+          },
+          "source_text_sha256": "05dc1c2f0ab3e1e1f3781d09c5d0f3ee428fbf5428a8f0be27e96210e64acca0",
+          "page_boundaries": [],
+          "reported_archival_reference": null,
+          "context_locator": {
+            "url": "https://archive.org/details/dieinselgruppevo00ehre",
+            "source_file": "dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+            "start_char": 11144,
+            "end_char": 11813,
+            "start_line": 482,
+            "end_line": 492,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false
+          }
+        },
+        {
+          "lane": "venetian",
+          "url": "https://archive.org/details/dieinselgruppevo00ehre",
+          "title": "Die Inselgruppe von Milos [microform]. Versuch einer geologisch-geographischen Beschreibung der Eilande Milos, Kimolos, Polivos und Erimomilos auf grund eigener Anschauung",
+          "source_bibliography": {
+            "creator": "Ehrenburg, Karl",
+            "date": [
+              "1889-01-01T00:00:00Z"
+            ],
+            "source_type": null,
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "venetian/library_acquisition/dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+          "finding_id": "finding-af83dd2cb8ab934d4421",
+          "locator": {
+            "url": "https://archive.org/details/dieinselgruppevo00ehre",
+            "source_file": "dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+            "start_char": 11518,
+            "end_char": 11735,
+            "start_line": 487,
+            "end_line": 491,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false,
+            "offset_unit": "UNICODE_CODE_POINTS",
+            "span_semantics": "EXACT_QUOTE"
+          },
+          "source_text_sha256": "05dc1c2f0ab3e1e1f3781d09c5d0f3ee428fbf5428a8f0be27e96210e64acca0",
+          "page_boundaries": [],
+          "reported_archival_reference": null,
+          "context_locator": {
+            "url": "https://archive.org/details/dieinselgruppevo00ehre",
+            "source_file": "dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+            "start_char": 11144,
+            "end_char": 11813,
+            "start_line": 482,
+            "end_line": 492,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false
+          }
+        }
+      ],
+      "entity_surface_corrections": [],
+      "date_evidence": null,
+      "date_basis": "EXPLICIT_PARAGRAPH",
+      "uncertainty": [
+        "ACTION_UNRESOLVED",
+        "ORIGINAL_NOT_INSPECTED"
+      ],
+      "source_uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "model_analysis": true,
+      "verified": false,
+      "source_classification": "UNVERIFIED",
+      "model_proposed_source_classification": "UNVERIFIED",
+      "classification_status": "MODEL_PROVISIONAL_REQUIRES_SOURCE_CRITICISM",
+      "usage_type": "UNRESOLVED",
+      "assertion_class": "SOURCE_STATEMENT",
+      "verification_status": "UNVERIFIED"
+    }
+  ],
+  "answer_sections": [],
+  "coverage": {
+    "original_unique_passages": 398,
+    "unique_passages": 398,
+    "selected_passages": 8,
+    "repeated_occurrences": 56,
+    "deferred": [
+      {
+        "evidence_id": "e-effd1550e468ec69ce4d",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-bd925be2df8d71e24595",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-dfb77f28780745316c83",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-9fd5d52c4bd308a791f6",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-d7612711ae40945c053b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-762831fc7c96401b224a",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-4042858cf554d8b0aef9",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-63de44ac8e2214578eaf",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-9d7d8d3a621e5136b9cd",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-ae13376ce516d2a51c93",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b813b0e614fb65974000",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-cffb3fe79380c985e838",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-72695100f618d4355648",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-426a6e359f5308106251",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-05a584425056ec798a5d",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-13964e8dd624c2b30455",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b6194e0345c19a89daeb",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-c9aa296a2ffa9db4634f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-5bd1746b5c347976b8b1",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-66dcf0198de0c61e5585",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-044870fc0d2e4ea6e9ad",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-a96239d9302c85c7886b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-00f5bcbc5d87893d0018",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-f4519453cd3c8718436d",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-a00c27a2b8356fb73280",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-baa9dc2812f636ecb163",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-88555356e5b69a63425a",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-faffcaf1c570c02c2480",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-98d5d9b570e98cf31ae5",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-c4680894d14a09307965",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-d4fc3b3ecc5c69c9e6b1",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-2ac06e2d92064f197102",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-19383260c842d0cc7ef1",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-d19d12f49e79214f56cc",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-adc5288b7d6f52921f48",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-9fe255fcf6f74910aa15",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-02942bca6e1177d4d81e",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-9628a3593a97a2a02ad3",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-cbe141701b875b93d1bf",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b0375d73528c119a4566",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b41db2709950bc572aba",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-c8bb22722a2864e0293f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-d045077f67b9d4ba6765",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-db9180ebc9a9a047e2ca",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-e3a1814d3b6558d9e411",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-bd430d8c8e8cc4a4737e",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-00708d8932f4a0b2b20b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-34f61c6afe0e37ff3656",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-44253be113e685c584d7",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-98bbf7f42409a6c2cffb",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-6d98951be1cbcc24a0f2",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-3a042be3775c0cec3008",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-3bd8189d023cc42a441f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-fc77e946f445ee02d747",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-f3a25340291a4cf99bea",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-3ed3fc184b8ae5159b6e",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-5c02a741bb9278d3cbfa",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-2489bd4c825e3cb68e2a",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-21a7155ea5152682670c",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-a347025990d8658c118d",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-128938a8815a85cac9df",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-911a826011bbae2329a4",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-9343e2af367002969aa6",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-20a5a9513ac27cd58ab7",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-338b14b402c35d63aecd",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-c025fd0a9f5b22a2283f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-82306ffa2e8a5dba4e00",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-cc25a10d56e431b6f106",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-f79d164ebaa58924ac52",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-21d5269f61f57a4a9676",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-bc84558ebea14ed5cc96",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-3245f8b62262871d9975",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-966eab056e2dd3f16992",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-17d964f8ba858602d7c0",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-a544d2e5718151ffb779",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b19420ee1b29d74840d6",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-feb52922f4bb544c0ed9",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-9b213a862e5b029a7087",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b827a1d7cf7df6ac238a",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-c68b60a98c7712e83311",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-c04b1ee891813b2d25a5",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-e239ac76d428c60bbe13",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-42b8beb0d6bac72fefae",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-ccfc910884581f623b76",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-9cbd64eb75a7cc41c65f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-7658166f84c9855df5c4",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-770230108a507e1fc72d",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-a2d73c486a78e706f66d",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-8c73beafbaeaa695a567",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-f29107633883f0fb53f1",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-6e1914582e6c421cf9db",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-17ec0c6771fb2bf47d5e",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-a4d7f83713c0f74c99b3",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-138cc7cc4cbc0cd23959",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-73b1d5bb10842775f434",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-82e7e4efca41e88c44af",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-93d4d1ab6929eb4f11b0",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-7d9c6f98b79b3112924f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-7a26229ce25bb8523ecf",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-d0c41dbab3c18268a5e0",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-1b5c0fed387a44a7d0ca",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-319317bb0d7fd1275a05",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-f7049fba90ce2c698a4b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-2ce5559fa5b4d72863e3",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-5d8af4db2a3798e0ac59",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-a1cd1b1c3fac87e7ef43",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-f65f5d1b596e522283ed",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b6479e2534a6269d74f7",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-ed940306d667190139ce",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-aa8842bc16c76a4f5fff",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-80caf3e9ff6bb7a843a4",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-d591aed9ada84e7951df",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-4c9ff1dd59ba0dce9c42",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-847a0b971883830dfc42",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-bddf8f69cdd4e4d9bef1",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-f7fc743c65ae49c34296",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-cbc517d2b7285e172a5a",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-bd28f70f99f99c20a881",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-24206e1a70a250e2a895",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-1a6433d3653d24662f8e",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-db7b92b5b574bb094bdc",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-f32ad869525798239ad4",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-2f2eb75a784c45ef0d56",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-494275f6eafbf1e92bbe",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-3cc246ccb36955cc9f12",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-6c79ec13b52ad76da56d",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-3f475282b21e0dbcf733",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-2bb578854d6d75be6b02",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b7b065dcee6bafcdb9fd",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-6e378971503bacca0eaf",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-72b443b8f70d7bdb199c",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-d67f9e8da0dbbd771fae",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-367230cbb516c2a4fc4d",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-38fcb958fd404e27d32a",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-9ef761c84bf7ec34e436",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-3c3f762357c15441f5ab",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-8f717e402d6e3f4c275f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-0e9f999b825a7d7ab197",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-966c74a8256936482ffb",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-307ca69aefb96a04e14b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-8aaeb31ce724f5088349",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-cb5e542616c4b0c1de02",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-613825123f2086219b33",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-96993020d1c494fdaf7f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-73175c60d371efa810b6",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-0bcce1ba890a50f5e5db",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-d6f1fdbcbde1bcff9079",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-920d756d59f478a56067",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-c577dd719dee2ee51ef8",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-9a096ace6f653786c623",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-0907795a219ae9deb898",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-aef545cd967c63c24a62",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-e455c54f679de7a47b1c",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-12c70cba1fd6751e9d1c",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-99e3f55e131480e8a3dc",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-7908f8ccac07efe03686",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-a04661f6ee5049e03fb3",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-1282ac00b475d0f77d27",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-426e984c122be616bd46",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-9dfb51c3423e8c5c564f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-f7263db9afc82a059a1f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-f6bf4c80127f140972ba",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-46c7c2def1ca487e04a3",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-7228e0e85321374b8724",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-997b21f67f727773470b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-68c3aac8b094873b5183",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-3c9c8cd716b749384e1f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-dc885fcb249a9b2e0dee",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-2537926c99b4a695d369",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-6df409bfd8d5079381e8",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-90f44336fe74d2de8b55",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-310d2545042525e54d91",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-888aee7a42dfef4498b6",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-59793ff3b9674233e424",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-375dd4414cbc98e9923e",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-d4ba9f1d7b18f0176800",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-3701928cee5e42f3bd1f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-57fd94a2808b189326c2",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-daa71dbbe607d5897605",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-20d9fa58c760d567c33f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b89d27e1129e01af4b7b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-4460c25020a7d683ba61",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-487fc78b8a9952606c63",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-0dc26e7f25266e8da7dd",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-5d767d9caefc3fe4ef9a",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-45c686ca9246d3325eef",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-4c1a5165f24fe1a84e9f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-fa3e2a9211d831430043",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-05c145488619806d658b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-d1576d64366b49ef4fd4",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-51d9c42d4f1fafe81c88",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-a24090a9714a5d6db3df",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-c5ff47f5a76977fc3454",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-993b0c6cface3fa74d10",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-367f6498d24969f5e411",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-625b35828423a7a5406e",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-32b124a6aa7749695336",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-6fcfb01bc9a7b997cabe",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-0130a71ff02b244ff1d4",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-f257f7ae7eaf9f903b52",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-9e5a31aefd48e772946e",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-5ac0db055032bd130864",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-d91e5346d503b3d587d9",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-e76264a86d68d91877b9",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-180bc0992c86639e317b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-ad4de5a5abe6a3e20fd6",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-64e72e5d7625928db61d",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-665edbca50fcc448440e",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-d2e124f0a31797e0cd0f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-bdd34763c7919a7d3a82",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-02401acc37adc86a4c77",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-2cfeaf17c071a0efbe13",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-df79a0fd6fed0edd81a6",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-eb07334ce3a3cc6eedf8",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-62c2a58bd3810eb5815e",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-d435380e22fa1a55d788",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-55a90cc49750ed5344ff",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-5d4ccd4d4f11782f7837",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-f0c43c4294581356ec8b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-cf062e7d37548a07cf3e",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-ece6c7d90b72fb23f76d",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-cb7757b2e6fee66a49ff",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-853deacb71babfc99bd2",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-05331f122ca2c0119bcd",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-4256224dd299a0526da1",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-3f0c3a66d1328070b401",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-3d4146a8af25fc5aa743",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-4cd8c4adb95e5bbfb0d1",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-0e81065e537130c5ae9f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-ff88dd3ec7e755a31b95",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-d3ce305a29faa8712b48",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-0c696fdcd821eb56ec17",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-27e02a49fec8de3fab7b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-554eaee6439fc67c8624",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-98c981e5a3d05f044beb",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-88daad5030efa79a6afa",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-abf7e19496a55f8c889a",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-0dd1d730908bee60d100",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-d8d3b47fe56feeeb6687",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-6ef5f2a17af9b00386c1",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-199e9e260f7b7f7ce3c7",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-ff8ff2efdb39af211078",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-048cae148721a1bf794f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-0c9ed42f35cce693e827",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-11acfb8f4448614655d2",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-08820d757763f1ed530b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-8d23b7cc87b39d71fc8b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-45fc2cd3f14385008c12",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-8f883b19ab32ecd9cf4b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-06b8179ede08f43de938",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-e8df22ed70224dc19d15",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-fd9cc1064143592876ef",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-e153eed806cd0f6ecb8b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-884ce032a4474a1a0dc6",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-f17c5ebc9c8752b376ba",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-a64089f8ff9bc28331a8",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-2e9f7d3c3a84f9bbcffe",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-f2a62a9786bd2a99ac7f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-2c25ac327cf2bd945c19",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-3bdb6a0f6ce53fb07910",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-7897e76f1fa3c7a50667",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-5e6cf9ac20b84913f919",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-fda9b81166190df72ac2",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-4555e05bf174cfbc4849",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-aa58e25c329f41b0a713",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-5457619d8b4dbd92d7a7",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-dcacde0e1d33a92a29c2",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-4bc8c3f167fb0d4d63e9",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-c70959831e23fbfb0c36",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-39d7f2cde862734ae08c",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-2721c992095f840cdb7a",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-9c4470af8aec40bf0949",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-0fc04f80e44588f91e22",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b1100fec37c84ab7109c",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-ea92b64ae308810465cc",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-6824ce25ea9203a423cb",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-69aeaea023aaf33814c5",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-d58555b586e9dadeec17",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-36d33c1873a8330cae4a",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-ff82b29aa0cb459bd242",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-ad27027364ade75b5b93",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-9fe72446e2842fa4b55a",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-ce971483470309549272",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-30928be6841567fa7564",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-9012509fa3a501669586",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-095b7451997997e0df05",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-a97ced48fd0ebf376290",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-864f30abcc60bee82d0f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b9574c25d33316dd1b8c",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-93dd827232b072566f36",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b08da167fbc4637a91fc",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-5a515ea49b669b6c5699",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-deb7b6963c8ab9d01442",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-2a85154fdca92887ffb3",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b6587e133fdce1dd7946",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-d9a93726b36c2f612048",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-224058390f876b26bb3a",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-c37ed22a6eaceb3a032a",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b0b39e883930ae80372d",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-e3cb80f79adca9a0d644",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-0d2a0a28fbf56882103c",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-5c6c549c991f4682c338",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-3a8aff80427accfd602f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-c4f5f5379bcdd3940e45",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-3aef9ae48ca0c5339771",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-4d2cffb0e0f2ad1cdd20",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-27b0069cc8fe5df8bfee",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-2f1cd41be04682aa87bb",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-dd44e45a47c4c6e9d5b1",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-c419c8033abf833858be",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-e2d26b24a5afce1ef37b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-1c3e1d5e727968d050c6",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b8910d865532dd09682c",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-1fdc01c0a997fe51b44b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-681eb9454592e4c6f9d7",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-710bc11f33c8ee93935a",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-5fc006ee2de0b4970729",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-43056c6724ff7515f9b7",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-13102464dc0174fb49df",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-87a4bebb90419bbd6666",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-27d60fb267f2712eb733",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-fe57f77a3ed08622fbd6",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-6809195bf7f564baf5bd",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-5956a23a1768f2ef1d3e",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-3014d4040ecc24d7c341",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-761cd9bcd9b3f576dedc",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-44fba8a964371277fc24",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-666b9bcafa5d5a5d4a67",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-69952ad503aefcc01267",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b35f9f73cb97d2ea43c5",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b99b47895459c4f65457",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-cad88dcf10aac78327f6",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-4cdd40a2ffd30fa4762f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b7003817b83018d0510a",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-0fd41cfa1981cea853da",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-4caeaf2f6666424c4af1",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-399add0eee9e28a25330",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-7cd3e47fbf2be820715b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-548ba1e30095f0558404",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-5decc26f7619a707ba05",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-9a81216113590ff34c56",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-4fcbde2ab515e280e606",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-32dd13e8d8628cb1f5e8",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-ffea387d32db1ba0227e",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-42ee07b0fe8adb335004",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-3621a38a02a4cda7eb64",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-080aa9a18fca3774cc76",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b0af9fd32b281cb48e45",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-58e7ff19f3ee5fad9420",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-a9502a6ca8ed82ab794d",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-a78e2ee61d34da696718",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-c93632d001abf3431bb5",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-75e62810fa384c28e5f1",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-c0c90b80a249c3bb8244",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-6c32af8f1be76315a47b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-f9fc696af54eaf8c13ed",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-5d918e27797388d84d95",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-e976058541844523d1c0",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-fdcd049c1994deec9440",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-a6db194dea89a9901094",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-1be1e9a26395fb5211b9",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-75bfc27e7e43bf0cb06e",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-08a30704a897f121375f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-08eb281f5bd87cb9744e",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-0ae8fbd84a52af401848",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-0c284e7b6014d76264c9",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-41858e4ed1938fe5d80b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-e0bd522380c6c6a90a60",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-851b2cd581206dcadd15",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-44e62c589d4044801c25",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-6d601f3755f6d6de9f1e",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-8ba7ee6767ca6d809015",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-196dbb04c65ef588ff3e",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-5f8c2dc9fedc82af8107",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-fbbe2d565ce4733a9a2a",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-c57108e0f3fac1d546c7",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-a3d0c3ce3beca70d4058",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-145a62a5b2960d8e3415",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-56da70bcabe32bb6d6eb",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-cf88adea5e697c69513f",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-be74d3de115d4375cee8",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-eed33cde4c4b5d411e3a",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-3cdeae517dc615700d03",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-7b1425b4eae199b86cfd",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-aff3acd43b632e5b6620",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-6bfb8f266964af0532cb",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-35a7e890cefda8dc1bb7",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-8ed7a057f9269c6eb7e8",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-b1213122dd0c32386f7b",
+        "reason": "MODEL_CALL_BUDGET"
+      },
+      {
+        "evidence_id": "e-23390327c378d9504d84",
+        "reason": "MODEL_CALL_BUDGET"
+      }
+    ],
+    "excluded": [
+      {
+        "finding_id": "finding-34a98b67ff06d2d85433",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-1715b7e676a438e411cf",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-c5e7fe7a743daf7952c7",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-77397b1923240a178155",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-cd906419b416708bf28d",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-50d1de49cddadef7aaed",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-c94ad1a0231a3c2f5fab",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-1161a010eda4102e26a0",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-2beb804cb4896cf77b6d",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-55002df725860c347166",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-a00b223d929b7186ef50",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-55e634ddb618fa8d48d0",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-a11ff4a07c0560bb8539",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-4ce8a64e70a289434032",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-894a7486cfa1a1cdcbee",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-f4fb2ee86ec644299471",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-f0236e6ecf45e0147664",
+        "reason": "UNSUITABLE_FOR_AUTOMATIC_SYNTHESIS"
+      },
+      {
+        "finding_id": "finding-d2aa7b32e50f9880e4db",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-c3f49690cbbc54746b1f",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-1135e9731caa8042d09e",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-3274a66237f8a0e9b67a",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-36df80b6c0e4c5ec528c",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-d66f070813a6608e8973",
+        "reason": "UNSUITABLE_FOR_AUTOMATIC_SYNTHESIS"
+      },
+      {
+        "finding_id": "finding-ecd365af47294546c0dd",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-ea757128158e6e7d30fc",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-b31090363aa9f237739d",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-2dffe572a689c97c46d8",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-da1701e8ef715236c36a",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-306629c23cdff8bd6e20",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-2134ff318daaf531c88b",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-ba3b98556c7dbe3043d4",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-897615d85ef2a63a803f",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-ac59b4215a19ab034963",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-4510b20fe42eb90c2c64",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-42b460558bd141b1aca8",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-e11e9930312c32396b45",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-b025ac3f5e4aaffed15c",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-f72c9d9d2abebf8cbd9d",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-151191de542db4f2d279",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-c5f19ef36aa1743214bd",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-e2a7070582a71b91bbbd",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-1cbb0e97ae937d79cb9c",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-5640373c30db2988c25a",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-b62e155dff7e35ba5054",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-4bd3b572c8740435a6e6",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-7aab8543989ad77b1e4b",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-ce0b61e9c0fe79c4ce29",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-1473476555f891edb371",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-f963401b0890de928f0e",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-a2111ce1ee404d4b9ffc",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-cd7a9f60addeda8e298a",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-5f7495cf97045485bb75",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-226c6f4a28a87c3076ae",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-f2343cfebbaab1c0905c",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-f1a66e0e85c7bcefcd5a",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-27e8fdeaed365d3e27b8",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-1135e9731caa8042d09e",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-3274a66237f8a0e9b67a",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-36df80b6c0e4c5ec528c",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-d66f070813a6608e8973",
+        "reason": "UNSUITABLE_FOR_AUTOMATIC_SYNTHESIS"
+      },
+      {
+        "finding_id": "finding-ecd365af47294546c0dd",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      },
+      {
+        "finding_id": "finding-ea757128158e6e7d30fc",
+        "reason": "LATER_NAMESAKE_REQUIRES_IDENTITY_REVIEW"
+      }
+    ],
+    "pass_priority": "NEW_EXTRACTION"
+  },
+  "evidence": [
+    {
+      "evidence_id": "e-dd9e509015f3b1f6de10",
+      "text": "Auf  Kimolos  war  die  Lage  der  antiken  Stadt  ebenfalls \naxü’  der  Westseite,  an  der  Bucht  des  h.  Andreas.  Die  Stelle \nheisst  jetzt  Elliniko  ( F//.kr^viy.o).  Der  heutige  Ort  befindet \nsich  auf  der  Südostseite.  Nach  Sonnini  (II,  S.  25)  wurde \ner  1646  von  Flüchtlingen  aus  Siphnos  gegründet,  vielleicht \nan  der  Baustelle  des  nach  Thevenot  (I,  S.  342)  von  Cor- \nsaren  1638  verbrannten  Dorfes.  Er  bildete  noch  zu  Fied- \nlers Zeiten  ein  Rechteck  mit  einer  Kirche  in  der  Mitte.",
+      "similar_text_fingerprint": "5db0a7a4bd0ba9130aee6cf08a7b13ad28996300625fb712e9fe0e9abcbdcb3b",
+      "years_in_scope": [
+        1638,
+        1646
+      ],
+      "date_basis": "EXPLICIT_PARAGRAPH",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": "Ehrenburg, Karl",
+        "date": null,
+        "source_type": null,
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "MULTIPLE_DATES_REQUIRE_CLAUSE_REVIEW",
+        "ACTION_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/dieinselgruppevo00ehre",
+          "title": "Die Inselgruppe von Milos [microform]. Versuch einer geologisch-geographischen Beschreibung der Eilande Milos, Kimolos, Polivos und Erimomilos auf grund eigener Anschauung",
+          "source_bibliography": {
+            "creator": "Ehrenburg, Karl",
+            "date": null,
+            "source_type": null,
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "travellers/library_acquisition/dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+          "finding_id": "finding-b9b0973abd5337b28556",
+          "locator": {
+            "url": "https://archive.org/details/dieinselgruppevo00ehre",
+            "source_file": "dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+            "start_char": 209669,
+            "end_char": 210203,
+            "start_line": 4937,
+            "end_line": 4944,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false
+          },
+          "source_text_sha256": "05dc1c2f0ab3e1e1f3781d09c5d0f3ee428fbf5428a8f0be27e96210e64acca0",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        },
+        {
+          "lane": "venetian",
+          "url": "https://archive.org/details/dieinselgruppevo00ehre",
+          "title": "Die Inselgruppe von Milos [microform]. Versuch einer geologisch-geographischen Beschreibung der Eilande Milos, Kimolos, Polivos und Erimomilos auf grund eigener Anschauung",
+          "source_bibliography": {
+            "creator": "Ehrenburg, Karl",
+            "date": [
+              "1889-01-01T00:00:00Z"
+            ],
+            "source_type": null,
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "venetian/library_acquisition/dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+          "finding_id": "finding-b9b0973abd5337b28556",
+          "locator": {
+            "url": "https://archive.org/details/dieinselgruppevo00ehre",
+            "source_file": "dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+            "start_char": 209669,
+            "end_char": 210203,
+            "start_line": 4937,
+            "end_line": 4944,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false
+          },
+          "source_text_sha256": "05dc1c2f0ab3e1e1f3781d09c5d0f3ee428fbf5428a8f0be27e96210e64acca0",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 1.0,
+        "title_period_hint": true,
+        "in_scope_century_context": false,
+        "direct_use_vocabulary": false,
+        "conjecture_context": false,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-2102e45b71c8e55d98c3",
+      "text": "The town of ARGENTIERA is’ very modern; its confiruction goes no \nfarther back than 1646. <A tradition, preferved among the prefent inha- \nbitants, informs us that it was begun by fome Greek fugitives from the - | \nIfland of Srpnawto, who kept themfelves concealed, for fome time, in \na wood which then covered its fite. Thefe Greeks had brought with \nthem in their flight an image of the Virgin, and they built houfes in \nthe place where the reprefentation of the mother of God had been pleafed \nto fiop with them, and to preferve them from the attacks of their",
+      "similar_text_fingerprint": "550319a1fd35ab96c00385b8609236c8a43f7d468c70d94b9b4a7a084171a0a2",
+      "years_in_scope": [
+        1646
+      ],
+      "date_basis": "EXPLICIT_PARAGRAPH",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": [
+          "Sonnini, C. S. (Charles Sigisbert), 1751-1812"
+        ],
+        "date": [
+          "1801-01-01T00:00:00Z"
+        ],
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/b33088408_0003",
+          "title": "Travels in Greece and Turkey, undertaken by order of Louis XVI. And with the authority of the Ottoman court",
+          "source_bibliography": {
+            "creator": [
+              "Sonnini, C. S. (Charles Sigisbert), 1751-1812"
+            ],
+            "date": [
+              "1801-01-01T00:00:00Z"
+            ],
+            "source_type": "OCR_CONTEXT",
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "travellers/library_acquisition/b33088408_0003_b33088408_0003_djvu.txt",
+          "finding_id": "finding-70cb843f2692b1b25941",
+          "locator": {
+            "url": "https://archive.org/details/b33088408_0003",
+            "source_file": "b33088408_0003_b33088408_0003_djvu.txt",
+            "start_char": 588508,
+            "end_char": 589070,
+            "start_line": 13723,
+            "end_line": 13730,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false
+          },
+          "source_text_sha256": "0562d7682d37434a05f64aee09cb89ec8080506824b1ebc39be31c0dca7d7892",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 1.0,
+        "title_period_hint": true,
+        "in_scope_century_context": false,
+        "direct_use_vocabulary": false,
+        "conjecture_context": false,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-0f8251de4ace16ddf38f",
+      "text": "Die kartographischen Darstellungen von der Tabula \nPeutingeriana bis ins XIII. Jahrhundert zeigen Milos ohne \njede Individualisierung der Gestalt, ja meist an durchaus \nunrichtiger Stelle. Die halbraond- oder hufeisenförmige Ge- \nstalt tritt erst in den Portulanen des XIV. Säkulums auf. \nDoppelnamen veranlassen Doppelsetzung des Objekts. So ist \nz. B. die Insel Kimolos auf der Karte des Petrus Visconti \n1318 (Jomard, Les monuments de la geographie, pl. IX^ \nfig. 6) in die zwei Inseln „Quimano\" und „Argentara* auf- \ngelöst Solche Doppelsetzungen erhalten sich noch bis ins \nXVIII. Jahrhundert.",
+      "similar_text_fingerprint": "44bb74aca9171e2ad14e6348a003b2c20dfe7e8abe86d3ca86318bacad4e0916",
+      "years_in_scope": [
+        1318
+      ],
+      "date_basis": "EXPLICIT_PARAGRAPH",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": [
+          "Karl Ehrenburg"
+        ],
+        "date": [
+          "1889-01-01T00:00:00Z"
+        ],
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/dieinselgruppev00ehregoog",
+          "title": "Die Inselgruppe von Milos: Versuch einer geologisch-geographischen Beschreibung der Eilande ...",
+          "source_bibliography": {
+            "creator": [
+              "Karl Ehrenburg"
+            ],
+            "date": [
+              "1889-01-01T00:00:00Z"
+            ],
+            "source_type": "OCR_CONTEXT",
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "travellers/library_acquisition/dieinselgruppev00ehregoog_dieinselgruppev00ehregoog_djvu.txt",
+          "finding_id": "finding-5cf7178932deda5af7be",
+          "locator": {
+            "url": "https://archive.org/details/dieinselgruppev00ehregoog",
+            "source_file": "dieinselgruppev00ehregoog_dieinselgruppev00ehregoog_djvu.txt",
+            "start_char": 15523,
+            "end_char": 16121,
+            "start_line": 595,
+            "end_line": 605,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false
+          },
+          "source_text_sha256": "3fa57a80b2c109c621ad8190ae68aa0ce88369df95492e732890f1283922b3db",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 1.0,
+        "title_period_hint": true,
+        "in_scope_century_context": false,
+        "direct_use_vocabulary": false,
+        "conjecture_context": false,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-ce1194d9bdbd0e3f6ea7",
+      "text": "FLORA OF KIMOLOS ISLAND 139 \n\n\n\n\n\nTABLE 2. Life forms in the flora of Kimolos Island \n\n\nLife form Total no. of taxa % \n\nPhanerophytes 26 5.96 \nChamaephytes 35 8.03 \nHemicryptophytes 61 13.99 \nTherophytes 246 56.42 \nGeophytes 67 15.37 \nHydrophytes 1 0.23 \nTotal 436 100.00 \n\nEndemism \n\n\nAccording to Tan & Iatrou (2001), 1640 taxa are found in the phytogeographical \nregion of the Kiklades, 157 of which are considered endemics (9.38%) according to \nGeorghiou & Delipetrou (2010). In Kimolos, 30 endemic taxa were found (Table 4), \nmaking up 6.88% of its flora. The number of endemic taxa is low compared to the \ntotal but, taking into consideration the small size of the study area (c.36 km?), its \ngeographic position not close to known areas of high endemism, the unfavourable \nclimate, as well as the intense human pressure present on Kimolos (i.e. chalk quarries), \nthis amount is rather significant. Furthermore, compared to the levels of endemism in \nother parts of the SAVA, yet with larger size than that of the study area, such as \nAegina, Апаћ, the Methana Peninsula, Milos, Nisiros and Santorini (3.04%, 5.99%, \n\n\nTABLE 3. Chorological groups in the flora of Kimolos Island \n\n\nTotal \n\nChorological group No. of taxa % No. of taxa % \n\n1. Widely distributed taxa 72 16.51 \nCosmopolitan 36 8.25 \n\nTropical 5 1.15 \n\nTemperate 19 4.36 \n\nEurasian 5 1.15 \n\nBoreal 2 0.46 \n\nEuropean 3 0.68 \n\nAfrican 2 0.46 \n\n2. Mediterranean taxa 334 76.61 \nMediterranean 23 5.28 \n\nEurymediterranean 96 22.02 \n\nStenomediterranean 111 25.46 \n\nEast Mediterranean 58 13.30 \nMediterranean-Submediterranean 46 10.55 \n\n3. Endemic taxa 30 6.88 \nEndemic 30 6.88 \n\n\nTotal 436 100.00 436 100.00",
+      "similar_text_fingerprint": "e70f9320ae879af03762da57850818bff3e350e8e1bc92a58465bd5c01ba319a",
+      "years_in_scope": [
+        1640,
+        2001,
+        2010
+      ],
+      "date_basis": "EXPLICIT_PARAGRAPH",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": [
+          "Kougioumoutzis, K",
+          "Tiniakou, A",
+          "Georgiou, O",
+          "Georgiadis, T"
+        ],
+        "date": [
+          "2014-01-01T00:00:00Z"
+        ],
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "MULTIPLE_DATES_REQUIRE_CLAUSE_REVIEW",
+        "ACTION_UNRESOLVED",
+        "NAME_FROM_SECTION_HEADING"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/s0960428614000055",
+          "title": "CONTRIBUTION TO THE FLORA OF THE SOUTH AEGEAN VOLCANIC ARC: KIMOLOS ISLAND (KIKLADES, GREECE)",
+          "source_bibliography": {
+            "creator": [
+              "Kougioumoutzis, K",
+              "Tiniakou, A",
+              "Georgiou, O",
+              "Georgiadis, T"
+            ],
+            "date": [
+              "2014-01-01T00:00:00Z"
+            ],
+            "source_type": "OCR_CONTEXT",
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "travellers/library_acquisition/s0960428614000055_s0960428614000055_djvu.txt",
+          "finding_id": "finding-4255f626fa028132e5ae",
+          "locator": {
+            "url": "https://archive.org/details/s0960428614000055",
+            "source_file": "s0960428614000055_s0960428614000055_djvu.txt",
+            "start_char": 9975,
+            "end_char": 11646,
+            "start_line": 227,
+            "end_line": 297,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false
+          },
+          "source_text_sha256": "3921d7a213ef320c89cb8b4ac21f9faab81eb7751cc5812cc6e671e9f1ce8fa7",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 1.0,
+        "title_period_hint": true,
+        "in_scope_century_context": false,
+        "direct_use_vocabulary": false,
+        "conjecture_context": false,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-b8fa0da4461cbb7c44e8",
+      "text": "Die  kartographischen  Darstellungen  von  der  Tabula \nPeutingeriana  bis  ins  XHI.  Jahrhundert  zeigen  Milos  ohne \njede  Individualisierung  der  Gestalt,  ja  meist  an  durchaus \nunrichtiger  Stelle.  Die  halbmond-  oder  hufeisenförmige  Ge- \nstalt tritt  erst  in  den  Portulanen  des  XI\\.  Säkulums  auf. \nDoppelnamen  veranlassen  Doppelsetzung  des  Objekts.  So  ist \nz.  B.  die  Insel  Kimolos  auf  der  Karte  des  Petrus  Visconti \n1318  (Jomard,  Les  monuments  de  la  geographie,  pl.  IX, \nhg.  6)  in  die  zwei  Inseln  «Quimäno“  und  «Argentara“  auf- \ngelöst. Solche  Doppelsetzungen  erhalten  sich  noch  bis  ins \nXVIII.  Jahrhundert.",
+      "similar_text_fingerprint": "de760e7e474802d3d72a6c7705c48dc9969da91bf0526af493c32ad39492d296",
+      "years_in_scope": [
+        1318
+      ],
+      "date_basis": "EXPLICIT_PARAGRAPH",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": "Ehrenburg, Karl",
+        "date": null,
+        "source_type": null,
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/dieinselgruppevo00ehre",
+          "title": "Die Inselgruppe von Milos [microform]. Versuch einer geologisch-geographischen Beschreibung der Eilande Milos, Kimolos, Polivos und Erimomilos auf grund eigener Anschauung",
+          "source_bibliography": {
+            "creator": "Ehrenburg, Karl",
+            "date": null,
+            "source_type": null,
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "travellers/library_acquisition/dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+          "finding_id": "finding-af83dd2cb8ab934d4421",
+          "locator": {
+            "url": "https://archive.org/details/dieinselgruppevo00ehre",
+            "source_file": "dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+            "start_char": 11144,
+            "end_char": 11813,
+            "start_line": 482,
+            "end_line": 492,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false
+          },
+          "source_text_sha256": "05dc1c2f0ab3e1e1f3781d09c5d0f3ee428fbf5428a8f0be27e96210e64acca0",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        },
+        {
+          "lane": "venetian",
+          "url": "https://archive.org/details/dieinselgruppevo00ehre",
+          "title": "Die Inselgruppe von Milos [microform]. Versuch einer geologisch-geographischen Beschreibung der Eilande Milos, Kimolos, Polivos und Erimomilos auf grund eigener Anschauung",
+          "source_bibliography": {
+            "creator": "Ehrenburg, Karl",
+            "date": [
+              "1889-01-01T00:00:00Z"
+            ],
+            "source_type": null,
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "venetian/library_acquisition/dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+          "finding_id": "finding-af83dd2cb8ab934d4421",
+          "locator": {
+            "url": "https://archive.org/details/dieinselgruppevo00ehre",
+            "source_file": "dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+            "start_char": 11144,
+            "end_char": 11813,
+            "start_line": 482,
+            "end_line": 492,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false
+          },
+          "source_text_sha256": "05dc1c2f0ab3e1e1f3781d09c5d0f3ee428fbf5428a8f0be27e96210e64acca0",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 1.0,
+        "title_period_hint": true,
+        "in_scope_century_context": false,
+        "direct_use_vocabulary": false,
+        "conjecture_context": false,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-65cb4d3cab008d875dd9",
+      "text": "Besiedelungsgeschichte.  Die  Lage  der  Hauptansiede- \nlun<^  hat  auf  Milos  mindestens  zwei-,  auf  Kimolos  einmal \n«gewechselt.  Die  alte  Stadt  von  Melos  lag  in  dein  Thale \nKlima  südwestlich  Kastro.  Die  Reisenden  des  17.  .Jahrhun- \nderts, sowie  die  Karten  jener  Zeit  zeigen  als  Hauptort  eine \nStadt  östlich  vom  innersten  Winkel  des  Hafens  in  der  halb- \nkreisförmigen Ebene  an,  wo  jetzt  die  Ruinen  von  Palaea- \nchora  liegen.  Im  .Jahre  1738  ward  sie  durch  ein  Erdbeben \nzerstört,  wie  aus  der  oben  angeführten  Notiz  bei  J.  Schmidt \nerhellt.  Die  Art  des  Untergangs  dieser  Stadt  ist  gänzlich \naus  der  Erinnerung  der  Bewohner  geschwunden.  Man  hört \njetzt  nur  die  abenteuerlichsten  Sagen,  in  denen  neben  vielem \nzauberischem  Beiwerk  besonders  von  einer  ansteckenden",
+      "similar_text_fingerprint": "ae5fa5b2ef0ed31b6903cf645c3142cda1876974601c8c023a075d17e7e19e83",
+      "years_in_scope": [
+        1738
+      ],
+      "date_basis": "EXPLICIT_PARAGRAPH",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": "Ehrenburg, Karl",
+        "date": null,
+        "source_type": null,
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/dieinselgruppevo00ehre",
+          "title": "Die Inselgruppe von Milos [microform]. Versuch einer geologisch-geographischen Beschreibung der Eilande Milos, Kimolos, Polivos und Erimomilos auf grund eigener Anschauung",
+          "source_bibliography": {
+            "creator": "Ehrenburg, Karl",
+            "date": null,
+            "source_type": null,
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "travellers/library_acquisition/dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+          "finding_id": "finding-81c5c87bb389bd14c8f2",
+          "locator": {
+            "url": "https://archive.org/details/dieinselgruppevo00ehre",
+            "source_file": "dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+            "start_char": 201325,
+            "end_char": 202175,
+            "start_line": 4746,
+            "end_line": 4758,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false
+          },
+          "source_text_sha256": "05dc1c2f0ab3e1e1f3781d09c5d0f3ee428fbf5428a8f0be27e96210e64acca0",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        },
+        {
+          "lane": "venetian",
+          "url": "https://archive.org/details/dieinselgruppevo00ehre",
+          "title": "Die Inselgruppe von Milos [microform]. Versuch einer geologisch-geographischen Beschreibung der Eilande Milos, Kimolos, Polivos und Erimomilos auf grund eigener Anschauung",
+          "source_bibliography": {
+            "creator": "Ehrenburg, Karl",
+            "date": [
+              "1889-01-01T00:00:00Z"
+            ],
+            "source_type": null,
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "venetian/library_acquisition/dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+          "finding_id": "finding-81c5c87bb389bd14c8f2",
+          "locator": {
+            "url": "https://archive.org/details/dieinselgruppevo00ehre",
+            "source_file": "dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+            "start_char": 201325,
+            "end_char": 202175,
+            "start_line": 4746,
+            "end_line": 4758,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false
+          },
+          "source_text_sha256": "05dc1c2f0ab3e1e1f3781d09c5d0f3ee428fbf5428a8f0be27e96210e64acca0",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 1.0,
+        "title_period_hint": true,
+        "in_scope_century_context": false,
+        "direct_use_vocabulary": false,
+        "conjecture_context": false,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-3babdae95c59f2817ff9",
+      "text": "Oeschichtliches. Die seltenen Erwähnungen unserer \nEilande geben uns nur dürftige Aufschlüsse über deren Ge- \nschichte.^) Nachdem die erste phönikische Ansiedelung durch \ndorische Kolonisation verdrängt war, bildet das bedeutendste \nEreignis die 416 v. Chr. erfolgte Eroberung von Melos durch \ndie Athener. Die Bedeutung der Insel wurde dadurch für \nimmer vernichtet. Fortan teilte sie die Geschicke ihrer Nach- \nbarn, kam unter die Herrschaft der Makedonier, Römer und \nByzantiner, dann nach Aufrichtung des lateinischen Kaiser- \ntums 1207 unter die venetianischen Herzöge von Naxos, bil- \ndete 1341 — 1383 ein selbständiges Herzogtum unter Marco \nSanudo, Francesco I, Crispo, der es dann wieder mit \nNaxos vereinigte. 1537 unterlag Milos den Türken und \nblieb unter deren Botmässigkeit bis zur Aufrichtung des \nneuen Königreichs Griechenland. Über Kimolos ist noch \nweniger zu sagen. Im Altertum scheint es ein von Melos \nunabhängiges Gemeinwesen gebildet zu haben. Später teilte \nes wie Melos die Geschicke der übrigen Gykladen.",
+      "similar_text_fingerprint": "cb0e4b42540ce2ff5cfa6e19e42a1ef8dcb08d6351cef315458b194e2d8df02c",
+      "years_in_scope": [
+        1207,
+        1341,
+        1383,
+        1537
+      ],
+      "date_basis": "EXPLICIT_PARAGRAPH",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": [
+          "Karl Ehrenburg"
+        ],
+        "date": [
+          "1889-01-01T00:00:00Z"
+        ],
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "MULTIPLE_DATES_REQUIRE_CLAUSE_REVIEW",
+        "ACTION_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/dieinselgruppev00ehregoog",
+          "title": "Die Inselgruppe von Milos: Versuch einer geologisch-geographischen Beschreibung der Eilande ...",
+          "source_bibliography": {
+            "creator": [
+              "Karl Ehrenburg"
+            ],
+            "date": [
+              "1889-01-01T00:00:00Z"
+            ],
+            "source_type": "OCR_CONTEXT",
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "travellers/library_acquisition/dieinselgruppev00ehregoog_dieinselgruppev00ehregoog_djvu.txt",
+          "finding_id": "finding-577c90a076cc8a47ebd6",
+          "locator": {
+            "url": "https://archive.org/details/dieinselgruppev00ehregoog",
+            "source_file": "dieinselgruppev00ehregoog_dieinselgruppev00ehregoog_djvu.txt",
+            "start_char": 189843,
+            "end_char": 190874,
+            "start_line": 4844,
+            "end_line": 4861,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false
+          },
+          "source_text_sha256": "3fa57a80b2c109c621ad8190ae68aa0ce88369df95492e732890f1283922b3db",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 1.0,
+        "title_period_hint": true,
+        "in_scope_century_context": false,
+        "direct_use_vocabulary": false,
+        "conjecture_context": false,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-d3e8c1624a86ae0de125",
+      "text": "Geschichtliches.  Die  seltenen  Erwähnungen  unserer \nEilande  geben  uns  nur  dürftige  Aufschlüsse  über  deren  Ge- \nschichte.^) Nachdem  die  erste  phönikische  Ansiedelung  durch \ndorische  Kolonisation  verdrängt  war,  bildet  das  bedeutendste \nEreignis  die  416  v.  Chr.  erfolgte  Eroberung  von  Melos  durch \ndie  Athener.  Die  Bedeutung  der  Insel  wurde  dadurch  für \nimmer  vernichtet.  Fortan  teilte  sie  die  Geschicke  ihrer  Nach- \nbarn, kam  unter  die  Herrschaft  der  Alakedonier,  Römer  und \nByzantiner,  dann  nach  Aufrichtung  des  lateinischen  Kaisei- \ntums  1207  unter  die  venetianischen  Herzoge  von  Naxos,  bil- \ndete 1341 — 1383  ein  selbständiges  Herzogtum  unter  Marco \nSanudo,  Francesco  I.  Crispo,  der  es  dann  wieder  mit \nNaxos  vereinigte.  1537  unterlag  Alilos  den  Türken  und \nblieb  unter  deren  Botmässigkeit  bis  zur  Aufrichtung  des \nneuen  Königreichs  Griechenland.  Über  Kimolos  ist  noch \nweniger  zu  sagen.  Ini  Altertum  sclieint  es  ein  \\on  Alelos \nunabhängiges  Gemeinwesen  gebildet  zu  haben.  Später  teilte \nes  wie  Melos  die  Geschicke  der  übrigen  Cykladen.",
+      "similar_text_fingerprint": "638393cc8271d068f026cddbfff35fed1d679a3c0939013e8826a8e3f3728c77",
+      "years_in_scope": [
+        1207,
+        1341,
+        1383,
+        1537
+      ],
+      "date_basis": "EXPLICIT_PARAGRAPH",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": "Ehrenburg, Karl",
+        "date": null,
+        "source_type": null,
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "MULTIPLE_DATES_REQUIRE_CLAUSE_REVIEW",
+        "ACTION_UNRESOLVED"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/dieinselgruppevo00ehre",
+          "title": "Die Inselgruppe von Milos [microform]. Versuch einer geologisch-geographischen Beschreibung der Eilande Milos, Kimolos, Polivos und Erimomilos auf grund eigener Anschauung",
+          "source_bibliography": {
+            "creator": "Ehrenburg, Karl",
+            "date": null,
+            "source_type": null,
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "travellers/library_acquisition/dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+          "finding_id": "finding-b5621aa5c699dffb5dc4",
+          "locator": {
+            "url": "https://archive.org/details/dieinselgruppevo00ehre",
+            "source_file": "dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+            "start_char": 199185,
+            "end_char": 200345,
+            "start_line": 4704,
+            "end_line": 4721,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false
+          },
+          "source_text_sha256": "05dc1c2f0ab3e1e1f3781d09c5d0f3ee428fbf5428a8f0be27e96210e64acca0",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        },
+        {
+          "lane": "venetian",
+          "url": "https://archive.org/details/dieinselgruppevo00ehre",
+          "title": "Die Inselgruppe von Milos [microform]. Versuch einer geologisch-geographischen Beschreibung der Eilande Milos, Kimolos, Polivos und Erimomilos auf grund eigener Anschauung",
+          "source_bibliography": {
+            "creator": "Ehrenburg, Karl",
+            "date": [
+              "1889-01-01T00:00:00Z"
+            ],
+            "source_type": null,
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "venetian/library_acquisition/dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+          "finding_id": "finding-b5621aa5c699dffb5dc4",
+          "locator": {
+            "url": "https://archive.org/details/dieinselgruppevo00ehre",
+            "source_file": "dieinselgruppevo00ehre_dieinselgruppevo00ehre_djvu.txt",
+            "start_char": 199185,
+            "end_char": 200345,
+            "start_line": 4704,
+            "end_line": 4721,
+            "printed_page": null,
+            "scan_indexes_0_based": [],
+            "pdf_file": null,
+            "pdf_reference_base": "LANE_ROOT",
+            "original_inspected": false
+          },
+          "source_text_sha256": "05dc1c2f0ab3e1e1f3781d09c5d0f3ee428fbf5428a8f0be27e96210e64acca0",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 1.0,
+        "title_period_hint": true,
+        "in_scope_century_context": false,
+        "direct_use_vocabulary": false,
+        "conjecture_context": false,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    }
+  ],
+  "calls": [
+    {
+      "role": "evidence_extractor",
+      "status": "COMPLETED",
+      "requested_model": "Qwen/Qwen3-8B-GGUF",
+      "started_utc": "2026-10-29T08:10:44.541676+00:00",
+      "prompt_sha256": "8779e6308750036e3ed1d9ef46beda8c9af248e9d9b1302fe3e93bbdf6459e0d",
+      "response_schema_sha256": "3c3cf4b44d1519f1f1ff70a11d444bfb5220c73cec718ce07a243f118a6ea53f",
+      "prompt_file": "model_responses/1-evidence_extractor.prompt.txt",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF",
+      "error": null,
+      "model_identity": {
+        "repository": "Qwen/Qwen3-8B-GGUF",
+        "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+        "filename": "Qwen3-8B-Q4_K_M.gguf",
+        "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+        "files": [
+          {
+            "filename": "Qwen3-8B-Q4_K_M.gguf",
+            "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+            "lfs_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785"
+          }
+        ],
+        "provider": "local_llama_cpp",
+        "external_api_key_required": false,
+        "model_url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/tree/7c41481f57cb95916b40956ab2f0b139b296d974",
+        "file": "Qwen3-8B-Q4_K_M.gguf"
+      },
+      "usage": {
+        "prompt_tokens": 2356,
+        "completion_tokens": 274,
+        "total_tokens": 2630
+      },
+      "wire_prompt_sha256": "86c1daf7952f62f80a61cf9d1797d1476082f2092719c3fc4602f9ef8a20b092",
+      "chat_mode": "CHATML_NO_THINK",
+      "finish_reason": "stop",
+      "elapsed_seconds": 135.08,
+      "response_sha256": "e046c21c7357d373d7b8eb61ad151d80bece2d026c22209d48c79a5522520f14",
+      "prompt_version": "2026-10-20.1",
+      "completed_utc": "2026-10-29T08:13:08.159674+00:00"
+    },
+    {
+      "role": "evidence_extractor",
+      "status": "COMPLETED",
+      "requested_model": "Qwen/Qwen3-8B-GGUF",
+      "started_utc": "2026-10-29T08:13:08.163366+00:00",
+      "prompt_sha256": "1cb8a4de533c62d7b8026f8794393a9ed1a7eea58559b26e11aaf09e94c33812",
+      "response_schema_sha256": "3c3cf4b44d1519f1f1ff70a11d444bfb5220c73cec718ce07a243f118a6ea53f",
+      "prompt_file": "model_responses/2-evidence_extractor.prompt.txt",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF",
+      "error": null,
+      "model_identity": {
+        "repository": "Qwen/Qwen3-8B-GGUF",
+        "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+        "filename": "Qwen3-8B-Q4_K_M.gguf",
+        "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+        "files": [
+          {
+            "filename": "Qwen3-8B-Q4_K_M.gguf",
+            "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+            "lfs_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785"
+          }
+        ],
+        "provider": "local_llama_cpp",
+        "external_api_key_required": false,
+        "model_url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/tree/7c41481f57cb95916b40956ab2f0b139b296d974",
+        "file": "Qwen3-8B-Q4_K_M.gguf"
+      },
+      "usage": {
+        "prompt_tokens": 3156,
+        "completion_tokens": 327,
+        "total_tokens": 3483
+      },
+      "wire_prompt_sha256": "d8d1a6eefadbd2b63cd8f146cc37fdaaceb89d9cfcc2dbc40017485f525210e4",
+      "chat_mode": "CHATML_NO_THINK",
+      "finish_reason": "stop",
+      "elapsed_seconds": 88.75,
+      "response_sha256": "b0e31383b10a22c356506d368fed5373d376650f05f32d6fac6580c7df566a83",
+      "prompt_version": "2026-10-20.1",
+      "completed_utc": "2026-10-29T08:14:36.916392+00:00"
+    },
+    {
+      "role": "evidence_extractor",
+      "status": "COMPLETED",
+      "requested_model": "Qwen/Qwen3-8B-GGUF",
+      "started_utc": "2026-10-29T08:14:36.920469+00:00",
+      "prompt_sha256": "a599e9f5eb4148488a44df718a4d42f0bad1b0c296e9526815b703bd2a3169c7",
+      "response_schema_sha256": "e11a1543f6d9c5d14edb6eb428d090ff96f96b40db2d8fa2441bc8e297a4ebbd",
+      "prompt_file": "model_responses/3-evidence_extractor.prompt.txt",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF",
+      "error": null,
+      "model_identity": {
+        "repository": "Qwen/Qwen3-8B-GGUF",
+        "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+        "filename": "Qwen3-8B-Q4_K_M.gguf",
+        "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+        "files": [
+          {
+            "filename": "Qwen3-8B-Q4_K_M.gguf",
+            "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+            "lfs_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785"
+          }
+        ],
+        "provider": "local_llama_cpp",
+        "external_api_key_required": false,
+        "model_url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/tree/7c41481f57cb95916b40956ab2f0b139b296d974",
+        "file": "Qwen3-8B-Q4_K_M.gguf"
+      },
+      "usage": {
+        "prompt_tokens": 2575,
+        "completion_tokens": 238,
+        "total_tokens": 2813
+      },
+      "wire_prompt_sha256": "04789345795ce826ba086d2f941d9025b558b94de169eb660207c0091971c322",
+      "chat_mode": "CHATML_NO_THINK",
+      "finish_reason": "stop",
+      "elapsed_seconds": 120.99,
+      "response_sha256": "a2a3e4f821aeb8f3982ca4390e5f2f5cc7ed504f89df4be7d653bf59d7e1b367",
+      "prompt_version": "2026-10-20.1",
+      "completed_utc": "2026-10-29T08:16:37.917816+00:00"
+    },
+    {
+      "role": "evidence_extractor",
+      "status": "COMPLETED",
+      "requested_model": "Qwen/Qwen3-8B-GGUF",
+      "started_utc": "2026-10-29T08:16:37.922841+00:00",
+      "prompt_sha256": "44b3b8edc5066304dd6fd8df0193df1baa604d7e084be89513e4a2a9af98599d",
+      "response_schema_sha256": "0874b4b3be6e4ee3109e57add1151a1f369b24db5577032e86669336db53ddf5",
+      "prompt_file": "model_responses/4-evidence_extractor.prompt.txt",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF",
+      "error": null,
+      "model_identity": {
+        "repository": "Qwen/Qwen3-8B-GGUF",
+        "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+        "filename": "Qwen3-8B-Q4_K_M.gguf",
+        "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+        "files": [
+          {
+            "filename": "Qwen3-8B-Q4_K_M.gguf",
+            "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+            "lfs_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785"
+          }
+        ],
+        "provider": "local_llama_cpp",
+        "external_api_key_required": false,
+        "model_url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/tree/7c41481f57cb95916b40956ab2f0b139b296d974",
+        "file": "Qwen3-8B-Q4_K_M.gguf"
+      },
+      "usage": {
+        "prompt_tokens": 3043,
+        "completion_tokens": 287,
+        "total_tokens": 3330
+      },
+      "wire_prompt_sha256": "8a161c8e2475039d8fcc1d230a32f247be84c0b119a668efcd60f5bc8a9eb9a5",
+      "chat_mode": "CHATML_NO_THINK",
+      "finish_reason": "stop",
+      "elapsed_seconds": 150.55,
+      "response_sha256": "cf9facae6112b6d2e38e70caa16ca90f954f963661b37ad6dbbd46e266235a7b",
+      "prompt_version": "2026-10-20.1",
+      "completed_utc": "2026-10-29T08:19:08.480568+00:00"
+    },
+    {
+      "role": "evidence_extractor",
+      "status": "COMPLETED",
+      "requested_model": "Qwen/Qwen3-8B-GGUF",
+      "started_utc": "2026-10-29T08:19:08.484247+00:00",
+      "prompt_sha256": "d865e91d36671e6432b39d6676822724362834c5c195fc7781d9f3618c2503eb",
+      "response_schema_sha256": "0874b4b3be6e4ee3109e57add1151a1f369b24db5577032e86669336db53ddf5",
+      "prompt_file": "model_responses/5-evidence_extractor.prompt.txt",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF",
+      "error": null,
+      "model_identity": {
+        "repository": "Qwen/Qwen3-8B-GGUF",
+        "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+        "filename": "Qwen3-8B-Q4_K_M.gguf",
+        "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+        "files": [
+          {
+            "filename": "Qwen3-8B-Q4_K_M.gguf",
+            "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+            "lfs_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785"
+          }
+        ],
+        "provider": "local_llama_cpp",
+        "external_api_key_required": false,
+        "model_url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/tree/7c41481f57cb95916b40956ab2f0b139b296d974",
+        "file": "Qwen3-8B-Q4_K_M.gguf"
+      },
+      "usage": {
+        "prompt_tokens": 3871,
+        "completion_tokens": 335,
+        "total_tokens": 4206
+      },
+      "wire_prompt_sha256": "cd2f31c62b93785c44274613e6c41f537e68086479ff9801ba3d6a7122475bb8",
+      "chat_mode": "CHATML_NO_THINK",
+      "finish_reason": "stop",
+      "elapsed_seconds": 98.82,
+      "response_sha256": "fcdc94c431b503a22e4518cee8ddc3f761b7edd63ab5ad53ee2aad70dbd29031",
+      "prompt_version": "2026-10-20.1",
+      "completed_utc": "2026-10-29T08:20:47.307910+00:00"
+    }
+  ],
+  "rejected": [
+    {
+      "reason": "ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE",
+      "evidence_id": "e-2102e45b71c8e55d98c3",
+      "field": "places",
+      "proposed_values": [
+        "ARGENTIERA"
+      ],
+      "selected_passage_ids": [
+        2
+      ]
+    },
+    {
+      "reason": "ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE",
+      "evidence_id": "e-2102e45b71c8e55d98c3",
+      "field": "places",
+      "proposed_values": [
+        "ARGENTIERA"
+      ],
+      "selected_passage_ids": [
+        1
+      ]
+    },
+    {
+      "reason": "ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE",
+      "evidence_id": "e-2102e45b71c8e55d98c3",
+      "field": "places",
+      "proposed_values": [
+        "ARGENTIERA"
+      ],
+      "selected_passage_ids": [
+        2,
+        3
+      ]
+    },
+    {
+      "reason": "ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE",
+      "evidence_id": "e-2102e45b71c8e55d98c3",
+      "field": "places",
+      "proposed_values": [
+        "ARGENTIERA"
+      ],
+      "selected_passage_ids": [
+        1,
+        2
+      ]
+    },
+    {
+      "reason": "ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE",
+      "evidence_id": "e-d3e8c1624a86ae0de125",
+      "field": "places",
+      "proposed_values": [
+        "Kimolos"
+      ],
+      "selected_passage_ids": [
+        7
+      ]
+    },
+    {
+      "reason": "ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE",
+      "evidence_id": "e-d3e8c1624a86ae0de125",
+      "field": "places",
+      "proposed_values": [
+        "Kimolos"
+      ],
+      "selected_passage_ids": [
+        5
+      ]
+    }
+  ],
+  "selection_priority": {
+    "policy": "relevance-before-diversity-v1",
+    "retained_passages": 398,
+    "tier_counts": {
+      "5": 307,
+      "6": 91
+    },
+    "verification_implied": false,
+    "selected": [
+      {
+        "evidence_id": "e-dd9e509015f3b1f6de10",
+        "tier": 5,
+        "reason": "CONTEXT_OR_SCOPE_UNRESOLVED",
+        "genre": "NARRATIVE_CONTEXT",
+        "temporal_coherence": true,
+        "primary_source_metadata_hint": false,
+        "conjecture_retained": false,
+        "role": "READING_PRIORITY_NOT_TRUTH_OR_SOURCE_INDEPENDENCE"
+      },
+      {
+        "evidence_id": "e-2102e45b71c8e55d98c3",
+        "tier": 5,
+        "reason": "CONTEXT_OR_SCOPE_UNRESOLVED",
+        "genre": "NARRATIVE_CONTEXT",
+        "temporal_coherence": true,
+        "primary_source_metadata_hint": false,
+        "conjecture_retained": false,
+        "role": "READING_PRIORITY_NOT_TRUTH_OR_SOURCE_INDEPENDENCE"
+      },
+      {
+        "evidence_id": "e-0f8251de4ace16ddf38f",
+        "tier": 5,
+        "reason": "CONTEXT_OR_SCOPE_UNRESOLVED",
+        "genre": "NARRATIVE_CONTEXT",
+        "temporal_coherence": true,
+        "primary_source_metadata_hint": false,
+        "conjecture_retained": false,
+        "role": "READING_PRIORITY_NOT_TRUTH_OR_SOURCE_INDEPENDENCE"
+      },
+      {
+        "evidence_id": "e-ce1194d9bdbd0e3f6ea7",
+        "tier": 5,
+        "reason": "CONTEXT_OR_SCOPE_UNRESOLVED",
+        "genre": "NARRATIVE_CONTEXT",
+        "temporal_coherence": true,
+        "primary_source_metadata_hint": false,
+        "conjecture_retained": false,
+        "role": "READING_PRIORITY_NOT_TRUTH_OR_SOURCE_INDEPENDENCE"
+      },
+      {
+        "evidence_id": "e-b8fa0da4461cbb7c44e8",
+        "tier": 5,
+        "reason": "CONTEXT_OR_SCOPE_UNRESOLVED",
+        "genre": "NARRATIVE_CONTEXT",
+        "temporal_coherence": true,
+        "primary_source_metadata_hint": false,
+        "conjecture_retained": false,
+        "role": "READING_PRIORITY_NOT_TRUTH_OR_SOURCE_INDEPENDENCE"
+      },
+      {
+        "evidence_id": "e-65cb4d3cab008d875dd9",
+        "tier": 5,
+        "reason": "CONTEXT_OR_SCOPE_UNRESOLVED",
+        "genre": "NARRATIVE_CONTEXT",
+        "temporal_coherence": true,
+        "primary_source_metadata_hint": false,
+        "conjecture_retained": false,
+        "role": "READING_PRIORITY_NOT_TRUTH_OR_SOURCE_INDEPENDENCE"
+      },
+      {
+        "evidence_id": "e-3babdae95c59f2817ff9",
+        "tier": 5,
+        "reason": "CONTEXT_OR_SCOPE_UNRESOLVED",
+        "genre": "NARRATIVE_CONTEXT",
+        "temporal_coherence": true,
+        "primary_source_metadata_hint": false,
+        "conjecture_retained": false,
+        "role": "READING_PRIORITY_NOT_TRUTH_OR_SOURCE_INDEPENDENCE"
+      },
+      {
+        "evidence_id": "e-d3e8c1624a86ae0de125",
+        "tier": 5,
+        "reason": "CONTEXT_OR_SCOPE_UNRESOLVED",
+        "genre": "NARRATIVE_CONTEXT",
+        "temporal_coherence": true,
+        "primary_source_metadata_hint": false,
+        "conjecture_retained": false,
+        "role": "READING_PRIORITY_NOT_TRUTH_OR_SOURCE_INDEPENDENCE"
+      }
+    ]
+  },
+  "passage_triage": null,
+  "identity_linkage": null,
+  "limitations": [
+    "MODEL_OUTPUT_REQUIRES_REVIEW",
+    "ORIGINAL_INSPECTION_NOT_PERFORMED",
+    "SOURCE_INDEPENDENCE_NOT_ESTABLISHED",
+    "BOUNDED_EVIDENCE_COVERAGE"
+  ],
+  "verified": false,
+  "human_reviewed": false,
+  "semantic_module_sha256": "29fed793afd1373ff2a29a3afd71f7d5b715dda0ac3a4c36922aed1dc4085a68",
+  "extraction_cache_binding": {
+    "running_module_sha256": "29fed793afd1373ff2a29a3afd71f7d5b715dda0ac3a4c36922aed1dc4085a68",
+    "raw_cache_module_sha256": "29fed793afd1373ff2a29a3afd71f7d5b715dda0ac3a4c36922aed1dc4085a68",
+    "policy": "RAW_PAYLOADS_REVALIDATED_BY_CURRENT_VALIDATORS_NO_VERIFICATION_REUSE"
+  },
+  "software_revision": "91d6fa42997a1eba861ff7e101c109f092a45cbd"
+}

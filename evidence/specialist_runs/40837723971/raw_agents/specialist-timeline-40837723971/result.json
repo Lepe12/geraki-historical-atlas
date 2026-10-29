@@ -1,0 +1,1513 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "timeline",
+  "label": "Timeline Consistency Agent",
+  "assignment_id": "timeline:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "dated_events",
+    "chronology_conflicts",
+    "gaps",
+    "impossible_overlaps"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "ecf1720a46b14ed63624ec151b5d4acd6f1cc33f8070e7c9059b64a09cd23aaa",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "timeline",
+    "assignment_id": "timeline:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:PARES / Archivo General de Simancas",
+      "repo:Archives diplomatiques France",
+      "repo:Gallica/BnF",
+      "repo:Academia.edu Public Research"
+    ],
+    "queries": [
+      "\"Zerphalon\"",
+      "\"Zerphalon\" chronology",
+      "\"Zerphalon\" dated letter report",
+      "\"Zerphalon\" voyage operation",
+      "\"Ζερφαλων\""
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:PARES / Archivo General de Simancas",
+        "route_type": "repository_dispatch",
+        "repository": "PARES / Archivo General de Simancas",
+        "connector_id": null,
+        "score": 100,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Archives diplomatiques France",
+        "route_type": "repository_dispatch",
+        "repository": "Archives diplomatiques France",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:İSAM Kütüphanesi",
+        "route_type": "repository_dispatch",
+        "repository": "İSAM Kütüphanesi",
+        "connector_id": null,
+        "score": 90,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Crossref Scholarly Metadata",
+        "route_type": "repository_dispatch",
+        "repository": "Crossref Scholarly Metadata",
+        "connector_id": null,
+        "score": 86,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"Zerphalon\" dated letter report",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Zerphalon%22+dated+letter+report\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 548}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Zerphalon%22+dated+letter+report\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 548}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"Zerphalon\" chronology",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Zerphalon%22+chronology\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 591}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Zerphalon%22+chronology\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 591}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"Zerphalon\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Zerphalon%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 595}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Zerphalon%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 595}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"Zerphalon\" voyage operation",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Zerphalon%22+voyage+operation\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 595}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Zerphalon%22+voyage+operation\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 595}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"Ζερφαλων\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 599}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 599}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Archives diplomatiques France\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Zerphalon%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Zerphalon%22\", \"content_type\": \"text/html\", \"response_bytes\": 33484, \"response_sha256\": \"8807d4f792fa747e36311da67b93f787f90baae26171c6b0efee7469db27edad\", \"elapsed_ms\": 658}], \"detail\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Zerphalon%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\" dated letter report",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Archives diplomatiques France\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Zerphalon%22+dated+letter+report\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Zerphalon%22+dated+letter+report\", \"content_type\": \"text/html\", \"response_bytes\": 33484, \"response_sha256\": \"8807d4f792fa747e36311da67b93f787f90baae26171c6b0efee7469db27edad\", \"elapsed_ms\": 523}], \"detail\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Zerphalon%22+dated+letter+report\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\" chronology",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Archives diplomatiques France\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Zerphalon%22+chronology\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Zerphalon%22+chronology\", \"content_type\": \"text/html\", \"response_bytes\": 33484, \"response_sha256\": \"8807d4f792fa747e36311da67b93f787f90baae26171c6b0efee7469db27edad\", \"elapsed_ms\": 567}], \"detail\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Zerphalon%22+chronology\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ζερφαλων\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Archives diplomatiques France\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22\", \"content_type\": \"text/html\", \"response_bytes\": 33484, \"response_sha256\": \"8807d4f792fa747e36311da67b93f787f90baae26171c6b0efee7469db27edad\", \"elapsed_ms\": 521}], \"detail\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\" voyage operation",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Archives diplomatiques France\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Zerphalon%22+voyage+operation\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Zerphalon%22+voyage+operation\", \"content_type\": \"text/html\", \"response_bytes\": 33484, \"response_sha256\": \"8807d4f792fa747e36311da67b93f787f90baae26171c6b0efee7469db27edad\", \"elapsed_ms\": 555}], \"detail\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Zerphalon%22+voyage+operation\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 605, \"response_sha256\": \"606a030475c4adc1c20e1af0ddf7f7f1993b204c80ebfea48c4d30aa58888fd4\", \"elapsed_ms\": 862}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\" chronology",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++chronology%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++chronology%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 616, \"response_sha256\": \"e8c5e1c01f2e362fe04fcb615d121e0f1338d613a2096fd6470ddcc11ad528a0\", \"elapsed_ms\": 799}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++chronology%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ζερφαλων\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 612, \"response_sha256\": \"a61e102d02506a12de7e9cc919e339e23f25afb97dc2db20eae4af7d0f9d46b0\", \"elapsed_ms\": 616}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\" voyage operation",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++voyage+operation%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++voyage+operation%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 622, \"response_sha256\": \"34c8db40576f97e1234d86e6bcce42d08545cac8c74aa9e62aa12e93c7116576\", \"elapsed_ms\": 642}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++voyage+operation%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\" dated letter report",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++dated+letter+report%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++dated+letter+report%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 625, \"response_sha256\": \"cb28d679acbb5aac8e00d7eda8e66fc0979d036da412dd12ce5105a1b9545b7a\", \"elapsed_ms\": 670}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++dated+letter+report%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Zerphalon\" chronology",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+chronology\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 86}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+chronology&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 184}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+chronology&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+chronology&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1161, \"response_sha256\": \"5d19b0aae6897adfe8fe4ef2feedb85387d5605cd896700503e485e975720986\", \"elapsed_ms\": 367}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+chronology\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 86}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+chronology&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 184}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+chronology&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+chronology&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1161, \"response_sha256\": \"5d19b0aae6897adfe8fe4ef2feedb85387d5605cd896700503e485e975720986\", \"elapsed_ms\": 367}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Zerphalon\" voyage operation",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+voyage+operation\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 80}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+voyage+operation&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 105}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+voyage+operation&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+voyage+operation&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1185, \"response_sha256\": \"38859ce5fa4f2cb2dec91b3276d66e7736a988f5c7046d9abb49938f5de3aec0\", \"elapsed_ms\": 185}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+voyage+operation\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 80}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+voyage+operation&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 105}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+voyage+operation&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+voyage+operation&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1185, \"response_sha256\": \"38859ce5fa4f2cb2dec91b3276d66e7736a988f5c7046d9abb49938f5de3aec0\", \"elapsed_ms\": 185}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Zerphalon\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 139}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 187, \"response_sha256\": \"6ec0a900b362c5149fd8a58cf16525b414923941dd1284fb1f8083a4e7d54c97\", \"elapsed_ms\": 957}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1027, \"response_sha256\": \"0c2f043413b2f752ed155bf85a39bc5a6711f1688843a503b55d6aeaad883734\", \"elapsed_ms\": 136}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 139}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 187, \"response_sha256\": \"6ec0a900b362c5149fd8a58cf16525b414923941dd1284fb1f8083a4e7d54c97\", \"elapsed_ms\": 957}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1027, \"response_sha256\": \"0c2f043413b2f752ed155bf85a39bc5a6711f1688843a503b55d6aeaad883734\", \"elapsed_ms\": 136}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"resu"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Zerphalon\" dated letter report",
+      "records": [
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2172/969208",
+          "title": "Letter to Eduard Smetanin, dated March 2, 2007: Final CRADA report.",
+          "creator": [
+            "D. A. Ehst"
+          ],
+          "date": [
+            "2007-3-2"
+          ],
+          "url": "https://doi.org/10.2172/969208",
+          "doi": "10.2172/969208",
+          "type": "report",
+          "publisher": "Office of Scientific and Technical Information (OSTI)",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.31096/wua026-11",
+          "title": "Letter dated August 29, 1863",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.31096/wua026-11",
+          "doi": "10.31096/wua026-11",
+          "type": "database",
+          "publisher": "Willamette University",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.31096/wua026-5",
+          "title": "Letter dated November 1, 1861",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.31096/wua026-5",
+          "doi": "10.31096/wua026-5",
+          "type": "database",
+          "publisher": "Willamette University",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.31096/wua026-1",
+          "title": "Letter dated September 02, 1863",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.31096/wua026-1",
+          "doi": "10.31096/wua026-1",
+          "type": "database",
+          "publisher": "Willamette University",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.31096/wua026-7",
+          "title": "Letter dated January 3, 1862",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.31096/wua026-7",
+          "doi": "10.31096/wua026-7",
+          "type": "database",
+          "publisher": "Willamette University",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.31096/wua026-8",
+          "title": "Letter dated June 11, 1864",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.31096/wua026-8",
+          "doi": "10.31096/wua026-8",
+          "type": "database",
+          "publisher": "Willamette University",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.31096/wua026-3",
+          "title": "Letter dated February 17, 1864",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.31096/wua026-3",
+          "doi": "10.31096/wua026-3",
+          "type": "database",
+          "publisher": "Willamette University",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.31096/wua026-6",
+          "title": "Letter dated October 8, 1861",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.31096/wua026-6",
+          "doi": "10.31096/wua026-6",
+          "type": "database",
+          "publisher": "Willamette University",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.31096/wua026-10",
+          "title": "Letter dated July 25, 1865",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.31096/wua026-10",
+          "doi": "10.31096/wua026-10",
+          "type": "database",
+          "publisher": "Willamette University",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.31096/wua026-12",
+          "title": "Letter dated October 21, 1863",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.31096/wua026-12",
+          "doi": "10.31096/wua026-12",
+          "type": "database",
+          "publisher": "Willamette University",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.31096/wua026-4",
+          "title": "Letter dated August 22, 1862",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.31096/wua026-4",
+          "doi": "10.31096/wua026-4",
+          "type": "database",
+          "publisher": "Willamette University",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.31096/wua026-2",
+          "title": "Letter dated September 24, 1861",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.31096/wua026-2",
+          "doi": "10.31096/wua026-2",
+          "type": "database",
+          "publisher": "Willamette University",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.31096/wua026-9",
+          "title": "Letter dated May 27, 1862",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.31096/wua026-9",
+          "doi": "10.31096/wua026-9",
+          "type": "database",
+          "publisher": "Willamette University",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.3998/mpub.12838586.cmp.18",
+          "title": "Wu Zhiying’s letter to Xu Zihua, dated March 10, 1912",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.3998/mpub.12838586.cmp.18",
+          "doi": "10.3998/mpub.12838586.cmp.18",
+          "type": "component",
+          "publisher": "University of Michigan Library",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.3998/mpub.12838586.cmp.19",
+          "title": "Wu Zhiying’s letter to Xu Zihua, dated July 17, 1912",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.3998/mpub.12838586.cmp.19",
+          "doi": "10.3998/mpub.12838586.cmp.19",
+          "type": "component",
+          "publisher": "University of Michigan Library",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2307/3923011",
+          "title": "Carolina \"Bays\" Dated",
+          "creator": [],
+          "date": [
+            "1946-1-19"
+          ],
+          "url": "https://doi.org/10.2307/3923011",
+          "doi": "10.2307/3923011",
+          "type": "journal-article",
+          "publisher": "JSTOR",
+          "container_title": [
+            "The Science News-Letter"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2307/3939288",
+          "title": "Meteorite Landing Dated",
+          "creator": [],
+          "date": [
+            "1958-5-17"
+          ],
+          "url": "https://doi.org/10.2307/3939288",
+          "doi": "10.2307/3939288",
+          "type": "journal-article",
+          "publisher": "JSTOR",
+          "container_title": [
+            "The Science News-Letter"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.18356/9789211067323c024",
+          "title": "Annex 80. Letter from Sir G. Bonham to Lord Salisbury dated 4 December 1891, enclosing letter from E. van Tienhoven to Sir H. Rumbold dated 1 December 1891, translation of letter from Vice-Admiral Röell to the Governor-General of Netherlands India dated 27 July 1891 and Report of Dutch Surveying-vessel Banda of 30 May and 11 July 1891",
+          "creator": [],
+          "date": [
+            "2013-9-19"
+          ],
+          "url": "https://doi.org/10.18356/9789211067323c024",
+          "doi": "10.18356/9789211067323c024",
+          "type": "book-chapter",
+          "publisher": "United Nations",
+          "container_title": [
+            "Pleadings, Oral Arguments, Documents",
+            "Case Concerning Sovereignty Over Pulau Ligitan and Pulau Sipadan (Indonesia/Malaysia) Volume II, Memorial of Indonesia"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.5962/bhl.title.155691",
+          "title": "[Letter to Botanical Gardens Singapore dated 29 January 1878]",
+          "creator": [],
+          "date": [
+            "1878"
+          ],
+          "url": "https://doi.org/10.5962/bhl.title.155691",
+          "doi": "10.5962/bhl.title.155691",
+          "type": "monograph",
+          "publisher": "[s.n.]",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2307/3943029",
+          "title": "Glass Dated by Its Crust",
+          "creator": [],
+          "date": [
+            "1961-1-21"
+          ],
+          "url": "https://doi.org/10.2307/3943029",
+          "doi": "10.2307/3943029",
+          "type": "journal-article",
+          "publisher": "JSTOR",
+          "container_title": [
+            "The Science News-Letter"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+dated+letter+report\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 89}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+dated+letter+report&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+dated+letter+report&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 20887, \"response_sha256\": \"d99333e9798c1a40bd0101ac8c4d1375b1dd6c3598029c4d586a842a334fa1ba\", \"elapsed_ms\": 902}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+dated+letter+report&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+dated+letter+report&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1197, \"response_sha256\": \"e885692ba59aeb1e7b110d0f133b1d04355fe0d043e5fdfeff58dea5eb7a7f2b\", \"elapsed_ms\": 131}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 20, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+dated+letter+report\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 89}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+dated+letter+report&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+dated+letter+report&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 20887, \"response_sha256\": \"d99333e9798c1a40bd0101ac8c4d1375b1dd6c3598029c4d586a842a334fa1ba\", \"elapsed_ms\": 902}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+dated+letter+report&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+dated+letter+report&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1197, \"response_sha256\": \"e885692ba59aeb1e7b110d0f133b1d04355fe0d043e5fdfeff58dea5eb7a7f2b\", \"elapsed_ms\": 131}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Ζερφαλων\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 86}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 187, \"response_sha256\": \"6ec0a900b362c5149fd8a58cf16525b414923941dd1284fb1f8083a4e7d54c97\", \"elapsed_ms\": 825}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1184, \"response_sha256\": \"9823c4ef7558eb0b9ee41ac69171a5168133a197a199e22be2441be658f816b1\", \"elapsed_ms\": 181}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 86}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 187, \"response_sha256\": \"6ec0a900b362c5149fd8a58cf16525b414923941dd1284fb1f8083a4e7d54c97\", \"elapsed_ms\": 825}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1184, \"response_sha256\": \"9823c4ef7558eb0b9ee41ac69171a5168133a197a199e22be2441be658f816b1\", \"elapsed_ms\": 181}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA byp"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "40837723971",
+    "agent_id": "timeline",
+    "source_leads": [
+      {
+        "id": "lead_94c9408254f5a8089c56f7fe",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2172/969208",
+        "title": "Letter to Eduard Smetanin, dated March 2, 2007: Final CRADA report.",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_76fe0fb6a2189cb7355148d2",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.31096/wua026-11",
+        "title": "Letter dated August 29, 1863",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c3974eb46ed0c55d15cc6da3",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.31096/wua026-5",
+        "title": "Letter dated November 1, 1861",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3e1dc58b20bcdaef431693ac",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.31096/wua026-1",
+        "title": "Letter dated September 02, 1863",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_43210b987c45f88031918bba",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.31096/wua026-7",
+        "title": "Letter dated January 3, 1862",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0a39b798ad038127da84f451",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.31096/wua026-8",
+        "title": "Letter dated June 11, 1864",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b0013cd409b08ae767056c32",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.31096/wua026-3",
+        "title": "Letter dated February 17, 1864",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2d9215669a8778d0ca1cb571",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.31096/wua026-6",
+        "title": "Letter dated October 8, 1861",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1291585d15ff937a5084cbf3",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.31096/wua026-10",
+        "title": "Letter dated July 25, 1865",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0171f463a7e323eb4886f7cb",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.31096/wua026-12",
+        "title": "Letter dated October 21, 1863",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f7322ae9598c49fa02420f9c",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.31096/wua026-4",
+        "title": "Letter dated August 22, 1862",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_bad13316aca7d5faf980d7ab",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.31096/wua026-2",
+        "title": "Letter dated September 24, 1861",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2b5d4ecfb1d33879ce151863",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.31096/wua026-9",
+        "title": "Letter dated May 27, 1862",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1f4c920caf9d6bacca76d7b9",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.3998/mpub.12838586.cmp.18",
+        "title": "Wu Zhiying’s letter to Xu Zihua, dated March 10, 1912",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9e474cd18b070dc058888281",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.3998/mpub.12838586.cmp.19",
+        "title": "Wu Zhiying’s letter to Xu Zihua, dated July 17, 1912",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_402eb1287a2b43f9316db8e7",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2307/3923011",
+        "title": "Carolina \"Bays\" Dated",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1e1d15dff74caeb744cb7138",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2307/3939288",
+        "title": "Meteorite Landing Dated",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_92dd76447e957efd4b0b6ae6",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.18356/9789211067323c024",
+        "title": "Annex 80. Letter from Sir G. Bonham to Lord Salisbury dated 4 December 1891, enclosing letter from E. van Tienhoven to Sir H. Rumbold dated 1 December 1891, translation of letter from Vice-Admiral Röell to the Governor-General of Netherlands India dated 27 July 1891 and Report of Dutch Surveying-vessel Banda of 30 May and 11 July 1891",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_774905d6d137b2984030e461",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.5962/bhl.title.155691",
+        "title": "[Letter to Botanical Gardens Singapore dated 29 January 1878]",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_18933ec69071778e4c685f89",
+        "run_id": "40837723971",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2307/3943029",
+        "title": "Glass Dated by Its Crust",
+        "query": "\"Zerphalon\" dated letter report",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      }
+    ],
+    "connector_errors": [
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Zerphalon%22+dated+letter+report\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 548}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Zerphalon%22+chronology\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 591}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Zerphalon%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 595}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Zerphalon%22+voyage+operation\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 595}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 599}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+chronology\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 86}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+chronology&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 184}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+chronology&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+chronology&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1161, \"response_sha256\": \"5d19b0aae6897adfe8fe4ef2feed"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+voyage+operation\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 80}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+voyage+operation&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 105}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+voyage+operation&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+voyage+operation&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1185, \"response_sha256\": \"3885"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 139}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 187, \"response_sha256\": \"6ec0a900b362c5149fd8a58cf16525b414923941dd1284fb1f8083a4e7d54c97\", \"elapsed_ms\": 957}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/work"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+dated+letter+report\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 89}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+dated+letter+report&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+dated+letter+report&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 20887, \"response_sha256\": \"d99333e9798c1a40bd0101ac8c4d1375b1dd6c3598029c4d586a842a334fa1ba\", \"elapsed_ms\": 902}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+dated+letter+report&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_st"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 86}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 187, \"response_sha256\": \"6ec0a900b362c5149fd8a58cf16525b414923941dd1284fb1f8083a4e7d54c97\", \"elapsed_ms\": 825}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%C"
+      }
+    ],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 20,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}

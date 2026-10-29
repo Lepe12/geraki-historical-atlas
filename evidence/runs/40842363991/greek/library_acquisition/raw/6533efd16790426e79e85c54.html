@@ -1,0 +1,92 @@
+    <!doctype html>
+    <html>
+    <head>
+    <meta charset="utf-8">
+    <title>Verifying your browser</title>
+
+    <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #eee;
+      color: #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+
+    }
+    .box { text-align: center; 
+           max-width: 420px;  
+     }
+    .spinner {
+      margin: 20px auto;
+      border: 4px solid #32414b;
+      border-top: 4px solid #b3a069;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+
+    </head>
+    <body>
+    <div class="box">
+    <h2>Verifying your browser…</h2>
+    <img src="/svg/Logo_Universitaet_Tuebingen.svg">
+    <img src="/svg/Logo_Universitaetsbibliothek_Tuebingen.svg">
+    <div class="spinner"></div>
+    <p id="counter">0 hashes</p>
+    </div>
+
+    <script>
+    (async () => {
+      const DIFFICULTY_BITS = 17;
+      const nonce = "d97cf900bb262af4b7f7de82b49bfce2";
+      const TS = "1793263557";
+      const TTL = "1800";
+      const counter = document.getElementById("counter");
+
+      let i = 0;
+
+      function countLeadingZeroBits(bytes) {
+        const value =
+          (bytes[0] << 16) |
+          (bytes[1] << 8) |
+          bytes[2];
+        return Math.clz32(value) - 8;
+      }
+
+      while (true) {
+        const msg = nonce + i;
+
+        const hash = new Uint8Array (await crypto.subtle.digest("SHA-256",
+          new TextEncoder().encode(msg))
+        );
+
+        if (i % 101 === 0) {
+          counter.textContent = i + " hashes tried";
+          await new Promise(r => setTimeout(r, 0));
+        }
+
+        if (countLeadingZeroBits(hash) >= DIFFICULTY_BITS) {
+          document.cookie =
+            "pow_token=" + nonce + ":" + TS + ":" + i +
+            "; path=/; max-age=" + TTL + "; SameSite=Lax";
+
+          setTimeout(() => {
+            location.reload();
+          }, 50);
+
+          break;
+        }
+
+        i++;
+      }
+    })();
+    </script>
+    </body>
+    </html>
+    

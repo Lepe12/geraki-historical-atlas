@@ -837,6 +837,21 @@ def david_rumsey_maps(q,lane):
 def internet_archive_texts(q,lane):
     return _open_collection("internet_archive",q,lane)
 
+def _open_collection_extra(source,q,lane):
+    """Gallica / Europeana / HathiTrust via tools/connectors/open_collections_extra.py."""
+    try:from .open_collections_extra import lane_search
+    except ImportError:from open_collections_extra import lane_search
+    return lane_search(source,q,lane)
+
+def gallica_bnf_digitized(q,lane):
+    return _open_collection_extra("gallica",q,lane)
+
+def europeana_search(q,lane):
+    return _open_collection_extra("europeana",q,lane)
+
+def hathitrust_bib(q,lane):
+    return _open_collection_extra("hathitrust",q,lane)
+
 def unsupported(repository, reason="No stable anonymous machine-search connector configured."):
     return "AUTH_OR_BROWSER_REQUIRED",[],reason
 
@@ -862,6 +877,9 @@ def dispatch(repository,q,lane):
     """Dispatch exact repository labels from lane_repository_plan.py."""
     if repository=="David Rumsey Map Collection": return david_rumsey_maps(q,lane)
     if repository=="Internet Archive": return internet_archive_texts(q,lane)
+    if repository=="Gallica (BnF digitized)": return gallica_bnf_digitized(q,lane)
+    if repository=="Europeana": return europeana_search(q,lane)
+    if repository=="HathiTrust Digital Library": return hathitrust_bib(q,lane)
     if repository=="Gallica/BnF": return bnf_sru(q,lane)  # catalogue SRU is stable public fallback
     if repository=="Google Books": return google_books(q,lane)
     if repository=="Library of Congress": return library_of_congress(q,lane)
