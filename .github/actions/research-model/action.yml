@@ -1,5 +1,5 @@
 name: Prepare existing research inference boundary
-description: Install a checksum-verified CPU model for the existing pipeline.
+description: Install a checksum-verified CPU model for the existing pipeline, plus the small local multilingual embedding model used by hybrid retrieval.
 runs:
   using: composite
   steps:
@@ -40,3 +40,27 @@ runs:
       with:
         path: ${{ env.NABOU_MODEL_CACHE_DIR }}
         key: ${{ env.NABOU_MODEL_CACHE_KEY }}
+    # Local multilingual embeddings for hybrid retrieval (tools/local_embeddings.py):
+    # multilingual-e5-small, ONNX int8, ~135 MB, CPU, pinned revision + SHA-256.
+    # Any failure here only means hybrid retrieval falls back to char n-grams.
+    - uses: actions/cache/restore@v4
+      id: embed-cache
+      continue-on-error: true
+      with:
+        path: ~/.cache/nabou-models/multilingual-e5-small
+        key: nabou-embed-multilingual-e5-small-onnx-int8-761b726d-v1
+    - name: Prepare the local multilingual embedding model (fallback-safe)
+      id: embed-model
+      continue-on-error: true
+      shell: bash
+      run: |
+        dir="$HOME/.cache/nabou-models/multilingual-e5-small"
+        python3 -m pip install --quiet 'onnxruntime>=1.18,<2' 'tokenizers>=0.19,<1'
+        python3 tools/local_embeddings.py --download "$dir"
+        echo "PCT_EMBED_MODEL_DIR=$dir" >> "$GITHUB_ENV"
+    - uses: actions/cache/save@v4
+      if: steps.embed-model.outcome == 'success' && steps.embed-cache.outputs.cache-hit != 'true'
+      continue-on-error: true
+      with:
+        path: ~/.cache/nabou-models/multilingual-e5-small
+        key: nabou-embed-multilingual-e5-small-onnx-int8-761b726d-v1

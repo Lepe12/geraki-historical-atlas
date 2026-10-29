@@ -3,8 +3,12 @@ fused with Reciprocal Rank Fusion (RRF), then a reranker on the top-K.
 
 Reading order only: nothing is deleted, verified or promoted.
 
-Vector backends (no paid API, no download in the pipeline):
-  char-ngram-tfidf  default. Character 3-5-grams on accent-folded text,
+Vector backends (no paid API):
+  onnx-e5           local multilingual-e5-small (ONNX int8, ~135 MB, CPU;
+                    tools/local_embeddings.py). Used automatically when
+                    PCT_EMBED_MODEL_DIR holds the verified model (the
+                    research-model action downloads it into the Actions cache).
+  char-ngram-tfidf  fallback. Character 3-5-grams on accent-folded text,
                     TF-IDF weighted, cosine. Not a neural model: it is
                     robust to OCR damage, declension and spelling across
                     Greek/French/Italian/Latin (Κιμώλου ~ Κίμωλος,
@@ -21,7 +25,10 @@ status (place_context.py), and in-window years. No cross-encoder model is
 configured in this project; the slot is pluggable (rerank_fn).
 
 Env: PCT_HYBRID_RETRIEVAL=0 off; PCT_RRF_K (60); PCT_RERANK_TOP (50);
-PCT_EMBED_BACKEND (char-ngram-tfidf|llama-cpp-gguf); PCT_EMBED_MODEL_PATH.
+PCT_EMBED_BACKEND (auto|onnx-e5|char-ngram-tfidf|llama-cpp-gguf; default auto =
+onnx-e5 when the model is present, else char-ngram); PCT_EMBED_MODEL_DIR;
+PCT_EMBED_MODEL_PATH (GGUF); PCT_EMBED_MAX_DOCS (2000: only the lexical top-N
+are embedded, the rest keep lexical-only RRF).
 """
 import math
 import os
@@ -44,8 +51,20 @@ def settings(env=None):
     return {'enabled': str(env.get('PCT_HYBRID_RETRIEVAL', '1')).strip().lower() not in ('0', 'false', 'no', 'off'),
             'rrf_k': max(1, int(env.get('PCT_RRF_K', '60'))),
             'rerank_top': max(0, int(env.get('PCT_RERANK_TOP', '50'))),
-            'backend': str(env.get('PCT_EMBED_BACKEND', 'char-ngram-tfidf')).strip(),
-            'model_path': str(env.get('PCT_EMBED_MODEL_PATH', '')).strip()}
+            'backend': str(env.get('PCT_EMBED_BACKEND', 'auto')).strip(),
+            'model_path': str(env.get('PCT_EMBED_MODEL_PATH', '')).strip(),
+            'model_dir': str(env.get('PCT_EMBED_MODEL_DIR', '')).strip(),
+            'max_docs': max(1, int(env.get('PCT_EMBED_MAX_DOCS', '2000')))}
+
+
+_EMBEDDERS = {}
+
+
+def _onnx_embedder(directory):
+    if directory not in _EMBEDDERS:
+        import local_embeddings
+        _EMBEDDERS[directory] = local_embeddings.load(directory)
+    return _EMBEDDERS[directory]
 
 
 # ------------------------------------------------------------------ vectors
@@ -90,7 +109,19 @@ def _cos_dense(a, b):
 
 def vector_scores(query, texts, cfg, embed_fn=None):
     """(scores, backend_used, note)."""
-    if embed_fn is None and cfg['backend'] == 'llama-cpp-gguf':
+    backend = cfg.get('backend', 'auto')
+    if embed_fn is None and backend in ('auto', 'onnx-e5'):
+        if backend == 'onnx-e5' or cfg.get('model_dir'):
+            fn, note = _onnx_embedder(cfg.get('model_dir', ''))
+            if fn is None:
+                return _char(query, texts), 'char-ngram-tfidf', note
+            try:
+                vecs = fn([query, *texts])
+                return [round(_cos_dense(vecs[0], v), 5) for v in vecs[1:]], 'onnx-e5', None
+            except Exception as exc:  # noqa: BLE001
+                return _char(query, texts), 'char-ngram-tfidf', 'ONNX_EMBED_FAILED:' + type(exc).__name__
+        return _char(query, texts), 'char-ngram-tfidf', None
+    if embed_fn is None and backend == 'llama-cpp-gguf':
         if cfg['model_path'] and os.path.isfile(cfg['model_path']):
             try:
                 from llama_cpp import Llama
@@ -156,11 +187,12 @@ def fuse(scored, query, name_stems, topic_stems, window=None, place_fn=None, env
     normal = [s for s in scored if not any(r.startswith('OTHER_PLACE_HOMONYM') for r in s.get('reasons', []))]
     homonyms = [s for s in scored if s not in normal]
     ids = [s['row']['evidence_id'] for s in normal]
-    vec, backend, note = vector_scores(query, [s['row'].get('text') or '' for s in normal], cfg, embed_fn)
+    embedded = normal[:cfg['max_docs']]
+    vec, backend, note = vector_scores(query, [s['row'].get('text') or '' for s in embedded], cfg, embed_fn)
     by_id = {s['row']['evidence_id']: s for s in normal}
-    for s, v in zip(normal, vec):
+    for s, v in zip(embedded, vec):
         s['vector'] = round(v, 6)
-    vector_order = [s['row']['evidence_id'] for s in sorted(normal, key=lambda s: (-s['vector'], s['index']))]
+    vector_order = [s['row']['evidence_id'] for s in sorted(embedded, key=lambda s: (-s['vector'], s['index']))]
     fused, rrf_score = rrf([ids, vector_order], cfg['rrf_k'])
     top, rest = fused[:cfg['rerank_top']], fused[cfg['rerank_top']:]
     rr = {}
@@ -177,7 +209,7 @@ def fuse(scored, query, name_stems, topic_stems, window=None, place_fn=None, env
             s['rerank'], s['rerank_parts'] = rr[eid]
     moved = sum(1 for a, b in zip(ids, order) if a != b)
     report = {'policy': POLICY, 'applied': True, 'vector_backend': backend, 'vector_note': note,
-              'neural_embeddings': backend == 'llama-cpp-gguf', 'cross_encoder': 'deterministic-proximity-reranker' if rerank_fn is None else 'custom',
+              'neural_embeddings': backend in ('llama-cpp-gguf', 'onnx-e5'), 'embedded_docs': len(embedded), 'cross_encoder': 'deterministic-proximity-reranker' if rerank_fn is None else 'custom',
               'rrf_k': cfg['rrf_k'], 'rerank_top': min(cfg['rerank_top'], len(fused)), 'positions_changed': moved,
               'homonyms_kept_last': len(homonyms), 'paid_api_calls': 0}
     return [by_id[e] for e in order] + homonyms, report

@@ -46,6 +46,16 @@ class Parts(unittest.TestCase):
 
 
 class InRanking(unittest.TestCase):
+    # These pin the default (char-ngram) backend; the e5 model has its own tests.
+    def setUp(self):
+        import os
+        self._dir = os.environ.pop('PCT_EMBED_MODEL_DIR', None)
+
+    def tearDown(self):
+        import os
+        if self._dir is not None:
+            os.environ['PCT_EMBED_MODEL_DIR'] = self._dir
+
     def test_report_and_nothing_dropped(self):
         records = [row('e%d' % i, ('Kimolos corsaires ' if i % 4 == 0 else '') + PROSE + ' %d' % i) for i in range(12)]
         ordered, report = rank(records, 'Κίμωλος', ['Kimolos'], '', 'ρόλο κουρσάρων')
