@@ -186,13 +186,14 @@ class Client:
             return self.fetcher(url, headers={'User-Agent': USER_AGENT, 'Accept': 'application/json'}, timeout=self.timeout)
         return _http_audit().fetch(url, headers={'User-Agent': USER_AGENT, 'Accept': 'application/json'}, timeout=self.timeout)
 
-    def get_json(self, url, connector_id):
+    def get_json(self, url, connector_id, scrub=None):
+        """scrub(data) runs before caching, e.g. to drop an API key a response echoes back."""
         key = hashlib.sha256(url.encode('utf-8')).hexdigest()
         path = self.cache_dir / (key + '.json')
         if self.ttl > 0 and path.is_file() and time.time() - path.stat().st_mtime < self.ttl:
             try:
                 data = json.loads(path.read_text(encoding='utf-8'))
-                self.requests.append({'url': url, 'cached': True})
+                self.requests.append({'url': redact_url(url), 'cached': True})
                 return data, True
             except ValueError:
                 pass
@@ -202,7 +203,9 @@ class Client:
         else:
             raw = self._fetch(url)
         data = json.loads(raw.decode('utf-8', 'replace') if isinstance(raw, bytes) else raw)
-        self.requests.append({'url': url, 'cached': False})
+        if scrub:
+            data = scrub(data)
+        self.requests.append({'url': redact_url(url), 'cached': False})
         if self.ttl > 0:
             try:
                 self.cache_dir.mkdir(parents=True, exist_ok=True)
@@ -212,6 +215,43 @@ class Client:
             except OSError:
                 pass
         return data, False
+
+    def get_text(self, url, connector_id):
+        """Same politeness and cache as get_json, for XML APIs (e.g. SRU)."""
+        key = hashlib.sha256(url.encode('utf-8')).hexdigest()
+        path = self.cache_dir / (key + '.txt')
+        if self.ttl > 0 and path.is_file() and time.time() - path.stat().st_mtime < self.ttl:
+            self.requests.append({'url': redact_url(url), 'cached': True})
+            return path.read_text(encoding='utf-8'), True
+        if self.pace:
+            with _rate_limit().ConnectorLease(connector_id):
+                raw = self._fetch(url)
+        else:
+            raw = self._fetch(url)
+        text = raw.decode('utf-8', 'replace') if isinstance(raw, bytes) else raw
+        self.requests.append({'url': redact_url(url), 'cached': False})
+        if self.ttl > 0:
+            try:
+                self.cache_dir.mkdir(parents=True, exist_ok=True)
+                tmp = path.with_suffix('.tmp')
+                tmp.write_text(text, encoding='utf-8')
+                tmp.replace(path)
+            except OSError:
+                pass
+        return text, False
+
+
+SECRET_PARAMS = re.compile(r'^(?:wskey|api_?key|key|access_token|token|secret|password)$', re.I)
+
+
+def redact_url(url):
+    """URL with API keys masked, for reports and receipts (the real key is never stored)."""
+    parts = urllib.parse.urlsplit(str(url))
+    if not parts.query:
+        return str(url)
+    params = [(k, 'REDACTED' if SECRET_PARAMS.match(k) else v)
+              for k, v in urllib.parse.parse_qsl(parts.query, keep_blank_values=True)]
+    return urllib.parse.urlunsplit(parts._replace(query=urllib.parse.urlencode(params)))
 
 
 def _error_status(error):
