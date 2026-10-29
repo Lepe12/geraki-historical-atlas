@@ -61,7 +61,9 @@ if previous:
     old={a['repository']:a for a in previous.get('attempts',[])}
     attempts=[old.get(a['repository'],a) for a in attempts]
 save_partial()
-from search_priority import place_piracy_first, search_name_variants, names_only
+from search_priority import lane_piracy_terms, place_piracy_first, search_name_variants, names_only
+from query_plan import search_log, with_combined_first
+PLANNED=[];PLAN_NOTES={}
 MAP_CATALOGUES=("David Rumsey Map Collection","Gallica (BnF digitized)","Europeana","HathiTrust Digital Library")
 SEARCH_NAMES=names_only(search_name_variants(plan.get("target",""),plan.get("aliases",[])))
 repo_specs=[]
@@ -190,6 +192,11 @@ for repo_index,r in enumerate(plan["repositories"]):
         # old-name x piracy-term combinations (e.g. "Argentière" corsaires)
         # ahead of generic queries so the round limit cannot drop them.
         repo_terms=place_piracy_first(repo_terms,SEARCH_NAMES,lane)
+        # One Boolean query with every name variant and piracy term first,
+        # where the source's syntax is known to take OR (query_plan.py).
+        repo_terms,plan_note=with_combined_first(name,repo_terms,SEARCH_NAMES,lane_piracy_terms(lane))
+        PLAN_NOTES[name]=plan_note
+    PLANNED.append(list(repo_terms))
     completed={a['query'] for a in attempts[repo_index].get('queries',[])}
     pending=[q for q in repo_terms if q not in completed]
     if attempts[repo_index].get('status') in ('API_KEY_REQUIRED','AUTH_OR_BROWSER_REQUIRED','ACCESS_BLOCKED','REMOTE_ACCESS_BLOCKED','REMOTE_RATE_LIMITED'):pending=[]
@@ -246,5 +253,7 @@ payload={'schema':'pct-lane-discovery-v3','lane':lane,'request_file':plan.get('r
          'target':plan.get('target'),'aliases':plan.get('aliases',[]),'date_range':plan.get('date_range'),
          'attempts':attempts,'results':results,'partial':bool(remaining),'deferred_queries':remaining,
          'gate':'Bounded discovery only. Deferred queries are not searched; acquisition is not verification.'}
+payload['search_log']=search_log(lane,attempts,PLANNED,PLAN_NOTES,budget,quantum)
+(out/f'{lane}.search_log.json').write_text(json.dumps(payload['search_log'],ensure_ascii=False,indent=2),encoding='utf-8')
 (out/f'{lane}.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
 print('LANE DISCOVERY',lane,'records',len(results),'remaining repositories',len(remaining))
