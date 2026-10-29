@@ -97,6 +97,9 @@ def record(root, answer, round_number, analysis_path=None, env=None):
                           'sentence_windows', 'sent_this_pass')} if (funnel.get('prefilter') or {}).get('applied') else None,
            'collected': (funnel.get('collected') or {}).get('unique_excerpts'),
            'model_calls': len(answer.get('calls') or [])}
+    if answer.get('semantic_shards'):
+        # Opt-in parallel reading: per-shard and total counts of this round.
+        row['shards'] = answer['semantic_shards']
     rounds.append(row)
     rounds.sort(key=lambda r: r['round'])
     ledger = {'schema': SCHEMA, 'caps': cap, 'rounds': rounds,
