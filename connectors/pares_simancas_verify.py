@@ -2,16 +2,18 @@
 
 Catalogue metadata verification only; not original-document inspection.
 """
-import argparse,json,re,urllib.request
+import argparse,json,re,sys
 from html import unescape
+from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parent.parent/'tools'))
+from connectors.repository_connectors import _pares_get
 
 BASE="https://pares.cultura.gob.es/ParesBusquedas20/catalogo/description/"
 def verify(record_id):
     if not re.fullmatch(r"[0-9]{1,12}",str(record_id)): raise ValueError("Invalid PARES record id")
     url=BASE+str(record_id)+"/imprimir"
-    req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0 (compatible; GERAKI-Research/1.0)"})
-    with urllib.request.urlopen(req,timeout=25) as res:
-        raw=res.read(2500000).decode("utf-8","replace")
+    # Paced, Retry-After/backoff-aware transport shared with the discovery connector.
+    raw=_pares_get(url,timeout=25)[:2500000].decode("utf-8","replace")
     text=unescape(re.sub(r"<[^>]+>"," ",re.sub(r"<(script|style)\b[^>]*>.*?</\1>"," ",raw,flags=re.I|re.S)))
     text=re.sub(r"\s+"," ",text)
     archive="Archivo General de Simancas" in text
