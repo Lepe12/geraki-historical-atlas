@@ -13,8 +13,8 @@ from html import unescape
 
 UA={"User-Agent":"Piratecartography-Historical-Research/3.0 (+scholarly catalogue discovery)"}
 
-def _get(url, timeout=20, accept=None):
-    headers=dict(UA)
+def _get(url, timeout=20, accept=None, headers=None):
+    headers=dict(headers or UA)
     if accept: headers["Accept"]=accept
     try:from .http_audit import fetch
     except ImportError:from http_audit import fetch
@@ -467,6 +467,67 @@ def ddb(q,lane):
           "url":("https://www.deutsche-digitale-bibliothek.de/item/"+ident) if ident else None})
     return "EXECUTED",out,url
 
+# --- PARES (Archivo General de Simancas) polite transport -------------------
+# PARES answers bursts from server IPs with HTTP 429.  All PARES requests go
+# through _pares_get: a minimum delay between requests, Retry-After honoured,
+# exponential backoff with jitter on 429/503, and a hard cap on total waiting
+# so a workflow step can never hang past its timeout.  Still blocked => the
+# final HTTPError propagates and audited_dispatch reports REMOTE_RATE_LIMITED.
+PARES_UA={"User-Agent":("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+           "(KHTML, like Gecko) Chrome/126.0 Safari/537.36"),
+          "Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          "Accept-Language":"es-ES,es;q=0.9,en;q=0.8"}
+_PARES_STATE={"last":0.0,"waited":0.0}
+
+def _env_float(name,default):
+    try:return max(0.0,float(os.environ.get(name,default)))
+    except (TypeError,ValueError):return float(default)
+
+def _retry_after_seconds(error):
+    value=(error.headers.get("Retry-After") if getattr(error,"headers",None) else None)
+    if not value:return None
+    value=str(value).strip()
+    if value.isdigit():return float(value)
+    try:
+        from email.utils import parsedate_to_datetime
+        import datetime as _dt
+        when=parsedate_to_datetime(value)
+        return max(0.0,(when-_dt.datetime.now(when.tzinfo or _dt.timezone.utc)).total_seconds())
+    except Exception:return None
+
+def _pares_backoff_delay(attempt,error,base=None,cap=None,rand=None):
+    """Seconds to wait before retry number attempt (0-based)."""
+    import random
+    base=_env_float("PCT_PARES_BACKOFF_BASE_S",4) if base is None else base
+    cap=_env_float("PCT_PARES_BACKOFF_CAP_S",45) if cap is None else cap
+    rand=random.random if rand is None else rand
+    hinted=_retry_after_seconds(error)
+    if hinted is not None:return min(cap,hinted)
+    return min(cap,base*(2**attempt)*(0.5+rand()))
+
+def _pares_get(url,timeout=25,sleep=time.sleep,clock=time.monotonic,fetch=None):
+    if fetch is None:
+        # Route through the module-level _get so existing tests that patch
+        # _get keep working and no test can reach the live PARES server.
+        fetch=lambda u,headers,timeout:_get(u,timeout=timeout,headers=headers)
+    min_delay=_env_float("PCT_PARES_MIN_DELAY_S",3)
+    retries=int(_env_float("PCT_PARES_MAX_RETRIES",3))
+    budget=_env_float("PCT_PARES_MAX_TOTAL_WAIT_S",90)
+    attempt=0
+    while True:
+        gap=min_delay-(clock()-_PARES_STATE["last"])
+        if gap>0:sleep(gap)
+        try:
+            return fetch(url,headers=dict(PARES_UA),timeout=timeout)
+        except urllib.error.HTTPError as error:
+            if error.code not in (429,503) or attempt>=retries:raise
+            delay=_pares_backoff_delay(attempt,error)
+            if _PARES_STATE["waited"]+delay>budget:raise
+            _PARES_STATE["waited"]+=delay
+            sleep(delay);attempt+=1
+        finally:
+            _PARES_STATE["last"]=clock()
+
 def pares_simancas(q,lane):
     """Resolve a known public PARES record URL/ID; NOT a general catalogue search."""
     value=str(q).strip()
@@ -478,16 +539,22 @@ def pares_simancas(q,lane):
             return "INVALID_QUERY",[],"Expected short catalogue search text"
         search_url="https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?"+urllib.parse.urlencode({"texto":value})
         try:
-            html=_get(search_url,timeout=25).decode("utf-8","replace")
+            html=_pares_get(search_url,timeout=25).decode("utf-8","replace")
             if not re.search(r'resultados|search results|results page',html,re.I):
                 return "SEARCH_NOT_CONFIRMED",[],search_url
             ids=list(dict.fromkeys(re.findall(r'(?:/catalogo/description/|catalogo/description/)([0-9]{2,12})',html)))
             # Search result links are not proof of archive attribution.
             # Confirm each description page before emitting a Simancas hit.
             rows=[]
-            for candidate_id in ids[:20]:
-                time.sleep(0.4)
-                record_status,record_rows,record_detail=pares_simancas(candidate_id,lane)
+            max_candidates=int(_env_float("PCT_PARES_MAX_CANDIDATES",20)) or 20
+            for candidate_id in ids[:max_candidates]:
+                try:
+                    record_status,record_rows,record_detail=pares_simancas(candidate_id,lane)
+                except urllib.error.HTTPError as exc:
+                    if exc.code not in (403,429,503):raise
+                    if not rows:raise
+                    record_status=('REMOTE_RATE_LIMITED' if exc.code in (429,503) else 'REMOTE_ACCESS_BLOCKED')
+                    record_rows,record_detail=[],search_url+" ; HTTP "+str(exc.code)+" on description "+candidate_id
                 if record_status=="EXECUTED":rows.extend(record_rows)
                 if record_status in ('REMOTE_RATE_LIMITED','REMOTE_ACCESS_BLOCKED'):
                     # Retain any earlier real descriptions, and stop immediately
@@ -507,7 +574,7 @@ def pares_simancas(q,lane):
     record_id=match.group(1)
     url="https://pares.cultura.gob.es/ParesBusquedas20/catalogo/description/"+record_id
     try:
-        raw=_get(url,timeout=25).decode("utf-8","replace")
+        raw=_pares_get(url,timeout=25).decode("utf-8","replace")
         from html import unescape
         plain=unescape(re.sub(r"<[^>]+>"," ",re.sub(r"(?is)<(script|style)[^>]*>.*?</\\1>"," ",raw)))
         plain=" ".join(plain.split())

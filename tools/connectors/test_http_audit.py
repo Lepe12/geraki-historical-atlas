@@ -18,7 +18,7 @@ class HttpAuditTests(unittest.TestCase):
         self.assertEqual(rows[0]['evidence_level'],'CATALOGUE_METADATA_ONLY')
 
     def test_pares_http_429_is_rate_limited_not_an_empty_or_blocked_search(self):
-        with patch.object(rc,'_get',side_effect=HTTPError('https://pares.cultura.gob.es/search',429,'wait',{'Retry-After':'120'},None)):
+        with patch.dict('os.environ',{'PCT_PARES_MAX_RETRIES':'0','PCT_PARES_MIN_DELAY_S':'0'}),patch.object(rc,'_get',side_effect=HTTPError('https://pares.cultura.gob.es/search',429,'wait',{'Retry-After':'120'},None)):
             status,rows,detail=rc.audited_dispatch('PARES / Archivo General de Simancas','corsarios','spanish_simancas')
         self.assertEqual(status,'REMOTE_RATE_LIMITED')
         self.assertEqual(rows,[])
