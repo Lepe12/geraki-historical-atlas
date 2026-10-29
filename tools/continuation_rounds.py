@@ -9,6 +9,9 @@ Stop reasons (clean stops, not failures):
   MAX_CONTINUATION_ROUNDS    PCT_CONTINUATION_MAX_ROUNDS reanalysis rounds done (default 5)
   NO_NEW_SUPPORTED_CLAIMS    PCT_CONTINUATION_NO_GAIN_ROUNDS consecutive rounds (default 2)
                              examined new excerpts without a new quotation-supported claim
+  DIMINISHING_RETURNS        the last continuation round examined new excerpts but added
+                             no new claim at all (supported or not); off with
+                             PCT_CONTINUATION_DIMINISHING_RETURNS=0
 """
 import json
 import os
@@ -18,13 +21,15 @@ from research_continuation import atomic
 
 SCHEMA = 'research-continuation-rounds-v1'
 SUPPORTED = ('QUOTATION_SUPPORTED_HISTORY_PENDING', 'SOURCE_ATTRIBUTED_HYPOTHESIS')
-CLEAN_STOPS = ('ALL_EXCERPTS_READ', 'NO_NEW_EXCERPTS_READ', 'MAX_CONTINUATION_ROUNDS', 'NO_NEW_SUPPORTED_CLAIMS')
+CLEAN_STOPS = ('ALL_EXCERPTS_READ', 'NO_NEW_EXCERPTS_READ', 'MAX_CONTINUATION_ROUNDS', 'NO_NEW_SUPPORTED_CLAIMS',
+               'DIMINISHING_RETURNS')
 
 
 def caps(env=None):
     env = os.environ if env is None else env
     return {'max_rounds': max(0, int(env.get('PCT_CONTINUATION_MAX_ROUNDS', '5'))),
-            'no_gain_rounds': max(1, int(env.get('PCT_CONTINUATION_NO_GAIN_ROUNDS', '2')))}
+            'no_gain_rounds': max(1, int(env.get('PCT_CONTINUATION_NO_GAIN_ROUNDS', '2'))),
+            'diminishing_returns': str(env.get('PCT_CONTINUATION_DIMINISHING_RETURNS', '1')).strip() not in ('0', 'false', 'off')}
 
 
 def ledger_path(root):
@@ -45,6 +50,11 @@ def load(root):
 def supported_ids(answer):
     return sorted(c['claim_id'] for c in (answer.get('claim_evidence_assessment') or {}).get('claims', [])
                   if c.get('status') in SUPPORTED)
+
+
+def claim_ids(answer):
+    return sorted({c['claim_id'] for c in (answer.get('claim_evidence_assessment') or {}).get('claims', [])
+                   if c.get('claim_id')})
 
 
 def queue_counts(root):
@@ -72,6 +82,9 @@ def stop_rule(ledger, cap):
     tail = continuation[-cap['no_gain_rounds']:]
     if len(tail) == cap['no_gain_rounds'] and all(r['new_supported_claims'] == 0 for r in tail):
         return 'NO_NEW_SUPPORTED_CLAIMS'
+    if (cap.get('diminishing_returns', True) and last['round'] >= 1 and last.get('new_examined', 0) > 0
+            and last.get('new_claims') == 0):
+        return 'DIMINISHING_RETURNS'
     return None
 
 
@@ -83,17 +96,21 @@ def record(root, answer, round_number, analysis_path=None, env=None):
     rounds = [r for r in ledger['rounds'] if r['round'] != round_number]
     previous_supported = {cid for r in rounds for cid in r.get('supported_claim_ids', [])}
     previous_examined = max([r['examined'] for r in rounds] or [0])
+    previous_claims = {cid for r in rounds for cid in r.get('claim_ids', [])}
     funnel = answer.get('research_funnel') or {}
     counts = queue_counts(root)
     total = counts['total'] if counts else (funnel.get('collected') or {}).get('unique_excerpts', 0)
     examined = counts['examined'] if counts else (funnel.get('examined') or {}).get('excerpts', 0)
     supported = supported_ids(answer)
+    claims = claim_ids(answer)
     row = {'round': round_number, 'analysis_path': analysis_path, 'status': answer.get('status'),
            'total': total, 'examined': examined, 'remaining': max(0, total - examined),
            'new_examined': max(0, examined - previous_examined),
            'supported_claims': len(supported),
            'new_supported_claims': len(set(supported) - previous_supported),
            'supported_claim_ids': supported,
+           'claim_ids': claims,
+           'new_claims': len(set(claims) - previous_claims) if any('claim_ids' in r for r in rounds) or round_number == 0 else None,
            'answer_paragraphs': len(answer.get('answer_sections') or []),
            'queue_status': counts['status'] if counts else None,
            'prefilter': {k: (funnel.get('prefilter') or {}).get(k) for k in
