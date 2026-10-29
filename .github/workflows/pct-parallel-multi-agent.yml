@@ -35,6 +35,10 @@ on:
         description: "Allow the hourly coordinator to continue this run automatically; false holds it out of every automatic chain"
         type: boolean
         default: true
+      eval_fast_mode:
+        description: "Evaluation only: requires 1-3 selected_agents, caps acquisition/synthesis time, reports INCOMPLETE validation as a warning. Off = normal production research"
+        type: boolean
+        default: false
   push:
     branches:
       - main
@@ -52,6 +56,7 @@ env:
   PCT_PURPOSE: ${{ inputs.purpose }}
   PCT_SELECTED_AGENTS: ${{ inputs.selected_agents }}
   PCT_AUTO_CONTINUE: ${{ inputs.auto_continue == false && 'false' || 'true' }}
+  PCT_EVAL_FAST_MODE: ${{ inputs.eval_fast_mode == true && 'true' || 'false' }}
   PCT_LLM_PROVIDER: ${{ vars.PCT_LLM_PROVIDER || 'local_llama_cpp' }}
   PCT_LLM_MODEL: ${{ vars.PCT_LLM_MODEL || 'Qwen/Qwen3-8B-GGUF' }}
   PCT_LLM_BASE_URL: ${{ vars.PCT_LLM_BASE_URL }}
@@ -70,6 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
+      run_specialists: ${{ steps.matrix.outputs.run_specialists }}
       target: ${{ steps.identity.outputs.target }}
       aliases: ${{ steps.identity.outputs.aliases }}
       date_range: ${{ steps.identity.outputs.date_range }}
@@ -127,24 +133,11 @@ jobs:
           python3 tools/verify_request_integrity.py
       - id: matrix
         name: Build bounded research lane matrix
+        # Production (eval fast mode off): blank selection = all eleven lanes,
+        # specialists always run. Fast mode: 1-3 explicit lanes; specialists run
+        # only for travellers, the one lane that consumes their output.
         run: |
-          python3 - <<'PY' >> "$GITHUB_OUTPUT"
-          import json, os
-          allowed=["greek","travellers","spanish_simancas","venetian","french","british","dutch","german","italian_states","ottoman","north_african"]
-          raw=os.environ.get("PCT_SELECTED_AGENTS","").strip()
-          if not raw:
-              selected=allowed
-          else:
-              selected=[]
-              for lane in [x.strip() for x in raw.split(",") if x.strip()]:
-                  if lane not in allowed:
-                      raise SystemExit("UNKNOWN_RESEARCH_LANE:"+lane)
-                  if lane not in selected:
-                      selected.append(lane)
-              if not selected:
-                  raise SystemExit("EMPTY_RESEARCH_LANE_SELECTION")
-          print("matrix="+json.dumps(selected,separators=(",",":")))
-          PY
+          python3 tools/eval_fast_mode.py matrix | tee -a "$GITHUB_OUTPUT"
       - name: Announce request preparation complete
         run: |
           python3 tools/orchestrator/jarvis_event_bus.py --run-id "$GITHUB_RUN_ID" --event-type agent_idle --agent-id jarvis --phase request_validated --percent 100 --status IDLE --detail "Canonical request validated; specialist jobs may start"
@@ -162,6 +155,7 @@ jobs:
 
   specialist-research:
     needs: prepare
+    if: needs.prepare.outputs.run_specialists != 'false'
     uses: ./.github/workflows/jarvis-specialist-research.yml
     secrets:
       SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
@@ -216,6 +210,17 @@ jobs:
       - name: Announce lane start to Command Center
         run: |
           python3 tools/orchestrator/jarvis_event_bus.py --run-id "$GITHUB_RUN_ID" --event-type agent_started --agent-id "$PCT_RESEARCH_LANE" --phase "repository discovery" --percent 5 --status RUNNING --detail "JARVIS lane execution started"
+      - name: Apply eval fast-mode acquisition caps
+        if: env.PCT_EVAL_FAST_MODE == 'true'
+        run: |
+          {
+            echo "PCT_DISCOVERY_PASSES=2"
+            echo "PCT_MAX_ACQUISITION_CANDIDATES=15"
+            echo "PCT_ACQUISITION_BATCHES=1"
+            echo "PCT_ACQUISITION_BUDGET_SECONDS=180"
+            echo "PCT_CITATION_QUERY_LIMIT=3"
+          } >> "$GITHUB_ENV"
+          echo "EVAL_FAST_MODE: lane acquisition capped (evaluation only)"
       - name: Install browser for public legacy catalogues
         if: contains(fromJSON('["greek","travellers","venetian","italian_states"]'), matrix.lane)
         run: |
@@ -224,7 +229,7 @@ jobs:
       - name: Build lane-specific repository plan
         run: |
           python3 tools/lane_repository_plan.py
-          for discovery_pass in 1 2 3 4 5 6; do
+          for discovery_pass in $(seq 1 "${PCT_DISCOVERY_PASSES:-6}"); do
             timeout 300s python3 tools/lane_repository_discovery.py || { code=$?; echo "LANE DISCOVERY FAILED exit=$code"; exit "$code"; }
             python3 -c 'import json,os,sys; sys.exit(0 if json.load(open("lane_discovery/"+os.environ["PCT_RESEARCH_LANE"]+".json")).get("partial") else 1)' || break
           done
@@ -407,7 +412,7 @@ jobs:
 
   jarvis-escalation-check:
     needs: [prepare, research-lanes]
-    if: always() && needs.prepare.result == 'success' && github.ref == 'refs/heads/main' && inputs.selected_agents != ''
+    if: always() && needs.prepare.result == 'success' && github.ref == 'refs/heads/main' && inputs.selected_agents != '' && inputs.eval_fast_mode != true
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -481,6 +486,11 @@ jobs:
           python3 tools/orchestrator/jarvis_state_board.py \
             --run-id "$PCT_RUN_ID" \
             --output "evidence/runs/$PCT_RUN_ID/JARVIS_STATE_BOARD.json"
+      - name: Apply eval fast-mode synthesis budget
+        if: env.PCT_EVAL_FAST_MODE == 'true'
+        run: |
+          echo "PCT_SEMANTIC_BUDGET_SECONDS=600" >> "$GITHUB_ENV"
+          echo "EVAL_FAST_MODE: synthesis pass capped at 600s (evaluation only)"
       - name: Extract, review and synthesize the actual acquired sources
         timeout-minutes: 50
         env:
@@ -490,7 +500,14 @@ jobs:
         if: always()
         env:
           PCT_RUN_ID: ${{ github.run_id }}
-        run: python3 tools/research_validation_report.py --run-id "$PCT_RUN_ID" ${{ needs.prepare.outputs.require_semantic_analysis == 'true' && '--require-complete' || '' }}
+        run: |
+          if [ "$PCT_EVAL_FAST_MODE" = "true" ]; then
+            # Eval fast mode: INCOMPLETE is reported as a warning, artifacts still upload.
+            python3 tools/research_validation_report.py --run-id "$PCT_RUN_ID"
+            python3 tools/eval_fast_mode.py validation-warning --run-id "$PCT_RUN_ID"
+          else
+            python3 tools/research_validation_report.py --run-id "$PCT_RUN_ID" ${{ needs.prepare.outputs.require_semantic_analysis == 'true' && '--require-complete' || '' }}
+          fi
       - name: Preserve the actual command center research status
         if: always()
         env:

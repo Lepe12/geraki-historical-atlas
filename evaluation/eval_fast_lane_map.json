@@ -1,0 +1,192 @@
+{
+  "schema": "pct-eval-fast-lane-map-v1",
+  "eval_set": "evaluation/research_eval_set.v2.pending.json",
+  "purpose": "Per-question lane subset for eval fast mode (workflow input eval_fast_mode=true). Evaluation only; production research still runs all eleven lanes.",
+  "method": "Lanes chosen from the repositories each lane searches (tools/lane_repository_plan.py) and the gold sources listed for each item in the eval set. No new sources are introduced; the rationale only names source keys already in the eval set.",
+  "limits": [
+    "A gold source can be missed if it is only reachable from an excluded lane; fast-mode scores are a lower bound on full-run recall.",
+    "Lane choice is not a historical claim; it is a search-routing choice."
+  ],
+  "items": {
+    "ID-01-lantzas-aliases": {
+      "lanes": [
+        "greek",
+        "spanish_simancas",
+        "venetian"
+      ],
+      "rationale": "Gold source FLORISTAN2005 (scholarly article, findable via the greek lane's OpenAlex/Crossref/Academia) cites AGS documents (spanish_simancas: PARES) and Venetian dispatches (venetian: ASVe)."
+    },
+    "ID-02-lanza-namesakes": {
+      "lanes": [
+        "greek",
+        "spanish_simancas",
+        "venetian"
+      ],
+      "rationale": "Gold sources FLORISTAN2005 and GURKAN2014 are scholarly articles (greek lane scholarly connectors); Gürkan cites ASV Capi del Consiglio dei Dieci (venetian) and the Habsburg context points to Simancas (spanish_simancas)."
+    },
+    "ID-03-kapsis-aliases": {
+      "lanes": [
+        "travellers",
+        "french",
+        "greek"
+      ],
+      "rationale": "Gold sources SAULGER1698 and TOURNEFORT1718: travellers lane searches BSB (Saulger 1698, bsb10447069) and Internet Archive (Tournefort 1718); french lane searches Gallica/BnF and French diplomatic archives (Saulger is a French print); Greek name forms (Καψής/Κάψης) via the greek lane searches SearchCulture/EKT, Anemi, OpenAlex, Crossref, Academia (Greek and scholarly literature)."
+    },
+    "ID-04-creveliers-aliases": {
+      "lanes": [
+        "travellers",
+        "french",
+        "greek"
+      ],
+      "rationale": "Gold sources SAULGER1698, TOURNEFORT1718 (travellers lane searches BSB (Saulger 1698, bsb10447069) and Internet Archive (Tournefort 1718)), French corsair (french lane searches Gallica/BnF and French diplomatic archives (Saulger is a French print)), KOUTZAKIOTIS2023 is a Greek scholarly article (hdl 10442, greek lane)."
+    },
+    "FC-01-capsi-hanged-1680": {
+      "lanes": [
+        "travellers",
+        "french"
+      ],
+      "rationale": "Gold sources SAULGER1698 and TOURNEFORT1718: travellers lane searches BSB (Saulger 1698, bsb10447069) and Internet Archive (Tournefort 1718); french lane searches Gallica/BnF and French diplomatic archives (Saulger is a French print)."
+    },
+    "FC-02-creveliers-petra-1676": {
+      "lanes": [
+        "travellers",
+        "french"
+      ],
+      "rationale": "Gold source SAULGER1698: travellers lane searches BSB (Saulger 1698, bsb10447069) and Internet Archive (Tournefort 1718); french lane searches Gallica/BnF and French diplomatic archives (Saulger is a French print)."
+    },
+    "FC-03-lantzas-1596-arrest": {
+      "lanes": [
+        "greek",
+        "spanish_simancas",
+        "italian_states"
+      ],
+      "rationale": "Gold source FLORISTAN2005 (scholarly, greek lane connectors) cites AGS documents (spanish_simancas); the arrest was in Naples, whose state archives are in the italian_states lane (SIAS)."
+    },
+    "CT-01-creveliers-death-date": {
+      "lanes": [
+        "travellers",
+        "french",
+        "greek"
+      ],
+      "rationale": "Contradiction between SAULGER1698 (travellers lane searches BSB (Saulger 1698, bsb10447069) and Internet Archive (Tournefort 1718); french lane searches Gallica/BnF and French diplomatic archives (Saulger is a French print)) and KOUTZAKIOTIS2023 (Greek scholarly article, greek lane)."
+    },
+    "CT-02-kapsis-origin": {
+      "lanes": [
+        "travellers",
+        "french",
+        "greek"
+      ],
+      "rationale": "SAULGER1698 and TOURNEFORT1718 (travellers lane searches BSB (Saulger 1698, bsb10447069) and Internet Archive (Tournefort 1718); french lane searches Gallica/BnF and French diplomatic archives (Saulger is a French print)) versus STOUKAS2018, a Greek web article citing Krantonelli (greek lane)."
+    },
+    "CT-03-kapsis-dates": {
+      "lanes": [
+        "travellers",
+        "french"
+      ],
+      "rationale": "Gold source SAULGER1698 only (after historian review): travellers lane searches BSB (Saulger 1698, bsb10447069) and Internet Archive (Tournefort 1718); french lane searches Gallica/BnF and French diplomatic archives (Saulger is a French print)."
+    },
+    "NG-01-lantzas-milos-premise": {
+      "lanes": [
+        "greek",
+        "spanish_simancas",
+        "travellers"
+      ],
+      "rationale": "False premise: Lantzas sources FLORISTAN2005/GURKAN2014 (greek scholarly connectors, spanish_simancas for AGS) versus SAULGER1698 for who actually ruled Milos (travellers: BSB)."
+    },
+    "NG-02-kapsis-morosini-battle": {
+      "lanes": [
+        "travellers",
+        "french",
+        "venetian"
+      ],
+      "rationale": "No gold source (false-premise item). Kapsis is documented in SAULGER1698/TOURNEFORT1718 (travellers, french); Morosini is Venetian, so the venetian lane is the place a real battle record would surface."
+    },
+    "NG-03-fictional-zerphalon": {
+      "lanes": [
+        "travellers",
+        "greek"
+      ],
+      "rationale": "Fictional control with no gold source; two broad lanes (travellers, greek) are enough to test that NABOU reports no evidence."
+    },
+    "SY-01-milos-1660-1680": {
+      "lanes": [
+        "travellers",
+        "french",
+        "greek"
+      ],
+      "rationale": "Gold sources SAULGER1698, TOURNEFORT1718 (travellers lane searches BSB (Saulger 1698, bsb10447069) and Internet Archive (Tournefort 1718); french lane searches Gallica/BnF and French diplomatic archives (Saulger is a French print)) and KOUTZAKIOTIS2023 (greek lane)."
+    },
+    "SY-02-kapsis-kingdom": {
+      "lanes": [
+        "travellers",
+        "french",
+        "greek"
+      ],
+      "rationale": "Gold sources SAULGER1698 (travellers lane searches BSB (Saulger 1698, bsb10447069) and Internet Archive (Tournefort 1718); french lane searches Gallica/BnF and French diplomatic archives (Saulger is a French print)) and STOUKAS2018 (Greek web article, greek lane)."
+    },
+    "PN-01-argentiere": {
+      "lanes": [
+        "travellers",
+        "greek"
+      ],
+      "rationale": "Gold source TOURNEFORT1718 (Argentiere chapter, Internet Archive, travellers lane); the modern name Κίμωλος via the greek lane."
+    },
+    "PN-02-antimilo": {
+      "lanes": [
+        "travellers",
+        "greek"
+      ],
+      "rationale": "Gold source TOURNEFORT1718 (Internet Archive, travellers lane); modern Greek name Αντίμηλος via the greek lane."
+    },
+    "PN-03-cerigo": {
+      "lanes": [
+        "travellers",
+        "venetian",
+        "greek"
+      ],
+      "rationale": "Gold source OSBORNE_COLL_V2 (Internet Archive, travellers lane); the question asks who held Cerigo, a Venetian possession (venetian lane); modern name Κύθηρα via the greek lane."
+    },
+    "PN-04-gadronise-agathonisi": {
+      "lanes": [
+        "greek",
+        "travellers"
+      ],
+      "rationale": "Gold source AURA14_PANTZOURIS (nepub.lib.uoa.gr, Greek scholarly publication, greek lane); travellers lane for the old toponym in travel literature."
+    },
+    "FC-04-pirate-season-milos": {
+      "lanes": [
+        "greek",
+        "travellers"
+      ],
+      "rationale": "Gold source AURA14_PANTZOURIS (Greek scholarly publication, greek lane); Roberts is an English captivity narrative, so the travellers lane (Internet Archive, Google Books)."
+    },
+    "FC-05-capuchins-milo": {
+      "lanes": [
+        "travellers",
+        "french"
+      ],
+      "rationale": "Gold sources SAULGER1698, TOURNEFORT1718: travellers lane searches BSB (Saulger 1698, bsb10447069) and Internet Archive (Tournefort 1718); Capuchin mission and Saulger are French (french lane searches Gallica/BnF and French diplomatic archives (Saulger is a French print))."
+    },
+    "FC-06-siphanto-provencal-corsair": {
+      "lanes": [
+        "travellers",
+        "french"
+      ],
+      "rationale": "Gold source TOURNEFORT1718 (Internet Archive, travellers lane); Provençal corsair, French context (french lane searches Gallica/BnF and French diplomatic archives (Saulger is a French print))."
+    },
+    "NG-04-manetas-phournoi-base": {
+      "lanes": [
+        "greek",
+        "travellers"
+      ],
+      "rationale": "Gold source AURA14_KOUTSOUFLAKIS (nepub.lib.uoa.gr, greek lane); travellers lane as second broad lane for the negative check."
+    },
+    "CT-04-manetas-legend-place": {
+      "lanes": [
+        "greek",
+        "travellers"
+      ],
+      "rationale": "Gold source AURA14_KOUTSOUFLAKIS (nepub.lib.uoa.gr, greek lane); travellers lane as second broad lane."
+    }
+  }
+}
