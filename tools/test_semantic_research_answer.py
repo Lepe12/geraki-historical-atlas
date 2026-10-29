@@ -245,7 +245,7 @@ class SemanticAnswer(unittest.TestCase):
                 return response({'items':[item(eid)]})
             # Synthetic text never names Milos, so the no-LLM pre-filter would
             # (correctly) hold it back; this test exercises the validator itself.
-            with patch.dict(os.environ,{'PCT_PREFILTER':'0'}):
+            with patch.dict(os.environ,{'PCT_PREFILTER':'0','PCT_SCREENING':'0'}):
                 out=execute(tmp,'Μήλος (1660-1680)',caller=caller,config={'configured':True,'missing':[]})
             self.assertEqual(out['request_kind'],'place')
             self.assertEqual(out['status'],'EXTRACTION_FAILED_OR_UNSUPPORTED')
@@ -561,7 +561,7 @@ class SemanticAnswer(unittest.TestCase):
             (base/'run_manifest/manifest.json').write_text(json.dumps({'normalized_request':{'target':'Πέτρος Λάντζας','aliases':['Pietro Lanza']}}))
             # Synthetic text does not name the person; pre-filter off so the
             # identity/date guard itself is exercised.
-            with patch.dict(os.environ,{'PCT_PREFILTER':'0'}):
+            with patch.dict(os.environ,{'PCT_PREFILTER':'0','PCT_SCREENING':'0'}):
                 out=execute(tmp,'question',config={'configured':False,'missing':[]})
             self.assertEqual(len(out['claims']),1)
             self.assertEqual(out['coverage']['identity_held'],[])

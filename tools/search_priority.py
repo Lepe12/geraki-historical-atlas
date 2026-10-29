@@ -141,8 +141,21 @@ def candidate_text(item):
     return ' '.join(parts)
 
 
-def guard_candidates(items, names):
-    """Hold back other-place homonyms from automatic acquisition (kept, never dropped)."""
+def guard_candidates(items, names, env=None):
+    """Hold back other-place homonyms from automatic acquisition (kept, never dropped).
+
+    Gazetteer disambiguation (place_context.py): a candidate that names the
+    place only by an ambiguous name (e.g. 'Argentière') with none of its
+    context places (Milo, Cyclades, Archipel, Levant ...) is held as
+    REVIEW_REQUIRED with the reason; PCT_PLACE_CONTEXT=0 turns this off."""
+    env = os.environ if env is None else env
+    use_context = str(env.get('PCT_PLACE_CONTEXT', '1')).strip().lower() not in ('0', 'false', 'no', 'off')
+    prof = None
+    if use_context:
+        from place_context import AMBIGUOUS, classify, profile
+        prof = profile(names)
+        if not (prof['ambiguous_names'] and prof['context']):
+            prof = None
     kept, held = [], []
     for x in items:
         h = None if x.get('priority_target') else homonym_check(candidate_text(x), names)
@@ -152,8 +165,18 @@ def guard_candidates(items, names):
                                          'homonym_guard': h['id'], 'reason': 'OTHER_PLACE_HOMONYM: ' + h['other_place']}
             x.pop('source_lead', None)
             held.append(x)
-        else:
-            kept.append(x)
+            continue
+        if prof and not x.get('priority_target') and (x.get('relevance_assessment') or {}).get('status') == 'PRIORITY':
+            status, detail = classify(candidate_text(x), names, prof)
+            if status == AMBIGUOUS:
+                x = dict(x)
+                x['relevance_assessment'] = {**x['relevance_assessment'], 'status': 'REVIEW_REQUIRED',
+                                             'place_context_guard': detail,
+                                             'reason': 'AMBIGUOUS_PLACE_NAME_WITHOUT_CONTEXT: ' + detail.split(':', 1)[1]}
+                x.pop('source_lead', None)
+                held.append(x)
+                continue
+        kept.append(x)
     return kept, held
 
 

@@ -106,7 +106,7 @@ class RoundTests(unittest.TestCase):
 
     def test_stop_after_consecutive_rounds_without_new_supported_claims(self):
         self.queue(8); record(self.root, answer(['c1']), 0, None, self.env)
-        self.queue(20); self.assertIsNone(record(self.root, answer(['c1']), 1, None, self.env)['stop_reason'])
+        self.queue(20); self.assertIsNone(record(self.root, answer(['c1'], ['c2']), 1, None, self.env)['stop_reason'])
         self.queue(30); self.assertEqual(record(self.root, answer(['c1']), 2, None, self.env)['stop_reason'],
                                          'NO_NEW_SUPPORTED_CLAIMS')
         self.assertEqual(stopped(self.root), 'NO_NEW_SUPPORTED_CLAIMS')

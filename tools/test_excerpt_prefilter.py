@@ -166,7 +166,8 @@ class Pipeline(unittest.TestCase):
             (base / 'structured_output/extracted_findings.json').write_text(json.dumps({'findings': findings}))
             (base / 'run_manifest/manifest.json').write_text(json.dumps({'normalized_request': {
                 'target': 'Κίμωλος', 'aliases': ['Argentiera', 'Kimolos']}}))
-            with patch.dict(os.environ, {'PCT_EXCERPT_RANKING': '1'}):
+            # Screening (place context) is tested in test_place_context_screening.
+            with patch.dict(os.environ, {'PCT_EXCERPT_RANKING': '1', 'PCT_SCREENING': '0'}):
                 out = execute(tmp, 'Argentiera', config={'configured': False, 'missing': []})
             pre = out['coverage']['prefilter']
             self.assertEqual(pre['filtered_out'], 1)
@@ -187,7 +188,7 @@ class Pipeline(unittest.TestCase):
             ledger = record(tmp, out, 0, 'research_answer', env={})
             self.assertEqual(ledger['rounds'][0]['prefilter']['filtered_out'], 1)
             self.assertEqual(ledger['rounds'][0]['collected'], 2)
-            with patch.dict(os.environ, {'PCT_PREFILTER': '0'}):
+            with patch.dict(os.environ, {'PCT_PREFILTER': '0', 'PCT_SCREENING': '0'}):
                 off = execute(tmp, 'Argentiera', config={'configured': False, 'missing': []})
             self.assertIsNone(off['coverage']['prefilter']); self.assertEqual(off['coverage']['unique_passages'], 2)
 

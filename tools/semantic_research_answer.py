@@ -1046,6 +1046,22 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         all_records,filtered_items,prefilter_report=gate(all_records,question_kind,request.get('target',''),
             request.get('aliases',[]) or [],request.get('date_range','') or '',request.get('purpose','') or '',
             near_duplicate_of=(ranking_report or {}).get('near_duplicate_of'))
+    screening_report=None
+    if request and all_records:
+        # Explicit yes/no screening (place/name, topic, period) before the
+        # readers; failures are listed as FILTERED with every answer, never
+        # deleted, and re-includable (PCT_SCREENING_REINCLUDE / PCT_SCREENING=0).
+        from excerpt_screening import screen
+        all_records,screened_out,screening_report=screen(all_records,question_kind,request.get('target',''),
+            [*(request.get('aliases',[]) or []),*(request.get('search_name_variants',[]) or [])],
+            request.get('date_range','') or '',request.get('purpose','') or '')
+        filtered_items=list(filtered_items)+screened_out
+        if prefilter_report is not None:
+            prefilter_report['screening']={k:v for k,v in screening_report.items() if k!='failed_items'}
+            prefilter_report['kept']=len(all_records);prefilter_report['filtered_out']=len(filtered_items)
+            for f in screened_out:
+                prefilter_report['filtered_by_reason'][f['status']]=prefilter_report['filtered_by_reason'].get(f['status'],0)+1
+            prefilter_report.setdefault('filtered',[]).extend(screened_out)
     triage_report=None
     if question_kind=='person' and target_names and all_records:
         # Deterministic, model-free reading order: named/continuation pages,
@@ -1119,7 +1135,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
          'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
          'model_configuration':routing_summary(),
          'configuration':conf,'model_used':False,'claims':[],'answer_sections':[],
-         'coverage':{'collected_unique_passages':collected_count,'prefilter':prefilter_report,
+         'coverage':{'collected_unique_passages':collected_count,'prefilter':prefilter_report,'screening':screening_report,
                      'original_unique_passages':original_passage_count,'unique_passages':len(all_records),'selected_passages':len(selected),
                      'repeated_occurrences':sum(len(r['occurrences'])-1 for r in all_records),'deferred':deferred,'excluded':excluded},
          'evidence':selected,'calls':[],'rejected':[],
@@ -1450,7 +1466,7 @@ def render_funnel(funnel,continuation=None):
            f"| 3. Υποστηριζόμενοι ισχυρισμοί / Supported claims | {f['claims']['supported_by_quotation']} από {f['claims']['extracted']} εξαγμένους |",
            f"| 4. Προσωρινή σύνθεση / Provisional synthesis | {f['provisional_synthesis']['paragraphs']} παράγραφοι |",
            f"| 5. Ανθρώπινη επαλήθευση / Human verification | {'έγινε' if f['human_verification']['performed'] else 'εκκρεμεί'} ({f['human_verification']['verified_claims']} επαληθευμένοι) |",
-           *(['','Τα φιλτραρισμένα δεν σβήστηκαν: είναι στο answer.json (coverage.prefilter.filtered) και επανέρχονται με PCT_PREFILTER_REINCLUDE. / Filtered excerpts are listed, not deleted.'] if (f.get('prefilter') or {}).get('filtered_out') else []),
+           *(['','Τα φιλτραρισμένα δεν σβήστηκαν: είναι στο answer.json (coverage.prefilter.filtered) και επανέρχονται με PCT_PREFILTER_REINCLUDE (ή PCT_SCREENING_REINCLUDE για όσα απέτυχαν στον έλεγχο κριτηρίων τόπος/θέμα/περίοδος, screened_out_*). / Filtered excerpts are listed, not deleted.'] if (f.get('prefilter') or {}).get('filtered_out') else []),
            '','«Υποστηρίζεται» σημαίνει μόνο ότι το παράθεμα στηρίζει τη διατύπωση· δεν είναι ιστορική επαλήθευση.','']
     if continuation:
         lines.extend(['### Γύροι συνέχισης / Continuation rounds','',
