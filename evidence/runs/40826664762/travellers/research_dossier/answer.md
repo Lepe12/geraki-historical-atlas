@@ -1,0 +1,334 @@
+# Ευρήματα από τις πηγές
+
+Πώς και πότε τελείωσε η εξουσία του Ιωάννη Καψή στη Μήλο;
+
+Εντοπίστηκαν 13 αποσπάσματα εντός της ζητούμενης περιόδου. Αποδίδονται στις πηγές τους και εκκρεμεί έλεγχος.
+
+## 1000 — ERIC EJ958869: Effects of Computer-Aided Personalized System of Instruction in Developing Knowledge and Critical Thinking in Blended Learning Courses
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Course requirements were similar across all four sections. 
+> The only difference was that students in the two CAPSI sections 
+> were required to complete two APA-formatted essays (roughly 
+> 1000 words each) and a CAPSI assignment, while students in 
+> the two the non-CAPSI sections were required to write three 
+> APA-formatted essays (roughly 1000 words each) as a part of 
+> course requirements
+
+Πηγή: https://archive.org/details/ERIC_EJ958869; αρχείο ERIC_EJ958869_ERIC_EJ958869_djvu.txt, γραμμές 224–230.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, ACTION_UNRESOLVED.
+
+## 1045, 1058, 1375, 1477, 2006, 2008, 2010, 2012, 2013, 2014, 2018, 2019 — 10 anos de um CAPSi
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> In: E. Lauridsen-Ribeiro & O. Y. Tanaka (Eds.), Atenção em Saúde Mental para crianças e
+> adolescentes no SUS (pp.186-210). São Paulo: Hucitec.
+> Rinaldi, D. L., & Bursztyn, D. C. (2008). O desafio da clínica na atenção psicossocial. Arquivos
+> Brasileiros
+> de
+> Psicologia,
+> 60(2),
+> 32-39.
+> Recuperado
+> em
+> http://pepsic.bvsalud.org/pdf/arbp/v60n2/v60n2a05.pdf
+> Ronchi, J. P. & Avellar, L. Z. (2010). Saúde mental da criança e do adolescente: a experiência do CAPSi
+> da cidade de Vitória-ES. Psicologia: Teoria e Prática, 12(1), 71-84. Recuperado em
+> http://pepsic.bvsalud.org/pdf/ptp/v12n1/v12n1a07.pdf
+> Ronchi, J. P. & Avellar, L. Z. (2013). Ambiência na Atenção Psicossocial Infantojuvenil: um estudo no
+> CAPSi. Saúde e Sociedade, 22(4), 1045-1058. doi: http://dx.doi.org/10.1590/S010412902013000400008
+> Silva, M. E., & Ferrari, I. F. (2018) Dificuldades de adesão ao tratamento nos CAPSi por adolescentes
+> usuários de drogas: a singularidade como princípio propositivo e os desafios da prática. In: I. Ferrari
+> & J. Ferreira-Neto (Orgs.), Políticas públicas e clínica: estudos em psicologia e psicanálise (pp. 92111). Belo Horizonte: Editora PUC Minas.
+> Souza, A. C. (2006). Ampliando o campo de atenção psicossocial: a articulação dos centros de atenção
+> psicossocial com a saúde da família. Escola Anna Nery, 10(4), 703-710. doi:
+> http://dx.doi.org/10.1590/S1414-81452006000400012
+> Taño, B. L. (2014). Os Centros de Atenção Psicossocial Infantojuvenis (CAPSi) e as práticas de cuidado
+> para as crianças e adolescentes em intenso sofrimento psíquico. Dissertação (Mestrado em Terapia
+> Ocupacional) – Universidade Federal de São Carlos, SP, Brasil. Recuperado em
+> http://www.cadernosdeterapiaocupacional.ufscar.br/ index.php/cadernos/article/view/865/624
+> Teixeira, R. M., & Jucá, V. J. (2014). Caracterização dos usuários de um centro de atenção psicossocial
+> infantojuvenil do município de Salvador (BA). Revista de Psicologia, Fortaleza, 5(2), 70-84.
+> Disponível em http://www.periodicos.ufc.br/psicologiaufc/article/view/1477/1375
+> Tristão, K. G. (2018). CAPSij como lugar de cuidado para crianças e adolescentes em uso de
+> substâncias psicoativas. Tese (Doutorado em Psicologia) – Universidade Federal do Espírito Santo,
+> Vitória,
+> ES,
+> Brasil.
+> Recuperado
+> em
+> http://portais4.ufes.br/posgrad/teses/tese_9223_TESE%20Kelly%20Guimar%E3es%20Trist%E3o.
+> pdf
+> Tristão, K. G., & Avellar, L. Z. (2019). A estratégia de redução de danos no cuidado a adolescentes em
+> uso de substâncias psicoativas. Cadernos Brasileiros de Saúde Mental/Brazilian Journal of Mental
+> Health,
+> 11(30),
+> 55-77.
+> Recuperado
+> em
+> https://periodicos.ufsc.br/index.php/cbsm/article/view/69726/42272
+> Viganò, C. (2010). Avaliação e evidência clínica na saúde mental. Revista Latinoamericana de
+> Psicopatologia Fundamental, 13(3), 469-481. doi: http://dx.doi.org/10.1590/S141547142010000300007
+> Visani, P., & Rabello, S. (2012). Considerações sobre o diagnóstico precoce na clínica do autismo e das
+> psicoses infantis. Revista Latinoamericana de Psicopatologia Fundamental, 15(2), 293-308. doi:
+> http://dx.doi.org/10.1590/S1415-47142012000200006
+> Revisão gramatical: Profª Ediliane Brito de Araújo
+> E-mail: grafia.al@hotmail.com
+
+Πηγή: https://doi.org/10.11606/issn.1981-1624.v25i1p165-183; αρχείο 78dd25450f18934d52e6f008.txt, γραμμές 903–955.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, MULTIPLE_DATES_REQUIRE_CLAUSE_REVIEW, ACTION_UNRESOLVED.
+
+## 1415, 2022 — A narrativa interativa devolutiva no diálogo com os profissionais de um CAPSi The interactive feedback narrative in dialogue with CAPSi professionals La narrativa interactiva devolutiva en el diálogo con los profesionales de un CAPSi Le récit interactif de retour dans le dialogue avec les professionnels d'un CAPS
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Bustamante, V., & Onocko-Campos, R. (2022). Processo de trabalho e sofrimento institucional em Centros de Atenção Psicossocial Infanto-juvenis (Capsi): Uma pesquisa-intervenção junto a trabalhadores. Revista Latinoamericana de Psicopatologia Fundamental, 25(2), 429–452. https://doi.org/10.1590/1415-4714.2022v25n2p429.9
+
+Πηγή: https://doi.org/10.5020/23590777.rs.v25i3.e15092; αρχείο c183334f4a0841c383209401.txt, γραμμές 381–381.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, MULTIPLE_DATES_REQUIRE_CLAUSE_REVIEW, ACTION_UNRESOLVED.
+
+## 1415, 2022 — The Interactive Feedback Narrative in Dialogue with CAPSi Professionals La Narrativa Interactiva Devolutiva en el Diálogo con los Profesionales de un CAPS Le Récit Interactif de Retour dans le Dialogue avec les Professionnels d'un CAPS A Narrativa Interativa Devolutiva no Diálogo com os Profissionais de um CAPSi
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Bustamante, V., & Onocko-Campos, R. (2022). Processo de trabalho e sofrimento institucional em Centros de Atenção Psicossocial Infanto-juvenis (Capsi): Uma pesquisa-intervenção junto a trabalhadores. Revista Latinoamericana de Psicopatologia Fundamental, 25(2), 429–452. https://doi.org/10.1590/1415-4714.2022v25n2p429.9
+
+Πηγή: https://doi.org/10.5020/23590777.rs.v25i3.e17016; αρχείο fe5f25367e307054a71909bc.txt, γραμμές 339–339.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, MULTIPLE_DATES_REQUIRE_CLAUSE_REVIEW, ACTION_UNRESOLVED.
+
+## 1505, 1984, 1986, 1987 — Greek Government Gazette: Part 2, 1987 no. 241
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> ΙΩΑΝΝΗΣ ΚΑΨΗΣ 
+> 
+> 
+> Αριθ. 20496/7281 (4) 
+> 
+> Καθορισμός αριθμού συνεδριάσεων και αμοιβής των μετεχόντων στο 
+> Τεχνικό Συμβούλιο. 
+> 
+> 01 ΥΠΟΥΡΓΟΙ 
+> ΟΙΚΟΝΟΜΙΚΩΝ ΚΑΙ 
+> 
+> ΥΓΕΙΑΣ—ΠΡΟΝΟΙΑΣ & ΚΟΙΝ. ΑΣΦΑΛΙΣΕΩΝ 
+> Έχοντας υπόψη: 
+> 
+> 1. Τις διατάξεις του Ν. 1505/1984 (ΦΕΚ 194/3.12.1984 τεύχος 
+> Λ') «Αναδιάρθρωση μισθολογίου προσωπικού της Δημόσιας Διοίκη¬ 
+> σης και άλλες συναφείς διατάξεις». 
+> 
+> 2. Την αριθμ. 13208/360 εγκ. 1/28.1.1985 εγκύκλιο του Υπουρ¬ 
+> γείου Οικονομικών — Γενικό Λογιστήριο του Κράτους. 
+> 
+> 3. Την κοινή απόφαση των Υπουργών Προεδρίας Κυβερνήσεως, 
+> Υγείας, Πρόνοιας και Κοινωνικών Ασφαλίσεων και Περιβάλλοντος 
+> Χωροταξίας και Δημοσίων Έργων ΔΤΥ/α/οικ. 3196/24.9.86 (ΦΕΚ 
+> 619/86 τεύχος Β'). 
+> 
+> I. Γην απόφαση του Υπουργού Υγείας, Πρόνοιας και Κοινωνικών 
+> Ασφαλίσεων ΔI γ/50990/7.1 1. 1986 (ΦΕΚ 790/1 1.1 1.1986 τ.Β ) 
+> 5. Το αριθμ. 47/3.2.1987 έγγραφο της Δώσης Τεχνικών Υπηρε¬ 
+> 
+> 
+> σιών του Υπουργείου Υγείας, Πρόνοιας και Κοινωνικών Λσφαλί 
+> σεων. 
+> 
+> 6. Την αρ. 2389/13.2.1987 απόφαση του Πρωθυπουργού και τοι 
+> Υπουργού Οικονομικών, αποφασίζουμε: 
+> 
+> 1. Καθορίζουμε τον αριθμό των στνεδριάσεων του Τεχνικού Συμ 
+> βουλίου μέχρι τρεις (3) το μήνα. 
+> 
+> 2. Η κατά συνεδρίαση αποζημίωση των μετεχόντων στο ανωτέρο. 
+> Συμβούλιο (μελών, Γραμματέα και εισηγητών) θα είναι για μεν τουΓ 
+> υπαλλήλους του Δημοσίου τομέα η οριζόμενη από το άρθρο 18 του Ν. 
+> 1505/1984 υπό τη ρητή προϋπόθεση πραγματοποιήσεως των συνε¬ 
+> δριάσεων του Συμβουλίου εκτός των ωρών εργασίας για δε τους ιδιώ 
+> τες χίλιες πεντακόσιες (1.500) δραχμές. 
+> 
+> Η απόφαση αυτή, της οποίας η ισχύς αρχίζει από 1.1.1987, να δη- 
+> μοσιευθεί στην Εφημερίδα της Κυβερνήσεως. 
+> 
+> Αθήνα, 27 Μαρτίου 1987 
+> 01 ΥΠΟΥΡΓΟΙ
+
+Πηγή: https://archive.org/details/GreekGovernmentGazette-19870200241; αρχείο GreekGovernmentGazette-19870200241_19870200241_djvu.txt, γραμμές 409–460.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, MULTIPLE_DATES_REQUIRE_CLAUSE_REVIEW, ACTION_UNRESOLVED, NAME_FROM_SECTION_HEADING.
+
+## 1624, 2020 — The Interactive Feedback Narrative in Dialogue with CAPSi Professionals La Narrativa Interactiva Devolutiva en el Diálogo con los Profesionales de un CAPS Le Récit Interactif de Retour dans le Dialogue avec les Professionnels d'un CAPS A Narrativa Interativa Devolutiva no Diálogo com os Profissionais de um CAPSi
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Leitão, I. B., & Avellar, L. Z. (2020). 10 anos de um CAPSi: Percepções dos profissionais acerca do trabalho em saúde mental infantojuvenil. Estilos da Clínica, 25(1), 165-183. https://doi.org/10.11606/issn.1981-1624.v25i1p165-183
+
+Πηγή: https://doi.org/10.5020/23590777.rs.v25i3.e17016; αρχείο fe5f25367e307054a71909bc.txt, γραμμές 427–427.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, MULTIPLE_DATES_REQUIRE_CLAUSE_REVIEW, ACTION_UNRESOLVED.
+
+## 1624, 2020 — A narrativa interativa devolutiva no diálogo com os profissionais de um CAPSi The interactive feedback narrative in dialogue with CAPSi professionals La narrativa interactiva devolutiva en el diálogo con los profesionales de un CAPSi Le récit interactif de retour dans le dialogue avec les professionnels d'un CAPS
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Leitão, I. B., & Avellar, L. Z. (2020). 10 anos de um CAPSi: Percepções dos profissionais acerca do trabalho em saúde mental infantojuvenil. Estilos da Clínica, 25(1), 165-183. https://doi.org/10.11606/issn.1981-1624.v25i1p165-183
+
+Πηγή: https://doi.org/10.5020/23590777.rs.v25i3.e15092; αρχείο c183334f4a0841c383209401.txt, γραμμές 425–425.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, MULTIPLE_DATES_REQUIRE_CLAUSE_REVIEW, ACTION_UNRESOLVED.
+
+## 1677 — Διαδρομή Ελευθερίας 174 (2017 Sep)
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Η Μήλος εν µέσω οθωμανικής κυριαρχίας, το 1677 απέ- 
+> κτησε πειρατή βασιλιά! Ο Ιωάννης Κάψης µε τα αδέρφια 
+> του Τροµάρα και Νίκο εξορμούσαν µε δύο γαλέρες από 
+> τον Μύτικα της Αιτωλοακαρνανίας και σάλπαραν σε όλο 
+> στο Αιγαίο και το Ιόνιο. Ο Κάψης σε µια στάση του στην 
+> Μήλο γνώρισε την κόρη ενός πλούσιου προύχοντα όπου 
+> και την παντρεύτηκε αφήνοντας στην άκρη τον πειρατικό 
+> βίο. Μετά από την σύντομη ανάπαυλα ο Κάψης γίνεται 
+> πάλι πειρατής µε αφορμή την δολοφονία του αδελφού 
+> του Τροµάρα από τους Οθωμανούς. Ο Κάψης κατατρέ- 
+> χει τους Οθωμανούς, ισχυροποιείται µε πλοία, άνδρες 
+> και όπλα και επιστρέφει στην Μήλο, όπου διώχνει τους 
+> Οθωμανούς και χρήζει τον εαυτό του βασιλιά του νησιού. 
+> Η στέψη γίνεται στον μητροπολιτικό ναό από τον Λατίνο 
+> επίσκοπο των καθολικών δόν Καμίλλο. Για τρία χρόνια η 
+> Μήλος είναι ελεύθερη από την Οθωμανική κυριαρχία και 
+> υπακούει στους νόµους του πειρατή. Ο Κάψης συγκροτεί 
+> όλες τις λειτουργίες ενός κράτους µε δικαστήριο, αστυνο-
+
+Πηγή: https://archive.org/details/diadromi_174; αρχείο diadromi_174_diadromi_174_djvu.txt, γραμμές 3676–3693.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED.
+
+## 1677 — Διαδρομή Ελευθερίας 174 (2017 Sep)
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Η Μήλος εν µέσω οθωμανικής κυριαρχίας, το 1677 απέ- 
+> κτησε πειρατή βασιλιά! Ο Ιωάννης Κάψης µε τα αδέρφια
+
+Πηγή: https://archive.org/details/diadromi_174; αρχείο diadromi_174_diadromi_174_djvu.txt, γραμμές 3557–3558.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED.
+
+## 1677, 1680 — Διαδρομή Ελευθερίας 174 (2017 Sep)
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Η Μήλος εν µέσω οθωμανικής κυριαρχίας, το 1677 απέ- 
+> κτησε πειρατή βασιλιά! Ο Ιωάννης Κάψης µε τα αδέρφια 
+> του Τροµάρα και Νίκο εξορμούσαν µε δύο γαλέρες από 
+> τον Μύτικα της Αιτωλοακαρνανίας και σάλπαραν σε όλο 
+> στο Αιγαίο και το Ιόνιο. Ο Κάψης σε µια στάση του στην 
+> Μήλο γνώρισε την κόρη ενός πλούσιου προύχοντα όπου 
+> και την παντρεύτηκε αφήνοντας στην άκρη τον πειρατικό 
+> βίο. Μετά από την σύντομη ανάπαυλα ο Κάψης γίνεται 
+> πάλι πειρατής µε αφορμή την δολοφονία του αδελφού 
+> του Τροµάρα από τους Οθωμανούς. Ο Κάψης κατατρέ- 
+> χει τους Οθωμανούς, ισχυροποιείται µε πλοία, άνδρες 
+> και όπλα και επιστρέφει στην Μήλο, όπου διώχνει τους 
+> Οθωμανούς και χρήζει τον εαυτό του βασιλιά του νησιού. 
+> Η στέψη γίνεται στον μητροπολιτικό ναό από τον Λατίνο 
+> επίσκοπο των καθολικών δόν Καμίλλο. Για τρία χρόνια η 
+> Μήλος είναι ελεύθερη από την Οθωμανική κυριαρχία και 
+> υπακούει στους νόμους του πειρατή. Ο Κάψης συγκροτεί 
+> όλες τις λειτουργίες ενός κράτους µε δικαστήριο, αστυνο- 
+> µία, στρατό και Φοροεισπρακτικό μηχανισμό. Η κυριαρχία 
+> του Κάψη, όµως, Φαίνεται πως περιορίζονταν από την 
+> εξουσία της εκκλησίας και των προεστών,που ακόµα διεκ- 
+> δικούσαν µεγάλο μερίδιο από τους φόρους των κατοίκων. 
+> Το 1680 η κυριαρχία του Κάψη τελειώνει. Οι Οθωμανοί 
+> των συλλαμβάνουν, τον οδηγούν στην Κωνσταντινούπολη 
+> και τον απαγχονίζουν. Οι εκδοχές για το πώς οδηγήθηκε 
+> στα χέρια των Οθωμανών είναι δύο: α) Ο Κάψης παρα- 
+> πλανήθηκε από τους Οθωμανούς οι οποίοι του είπαν ότι 
+> ήρθαν για να τον τιμήσουν και να του προσφέρουν δώρα 
+> και οδηγήθηκε σε µια γαλέρα όπου βρίσκονταν τα δώρα... 
+> β) Ο Κάψης ηγήθηκε εξέγερσης ενάντια στους φόρουςπου 
+> έπρεπε οι κάτοικοι να πληρώνουν στο πατριαρχείο και
+
+Πηγή: https://archive.org/details/diadromi_174; αρχείο diadromi_174_diadromi_174_djvu.txt, γραμμές 3821–3851.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, MULTIPLE_DATES_REQUIRE_CLAUSE_REVIEW.
+
+## 1680 — Saulger, Robert: Histoire nouvelle des anciens ducs et autres souverains de l'Archipel: avec la description des principales isles
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Livre III. 323
+> 
+> ; pus: À peine eut-il misle pied dans
+> 
+> galére,quela foldatefque Turque qui
+> avoit le mot, l’entoura de tous côtez,
+> & le mit aux fers, aprés lui avoir ôté
+> fa chaîne d’or. On s'étonna comme il
+> ne fe fit point plùtòt tuer, lui qui avoit
+> tant de coeur, & qui devoit fçavoir que
+> 
+> | des Turcs ne pardonnent point. Auflia
+> 
+> tôt le Commandant fit prendre le lar-
+> ge , & mena fon prifonnier à Conftan-
+> κο où quelques jours aprés il fut
+> pendu à un arbre devant la porte du
+> Grand Bagne l’an1680. Depuislamort
+> de Capfiles Turcs font devenus fi om-
+> brageux fur tout ce qui fe paffe d'un
+> peu extraordinaire à Milo , qu'il n’y a
+> pas encore trop long-tems (ar le Ca-
+> pitan Bacha y fut envoié exprés de Con-
+> ftantinople avec 30 galéres, pour faire
+> fauter par des mines l’Hofpice des Pe-
+> res Capucins, parcequ’on avoit donné
+> avis à la Porte, que cette Maifon avoit
+> Pair d’une citadelle , quoique tout fe
+> réduisît à une Eglife fort fimple , fur
+> laquelle ces pauvres Peres avoient fait
+> élever un petit dortoir de fept ou huit
+> cellules, Le Géneral ee quoique
+> vJ
+
+Πηγή: https://api.digitale-sammlungen.de/iiif/image/v2/bsb10447069_00341/full/full/0/default.jpg; αρχείο 389a2a55a389b0891fab65ff.txt, γραμμές 1–33.
+Βάση χρονολόγησης: EXPLICIT_PARAGRAPH.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, IDENTITY_ASSOCIATION_PROVISIONAL, ACTION_UNRESOLVED, SECTION_CONTINUATION_PAGE_BLOCK, NO_TARGET_NAME_ON_CONTINUATION_PAGE.
+
+## 1881 — Greek Government Gazette: Part 1, 1987 no. 176
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> Π απατναγιώτου, Εμπορικής Ναυτιλίας Ευστάθιος Αλεςαν- 
+> ορης, 6) Οι Υφυπουργοί Προεδρίας της Κυβέρνησης και Ε¬ 
+> ξωτερικών Ιωάννης Καψης, Εσωτερικών Βασίλειος ΙΙαπα- 
+> γιάννης, Εθνικής Άμυνας Θεόδωρός Στάθης, 1 γειας, 
+> Πρόνοιας και Κοινωνικών Ασφαλίσεων Γρηγόριος Σολω¬ 
+> μός και Βιομηχανίας, Ενέργειας και Τεχνολογίας I εώργιος 
+> Πέτσος. με πρόταση του Πρωθυπουργού, αποφασίζουμε.
+
+Πηγή: https://archive.org/details/GreekGovernmentGazette-19870100176; αρχείο GreekGovernmentGazette-19870100176_19870100176_djvu.txt, γραμμές 61–67.
+Βάση χρονολόγησης: YEAR_HEADING.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, DATE_FROM_SECTION_HEADING, ACTION_UNRESOLVED.
+
+## 1881 — Greek Government Gazette: Part 1, 1987 no. 176
+
+Η πηγή αναφέρει (αυτόματη εξαγωγή από αποκτημένο κείμενο, χωρίς έλεγχο πρωτοτύπου):
+
+> 6. Ιωάννη Καψή, Υφυπουργό Προεδρίας της ^Κυβέρνησης 
+> και Εξωτερικών.
+
+Πηγή: https://archive.org/details/GreekGovernmentGazette-19870100176; αρχείο GreekGovernmentGazette-19870100176_19870100176_djvu.txt, γραμμές 84–85.
+Βάση χρονολόγησης: YEAR_HEADING.
+Εκκρεμότητες: ORIGINAL_NOT_INSPECTED, SOURCE_GENEALOGY_PENDING, INDEPENDENCE_UNRESOLVED, DATE_FROM_SECTION_HEADING, ACTION_UNRESOLVED.
+
+
+Η ανεξαρτησία των πηγών και οι πιθανές αντιφάσεις δεν έχουν ακόμη αξιολογηθεί.
