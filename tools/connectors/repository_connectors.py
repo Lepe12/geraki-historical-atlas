@@ -825,6 +825,18 @@ def moreveneto_public(q,lane):
                 'url':None,'date':[],'catalogue_endpoint':endpoint,'evidence_level':'CATALOGUE_METADATA_ONLY'})
     return 'EXECUTED',rows,endpoint+' ; '+full_failure+'anonymous catalogue autocomplete; total='+str(result.get('totalCount'))
 
+def _open_collection(source,q,lane):
+    """Internet Archive texts / David Rumsey maps via tools/connectors/open_collections.py."""
+    try:from .open_collections import lane_search
+    except ImportError:from open_collections import lane_search
+    return lane_search(source,q,lane)
+
+def david_rumsey_maps(q,lane):
+    return _open_collection("david_rumsey",q,lane)
+
+def internet_archive_texts(q,lane):
+    return _open_collection("internet_archive",q,lane)
+
 def unsupported(repository, reason="No stable anonymous machine-search connector configured."):
     return "AUTH_OR_BROWSER_REQUIRED",[],reason
 
@@ -848,6 +860,8 @@ def dispatch(repository,q,lane):
     if repository=="Public Web Source Discovery":
         return _public_site_index(q,lane,repository,None,20)
     """Dispatch exact repository labels from lane_repository_plan.py."""
+    if repository=="David Rumsey Map Collection": return david_rumsey_maps(q,lane)
+    if repository=="Internet Archive": return internet_archive_texts(q,lane)
     if repository=="Gallica/BnF": return bnf_sru(q,lane)  # catalogue SRU is stable public fallback
     if repository=="Google Books": return google_books(q,lane)
     if repository=="Library of Congress": return library_of_congress(q,lane)
