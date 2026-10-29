@@ -1,0 +1,3672 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "source_genealogy",
+  "label": "Source Genealogy Agent",
+  "assignment_id": "source_genealogy:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "source_chains",
+    "derivative_sources",
+    "independence_warnings",
+    "primary_source_targets"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "1928b50b166f64f9bebed40dd8c04d23ae87ec3353955445f4b71863df6e8018",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "source_genealogy",
+    "assignment_id": "source_genealogy:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:Biblioteca Digital Hispánica",
+      "repo:Academia.edu Public Research"
+    ],
+    "queries": [
+      "\"Pietro Lanza\"",
+      "\"Pedro Lanza\"",
+      "\"Pedro Lantzas\"",
+      "\"Πέτρος Λάντζας\"",
+      "\"Pedro Lantza\""
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 108,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 100,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 90,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Crossref Scholarly Metadata",
+        "route_type": "repository_dispatch",
+        "repository": "Crossref Scholarly Metadata",
+        "connector_id": null,
+        "score": 86,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pedro Lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pedro+Lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pedro+Lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 609, \"response_sha256\": \"87ed1a874291819526dac36669081a353e33c8253d9a78994d99e019be4527b9\", \"elapsed_ms\": 649}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pedro+Lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 623, \"response_sha256\": \"e753864b839e82bdfffff365e273c71a66bd6c114003d0b5079f967c52b7f9f9\", \"elapsed_ms\": 652}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pedro Lantza\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pedro+Lantza+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pedro+Lantza+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 608, \"response_sha256\": \"d450899f14ab460f465414087a9ee9329a0dc3bf63d750bfe4e0ce461ade2fe5\", \"elapsed_ms\": 664}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pedro+Lantza+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pietro Lanza\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Pietro+Lanza%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22Pietro+Lanza%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25529, \"response_sha256\": \"584522d3d6d49352b67d5b4ab97e109db63b07c66e7e425e927703bd54e4f391\", \"elapsed_ms\": 759}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22Pietro+Lanza%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25617, \"response_sha256\": \"3e66441d083b44bf078d1a56078848ca79a69a6c3a5b14e682acb6f4a043422d\", \"elapsed_ms\": 171}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pedro Lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Pedro+Lantzas%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22Pedro+Lantzas%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25529, \"response_sha256\": \"b0a38da8eab852c8e74248f2ddd57481e9d034603bcf5f42fc512417122ae4b4\", \"elapsed_ms\": 187}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22Pedro+Lantzas%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pedro Lanza\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Pedro+Lanza%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22Pedro+Lanza%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 31568, \"response_sha256\": \"c962a29925e5898d8ebbf90e40a369cda78a842446c75ed02f6187ea23cf094b\", \"elapsed_ms\": 196}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22Pedro+Lanza%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Pedro Lantza\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Pedro+Lantza%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 105}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Pedro+Lantza%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 105}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pietro Lanza\"",
+      "records": [
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737750c",
+          "title": "Lezione accademica sugli asili infantili, di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1840"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737750c",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737750c"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb45043757m",
+          "title": "Sagittario in amore : poesie postume / Pietro Cimatti ; note critiche e cura di Davide Argnani e Stefania Porrino ; prefazione di Ludovico Griguoli Lanza",
+          "creator": [
+            "Cimatti, Pietro (1929-1991). Auteur du texte"
+          ],
+          "date": [
+            "2015"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb45043757m",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb45043757m",
+            "ISBN 9788897726753"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737754r",
+          "title": "Donne e gioielli in Sicilia nel medio evo e nel rinascimento... / Pietro Lanza di Scalea",
+          "creator": [
+            "Lanza di Scalea, Pietro. Auteur du texte"
+          ],
+          "date": [
+            "1892"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737754r",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737754r"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737747g",
+          "title": "Degli Arabi e del loro soggiorno in Sicilia, memoria di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1832"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737747g",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737747g"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737751q",
+          "title": "Dello Spirito di associazione nella Inghilterra in particolare, saggïo politico ed economico, di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1842"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737751q",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737751q"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb307377553",
+          "title": "Enrico Rosso e la confisca de' suoi mobili in Castiglione, ricerche storiche del secolo XIV / Pietro Lanza di Scalea",
+          "creator": [
+            "Lanza di Scalea, Pietro. Auteur du texte"
+          ],
+          "date": [
+            "1890"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb307377553",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb307377553"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737748t",
+          "title": "Dell' Arte drammatica in Sicilia, epitome di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1834"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30737748t",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30737748t"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb47022743j",
+          "title": "24/5/31, Exposition coloniale, le prince Di Sclalea [i.e. Di Scalea] : [photographie de presse] / [Agence Rol]",
+          "creator": [
+            "Agence Rol. Agence photographique (commanditaire)"
+          ],
+          "date": [
+            "1931"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb47022743j",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb47022743j"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30132553m",
+          "title": "In Morte di Maddalena Caracciolo, principessa di Scalea, cantico di Giuseppe Borghi, preceduta da un cenno necrologico (da Pietro Lanza, principe di Scordia)",
+          "creator": [
+            "Borghi, Giuseppe (1790-1847). Auteur du texte",
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1838"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30132553m",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30132553m"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb307377495",
+          "title": "Considerazioni sulla storia di Sicilia dal 1532 al 1789, da servir d'aggiunte e di chiose al Botta, di Pietro Lanza,...",
+          "creator": [
+            "Lanza, Pietro (principe di Scordia). Auteur du texte"
+          ],
+          "date": [
+            "1836"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb307377495",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb307377495"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb31550875h",
+          "title": "Italia e Francia, 1870, secondo narrazioni di G. Lanza, Q. Sella, E. Ollivier e d'un uomo politico italiano",
+          "creator": [
+            "Vayra, Pietro (1836-1898). Auteur du texte"
+          ],
+          "date": [
+            "1895"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb31550875h",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb31550875h"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb30961712b",
+          "title": "Pietro Lanza e Stella, principe di Trabia, e l'agricoltura in Sicilia nel 1786 e nel 1896, per Carlo Crispo Moncada",
+          "creator": [
+            "Moncada, Carlo Crispo. Auteur du texte"
+          ],
+          "date": [
+            "1897"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb30961712b",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb30961712b"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb46889466j",
+          "title": "The Immortal Voice of Mario Lanza: A Centennial Celebration / Mario Lanza",
+          "creator": [
+            "Lanza, Mario (1921-1959). Interprète",
+            "Mascagni, Pietro (1863-1945). Compositeur",
+            "Romberg, Sigmund (1887-1951). Compositeur",
+            "Rodgers, Richard (1902-1979). Compositeur"
+          ],
+          "date": [
+            "2021"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb46889466j",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb46889466j"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb376873058",
+          "title": "Le proposte di un principe : Pietro Lanza e la \"ricchezza del Regno\" / Giacomo Dentici",
+          "creator": [
+            "Dentici, Giacomo (1940-....). Auteur du texte"
+          ],
+          "date": [
+            "1999"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb376873058",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb376873058",
+            "ISBN 8881280892"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb38632566x",
+          "title": "Cavalleria rusticana. Addio alla madre / Mascagni, comp. ; Mario Lanza, T ; RCA Victor Orchestra ; Constantine Callinicos, dir.. La forza del destino. O tu che in seno agli angeli / Verdi, comp. ; Mario Lanza, T ; RCA Victor Orchestra ; Constantine Callinicos, dir.",
+          "creator": [
+            "Mascagni, Pietro (1863-1945). Compositeur",
+            "Verdi, Giuseppe (1813-1901). Compositeur",
+            "Lanza, Mario (1921-1959). Ténor",
+            "Callinicos, Constantine (1913-1986). Direction d'orchestre"
+          ],
+          "date": [
+            "195."
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb38632566x",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb38632566x"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb37894554v",
+          "title": "Cavalleria rusticana. Mamma que vino e generoso / Pietro Mascagni. L'Africana. Mi batte il core : récit. L'Africana. Aria de l'acte 4, O Paradiso ! / Meyerbeer, comp. ; Mario Lanza, T ; RCA Victor orchestra ; Constantine Callinicos, dir.",
+          "creator": [
+            "Lanza, Mario (1921-1959). Ténor",
+            "Callinicos, Constantine (1913-1986). Direction d'orchestre"
+          ],
+          "date": [
+            "194."
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb37894554v",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb37894554v"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+          "title": "Peter of Auvergne : university master of the 13th century / edited by Christoph Flüeler, Lidia Lanza, Marco Toste",
+          "creator": [],
+          "date": [
+            "2015"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+            "ISBN 3110228483"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb38297620n",
+          "title": "José Carreras : a tribute to Mario Lanza / Declan Lowney, réal. ; José Carreras, T ; English concert chorus ; BBC Concert orchestra ; Enrique Ricci, dir.",
+          "creator": [
+            "Lowney, Declan (1960-....). Réalisateur"
+          ],
+          "date": [
+            "1994"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb38297620n",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb38297620n"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb46741746t",
+          "title": "Scriptum super III-VIII libros Politicorum Aristotelis : edizione, introduzione e note / Petrus de Alvernia ; a cura di Lidia Lanza",
+          "creator": [
+            "Pierre d'Auvergne (124.?-1304). Auteur du texte"
+          ],
+          "date": [
+            "2021"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb46741746t",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb46741746t",
+            "ISBN 9783954902781"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb381836987",
+          "title": "Stabat Mater / Pergolesi. Concerti grossi n ° III à V / Alessandro Scarlatti ; Mirella Freni, S ; Teresa Berganza, A ; Solisti dell'orchestra Scarlatti Napoli ; Ettore Gracis, dir",
+          "creator": [
+            "Pergolesi, Giovanni Battista (1710-1736). Compositeur",
+            "Scarlatti, Alessandro (1660-1725). Compositeur",
+            "Gracis, Ettore (1915-1992). Direction d'orchestre",
+            "Freni, Mirella (1935-2020). Soprano"
+          ],
+          "date": [
+            "1989"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb381836987",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb381836987"
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pietro+Lanza+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pietro+Lanza+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 38632, \"response_sha256\": \"2de93c1a6164af72f4f816500d690cd2d42a534738cbf019f890ef1dda1edc26\", \"elapsed_ms\": 932}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pietro+Lanza+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 20, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pedro Lanza\"",
+      "records": [
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb352909807",
+          "title": "Obras de Lope de Vega. XX-XXI, Crónicas y leyendas dramáticas de España. Tercera sección / ed. y estudio preliminar de D. Marcelino Menéndez Pelayo",
+          "creator": [
+            "Vega, Lope de (1562-1635). Auteur du texte"
+          ],
+          "date": [
+            "1967-1968"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb352909807",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb352909807"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb32427021d",
+          "title": "Letras españolas : Silverio Lanza, Azorín, Baroja, Marquina, Alberto Insúa, Guanyabéns, Unamuno, Vicente Médina, Pedro Corominas, Ciges Aparicio, Répide, Villaespesa, Juan R. Jiménez, Diez-Canedo / Juan Mas y Pi",
+          "creator": [
+            "Mas y Pi, Juan. Auteur du texte"
+          ],
+          "date": [
+            "1911"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb32427021d",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb32427021d"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb390766303",
+          "title": "El Peru de Mario Vargas Llosa : Homenaje al Premio Cervantes 1994 : Exposicion, Alcalá de Henares, Universidad, 24 de abril-24 de mayo 1995 / catalogo Jesus Canete Ochoa, Fernando Fernandez Lanza ; comisario Luis de Toledo",
+          "creator": [],
+          "date": [
+            "1995"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb390766303",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb390766303"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+          "title": "Peter of Auvergne : university master of the 13th century / edited by Christoph Flüeler, Lidia Lanza, Marco Toste",
+          "creator": [],
+          "date": [
+            "2015"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+            "ISBN 3110228483"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb46741746t",
+          "title": "Scriptum super III-VIII libros Politicorum Aristotelis : edizione, introduzione e note / Petrus de Alvernia ; a cura di Lidia Lanza",
+          "creator": [
+            "Pierre d'Auvergne (124.?-1304). Auteur du texte"
+          ],
+          "date": [
+            "2021"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb46741746t",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb46741746t",
+            "ISBN 9783954902781"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb487166572",
+          "title": "Coplas del Querer (Edición 15ºAniversario / Remasterizado 2025) : Edición 15ºAniversario / Remasterizado 2025 / Miguel Poveda",
+          "creator": [
+            "Poveda, Miguel (1973-....). Interprète",
+            "Poveda, Miguel (1973-....). Chant",
+            "Quiroga. Compositeur",
+            "Amargós, Joan Albert (1950-....). Producteur artistique. Arrangeur"
+          ],
+          "date": [
+            "2025"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb487166572",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb487166572"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb31552456m",
+          "title": "Obras de Lope de Vega, publicadas por la Real academia española. [Tomo VII-XV]",
+          "creator": [
+            "Vega, Lope de (1562-1635). Auteur du texte"
+          ],
+          "date": [
+            "1890-1913"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb31552456m",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb31552456m"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb383031229",
+          "title": "El barberillo de Lavapiés / Francisco Asenjo Barbieri, comp. ; María Bayo, S (Marquesita) ; Lola Casariego, MS (Paloma) ; Manuel Lanza, BAR (Lamparilla)... [et al.] ; Coros Polifonico Universitario, La Laguna ; Orquesta Sinfonica de Tenerife ; Victor Pablo Perez, dir.",
+          "creator": [
+            "Barbieri, Francisco Asenjo (1823-1894). Compositeur",
+            "Lanza, Manuel. Baryton (voix)",
+            "Casariego, Lola. Mezzo-soprano",
+            "Bayo, María (1964-....). Soprano"
+          ],
+          "date": [
+            "1995"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb383031229",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb383031229"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb476330809",
+          "title": "Las Voces De Rosario / Rosario",
+          "creator": [
+            "RosarioRosario (1963-....). Interprète",
+            "Rosario (1963-....). Interprète. Chant",
+            "Rosario (1963-....). Interprète. Chant. Voix parlée",
+            "Rosario (1963-....). Interprète"
+          ],
+          "date": [
+            "2024"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb476330809",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb476330809"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb44704268c",
+          "title": "Applications of evolutionary computation : EvoApplications 2012: EvoCOMNET, EvoCOMPLEX, EvoFIN, EvoGAMES, EvoHOT, EvoIASP, EvoNUM, EvoPAR, EvoRISK, EvoSTIM, and EvoSTOC, Málaga, Spain, April 11-13, 2012, Proceedings / Cecilia Di Chio [and others] (eds.)",
+          "creator": [
+            "EvoApplications 2012 (2012 ; Málaga, Spain). Auteur du texte"
+          ],
+          "date": [
+            "2012"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb44704268c",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb44704268c",
+            "ISBN 9783642291784"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb476243418",
+          "title": "Bajando las revoluciones",
+          "creator": [
+            "Tomatito. Interprète. Guitare",
+            "de Lucía, Paco. Interprète. Guitare. Luth. Luths (musique ethnique). Mandoline. Instrumentiste. Chant",
+            "Riqueni, Rafael. Interprète. Guitare",
+            "Márquez, Rocío. Interprète. Voix parlée"
+          ],
+          "date": [
+            "2024"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb476243418",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb476243418"
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pedro+Lanza+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pedro+Lanza+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 84012, \"response_sha256\": \"080c6c157c9b832c365ff44661019dcd4dc2afde1fb2bfccf409d624ed95a2c9\", \"elapsed_ms\": 1242}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pedro+Lanza+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 11, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pedro Lantza\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Pedro+Lantza%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Pedro+Lantza%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"45225f3e4b3d9430bff5e06ec2ffb56cbbc9a5332bebd37de5933949ac198828\", \"elapsed_ms\": 810}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Pedro+Lantza%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pedro Lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Pedro+Lantzas%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Pedro+Lantzas%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"45225f3e4b3d9430bff5e06ec2ffb56cbbc9a5332bebd37de5933949ac198828\", \"elapsed_ms\": 1147}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Pedro+Lantzas%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"45225f3e4b3d9430bff5e06ec2ffb56cbbc9a5332bebd37de5933949ac198828\", \"elapsed_ms\": 1143}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pietro Lanza\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Pietro+Lanza%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Pietro+Lanza%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"45225f3e4b3d9430bff5e06ec2ffb56cbbc9a5332bebd37de5933949ac198828\", \"elapsed_ms\": 1271}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Pietro+Lanza%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Pedro Lanza\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Pedro+Lanza%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 112}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Pedro+Lanza%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 218}, {\"url\": \"https://api.openalex.org/works?search=%22Pedro+Lanza%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": \"64437\", \"error_code\": \"HTTP_429\", \"elapsed_ms\": 301}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Pedro+Lanza%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 112}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Pedro+Lanza%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 218}, {\"url\": \"https://api.openalex.org/works?search=%22Pedro+Lanza%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": \"64437\", \"error_code\": \"HTTP_429\", \"elapsed_ms\": 301}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Pietro Lanza\"",
+      "records": [
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gmo/9781561592630.article.21918",
+          "title": "Platania, Pietro",
+          "creator": [
+            "Andrea Lanza"
+          ],
+          "date": [
+            "2001"
+          ],
+          "url": "https://doi.org/10.1093/gmo/9781561592630.article.21918",
+          "doi": "10.1093/gmo/9781561592630.article.21918",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Music Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gmo/9781561592630.article.10861",
+          "title": "Generali, Pietro",
+          "creator": [
+            "Andrea Lanza"
+          ],
+          "date": [
+            "2001"
+          ],
+          "url": "https://doi.org/10.1093/gmo/9781561592630.article.10861",
+          "doi": "10.1093/gmo/9781561592630.article.10861",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Music Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gmo/9781561592630.article.o903915",
+          "title": "Platania, Pietro (opera)",
+          "creator": [
+            "Andrea Lanza"
+          ],
+          "date": [
+            "2002"
+          ],
+          "url": "https://doi.org/10.1093/gmo/9781561592630.article.o903915",
+          "doi": "10.1093/gmo/9781561592630.article.o903915",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Music Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gmo/9781561592630.article.o901885",
+          "title": "Generali, Pietro (opera)",
+          "creator": [
+            "Andrea Lanza"
+          ],
+          "date": [
+            "2002"
+          ],
+          "url": "https://doi.org/10.1093/gmo/9781561592630.article.o901885",
+          "doi": "10.1093/gmo/9781561592630.article.o901885",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Music Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1007/jhep03(2026)238",
+          "title": "Symmetry extension by condensation defects in five-dimensional gauge theories",
+          "creator": [
+            "Matteo Bertolini",
+            "Lorenzo Di Pietro",
+            "Stefano C. Lanza",
+            "Pierluigi Niro",
+            "Antonio Santaniello"
+          ],
+          "date": [
+            "2026-3-25"
+          ],
+          "url": "https://doi.org/10.1007/jhep03(2026)238",
+          "doi": "10.1007/jhep03(2026)238",
+          "type": "journal-article",
+          "publisher": "Springer Science and Business Media LLC",
+          "container_title": [
+            "Journal of High Energy Physics"
+          ],
+          "description": "A bstract We investigate the symmetry structure of five-dimensional Yang-Mills theories with 𝔰𝔲( N ) gauge algebra. These theories feature intertwined 0-, 1-, and 2-form symmetries, depending on the global variant one is considering. In the SU( N ) theory, there is a mixed ’t Hooft anomaly between the instantonic 0-form symmetry and the electric 1-form symmetry. We show that in the PSU( N ) theory this translates into a ℤ N extension of the instantonic symmetry, generated by an invertible condensation defect of the magnetic 2-form symmetry. We identify the charged configurations as linked ’t Hooft surfaces, while pointlike instanton operators remain insensitive to the extension. We generalize our analysis to the SU( N )/ℤ k global form and show that similar results hold, embedded now in a 3-group structure for generic k . We then apply our findings to SO(3) supersymmetric Yang-Mills theory. We determine the global form of the enhanced instantonic symmetry of its superconformal UV completion, showing that it arises through a similar symmetry extension mechanism from the parent E 1 theory, which is the UV completion of SU(2) supersymmetric Yang-Mills theory. Finally, we recast our results in the language of the symmetry topological field theory. As a warm-up, we also analyze Maxwell theory, highlighting analogous features involving continuous symmetries and composite currents.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://link.springer.com/content/pdf/10.1007/JHEP03(2026)238.pdf",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://link.springer.com/article/10.1007/JHEP03(2026)238",
+              "content_type": "text/html",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://link.springer.com/content/pdf/10.1007/JHEP03(2026)238.pdf",
+              "content_type": "application/pdf",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1007/s11243-009-9308-7",
+          "title": "Fluxional rearrangement in congested ruthenium(II) complexes containing pyrimidine- and/or pyridine-based dithioether ligands",
+          "creator": [
+            "Giuseppe Tresoldi",
+            "Santo Di Pietro",
+            "Dario Drommi",
+            "Santo Lanza"
+          ],
+          "date": [
+            "2010-3"
+          ],
+          "url": "https://doi.org/10.1007/s11243-009-9308-7",
+          "doi": "10.1007/s11243-009-9308-7",
+          "type": "journal-article",
+          "publisher": "Springer Science and Business Media LLC",
+          "container_title": [
+            "Transition Metal Chemistry"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://link.springer.com/content/pdf/10.1007/s11243-009-9308-7.pdf",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "http://link.springer.com/article/10.1007/s11243-009-9308-7/fulltext.html",
+              "content_type": "text/html",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "http://link.springer.com/content/pdf/10.1007/s11243-009-9308-7",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00156484",
+          "title": "Rotari, Pietro or Pietro Antonio (Count)",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00156484",
+          "doi": "10.1093/benz/9780199773787.article.b00156484",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gao/9781884446054.013.7002292910",
+          "title": "(1) Pietro Lombardo [Pietro Solari]",
+          "creator": [
+            "Sarah Blake McHam"
+          ],
+          "date": [
+            "2018-1-12"
+          ],
+          "url": "https://doi.org/10.1093/gao/9781884446054.013.7002292910",
+          "doi": "10.1093/gao/9781884446054.013.7002292910",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Art Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00141700",
+          "title": "Pietro di Domenico di Pietro da Lucca",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00141700",
+          "doi": "10.1093/benz/9780199773787.article.b00141700",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00074729",
+          "title": "Giovenale, Angelo di Pietro, or Silvestro di Pietro",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00074729",
+          "doi": "10.1093/benz/9780199773787.article.b00074729",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1002/ejic.200800595",
+          "title": "Dynamic Stereochemical Behaviour of Congested Ruthenium(II) Complexes Containing Asymmetric Thioether Ligands Based on Pyridine and Pyrimidine",
+          "creator": [
+            "Giuseppe Tresoldi",
+            "Santo Lanza",
+            "Santo Di Pietro",
+            "Dario Drommi"
+          ],
+          "date": [
+            "2008-10"
+          ],
+          "url": "https://doi.org/10.1002/ejic.200800595",
+          "doi": "10.1002/ejic.200800595",
+          "type": "journal-article",
+          "publisher": "Wiley",
+          "container_title": [
+            "European Journal of Inorganic Chemistry"
+          ],
+          "description": "Abstract The asymmetric thioethers L [L = 2‐pyridylmethyl 2′‐pyrimidyl sulfide (pps) and 2‐(4‐methylpyrimidyl) 2′‐pyridylmethyl sulfide (mps)] reacted with cis ‐[RuCl 2 ( N , N ‐L′) 2 ] [L′ = di‐2‐pyridyl sulfide (dps); 2,2′‐bis(4‐methylpyridyl) sulfide (4mdps); 2,2′‐bis(5‐methylpyridyl) sulfide (5mdps)] to give the five‐membered‐ring chelate complexes [Ru( N , N ‐L′) 2 ( N pyridine , S ‐L)] ++ as the major products (92–95 %). Because the sulfur and ruthenium atoms are stereogenic centres, with ( R ) and ( S ) and Δ and Λ configurations, respectively, four isomers, including the enantiomers were obtained. At low temperature and in the methylene region of the 1 H NMR spectra, two AB systems due to the enantiomer couples Δ S Λ R ( a ) and Δ R Λ S ( b ) were observed with abundances of 77–89 and 6–18 %, respectively. Furthermore, NMR spectroscopic investigations showed that the hybrid polydentate ligands L change their coordination mode. Thus, although a and b largely predominate, a mixture of species containing L and the Ru( N , N ‐L′) 2 unit in the ratio 1:1 are present. The four‐membered‐ring chelate complexes [Ru( N , N ‐L′) 2 ( N pyrimidine , S ‐L)] ++ ( c ), as minor species (abundance 1–8 %), are always observed, whereas the dinuclear species [{Ru( N , N ‐L′) 2 } 2 (μ‐L) 2 ] +4 ( d , e ) are observed when L′ = dps or 5mdps. In these cases, four AB systems are assigned to dinuclear species d and e containing two bridging L that act as N pyridine ,S‐ or N pyridine ,N pyrimidine ‐donor ligands. The 1 H NMR spectra are temperature dependent in that at low temperature the complexes undergo inversion of the chiral centre of the coordinated sulfur atom ( a [rlhar2] b ) and the dimer ( d , e ) and monomer ( c ) are in equilibrium; at higher temperatures the complexes undergo a structural dynamic rearrangement, which involves exchange between the coordinated and uncoordinated N atoms ( b [rlhar2] c ). One‐dimensional band‐shape analysis of the exchanging methylene and methyl proton signals showed that the energy barriers for inversion of the sulfur centre are in the 50–53 kJ mol –1 range, whereas those for the higher‐temperatures process are in the 62–68 kJ mol –1 range. The possible mechanisms of the processes are discussed. NMR spectroscopic findings suggest that inversion at the sulfur centre occurs without any bond rupture, whereas the exchange, at higher temperatures ( b [rlhar2] c ), is a dissociative process involving the breaking of a Ru–N pyridine bond.(© Wiley‐VCH Verlag GmbH & Co. KGaA, 69451 Weinheim, Germany, 2008)",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://api.wiley.com/onlinelibrary/tdm/v1/articles/10.1002%2Fejic.200800595",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://api.wiley.com/onlinelibrary/tdm/v1/articles/10.1002%2Fejic.200800595",
+              "content_type": "unspecified",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://onlinelibrary.wiley.com/doi/pdf/10.1002/ejic.200800595",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://onlinelibrary.wiley.com/doi/full-xml/10.1002/ejic.200800595",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://chemistry-europe.onlinelibrary.wiley.com/doi/pdf/10.1002/ejic.200800595",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00152053",
+          "title": "Ricci, Giovanni or Gian Pietro or Giovanni Pietro Pedrini",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00152053",
+          "doi": "10.1093/benz/9780199773787.article.b00152053",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gao/9781884446054.article.t067465",
+          "title": "Piero [Pietro di Benedetto di Pietro] della Francesca",
+          "creator": [
+            "Frank Dabell",
+            "J.V. Field"
+          ],
+          "date": [
+            "2003"
+          ],
+          "url": "https://doi.org/10.1093/gao/9781884446054.article.t067465",
+          "doi": "10.1093/gao/9781884446054.article.t067465",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Art Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gmo/9781561592630.article.o903264",
+          "title": "Morandi, Pietro",
+          "creator": [],
+          "date": [
+            "2002"
+          ],
+          "url": "https://doi.org/10.1093/gmo/9781561592630.article.o903264",
+          "doi": "10.1093/gmo/9781561592630.article.o903264",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Music Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gao/9781884446054.article.t2060774",
+          "title": "Girometti, Pietro",
+          "creator": [],
+          "date": [
+            "2008-7-15"
+          ],
+          "url": "https://doi.org/10.1093/gao/9781884446054.article.t2060774",
+          "doi": "10.1093/gao/9781884446054.article.t2060774",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Art Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.3390/md18020086",
+          "title": "Protein Hydrolysates from Anchovy (Engraulis encrasicolus) Waste: In Vitro and In Vivo Biological Activities",
+          "creator": [
+            "Alessia Giannetto",
+            "Emanuela Esposito",
+            "Marika Lanza",
+            "Sabrina Oliva",
+            "Kristian Riolo",
+            "Simona Di Pietro",
+            "Jessica Maria Abbate",
+            "Giovanni Briguglio"
+          ],
+          "date": [
+            "2020-1-28"
+          ],
+          "url": "https://doi.org/10.3390/md18020086",
+          "doi": "10.3390/md18020086",
+          "type": "journal-article",
+          "publisher": "MDPI AG",
+          "container_title": [
+            "Marine Drugs"
+          ],
+          "description": "Fish waste utilization to obtain protein hydrolysates has been demonstrated to be a useful strategy to face both environmental and economic impacts while obtaining high-value products with remarkable biological and nutritional properties. In the present study, protein hydrolysates obtained from anchovy Engraulis encrasicolus (APH) by-products were assessed for their potential biological activities in both in vitro and in vivo models. The treatment with APH exerted a significant protection against LPS-induced inflammation in RAW 264.7 cells, decreasing the protein expression of pro-inflammatory mediators (i.e., COX-2) and inhibiting the nuclear translocation of NF-κB through IκB-α. Moreover, APH modulated the expression of iNOS, MnSOD and HO-1, thus decreasing the severity of oxidative stress. The supplementation of APH in the diet of ApoE knockout mice down-regulated the proinflammatory cytokines (i.e., TNF-α, IL-1α, IL-1β, IL-6) in both aorta and heart tissues, and modulated the expression of oxidative stress-related genes (Cu/ZnSod, MnSod, Cat, Gpx and Ho), indicating that APH can exert a beneficial role, having anti-inflammatory and antioxidant activities. The nutritional properties of APH, together with their biological activities herein reported, highlight the possibility of obtaining bioactive molecules from fish waste and encourage their use as potential nutraceuticals in food and pharmaceutical industries in the next future.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.mdpi.com/1660-3397/18/2/86/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00141657",
+          "title": "Pietro",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00141657",
+          "doi": "10.1093/benz/9780199773787.article.b00141657",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gmo/9781561592630.article.o904251",
+          "title": "Romani, Pietro",
+          "creator": [],
+          "date": [
+            "2002"
+          ],
+          "url": "https://doi.org/10.1093/gmo/9781561592630.article.o904251",
+          "doi": "10.1093/gmo/9781561592630.article.o904251",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Music Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.5040/9781350876293",
+          "title": "Donizetti: Pietro Il Grande",
+          "creator": [],
+          "date": [
+            "2021"
+          ],
+          "url": "https://doi.org/10.5040/9781350876293",
+          "doi": "10.5040/9781350876293",
+          "type": "other",
+          "publisher": "Dynamic",
+          "container_title": [
+            "Donizetti: Pietro Il Grande"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00141658",
+          "title": "Pietro",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00141658",
+          "doi": "10.1093/benz/9780199773787.article.b00141658",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Pietro+Lanza%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 144}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Pietro+Lanza%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Pietro+Lanza%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 89117, \"response_sha256\": \"5726db41c274905a2ae4c4a0be66fc35db638aac4526c4d1199806fe725901b8\", \"elapsed_ms\": 669}, {\"url\": \"https://api.openalex.org/works?search=%22Pietro+Lanza%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": \"64437\", \"error_code\": \"HTTP_429\", \"elapsed_ms\": 338}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}]}\", \"result_count\": 20, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Pietro+Lanza%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 144}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Pietro+Lanza%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Pietro+Lanza%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 89117, \"response_sha256\": \"5726db41c274905a2ae4c4a0be66fc35db638aac4526c4d1199806fe725901b8\", \"elapsed_ms\": 669}, {\"url\": \"https://api.openalex.org/works?search=%22Pietro+Lanza%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": \"64437\", \"error_code\": \"HTTP_429\", \"elapsed_ms\": 338}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}]}\", \"result_count\": 20, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pedro Lanza\"",
+      "records": [
+        {
+          "discovery_repository": "Biblioteca Nacional de España SRU",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "(OCoLC)433359849",
+          "title": "El caballeru de la murnia figura Pedro Lanza Alfonso",
+          "creator": [
+            "Lanza Alfonso, Pedro"
+          ],
+          "date": [
+            "[2004]"
+          ],
+          "url": null,
+          "identifiers": [
+            "(OCoLC)433359849",
+            "(SpMaBN)bimo0002005919",
+            "991017819489708606"
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Pedro+Lanza%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Pedro+Lanza%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 9079, \"response_sha256\": \"f2f168a19fce64a22fd01167c8a470f5627edcce5a2fc5890119e9dff3c4a5b5\", \"elapsed_ms\": 1616}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Pedro+Lanza%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 1, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Pedro Lantza\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Pedro+Lantza%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 217}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Pedro+Lantza%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 241}, {\"url\": \"https://api.openalex.org/works?search=%22Pedro+Lantza%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": \"64436\", \"error_code\": \"HTTP_429\", \"elapsed_ms\": 121}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Pedro+Lantza%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 217}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Pedro+Lantza%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 241}, {\"url\": \"https://api.openalex.org/works?search=%22Pedro+Lantza%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": \"64436\", \"error_code\": \"HTTP_429\", \"elapsed_ms\": 121}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 119}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 449}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": \"64436\", \"error_code\": \"HTTP_429\", \"elapsed_ms\": 130}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 119}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 449}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": \"64436\", \"error_code\": \"HTTP_429\", \"elapsed_ms\": 130}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Pedro Lantzas\"",
+      "records": [
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.3764/ajaonline1182.lantzas",
+          "title": "Individuals and Society in Mycenaean Pylos (Book Review)",
+          "creator": [
+            "Katie Lantzas"
+          ],
+          "date": [
+            "2014-4"
+          ],
+          "url": "https://doi.org/10.3764/ajaonline1182.lantzas",
+          "doi": "10.3764/ajaonline1182.lantzas",
+          "type": "journal-article",
+          "publisher": "University of Chicago Press",
+          "container_title": [
+            "American Journal of Archaeology"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.30861/9781407310206",
+          "title": "Settlement and Social Trends in the Argolid and the Methana Peninsula, 1200–900 BC",
+          "creator": [
+            "Katie Lantzas"
+          ],
+          "date": [
+            "2012"
+          ],
+          "url": "https://doi.org/10.30861/9781407310206",
+          "doi": "10.30861/9781407310206",
+          "type": "monograph",
+          "publisher": "University of Michigan Press",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.fulcrum.org/epubs/ks65hf054/file",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.3764/ajaonline1203.lantzas",
+          "title": "Book Review of Vravron: The Mycenaean Cemetery, by Thanasis I. Papadopoulos and Litsa Kontorli-Papadopoulou",
+          "creator": [
+            "Katie Lantzas"
+          ],
+          "date": [
+            "2016-7"
+          ],
+          "url": "https://doi.org/10.3764/ajaonline1203.lantzas",
+          "doi": "10.3764/ajaonline1203.lantzas",
+          "type": "journal-article",
+          "publisher": "University of Chicago Press",
+          "container_title": [
+            "American Journal of Archaeology"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00076743",
+          "title": "González de San Pedro, Pedro",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00076743",
+          "doi": "10.1093/benz/9780199773787.article.b00076743",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/acref/9780195301731.013.75181",
+          "title": "Tabares, Pedro Rafael “Pedro Ferreira”",
+          "creator": [
+            "Eduardo R. Palermo"
+          ],
+          "date": [
+            "2016-6-1"
+          ],
+          "url": "https://doi.org/10.1093/acref/9780195301731.013.75181",
+          "doi": "10.1093/acref/9780195301731.013.75181",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "African American Studies Center"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.52232/jhpsm.v1i1.59",
+          "title": "THE EFFECTIVENESS OF TELEPHARMACY INTERVENTION ON HYPERTENSIVE PATIENTS",
+          "creator": [
+            "Genie Zaskia Makiling Aca-ac",
+            "Hudson Ken Abe Andawit",
+            "Nellyn Kyle Adrales Blando",
+            "Queenie Ursabia Calamba",
+            "Aura Thea Pagnamitan Fonte",
+            "Zaldhy Otagan Jualo",
+            "Maria Isabel Millan",
+            "Caryl Joyce Amista Pepugal"
+          ],
+          "date": [
+            "2022-5-31"
+          ],
+          "url": "https://doi.org/10.52232/jhpsm.v1i1.59",
+          "doi": "10.52232/jhpsm.v1i1.59",
+          "type": "journal-article",
+          "publisher": "Denpasar Institute",
+          "container_title": [
+            "Journal of Health Promotion and Service Management"
+          ],
+          "description": "Telepharmacy is a pharmaceutical care provision through a remote interaction between patients and pharmacists that provides patient counseling on medication management and adherence especially on chronic diseases such as hypertension. The study aims to evaluate the effectiveness of telepharmacy intervention on hypertensive patients during the COVID-19 pandemic. The research employed a quantitative, quasi-experimental design utilizing a purposive sampling technique to assess the effectiveness of telepharmacy intervention on their blood pressure and medication adherence. Thirty (30) participants were examined and subjected to the study using Wilcoxon signed-rank t-test and Student’s t-test to compare and analyze the parameters before and after the interventions. The results showed that telepharmacy intervention manifested a significant difference in the level of effectiveness of the patient’s systolic profile (p=0.009), diastolic profile (p= 0.766), and medication adherence (p<.001) in the intervention conducted. Moreover, there was a significant difference between the patients subjected to the intervention (p=0.009) between the patients who did not receive any intervention (p=0.798). Correlations between the parameters showed a moderately high negative relationship (-0.678) between the telepharmacy intervention and the blood pressure and medication adherence (p<0.01) which was highly significant. This means that as medication adherence increases, blood pressure decreases. Therefore, the effect size of the telepharmacy intervention was effective in decreasing its systolic, controlled diastolic, and medication adherence. Nevertheless, telepharmacy intervention is not yet fully maximized in the Philippines which can be a potential use in delivering pharmaceutical care. Current findings clearly illustrate the desirability and efficacy of telepharmacy intervention that can be utilized in the accessibility of medications to hypertensive patients",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2307/j.ctvqmp101.20",
+          "title": "The Post-Mycenaean dead:",
+          "creator": [
+            "Katie Lantzas"
+          ],
+          "date": [
+            "2014-10-18"
+          ],
+          "url": "https://doi.org/10.2307/j.ctvqmp101.20",
+          "doi": "10.2307/j.ctvqmp101.20",
+          "type": "book-chapter",
+          "publisher": "Archaeopress Publishing Ltd",
+          "container_title": [
+            "Athyrmata: Critical Essays on the Archaeology of the Eastern Mediterranean in Honour of E. Susan Sherratt"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00137690",
+          "title": "Pedro",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00137690",
+          "doi": "10.1093/benz/9780199773787.article.b00137690",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00137687",
+          "title": "Pedro",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00137687",
+          "doi": "10.1093/benz/9780199773787.article.b00137687",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00137688",
+          "title": "Pedro",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00137688",
+          "doi": "10.1093/benz/9780199773787.article.b00137688",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gmo/9781561592630.article.52253",
+          "title": "Hernandes, Pedro",
+          "creator": [],
+          "date": [
+            "2001"
+          ],
+          "url": "https://doi.org/10.1093/gmo/9781561592630.article.52253",
+          "doi": "10.1093/gmo/9781561592630.article.52253",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Music Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.19130/iifl.tlalocan.1997.146",
+          "title": "Pedro, Pedro, Petsintowian",
+          "creator": [
+            "Valentín Peralta Ramírez"
+          ],
+          "date": [
+            "2013-5-6"
+          ],
+          "url": "https://doi.org/10.19130/iifl.tlalocan.1997.146",
+          "doi": "10.19130/iifl.tlalocan.1997.146",
+          "type": "journal-article",
+          "publisher": "Instituto de Investigaciones Filologicas",
+          "container_title": [
+            "Tlalocan"
+          ],
+          "description": "Valentin Peralta describes how this Nahuatl tale fromSan Jerónimo Amanalco, Tezcoco, Edo. de México. \"Pedro, Pedro, Petsintowian\",belongs to the yektlaˀtoli, or 'correct speech' register. Itreflects the relation between narrative components that draws on the existenceof a cosmos that is the result of the constant movement of creation anddestruction, that is, ruled by a cyclical law of death and rebirth, and ofconstant renovation. The story relates how a small child uses his babybrother's blood to paint a temple that he has built, and that his father thenleaves him alone in the forest where in order to survive he turns into a birdknown as \"petsintowian\".",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://132.247.70.45/tlalocan/index.php/tl/article/download/146/146",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://132.247.70.45/tlalocan/index.php/tl/article/download/146/146",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gmo/9781561592630.article.o902717",
+          "title": "Lavirgen, Pedro",
+          "creator": [],
+          "date": [
+            "2002"
+          ],
+          "url": "https://doi.org/10.1093/gmo/9781561592630.article.o902717",
+          "doi": "10.1093/gmo/9781561592630.article.o902717",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Music Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.5744/florida/9781683401551.003.0007",
+          "title": "The Pedro Pan Paradox",
+          "creator": [
+            "Deborah Shnookal"
+          ],
+          "date": [
+            "2020-6-23"
+          ],
+          "url": "https://doi.org/10.5744/florida/9781683401551.003.0007",
+          "doi": "10.5744/florida/9781683401551.003.0007",
+          "type": "book-chapter",
+          "publisher": "University Press of Florida",
+          "container_title": [
+            "Operation Pedro Pan and the Exodus of Cuba's Children"
+          ],
+          "description": "This chapter considers the many myths and contradictions in common understandings of Operation Pedro Pan. Although people on the island often regard the exodus as a criminal act against the Cuban revolution, no children were prevented from leaving and no one was ever charged or imprisoned for organizing their departures. This chapter also discusses how the story of the “rescue” mission became an ideological foundation of the Cuban-American community in the United States and how, ironically, in the 1999–2000 international custody battle over the refugee child Elián González, a Cuban father’s right of patria potestad was temporarily overturned by the toxic exile politics of Miami’s Cuban community. The author also explains how some young Cuban-Americans, many of them former Pedro Pans, later took the initiative to establish the Antonio Maceo Brigade in order to reconnect with their Cuban roots, despite threats of physical attacks (and even murder, in the case of Carlos Muñiz) by anti-Castro terrorist groups, such as Omega 7.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00131441",
+          "title": "Noriega, Pedro",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00131441",
+          "doi": "10.1093/benz/9780199773787.article.b00131441",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00048788",
+          "title": "Delgadillo, Pedro",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00048788",
+          "doi": "10.1093/benz/9780199773787.article.b00048788",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00160189",
+          "title": "Sánchez, Pedro",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00160189",
+          "doi": "10.1093/benz/9780199773787.article.b00160189",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00115930",
+          "title": "Manso, Pedro",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00115930",
+          "doi": "10.1093/benz/9780199773787.article.b00115930",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00070720",
+          "title": "García, Pedro",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00070720",
+          "doi": "10.1093/benz/9780199773787.article.b00070720",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00005232",
+          "title": "Ángel, Pedro",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00005232",
+          "doi": "10.1093/benz/9780199773787.article.b00005232",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Pedro+Lantzas%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 98}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Pedro+Lantzas%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Pedro+Lantzas%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 31363, \"response_sha256\": \"4e36dbea12953a2a12c39b539921489af05c8258c52b8a703c295a4f8a640062\", \"elapsed_ms\": 971}, {\"url\": \"https://api.openalex.org/works?search=%22Pedro+Lantzas%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": \"64436\", \"error_code\": \"HTTP_429\", \"elapsed_ms\": 92}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}]}\", \"result_count\": 20, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Pedro+Lantzas%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 98}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Pedro+Lantzas%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Pedro+Lantzas%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 31363, \"response_sha256\": \"4e36dbea12953a2a12c39b539921489af05c8258c52b8a703c295a4f8a640062\", \"elapsed_ms\": 971}, {\"url\": \"https://api.openalex.org/works?search=%22Pedro+Lantzas%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": \"64436\", \"error_code\": \"HTTP_429\", \"elapsed_ms\": 92}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}]}\", \"result_count\": 20, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "40826640986",
+    "agent_id": "source_genealogy",
+    "source_leads": [
+      {
+        "id": "lead_286685100f0f69bc1de9fc5f",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737750c",
+        "title": "Lezione accademica sugli asili infantili, di Pietro Lanza,...",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_146a41707f73b6a50eb4b5fa",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb45043757m",
+        "title": "Sagittario in amore : poesie postume / Pietro Cimatti ; note critiche e cura di Davide Argnani e Stefania Porrino ; prefazione di Ludovico Griguoli Lanza",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_aa4ca48a898f583bfea64181",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737754r",
+        "title": "Donne e gioielli in Sicilia nel medio evo e nel rinascimento... / Pietro Lanza di Scalea",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fdfa0873af6e3b3edf54364a",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737747g",
+        "title": "Degli Arabi e del loro soggiorno in Sicilia, memoria di Pietro Lanza,...",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0b2c065907dc12445571b8ff",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737751q",
+        "title": "Dello Spirito di associazione nella Inghilterra in particolare, saggïo politico ed economico, di Pietro Lanza,...",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c34c40dc5b0cb0293fb45abc",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb307377553",
+        "title": "Enrico Rosso e la confisca de' suoi mobili in Castiglione, ricerche storiche del secolo XIV / Pietro Lanza di Scalea",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_61326de324b2c8844474bd5a",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb30737748t",
+        "title": "Dell' Arte drammatica in Sicilia, epitome di Pietro Lanza,...",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_34531e2c5cd14a9bcc14c58d",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb47022743j",
+        "title": "24/5/31, Exposition coloniale, le prince Di Sclalea [i.e. Di Scalea] : [photographie de presse] / [Agence Rol]",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4b50f3397447e6a9cb5a3c79",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb30132553m",
+        "title": "In Morte di Maddalena Caracciolo, principessa di Scalea, cantico di Giuseppe Borghi, preceduta da un cenno necrologico (da Pietro Lanza, principe di Scordia)",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c2ce7db73dc130c4a16bdd5f",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb307377495",
+        "title": "Considerazioni sulla storia di Sicilia dal 1532 al 1789, da servir d'aggiunte e di chiose al Botta, di Pietro Lanza,...",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_40b819b11fb2600ec5068a30",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb31550875h",
+        "title": "Italia e Francia, 1870, secondo narrazioni di G. Lanza, Q. Sella, E. Ollivier e d'un uomo politico italiano",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b02757bd0c62ed28911c5f51",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb30961712b",
+        "title": "Pietro Lanza e Stella, principe di Trabia, e l'agricoltura in Sicilia nel 1786 e nel 1896, per Carlo Crispo Moncada",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9558eddfd5a966bdee5acc73",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb46889466j",
+        "title": "The Immortal Voice of Mario Lanza: A Centennial Celebration / Mario Lanza",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c5415138533c69925c8c178c",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb376873058",
+        "title": "Le proposte di un principe : Pietro Lanza e la \"ricchezza del Regno\" / Giacomo Dentici",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_66cb01af8df7f51ad5715018",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb38632566x",
+        "title": "Cavalleria rusticana. Addio alla madre / Mascagni, comp. ; Mario Lanza, T ; RCA Victor Orchestra ; Constantine Callinicos, dir.. La forza del destino. O tu che in seno agli angeli / Verdi, comp. ; Mario Lanza, T ; RCA Victor Orchestra ; Constantine Callinicos, dir.",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7242c744a3e450f390ee7e48",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb37894554v",
+        "title": "Cavalleria rusticana. Mamma que vino e generoso / Pietro Mascagni. L'Africana. Mi batte il core : récit. L'Africana. Aria de l'acte 4, O Paradiso ! / Meyerbeer, comp. ; Mario Lanza, T ; RCA Victor orchestra ; Constantine Callinicos, dir.",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e2ee274b95e9701760ae7679",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+        "title": "Peter of Auvergne : university master of the 13th century / edited by Christoph Flüeler, Lidia Lanza, Marco Toste",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e1d3c5d624ab01eb43b2042b",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb38297620n",
+        "title": "José Carreras : a tribute to Mario Lanza / Declan Lowney, réal. ; José Carreras, T ; English concert chorus ; BBC Concert orchestra ; Enrique Ricci, dir.",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6cd8f61e3e09a6c670daf583",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb46741746t",
+        "title": "Scriptum super III-VIII libros Politicorum Aristotelis : edizione, introduzione e note / Petrus de Alvernia ; a cura di Lidia Lanza",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_522b7e2df693db43fe10a5de",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb381836987",
+        "title": "Stabat Mater / Pergolesi. Concerti grossi n ° III à V / Alessandro Scarlatti ; Mirella Freni, S ; Teresa Berganza, A ; Solisti dell'orchestra Scarlatti Napoli ; Ettore Gracis, dir",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c824eb717e72b3d9ebfcbcc7",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb352909807",
+        "title": "Obras de Lope de Vega. XX-XXI, Crónicas y leyendas dramáticas de España. Tercera sección / ed. y estudio preliminar de D. Marcelino Menéndez Pelayo",
+        "query": "\"Pedro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_76efc2a60257bdc38e638c50",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb32427021d",
+        "title": "Letras españolas : Silverio Lanza, Azorín, Baroja, Marquina, Alberto Insúa, Guanyabéns, Unamuno, Vicente Médina, Pedro Corominas, Ciges Aparicio, Répide, Villaespesa, Juan R. Jiménez, Diez-Canedo / Juan Mas y Pi",
+        "query": "\"Pedro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8186c40442623fe505e08f0c",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb390766303",
+        "title": "El Peru de Mario Vargas Llosa : Homenaje al Premio Cervantes 1994 : Exposicion, Alcalá de Henares, Universidad, 24 de abril-24 de mayo 1995 / catalogo Jesus Canete Ochoa, Fernando Fernandez Lanza ; comisario Luis de Toledo",
+        "query": "\"Pedro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_bfe327ef19a86e1da2e047f8",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb487166572",
+        "title": "Coplas del Querer (Edición 15ºAniversario / Remasterizado 2025) : Edición 15ºAniversario / Remasterizado 2025 / Miguel Poveda",
+        "query": "\"Pedro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a6688729853e9b140b18f9cd",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb31552456m",
+        "title": "Obras de Lope de Vega, publicadas por la Real academia española. [Tomo VII-XV]",
+        "query": "\"Pedro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_dd6648cd10b37075973b52d2",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb383031229",
+        "title": "El barberillo de Lavapiés / Francisco Asenjo Barbieri, comp. ; María Bayo, S (Marquesita) ; Lola Casariego, MS (Paloma) ; Manuel Lanza, BAR (Lamparilla)... [et al.] ; Coros Polifonico Universitario, La Laguna ; Orquesta Sinfonica de Tenerife ; Victor Pablo Perez, dir.",
+        "query": "\"Pedro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_26214c54c49d04ca4517c55e",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb476330809",
+        "title": "Las Voces De Rosario / Rosario",
+        "query": "\"Pedro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_61fb5bc4de33d62cd5ce8879",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb44704268c",
+        "title": "Applications of evolutionary computation : EvoApplications 2012: EvoCOMNET, EvoCOMPLEX, EvoFIN, EvoGAMES, EvoHOT, EvoIASP, EvoNUM, EvoPAR, EvoRISK, EvoSTIM, and EvoSTOC, Málaga, Spain, April 11-13, 2012, Proceedings / Cecilia Di Chio [and others] (eds.)",
+        "query": "\"Pedro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a429bbb0d98d5029f784dfec",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb476243418",
+        "title": "Bajando las revoluciones",
+        "query": "\"Pedro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2129be7c18deef86a26a6109",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gmo/9781561592630.article.21918",
+        "title": "Platania, Pietro",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_290dd151f869bb5ec763cabd",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gmo/9781561592630.article.10861",
+        "title": "Generali, Pietro",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_835cdf37b396510e53eda0cd",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gmo/9781561592630.article.o903915",
+        "title": "Platania, Pietro (opera)",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3a0befcae802f6cb6c47440f",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gmo/9781561592630.article.o901885",
+        "title": "Generali, Pietro (opera)",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3821a6b6d56fc782d9b01115",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1007/jhep03(2026)238",
+        "title": "Symmetry extension by condensation defects in five-dimensional gauge theories",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3818e9cddbce324971c51b85",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1007/s11243-009-9308-7",
+        "title": "Fluxional rearrangement in congested ruthenium(II) complexes containing pyrimidine- and/or pyridine-based dithioether ligands",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9a87a0b772fd648db3048c35",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00156484",
+        "title": "Rotari, Pietro or Pietro Antonio (Count)",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4a8382975c4371fb6d61410d",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gao/9781884446054.013.7002292910",
+        "title": "(1) Pietro Lombardo [Pietro Solari]",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e5d83c5b93cd3dd852e568f7",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00141700",
+        "title": "Pietro di Domenico di Pietro da Lucca",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d0716a9b1a42acc869395193",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00074729",
+        "title": "Giovenale, Angelo di Pietro, or Silvestro di Pietro",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b9ff35180da1da763a8e21d4",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1002/ejic.200800595",
+        "title": "Dynamic Stereochemical Behaviour of Congested Ruthenium(II) Complexes Containing Asymmetric Thioether Ligands Based on Pyridine and Pyrimidine",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_03b4aa13d33b4e435a1fcbe8",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00152053",
+        "title": "Ricci, Giovanni or Gian Pietro or Giovanni Pietro Pedrini",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0e8ada9e44583824c6b9d412",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gao/9781884446054.article.t067465",
+        "title": "Piero [Pietro di Benedetto di Pietro] della Francesca",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6f73c48633de3214f97d7b38",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gmo/9781561592630.article.o903264",
+        "title": "Morandi, Pietro",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fc7d585d93ce589d7314303b",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gao/9781884446054.article.t2060774",
+        "title": "Girometti, Pietro",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_35a5568cbb89e4ae1a591d98",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.3390/md18020086",
+        "title": "Protein Hydrolysates from Anchovy (Engraulis encrasicolus) Waste: In Vitro and In Vivo Biological Activities",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2b6442c8fbb2d5fbae7f1d6e",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00141657",
+        "title": "Pietro",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_928a4da7e1af18e2d271ea4c",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gmo/9781561592630.article.o904251",
+        "title": "Romani, Pietro",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3eff3b6e7bc5af0a35d60947",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.5040/9781350876293",
+        "title": "Donizetti: Pietro Il Grande",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_be73c7b9de208eb86b2f6452",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00141658",
+        "title": "Pietro",
+        "query": "\"Pietro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8522e2dd2ccbb53ae69c0a9c",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Biblioteca Digital Hispánica",
+        "source_url_or_identifier": "(OCoLC)433359849",
+        "title": "El caballeru de la murnia figura Pedro Lanza Alfonso",
+        "query": "\"Pedro Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_dd6e1e40c0a79657f79bd6b7",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.3764/ajaonline1182.lantzas",
+        "title": "Individuals and Society in Mycenaean Pylos (Book Review)",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9e4537ae94567213d6f45b29",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.30861/9781407310206",
+        "title": "Settlement and Social Trends in the Argolid and the Methana Peninsula, 1200–900 BC",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ba6d3f38ae001cb7e286b187",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.3764/ajaonline1203.lantzas",
+        "title": "Book Review of Vravron: The Mycenaean Cemetery, by Thanasis I. Papadopoulos and Litsa Kontorli-Papadopoulou",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c8cf82fbf8cc4bd954ca7ca4",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00076743",
+        "title": "González de San Pedro, Pedro",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_082b8d15641dde05b6585401",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/acref/9780195301731.013.75181",
+        "title": "Tabares, Pedro Rafael “Pedro Ferreira”",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_10ec56459333490d78001f31",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.52232/jhpsm.v1i1.59",
+        "title": "THE EFFECTIVENESS OF TELEPHARMACY INTERVENTION ON HYPERTENSIVE PATIENTS",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fd57b0e3162e818ad2c712b9",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2307/j.ctvqmp101.20",
+        "title": "The Post-Mycenaean dead:",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1405649b7bc528bab77b8e5c",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00137690",
+        "title": "Pedro",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f590762de9ba83cabc4e828b",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00137687",
+        "title": "Pedro",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_695af39dd3849b899c70340d",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00137688",
+        "title": "Pedro",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6e9b990d02d863d5aa097bf4",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gmo/9781561592630.article.52253",
+        "title": "Hernandes, Pedro",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9e1ae7098e7c38972bf5cc2f",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.19130/iifl.tlalocan.1997.146",
+        "title": "Pedro, Pedro, Petsintowian",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_109274d243f9863205654646",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gmo/9781561592630.article.o902717",
+        "title": "Lavirgen, Pedro",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_56653b2ea3a50e26e11a07e2",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.5744/florida/9781683401551.003.0007",
+        "title": "The Pedro Pan Paradox",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e051336e66f12ae8b180198a",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00131441",
+        "title": "Noriega, Pedro",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e1566d4747274a9a232f4a98",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00048788",
+        "title": "Delgadillo, Pedro",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f579c809d911f13209d771c4",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00160189",
+        "title": "Sánchez, Pedro",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_812068c4fbc301390730b18e",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00115930",
+        "title": "Manso, Pedro",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_732f572717fd6c05534f16a9",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00070720",
+        "title": "García, Pedro",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fc22dddba157cab47938c2dd",
+        "run_id": "40826640986",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00005232",
+        "title": "Ángel, Pedro",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      }
+    ],
+    "connector_errors": [
+      {
+        "connector_id": "repo:Internet Culturale",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Pedro+Lantza%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 105}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Pedro+Lanza%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 112}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Pedro+Lanza%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 218}, {\"url\": \"https://api.openalex.org/works?search=%22Pedro+Lanza%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": \"64437\", \"error_code\": \"HTTP_429\", \"elapsed_ms\": 301}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Pietro+Lanza%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 144}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Pietro+Lanza%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Pietro+Lanza%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 89117, \"response_sha256\": \"5726db41c274905a2ae4c4a0be66fc35db638aac4526c4d1199806fe725901b8\", \"elapsed_ms\": 669}, {\"url\": \"https://api.openalex.org/works?search=%22Pietro+Lanza%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": \"64437\", \"erro"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Pedro+Lantza%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 217}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Pedro+Lantza%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 241}, {\"url\": \"https://api.openalex.org/works?search=%22Pedro+Lantza%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": \"64436\", \"error_code\": \"HTTP_429\", \"elapsed_ms\": 121}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\""
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 119}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 449}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": \"64436\","
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Pedro+Lantzas%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 98}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Pedro+Lantzas%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Pedro+Lantzas%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 31363, \"response_sha256\": \"4e36dbea12953a2a12c39b539921489af05c8258c52b8a703c295a4f8a640062\", \"elapsed_ms\": 971}, {\"url\": \"https://api.openalex.org/works?search=%22Pedro+Lantzas%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": \"64436\", \"e"
+      }
+    ],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 72,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
