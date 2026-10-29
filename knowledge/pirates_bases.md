@@ -19,6 +19,9 @@
 ## Μαθήματα διαδικασίας (τι δούλεψε / τι όχι)
 Μορφή: ημερομηνία · εργασία · τι έκανα · τι δούλεψε · τι απέτυχε ή να αποφεύγεται · ποιος
 - 2026-10-28 · Zotero sync · Πρώτα dry-run, μετά εφαρμογή, μετά ξανά dry-run (πρέπει 0 εγγραφές). Το κλειδί θέλει και πρόσβαση στις σημειώσεις, αλλιώς βγαίνουν διπλές. · Nori
+- 2026-10-29 · Αναζήτηση David Rumsey / Internet Archive · Ερωτήματα στο archive.org advancedsearch. Δουλεύουν ολόκληρες λέξεις (pirates OR corsaires). Το πρόθεμα με αστερίσκο (pirat*) δίνει σιωπηλά 0. Το σκέτο Milo φέρνει χιλιάδες συνωνυμίες (άτομα με όνομα Milo, Venus de Milo, Milo NY). Χρειάζεται χρονικό παράθυρο (π.χ. 1450–1900) και έλεγχος του πεδίου coverage. Το Cerigo είναι πολύ πιο καθαρό. · Grok Bot (executor)
 
 ## Πηγές και αρχεία (ποιότητα)
 Μορφή: πηγή/αρχείο · τι έχει · πόσο αξιόπιστο · προβλήματα πρόσβασης
+- David Rumsey Map Collection · χάρτες, πορτολάνοι, νησολόγια (π.χ. Roux 1764 «Pl. 86. I. Milo», Heather 1814 «Port Milo», Mercator/Hondius 1607 Candia με ένθετο Milo) · πολύ αξιόπιστη καταλογογράφηση · Το API LUNA (/luna/servlet/as, search) απαγορεύεται στο robots.txt, άρα δεν το χρησιμοποιούμε. Ψάχνουμε στο αντίγραφο του Internet Archive (collection:david-rumsey-map-collection) και κρατάμε το επίσημο link davidrumsey.com/luna/servlet/detail/RUMSEY~8~1~… (πεδίο source). Η πληρότητα του αντιγράφου δεν είναι γνωστή.
+- Internet Archive (archive.org/advancedsearch.php) · κείμενα και βιβλία (π.χ. Castellan 1808 «Lettres sur la Morée et les iles de Cérigo», Sathas «Mnēmeia hellēnikēs historias» 1880) · ψάχνει μόνο σε μεταδεδομένα, όχι στο πλήρες κείμενο. Δεν υποστηρίζει αστερίσκο. Δεν έχει δηλωμένο όριο ρυθμού, οπότε κρατάμε 1 αίτημα/δευτ. και cache.

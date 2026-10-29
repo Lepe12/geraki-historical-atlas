@@ -79,6 +79,19 @@ for repo_index,r in enumerate(plan["repositories"]):
             focused.append(f'"{n}" corsair')
             if ys: focused.append(f'"{n}" {ys[0]}')
         repo_terms=list(dict.fromkeys(focused))[:int(os.getenv("PCT_TRAVELLERS_REPO_QUERY_LIMIT","16"))]
+    if name=="David Rumsey Map Collection":
+        # Map titles name places, not pirates: query place names only, plus the
+        # sourced historical variants from the gazetteer/knowledge file (e.g. Milo, Cerigo).
+        names=[str(plan.get("target") or "").strip()]+[str(x).strip() for x in plan.get("aliases",[]) if str(x).strip()]
+        try:
+            from connectors.open_collections import place_aliases
+            expanded=[]
+            for n in names[:3]:
+                if n: expanded+=[a["name"] for a in place_aliases(n,4)[0]]
+            names=names+expanded
+        except Exception:
+            pass
+        repo_terms=list(dict.fromkeys(n for n in names if n))[:int(os.getenv("PCT_RUMSEY_QUERY_LIMIT","6"))]
     if lane=="ottoman":
         # Ottoman catalogues can be slow or browser-mediated. Bound each repository
         # to a focused, auditable query set so one remote surface cannot consume the
