@@ -1025,7 +1025,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         # date window, purpose, source quality); near-duplicates read last.
         # Reading order only: every excerpt stays in the queue and coverage.
         from excerpt_ranking import rank
-        all_records,ranking_report=rank(all_records,request.get('target',''),request.get('aliases',[]) or [],
+        all_records,ranking_report=rank(all_records,request.get('target',''),[*(request.get('aliases',[]) or []),*(request.get('search_name_variants',[]) or [])],
                                         request.get('date_range','') or '',request.get('purpose','') or '')
         if question_kind=='topic':
             # Broad topics keep their region/period/event tiers as the primary

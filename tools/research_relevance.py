@@ -25,8 +25,12 @@ def identity(req, ctx):
     if not isinstance(regions, list) or any(not isinstance(x, str) for x in regions):
         raise ValueError('REGION_TERMS_MUST_BE_STRINGS')
     kind = supplied.get('type') or ('place' if re.search(r'\bisland\b|\bharbou?r\b|\bport\b|νησ', norm(ctx.get('purpose'))) else 'unknown')
-    focus=decompose(ctx['target'],ctx.get('aliases', []),ctx.get('purpose',''),kind,regions)
-    return {'target': ctx['target'], 'aliases': ctx.get('aliases', []), 'type': focus['kind'], 'focus':focus,
+    # Old names recorded by preflight (search_name_variants) count as names of the
+    # place for relevance; the request's own aliases stay first.
+    extra = [v for v in (req.get('search_name_variants') or []) if isinstance(v, str)]
+    aliases = list(dict.fromkeys([*ctx.get('aliases', []), *[v for v in extra if v != ctx['target']]]))
+    focus=decompose(ctx['target'],aliases,ctx.get('purpose',''),kind,regions)
+    return {'target': ctx['target'], 'aliases': aliases, 'type': focus['kind'], 'focus':focus,
             'region_terms': regions, 'date_range': ctx.get('date_range', ''),
             'rule': 'User-supplied geographic context is a search constraint, not source evidence.'}
 

@@ -13,6 +13,39 @@
 ## Παλιά ονόματα τόπων
 - Milo = Μήλος
 - Cerigo = Κύθηρα
+- Scarpanto = Κάρπαθος (νησί) · πηγή: https://www.wikidata.org/wiki/Q204757 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Stampalia = Αστυπάλαια · πηγή: https://www.wikidata.org/wiki/Q216768 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Termia = Κύθνος · πηγή: https://www.wikidata.org/wiki/Q739779 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Serfanto / Serfo = Σέριφος · πηγή: https://www.wikidata.org/wiki/Q217214 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Policandro = Φολέγανδρος · πηγή: https://www.wikidata.org/wiki/Q213902 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Amorgo = Αμοργός · πηγή: https://www.wikidata.org/wiki/Q208587 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Sciato = Σκιάθος · πηγή: https://www.wikidata.org/wiki/Q515085 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Sciro = Σκύρος · πηγή: https://www.wikidata.org/wiki/Q208566 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Syra / Siro / Σύρα = Σύρος · πηγή: https://www.wikidata.org/wiki/Q211230 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Cerigotto = Αντικύθηρα · πηγή: https://www.wikidata.org/wiki/Q213730 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Cervi = Ελαφόνησος · πηγή: https://www.wikidata.org/wiki/Q96408 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Strofadi / Stamfani / Arpyia = Στροφάδες · πηγή: https://www.wikidata.org/wiki/Q2165273 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Tigani / Τηγάνι = Πυθαγόρειο Σάμου · πηγή: https://www.wikidata.org/wiki/Q1857915 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Fogliavecchia / Focea = Φώκαια (Foça) · πηγή: https://www.wikidata.org/wiki/Q1921294 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Vourla / Urla = Βουρλά · πηγή: https://www.wikidata.org/wiki/Q996670 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Valona / Aulona = Αυλώνα (Vlorë) · πηγή: https://www.wikidata.org/wiki/Q159610 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Durazzo / Dyrrachium = Δυρράχιο (Durrës) · πηγή: https://www.wikidata.org/wiki/Q83285 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Adalia / Satalia / Attalia = Αττάλεια (Antalya) · πηγή: https://www.wikidata.org/wiki/Q6487 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Hydruntum = Οτράντο · πηγή: https://www.wikidata.org/wiki/Q52174 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Panormus = Παλέρμο · πηγή: https://www.wikidata.org/wiki/Q2656 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Maltezana (Maltezana Bay, GeoNames 257841) = κόλπος Ανάληψης, Αστυπάλαια · πηγή: https://www.wikidata.org/wiki/Q25018888 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Κάβο Σκυλί / Scyllaeum = ακρ. Σκύλλαιο (Τροιζηνία) · πηγή: https://www.wikidata.org/wiki/Q24924372 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Αβγό = νησίδα Πετροκάραβο Κορώνης · πηγή: https://www.wikidata.org/wiki/Q25000142 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Θηγανούσσα = Βενέτικο Μεσσηνίας · πηγή: https://www.wikidata.org/wiki/Q2512852 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Εγνούσα / Αιγνούσα / Oenussae = Οινούσσες · πηγή: https://www.wikidata.org/wiki/Q1142304 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Furni / Φούρνοι Κορσεών = Φούρνοι · πηγή: https://www.wikidata.org/wiki/Q608379 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Σκατζούρα (γραφή χάρτη) = Σκάντζουρα · πηγή: https://www.wikidata.org/wiki/Q520124 · επιβεβαιωμένο (Wikidata) · Grok Bot (executor), 2026-10-29
+- Σουριτσέ (χάρτης Γουργουρίνη, Σεφεριχισάρ) = άγνωστο· πιθανώς Sığacık/Τέως μόνο από θέση (0,5 km) · πηγή: καμία σε gazetteer · αμφίβολο
+- Κάβο Κολώνες (χάρτης) = ακρ. Σούνιο από θέση (0,34 km) · το όνομα χωρίς πηγή σε gazetteer · αμφίβολο ως όνομα
+- Argentiera / Argentièra / Cimòlo = Κίμωλος · πηγή: https://it.wikipedia.org/wiki/Argentiera_(isola) · επιβεβαιωμένο (Wikipedia it) · Grok Bot (executor), 2026-10-29
+- l'Argentière / Argentière = Κίμωλος · πηγή: Archives diplomatiques, fonds 436PO/1 «Consulat de France à Milo et l'Argentière» https://archivesdiplomatiques.diplomatie.gouv.fr/ark:/14366/ht4bnxfg3d50 · επιβεβαιωμένο · Grok Bot (executor), 2026-10-29
+- Cimolus = Κίμωλος · πηγή: https://en.wikipedia.org/wiki/Kimolos (λατινικά) · επιβεβαιωμένο (Wikipedia en) · Grok Bot (executor), 2026-10-29
+- Cimoli / Kimolo / Argentiere / Cimolis = Κίμωλος · πηγή: αίτημα του ιστορικού (Λεωνίδας), 2026-10-29 · δεν επαληθεύτηκε ακόμη σε πηγή, μόνο για αναζήτηση · Grok Bot (executor), 2026-10-29
 
 ## Ευρήματα
 

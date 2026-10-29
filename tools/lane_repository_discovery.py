@@ -61,6 +61,9 @@ if previous:
     old={a['repository']:a for a in previous.get('attempts',[])}
     attempts=[old.get(a['repository'],a) for a in attempts]
 save_partial()
+from search_priority import place_piracy_first, search_name_variants, names_only
+MAP_CATALOGUES=("David Rumsey Map Collection","Gallica (BnF digitized)","Europeana","HathiTrust Digital Library")
+SEARCH_NAMES=names_only(search_name_variants(plan.get("target",""),plan.get("aliases",[])))
 repo_specs=[]
 for repo_index,r in enumerate(plan["repositories"]):
     name=r["name"]; repo_records=[]; statuses=[]; diagnostics=[]
@@ -79,7 +82,7 @@ for repo_index,r in enumerate(plan["repositories"]):
             focused.append(f'"{n}" corsair')
             if ys: focused.append(f'"{n}" {ys[0]}')
         repo_terms=list(dict.fromkeys(focused))[:int(os.getenv("PCT_TRAVELLERS_REPO_QUERY_LIMIT","16"))]
-    if name in ("David Rumsey Map Collection","Gallica (BnF digitized)","Europeana","HathiTrust Digital Library"):
+    if name in MAP_CATALOGUES:
         # Map and catalogue titles name places, not pirates: query place names only, plus the
         # sourced historical variants from the gazetteer/knowledge file (e.g. Milo, Cerigo).
         names=[str(plan.get("target") or "").strip()]+[str(x).strip() for x in plan.get("aliases",[]) if str(x).strip()]
@@ -182,6 +185,11 @@ for repo_index,r in enumerate(plan["repositories"]):
         repo_terms=topic_queries(focus,lane)
         semantic=[r['query'] for r in (plan.get('semantic_query_expansion') or {}).get('accepted_queries',[]) if r.get('lane')==lane]
         repo_terms=list(dict.fromkeys(repo_terms[:2]+semantic+repo_terms[2:]))
+    elif name not in MAP_CATALOGUES and name!="Public Web Source Discovery" and os.getenv('PCT_PIRACY_FIRST','1')!='0':
+        # Only the first queries of each repository run in a pass: put the
+        # old-name x piracy-term combinations (e.g. "Argentière" corsaires)
+        # ahead of generic queries so the round limit cannot drop them.
+        repo_terms=place_piracy_first(repo_terms,SEARCH_NAMES,lane)
     completed={a['query'] for a in attempts[repo_index].get('queries',[])}
     pending=[q for q in repo_terms if q not in completed]
     if attempts[repo_index].get('status') in ('API_KEY_REQUIRED','AUTH_OR_BROWSER_REQUIRED','ACCESS_BLOCKED','REMOTE_ACCESS_BLOCKED','REMOTE_RATE_LIMITED'):pending=[]

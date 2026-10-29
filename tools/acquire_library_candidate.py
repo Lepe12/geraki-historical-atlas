@@ -27,7 +27,15 @@ for x in candidates:
     seen.add(k);items.append(x)
 
 # Assess before acquisition, retain every rejected/uncertain item in the backlog.
-ranked=rank(items,identity(req,ctx))
+ident=identity(req,ctx)
+ranked=rank(items,ident)
+# Known archival targets for this place lead the queue; other-place homonyms
+# (e.g. Alpine Argentière for Kimolos) are held back with their reason, never dropped.
+from search_priority import guard_candidates, priority_targets, put_priority_first
+search_names=[ident['target'],*ident.get('aliases',[])]
+ranked=put_priority_first(ranked,priority_targets(search_names))
+ranked,homonyms=guard_candidates(ranked,search_names)
+ranked=ranked+homonyms
 held_review=[x for x in ranked if x['relevance_assessment']['status']=='REVIEW_REQUIRED' and not x.get('source_lead')]
 off_target=[x for x in ranked if x['relevance_assessment']['status']=='EXCLUDE_FROM_ACQUISITION' and not x.get('source_lead')]
 held=held_review+off_target
