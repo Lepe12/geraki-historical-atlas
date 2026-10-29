@@ -7,6 +7,14 @@ import subprocess
 from pathlib import Path
 
 from research_continuation import digest, effective_citation_backlogs, latest_analysis
+from continuation_rounds import stopped
+
+# Clean, recorded stops: the corpus is finished for automatic chains, not failed.
+CLEAN_DECISIONS = ('NO_PENDING_SEMANTIC_WORK',)
+
+
+def clean(reason):
+    return reason in CLEAN_DECISIONS or str(reason).startswith('CONTINUATION_STOPPED:')
 
 
 def state(root, queue_relative=None):
@@ -103,7 +111,7 @@ def select(base, excluded=()):
         requested.add(run)
     selected = {}
     for root in sorted((base / 'evidence/runs').glob('*')):
-        if root.name in excluded or auto_continue_held(root):
+        if root.name in excluded or auto_continue_held(root) or stopped(root):
             continue
         before = state(root)
         citations = any(json.loads(p.read_text()).get('pending') or json.loads(p.read_text()).get('deferred')
@@ -114,6 +122,15 @@ def select(base, excluded=()):
 
 
 def decision(root, before, run_id):
+    """Progress guard first, then the recorded round caps (continuation_rounds)."""
+    result = progress_decision(root, before, run_id)
+    reason = stopped(root)
+    if result[0] and reason:
+        return False, 'CONTINUATION_STOPPED:' + reason
+    return result
+
+
+def progress_decision(root, before, run_id):
     """A crash, failed publication, reset queue or repeated sample must not self-loop."""
     pointer = json.loads((root / 'research_continuation/latest.json').read_text())
     if pointer['analysis_path'] != 'semantic_reanalysis_' + str(run_id):
@@ -206,7 +223,7 @@ def main():
     with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
         for key, value in values.items():
             output.write(key + '=' + json.dumps(value, separators=(',', ':')) + '\n')
-    if args.mode == 'handoff' and any(not value[0] and value[1] != 'NO_PENDING_SEMANTIC_WORK'
+    if args.mode == 'handoff' and any(not value[0] and not clean(value[1])
                                       for value in decisions.values()):
         raise SystemExit('AUTOMATIC_CONTINUATION_HELD: see handoff_decisions above')
 
@@ -218,7 +235,7 @@ def handoff_outputs(decisions, inherited=()):
     coordinator can retry them after repair. No failed corpus self-restarts.
     """
     held = {run for run, value in decisions.items()
-            if not value[0] and value[1] != 'NO_PENDING_SEMANTIC_WORK'}
+            if not value[0] and not clean(value[1])}
     return {'restart': any(value[0] for value in decisions.values()),
             'held_runs': sorted(set(inherited) | held)}
 

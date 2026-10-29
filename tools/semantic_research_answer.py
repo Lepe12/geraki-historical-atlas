@@ -241,6 +241,12 @@ def model_evidence(row):
     value['consulted_source']={k:(row.get('occurrences') or [{}])[0].get(k) for k in ('title','url')}
     value['repeated_occurrences']=len(row.get('occurrences',[]))
     value['source_independence']='UNKNOWN_NOT_ESTABLISHED'
+    if row.get('model_view')=='compact':
+        # Pre-filtered records: constants move to one prompt header line, so
+        # more excerpts fit the same context budget (excerpt_prefilter.py).
+        from excerpt_prefilter import compact
+        if row.get('model_window'):value['excerpt_window']=True
+        value=compact(value)
     return value
 
 def passages(text):
@@ -935,7 +941,39 @@ def execute(*args,**kwargs):
     except SemanticBudgetReached as error:answer=error.answer
     from research_priority import claim_assessment
     answer['claim_evidence_assessment']=claim_assessment(answer)
+    answer['research_funnel']=research_funnel(answer)
     return answer
+
+
+SUPPORTED_CLAIM_STATES=('QUOTATION_SUPPORTED_HISTORY_PENDING','SOURCE_ATTRIBUTED_HYPOTHESIS')
+
+
+def research_funnel(answer):
+    """collected -> examined -> supported claims -> provisional synthesis -> human verification."""
+    coverage=answer.get('coverage') or {}
+    deferred={r.get('evidence_id') for r in coverage.get('deferred') or []}
+    selected=[r.get('evidence_id') for r in answer.get('evidence') or []]
+    examined=len([e for e in selected if e not in deferred])
+    states=[c.get('status') for c in (answer.get('claim_evidence_assessment') or {}).get('claims',[])]
+    supported=sum(state in SUPPORTED_CLAIM_STATES for state in states)
+    unique=coverage.get('unique_passages',0)
+    prefilter=coverage.get('prefilter') or {}
+    windowing=prefilter.get('windowing') or {}
+    return {'policy':'research-funnel-v1',
+            'collected':{'unique_excerpts':coverage.get('collected_unique_passages',unique),'excluded_before_analysis':len(coverage.get('excluded') or [])},
+            'prefilter':{'applied':bool(prefilter),'filtered_out':prefilter.get('filtered_out',0),
+                         'filtered_by_reason':prefilter.get('filtered_by_reason',{}),
+                         'kept_excerpts':prefilter.get('kept',coverage.get('collected_unique_passages',unique)),
+                         'model_units':unique,'sentence_windows':windowing.get('windows',0),
+                         'chars_full':windowing.get('chars_full'),'chars_sent':windowing.get('chars_sent'),
+                         'sent_this_pass':coverage.get('selected_passages',0)},
+            'examined':{'excerpts':examined,'remaining':max(0,unique-examined),
+                        'deferred':len(deferred)},
+            'claims':{'extracted':len(answer.get('claims') or []),'supported_by_quotation':supported,
+                      'rejected_proposals':len(answer.get('rejected') or [])},
+            'provisional_synthesis':{'paragraphs':len(answer.get('answer_sections') or [])},
+            'human_verification':{'performed':bool(answer.get('human_reviewed')),'verified_claims':0},
+            'historical_verification':False}
 
 
 def _execute(run_root, question, caller=call, config=None, output_root=None, provenance_root=None,resume_reviewed_from=None):
@@ -959,6 +997,33 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
     from research_continuation import Continuation
     queue=Continuation(Path(provenance_root or run_root)/'research_continuation',
                        question,Path(__file__).read_bytes(),routing_summary())
+    ranking_report=None
+    if request and all_records and os.getenv('PCT_EXCERPT_RANKING','1')!='0':
+        # Deterministic relevance order (target + aliases + gazetteer old names,
+        # date window, purpose, source quality); near-duplicates read last.
+        # Reading order only: every excerpt stays in the queue and coverage.
+        from excerpt_ranking import rank
+        all_records,ranking_report=rank(all_records,request.get('target',''),request.get('aliases',[]) or [],
+                                        request.get('date_range','') or '',request.get('purpose','') or '')
+        if question_kind=='topic':
+            # Broad topics keep their region/period/event tiers as the primary
+            # key; lexical relevance only orders passages inside a tier.
+            from research_priority import describe
+            late=set(ranking_report['near_duplicate_ids'])
+            all_records.sort(key=lambda r:(r['evidence_id'] in late,describe(r,True)['tier']))
+            ranking_report['topic_tiers_primary']=True
+    collected_count=len(all_records);prefilter_report=None;filtered_items=[]
+    from excerpt_prefilter import settings as prefilter_settings
+    prefilter_config=prefilter_settings()
+    if request and all_records and prefilter_config['enabled']:
+        # Deterministic no-LLM gate: irrelevant, table/metadata/short and
+        # near-duplicate excerpts are not sent to the model. They are listed
+        # (answer.json, queue.json, rounds.json), never deleted, and can be
+        # re-included with PCT_PREFILTER_REINCLUDE=<ids>|all or PCT_PREFILTER=0.
+        from excerpt_prefilter import gate
+        all_records,filtered_items,prefilter_report=gate(all_records,question_kind,request.get('target',''),
+            request.get('aliases',[]) or [],request.get('date_range','') or '',request.get('purpose','') or '',
+            near_duplicate_of=(ranking_report or {}).get('near_duplicate_of'))
     triage_report=None
     if question_kind=='person' and target_names and all_records:
         # Deterministic, model-free reading order: named/continuation pages,
@@ -984,6 +1049,15 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
                                                          for r in all_records if r['evidence_id'] in namesake_ids]
     original_passage_count=len(all_records)
     model_budget=6500 if os.getenv('PCT_LLM_PROVIDER')=='local_llama_cpp' else 14000
+    model_budget=int(os.getenv('PCT_SEMANTIC_BATCH_CHARS') or model_budget)
+    if prefilter_report is not None:
+        # Only the sentences around literal target/alias hits of long
+        # excerpts go to the model; exact offsets keep the full excerpt linked.
+        from excerpt_prefilter import windows
+        all_records,prefilter_report['windowing']=windows(all_records,question_kind,prefilter_report['name_prefixes'],
+                                                          passages,quote_occurrences,digest)
+        if prefilter_config['compact_evidence']:
+            all_records=[{**r,'model_view':'compact'} for r in all_records]
     all_records=fit_passages(all_records,model_budget)
     all_groups,deferred,namesake_group_ids=plan_batches(all_records,namesake_ids,model_budget)
     batch_limit=max(1,int(os.getenv('PCT_SEMANTIC_BATCHES','3')))
@@ -996,7 +1070,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         and any(queue.completed(group) for group in all_groups))
     if review_backlog:batch_limit=0
     grouped,skipped=select_groups(all_groups,namesake_group_ids,batch_limit,queue.completed);deferred.extend(skipped)
-    queue.inventory(all_records,grouped,deferred)
+    queue.inventory(all_records,grouped,deferred,filtered_items)
     selected=[r for b in grouped for r in b]
     from research_priority import selection_report
     conf=configuration() if config is None else config
@@ -1004,11 +1078,13 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
          'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
          'model_configuration':routing_summary(),
          'configuration':conf,'model_used':False,'claims':[],'answer_sections':[],
-         'coverage':{'original_unique_passages':original_passage_count,'unique_passages':len(all_records),'selected_passages':len(selected),
+         'coverage':{'collected_unique_passages':collected_count,'prefilter':prefilter_report,
+                     'original_unique_passages':original_passage_count,'unique_passages':len(all_records),'selected_passages':len(selected),
                      'repeated_occurrences':sum(len(r['occurrences'])-1 for r in all_records),'deferred':deferred,'excluded':excluded},
          'evidence':selected,'calls':[],'rejected':[],
          'selection_priority':selection_report(all_records,selected,question_kind=='topic'),
          'passage_triage':triage_report,
+         'excerpt_ranking':ranking_report,
          'identity_linkage':linkage_report,
          'limitations':['MODEL_OUTPUT_REQUIRES_REVIEW','ORIGINAL_INSPECTION_NOT_PERFORMED',
                         'SOURCE_INDEPENDENCE_NOT_ESTABLISHED','BOUNDED_EVIDENCE_COVERAGE'],
@@ -1060,7 +1136,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
             pending=[{'evidence_id':r['evidence_id'],'reason':'SEMANTIC_PASS_BUDGET'}
                 for group in grouped if not queue.completed(group) for r in group]
             out['coverage']['deferred'].extend(pending)
-            queue.inventory(all_records,grouped,out['coverage']['deferred'])
+            queue.inventory(all_records,grouped,out['coverage']['deferred'],filtered_items)
             queue.pending('EXTRACTION' if out['coverage']['deferred'] else 'REVIEW_AND_SYNTHESIS')
             out['status']='RESEARCH_COVERAGE_PENDING' if out['coverage']['deferred'] else 'RESEARCH_REVIEW_PENDING'
             raise SemanticBudgetReached(out)
@@ -1116,6 +1192,9 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         if not resumed:out['status']='NO_REUSABLE_REVIEWED_SOURCE_CLAIMS';return out
     for group in ([] if resume_reviewed_from else grouped):
         prompt=RULES+'\nExtraction language: English. QUESTION: '+question+'\nReturn {"items":[{"passage_kind":"NARRATIVE_EVIDENCE","statement":"The consulted source reports ...","evidence_id":"copy supplied evidence_id","passage_ids":[0],"kind":"source_statement","source_type":"UNVERIFIED","actors":[],"places":[],"dates":[],"usage_type":"UNRESOLVED","uncertainty":[]}]}. Select at most 2 claims directly relevant to the question. For a person question, prioritize the named person, identity and sourced activities; a named place is optional. For a place or geographic topic, prioritize named-place claims. Choose 1-4 adjacent passage_ids from ONE evidence item. Do NOT output a quote: the engine copies the selected original text. Copy entity spellings literally from those selected passages; do not translate names. Dates must be strings copied from the selected passages or date_evidence. Empty arrays are valid. Leave unspecified actors, dates and places empty. State only what the selected passage actually supports, with source attribution. Distinguish an actual base from a raid site, and an intention from an executed action. usage_type may be BASE, ANCHORAGE, REFUGE, RAID_LOCATION, OTHER, UNRESOLVED. Modern studies are SECONDARY_SOURCE; contemporary authorship must be established for PRIMARY_SOURCE. Never infer location or dates from a book title.\nEVIDENCE_JSON:\n'+json.dumps([model_evidence(row) for row in group],ensure_ascii=False)
+        if any(r.get('model_view')=='compact' for r in group):
+            from excerpt_prefilter import COMPACT_HEADER
+            prompt+='\n'+COMPACT_HEADER.strip()
         prompt+='\nClassify passage_kind before proposing a claim. Index entries, bibliography citations, catalogue descriptions and lists of names are discovery leads, not narrative evidence for a historical event. Only NARRATIVE_EVIDENCE may support an answer. Relevant means answering the requested subject, activity and period, not merely repeating its spelling. Do not turn medieval background or a modern namesake into the requested historical finding.'
         prompt+=' Each statement should express ONE short source-attributed fact, at most30 words. Do not retell several people\'s conversations or a whole chronology in one claim. Historical narrative in a footnote may be NARRATIVE_EVIDENCE; a citation listing a work without its consulted content is a BIBLIOGRAPHIC_REFERENCE.'
         if question_kind=='person':prompt+=' Every item MUST contain a literal actor mention in actors from the selected passages. Select the sentence actually naming that actor. If an event date is absent from those sentences, leave it out of BOTH dates and statement.'
@@ -1151,7 +1230,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         else:
             out['coverage']['deferred'].extend({'evidence_id':r['evidence_id'],'reason':'EXTRACTION_RESPONSE_FAILED'} for r in group)
         out['claims'].extend(items)
-    queue.inventory(all_records,grouped,out['coverage']['deferred'])
+    queue.inventory(all_records,grouped,out['coverage']['deferred'],filtered_items)
     if out['coverage']['deferred'] and not (os.getenv('PCT_SEMANTIC_PARTIAL_ANSWER')=='1' and out['claims']):
         out['status']='EXTRACTION_FAILED_OR_UNSUPPORTED' if not out['claims'] and any(r['reason']=='EXTRACTION_RESPONSE_FAILED' for r in out['coverage']['deferred']) else 'RESEARCH_COVERAGE_PENDING'
         return out
@@ -1314,8 +1393,31 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
                unknowns=answer.get('unknowns',[]),model_limitations=answer.get('limitations',[]))
     return out
 
+def render_funnel(funnel,continuation=None):
+    f=funnel
+    lines=['## Διαδρομή προς την απάντηση / Path to the answer','',
+           '| Στάδιο / Stage | Πλήθος / Count |','| --- | --- |',
+           f"| 1. Συγκεντρώθηκαν / Collected | {f['collected']['unique_excerpts']} μοναδικά αποσπάσματα (+{f['collected']['excluded_before_analysis']} αποκλείστηκαν πριν την ανάλυση) |",
+           *([f"| 1β. Φίλτρο χωρίς μοντέλο / No-LLM filter | {p['filtered_out']} εκτός ({', '.join(f'{k}: {v}' for k,v in p['filtered_by_reason'].items() if v) or '-'}); κρατήθηκαν {p['kept_excerpts']}, στο μοντέλο {p['model_units']} μονάδες ({p['sentence_windows']} παράθυρα προτάσεων), σε αυτό το πέρασμα {p['sent_this_pass']} |"] if (p:=f.get('prefilter') or {}).get('applied') else []),
+           f"| 2. Εξετάστηκαν / Examined | {f['examined']['excerpts']} (απομένουν {f['examined']['remaining']}) |",
+           f"| 3. Υποστηριζόμενοι ισχυρισμοί / Supported claims | {f['claims']['supported_by_quotation']} από {f['claims']['extracted']} εξαγμένους |",
+           f"| 4. Προσωρινή σύνθεση / Provisional synthesis | {f['provisional_synthesis']['paragraphs']} παράγραφοι |",
+           f"| 5. Ανθρώπινη επαλήθευση / Human verification | {'έγινε' if f['human_verification']['performed'] else 'εκκρεμεί'} ({f['human_verification']['verified_claims']} επαληθευμένοι) |",
+           *(['','Τα φιλτραρισμένα δεν σβήστηκαν: είναι στο answer.json (coverage.prefilter.filtered) και επανέρχονται με PCT_PREFILTER_REINCLUDE. / Filtered excerpts are listed, not deleted.'] if (f.get('prefilter') or {}).get('filtered_out') else []),
+           '','«Υποστηρίζεται» σημαίνει μόνο ότι το παράθεμα στηρίζει τη διατύπωση· δεν είναι ιστορική επαλήθευση.','']
+    if continuation:
+        lines.extend(['### Γύροι συνέχισης / Continuation rounds','',
+                      '| Γύρος | Εξετάστηκαν (σύνολο) | Απομένουν | Νέοι υποστηριζόμενοι |','| --- | --- | --- | --- |'])
+        for r in continuation.get('rounds',[]):
+            lines.append(f"| {r['round']} | {r['examined']} | {r['remaining']} | {r['new_supported_claims']} |")
+        if continuation.get('stop_reason'):lines.append('');lines.append('Λόγος διακοπής / Stop reason: `'+continuation['stop_reason']+'`')
+        lines.append('')
+    return lines
+
+
 def render(out):
     lines=['# Απάντηση έρευνας','',out['question'],'','Κατάσταση: **'+out['status']+'**','']
+    if out.get('research_funnel'):lines.extend(render_funnel(out['research_funnel'],out.get('continuation_rounds')))
     assessments=out.get('claim_evidence_assessment',{}).get('claims',[])
     if assessments:
         lines.extend(['## Τεκμηρίωση ανά ισχυρισμό','',
@@ -1355,7 +1457,9 @@ def render(out):
         lines.extend(['## Πιθανές αντιφάσεις υπό έλεγχο',''])
         for c in out['review']['contradictions']:lines.append('- '+str(c.get('explanation'))+' ['+', '.join(c['claim_ids'])+']')
     lines.extend(['','## Περιορισμοί','',
-                  ('Ο φάκελος συγκεντρώνει ακριβή αποσπάσματα χωρίς υπηρεσία μοντέλου. Δεν παράγει ερμηνεία ή επιβεβαίωση ιστορικών γεγονότων.' if out.get('answer_mode')=='EXACT_SOURCE_EXTRACTS' else 'Η απάντηση είναι ανάλυση μοντέλου που περιμένει ανθρώπινο έλεγχο. Δεν αποτελεί επαλήθευση ιστορικών γεγονότων.'),
+                  ('Ο φάκελος συγκεντρώνει ακριβή αποσπάσματα χωρίς υπηρεσία μοντέλου. Δεν παράγει ερμηνεία ή επιβεβαίωση ιστορικών γεγονότων.' if out.get('answer_mode')=='EXACT_SOURCE_EXTRACTS' else
+                   'Η απάντηση είναι ανάλυση μοντέλου που περιμένει ανθρώπινο έλεγχο. Δεν αποτελεί επαλήθευση ιστορικών γεγονότων.' if out.get('answer_sections') else
+                   'Δεν υπάρχει ακόμη τελική σύνθεση. Όσοι ισχυρισμοί αναφέρονται παραπάνω είναι εξαγωγή του μοντέλου από αποσπάσματα, όχι απάντηση, και περιμένουν ανθρώπινο έλεγχο.'),
                   'Η επιτυχής αντιστοίχιση παραπομπής δεν αποδεικνύει από μόνη της ότι η ερμηνεία του μοντέλου είναι σωστή.',
                   'Η ανεξαρτησία των πηγών και η εξέταση πρωτοτύπων δεν θεωρούνται ολοκληρωμένες.',
                   f'Κάλυψη μοντέλου: {out["coverage"]["selected_passages"]}/{out["coverage"]["unique_passages"]} μοναδικά αποσπάσματα επιλέχθηκαν για ανάλυση. Αυτό δεν σημαίνει ότι όλα τεκμηριώνουν την τελική απάντηση.'])
@@ -1383,6 +1487,10 @@ def main():
     dest=root/'research_answer';dest.mkdir(exist_ok=True)
     from place_resolver import annotate as annotate_places
     annotate_places(out)
+    if (root/'research_continuation').is_dir():
+        # Round 0 of the continuation ledger: this run's own semantic pass.
+        from continuation_rounds import record
+        out['continuation_rounds']=record(root,out,0,'research_answer')
     (dest/'answer.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (dest/'answer.md').write_text(render(out),encoding='utf-8')
     from persistent_evidence_bundle import write as write_bundle

@@ -47,7 +47,17 @@ jobs:
       PCT_LLM_MODEL: Qwen/Qwen3-8B-GGUF
       PCT_RESUME_REVIEWED_CLAIMS: ${{ inputs.resume_reviewed_claims && '1' || '0' }}
       PCT_AUTO_CONTINUE: ${{ inputs.auto_continue == false && 'false' || 'true' }}
-      PCT_SEMANTIC_BATCHES: '3'
+      # Continuation rounds read the next best-ranked excerpts (excerpt_ranking.py).
+      # The 1800 s / 48-call pass budget below still bounds each round.
+      PCT_SEMANTIC_BATCHES: '6'
+      # No-LLM pre-filter + sentence windows before the model (excerpt_prefilter.py):
+      # filtered excerpts stay listed in answer.json/queue.json/rounds.json and
+      # return with PCT_PREFILTER_REINCLUDE=<ids>|all, or PCT_PREFILTER: '0'.
+      PCT_PREFILTER: '1'
+      PCT_PREFILTER_WINDOW_SENTENCES: '2'
+      # Clean stop rules recorded in research_continuation/rounds.json.
+      PCT_CONTINUATION_MAX_ROUNDS: '5'
+      PCT_CONTINUATION_NO_GAIN_ROUNDS: '2'
       PCT_SEMANTIC_PARTIAL_ANSWER: '1'
       PCT_SEMANTIC_CALLS_PER_PASS: '48'
       PCT_SEMANTIC_BUDGET_SECONDS: '1800'
