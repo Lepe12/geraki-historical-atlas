@@ -1,0 +1,2746 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "timeline",
+  "label": "Timeline Consistency Agent",
+  "assignment_id": "timeline:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "dated_events",
+    "chronology_conflicts",
+    "gaps",
+    "impossible_overlaps"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "6c456e087127533e1e32b604355fe6125201b7b666d0d5533fbedb45146ab155",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "timeline",
+    "assignment_id": "timeline:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:PARES / Archivo General de Simancas",
+      "repo:Archives diplomatiques France",
+      "repo:Gallica/BnF",
+      "repo:Academia.edu Public Research"
+    ],
+    "queries": [
+      "\"Ιωάννης Καψής\"",
+      "\"Ιωάννης Κάψης\"",
+      "\"Γιάννης Κάψης\"",
+      "\"Jean Capsi\"",
+      "\"Giovanni Capsi\""
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:PARES / Archivo General de Simancas",
+        "route_type": "repository_dispatch",
+        "repository": "PARES / Archivo General de Simancas",
+        "connector_id": null,
+        "score": 100,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Archives diplomatiques France",
+        "route_type": "repository_dispatch",
+        "repository": "Archives diplomatiques France",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:İSAM Kütüphanesi",
+        "route_type": "repository_dispatch",
+        "repository": "İSAM Kütüphanesi",
+        "connector_id": null,
+        "score": 90,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Crossref Scholarly Metadata",
+        "route_type": "repository_dispatch",
+        "repository": "Crossref Scholarly Metadata",
+        "connector_id": null,
+        "score": 86,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"Ιωάννης Καψής\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 637}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 637}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"Giovanni Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Giovanni+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 637}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Giovanni+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 637}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"Γιάννης Κάψης\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 640}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 640}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"Jean Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Jean+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 640}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Jean+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 640}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"Ιωάννης Κάψης\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 676}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 676}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ιωάννης Καψής\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Archives diplomatiques France\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"content_type\": \"text/html\", \"response_bytes\": 33484, \"response_sha256\": \"8807d4f792fa747e36311da67b93f787f90baae26171c6b0efee7469db27edad\", \"elapsed_ms\": 817}], \"detail\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ιωάννης Κάψης\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Archives diplomatiques France\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22\", \"content_type\": \"text/html\", \"response_bytes\": 33484, \"response_sha256\": \"8807d4f792fa747e36311da67b93f787f90baae26171c6b0efee7469db27edad\", \"elapsed_ms\": 832}], \"detail\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Giovanni Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Archives diplomatiques France\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Giovanni+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Giovanni+Capsi%22\", \"content_type\": \"text/html\", \"response_bytes\": 33484, \"response_sha256\": \"8807d4f792fa747e36311da67b93f787f90baae26171c6b0efee7469db27edad\", \"elapsed_ms\": 832}], \"detail\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Giovanni+Capsi%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Archives diplomatiques France\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Jean+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Jean+Capsi%22\", \"content_type\": \"text/html\", \"response_bytes\": 33484, \"response_sha256\": \"8807d4f792fa747e36311da67b93f787f90baae26171c6b0efee7469db27edad\", \"elapsed_ms\": 843}], \"detail\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22Jean+Capsi%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Archives diplomatiques France",
+      "repository": "Archives diplomatiques France",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Γιάννης Κάψης\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Archives diplomatiques France\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22\", \"content_type\": \"text/html\", \"response_bytes\": 33484, \"response_sha256\": \"8807d4f792fa747e36311da67b93f787f90baae26171c6b0efee7469db27edad\", \"elapsed_ms\": 846}], \"detail\": \"https://archivesdiplomatiques.diplomatie.gouv.fr/search/results?q=%22%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ιωάννης Καψής\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 621, \"response_sha256\": \"bef29cf532cd4527543413f6bd9d8127667b794ae13445a84d0c31989281aeaf\", \"elapsed_ms\": 819}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ιωάννης Κάψης\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 621, \"response_sha256\": \"bef29cf532cd4527543413f6bd9d8127667b794ae13445a84d0c31989281aeaf\", \"elapsed_ms\": 675}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Γιάννης Κάψης\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 621, \"response_sha256\": \"00a680012712101b7b02c91f13687aef20b683db4a991a915dcf8997bbc5c98b\", \"elapsed_ms\": 746}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Giovanni Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Giovanni+Capsi+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Giovanni+Capsi+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 610, \"response_sha256\": \"78f2b266e79d7bcb3ee4951ee9a2a62a380eda84d32c025122eb8e40510af003\", \"elapsed_ms\": 734}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Giovanni+Capsi+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Jean Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jean+Capsi+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jean+Capsi+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 606, \"response_sha256\": \"03015530801ce014c86eac86ff16ac4ab07441016a1c5e968e3ea61a608782ff\", \"elapsed_ms\": 745}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Jean+Capsi+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Jean Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Jean+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 85}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Jean+Capsi%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 297}, {\"url\": \"https://api.openalex.org/works?search=%22Jean+Capsi%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Jean+Capsi%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1031, \"response_sha256\": \"e124c5400bc97a0dd6abd0a091cf62f84de755932266c9ef2e17eb5a0fbc0b55\", \"elapsed_ms\": 183}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Jean+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 85}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Jean+Capsi%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 297}, {\"url\": \"https://api.openalex.org/works?search=%22Jean+Capsi%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Jean+Capsi%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1031, \"response_sha256\": \"e124c5400bc97a0dd6abd0a091cf62f84de755932266c9ef2e17eb5a0fbc0b55\", \"elapsed_ms\": 183}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Ιωάννης Κάψης\"",
+      "records": [
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/18878",
+          "title": "Ιωάννης ΣΤ'Καντακουζηνός",
+          "creator": [
+            "Γρηγόριος Μπαγκαβός"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/18878",
+          "doi": "10.12681/eadd/18878",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/17742",
+          "title": "Ιωάννης Πέζαρος ( 1749 - 1806 )",
+          "creator": [
+            "Μιχαήλ Λαφαζάνης"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/17742",
+          "doi": "10.12681/eadd/17742",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/24209",
+          "title": "Ο Άγιος Ιωάννης ο Λαμπαδιστής",
+          "creator": [
+            "Γεώργιος Κάκκουρας"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/24209",
+          "doi": "10.12681/eadd/24209",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/22408",
+          "title": "Ιωάννης-Ιερόθεος Κομνηνός μητροπολίτης Δρύστρας (1657-1719)",
+          "creator": [
+            "Δημήτριος Πάντος"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/22408",
+          "doi": "10.12681/eadd/22408",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/43861",
+          "title": "Ο Ιωάννης Αργυρόπουλος ως θεολόγος και φιλόσοφος",
+          "creator": [
+            "Πετρούλα Αγαθονικιάδου"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/43861",
+          "doi": "10.12681/eadd/43861",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Το θέμα της διδακτορικής διατριβής αφορά στον λόγιο του 15ου της ύστερης βυζαντινής περιόδου Ιωάννη Αργυρόπουλο. Σκοπός της διατριβής ήταν η μελέτη του βίου και κυρίως του συγγραφικού έργου του λόγιου, με στόχο να διερευνηθεί η σύνδεσή του με τη θεολογία και τη φιλοσοφία. Εξετάσαμε τη δράση του Αργυρόπουλου σε Κωνσταντινούπολη και Ιταλία υπό την επιρροή της παλαιολόγειας, αλλά και της ιταλικής Αναγέννησης. Κατόρθωσε στην Ακαδημία της Φλωρεντίας με τη διδασκαλία του να επηρεάσει τον στοχασμό των ουμανιστών της Αναγέννησης και να τον μετατοπίσει από τη ρητορική στη μεταφυσική φιλοσοφία. Παρουσιάσαμε αναλυτικά τα έργα του με θεολογικό και φιλοσοφικό περιεχόμενο, τους ρητορικούς λόγους του, καθώς και ένα σατιρικό λιβελογράφημα. Ειδικότερα, στην επιστολή του Λύσις αποριών και ζητημάτων διαπιστώσαμε τις απόψεις του για τη δημιουργία, την ελεύθερη βούληση του ανθρώπου, την πτώση των πρωτοπλάστων, τη σωτηρία του ανθρώπου με την ενανθρώπιση του Χριστού. Σε επόμενο έργο του ανασκευάζει την άποψη του Τραπεζούντιου ότι ο Θεός υπό την ουσίαν ανάγεται, διότι σ’ αυτήν την περίπτωση θα ήταν μεθεκτός και προσιτός από τον άνθρωπο κατά την ουσία Του και όχι κατά χάρη λόγω των άκτιστων ενεργειών Του. Με την Αναφορά του στον πάπα Νικόλαο 5ο, ο λόγιος ομολογεί πίστη και αφοσίωση στη ρωμαιοκαθολική εκκλησία. Στο έργο του Περί της του Αγίου Πνεύματος εκπορεύσεως συνοψίζει τις θέσεις του για την Αγία Τριάδα, ενώ ταυτόχρονα υιοθετεί για το Άγιο Πνεύμα τη θεολογική άποψη της Δύσης για το filioque. Με τη Μονωδία στον αυτοκράτορα Ιωάννη τον Παλαιολόγο και τους δύο Παραμυθητικούς λόγους του καταδεικνύει τη συνέχεια της ελληνικής παράδοσης των εθίμων για τον νεκρό, που έχει εγκωμιαστικό χαρακτήρα. Ο Βασιλικός λόγος για τον Κωνσταντίνο 11ο τον Παλαιολόγο εκθειάζει τη μοναρχία ως ιδεατή μορφή εξουσίας και τον αυτοκράτορα ως ιδανικό ηγέτη. Το λιβελογράφημα της Κωμωδίας του Καταβλαττά διακωμωδεί την προσωπικότητα του Καταβλαττά, ενώ αναδεικνύει τη σημασία της ιδιωτικής ζωής για τη διαμόρφωση του δημόσιου βίου. Ένα άλλο θέμα που θίξαμε ήταν η σχέση του Αργυρόπουλου με τον Πλάτωνα και τον Αριστοτέλη. Αντίθετα με άλλους συγκαιρινούς του, αναπτύσσει ισόρροπη σχέση με τους δύο φιλοσόφους, τόσο μέ τη διδασκαλία του, όσο και με τη μετριοπαθή στάση του απέναντι στην αντιπαράθεση Ελλήνων αριστοτελικών και πλατωνικών στη Δύση. Στο συγγραφικό του έργο εντοπίσαμε αναφορές στην Αγία Γραφή, σε Πατέρες της Εκκλησίας, στον Πλάτωνα και τον Αριστοτέλη, στον Ισοκράτη και τον Δημοσθένη, στον Όμηρο, τον Ησίοδο, τον Σοφοκλή, στον Ηρόδοτο και τον Πλούταρχο, στον νεοπλατωνικό Μιχαήλ Ψελλό, και σε άλλους. Χρησιμοποιεί την αλληγορία σε συνδυασμό με αρχαίους μύθους, αποφθέγματα και λαϊκές παραδόσεις. Υπήρξε λαμπρός εκπρόσωπος της παλαιολόγειας αναγέννησης με άρτια κλασική παιδεία και θεολογική κατάρτιση και ως δάσκαλος εργάστηκε για τη μόρφωση των ανθρώπων με σκοπό να μεταλαμπαδεύσει τη διανόηση.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/30921",
+          "title": "Ιωάννης Καρυοφύλλης (ci 1610-1692)",
+          "creator": [
+            "Βασίλειος Χαλαστάνης"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/30921",
+          "doi": "10.12681/eadd/30921",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Ἡ ἐκπονηθεῖσα ἐπὶ διδακτορίᾳ διατριβὴ γιὰ τὸν Ἰωάννη Καρυοφύλλη (ci.1610-1692), γνωστότερο ὡς μέγα λογοθέτη, εἶχε διπλὸ στόχο: α) νὰ ἐξακριβώσει ἂν ὁ τελευταῖος υἱοθέτησε καλβινικὲς ἀπόψεις καὶ β) ἂν εἶλκε τὴν καταγωγὴ ἐξ Ἀγράφων Εὐρυτανίας ἢ ὄχι. Γιὰ τὴν ἐπίτευξη τοῦ ὡς ἄνω στόχου καταβλήθηκε κάθε δυνατὴ προσπάθεια τῆς προσεγγίσεως τοῦ πηγαίου ὑλικοῦ καὶ τῆς συγκεντρώσεώς του μὲ ὅλα τὰ διαθέσιμα μηχανικά, ἠλεκτρονικὰ καὶ μεταφορικὰ μέσα (φίλμς, σι ντι, φωτοτυπίες, ἠλεκτρονικὴ ἀναζήτηση, ἐπιτόπιες προσωπικὲς ἐπισκέψεις). Ἀπὸ τὴν μακρόχρονη μελέτη τοῦ ἀνέκδοτου καὶ ἐκδεδομένου ὑλικοῦ, τὴν ἐνδελεχὴ ἐπανεξέταση ὅλων τῶν γεγονότων τοῦ βίου του, τὴν συστηματικὴ καταγραφὴ τοῦ διασωθέντος συγγραφικοῦ του ἔργου καὶ ἰδιαίτερα τοῦ θεολογικοῦ προέκυψαν ἐν περιλήψει τὰ ἀκόλουθα: α) τὸ ἐπώνυμο Καρυοφύλλης ἦταν οἰκογενειακὸ καὶ τὸ ἔφερε ἀπὸ τὴν περιοχὴ τῶν Ἀγράφων. β) Ἀποσαφηνίστηκε πλήρως ἡ δράση του στὴ διάρκεια τοῦ βίου του: διδασκαλία στὴν Πατριαρχικὴ Σχολή, ἀπουσία στὴ Βλαχία, ἐπάνοδος στὴν ΚΠολη, σχέση μὲ προσωπικότητες τῆς ἐποχῆς, συγκρούσεις καὶ διαμάχες ἰδίως στὸ ζήτημα τῆς μετουσιώσεως στὴ θεία Εὐχαριστία, σύνθεση συγγραφικοῦ ἔργου. γ) Στὸ ζήτημα τῆς μετουσιώσεως παρεξέκλινε ἀπὸ τὴν ὀρθόδοξη παράδοση, ἀρνούμενος τὸν ὅρο καὶ τὸ περιεχόμενο τοῦ ὅρου μετουσίωσις υἱοθετώντας καλβινικὲς ἀπόψεις.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/35294",
+          "title": "Ιωάννης Γεωμέτρης, ιαμβικά ποιήματα",
+          "creator": [
+            "Μαρία Τωμαδάκη"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/35294",
+          "doi": "10.12681/eadd/35294",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Στόχος της παρούσας διδακτορικής διατριβής είναι η κριτική έκδοση, η μετάφραση και ο σχολιασμός 236 ιαμβικών ποιημάτων του Ιωάννη Γεωμέτρη. Τα ποιήματα αυτά αναφέρονται τόσο σε θρησκευτικά όσο και κοσμικά θέματα. Για παράδειγμα, είναι αφιερωμένα στον Χριστό, τη Θεοτόκο, σε αγίους, εικόνες, λείψανα, αλλά και σε Βυζαντινούς αυτοκράτορες, αρχαίους συγγραφείς και φιλοσόφους. Ως προς τη λειτουργία τους, θα μπορούσαν στην πλειονότητά τους να θεωρηθούν εν δυνάμει επιγραφές ή βιβλιακά επιγράμματα, καθώς και εγκωμιαστικά ποιήματα. Η παρούσα έκδοση βασίστηκε στον κώδικα Paris. Suppl. gr. 352 και αποτελείται από τέσσερα μέρη. Το πρώτο μέρος περιλαμβάνει έξι εισαγωγικά κεφάλαια που αναφέρονται στα βιογραφικά στοιχεία του ποιητή, στη θεματολογία, τις μετρικές συνήθειες, τη χειρόγραφη παράδοση των ιαμβικών του ποιημάτων, καθώς και στις αρχές της παρούσας έκδοσης. Στο δεύτερο μέρος περιλαμβάνεται η κριτική έκδοση των κειμένων και η απόδοσή τους στη Νεοελληνική. Στη συνέχεια ακολουθεί ο σχολιασμός των ποιημάτων, στο πλαίσιο του οποίου εξετάζονται ποικίλα φιλολογικά, γλωσσικά, προσωπογραφικά και ιστορικά ζητήματα αλλά και θέματα που αφορούν τη βυζαντινή τέχνη, ενώ το τελευταίο μέρος περιλαμβάνει τρία ευρετήρια (Index nominum, Index verborum notabilium και Index locorum).",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/22652",
+          "title": "Ο Ιωάννης ο Χρυσόστομος για το Imperium Romanun",
+          "creator": [
+            "Κωνσταντίνος Μποζίνης"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/22652",
+          "doi": "10.12681/eadd/22652",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/19826",
+          "title": "Ο Ιωάννης Β' Κομνηνός και η εποχή του (1118-1143)",
+          "creator": [
+            "Αγγελική Παπαγεωργίου"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/19826",
+          "doi": "10.12681/eadd/19826",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/makedonika.1100",
+          "title": "Ιωάννης Ν. Παπαφής",
+          "creator": [
+            "Αλέξανδρος Ν. Λέτσας"
+          ],
+          "date": [
+            "1956-1-1"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.1100",
+          "doi": "10.12681/makedonika.1100",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μακεδονικά"
+          ],
+          "description": "No abstract",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/6654/6388",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/37477",
+          "title": "Φιλοσοφία και Ρητορική στον 15ο αιώνα",
+          "creator": [
+            "Αναστάσιος Μανδραπήλιας"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/37477",
+          "doi": "10.12681/eadd/37477",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Η νεότερη Ευρώπη οικοδομήθηκε πάνω στα θεμέλια της κλασικής αρχαιότητας, η μελέτη και γνώση της οποίας κατέστη εν πολλοίς δυνατή μέσω της συμβολής των Ελλήνων λογίων, οι οποίες παρά τις αντιξοότητες, έθεσαν τον εαυτό τους στην προσπάθεια της πνευματικής καλλιέργειας του υπόδουλου πληθυσμού και στη διάδοση της ελληνικής γλώσσας και φιλοσοφίας στη Δύση με σκοπό να μείνει κτήμα ες αεί στους μεταγενέστερους. Οι Έλληνες λόγιοι του Βυζαντίου, και συγκεκριμένα οι προαναφερθέντες, Ιωάννης Αργυρόπουλος, Ματθαίος Καμαριώτης και Γεώργιος Τραπεζούντιος συνέβαλαν με το έργο τους τα μέγιστα, καθώς οι δύο εξ αυτών εγκαταλείποντας της περιοχές τους, που βρίσκονταν υπό οθωμανική απειλή και πηγαίνοντας ως φυγάδες στη Δύση, μετέφεραν μαζί τους χειρόγραφα αρχαίων Ελλήνων και βυζαντινών συγγραφέων, καθώς και τις ανθρωπιστικές αξίες των κλασικών γραμμάτων και του βυζαντινού πολιτισμού. Το μεταναστευτικό αυτό ρεύμα συνέβαλε αποφασιστικά στην ανάπτυξη του Ουμανισμου στην Ευρώπη και στην πολιτιστική ακμή των Γραμμάτων και των Τεχνών, καθώς πυροδότησε το ενδιαφέρον των Δυτικών για την αρχαία ελληνική γνώση, με αποτέλεσμα πολλοί να αποφασίζουν να διδαχθούν την ελληνική γλώσσα. Ο δε Καμαριωτης έδωσε τον δικό του πνευματικό αγώνα εντός των συνόρων της Οθωμανικης πλέον αυτοκρατορίας προσπαθώντας να περισώσει ότι ήταν δυνατόν είτε αυτό αφορούσε τις έγγραφες πηγές είτε να συνεχίσει με τη διδασκαλία στους εναπομείναντες Ελληνες. Εν μέσω της τραγωδίας του Ελληνισμού στη Δύση είχαν αρχίσει να δημιουργούνται οι συνθήκες που θα έβγαζαν την Ευρώπη από το Μεσαίωνα και θα την οδηγούσαν στην πνευματική Αναγέννηση. Για τον λόγο αυτό είναι σημαντική η εξέταση του συνόλου των δομικών στοιχείων που επέφεραν όλες αυτές τις αλλαγές στην κοινωνία. Η πτώση της Κωνσταντινούπολης υπήρξε ο καταλύτης που επιτάχυνε τις εξελίξεις σε συνδυασμό με την μεταφορά των πολύτιμων Βυζαντινών χειρογράφων και την ανάπτυξη της τυπογραφίας που πυροδότησε πραγματικά την άνοδο των γραμμάτων και τα κατέστησε προσβάσιμα σε όλες τις κοινωνικές τάξεις.Η συνεισφορά των τριών επηρέασε την κατεύθυνση της πνευματικής αναγέννησης που διαφαινόταν λόγω των ευνοϊκών συνθηκών την εποχή εκείνη στη Δυση. Εισήγαγαν την Πλατωνικη Διαλεκτική σε σχέση με την Αριστοτέλεια Λογική γεγονός που επηρέασε άμεσα το κίνημα του ουμανισμού. Η Εκκλησία μετά από αιώνες κυριαρχίας του Αριστοτελικού φιλοσοφικού προτύπου είδε την μείωση της επιρροής της και την υποχώρηση προς τον τον Πλατωνισμο. Στο σκέλος της Ρητορικής η συνεισφορά τους και η επιρροή που άσκησαν είναι τεράστια διότι αναθέρμαναν το ενδιαφέρον των Λατίνων για την Αριστοτέλεια ρητορική η οποία αποτελεί τον ένα βασικό πυλώνα της Βυζαντινής παράδοσης, γεγονός που φάνηκε και από την επιβολή της ως διδακτικό βιβλίο στα σχολεία των Ισουητών μοναχών και επέβαλαν το Ερμογένειο corpus το οποίο κυριαρχούσε για αιώνες στο Ανατολικό τμήμα της αυτοκρατορίας. Ο ζήλος τους φαίνεται στα εκτενή σχόλια και στα εγχειρίδια που συνέταξαν προκειμένου να προωθήσουν την ρητορική τέχνη η οποία είναι άλλωστε άρρηκτα συνδεδεμένη με το φιλοσοφικό υπόβαθρο των αρχαίων Ελλήνων που πέρασε διά μέσω της ύστερα και στους Βυζαντινούς.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/makedonika.162",
+          "title": "Ιωάννης Καλλέρης (1901-1992)",
+          "creator": [
+            "Ιωάννης Τουλουμάκος"
+          ],
+          "date": [
+            "1992-1-1"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.162",
+          "doi": "10.12681/makedonika.162",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μακεδονικά"
+          ],
+          "description": "No abstract",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/5723/5462",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/dchae.852",
+          "title": "Ευαγγελιστής Ιωάννης - Μωϋσής (πίν. 54-55)",
+          "creator": [
+            "Ανδρέας ΞΥΓΓΟΠΟΥΛΟΣ"
+          ],
+          "date": [
+            "1976-1-11"
+          ],
+          "url": "https://doi.org/10.12681/dchae.852",
+          "doi": "10.12681/dchae.852",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Δελτίον Χριστιανικής Αρχαιολογικής Εταιρείας"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/deltion/article/viewFile/4533/4309",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/grsr.876",
+          "title": "Ιωάννης Βαβούρας: οικονομική πολιτική: θεωρητική εισαγωγή",
+          "creator": [
+            "Αγγελική Τσούχλου"
+          ],
+          "date": [
+            "1988-5-1"
+          ],
+          "url": "https://doi.org/10.12681/grsr.876",
+          "doi": "10.12681/grsr.876",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Επιθεώρηση Κοινωνικών Ερευνών"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/ekke/article/viewFile/7674/7392",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/makedonika.426",
+          "title": "Ιωάννης Κ. Βασδραβέλλης (1900-1981)",
+          "creator": [
+            "Κωνσταντίνος Αν. Βαβούσκος"
+          ],
+          "date": [
+            "1981-1-1"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.426",
+          "doi": "10.12681/makedonika.426",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μακεδονικά"
+          ],
+          "description": "<p>No abstract</p>",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/5987/5725",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/30404",
+          "title": "Ο Ιωάννης Γεννάδιος και η διαμόρφωση της εθνικής πολιτικής της Ελλάδας (1871-1918)",
+          "creator": [
+            "Μαριάννα Χριστοπούλου"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/30404",
+          "doi": "10.12681/eadd/30404",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Η παρούσα διδακτορική διατριβή παρουσιάζει και ερμηνεύει την επαγγελματική δράση του έλληνα διπλωμάτη Ιωάννη Γενναδίου (1844-1932), που υπηρέτησε ως επί το πλείστον στην ελληνική πρεσβεία Λονδίνου κατά το τελευταίο τέταρτο του 19ού αιώνα και το πρώτο, περίπου, τέταρτο του 20ού. Στόχος ήταν διαμέσου της «βιογράφησης» της δράσης του να απαντηθεί ένα ερώτημα διπλωματικής ιστορίας: ο τρόπος που ένας διπλωμάτης μπορεί να υπερβεί τα όρια της διαικπεραίωσης και να συνδιαμορφώσει την εξωτερική πολιτική της χώρας του. Aναλύονται αρχικά η ιδεολογική συγκρότηση του Γενναδίου, οι οικογενειακές και εκπαιδευτικές του καταβολές και οι εμπειρίες της γενιάς του σε σχέση κυρίως με τον βρετανικό παράγοντα. Παρουσιάζονται τα πρώτα δημοσιογραφικά του εγχειρήματα και αναλύεται διεξοδικά το 180σέλιδο κείμενό του για τη σφαγή στο Δήλεσι (1870). Επρόκειτο για κείμενο που αποτύπωσε το στίγμα της ερμηνείας του για τις παθογένειες του ελληνικού κράτους και αποτέλεσε το εφαλτήριο για την ένταξή του στο διπλωματικό σώμα. Το κύριο σώμα της διατριβής αναπτύσσει και ερμηνεύει τη διπλωματική δραστηριότητα του Γενναδίου σε σημαντικές φάσεις της ελληνικής ιστορίας, όπως η Ανατολική Κρίση (1875-1878), η κρίση της Ανατολικής Ρωμυλίας (1885-1886), οι Βαλκανικοί Πόλεμοι (1912-1913) και ο Πρώτος Παγκόσμιος Πόλεμος (1914-1918). Διαμέσου ή παράλληλα με αυτές τις φάσεις αναδεικνύονται και άλλες όχι και τόσο γνωστές πτυχές της συνδρομής του στην ελληνική διπλωματία, όπως οι σχέσεις που ανέπτυξε με το κόμμα των Βρετανών Φιλελευθέρων, η διένεργεια συστηματικής και οργανωμένης προπαγάνδας υπέρ των ελληνικών θέσεων, η διευθέτηση των Δανείων της Ανεξάρτησίας (1878-1880), όπως και του δασμού της ελληνικής σταφίδας στις ΗΠΑ και στη Μεγάλη Βρετανία (1888-1894).",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/53634",
+          "title": "Ο Ιωάννης Περμενιάτης και άλλοι Έλληνες ζωγράφοι στη Βενετία κατά το πρώτο μισό του δέκατου έκτου αιώνα",
+          "creator": [
+            "Ελένη Χαρχαρέ"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/53634",
+          "doi": "10.12681/eadd/53634",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Με την παρούσα εργασία επιχειρείται μία συμβολή στη μελέτη του έργου του Ιωάννη Περμενιάτη, ενταγμένου στο σύνολο των Ελλήνων ζωγράφων που έζησαν στη Βενετία το α΄ μισό του 16ου αιώνα, μία περίοδο σπουδαίας καλλιτεχνικής άνθησης για την ιταλική μητρόπολη. Παρουσιάζονται οι αρχειακές και οι καλλιτεχνικές μαρτυρίες που είναι γνωστές μέχρι σήμερα για δεκαπέντε Έλληνες ζωγράφους, εκ των οποίων οι περισσότεροι είναι μέλη της Ελληνικής Αδελφότητας, που ιδρύθηκε στη Βενετία το 1498. Το κύριο μέρος της εργασίας καταλαμβάνει η παρουσίαση του έργου του Ιωάννη Περμενιάτη, ο οποίος μαρτυρείται ως μέλος της Ελληνικής Αδελφότητας το έτος 1523. Τα έργα του, τρία υπογεγραμμένα και τριάντα δύο αποδιδόμενα, εξετάζονται αναλυτικά, ενταγμένα σε εικονογραφικές κατηγορίες. Στόχος της εξέτασης αυτής είναι η ανάδειξη των ποικίλων επιρροών που δέχθηκε ο ζωγράφος, αφενός από τη βυζαντινή παράδοση και αφετέρου από ένα ευρύτατο φάσμα της δυτικοευρωπαϊκής ζωγραφικής, καθώς και ο τρόπος με τον οποίο προχώρησε στη σύνθεση των επιδράσεων αυτών και τη δημιουργία μίας ιδιαίτερης εικαστικής γλώσσας. Επιχειρείται, με άλλα λόγια, να παρουσιασθούν πτυχές της καλλιτεχνικής προσωπικότητας ενός Έλληνα ζωγράφου, που μπόρεσε να ανταποκριθεί στα αιτήματα που έθετε η τέχνη και η θρησκευτικότητα της εποχής του, μέσα στο πλούσιο σε καλλιτεχνικά ερεθίσματα αλλά και απαιτητικό σε επαγγελματικό επίπεδο περιβάλλον της Βενετίας, προσφέροντας ένα έργο στο μεταίχμιο της μεταβυζαντινής και της δυτικής ζωγραφικής.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/er.9143",
+          "title": "Ιωάννης (Ιβάν) Σελιμίνσκι",
+          "creator": [
+            "Ν. Δ. Σωτηράκης"
+          ],
+          "date": [
+            "2016-5-10"
+          ],
+          "url": "https://doi.org/10.12681/er.9143",
+          "doi": "10.12681/er.9143",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "The Gleaner"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/eranistis/article/viewFile/9143/9378",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/makedonika.189",
+          "title": "Ιωάννης Τσικόπουλος: ένας ξεχασμένος Μακεδόνας λόγιος",
+          "creator": [
+            "Δημήτριος Κρήτος"
+          ],
+          "date": [
+            "1994-1-1"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.189",
+          "doi": "10.12681/makedonika.189",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μακεδονικά"
+          ],
+          "description": "<p>No Abstract</p>",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/5750/5489",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/16636",
+          "title": "Μελέτη μεθόδων παρασκευής - ιδιοτήτων - εφαρμογών σύνθετων πορώδων υλικών ρητινών φαινόλης - φορμαλδεϋδης και λιγνοκυτταρινούχων πρόσθετων",
+          "creator": [
+            "Ιωάννης Σφυράκης"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/16636",
+          "doi": "10.12681/eadd/16636",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "OpenAlex Scholarly Works",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "https://openalex.org/W4205249833",
+          "title": "Η ίδρυση της Πρέβεζας και επιδρομές στην ευρύτερη περιοχή",
+          "creator": [
+            "Γιώργος Ιασ. Μουστάκης"
+          ],
+          "date": [
+            "2015-12-31"
+          ],
+          "url": "https://doi.org/10.12681/prch.28285",
+          "doi": "https://doi.org/10.12681/prch.28285",
+          "type": "article",
+          "cited_by_count": 0,
+          "description": "Στο παρόν άρθρο γίνεται προσπάθεια αποσαφήνισης του χρόνου και του τόπου ίδρυσης της Πρέβεζας.",
+          "description_provenance": "OPENALEX_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/prevchr/article/download/28285/22202",
+              "is_oa": true,
+              "license": null,
+              "version": "publishedVersion"
+            }
+          ],
+          "digital_url": "https://ejournals.epublishing.ekt.gr/index.php/prevchr/article/download/28285/22202",
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "OPENALEX_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 170}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 100457, \"response_sha256\": \"c6f069cfebf0d9c23ef1770dacb5bf44fb742e34ca7f54d5f42f48b906fe64da\", \"elapsed_ms\": 686}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 11720, \"response_sha256\": \"07490ccdba87fd48a6e905625de8275b0405ce315ffb37c8b49d538acc8b5936\", \"elapsed_ms\": 433}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 1}]}\", \"result_count\": 21, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 170}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 100457, \"response_sha256\": \"c6f069cfebf0d9c23ef1770dacb5bf44fb742e34ca7f54d5f42f48b906fe64da\", \"elapsed_ms\": 686}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 11720, \"response_sha256\": \"07490ccdba87fd48a6e905625de8275b0405ce315ffb37c8b49d538ac"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Ιωάννης Καψής\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 178}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 457}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1283, \"response_sha256\": \"edef1489979a777ba3ade40434d7a27f2da9dbf393b7ae8f626a578880d88784\", \"elapsed_ms\": 727}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 178}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 457}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1283, \"response_sha256\": \"edef1489979a777ba3ade40434d7a27f2da9dbf393b7ae8f626a578880d88784\", \"elapsed_ms\": 727}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Γιάννης Κάψης\"",
+      "records": [
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/50806",
+          "title": "Γιάννης Μ. Αποστολάκης",
+          "creator": [
+            "Μαρία Νιώτη"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/50806",
+          "doi": "10.12681/eadd/50806",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Το διττό ερώτημα που βρίσκεται στη βάση του προβληματισμού της παρούσας διδακτορικής διατριβής διαφαίνεται ήδη από τον τίτλο της. Προς διερεύνηση τίθενται η ποιητική θεωρία του Γιάννη Μ. Αποστολάκη (1886-1947), του πρώτου καθηγητή στην έδρα της «Νεώτερης Ελληνικής Φιλολογίας» του Πανεπιστημίου Θεσσαλονίκης, της οποίας οι βασικές θέσεις είναι εγκατεσπαρμένες σε πολλά σημεία των κειμένων του, καθώς και η εφαρμογή αυτής της θεωρίας, ώστε να κριθούν ποιητικά έργα αλλά και κριτικές προσεγγίσεις των συγκεκριμένων ποιητικών έργων. Ως προέκταση της βασικής υπόθεσης εργασίας τίθεται και η διακρίβωση ορισμένων ιχνών της κριτικής πρόσληψης των θέσεων του Αποστολάκη, καθώς και πλευρές της καθηγεσίας του, ώστε να προσεγγιστεί επαρκέστερα ο θεωρητικός λόγος και η κριτική του πρακτική. Το χρονικό άνυσμα της εργασίας εκκινεί από τα πρώιμα κείμενα στον Νουμά (1904) και φτάνει ως το 2019 με την αφιέρωση στο πρόσωπό του της Ημερίδας από το Ίδρυμα της Βουλής των Ελλήνων υπό τον κύκλο «Πρόσωπα άξια τιμής», γεγονός που φανερώνει τη χρεία επανακαθορισμού ή επαναξιολόγησης της συνεισφοράς του. Το βασικό μεθοδολογικό μοντέλο της διατριβής συγκροτείται από τη σύζευξη κειμενοκεντρικής και ιστορικής – ερμηνευτικής μεθόδου. Επειδή τα κείμενα του Αποστολάκη ανήκουν στο γενικότερο γραμματειακό δοκιμιακό είδος με ισχυρή τη μορφή της επιστημονικής πραγματείας, δίνεται προτεραιότητα στο κειμενικό περιεχόμενο, αλλά σχολιάζεται και η μορφή τους, στην οποία πρωτεύουν τόσο ο δημοτικισμός του συγγραφέα όσο και η προσωπική του, σε αρκετά σημεία λογοτεχνικής υφής, ιδιόλεκτος. Τα κείμενα – πηγές της διατριβής εξετάζονται με όρους χρονικής διαδοχής και αλληλοσυσχέτισης, με άξονα όμως και το θεματικό επίκεντρο, για να αναδειχθεί η πορεία σκέψης του Αποστολάκη. Προκρίνεται η ανάδειξη της ποιητικής θεωρίας ως ένα παλίμψηστο ιδεών μέσω των προσωπικών του αναζητήσεων αλλά και υπό ένα ευρύ πλέγμα φιλοσοφικών και αισθητικών επηρεασμών, που του ασκήθηκαν, στο πλαίσιο της ιστορίας των ιδεών, από το ρομαντικογενές πνεύμα, τον σπιριτουαλισμό και τον καντιανισμό. Γίνεται φανερό ότι ο Αποστολάκης είχε διαμορφώσει ένα θεωρητικό και κριτικό μοντέλο για την ποίηση, το οποίο συνδέεται με τη ρομαντική θέαση του λογοτεχνικού φαινομένου. Η πρόθεση του ποιητή, η ζωή του ως ψυχική διεργασία προς την έκφραση της καλλιτεχνικής κορύφωσης, η προσπάθεια της κριτικής να συλλάβει και να διατυπώσει τον εσώτατο πυρήνα της ποιητικής σύλληψης, απαλλαγμένης από εξωτερικές επιδράσεις και προσμείξεις, αποτελούν βασικούς άξονες του θεωρητικού λόγου και της κριτικής πρακτικής του. Διαπιστώνεται ότι το ιστορικό συγκείμενο δευτερευόντως ενδιέφερε τον Αποστολάκη ως επαρκή αναγνώστη με την ιδιότητα του φιλολόγου-κριτικού, αλλά η συγγραφική πρόθεση των ποιητών, καθώς και η καλλιτεχνική ενσάρκωση της πρόθεσής τους, διυλισμένη από ποικίλα στάδια ψυχικής και λογοτεχνικής διεργασίας προς επίτευξιν του Υψηλού, συγκρότησαν τον βασικό του γνώμονα. Το πώς αυτός ο γνώμονας κρίθηκε ή αξιοποιήθηκε και από άλλους μελετητές-κριτικούς είναι ένα ζητούμενο, του οποίου η προσέγγιση προϋποθέτει λεπτομερή αποσαφήνιση και τεκμηριωμένη διακρίβωση των συντεταγμένων του συγκεκριμένου θεωρητικού και κριτικού γνώμονα και σε αυτά τα σημεία, κυρίως, στοχεύει η διατριβή.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/35380",
+          "title": "Γιάννης Παππάς 1913-2005",
+          "creator": [
+            "Γεωργία Αντωνοπούλου"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/35380",
+          "doi": "10.12681/eadd/35380",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Ο γλύπτης Γιάννης Παππάς [1913-2005] ανήκει στους καλλιτέχνες της γενιάς του 30. Υπήρξε Καθηγητής στην ΑΣΚΤ (Ανωτάτη Σχολή Καλών Τεχνών) [1953-1978], Διευθυντής της [1959-1969] και Ακαδημαϊκός από το 1980. Η διατριβή ερευνά τη ζωή και το έργο του και αναζητά τη συμβολή του στην τέχνη και στην πνευματική ζωή του τόπου {Α΄ μέρος}. Ειδικότερα, μελετώνται τα χρόνια της παραμονής του στην Αίγυπτο [1945-1952], {Β΄ μέρος}. Η έρευνα καταγράφει και αναλύει το έργο του στην Αλεξάνδρεια (σχέδιο, ζωγραφική, γλυπτική). Τεκμηριώνει την επαφή του με την αιγυπτιακή και ευρωπαϊκή τέχνη και αναζητά ρίζες στη ματιά του. Διερευνάται η στάση του απέναντι σε θέματα της τέχνης και οι συνισταμένες που συνέβαλαν στην πορεία του. Η εργασία στηρίζεται σε γραπτές και προφορικές πηγές στην ελληνική, γαλλική, αγγλική, ιταλική και αραβική γλώσσα καθώς και στην in situ έρευνα και παρατήρηση. Μελετήθηκε ανέκδοτο αρχειακό υλικό όπως το προσωπικό αρχείο του καλλιτέχνη, τα αρχεία Αλέξανδρου Παππά και Φώτη Φωτιάδη, της École Nationale Supérieure des Beaux Arts, της ΑΣΚΤ, του ΙΚΥ (Ίδρυμα Κρατικών Υποτροφιών), της Ελληνικής Κοινότητας Αλεξάνδρειας, του ΕΛΙΑ (Ελληνικό Λογοτεχνικό Ιστορικό Αρχείο), του Ιστορικού αρχείου του Δήμου Αθηναίων, της Τράπεζας της Ελλάδος, εφημερίδες, λοιπά αρχεία φορέων και οργανισμών καθώς και πηγές από το διαδίκτυο. Έγιναν συνεντεύξεις με ανθρώπους του οικογενειακού, φιλικού και επαγγελματικού περιβάλλοντος του Γιάννη Παππά. Μελετήθηκε γενικότερα η καλλιτεχνική δραστηριότητα (ελληνική, ευρωπαϊκή, αραβική) της Αλεξάνδρειας της πρώτης μεταπολεμικής περιόδου. Αναζητήθηκαν και τεκμηριώθηκαν τα έργα του καλλιτέχνη στην Ελλάδα και στο εξωτερικό. Εντοπίσθηκαν επίσης χαμένα και άγνωστα έργα. Τέλος, πραγματοποιήθηκαν εργαστηριακές αναλύσεις για τον προσδιορισμό της σύστασης των χρωστικών και του χυτού υλικού των έργων της Αιγύπτου. Τα ανωτέρω συγκροτούν τους πίνακες και τα παραρτήματα της εργασίας {τόμος Β΄}. Η έρευνα κατέδειξε πως ο Γιάννης Παππάς έζησε κατά τέχνην. Το δημόσιο γλυπτικό έργο του κινείται στο ρεαλιστικό ιδίωμα με έντονη την προσπάθεια απλότητας. Χαρακτηρίζεται από μνημειακότητα, αμεσότητα και το εύληπτο των διατυπώσεών του. Το μελετητικό του έργο διακρίνεται για την πολυφωνία, τον πλούτο έκφρασης, το εύρος και την ποιότητα των αναζητήσεων. Υπήρξε ανένταχτος καλλιτέχνης, ανεξάρτητος εκφραστής της εποχής του, ιδεαλιστής και οραματιστής. Εργάστηκε αφοσιωμένα για την αναβάθμιση της ΑΣΚΤ και την αναβίωση της χαλκοχυτικής στην Ελλάδα. Στα δρώμενα του τόπου πρωταγωνίστησε εξίσου η προσωπικότητά του. Το μέγεθος της συνολικής του προσφοράς συγκροτεί σημαντικό κεφάλαιο της νεοελληνικής τέχνης, στο οποίο τα χρόνια της Αιγύπτου έχουν βαρύτητα. Μακριά από την εμφυλιακή Ελλάδα, σε τόπο με απύθμενη ιστορία, όπου συνυπήρξαν το ελληνικό και δυτικοευρωπαϊκό στοιχείο, ενώ αφυπνιζόταν επαναστατικά το αραβικό, ο Παππάς δημιουργεί εκ του μηδενός και καθιερώνεται ως γλύπτης αξιώσεων, δεινός σχεδιαστής και ενθουσιώδης ζωγράφος. Παράλληλα, ταξιδεύοντας στην Ευρώπη, αντιλαμβάνεται την μεταπολεμική της εικόνα. Η περίοδος της Αιγύπτου διακρίνεται από ψυχική και καλλιτεχνική ελευθερία και αποδεικνύεται καθοριστική για τη μετά το 1952 καλλιτεχνική του πορεία.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/57759",
+          "title": "Ο Γιάννης Χρήστου ως Μύστης",
+          "creator": [
+            "Ηλιάνα Ηλιάδου"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/57759",
+          "doi": "10.12681/eadd/57759",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Η παρούσα μελέτη πραγματεύεται μία ολική ανασύσταση του έργου Μυστήριον του Γιάννη Χρήστου (1926-1970), ένα έργο που δημιουργήθηκε το 1966 αλλά η οριστική έκδοσή του από τον συνθέτη δεν ολοκληρώθηκε εξαιτίας του πρόωρου θανάτου του. Η μελέτη κινείται σε δύο άξονες: α) μια ενδελεχή θεώρηση του ίδιου του έργου και των συνθηκών μέσα στις οποίες εξελίχθηκε και β) την δημιουργία μιας ολοκληρωμένης έκδοσης με προορισμό την εκτέλεσή του, που συμπεριλαμβάνει αφενός τη συλλογή και αποκατάσταση των γραμμένων στοιχείων που αποτελούν την παρτιτούρα και αφετέρου την ανασύσταση του ηχητικού υλικού της συνοδευτικής μαγνητοταινίας. Η διατριβή περιλαμβάνει μια μελέτη της ζωής και του έργου του ΓΧ μέσα από μια επιλογή κειμένων του συνθέτη, εξετάζοντας την θέση του Μυστήριον μέσα στο έργο του. Αφηγείται την περιπέτεια της έκδοσης των τελευταίων έργων στα οποία περιλαμβάνεται και το Μυστήριον καθώς και της προσπάθειας του ΓΧ για την εκτέλεση του έργου, από την αναβολή της παράστασης στο Φεστιβάλ Αθηνών το 1966 μέχρι την επίσης αναβληθείσα τηλεοπτική παραγωγή της Δανικής Ραδιοτηλεόρασης τον Ιούνιο του 1969. Με αφορμή την τελευταία παραγωγή, ο ΓΧ προχώρησε σε κάποιες τροποποιήσεις της αρχικής εκδοχής του έργου. Αυτές, γράφτηκαν επάνω στην αρχική παρτιτούρα και σε γραπτά που συγκέντρωσε σε ένα φάκελο που προετοίμαζε την τελική εκδοχή της η οποία δεν ολοκληρώθηκε ποτέ. Στη μελέτη υποστηρίζεται ότι το φάκελος περιέχει πολύτιμες πληροφορίες σχετικά με τις τροποποιήσεις, το ηχητικό υλικό και τη χρήση του. Επιπλέον, η διατριβή εξετάζει το προσωπικό σημειογραφικό σύστημα του ΓΧ που εφαρμόζεται για πρώτη φορά στο Μυστήριον και που η εξελικτική του πορεία είναι εμφανής ανάμεσα στις δύο γραφές του έργου. Οι τροποποιήσεις του έργου αφορούν κυρίως στην χρήση μαγνητοταινίας. Έτσι, η διατριβή διερευνά τον τρόπο σημείωσης της μαγνητοταινίας και της λειτουργικής της σημασίας από τον Προμηθέα Δεσμώτη (1963) μέχρι και τα τελευταία έργα που η χρήση της γίνεται όλο και πιο συστηματική. Το Μυστήριον αποτελεί την μοναδική περίπτωση έργου της ύστερης δημιουργικής περιόδου του συνθέτη που δεν έχει παρουσιαστεί, τουλάχιστον σε μια πλήρη μορφή. Η διατριβή καταλήγει σε μια δυνητικά εκτελέσιμη εκδοχή που έχει ως στόχο να καλύψει το κενό που αφήνει η έλλειψη μιας τελικής παρτιτούρας. Αυτή η εκδοχή συγκεντρώνει το σύνολο της πληροφορίας για το έργο που είναι σήμερα διαθέσιμη μαζί με το ηχητικό υλικό που συνοδεύει το έργο και σημειώνεται στην παρτιτούρα του.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.52903/ccrd.a1.2022",
+          "title": "Γιάννης Στίνης : πορεία στον χρόνο",
+          "creator": [
+            "Χάρις Κανελλοπούλου"
+          ],
+          "date": [
+            "2022-8-1"
+          ],
+          "url": "https://doi.org/10.52903/ccrd.a1.2022",
+          "doi": "10.52903/ccrd.a1.2022",
+          "type": "monograph",
+          "publisher": "Τράπεζα της Ελλάδος",
+          "container_title": [],
+          "description": "Ο Γιάννης Στίνης (1914-2001) φιλοτεχνούσε μακέτες και εκτελούσε στοιχεία ή όψεις τραπεζογραμματίων στο ΙΕΤΑ για την Τράπεζα της Ελλάδος, ενώ συγχρόνως παρήγε και ελεύθερο ζωγραφικό και χαρακτικό έργο. Ως αφοσιωμένος ζωγράφος και φίλεργος χαράκτης που ήταν, δούλεψε έργα αντιπροσωπευτικά στα οποία αποτυπώνονται η επίμονη και λεπτολόγος πρόθεση ενασχόλησής του με το εκάστοτε μέσο που χρησιμοποιούσε. Το ζωγραφικό του έργο αφορά κατά κύριο λόγο τοπιογραφίες. Στις σκηνές που επιλέγει να απεικονίσει, έκδηλο είναι το ενδιαφέρον του για την εγγραφή της εντύπωσης – είτε αυτή αφορά την αναπαράσταση του περιβάλλοντος χώρου και των συνθηκών του σε μια δεδομένη στιγμή είτε επικεντρώνεται στην αποτύπωση μιας ανθρώπινης δράσης. Όπως η ζωγραφική, έτσι και η χαρακτική αποτέλεσε γόνιμο πεδίο δημιουργίας για τον Γιάννη Στίνη. Η εργασία του στη σχεδίαση και τη χάραξη νομισμάτων και τραπεζογραμματίων του επέτρεψε να εξοικειωθεί περαιτέρω με τις τεχνικές της χαρακτικής και να τις αξιοποιήσει στην προσωπική γραφή του, παράγοντας μια σειρά από χαρακτηριστικά χαρακτικά έργα. Ο Γιάννης Στίνης διακρίθηκε για την ευρηματική και λεπτομερή δουλειά του, καθώς και για την αφοσίωσή του στην τέχνη, την οποία δεν εγκατέλειψε μέχρι το τέλος: το τελευταίο έργο του χρονολογείται το 1999, δύο μόλις χρόνια πριν από τον θάνατό του. Το λεύκωμα Γιάννης Στίνης. Πορεία στον χρόνο συνοψίζει το σύνολο του έργου του, αποτελώντας την πρώτη ουσιαστική προσπάθεια καταγραφής και ανάδειξής του με συστηματικό τρόπο.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/59888",
+          "title": "Γιάννης Ανδρέου Παπαϊωάννου",
+          "creator": [
+            "Μαρία Ντούρου"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/59888",
+          "doi": "10.12681/eadd/59888",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Η παρούσα διατριβή μελετά την ύστερη περίοδο (1966-1989) της συνθετικής δημιουργίας του Γιάννη Ανδρέου Παπαϊωάννου (1910-1989) που περιλαμβάνει 67 έργα φωνητικής και οργανικής μουσικής, καρποί της προσωπικής τεχνικής και του κατασταλάγματος της καλλιτεχνικής ευαισθησίας του δημιουργού τους τα οποία φυλάσσονται στο Αρχείο Παπαϊωάννου που φιλοξενείται στα Ιστορικά Αρχεία του Μουσείου Μπενάκη. Αρωγοί της έρευνας ήταν τα χειρόγραφα και τα σκίτσα των έργων, τα σημειώματα του συνθέτη με αφορμή την εκτέλεσή τους, προγράμματα συναυλιών, κριτικές, δημοσιεύματα στον ημερήσιο τύπο, αναφορές, διαλέξεις και συνεντεύξεις του συνθέτη και ένα πλούσιο ηχητικό αρχείο. Η έρευνα προσεγγίζει διεξοδικά τον ύστερο Παπαϊωάννου με στόχο τη σκιαγράφηση του προσωπικού του ιδιώματος. Εντοπίζει το αποτύπωμα του συνθέτη στον ελλαδικό και ευρωπαϊκό χώρο και συνθέτει το ιστορικό πλαίσιο κάθε έργου ενώ παράλληλα καταδεικνύει τις συνθετικές τεχνικές, τον χαρακτήρα, τη μορφή, το tempo, τις μετρικές ενδείξεις, τη σύνθεση των μελωδικών γραμμών και των συνηχήσεων, τον ρόλο των οργάνων, τη βασική μοτιβική ιδέα και, κατά περίπτωση, τις ενορχηστρωτικές τεχνικές κάθε έργου. Επιπλέον, στα έργα φωνητικής μουσικής, διερευνάται κριτικά μέσα από έγκυρες ιστορικοφιλολογικές πηγές το ιστορικό πλαίσιο, το ύφος και η γλώσσα, το νόημα και το συγκινησιακό φορτίο του ποιήματος, εντοπίζονται τα συνθετικά ευρήματα μουσικής απόδοσής του και η συνοδοιπορία γλώσσας και μουσικής. Εφόσον το έργο έχει εκδοθεί, καταγράφονται αποκλίσεις της εκδομένης παρτιτούρας από το χειρόγραφο. Αντιπαραβολική ανάλυση λαμβάνει χώρα μεταξύ διαφορετικών εκδοχών του ιδίου έργου και μεταξύ έργων της ίδιας κατηγορίας. Συμπεράσματα παρατίθενται στο τέλος της ανάλυσης έργων που παρουσιάζουν ιδιαιτερότητες οι οποίες δεν θα μπορούσαν να αναδειχθούν σε παράθεση γενικών συμπερασμάτων, στο τέλος κάθε υποκατηγορίας ή κατηγορίας έργων και συνοπτικά-συγκεντρωτικά στο τελευταίο κεφάλαιο του πονήματος. Το πόνημα (Τόμος Ι) αποτελείται από ένα εισαγωγικό και πέντε κύρια κεφάλαια. Στο εισαγωγικό κεφάλαιο αναφέρονται μουσικολογικές μελέτες για το έργο του Παπαϊωάννου, προβληματισμοί και δυσκολίες που ανέκυψαν κατά τη συλλογή και μελέτη του υλικού, οι στόχοι και η μεθοδολογία της έρευνας. Το πρώτο κεφάλαιο εστιάζει στο ιστορικό αποτύπωμα του συνθέτη κατά την ύστερη περίοδο της δημιουργίας του. Στο δεύτερο κεφάλαιο αναλύονται κατά υποκατηγορίες τα έργα φωνητικής μουσικής (χορωδιακά a cappella, για φωνή και πιάνο, για φωνή και ενόργανο σύνολο, καντάτες) και στο τρίτο τα έργα οργανικής μουσικής (σολιστικά, μουσικής δωματίου, για ενόργανο σύνολο, για ορχήστρα δωματίου και για μεγάλη ορχήστρα). Στο τέταρτο αναλύεται το ‘Διπλό Κοντσέρτο για βιολί, πιάνο και ορχήστρα’ και στο πέμπτο παρατίθενται τα συμπεράσματα της έρευνας κατά την οποία οι αισθητικοτεχνικές παράμετροι που διαμορφώνουν το ελεύθερο ατονικό ιδίωμα του Παπαϊωάννου είναι: αναγωγή του ηχοχρώματος σε βασικό δομικό συστατικό του έργου, σύνθεση ευρέων μελωδικών γραμμών, δημιουργία ηχητικών σωμάτων, συνδυασμός σειραϊκών και ελεύθερων ατονικών τεχνικών, χρήση καθοδηγούμενων αλεατορικών στοιχείων, ύπαρξη μελωδικορυθμικών κυττάρων που εξελίσσονται στην πορεία του έργου, δημιουργία ενιαίων μεγάλων έργων με εξελισσόμενη φόρμα, στροφή στις νέες τεχνικές των οργάνων, ασυνήθιστοι συνδυασμοί οργάνων, υιοθέτηση εξωμουσικών τίτλων. Τέλος, στα έργα φωνητικής μουσικής: στροφή στον Κ.Π. Καβάφη και σε ποιητές σύγχρονους του συνθέτη, υιοθέτηση απαγγέλλουσας μελωδίας, παρουσία αφηγητή, συλλαβική μελοποίηση, κύκλοι τραγουδιών συχνά σε στίχους διαφορετικών ποιητών. Το πόνημα συνοδεύεται από παράρτημα (Τόμος ΙΙ) με σπάνιο αρχειακό υλικό, κατατοπιστικούς συγκεντρωτικούς πίνακες και πηγές.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/makedonika.1092",
+          "title": "Γιάννης Τσάρας",
+          "creator": [
+            "Αντώνιος-Αιμίλιος Ν. Ταχιάος"
+          ],
+          "date": [
+            "1987-1-1"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.1092",
+          "doi": "10.12681/makedonika.1092",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μακεδονικά"
+          ],
+          "description": "No abstract",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/6646/6380",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/prch.28463",
+          "title": "Το τρίγωνο των πατρίδων και η υπέρβαση τους: Γιάννης Δάλλας, «Περίακτος»",
+          "creator": [
+            "Στέλιος Μαφρέδας"
+          ],
+          "date": [
+            "2021-11-4"
+          ],
+          "url": "https://doi.org/10.12681/prch.28463",
+          "doi": "10.12681/prch.28463",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Πρεβεζάνικα Χρονικά"
+          ],
+          "description": "Βιβλιοκριτική για το βιβλίο του Γιάννη Δάλλα \"Περίακτος\"",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/prevchr/article/viewFile/28463/22293",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/prevchr/article/viewFile/28463/22293",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/visualmarch.3086",
+          "title": "Φύση -Όρια-Υλικά",
+          "creator": [
+            "Στέλλα Γιάννης Ζιώγας"
+          ],
+          "date": [
+            "2020-7-8"
+          ],
+          "url": "https://doi.org/10.12681/visualmarch.3086",
+          "doi": "10.12681/visualmarch.3086",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Διεθνές Συνέδριο για την Εικαστική Πορεία προς τις Πρέσπες"
+          ],
+          "description": "-",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://eproceedings.epublishing.ekt.gr/index.php/visualmarch/article/viewFile/3086/3226",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://eproceedings.epublishing.ekt.gr/index.php/visualmarch/article/viewFile/3086/3226",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1007/s13126-018-0488-5",
+          "title": "Νεκρολογία: Γιάννης Παπαδημητρίου",
+          "creator": [],
+          "date": [
+            "2018-9"
+          ],
+          "url": "https://doi.org/10.1007/s13126-018-0488-5",
+          "doi": "10.1007/s13126-018-0488-5",
+          "type": "journal-article",
+          "publisher": "Springer Science and Business Media LLC",
+          "container_title": [
+            "Hellenic Journal of Surgery"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://link.springer.com/content/pdf/10.1007/s13126-018-0488-5.pdf",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://link.springer.com/article/10.1007/s13126-018-0488-5/fulltext.html",
+              "content_type": "text/html",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://link.springer.com/content/pdf/10.1007/s13126-018-0488-5.pdf",
+              "content_type": "application/pdf",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/sas.624",
+          "title": "Γιάννης Σταυρακάκης (επιμ.) Φύση, Κοινωνία και Πολίτικη",
+          "creator": [
+            "Β. Γ."
+          ],
+          "date": [
+            "2015-9-24"
+          ],
+          "url": "https://doi.org/10.12681/sas.624",
+          "doi": "10.12681/sas.624",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Επιστήμη και Κοινωνία: Επιθεώρηση Πολιτικής και Ηθικής Θεωρίας"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/sas/article/viewFile/624/623",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/comparison.10807",
+          "title": "Γιάννης Η. Ιωάννου, Χωροχρονικά στην ποίηση, Εκδόσεις Καστανιώτη, Δοκίμιο, Αθήνα 2000, σελ. 134.",
+          "creator": [
+            "Μαίη Σεχάμπ"
+          ],
+          "date": [
+            "2017-1-31"
+          ],
+          "url": "https://doi.org/10.12681/comparison.10807",
+          "doi": "10.12681/comparison.10807",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Σύγκριση"
+          ],
+          "description": "[Δε διατίθεται περίληψη]",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/sygkrisi/article/viewFile/10807/10823",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/sygkrisi/article/viewFile/10807/10823",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/makedonika.1028",
+          "title": "I. Κ. Βασδραβέλλη, Ο φιλικός και αγωνιστής Γιάννης Φαρμάκης. Η ηρωική άμυνα στη Μολδαβία",
+          "creator": [
+            "Γεώργιος Χ. Χιονίδης"
+          ],
+          "date": [
+            "1972-1-1"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.1028",
+          "doi": "10.12681/makedonika.1028",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μακεδονικά"
+          ],
+          "description": "No abstract",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/6582/6316",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/28976",
+          "title": "Αισθητικές τάσεις, κοινωνικός χώρος και μόδα στην Ελλάδα στα τέλη του 20ου αιώνα",
+          "creator": [
+            "Ευαγγελία Πάτση"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/28976",
+          "doi": "10.12681/eadd/28976",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Η διατριβή εξετάζει τις θεματικές συλλογές ενδυμάτων που δημιούργησε ο Γιάννης Τσεκλένης εμπνευσμένος από τις εικαστικές και τις εφαρμοσμένες τέχνες, κατά το διάστημα 1965-1991. Παράλληλα εξετάζονται τα έργα τέχνης και τα αντικείμενα τα οποία λειτούργησαν ως πηγή έμπνευσης, η μετάβαση από το αρχικό ερέθισμα στο ένδυμα, το κοινωνικό πλαίσιο, η καινοτομία, η επιχειρηματικότητα, η υποδοχή από τον τύπο, η προβολή του πολιτισμού, η προσωπικότητα και η δημιουργικότητα του Γιάννη Τσεκλένη.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/keimena-paideias.30273",
+          "title": "Ο Γιάννης Αποστολάκης στη Φιλοσοφική Σχολή Θεσσαλονίκης:  Ένας φωτισμένος δημοτικιστής που βλέπει σωστά αλλά κρίνει άδικα",
+          "creator": [
+            "Βασίλης Απόστολος Φούκας"
+          ],
+          "date": [
+            "2022-7-1"
+          ],
+          "url": "https://doi.org/10.12681/keimena-paideias.30273",
+          "doi": "10.12681/keimena-paideias.30273",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Κείμενα Παιδείας"
+          ],
+          "description": "Σκοπός της παρούσας εργασίας είναι να φωτίσει άγνωστες πτυχές της ακαδημαϊκής ζωής και δράσης του πρώτου καθηγητή νεότερης ελληνικής φιλολογίας στο ελλαδικό πανεπιστήμιο, του δημοτικιστή Γιάννη Αποστολάκη. Ειδικότερα, η παρούσα εργασία στοχεύει, να διερευνήσει το διδακτικό έργο και τη γενικότερη παρουσία του Αποστολάκη στις Συνεδριάσεις της Φιλοσοφικής Σχολής του Πανεπιστημίου Θεσσαλονίκης κατά την περίοδο του Μεσοπολέμου και να συζητήσει ορισμένα από τα βασικότερα σημεία των αξιολογικών κρίσεων, στα οποία δίνει έμφαση ο Αποστολάκης, στις εξελίξεις ή στις εκλογές συναδέλφων του κατά την εξεταζόμενη περίοδο, όπως αυτά αποτυπώνονται στα επίσημα Πρακτικά των Συνεδριάσεων της Σχολής, με στόχο να σκιαγραφηθεί το προφίλ του και να αναδειχθεί ο ρόλος και η συμβολή του στα πρώτα χρόνια λειτουργίας του νεοσύστατου Πανεπιστημίου Θεσσαλονίκης. Η παρούσα εργασία αξιοποιεί, κυρίως, αρχειακό υλικό –ανέκδοτο και αδημοσίευτο έως σήμερα– από το Αρχείο της Φιλοσοφικής Σχολής του Πανεπιστημίου Θεσσαλονίκης.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/keimena-paideias/article/download/30273/23565",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/keimena-paideias/article/download/30273/23565",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/grsr.22348",
+          "title": "Για το βιβλίο: Σκαρπέλος Γιάννης (2019). Τα αβέβαια σημεία. Αθήνα: Τόπος, 257 σελ.",
+          "creator": [
+            "Lia Yoka"
+          ],
+          "date": [
+            "2020-2-7"
+          ],
+          "url": "https://doi.org/10.12681/grsr.22348",
+          "doi": "10.12681/grsr.22348",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Επιθεώρηση Κοινωνικών Ερευνών"
+          ],
+          "description": "N/A",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/ekke/article/viewFile/22348/19127",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/ekke/article/viewFile/22348/19127",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/makedonika.621",
+          "title": "Ιωάν. K. Βασδραβέλλη, Ο Φιλικός και αγωνιστής Γιάννης Φαρμάκης. Η ηρωϊκή άμυνα στη Μολδαβία",
+          "creator": [
+            "Νέστωρ Καμαριανός"
+          ],
+          "date": [
+            "1975-1-1"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.621",
+          "doi": "10.12681/makedonika.621",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μακεδονικά"
+          ],
+          "description": "No abstract",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/6176/5911",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/sas.931",
+          "title": "Γιάννης Α. Τασόπουλος, Το ηθικοπολιτικό θεμέλιο του συντάγματος",
+          "creator": [
+            "Αριστείδης Ν. Χατζής"
+          ],
+          "date": [
+            "2015-9-24"
+          ],
+          "url": "https://doi.org/10.12681/sas.931",
+          "doi": "10.12681/sas.931",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Επιστήμη και Κοινωνία: Επιθεώρηση Πολιτικής και Ηθικής Θεωρίας"
+          ],
+          "description": "No abstract",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/sas/article/viewFile/931/954",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/osj.43616",
+          "title": "Μία σύντομη ανασκόπηση της κίνησης του χεριού",
+          "creator": [
+            "Χρήστος Γιάννης",
+            "Δεσποινα Μαντζούκα",
+            "Μαρία Τουρανάκου",
+            "Αρμέλα Χότζα",
+            "Ρεβελάκη Κυριακή Επιβλέπουσα εκπαιδευτικός"
+          ],
+          "date": [
+            "2025-12-11"
+          ],
+          "url": "https://doi.org/10.12681/osj.43616",
+          "doi": "10.12681/osj.43616",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Open Schools Journal for Open Science"
+          ],
+          "description": "Η ανατομία και η λειτουργία του αθρώπινου χεριού είναι ένα εντυπωσιακό και πολύπλοκο ταυτόχρονα αντικείμενο μελέτης. Τα συστατικά του και η συνδεσμολογία τους, δίνουν την δυνατότητα ενός ευρέως φάσματος κινήσεων. Δυστυχώς κάποιοι άνθρωποι χάνουν τη λετουργικότητα του χεριού, είτε λόγω ατυχημάτων, είτε λόγω ασθενειών είτε επειδή γεννήθηκαν χωρίς χέρια. Ένα μηχανικό χέρι είναι μια συσκευή που μιμείται την κίνηση και την λειτουργία ενός ανθρώπινου χεριού χρησιμοποιώντας μηχανικά εξαρτήματα. Η αναγκαιότητα για τη δημιουργία του προέκυψε στην προσπάθεια ανακούφισης και αποκατάστασης των ανθρώπων με δυσλειτουργίες χεριού. Στο πρώτο μέρος της εργασίας μας θα ασχοληθούμε με την μελέτη της ανατομίας του ανθρώπινου χεριού και στο δεύτερο μέρος με την κατασκευή ενός μηχανικού χεριού με χρήση απλών ηλεκτρονικών υλικών.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/openschoolsjournal/article/download/43616/31639",
+              "content_type": "application/msword",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/openschoolsjournal/article/download/43616/31639",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/hpsa.14409",
+          "title": "Γιάννης Σταυρακάκης, Η Λακανική Αριστερά. Ψυχανάλυση, Θεωρία, Πολιτική, Σαββάλας, Αθήνα 2012, 361 σελ.",
+          "creator": [
+            "Μυρτώ Ρήγου"
+          ],
+          "date": [
+            "2017-10-24"
+          ],
+          "url": "https://doi.org/10.12681/hpsa.14409",
+          "doi": "10.12681/hpsa.14409",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Ελληνική Επιθεώρηση Πολιτικής Επιστήμης"
+          ],
+          "description": "Δεν διατίθεται περίληψη / no abstract available",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/hpsa/article/viewFile/14409/13029",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/hpsa/article/viewFile/14409/13029",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:timeline",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/hpsa.14778",
+          "title": "Γιάννης Σταυρακάκης, Lacan and the Political, εκδόσεις Routledge, Λονδίνο και Νέα Υόρκη 1999.",
+          "creator": [
+            "Dave Lewis"
+          ],
+          "date": [
+            "2017-10-24"
+          ],
+          "url": "https://doi.org/10.12681/hpsa.14778",
+          "doi": "10.12681/hpsa.14778",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Ελληνική Επιθεώρηση Πολιτικής Επιστήμης"
+          ],
+          "description": "μτφ. κειμένου: Ιάσων Γληνός",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/hpsa/article/viewFile/14778/13307",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/hpsa/article/viewFile/14778/13307",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 167}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 131376, \"response_sha256\": \"b4e2e25386ca78125becddcce64878a4963b733d3147efcd5b99bb716affcb9d\", \"elapsed_ms\": 730}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1283, \"response_sha256\": \"916fffe394ae40fb9a4b32be6c6ce640604d449fd3f093d29d909c46e0f6f6cf\", \"elapsed_ms\": 533}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 20, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 167}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 131376, \"response_sha256\": \"b4e2e25386ca78125becddcce64878a4963b733d3147efcd5b99bb716affcb9d\", \"elapsed_ms\": 730}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1283, \"response_sha256\": \"916fffe394ae40fb9a4b32be6c6ce640604d449fd3f093d29d909c46e0"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Giovanni Capsi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Giovanni+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 82}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Giovanni+Capsi%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 300}, {\"url\": \"https://api.openalex.org/works?search=%22Giovanni+Capsi%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Giovanni+Capsi%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1047, \"response_sha256\": \"30e70432ef4ddd6da5a9f35f52ad2675a02db7c32a3e62f44fea3d12ad7ef5c1\", \"elapsed_ms\": 336}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Giovanni+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 82}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Giovanni+Capsi%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 300}, {\"url\": \"https://api.openalex.org/works?search=%22Giovanni+Capsi%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Giovanni+Capsi%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1047, \"response_sha256\": \"30e70432ef4ddd6da5a9f35f52ad2675a02db7c32a3e62f44fea3d12ad7ef5c1\", \"elapsed_ms\": 336}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "timeline",
+      "assignment_id": "timeline:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "40826649191",
+    "agent_id": "timeline",
+    "source_leads": [
+      {
+        "id": "lead_8a3fb16e80b8a17fb8d84a78",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/18878",
+        "title": "Ιωάννης ΣΤ'Καντακουζηνός",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b606b96677b5fc9ba92c0880",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/17742",
+        "title": "Ιωάννης Πέζαρος ( 1749 - 1806 )",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4825fae75847dd410d0b270e",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/24209",
+        "title": "Ο Άγιος Ιωάννης ο Λαμπαδιστής",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a6fc048b67104c00f6f24025",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/22408",
+        "title": "Ιωάννης-Ιερόθεος Κομνηνός μητροπολίτης Δρύστρας (1657-1719)",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b1667dbf6159fc64cefc1485",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/43861",
+        "title": "Ο Ιωάννης Αργυρόπουλος ως θεολόγος και φιλόσοφος",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8a2630c5f0f96bce08cae3e2",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/30921",
+        "title": "Ιωάννης Καρυοφύλλης (ci 1610-1692)",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_09b597d4218cc678dd31d32a",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/35294",
+        "title": "Ιωάννης Γεωμέτρης, ιαμβικά ποιήματα",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2e9600ea9536e8b62ad4af42",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/22652",
+        "title": "Ο Ιωάννης ο Χρυσόστομος για το Imperium Romanun",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e68a0c18f99854825ed98dab",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/19826",
+        "title": "Ο Ιωάννης Β' Κομνηνός και η εποχή του (1118-1143)",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c85e9667fc9723ad65d34603",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/makedonika.1100",
+        "title": "Ιωάννης Ν. Παπαφής",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0c967e301356b639509ae513",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/37477",
+        "title": "Φιλοσοφία και Ρητορική στον 15ο αιώνα",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_67239643df1ebf64dcacec91",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/makedonika.162",
+        "title": "Ιωάννης Καλλέρης (1901-1992)",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e1013706e03c1eb966b8abf9",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/dchae.852",
+        "title": "Ευαγγελιστής Ιωάννης - Μωϋσής (πίν. 54-55)",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1c12556a1ed47fec1691eb8e",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/grsr.876",
+        "title": "Ιωάννης Βαβούρας: οικονομική πολιτική: θεωρητική εισαγωγή",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8b95ef231fe191b3bf35051a",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/makedonika.426",
+        "title": "Ιωάννης Κ. Βασδραβέλλης (1900-1981)",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b32e13f83684638dbb4971c2",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/30404",
+        "title": "Ο Ιωάννης Γεννάδιος και η διαμόρφωση της εθνικής πολιτικής της Ελλάδας (1871-1918)",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_672d59754d21cb452c441975",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/53634",
+        "title": "Ο Ιωάννης Περμενιάτης και άλλοι Έλληνες ζωγράφοι στη Βενετία κατά το πρώτο μισό του δέκατου έκτου αιώνα",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ba94dbfe0eee9f3527e2bff2",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/er.9143",
+        "title": "Ιωάννης (Ιβάν) Σελιμίνσκι",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_aa08ee495b68636496813204",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/makedonika.189",
+        "title": "Ιωάννης Τσικόπουλος: ένας ξεχασμένος Μακεδόνας λόγιος",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d1169ece144b09f7c9eace11",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/16636",
+        "title": "Μελέτη μεθόδων παρασκευής - ιδιοτήτων - εφαρμογών σύνθετων πορώδων υλικών ρητινών φαινόλης - φορμαλδεϋδης και λιγνοκυτταρινούχων πρόσθετων",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d8c512a199045933eed5f5f9",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/prch.28285",
+        "title": "Η ίδρυση της Πρέβεζας και επιδρομές στην ευρύτερη περιοχή",
+        "query": "\"Ιωάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c0bf5861bddcf782c7fb9f60",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/50806",
+        "title": "Γιάννης Μ. Αποστολάκης",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_99e4fd2d125489da308c96ce",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/35380",
+        "title": "Γιάννης Παππάς 1913-2005",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4ac0d25f9be69c4bde1e4504",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/57759",
+        "title": "Ο Γιάννης Χρήστου ως Μύστης",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_91aea265da3cf20bf613872b",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.52903/ccrd.a1.2022",
+        "title": "Γιάννης Στίνης : πορεία στον χρόνο",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e0bcabefef1b08ef06d56a00",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/59888",
+        "title": "Γιάννης Ανδρέου Παπαϊωάννου",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0b3e776b2fa8f1a72e5e7d64",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/makedonika.1092",
+        "title": "Γιάννης Τσάρας",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_abf418a1303e6116d586de7c",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/prch.28463",
+        "title": "Το τρίγωνο των πατρίδων και η υπέρβαση τους: Γιάννης Δάλλας, «Περίακτος»",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_94518d42e336e3492f589b93",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/visualmarch.3086",
+        "title": "Φύση -Όρια-Υλικά",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_67eaeec5e4397cce7b2f3d7e",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1007/s13126-018-0488-5",
+        "title": "Νεκρολογία: Γιάννης Παπαδημητρίου",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c54974735b470a711ebc8a98",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/sas.624",
+        "title": "Γιάννης Σταυρακάκης (επιμ.) Φύση, Κοινωνία και Πολίτικη",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5171ab95113ae730c931ff7b",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/comparison.10807",
+        "title": "Γιάννης Η. Ιωάννου, Χωροχρονικά στην ποίηση, Εκδόσεις Καστανιώτη, Δοκίμιο, Αθήνα 2000, σελ. 134.",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_dec9ef6e33047a65b3919d60",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/makedonika.1028",
+        "title": "I. Κ. Βασδραβέλλη, Ο φιλικός και αγωνιστής Γιάννης Φαρμάκης. Η ηρωική άμυνα στη Μολδαβία",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_41ad6256ea485658a45dfb52",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/28976",
+        "title": "Αισθητικές τάσεις, κοινωνικός χώρος και μόδα στην Ελλάδα στα τέλη του 20ου αιώνα",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e896e12e72a70a10eff58aea",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/keimena-paideias.30273",
+        "title": "Ο Γιάννης Αποστολάκης στη Φιλοσοφική Σχολή Θεσσαλονίκης:  Ένας φωτισμένος δημοτικιστής που βλέπει σωστά αλλά κρίνει άδικα",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f57e4d47925f6494f7c98a69",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/grsr.22348",
+        "title": "Για το βιβλίο: Σκαρπέλος Γιάννης (2019). Τα αβέβαια σημεία. Αθήνα: Τόπος, 257 σελ.",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_30c5c9fb55bf730879729752",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/makedonika.621",
+        "title": "Ιωάν. K. Βασδραβέλλη, Ο Φιλικός και αγωνιστής Γιάννης Φαρμάκης. Η ηρωϊκή άμυνα στη Μολδαβία",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3020f66129b06de4b0995898",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/sas.931",
+        "title": "Γιάννης Α. Τασόπουλος, Το ηθικοπολιτικό θεμέλιο του συντάγματος",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_67960772e1ea983d78e04a43",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/osj.43616",
+        "title": "Μία σύντομη ανασκόπηση της κίνησης του χεριού",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fc35f57f6aa83ab2e83e8e51",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/hpsa.14409",
+        "title": "Γιάννης Σταυρακάκης, Η Λακανική Αριστερά. Ψυχανάλυση, Θεωρία, Πολιτική, Σαββάλας, Αθήνα 2012, 361 σελ.",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ec17b22d372b67f5606d7c3e",
+        "run_id": "40826649191",
+        "agent_id": "timeline",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/hpsa.14778",
+        "title": "Γιάννης Σταυρακάκης, Lacan and the Political, εκδόσεις Routledge, Λονδίνο και Νέα Υόρκη 1999.",
+        "query": "\"Γιάννης Κάψης\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      }
+    ],
+    "connector_errors": [
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 637}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Giovanni+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 637}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 640}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22Jean+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 640}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 676}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Jean+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 85}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Jean+Capsi%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 297}, {\"url\": \"https://api.openalex.org/works?search=%22Jean+Capsi%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Jean+Capsi%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1031, \"response_sha256\": \"e124c5400bc97a0dd6abd0a091cf62f84de755932266c9ef2e17eb5a0fbc0b55\", \""
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 170}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 100457, \"response_sha256\": \"c6f069cfebf0d9c23ef1770dacb5bf44fb742e34ca7f54d5f42f48b906fe64da\", \"elapsed_ms\": 686}, {\"url\": \"https:"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 178}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 457}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/wo"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 167}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%93%CE%B9%CE%AC%CE%BD%CE%BD%CE%B7%CF%82+%CE%9A%CE%AC%CF%88%CE%B7%CF%82%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 131376, \"response_sha256\": \"b4e2e25386ca78125becddcce64878a4963b733d3147efcd5b99bb716affcb9d\", \"elapsed_ms\": 730}, {\"url\": \"https:"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Giovanni+Capsi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 82}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Giovanni+Capsi%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 300}, {\"url\": \"https://api.openalex.org/works?search=%22Giovanni+Capsi%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Giovanni+Capsi%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1047, \"response_sha256\": \"30e70432ef4ddd6da5a9f35f52ad2675a02db7c32a3e62f44fea"
+      }
+    ],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 41,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
