@@ -1,0 +1,624 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "relationship_network",
+  "label": "Relationship Network Agent",
+  "assignment_id": "relationship_network:wave2",
+  "assignment_wave": 2,
+  "requested_outputs": [
+    "persons",
+    "ships",
+    "places",
+    "patrons",
+    "states",
+    "relationship_edges"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "3acceed0bac4f6b38d99585a70fc7fbd07c5276aa5886fce702418b6786a171e",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "relationship_network",
+    "assignment_id": "relationship_network:wave2",
+    "assignment_wave": 2,
+    "route_ids": [
+      "repo:SearchCulture.gr / EKT",
+      "repo:The National Archives Public Content"
+    ],
+    "queries": [
+      "\"Πέτρος Λάντζας\"",
+      "\"Πέτρο Λάντζα\"",
+      "\"Pedro Lantzas\"",
+      "\"Petros Lantzas\"",
+      "\"Pietro Lanza\""
+    ],
+    "operation": "search",
+    "search_budget": 10,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "result_aware_fallback_v1",
+    "routes": [
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 85,
+        "reason": [
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 81,
+        "reason": [
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 80,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 10,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 767}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pietro Lanza\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Pietro+Lanza%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Pietro+Lanza%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 766}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Pietro+Lanza%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Petros+Lantzas%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Petros+Lantzas%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 770}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Petros+Lantzas%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 773}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pedro Lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Pedro+Lantzas%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Pedro+Lantzas%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 776}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Pedro+Lantzas%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "research guide",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"The National Archives Public Content\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 38122, \"response_sha256\": \"40a87a11b6b88538a46b5d377ee32a74a352b6af42c7eb6084f53a831dbb3224\", \"elapsed_ms\": 723}, {\"url\": \"https://www.nationalarchives.gov.uk/education/sessions-and-resources/?time-period=early-modern\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 410, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_410\", \"elapsed_ms\": 397}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 76874, \"response_sha256\": \"a5991c08582eac6b303edba8980474e73a95b62a41b5a23f52702433173cc438\", \"elapsed_ms\": 107}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 76874, \"response_sha256\": \"a5991c08582eac6b303edba8980474e73a95b62a41b5a23f52702433173cc438\", \"elapsed_ms\": 136}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68597, \"response_sha256\": \"d7d632fa472777223ff4d5f2d747c47954b97597123d4f3f797cb6a2889d27c9\", \"elapsed_ms\": 82}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68597, \"response_sha256\": \"d7d632fa472777223ff4d5f2d747c47954b97597123d4f3f797cb6a2889d27c9\", \"elapsed_ms\": 85}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68563, \"response_sha256\": \"e2736b9bae772fbe2a64b8a62625393846c89b18b470ad11e17e69711afe7ff9\", \"elapsed_ms\": 83}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68563, \"response_sha256\": \"e2736b9bae772fbe2a64b8a62625393846c89b18b470ad11e17e69711afe7ff9\", \"elapsed_ms\": 69}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68916, \"response_sha256\": \"5eb4cc44e19e9075448cf006f3d8b68c2f22517bf9a82f27f011d92c754fd0b2\", \"elapsed_ms\": 83}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68916, \"response_sha256\": \"5eb4cc44e19e9075448cf006f3d8b68c2f22517bf9a82f27f011d92c754fd0b2\", \"elapsed_ms\": 254}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68771, \"response_sha256\": \"a03067e8fa424c643d964d629e0aae19df21ad22788328321895527033e05e14\", \"elapsed_ms\": 368}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68771, \"response_sha256\": \"a03067e8fa424c643d964d629e0aae19df21ad22788328321895527033e05e14\", \"elapsed_ms\": 180}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68311, \"response_sha256\": \"9a90577e1cdd1bac6d1e6c0c65c4bce60e7f510c6e2b1f316c6a2269cc6e522b\", \"elapsed_ms\": 128}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68311, \"response_sha256\": \"9a90577e1cdd1bac6d1e6c0c65c4bce60e7f510c6e2b1f316c6a2269cc6e522b\", \"elapsed_ms\": 127}], \"detail\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22 ; bounded public-content hub crawl\", \"result_count\": 4, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lantzas\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"The National Archives Public Content\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Petros+Lantzas%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Petros+Lantzas%22\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 38096, \"response_sha256\": \"4f9d06402b20748398accc924fde8614c64ef507aa88a8cb09a40f48029e686b\", \"elapsed_ms\": 316}, {\"url\": \"https://www.nationalarchives.gov.uk/education/sessions-and-resources/?time-period=early-modern\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 410, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_410\", \"elapsed_ms\": 475}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 76874, \"response_sha256\": \"a5991c08582eac6b303edba8980474e73a95b62a41b5a23f52702433173cc438\", \"elapsed_ms\": 116}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 76874, \"response_sha256\": \"a5991c08582eac6b303edba8980474e73a95b62a41b5a23f52702433173cc438\", \"elapsed_ms\": 114}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68597, \"response_sha256\": \"d7d632fa472777223ff4d5f2d747c47954b97597123d4f3f797cb6a2889d27c9\", \"elapsed_ms\": 227}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68597, \"response_sha256\": \"d7d632fa472777223ff4d5f2d747c47954b97597123d4f3f797cb6a2889d27c9\", \"elapsed_ms\": 382}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68563, \"response_sha256\": \"e2736b9bae772fbe2a64b8a62625393846c89b18b470ad11e17e69711afe7ff9\", \"elapsed_ms\": 120}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68563, \"response_sha256\": \"e2736b9bae772fbe2a64b8a62625393846c89b18b470ad11e17e69711afe7ff9\", \"elapsed_ms\": 164}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68916, \"response_sha256\": \"5eb4cc44e19e9075448cf006f3d8b68c2f22517bf9a82f27f011d92c754fd0b2\", \"elapsed_ms\": 161}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68916, \"response_sha256\": \"5eb4cc44e19e9075448cf006f3d8b68c2f22517bf9a82f27f011d92c754fd0b2\", \"elapsed_ms\": 358}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68771, \"response_sha256\": \"a03067e8fa424c643d964d629e0aae19df21ad22788328321895527033e05e14\", \"elapsed_ms\": 164}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68771, \"response_sha256\": \"a03067e8fa424c643d964d629e0aae19df21ad22788328321895527033e05e14\", \"elapsed_ms\": 172}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68311, \"response_sha256\": \"9a90577e1cdd1bac6d1e6c0c65c4bce60e7f510c6e2b1f316c6a2269cc6e522b\", \"elapsed_ms\": 259}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68311, \"response_sha256\": \"9a90577e1cdd1bac6d1e6c0c65c4bce60e7f510c6e2b1f316c6a2269cc6e522b\", \"elapsed_ms\": 128}], \"detail\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Petros+Lantzas%22 ; bounded public-content hub crawl\", \"result_count\": 4, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"The National Archives Public Content\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 38114, \"response_sha256\": \"ec513a9a41d1bc69aed7b75a753542fd1f52a2bae7ede654fb57de3107c6d6de\", \"elapsed_ms\": 388}, {\"url\": \"https://www.nationalarchives.gov.uk/education/sessions-and-resources/?time-period=early-modern\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 410, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_410\", \"elapsed_ms\": 415}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 76874, \"response_sha256\": \"a5991c08582eac6b303edba8980474e73a95b62a41b5a23f52702433173cc438\", \"elapsed_ms\": 114}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 76874, \"response_sha256\": \"a5991c08582eac6b303edba8980474e73a95b62a41b5a23f52702433173cc438\", \"elapsed_ms\": 107}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68597, \"response_sha256\": \"d7d632fa472777223ff4d5f2d747c47954b97597123d4f3f797cb6a2889d27c9\", \"elapsed_ms\": 255}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68597, \"response_sha256\": \"d7d632fa472777223ff4d5f2d747c47954b97597123d4f3f797cb6a2889d27c9\", \"elapsed_ms\": 348}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68563, \"response_sha256\": \"e2736b9bae772fbe2a64b8a62625393846c89b18b470ad11e17e69711afe7ff9\", \"elapsed_ms\": 112}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68563, \"response_sha256\": \"e2736b9bae772fbe2a64b8a62625393846c89b18b470ad11e17e69711afe7ff9\", \"elapsed_ms\": 170}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68916, \"response_sha256\": \"5eb4cc44e19e9075448cf006f3d8b68c2f22517bf9a82f27f011d92c754fd0b2\", \"elapsed_ms\": 125}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68916, \"response_sha256\": \"5eb4cc44e19e9075448cf006f3d8b68c2f22517bf9a82f27f011d92c754fd0b2\", \"elapsed_ms\": 270}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68771, \"response_sha256\": \"a03067e8fa424c643d964d629e0aae19df21ad22788328321895527033e05e14\", \"elapsed_ms\": 332}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68771, \"response_sha256\": \"a03067e8fa424c643d964d629e0aae19df21ad22788328321895527033e05e14\", \"elapsed_ms\": 152}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68311, \"response_sha256\": \"9a90577e1cdd1bac6d1e6c0c65c4bce60e7f510c6e2b1f316c6a2269cc6e522b\", \"elapsed_ms\": 225}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68311, \"response_sha256\": \"9a90577e1cdd1bac6d1e6c0c65c4bce60e7f510c6e2b1f316c6a2269cc6e522b\", \"elapsed_ms\": 140}], \"detail\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22 ; bounded public-content hub crawl\", \"result_count\": 4, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pedro Lantzas\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "Help using the archive",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"The National Archives Public Content\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Pedro+Lantzas%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Pedro+Lantzas%22\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 38094, \"response_sha256\": \"b3dd961f039e270df88256eaccdae3999884ea0a256d487210319f828bdaaf08\", \"elapsed_ms\": 531}, {\"url\": \"https://www.nationalarchives.gov.uk/education/sessions-and-resources/?time-period=early-modern\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 410, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_410\", \"elapsed_ms\": 536}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 76874, \"response_sha256\": \"a5991c08582eac6b303edba8980474e73a95b62a41b5a23f52702433173cc438\", \"elapsed_ms\": 205}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 76874, \"response_sha256\": \"a5991c08582eac6b303edba8980474e73a95b62a41b5a23f52702433173cc438\", \"elapsed_ms\": 363}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68597, \"response_sha256\": \"d7d632fa472777223ff4d5f2d747c47954b97597123d4f3f797cb6a2889d27c9\", \"elapsed_ms\": 181}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68597, \"response_sha256\": \"d7d632fa472777223ff4d5f2d747c47954b97597123d4f3f797cb6a2889d27c9\", \"elapsed_ms\": 97}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68563, \"response_sha256\": \"e2736b9bae772fbe2a64b8a62625393846c89b18b470ad11e17e69711afe7ff9\", \"elapsed_ms\": 107}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68563, \"response_sha256\": \"e2736b9bae772fbe2a64b8a62625393846c89b18b470ad11e17e69711afe7ff9\", \"elapsed_ms\": 131}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68916, \"response_sha256\": \"5eb4cc44e19e9075448cf006f3d8b68c2f22517bf9a82f27f011d92c754fd0b2\", \"elapsed_ms\": 505}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68916, \"response_sha256\": \"5eb4cc44e19e9075448cf006f3d8b68c2f22517bf9a82f27f011d92c754fd0b2\", \"elapsed_ms\": 211}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68771, \"response_sha256\": \"a03067e8fa424c643d964d629e0aae19df21ad22788328321895527033e05e14\", \"elapsed_ms\": 186}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68771, \"response_sha256\": \"a03067e8fa424c643d964d629e0aae19df21ad22788328321895527033e05e14\", \"elapsed_ms\": 129}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68311, \"response_sha256\": \"9a90577e1cdd1bac6d1e6c0c65c4bce60e7f510c6e2b1f316c6a2269cc6e522b\", \"elapsed_ms\": 888}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68311, \"response_sha256\": \"9a90577e1cdd1bac6d1e6c0c65c4bce60e7f510c6e2b1f316c6a2269cc6e522b\", \"elapsed_ms\": 481}], \"detail\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Pedro+Lantzas%22 ; bounded public-content hub crawl\", \"result_count\": 4, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:The National Archives Public Content",
+      "repository": "The National Archives Public Content",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pietro Lanza\"",
+      "records": [
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "title": "Help with your research",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "title": "research guide",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "title": "Family history",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+          "metadata_text": "",
+          "child_urls": []
+        },
+        {
+          "discovery_repository": "The National Archives Public Content",
+          "discovery_lane": "specialist:relationship_network",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "title": "First World War",
+          "date": [],
+          "url": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+          "metadata_text": "",
+          "child_urls": []
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"The National Archives Public Content\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Pietro+Lanza%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Pietro+Lanza%22\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 38092, \"response_sha256\": \"f1bbee2f7cb05bd2890947ae2ccdc9206d497135cc0e004d7b30ccfb802bed59\", \"elapsed_ms\": 519}, {\"url\": \"https://www.nationalarchives.gov.uk/education/sessions-and-resources/?time-period=early-modern\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 410, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_410\", \"elapsed_ms\": 541}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 76874, \"response_sha256\": \"a5991c08582eac6b303edba8980474e73a95b62a41b5a23f52702433173cc438\", \"elapsed_ms\": 196}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=1\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 76874, \"response_sha256\": \"a5991c08582eac6b303edba8980474e73a95b62a41b5a23f52702433173cc438\", \"elapsed_ms\": 377}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68597, \"response_sha256\": \"d7d632fa472777223ff4d5f2d747c47954b97597123d4f3f797cb6a2889d27c9\", \"elapsed_ms\": 202}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=2\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68597, \"response_sha256\": \"d7d632fa472777223ff4d5f2d747c47954b97597123d4f3f797cb6a2889d27c9\", \"elapsed_ms\": 78}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68563, \"response_sha256\": \"e2736b9bae772fbe2a64b8a62625393846c89b18b470ad11e17e69711afe7ff9\", \"elapsed_ms\": 130}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=3\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68563, \"response_sha256\": \"e2736b9bae772fbe2a64b8a62625393846c89b18b470ad11e17e69711afe7ff9\", \"elapsed_ms\": 305}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68916, \"response_sha256\": \"5eb4cc44e19e9075448cf006f3d8b68c2f22517bf9a82f27f011d92c754fd0b2\", \"elapsed_ms\": 332}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=4\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68916, \"response_sha256\": \"5eb4cc44e19e9075448cf006f3d8b68c2f22517bf9a82f27f011d92c754fd0b2\", \"elapsed_ms\": 218}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68771, \"response_sha256\": \"a03067e8fa424c643d964d629e0aae19df21ad22788328321895527033e05e14\", \"elapsed_ms\": 152}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=5\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68771, \"response_sha256\": \"a03067e8fa424c643d964d629e0aae19df21ad22788328321895527033e05e14\", \"elapsed_ms\": 365}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68311, \"response_sha256\": \"9a90577e1cdd1bac6d1e6c0c65c4bce60e7f510c6e2b1f316c6a2269cc6e522b\", \"elapsed_ms\": 752}, {\"url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.nationalarchives.gov.uk/explore-the-collection/stories/?page=6\", \"content_type\": \"text/html; charset=utf-8\", \"response_bytes\": 68311, \"response_sha256\": \"9a90577e1cdd1bac6d1e6c0c65c4bce60e7f510c6e2b1f316c6a2269cc6e522b\", \"elapsed_ms\": 386}], \"detail\": \"https://www.nationalarchives.gov.uk/search/results/?_q=%22Pietro+Lanza%22 ; bounded public-content hub crawl\", \"result_count\": 4, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "relationship_network",
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "40826632223",
+    "agent_id": "relationship_network",
+    "source_leads": [
+      {
+        "id": "lead_1ef67bc9ef23d7558624a1c0",
+        "run_id": "40826632223",
+        "agent_id": "relationship_network",
+        "connector_id": "repo:The National Archives Public Content",
+        "source_url_or_identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=first-world-war",
+        "title": "First World War",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4d6970ff969c33ff8b2f869f",
+        "run_id": "40826632223",
+        "agent_id": "relationship_network",
+        "connector_id": "repo:The National Archives Public Content",
+        "source_url_or_identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+        "title": "research guide",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ef6d75c3d34b38547436e493",
+        "run_id": "40826632223",
+        "agent_id": "relationship_network",
+        "connector_id": "repo:The National Archives Public Content",
+        "source_url_or_identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/#find-a-research-guide/",
+        "title": "Help with your research",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f6e962c079520e2cc583f7af",
+        "run_id": "40826632223",
+        "agent_id": "relationship_network",
+        "connector_id": "repo:The National Archives Public Content",
+        "source_url_or_identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/research-guides/?research-category=family-history",
+        "title": "Family history",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c8a480b92cec61f35d26e364",
+        "run_id": "40826632223",
+        "agent_id": "relationship_network",
+        "connector_id": "repo:The National Archives Public Content",
+        "source_url_or_identifier": "https://www.nationalarchives.gov.uk/help-with-your-research/",
+        "title": "Help using the archive",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      }
+    ],
+    "connector_errors": [],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 20,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
