@@ -1,0 +1,211 @@
+{
+  "schema": "pct-specialist-agent-plan-v2",
+  "routing_authority": "JARVIS_PLANNER",
+  "target": "Κίμωλος",
+  "aliases": [
+    "Argentiere",
+    "Argentiera",
+    "Argentière",
+    "Cimolis",
+    "Kimolos",
+    "Αρζεντιέρα"
+  ],
+  "target_type": "all",
+  "research_focus": {
+    "schema": "pct-research-focus-v1",
+    "kind": "auto",
+    "entity": "Κίμωλος",
+    "names": [
+      "Κίμωλος",
+      "Argentiere",
+      "Argentiera",
+      "Argentière",
+      "Cimolis",
+      "Kimolos",
+      "Αρζεντιέρα"
+    ],
+    "roles": [],
+    "places": [],
+    "interpretation": "REQUEST_CONSTRAINTS_NOT_VERIFIED_FACTS"
+  },
+  "date_range": "",
+  "purpose": "Ποιο νησί λέγεται «Argentiere» στους παλιούς ταξιδιώτες και τι ρόλο είχε για τους κουρσάρους;",
+  "source_limit_per_agent": 4,
+  "fallback_limit_per_agent": 4,
+  "total_query_budget_per_agent": 20,
+  "parallel_agent_count": 1,
+  "verified_promotion_allowed": false,
+  "memory_context": [],
+  "memory_policy": "Persistent memory is retrieval/routing assistance only; it never verifies a historical claim.",
+  "rule": "JARVIS alone assigns second-wave fallback sources after evaluating first-wave outcomes.",
+  "assignment_wave": 2,
+  "agents": [
+    {
+      "agent_id": "relationship_network",
+      "label": "Relationship Network Agent",
+      "queries": [
+        "\"Κίμωλος\" associates captain crew",
+        "\"Κίμωλος\" ship vessel patron",
+        "\"Κίμωλος\" port base ally enemy",
+        "\"Κίμωλος\" governor consul merchant",
+        "\"Argentiere\"",
+        "\"Argentiera\"",
+        "\"Argentière\""
+      ],
+      "outputs": [
+        "persons",
+        "ships",
+        "places",
+        "patrons",
+        "states",
+        "relationship_edges"
+      ],
+      "source_routes": [
+        "repo:PARES / Archivo General de Simancas",
+        "repo:Archives diplomatiques France",
+        "registry:moreveneto_browser",
+        "repo:Internet Culturale",
+        "repo:The National Archives Public Content",
+        "repo:Nationaal Archief"
+      ],
+      "assignment_id": "relationship_network:wave2",
+      "assignment_wave": 2,
+      "assigned_sources": [
+        {
+          "route_id": "repo:SearchCulture.gr / EKT",
+          "route_type": "repository_dispatch",
+          "repository": "SearchCulture.gr / EKT",
+          "connector_id": null,
+          "score": 85,
+          "reason": [
+            "context:greek_aegean"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        },
+        {
+          "route_id": "repo:The National Archives Public Content",
+          "route_type": "repository_dispatch",
+          "repository": "The National Archives Public Content",
+          "connector_id": null,
+          "score": 84,
+          "reason": [
+            "agent_profile"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        }
+      ],
+      "fallback_sources": [
+        {
+          "route_id": "repo:OpenArchives.gr / EKT",
+          "route_type": "repository_dispatch",
+          "repository": "OpenArchives.gr / EKT",
+          "connector_id": null,
+          "score": 81,
+          "reason": [
+            "context:greek_aegean"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        },
+        {
+          "route_id": "repo:Nationaal Archief",
+          "route_type": "repository_dispatch",
+          "repository": "Nationaal Archief",
+          "connector_id": null,
+          "score": 80,
+          "reason": [
+            "agent_profile"
+          ],
+          "context_profiles": [
+            "greek_aegean"
+          ],
+          "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+        }
+      ],
+      "assigned_queries": [
+        "\"Κίμωλος\" associates captain crew",
+        "\"Κίμωλος\" ship vessel patron",
+        "\"Κίμωλος\" port base ally enemy",
+        "\"Κίμωλος\" governor consul merchant",
+        "\"Argentière\""
+      ],
+      "query_budget": {
+        "total": 10,
+        "max_total": 10,
+        "queries_per_source": 5
+      },
+      "routing_decision": {
+        "authority": "JARVIS_PLANNER",
+        "strategy": "result_aware_fallback_v1",
+        "selected_route_ids": [
+          "repo:SearchCulture.gr / EKT",
+          "repo:The National Archives Public Content"
+        ],
+        "fallback_route_ids": [
+          "repo:OpenArchives.gr / EKT",
+          "repo:Nationaal Archief"
+        ],
+        "trigger": "RECOVERY_RETRY",
+        "recovery_action": "RETRY",
+        "recovery_reason": "transient execution failure",
+        "first_wave_status_counts": {
+          "FAILED": 5,
+          "EXECUTED": 9,
+          "REMOTE_RATE_LIMITED": 5,
+          "REMOTE_ACCESS_BLOCKED": 1
+        },
+        "first_wave_records": 0,
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    }
+  ],
+  "reassignment_decisions": [
+    {
+      "agent_id": "identity_resolution",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 126
+    },
+    {
+      "agent_id": "timeline",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 123
+    },
+    {
+      "agent_id": "relationship_network",
+      "reassign": true,
+      "reason": "RECOVERY_RETRY",
+      "recovery_action": "RETRY",
+      "recovery_reason": "transient execution failure",
+      "assigned": [
+        "repo:SearchCulture.gr / EKT",
+        "repo:The National Archives Public Content"
+      ]
+    },
+    {
+      "agent_id": "contradiction",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 145
+    },
+    {
+      "agent_id": "source_genealogy",
+      "reassign": false,
+      "reason": "RECOVERY_ACCEPT",
+      "recovery_action": "ACCEPT",
+      "records": 86
+    }
+  ]
+}
