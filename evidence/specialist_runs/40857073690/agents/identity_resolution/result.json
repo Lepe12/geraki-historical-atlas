@@ -1,0 +1,3081 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "identity_resolution",
+  "label": "Identity Resolution Agent",
+  "assignment_id": "identity_resolution:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "entity_candidates",
+    "variant_names",
+    "same_entity_assessment",
+    "collision_warnings"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "3e8d96b941b295d7a05e889fc610f8f25bf3e792afe83416d309e3ffe4cd5845",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "identity_resolution",
+    "assignment_id": "identity_resolution:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:SearchCulture.gr / EKT",
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:OpenArchives.gr / EKT"
+    ],
+    "queries": [
+      "\"Κίμωλος\" variant spelling",
+      "\"Κίμωλος\" alias OR aliases",
+      "\"Κίμωλος\" historical name",
+      "\"Κίμωλος\" transliteration",
+      "\"Argentière\""
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 130,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 102,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κίμωλος\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+alias+OR+aliases\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+alias+OR+aliases\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1206}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+alias+OR+aliases\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κίμωλος\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+variant+spelling\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+variant+spelling\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1210}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+variant+spelling\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κίμωλος\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+transliteration\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+transliteration\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1215}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+transliteration\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κίμωλος\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+historical+name\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+historical+name\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1220}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+historical+name\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Argentière\"",
+      "records": [
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/pandektis_travel_col/000087-10442_162689",
+          "title": "Γυναίκες της Κύθνου Femmes de l'isle de l'Argentière",
+          "date": [
+            "1401  - 1900 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/pandektis_travel_col/000087-10442_162689",
+          "digital_url": "http://pandektis.ekt.gr/pandektis/handle/10442/162689",
+          "rights": "http://rightsstatements.org/vocab/InC/1.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/pandektis_travel_col/000087-10442_162689\", \"dc_title\": [\"Γυναίκες της Κύθνου\", \"Femmes de l'isle de l'Argentière\"], \"ekt_type\": [\"Δισδιάστατα γραφικά\"], \"ekt_subject\": [\"Εικαστικές τέχνες\", \"Ταξίδια\", \"Πορτραίτο\"], \"ekt_place\": [\"Νήσος Κύθνος\"], \"ekt_chronology\": [\"1401  - 1900 \"], \"dc_contributor\": [\"Ιόλη Βιγγοπούλου\", \"Ινστιτούτο Νεοελληνικών Ερευνών/ ΕΙΕ\"], \"edm_rights\": \"http://rightsstatements.org/vocab/InC/1.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/pandektis_travel_col/000087-10442_162689\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ινστιτούτο Ιστορικών Ερευνών (ΙΙΕ/ΕΙΕ)\", \"collection\": \"Πανδέκτης: Θησαυρός Ελληνικής Ιστορίας & Πολιτισμού - Συλλογή Ταξιδιωτικής Γραμματείας, 15ος-19ος αιώνας\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"http://pandektis.ekt.gr/pandektis/handle/10442/162689\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/pandektis_travel_col/000087-10442_162689",
+            "dc_title": [
+              "Γυναίκες της Κύθνου",
+              "Femmes de l'isle de l'Argentière"
+            ],
+            "ekt_type": [
+              "Δισδιάστατα γραφικά"
+            ],
+            "ekt_subject": [
+              "Εικαστικές τέχνες",
+              "Ταξίδια",
+              "Πορτραίτο"
+            ],
+            "ekt_place": [
+              "Νήσος Κύθνος"
+            ],
+            "ekt_chronology": [
+              "1401  - 1900 "
+            ],
+            "dc_contributor": [
+              "Ιόλη Βιγγοπούλου",
+              "Ινστιτούτο Νεοελληνικών Ερευνών/ ΕΙΕ"
+            ],
+            "edm_rights": "http://rightsstatements.org/vocab/InC/1.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/pandektis_travel_col/000087-10442_162689",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ινστιτούτο Ιστορικών Ερευνών (ΙΙΕ/ΕΙΕ)",
+            "collection": "Πανδέκτης: Θησαυρός Ελληνικής Ιστορίας & Πολιτισμού - Συλλογή Ταξιδιωτικής Γραμματείας, 15ος-19ος αιώνας",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "http://pandektis.ekt.gr/pandektis/handle/10442/162689"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-44409",
+          "title": "Γυναίκες της Κιμώλου.",
+          "date": [
+            "1782 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-44409",
+          "digital_url": "https://el.travelogues.gr/item.php?view=44409",
+          "rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/travelogues/000116-44409\", \"dc_title\": [\"Γυναίκες της Κιμώλου.\"], \"ekt_type\": [\"Εικονογράφηση\"], \"ekt_subject\": [\"Γυναίκες\", \"Ένδυση\", \"Κυκλάδες\", \"Πλοία\", \"Εθνοτικές ομάδες\", \"Πρόσωπο\"], \"ekt_place\": [\"Νήσος Κίμωλος\"], \"ekt_chronology\": [\"1782 \"], \"edm_rights\": \"http://creativecommons.org/licenses/by-nc/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/travelogues/000116-44409\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ίδρυμα Αικατερίνης Λασκαρίδη\", \"collection\": \"Travelogues\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"https://el.travelogues.gr/item.php?view=44409\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-44409",
+            "dc_title": [
+              "Γυναίκες της Κιμώλου."
+            ],
+            "ekt_type": [
+              "Εικονογράφηση"
+            ],
+            "ekt_subject": [
+              "Γυναίκες",
+              "Ένδυση",
+              "Κυκλάδες",
+              "Πλοία",
+              "Εθνοτικές ομάδες",
+              "Πρόσωπο"
+            ],
+            "ekt_place": [
+              "Νήσος Κίμωλος"
+            ],
+            "ekt_chronology": [
+              "1782 "
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-44409",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ίδρυμα Αικατερίνης Λασκαρίδη",
+            "collection": "Travelogues",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "https://el.travelogues.gr/item.php?view=44409"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-50917",
+          "title": "Χάρτης της Μήλου, της Κιμώλου και της Πολυαίγου.",
+          "date": [
+            "1801 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-50917",
+          "digital_url": "https://el.travelogues.gr/item.php?view=50917",
+          "rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/travelogues/000116-50917\", \"dc_title\": [\"Χάρτης της Μήλου, της Κιμώλου και της Πολυαίγου.\"], \"ekt_type\": [\"Χάρτης\", \"Εικονογράφηση\"], \"ekt_subject\": [\"Χάρτες\", \"Κυκλάδες\", \"Γεωλογία, γεωγραφία και ωκεανογραφία\"], \"ekt_place\": [\"Κυκλάδες\"], \"ekt_chronology\": [\"1801 \"], \"edm_rights\": \"http://creativecommons.org/licenses/by-nc/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/travelogues/000116-50917\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ίδρυμα Αικατερίνης Λασκαρίδη\", \"collection\": \"Travelogues\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"https://el.travelogues.gr/item.php?view=50917\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-50917",
+            "dc_title": [
+              "Χάρτης της Μήλου, της Κιμώλου και της Πολυαίγου."
+            ],
+            "ekt_type": [
+              "Χάρτης",
+              "Εικονογράφηση"
+            ],
+            "ekt_subject": [
+              "Χάρτες",
+              "Κυκλάδες",
+              "Γεωλογία, γεωγραφία και ωκεανογραφία"
+            ],
+            "ekt_place": [
+              "Κυκλάδες"
+            ],
+            "ekt_chronology": [
+              "1801 "
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-50917",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ίδρυμα Αικατερίνης Λασκαρίδη",
+            "collection": "Travelogues",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "https://el.travelogues.gr/item.php?view=50917"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-50922",
+          "title": "Γυναίκες της Κιμώλου.",
+          "date": [
+            "1801 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-50922",
+          "digital_url": "https://el.travelogues.gr/item.php?view=50922",
+          "rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/travelogues/000116-50922\", \"dc_title\": [\"Γυναίκες της Κιμώλου.\"], \"ekt_type\": [\"Εικονογράφηση\"], \"ekt_subject\": [\"Γυναίκες\", \"Ένδυση\", \"Νησιά Αιγαίου Πελάγους\", \"Πρόσωπο\"], \"ekt_place\": [\"Νήσος Κίμωλος\"], \"ekt_chronology\": [\"1801 \"], \"edm_rights\": \"http://creativecommons.org/licenses/by-nc/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/travelogues/000116-50922\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ίδρυμα Αικατερίνης Λασκαρίδη\", \"collection\": \"Travelogues\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"https://el.travelogues.gr/item.php?view=50922\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-50922",
+            "dc_title": [
+              "Γυναίκες της Κιμώλου."
+            ],
+            "ekt_type": [
+              "Εικονογράφηση"
+            ],
+            "ekt_subject": [
+              "Γυναίκες",
+              "Ένδυση",
+              "Νησιά Αιγαίου Πελάγους",
+              "Πρόσωπο"
+            ],
+            "ekt_place": [
+              "Νήσος Κίμωλος"
+            ],
+            "ekt_chronology": [
+              "1801 "
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-50922",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ίδρυμα Αικατερίνης Λασκαρίδη",
+            "collection": "Travelogues",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "https://el.travelogues.gr/item.php?view=50922"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-50849",
+          "title": "Ενδυμασίες γυναικών της Κιμώλου.",
+          "date": [
+            "1801 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-50849",
+          "digital_url": "https://el.travelogues.gr/item.php?view=50849",
+          "rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/travelogues/000116-50849\", \"dc_title\": [\"Ενδυμασίες γυναικών της Κιμώλου.\"], \"ekt_type\": [\"Εικονογράφηση\"], \"ekt_subject\": [\"Γυναίκες\", \"Ένδυση\", \"Κυκλάδες\", \"Πλοία\", \"Εθνοτικές ομάδες\", \"Πρόσωπο\"], \"ekt_place\": [\"Νήσος Κίμωλος\"], \"ekt_chronology\": [\"1801 \"], \"edm_rights\": \"http://creativecommons.org/licenses/by-nc/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/travelogues/000116-50849\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ίδρυμα Αικατερίνης Λασκαρίδη\", \"collection\": \"Travelogues\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"https://el.travelogues.gr/item.php?view=50849\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-50849",
+            "dc_title": [
+              "Ενδυμασίες γυναικών της Κιμώλου."
+            ],
+            "ekt_type": [
+              "Εικονογράφηση"
+            ],
+            "ekt_subject": [
+              "Γυναίκες",
+              "Ένδυση",
+              "Κυκλάδες",
+              "Πλοία",
+              "Εθνοτικές ομάδες",
+              "Πρόσωπο"
+            ],
+            "ekt_place": [
+              "Νήσος Κίμωλος"
+            ],
+            "ekt_chronology": [
+              "1801 "
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-50849",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ίδρυμα Αικατερίνης Λασκαρίδη",
+            "collection": "Travelogues",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "https://el.travelogues.gr/item.php?view=50849"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-54170",
+          "title": "Γυναίκα της Κιμώλου. Γυναίκα της Χίου.",
+          "date": [
+            "1812 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-54170",
+          "digital_url": "https://el.travelogues.gr/item.php?view=54170",
+          "rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/travelogues/000116-54170\", \"dc_title\": [\"Γυναίκα της Κιμώλου. Γυναίκα της Χίου.\"], \"ekt_type\": [\"Εικονογράφηση\"], \"ekt_subject\": [\"Γυναίκες\", \"Ένδυση\", \"Κοσμηματοποιία\", \"Εθνοτικές ομάδες\", \"Χίος\", \"Πρόσωπο\"], \"ekt_place\": [\"Νήσος Χίος\"], \"ekt_chronology\": [\"1812 \"], \"edm_rights\": \"http://creativecommons.org/licenses/by-nc/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/travelogues/000116-54170\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ίδρυμα Αικατερίνης Λασκαρίδη\", \"collection\": \"Travelogues\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"https://el.travelogues.gr/item.php?view=54170\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-54170",
+            "dc_title": [
+              "Γυναίκα της Κιμώλου. Γυναίκα της Χίου."
+            ],
+            "ekt_type": [
+              "Εικονογράφηση"
+            ],
+            "ekt_subject": [
+              "Γυναίκες",
+              "Ένδυση",
+              "Κοσμηματοποιία",
+              "Εθνοτικές ομάδες",
+              "Χίος",
+              "Πρόσωπο"
+            ],
+            "ekt_place": [
+              "Νήσος Χίος"
+            ],
+            "ekt_chronology": [
+              "1812 "
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by-nc/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-54170",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ίδρυμα Αικατερίνης Λασκαρίδη",
+            "collection": "Travelogues",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "https://el.travelogues.gr/item.php?view=54170"
+          }
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Argenti%C3%A8re%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Argenti%C3%A8re%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 5283, \"response_sha256\": \"64dd4a62e9cd30c2f14e6c68878b4e0b557746fe67fc0cdca79e9ee8751e65f5\", \"elapsed_ms\": 1418}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Argenti%C3%A8re%22\", \"result_count\": 6, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κίμωλος\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82++variant+spelling%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82++variant+spelling%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 627, \"response_sha256\": \"cae36367aa43c46d019996f2d8448aa9652127c4b8e11649d5c8f0280ff86e33\", \"elapsed_ms\": 1507}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82++variant+spelling%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κίμωλος\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+variant+spelling&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+variant+spelling&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25593, \"response_sha256\": \"1e5620ca3b382a2d96452d67234b5d7aec7f20f884db50fdb3052b4a7729aacc\", \"elapsed_ms\": 481}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+variant+spelling&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κίμωλος\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+alias+OR+aliases&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+alias+OR+aliases&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25593, \"response_sha256\": \"14278cd109c1e6a6d20de83fbd9309aa2f5494784d74a88e4ade14acaf6b16fe\", \"elapsed_ms\": 391}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+alias+OR+aliases&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κίμωλος\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+transliteration&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+transliteration&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25589, \"response_sha256\": \"f926cd2bb86963aac82ef0c6d004cb2406d1c5e16acef0b8efa0108c1c49f119\", \"elapsed_ms\": 163}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+transliteration&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κίμωλος\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+historical+name&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+historical+name&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 31568, \"response_sha256\": \"c962a29925e5898d8ebbf90e40a369cda78a842446c75ed02f6187ea23cf094b\", \"elapsed_ms\": 165}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+historical+name&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κίμωλος\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82++transliteration%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82++transliteration%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 626, \"response_sha256\": \"e3cfb777ff773764b471c26e3c9e4a58add3da85739abe5e93774f60cb1f2f89\", \"elapsed_ms\": 888}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82++transliteration%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κίμωλος\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 627, \"response_sha256\": \"cd15f1c161c18efb8220af7d81766ddffb05d47e095af8b2efd40a6929021d53\", \"elapsed_ms\": 899}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κίμωλος\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82++historical+name%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82++historical+name%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 626, \"response_sha256\": \"0993c365466cc165e602fd1126a8f11e97c5662e205758bf761c2f370ad6d0c3\", \"elapsed_ms\": 914}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82++historical+name%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Argentière\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Argenti%C3%A8re%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 186}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Argenti%C3%A8re%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 186}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Argentière\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Argenti%C3%A8re%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Argenti%C3%A8re%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 66992, \"response_sha256\": \"c7775447995395db2126ca4775cd62e62177b36f21f669b7a2fd70e117ca755d\", \"elapsed_ms\": 768}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Argenti%C3%A8re%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κίμωλος\" alias OR aliases",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-3675",
+          "title": "Η αξιοποίηση των social media στην τουριστική ανάπτυξη μιας περιοχής - Το παράδειγμα της Κιμώλου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-3675"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-23178",
+          "title": "Γεωμορφολογική χαρτογράφηση της Κιμώλου (Κυκλάδες)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-23178"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-92110",
+          "title": "Απάντησις, από 10 Σεπτ., Δημογερόντων Κιμώλου, εις υπ' αριθ. 1133 εγκύκλιον",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-92110"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-34367",
+          "title": "Δανειστικά και φορολογικά έγγραφα της κοινότητος Κιμώλου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-34367"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2900143",
+          "title": "Bentonite as an industrial mineral and comparison between Greek and Northern American bentonite",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2900143"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-86416",
+          "title": "Μπουγιουρδί, Αυγούστου, τού καπουδάν πασά Ραμάς Αβδούλ πασά, πρός προεστώτας, επιτρόπους καί λαόν τών νήσων Πάτμου, Πολυκάνδρου, Μήλου, Κιμώλου, Σίφνου και Κάσου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-86416"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098",
+          "title": "ΓΕΩΦΥΣΙΚΗ ΔΙΑΣΚΟΠΗΣΗ ΤΩΝ ΝΗΣΙΩΝ ΜΗΛΟΣ ΚΑΙ ΚΙΜΩΛΟΣ A GEOPHYSICAL STUDY OF MILOS AND KIMOLOS ISLANDS",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_57404",
+          "title": "Διερεύνηση της τριαδικής διασύνδεσης μεταξύ συνδημιουργίας αξίας, συμπεριφοράς του πολίτη και βιώσιμου τουρισμού: Η περίπτωση της νήσου Κιμώλου Investigating the triadic interconnection between value co-creation, citizenship behavior and sustainable tourism: The case of Kimolos island",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_57404"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-32433",
+          "title": "Από την Κύπρο στην Κίμωλο. Εικόνα Δέησης με τον Χριστό πλαισιωμένο από τον άγιο Ανδρόνικο και την αγία Αθανασία From Cyprus to Kimolos. An icon with a Deesis with Christ flanked by Saints Andronikos and Athanasia",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-32433"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_8062",
+          "title": "Κέντρο έρευνας και περίθαλψης θαλάσσιων ζώων στην Κίμωλο",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_8062"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_21729",
+          "title": "Αρχαιότητες και μνημεία Κυκλάδων: Κίμωλος (Ελληνικά) (Πίν. 409-410˙ Σχέδ. 2)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_21729"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-33867",
+          "title": "Διαθήκη",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-33867"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-19913",
+          "title": "Μαρτυρικό",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-19913"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-38247",
+          "title": "Ιδιωτικά δικαιοπρακτικά έγγραφα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-38247"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-48319",
+          "title": "Νοταριακά και διοικητικά έγγραφα στην γαλλική γλώσσα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-48319"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2864865",
+          "title": "Εγκαταστάσεις επεξεργασίας υγρών αποβλήτων. Εθνικό και Κοινοτικό θεσμικό πλαίσιο - Περιγραφή και λειτουργία μονάδας επεξεργασίας αστικών λυμάτων Κιμώλου (βιολογικός καθαρισμός)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2864865"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_50124",
+          "title": "Χωρικές παρεμβάσεις σε περιβάλλον νησιωτικότητας Spatial Interventions in the insular environment",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_50124"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_43644",
+          "title": "Ανάλυση αβεβαιότητας στη διαστασιολόγηση δεξαμενών ομβρίων υδάτων για τη Νήσο Κίμωλο Uncertainty analysis in sizing rainwater harvest tanks in Kimolos Island",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_43644"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_55195",
+          "title": "Φραγμίτες: δίκτυο παραγωγής & επεξεργασίας καλαμιού στην Κίμωλο Phragmites: a network of producing and processing reed at the island of Kimolos",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_55195"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4334",
+          "title": "Τρεις σκηνές από τον θεομητορικό κύκλο σε τμήμα εικόνας από την Κίμωλο Three scenes from the mariological cycle on part of an icon from Kimolos",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4334"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A1337673",
+          "title": "Ηφαιστειακοί Τόφφοι Πυριτιωμένοι από την Πώρια Κιμώλου σαν Ποζολανικά πρόσθετα σε τσιμέντα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A1337673"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-41609",
+          "title": "Ιδιωτικά δικαιοπρακτικά έγγραφα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-41609"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-19493",
+          "title": "Διαδικαστικά και ιδιωτικά έγγραφα, νοταριακή πράξη",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-19493"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-8585",
+          "title": "Οικονομοτεχνική ανάλυση και αξιολόγηση συστήματος αφαλάτωσης από ΑΠΕ",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-8585"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4359",
+          "title": "Ο θεομητορικός κύκλος στον ναό της Αγίας Ματρώνας στην Κίμωλο The mariological cycle in the church of Ayia Matrona on Kimolos",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4359"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+alias+OR+aliases&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+alias+OR+aliases&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 484695, \"response_sha256\": \"69b4d49f0eed445f46258a85422e101f34e5e8f2aceee749b3644a90881d8d72\", \"elapsed_ms\": 1876}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+alias+OR+aliases&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κίμωλος\" variant spelling",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-3675",
+          "title": "Η αξιοποίηση των social media στην τουριστική ανάπτυξη μιας περιοχής - Το παράδειγμα της Κιμώλου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-3675"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-23178",
+          "title": "Γεωμορφολογική χαρτογράφηση της Κιμώλου (Κυκλάδες)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-23178"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-92110",
+          "title": "Απάντησις, από 10 Σεπτ., Δημογερόντων Κιμώλου, εις υπ' αριθ. 1133 εγκύκλιον",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-92110"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-34367",
+          "title": "Δανειστικά και φορολογικά έγγραφα της κοινότητος Κιμώλου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-34367"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2900143",
+          "title": "Bentonite as an industrial mineral and comparison between Greek and Northern American bentonite",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2900143"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-86416",
+          "title": "Μπουγιουρδί, Αυγούστου, τού καπουδάν πασά Ραμάς Αβδούλ πασά, πρός προεστώτας, επιτρόπους καί λαόν τών νήσων Πάτμου, Πολυκάνδρου, Μήλου, Κιμώλου, Σίφνου και Κάσου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-86416"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098",
+          "title": "ΓΕΩΦΥΣΙΚΗ ΔΙΑΣΚΟΠΗΣΗ ΤΩΝ ΝΗΣΙΩΝ ΜΗΛΟΣ ΚΑΙ ΚΙΜΩΛΟΣ A GEOPHYSICAL STUDY OF MILOS AND KIMOLOS ISLANDS",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_57404",
+          "title": "Διερεύνηση της τριαδικής διασύνδεσης μεταξύ συνδημιουργίας αξίας, συμπεριφοράς του πολίτη και βιώσιμου τουρισμού: Η περίπτωση της νήσου Κιμώλου Investigating the triadic interconnection between value co-creation, citizenship behavior and sustainable tourism: The case of Kimolos island",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_57404"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-32433",
+          "title": "Από την Κύπρο στην Κίμωλο. Εικόνα Δέησης με τον Χριστό πλαισιωμένο από τον άγιο Ανδρόνικο και την αγία Αθανασία From Cyprus to Kimolos. An icon with a Deesis with Christ flanked by Saints Andronikos and Athanasia",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-32433"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_8062",
+          "title": "Κέντρο έρευνας και περίθαλψης θαλάσσιων ζώων στην Κίμωλο",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_8062"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_21729",
+          "title": "Αρχαιότητες και μνημεία Κυκλάδων: Κίμωλος (Ελληνικά) (Πίν. 409-410˙ Σχέδ. 2)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_21729"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-33867",
+          "title": "Διαθήκη",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-33867"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-19913",
+          "title": "Μαρτυρικό",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-19913"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-38247",
+          "title": "Ιδιωτικά δικαιοπρακτικά έγγραφα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-38247"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-48319",
+          "title": "Νοταριακά και διοικητικά έγγραφα στην γαλλική γλώσσα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-48319"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2864865",
+          "title": "Εγκαταστάσεις επεξεργασίας υγρών αποβλήτων. Εθνικό και Κοινοτικό θεσμικό πλαίσιο - Περιγραφή και λειτουργία μονάδας επεξεργασίας αστικών λυμάτων Κιμώλου (βιολογικός καθαρισμός)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2864865"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_50124",
+          "title": "Χωρικές παρεμβάσεις σε περιβάλλον νησιωτικότητας Spatial Interventions in the insular environment",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_50124"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_43644",
+          "title": "Ανάλυση αβεβαιότητας στη διαστασιολόγηση δεξαμενών ομβρίων υδάτων για τη Νήσο Κίμωλο Uncertainty analysis in sizing rainwater harvest tanks in Kimolos Island",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_43644"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_55195",
+          "title": "Φραγμίτες: δίκτυο παραγωγής & επεξεργασίας καλαμιού στην Κίμωλο Phragmites: a network of producing and processing reed at the island of Kimolos",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_55195"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4334",
+          "title": "Τρεις σκηνές από τον θεομητορικό κύκλο σε τμήμα εικόνας από την Κίμωλο Three scenes from the mariological cycle on part of an icon from Kimolos",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4334"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A1337673",
+          "title": "Ηφαιστειακοί Τόφφοι Πυριτιωμένοι από την Πώρια Κιμώλου σαν Ποζολανικά πρόσθετα σε τσιμέντα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A1337673"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-41609",
+          "title": "Ιδιωτικά δικαιοπρακτικά έγγραφα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-41609"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-19493",
+          "title": "Διαδικαστικά και ιδιωτικά έγγραφα, νοταριακή πράξη",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-19493"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-8585",
+          "title": "Οικονομοτεχνική ανάλυση και αξιολόγηση συστήματος αφαλάτωσης από ΑΠΕ",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-8585"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4359",
+          "title": "Ο θεομητορικός κύκλος στον ναό της Αγίας Ματρώνας στην Κίμωλο The mariological cycle in the church of Ayia Matrona on Kimolos",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4359"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+variant+spelling&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+variant+spelling&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 484695, \"response_sha256\": \"aeae15870ea8a7940255edfb2dc6e809e3da3f4086ab7e934aa3ce1ba1322ec8\", \"elapsed_ms\": 2290}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+variant+spelling&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κίμωλος\" historical name",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-3675",
+          "title": "Η αξιοποίηση των social media στην τουριστική ανάπτυξη μιας περιοχής - Το παράδειγμα της Κιμώλου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-3675"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-23178",
+          "title": "Γεωμορφολογική χαρτογράφηση της Κιμώλου (Κυκλάδες)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-23178"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-92110",
+          "title": "Απάντησις, από 10 Σεπτ., Δημογερόντων Κιμώλου, εις υπ' αριθ. 1133 εγκύκλιον",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-92110"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-34367",
+          "title": "Δανειστικά και φορολογικά έγγραφα της κοινότητος Κιμώλου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-34367"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2900143",
+          "title": "Bentonite as an industrial mineral and comparison between Greek and Northern American bentonite",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2900143"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-86416",
+          "title": "Μπουγιουρδί, Αυγούστου, τού καπουδάν πασά Ραμάς Αβδούλ πασά, πρός προεστώτας, επιτρόπους καί λαόν τών νήσων Πάτμου, Πολυκάνδρου, Μήλου, Κιμώλου, Σίφνου και Κάσου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-86416"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098",
+          "title": "ΓΕΩΦΥΣΙΚΗ ΔΙΑΣΚΟΠΗΣΗ ΤΩΝ ΝΗΣΙΩΝ ΜΗΛΟΣ ΚΑΙ ΚΙΜΩΛΟΣ A GEOPHYSICAL STUDY OF MILOS AND KIMOLOS ISLANDS",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_57404",
+          "title": "Διερεύνηση της τριαδικής διασύνδεσης μεταξύ συνδημιουργίας αξίας, συμπεριφοράς του πολίτη και βιώσιμου τουρισμού: Η περίπτωση της νήσου Κιμώλου Investigating the triadic interconnection between value co-creation, citizenship behavior and sustainable tourism: The case of Kimolos island",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_57404"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-32433",
+          "title": "Από την Κύπρο στην Κίμωλο. Εικόνα Δέησης με τον Χριστό πλαισιωμένο από τον άγιο Ανδρόνικο και την αγία Αθανασία From Cyprus to Kimolos. An icon with a Deesis with Christ flanked by Saints Andronikos and Athanasia",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-32433"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_8062",
+          "title": "Κέντρο έρευνας και περίθαλψης θαλάσσιων ζώων στην Κίμωλο",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_8062"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_21729",
+          "title": "Αρχαιότητες και μνημεία Κυκλάδων: Κίμωλος (Ελληνικά) (Πίν. 409-410˙ Σχέδ. 2)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_21729"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-33867",
+          "title": "Διαθήκη",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-33867"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-19913",
+          "title": "Μαρτυρικό",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-19913"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-38247",
+          "title": "Ιδιωτικά δικαιοπρακτικά έγγραφα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-38247"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-48319",
+          "title": "Νοταριακά και διοικητικά έγγραφα στην γαλλική γλώσσα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-48319"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2864865",
+          "title": "Εγκαταστάσεις επεξεργασίας υγρών αποβλήτων. Εθνικό και Κοινοτικό θεσμικό πλαίσιο - Περιγραφή και λειτουργία μονάδας επεξεργασίας αστικών λυμάτων Κιμώλου (βιολογικός καθαρισμός)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2864865"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_50124",
+          "title": "Χωρικές παρεμβάσεις σε περιβάλλον νησιωτικότητας Spatial Interventions in the insular environment",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_50124"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_43644",
+          "title": "Ανάλυση αβεβαιότητας στη διαστασιολόγηση δεξαμενών ομβρίων υδάτων για τη Νήσο Κίμωλο Uncertainty analysis in sizing rainwater harvest tanks in Kimolos Island",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_43644"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_55195",
+          "title": "Φραγμίτες: δίκτυο παραγωγής & επεξεργασίας καλαμιού στην Κίμωλο Phragmites: a network of producing and processing reed at the island of Kimolos",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_55195"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4334",
+          "title": "Τρεις σκηνές από τον θεομητορικό κύκλο σε τμήμα εικόνας από την Κίμωλο Three scenes from the mariological cycle on part of an icon from Kimolos",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4334"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A1337673",
+          "title": "Ηφαιστειακοί Τόφφοι Πυριτιωμένοι από την Πώρια Κιμώλου σαν Ποζολανικά πρόσθετα σε τσιμέντα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A1337673"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-41609",
+          "title": "Ιδιωτικά δικαιοπρακτικά έγγραφα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-41609"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-19493",
+          "title": "Διαδικαστικά και ιδιωτικά έγγραφα, νοταριακή πράξη",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-19493"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-8585",
+          "title": "Οικονομοτεχνική ανάλυση και αξιολόγηση συστήματος αφαλάτωσης από ΑΠΕ",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-8585"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4359",
+          "title": "Ο θεομητορικός κύκλος στον ναό της Αγίας Ματρώνας στην Κίμωλο The mariological cycle in the church of Ayia Matrona on Kimolos",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4359"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+historical+name&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+historical+name&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 488669, \"response_sha256\": \"bc914d58c2656360da7a3b83acb1e1b6688fcd16c2c8cb7cadee4622799106e4\", \"elapsed_ms\": 2441}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+historical+name&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κίμωλος\" transliteration",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-3675",
+          "title": "Η αξιοποίηση των social media στην τουριστική ανάπτυξη μιας περιοχής - Το παράδειγμα της Κιμώλου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-3675"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_34437",
+          "title": "Textual phenomena addressing youth: Orthographic, typographic, and ideological aspects of the Greek-Cypriot dialect",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_34437"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-23178",
+          "title": "Γεωμορφολογική χαρτογράφηση της Κιμώλου (Κυκλάδες)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-23178"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_15638",
+          "title": "Ο εξαγγλισμός της Νέας Ελληνικής : μια ποιοτική και ποσοτική μελέτη Evaluating Anglicisation in Modern Greek : a qualitative and quantitative survey",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_15638"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_48416",
+          "title": "Ο εξαγγλισμός της νέας ελληνικής: μία ποιοτική και ποσοτική μελέτη L’anglicisation du grec moderne: une étude qualitative et quantitative",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_48416"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-92110",
+          "title": "Απάντησις, από 10 Σεπτ., Δημογερόντων Κιμώλου, εις υπ' αριθ. 1133 εγκύκλιον",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-92110"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-34367",
+          "title": "Δανειστικά και φορολογικά έγγραφα της κοινότητος Κιμώλου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-34367"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2900143",
+          "title": "Bentonite as an industrial mineral and comparison between Greek and Northern American bentonite",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2900143"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-296959",
+          "title": "Roman-alphabeted Greek and transliteration in the digital language practices of Greek secondary school pupils on Facebook",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-296959"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-86416",
+          "title": "Μπουγιουρδί, Αυγούστου, τού καπουδάν πασά Ραμάς Αβδούλ πασά, πρός προεστώτας, επιτρόπους καί λαόν τών νήσων Πάτμου, Πολυκάνδρου, Μήλου, Κιμώλου, Σίφνου και Κάσου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-86416"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098",
+          "title": "ΓΕΩΦΥΣΙΚΗ ΔΙΑΣΚΟΠΗΣΗ ΤΩΝ ΝΗΣΙΩΝ ΜΗΛΟΣ ΚΑΙ ΚΙΜΩΛΟΣ A GEOPHYSICAL STUDY OF MILOS AND KIMOLOS ISLANDS",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_57404",
+          "title": "Διερεύνηση της τριαδικής διασύνδεσης μεταξύ συνδημιουργίας αξίας, συμπεριφοράς του πολίτη και βιώσιμου τουρισμού: Η περίπτωση της νήσου Κιμώλου Investigating the triadic interconnection between value co-creation, citizenship behavior and sustainable tourism: The case of Kimolos island",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_57404"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-32433",
+          "title": "Από την Κύπρο στην Κίμωλο. Εικόνα Δέησης με τον Χριστό πλαισιωμένο από τον άγιο Ανδρόνικο και την αγία Αθανασία From Cyprus to Kimolos. An icon with a Deesis with Christ flanked by Saints Andronikos and Athanasia",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-32433"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_8062",
+          "title": "Κέντρο έρευνας και περίθαλψης θαλάσσιων ζώων στην Κίμωλο",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_8062"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_21729",
+          "title": "Αρχαιότητες και μνημεία Κυκλάδων: Κίμωλος (Ελληνικά) (Πίν. 409-410˙ Σχέδ. 2)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_21729"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-33867",
+          "title": "Διαθήκη",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-33867"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-19913",
+          "title": "Μαρτυρικό",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-19913"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_4935",
+          "title": "Ανάπτυξη μεθόδου με σκοπό την αναγνώριση και εξαγωγή θεματικών λέξεων κλειδιών από διευθύνσεις ιστοσελίδων του ελληνικού Διαδικτύου Keyword identification within Greek URLs",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_4935"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-38247",
+          "title": "Ιδιωτικά δικαιοπρακτικά έγγραφα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-38247"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-48319",
+          "title": "Νοταριακά και διοικητικά έγγραφα στην γαλλική γλώσσα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-48319"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2864865",
+          "title": "Εγκαταστάσεις επεξεργασίας υγρών αποβλήτων. Εθνικό και Κοινοτικό θεσμικό πλαίσιο - Περιγραφή και λειτουργία μονάδας επεξεργασίας αστικών λυμάτων Κιμώλου (βιολογικός καθαρισμός)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2864865"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_50124",
+          "title": "Χωρικές παρεμβάσεις σε περιβάλλον νησιωτικότητας Spatial Interventions in the insular environment",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_50124"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_43644",
+          "title": "Ανάλυση αβεβαιότητας στη διαστασιολόγηση δεξαμενών ομβρίων υδάτων για τη Νήσο Κίμωλο Uncertainty analysis in sizing rainwater harvest tanks in Kimolos Island",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_43644"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_55195",
+          "title": "Φραγμίτες: δίκτυο παραγωγής & επεξεργασίας καλαμιού στην Κίμωλο Phragmites: a network of producing and processing reed at the island of Kimolos",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_55195"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4334",
+          "title": "Τρεις σκηνές από τον θεομητορικό κύκλο σε τμήμα εικόνας από την Κίμωλο Three scenes from the mariological cycle on part of an icon from Kimolos",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4334"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+transliteration&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+transliteration&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 572503, \"response_sha256\": \"7f30579a826a55308a2b1f5d6e8d3b64361676394758269969fe6d3c08d0ed47\", \"elapsed_ms\": 2670}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+transliteration&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Argentière\"",
+      "records": [
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb44239548j",
+          "title": "La mine d'argent du Fournel : des origines médiévales de L'Argentière-La Bessée à sa première industrie au XIXe siècle / Musée des mines, Service culturel de la ville de L'Argentière-La Bessée ; présenté par Bruno Ancel ; avec la collaboration de Vanessa Py, Christophe Marconnet, Éric Kammenthaler... [et al.]",
+          "creator": [
+            "Musée des mines (L'Argentière-la-Bessée, Hautes-Alpes). Auteur du texte"
+          ],
+          "date": [
+            "2013"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb44239548j",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb44239548j",
+            "ISBN 9782912265203"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb338058566",
+          "title": "Statuts et Règlements du chapitre noble de L'Argentière",
+          "creator": [
+            "Abbaye Notre-Dame de l'Argentière. Auteur du texte"
+          ],
+          "date": [
+            "1780"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb338058566",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb338058566"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb388900419",
+          "title": "Le vignoble d'altitude : Bacchus y trouva un royaume ! / textes et photos, Nathalie Pogneaux pour la Communauté de communes du Canton de L'Argentière-la-Bessée",
+          "creator": [
+            "Pogneaux, Nathalie. Auteur du texte",
+            "Communauté de communes du pays des Écrins. Auteur du texte"
+          ],
+          "date": [
+            "2001"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb388900419",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb388900419",
+            "ISBN 2951702515"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb439023133",
+          "title": "Le bourg abbatial de Villemagne-l'Argentière (Hérault) : dynamique économique et commande monumentale XIe-XIVe siècles / Florence Journot",
+          "creator": [
+            "Journot, Florence (1959-....). Auteur du texte"
+          ],
+          "date": [
+            "2013"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb439023133",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb439023133",
+            "ISBN 9781407311821"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb35809439r",
+          "title": "Argentière, un village sous la neige : l'aventure du ski dans le haut de la vallée / texte de Jean Belleville ; préf. de Roger Frison-Roche",
+          "creator": [
+            "Belleville, Jean (1936-....). Auteur du texte"
+          ],
+          "date": [
+            "1995"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb35809439r",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb35809439r",
+            "ISBN 2903420092"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb34530635q",
+          "title": "La Sainte Montagne (Saint-Genis-l'Argentière)",
+          "creator": [
+            "Paix et joie (Saint-Genis-l'Argentière, Rhône). Auteur du texte"
+          ],
+          "date": [
+            "1995-2009"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb34530635q",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb34530635q",
+            "ISSN 12669660"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb32837488p",
+          "title": "Distribution solennelle des prix (Petit séminaire de l'Argentière)",
+          "creator": [
+            "Petit séminaire de l'Argentière (Aveize, Rhône). Auteur du texte"
+          ],
+          "date": [
+            "18..-18.."
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb32837488p",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb32837488p"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb436523426",
+          "title": "Gilbert Planche et L'Argentière-La Bessée : 100 ans d'hydroélectricité, 1910-2010 / [Mairie de l'Argentière-la-Bessée]",
+          "creator": [],
+          "date": [
+            "2010"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb436523426",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb436523426",
+            "ISBN 9782912265135"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb44388743b",
+          "title": "[Le glacier d'Argentière et l'Aiguille d'Argentière] / [photogr. Robert Perret ?]",
+          "creator": [
+            "Perret, Robert (1881-1965). Photographe présumé"
+          ],
+          "date": [
+            "1920-1929"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb44388743b",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb44388743b"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb475034213",
+          "title": "Écrins mag : journal semestriel de la Communauté de communes du pays des Écrins / [directeur de la publication Cyrille Drujon d'Astros]",
+          "creator": [
+            "Communauté de communes du pays des Écrins. Auteur du texte"
+          ],
+          "date": [
+            "20.."
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb475034213",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb475034213",
+            "ISSN 30391326"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb47415951x",
+          "title": "Les artisans des Sablonnières : l'histoire de la construction de l'usine de l'Argentière-La Bessée, 1906-1911 / Gérard Guimbert",
+          "creator": [
+            "Guimbert, Gérard. Auteur du texte"
+          ],
+          "date": [
+            "2023"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb47415951x",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb47415951x",
+            "ISBN 9782361421878"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb423787326",
+          "title": "Saint Majan / Michel Quatrefages",
+          "creator": [
+            "Quatrefages, Michel. Auteur du texte"
+          ],
+          "date": [
+            "2010"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb423787326",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb423787326",
+            "ISBN 9782750426750"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb459410463",
+          "title": "Le Glandon : chalet, aiguilles d'Argentière",
+          "creator": [
+            "Duchemin, Émile (1862-1914). Photographe"
+          ],
+          "date": [
+            "1890-1914"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb459410463",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb459410463"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb45941047f",
+          "title": "Le Glandon : chalet, aiguilles d'Argentière",
+          "creator": [
+            "Duchemin, Émile (1862-1914). Photographe"
+          ],
+          "date": [
+            "1890-1914"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb45941047f",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb45941047f"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb42272185h",
+          "title": "Des nouvelles de la montagne : les nouvelles lauréates, 2006 à 2009 : concours / [organisé par la] commune de l'Argentière-la-Bessée, service culturel municipal, Bibliothèque municipale Château Saint-Jean",
+          "creator": [],
+          "date": [
+            "2010"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb42272185h",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb42272185h",
+            "ISBN 9782912265142"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb327719408",
+          "title": "Exercice littéraire du Petit Séminaire de l'Argentière...",
+          "creator": [
+            "Petit séminaire de l'Argentière (Aveize, Rhône). Auteur du texte"
+          ],
+          "date": [
+            "18??"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb327719408",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb327719408"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb42551312q",
+          "title": "Mines : Fournel : d'eau & d'argent / [photographies d'] Arthur Akopy ; [textes de] Bruno Ancel, Ian Cowburn, Frédérique Verlinden",
+          "creator": [
+            "Ancel, Bruno. Auteur du texte",
+            "Cowburn, Ian. Auteur du texte",
+            "Verlinden, Frédérique (1957-....). Auteur du texte"
+          ],
+          "date": [
+            "2010"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb42551312q",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb42551312q",
+            "ISBN 9782361420215"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb44312413p",
+          "title": "L'Argentière-la-Bessée : l'industrie au XXe siècle / Dominique Pogneaux",
+          "creator": [
+            "Pogneaux, Dominique (1945-....). Auteur du texte"
+          ],
+          "date": [
+            "2012"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb44312413p",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb44312413p",
+            "ISBN 9782361420420"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb40205501r",
+          "title": "Les Cahiers du château Saint-Jean / Ville de L'Argentière La Bessée, Service culturel municipal",
+          "creator": [
+            "L'Argentière-la-Bessée (Hautes-Alpes). Auteur du texte"
+          ],
+          "date": [
+            "2006-2013"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb40205501r",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb40205501r",
+            "ISSN 19527071"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb344015994",
+          "title": "Le Canton (L'Argentière-la-Bessée)",
+          "creator": [
+            "Syndicat intercommunal à vocation multiple pour l'équipement et le développement du canton de L'Argentière-La Bessée. Auteur du texte"
+          ],
+          "date": [
+            "1986-198?"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb344015994",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb344015994",
+            "ISSN 09831746"
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Argenti%C3%A8re+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Argenti%C3%A8re+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 36017, \"response_sha256\": \"1bb118a173541861fe9d6f56d601eba56a89eba6b9963a73c14f0d62ecd5de20\", \"elapsed_ms\": 10144}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Argenti%C3%A8re+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 20, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "40857073690",
+    "agent_id": "identity_resolution",
+    "source_leads": [
+      {
+        "id": "lead_2501bcc00f607406dbf5cedb",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/pandektis_travel_col/000087-10442_162689",
+        "title": "Γυναίκες της Κύθνου Femmes de l'isle de l'Argentière",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9e14ee6f7bb4e0dde6c49c3b",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-44409",
+        "title": "Γυναίκες της Κιμώλου.",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d70b1d3fefc908bc928a75c5",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-50917",
+        "title": "Χάρτης της Μήλου, της Κιμώλου και της Πολυαίγου.",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_594bed700e13896f7e3061ba",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-50922",
+        "title": "Γυναίκες της Κιμώλου.",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_11fb4e8e0cfbdb78552d6a78",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-50849",
+        "title": "Ενδυμασίες γυναικών της Κιμώλου.",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9e2a92bc0195b207931b0962",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/travelogues/000116-54170",
+        "title": "Γυναίκα της Κιμώλου. Γυναίκα της Χίου.",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_38e7db237ce07dde71ef2822",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-3675",
+        "title": "Η αξιοποίηση των social media στην τουριστική ανάπτυξη μιας περιοχής - Το παράδειγμα της Κιμώλου",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_25072a97411db0e0127da2dc",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-23178",
+        "title": "Γεωμορφολογική χαρτογράφηση της Κιμώλου (Κυκλάδες)",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_cc25e5b027ebfc2240dafa93",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-92110",
+        "title": "Απάντησις, από 10 Σεπτ., Δημογερόντων Κιμώλου, εις υπ' αριθ. 1133 εγκύκλιον",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_53fc0f0a1bed11b3bb99f2b5",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-34367",
+        "title": "Δανειστικά και φορολογικά έγγραφα της κοινότητος Κιμώλου",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_11e6cea2fd07b3015132c0f7",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2900143",
+        "title": "Bentonite as an industrial mineral and comparison between Greek and Northern American bentonite",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1abe9593c5a3168455e1b50f",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-86416",
+        "title": "Μπουγιουρδί, Αυγούστου, τού καπουδάν πασά Ραμάς Αβδούλ πασά, πρός προεστώτας, επιτρόπους καί λαόν τών νήσων Πάτμου, Πολυκάνδρου, Μήλου, Κιμώλου, Σίφνου και Κάσου",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f25468e7e455b00898c5dabe",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098",
+        "title": "ΓΕΩΦΥΣΙΚΗ ΔΙΑΣΚΟΠΗΣΗ ΤΩΝ ΝΗΣΙΩΝ ΜΗΛΟΣ ΚΑΙ ΚΙΜΩΛΟΣ A GEOPHYSICAL STUDY OF MILOS AND KIMOLOS ISLANDS",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e3217c21b2c242389960fe9e",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_57404",
+        "title": "Διερεύνηση της τριαδικής διασύνδεσης μεταξύ συνδημιουργίας αξίας, συμπεριφοράς του πολίτη και βιώσιμου τουρισμού: Η περίπτωση της νήσου Κιμώλου Investigating the triadic interconnection between value co-creation, citizenship behavior and sustainable tourism: The case of Kimolos island",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3d4c2d86ad9c33a82e033605",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-32433",
+        "title": "Από την Κύπρο στην Κίμωλο. Εικόνα Δέησης με τον Χριστό πλαισιωμένο από τον άγιο Ανδρόνικο και την αγία Αθανασία From Cyprus to Kimolos. An icon with a Deesis with Christ flanked by Saints Andronikos and Athanasia",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8041afa8899adb7d79fe0a1f",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_8062",
+        "title": "Κέντρο έρευνας και περίθαλψης θαλάσσιων ζώων στην Κίμωλο",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_43d5a223b9fd71fbdea6d7d0",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_21729",
+        "title": "Αρχαιότητες και μνημεία Κυκλάδων: Κίμωλος (Ελληνικά) (Πίν. 409-410˙ Σχέδ. 2)",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9c33b26725e386429dc22443",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-33867",
+        "title": "Διαθήκη",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5a5f567eb464758b3a245b21",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-19913",
+        "title": "Μαρτυρικό",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e96d7f75db71ec68200fb6c1",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-38247",
+        "title": "Ιδιωτικά δικαιοπρακτικά έγγραφα",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0ab61d3a4e602c9c7a03a80d",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-48319",
+        "title": "Νοταριακά και διοικητικά έγγραφα στην γαλλική γλώσσα",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_692bcd4fd4310969d87c1eb2",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2864865",
+        "title": "Εγκαταστάσεις επεξεργασίας υγρών αποβλήτων. Εθνικό και Κοινοτικό θεσμικό πλαίσιο - Περιγραφή και λειτουργία μονάδας επεξεργασίας αστικών λυμάτων Κιμώλου (βιολογικός καθαρισμός)",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_66dace3f626a0bdcce7bdf94",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_50124",
+        "title": "Χωρικές παρεμβάσεις σε περιβάλλον νησιωτικότητας Spatial Interventions in the insular environment",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_cf530ab9b16b61fdb4b3e5c8",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_43644",
+        "title": "Ανάλυση αβεβαιότητας στη διαστασιολόγηση δεξαμενών ομβρίων υδάτων για τη Νήσο Κίμωλο Uncertainty analysis in sizing rainwater harvest tanks in Kimolos Island",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5b63b26e862df6fbb491ce16",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_55195",
+        "title": "Φραγμίτες: δίκτυο παραγωγής & επεξεργασίας καλαμιού στην Κίμωλο Phragmites: a network of producing and processing reed at the island of Kimolos",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_90f9c0636ff158496b12ffba",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4334",
+        "title": "Τρεις σκηνές από τον θεομητορικό κύκλο σε τμήμα εικόνας από την Κίμωλο Three scenes from the mariological cycle on part of an icon from Kimolos",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0bb522b13f921f485877d851",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A1337673",
+        "title": "Ηφαιστειακοί Τόφφοι Πυριτιωμένοι από την Πώρια Κιμώλου σαν Ποζολανικά πρόσθετα σε τσιμέντα",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1f1049a3d9147cc0515c5d05",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-41609",
+        "title": "Ιδιωτικά δικαιοπρακτικά έγγραφα",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_833e9ca0d4675c41b44ed01a",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-19493",
+        "title": "Διαδικαστικά και ιδιωτικά έγγραφα, νοταριακή πράξη",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_95918f0c137bdc79aa2ed425",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-8585",
+        "title": "Οικονομοτεχνική ανάλυση και αξιολόγηση συστήματος αφαλάτωσης από ΑΠΕ",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_58d7e0e8c9db62b2ba3b63ca",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/deltion/000077-4359",
+        "title": "Ο θεομητορικός κύκλος στον ναό της Αγίας Ματρώνας στην Κίμωλο The mariological cycle in the church of Ayia Matrona on Kimolos",
+        "query": "\"Κίμωλος\" alias OR aliases",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f5d74f9201484dc1d6de29fc",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_34437",
+        "title": "Textual phenomena addressing youth: Orthographic, typographic, and ideological aspects of the Greek-Cypriot dialect",
+        "query": "\"Κίμωλος\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_eca7ad9b34d1609e4309d33a",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_15638",
+        "title": "Ο εξαγγλισμός της Νέας Ελληνικής : μια ποιοτική και ποσοτική μελέτη Evaluating Anglicisation in Modern Greek : a qualitative and quantitative survey",
+        "query": "\"Κίμωλος\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_96f39efe0d944938d7402efd",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_48416",
+        "title": "Ο εξαγγλισμός της νέας ελληνικής: μία ποιοτική και ποσοτική μελέτη L’anglicisation du grec moderne: une étude qualitative et quantitative",
+        "query": "\"Κίμωλος\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_678b932eba3e6d561b338d89",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-296959",
+        "title": "Roman-alphabeted Greek and transliteration in the digital language practices of Greek secondary school pupils on Facebook",
+        "query": "\"Κίμωλος\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_38cac105f0e596a29a494ce6",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_4935",
+        "title": "Ανάπτυξη μεθόδου με σκοπό την αναγνώριση και εξαγωγή θεματικών λέξεων κλειδιών από διευθύνσεις ιστοσελίδων του ελληνικού Διαδικτύου Keyword identification within Greek URLs",
+        "query": "\"Κίμωλος\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_91f008e930ef748bbe3845ad",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb44239548j",
+        "title": "La mine d'argent du Fournel : des origines médiévales de L'Argentière-La Bessée à sa première industrie au XIXe siècle / Musée des mines, Service culturel de la ville de L'Argentière-La Bessée ; présenté par Bruno Ancel ; avec la collaboration de Vanessa Py, Christophe Marconnet, Éric Kammenthaler... [et al.]",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e4b10c7fcf9e3d2ffc990a9d",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb338058566",
+        "title": "Statuts et Règlements du chapitre noble de L'Argentière",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f672868b955795ab74a8de91",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb388900419",
+        "title": "Le vignoble d'altitude : Bacchus y trouva un royaume ! / textes et photos, Nathalie Pogneaux pour la Communauté de communes du Canton de L'Argentière-la-Bessée",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a1d9f09021955148772280c3",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb439023133",
+        "title": "Le bourg abbatial de Villemagne-l'Argentière (Hérault) : dynamique économique et commande monumentale XIe-XIVe siècles / Florence Journot",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b98018ed19765539f08da51a",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb35809439r",
+        "title": "Argentière, un village sous la neige : l'aventure du ski dans le haut de la vallée / texte de Jean Belleville ; préf. de Roger Frison-Roche",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_bb63450e6bf81028f970aa46",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb34530635q",
+        "title": "La Sainte Montagne (Saint-Genis-l'Argentière)",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1695700cbb90024e092a8e75",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb32837488p",
+        "title": "Distribution solennelle des prix (Petit séminaire de l'Argentière)",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a97a714f1d5d527a1da6e143",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb436523426",
+        "title": "Gilbert Planche et L'Argentière-La Bessée : 100 ans d'hydroélectricité, 1910-2010 / [Mairie de l'Argentière-la-Bessée]",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_318539fd856e1c8d4c0316e1",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb44388743b",
+        "title": "[Le glacier d'Argentière et l'Aiguille d'Argentière] / [photogr. Robert Perret ?]",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_386e408f3f57079a2ce5be7f",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb475034213",
+        "title": "Écrins mag : journal semestriel de la Communauté de communes du pays des Écrins / [directeur de la publication Cyrille Drujon d'Astros]",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_98da8bacd43a0ba83af79620",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb47415951x",
+        "title": "Les artisans des Sablonnières : l'histoire de la construction de l'usine de l'Argentière-La Bessée, 1906-1911 / Gérard Guimbert",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b369caf237db09bc7104f7b6",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb423787326",
+        "title": "Saint Majan / Michel Quatrefages",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5e27f137071287965499718d",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb459410463",
+        "title": "Le Glandon : chalet, aiguilles d'Argentière",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_affbb488f6aa1c97ea4d17c3",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb45941047f",
+        "title": "Le Glandon : chalet, aiguilles d'Argentière",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2f22ca77591bd64d89879e16",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb42272185h",
+        "title": "Des nouvelles de la montagne : les nouvelles lauréates, 2006 à 2009 : concours / [organisé par la] commune de l'Argentière-la-Bessée, service culturel municipal, Bibliothèque municipale Château Saint-Jean",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2099eb211075fa300a547064",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb327719408",
+        "title": "Exercice littéraire du Petit Séminaire de l'Argentière...",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_db4935ff2c0f2056ad82f265",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb42551312q",
+        "title": "Mines : Fournel : d'eau & d'argent / [photographies d'] Arthur Akopy ; [textes de] Bruno Ancel, Ian Cowburn, Frédérique Verlinden",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f1e6dcb599cd6cb404bc48b3",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb44312413p",
+        "title": "L'Argentière-la-Bessée : l'industrie au XXe siècle / Dominique Pogneaux",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_117c69859c074a2992836746",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb40205501r",
+        "title": "Les Cahiers du château Saint-Jean / Ville de L'Argentière La Bessée, Service culturel municipal",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c8848fdb1ceef0aa939501eb",
+        "run_id": "40857073690",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb344015994",
+        "title": "Le Canton (L'Argentière-la-Bessée)",
+        "query": "\"Argentière\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      }
+    ],
+    "connector_errors": [
+      {
+        "connector_id": "repo:Internet Culturale",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Argenti%C3%A8re%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 186}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      }
+    ],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 126,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
