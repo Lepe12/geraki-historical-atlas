@@ -1,4 +1,6 @@
 name: Real acquired-source semantic reanalysis
+# The run_id in the title lets tools/auto_chain.py see queued rounds of one corpus.
+run-name: Semantic reanalysis ${{ inputs.run_id }}
 on:
   workflow_call:
     inputs:
@@ -35,6 +37,10 @@ on:
 permissions:
   contents: write
   actions: write
+# One round per corpus at a time; a self-chained next round waits here.
+concurrency:
+  group: research-reanalysis-round-${{ inputs.run_id || 'default' }}
+  cancel-in-progress: false
 jobs:
   plan:
     # semantic_shards: input, else the corpus marker research_continuation/semantic_shards.json
@@ -191,11 +197,28 @@ jobs:
           git fetch origin main
           git restore --source=origin/main -- "evidence/runs/$PARENT_RESEARCH_RUN"
           python3 tools/research_continuation_handoff.py handoff --baseline "$BASELINE"
-      - name: Continue this research without waiting for another
-        if: always() && steps.checkpoint.outputs.restart == 'true' && env.PCT_AUTO_CONTINUE == 'true'
+      - name: Decide the next round of this research (opted-in corpora only)
+        id: chain
+        if: always() && steps.baseline.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run research-semantic-reanalysis.yml --repo "$GITHUB_REPOSITORY" --ref main -f "run_id=$PARENT_RESEARCH_RUN"
+          RESTART: ${{ steps.checkpoint.outputs.restart == 'true' && 'true' || 'false' }}
+        run: |
+          git fetch origin main
+          git restore --source=origin/main -- "evidence/runs/$PARENT_RESEARCH_RUN"
+          PYTHONPATH=tools python3 tools/auto_chain.py chain --run-id "$PARENT_RESEARCH_RUN" --restart "$RESTART" --auto-continue "$PCT_AUTO_CONTINUE" --shards "1"
+          ledger="evidence/runs/$PARENT_RESEARCH_RUN/research_continuation/rounds.json"
+          if [ -e "$ledger" ]; then git add "$ledger"; fi
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Record automatic continuation decision'
+          python3 tools/publish_research_outputs.py || echo 'AUTO_CHAIN_DECISION_LOG_NOT_PUBLISHED'
+      - name: Continue this research with its next round
+        if: always() && steps.chain.outputs.dispatch == 'true' && env.PCT_AUTO_CONTINUE == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: PYTHONPATH=tools python3 tools/auto_chain.py dispatch --run-id "$PARENT_RESEARCH_RUN" --shards "${{ steps.chain.outputs.shards }}"
 
   # ---- Opt-in parallel reading (semantic_shards 2-4); never runs for 1. ----
   shard-prepare:
@@ -385,8 +408,25 @@ jobs:
           git fetch origin main
           git restore --source=origin/main -- "evidence/runs/$PARENT_RESEARCH_RUN"
           python3 tools/research_continuation_handoff.py handoff --baseline "$BASELINE"
-      - name: Continue this research in parallel without waiting for another
-        if: always() && steps.checkpoint.outputs.restart == 'true' && env.PCT_AUTO_CONTINUE == 'true'
+      - name: Decide the next round of this research (opted-in corpora only)
+        id: chain
+        if: always() && needs.shard-prepare.outputs.baseline != ''
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run research-semantic-reanalysis.yml --repo "$GITHUB_REPOSITORY" --ref main -f "run_id=$PARENT_RESEARCH_RUN" -f "semantic_shards=$PCT_SEMANTIC_SHARDS"
+          RESTART: ${{ steps.checkpoint.outputs.restart == 'true' && 'true' || 'false' }}
+        run: |
+          git fetch origin main
+          git restore --source=origin/main -- "evidence/runs/$PARENT_RESEARCH_RUN"
+          PYTHONPATH=tools python3 tools/auto_chain.py chain --run-id "$PARENT_RESEARCH_RUN" --restart "$RESTART" --auto-continue "$PCT_AUTO_CONTINUE" --shards "$PCT_SEMANTIC_SHARDS"
+          ledger="evidence/runs/$PARENT_RESEARCH_RUN/research_continuation/rounds.json"
+          if [ -e "$ledger" ]; then git add "$ledger"; fi
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Record automatic continuation decision'
+          python3 tools/publish_research_outputs.py || echo 'AUTO_CHAIN_DECISION_LOG_NOT_PUBLISHED'
+      - name: Continue this research with its next round
+        if: always() && steps.chain.outputs.dispatch == 'true' && env.PCT_AUTO_CONTINUE == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: PYTHONPATH=tools python3 tools/auto_chain.py dispatch --run-id "$PARENT_RESEARCH_RUN" --shards "${{ steps.chain.outputs.shards }}"

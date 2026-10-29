@@ -198,7 +198,8 @@ class HandoffTests(unittest.TestCase):
         self.assertEqual(text.count('      auto_continue:\n        type: boolean\n        default: true\n'), 2)
         self.assertIn("PCT_AUTO_CONTINUE: ${{ inputs.auto_continue == false && 'false' || 'true' }}", text)
         steps = text.split('\n      - ')
-        dispatching = [step for step in steps if 'gh workflow run' in step]
+        # Dispatches go through the guarded tools/auto_chain.py (opt-in marker, caps).
+        dispatching = [step for step in steps if 'auto_chain.py dispatch' in step]
         self.assertTrue(dispatching)
         for step in dispatching:
             condition = next(line for line in step.splitlines() if line.strip().startswith('if:'))
