@@ -1090,14 +1090,18 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         and previous[0].get('model_configuration')==routing_summary()
         and previous[0].get('coverage',{}).get('claims_awaiting_review')
         and any(queue.completed(group) for group in all_groups))
-    if review_backlog:batch_limit=0
     # Opt-in parallel reading (research-semantic-reanalysis.yml semantic_shards):
     # a shard extracts only its round-robin slice of unread batches; the merge
     # pass reads nothing new and replays every shard's saved extraction.
     shard=semantic_shard();shard_merge=os.getenv('PCT_SEMANTIC_MERGE')=='1'
+    # A shard's job is reading unread excerpts; the claim-review backlog is
+    # handled by the merge pass. Decide this before zeroing the batch limit,
+    # otherwise every continuation round after the first one read 0 new
+    # excerpts (Kimolos 40857073690 rounds 2-5: stuck at 115/259).
+    if shard:review_backlog=False
+    if review_backlog:batch_limit=0
     candidate_groups=all_groups;shard_report=None
     if shard:
-        review_backlog=False
         candidate_groups,other_shards=shard_groups(all_groups,queue.completed,*shard)
         deferred.extend(other_shards)
     if shard_merge:batch_limit=0

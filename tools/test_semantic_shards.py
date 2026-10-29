@@ -172,6 +172,47 @@ class ShardMerge(unittest.TestCase):
             self.assertEqual(merged['answer_scope'], 'PROVISIONAL_EXAMINED_PASSAGES_ONLY')
 
 
+class ContinuationRoundReadsUnread(unittest.TestCase):
+    """Kimolos 40857073690: rounds 2-5 read 0 new excerpts (stuck at 115/259)."""
+
+    def test_round_2_shard_selects_only_unexamined_excerpts_despite_review_backlog(self):
+        from semantic_research_answer import routing_summary
+        with tempfile.TemporaryDirectory() as root:
+            fixture(root)
+            env = {**BASE_ENV, 'PCT_SEMANTIC_BATCHES': '2', 'PCT_SEMANTIC_SHARD': '0/1'}
+            first = Caller()
+            with patch.dict(os.environ, env):
+                execute(root, 'Synthetic question', caller=first, config=CONFIG,
+                        output_root=Path(root) / 'round_1', provenance_root=root)
+            self.assertEqual(len(first.extracted), 2)
+            # The previous round left claims awaiting review: before the fix this
+            # zeroed the batch limit, so every shard selected 0 batches.
+            previous = ({'question': 'Synthetic question', 'model_configuration': routing_summary(),
+                         'coverage': {'claims_awaiting_review': ['c-pending']}}, {})
+            second = Caller()
+            with patch.dict(os.environ, env), patch('research_continuation.latest_analysis', return_value=previous):
+                out = execute(root, 'Synthetic question', caller=second, config=CONFIG,
+                              output_root=Path(root) / 'round_2', provenance_root=root)
+            self.assertEqual(out['semantic_shard']['selected_batches'], 2)  # unread only
+            self.assertEqual(len(second.extracted), 2)
+            self.assertFalse(set(second.extracted) & set(first.extracted))
+            # The merge pass of round 2 now counts 4 of 5 excerpts examined.
+            with patch.dict(os.environ, {**BASE_ENV, 'PCT_SEMANTIC_MERGE': '1'}):
+                merged = execute(root, 'Synthetic question', caller=Caller(forbid=('evidence_extractor',)),
+                                 config=CONFIG, output_root=Path(root) / 'merge_2', provenance_root=root)
+            self.assertEqual(merged['research_funnel']['examined']['excerpts'], 4)
+            self.assertEqual(merged['research_funnel']['examined']['remaining'], 1)
+
+    def test_chain_stops_when_a_round_reads_no_new_excerpt(self):
+        from continuation_rounds import stop_rule
+        cap = {'max_rounds': 5, 'no_gain_rounds': 2}
+        rounds = [{'round': 0, 'remaining': 246, 'new_examined': 13, 'new_supported_claims': 0},
+                  {'round': 1, 'remaining': 144, 'new_examined': 102, 'new_supported_claims': 8}]
+        self.assertIsNone(stop_rule({'rounds': rounds}, cap))
+        rounds.append({'round': 2, 'remaining': 144, 'new_examined': 0, 'new_supported_claims': 2})
+        self.assertEqual(stop_rule({'rounds': rounds}, cap), 'NO_NEW_EXCERPTS_READ')
+
+
 class ReanalysisModes(unittest.TestCase):
     def test_merge_summary_counts_and_missing_shards(self):
         from reanalyse_acquired_research import merge_summary

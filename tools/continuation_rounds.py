@@ -4,6 +4,8 @@ Ledger: evidence/runs/<run>/research_continuation/rounds.json
   round 0 = the research run's own semantic pass, round N = N-th reanalysis.
 Stop reasons (clean stops, not failures):
   ALL_EXCERPTS_READ          nothing left in the queue
+  NO_NEW_EXCERPTS_READ       the last continuation round read 0 unread excerpts
+                             while some remain (another round would repeat it)
   MAX_CONTINUATION_ROUNDS    PCT_CONTINUATION_MAX_ROUNDS reanalysis rounds done (default 5)
   NO_NEW_SUPPORTED_CLAIMS    PCT_CONTINUATION_NO_GAIN_ROUNDS consecutive rounds (default 2)
                              examined new excerpts without a new quotation-supported claim
@@ -16,7 +18,7 @@ from research_continuation import atomic
 
 SCHEMA = 'research-continuation-rounds-v1'
 SUPPORTED = ('QUOTATION_SUPPORTED_HISTORY_PENDING', 'SOURCE_ATTRIBUTED_HYPOTHESIS')
-CLEAN_STOPS = ('ALL_EXCERPTS_READ', 'MAX_CONTINUATION_ROUNDS', 'NO_NEW_SUPPORTED_CLAIMS')
+CLEAN_STOPS = ('ALL_EXCERPTS_READ', 'NO_NEW_EXCERPTS_READ', 'MAX_CONTINUATION_ROUNDS', 'NO_NEW_SUPPORTED_CLAIMS')
 
 
 def caps(env=None):
@@ -62,6 +64,8 @@ def stop_rule(ledger, cap):
     last = rounds[-1]
     if last['remaining'] <= 0 or last.get('queue_status') == 'COMPLETE':
         return 'ALL_EXCERPTS_READ'
+    if last['round'] >= 1 and last.get('new_examined', 1) <= 0:
+        return 'NO_NEW_EXCERPTS_READ'
     continuation = [r for r in rounds if r['round'] >= 1]
     if last['round'] >= cap['max_rounds']:
         return 'MAX_CONTINUATION_ROUNDS'
