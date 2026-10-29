@@ -106,8 +106,17 @@ def knowledge_aliases(path=KNOWLEDGE):
             continue
         m = re.match(r'^\s*-\s*(.+?)\s*=\s*(.+?)\s*$', line) if inside else None
         if m:
-            pairs.append((m.group(1), m.group(2)))
+            # 'A / B = C (note) · πηγή: … · …': the names only, every left form.
+            right = _alias_name(m.group(2).split(' · ')[0])
+            for left in m.group(1).split(' / '):
+                left = _alias_name(left)
+                if left and right:
+                    pairs.append((left, right))
     return pairs
+
+
+def _alias_name(text):
+    return re.sub(r'\s*\([^)]*\)', '', text).strip()
 
 
 def _usable_variant(name):

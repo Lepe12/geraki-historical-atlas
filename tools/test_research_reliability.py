@@ -50,7 +50,8 @@ class Reliability(unittest.TestCase):
         rows=[{'repository':'Offline catalogue','identifier':str(i),'title':'History of Milos island'} for i in range(5)]
         rows.append({'repository':'Offline catalogue','identifier':'noise','title':'Melos Zeitschrift für Musik'})
         self.write('citation_chase_candidates/repository_candidates.json',{'selected':rows})
-        self.env.update(PCT_MAX_ACQUISITION_CANDIDATES='2',PCT_ACQUISITION_BATCHES='1')
+        # Offline catalogue fixture: no built-in CADN priority targets (they are tested in test_search_priority).
+        self.env.update(PCT_MAX_ACQUISITION_CANDIDATES='2',PCT_ACQUISITION_BATCHES='1',PCT_PRIORITY_TARGETS='0')
         self.run_tool('acquire_library_candidate.py');r=self.read('library_acquisition/acquisition_report.json')
         self.assertEqual((len(r['results']),r['deferred_count'],r['held_count']),(2,3,1))
         self.run_tool('acquire_library_candidate.py');self.run_tool('acquire_library_candidate.py')

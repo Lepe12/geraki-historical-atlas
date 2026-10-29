@@ -13,10 +13,13 @@ from pathlib import Path
 
 from research_topics import BASES, PIRACY
 
-POLICY = 'lexical-bm25-alias-date-quality-v1'
+POLICY = 'lexical-bm25-alias-date-quality-v2'
 NEAR_DUPLICATE_CONTAINMENT = 0.7
 SHINGLE = 3
 SCORE_LOG_LIMIT = 500
+PIRACY_BOOST = 2.0
+BASES_BOOST = 0.75
+HOMONYM_PENALTY = -6.0
 PREFIX = 6  # 'argentier' matches Argentiera/Argentiere/Argentière
 STOP = set('''the and of to in a is that for on with as by at from this was were be are or an it which
 his her their its not but have has had into than then there these those also such been about what who
@@ -24,7 +27,17 @@ when where how why did does question research scope και του της την 
 ως ποιο ποια ποιος ποιες ποιοι πότε πώς ήταν είναι λέγεται τους τις τα το οι η ο ένα μια παλιούς
 der die das und von zu mit den des dem ein eine im ist auf le la les de du des et en un une est dans
 il lo gli della delle di da che per con una
-νησοσ νησι νησια island isle insel isola ile isla eiland ada'''.split())
+νησοσ νησι νησια island isle insel isola ile isla eiland ada
+είχε είχαν έχει έχουν ρόλο ρόλος ρόλοι στους στις στον στα στο σε κατά μετά πριν ποιον ποιους ποιων
+τι γιατί πού ποτέ αν ότι όπως όταν μέσα έξω πάνω ήταν υπήρχε υπήρχαν λένε λέει δείχνει δείχνουν
+ταξίδι ταξίδια ταξίδεψε πηγές πηγή στοιχεία μαρτυρίες αναφορές αναφέρει αναφέρουν παλιές παλιοί
+role played during period century αιώνα αιώνας role rôle ruolo papel'''.split())
+# Words of a piracy question that are real topic terms (stems, folded).
+PIRACY_TOPIC_TERMS = ('pirat', 'corsai', 'corsar', 'korsan', 'forban', 'πειρατ', 'κουρσα', 'levend',
+                      'zeerov', 'seerau', 'kaper', 'malta', 'maltes', 'esclav', 'captiv', 'rançon', 'ranson',
+                      'riscat', 'λυτρα', 'αιχμαλ', 'σκλαβ')
+BASES_TOPIC_TERMS = ('ορμητη', 'αγκυρο', 'λιμανι', 'harbou', 'anchor', 'refuge', 'repair', 'mouill',
+                     'porto', 'rifugi', 'haven')
 _GAZETTEER = Path(__file__).resolve().parents[1] / 'data/gazetteer/mediterranean_gazetteer.v1.json'
 
 
@@ -103,10 +116,17 @@ def rank(records, target='', aliases=(), date_range='', purpose='', gazetteer=_G
     """Return (ordered records, report). Deterministic for identical input."""
     names = expand_names([target, *aliases], gazetteer)
     name_terms = sorted({_stem(t) for n in names for t in tokens(n) if t not in _stop() and len(t) >= 3})
-    purpose_terms = sorted({_stem(t) for t in tokens(purpose) if t not in _stop() and len(t) >= 4} - set(name_terms))
     piracy_purpose = bool(re.search(PIRACY + '|' + BASES, fold(purpose)))
-    window = _years(date_range)
-    window = (min(window), max(window)) if window else None
+    purpose_terms = {_stem(t) for t in tokens(purpose) if t not in _stop() and len(t) >= 4}
+    if piracy_purpose:
+        # A piracy question is ranked on piracy vocabulary in every source
+        # language, not on the words of the Greek question ('ρόλο', 'στους').
+        purpose_terms = {t for t in purpose_terms if re.search(PIRACY + '|' + BASES, t)}
+        purpose_terms |= {_stem(fold(t)) for t in PIRACY_TOPIC_TERMS + BASES_TOPIC_TERMS}
+    purpose_terms = sorted(purpose_terms - set(name_terms))
+    from search_priority import homonym_check, infer_window
+    start, end, window_basis = infer_window(date_range, purpose)
+    window = (start, end) if start is not None else None
     docs = [[_stem(t) for t in tokens(r.get('text'))] for r in records]
     n = len(docs) or 1
     avg = sum(map(len, docs)) / n or 1.0
@@ -137,9 +157,10 @@ def rank(records, target='', aliases=(), date_range='', purpose='', gazetteer=_G
         folded_text = fold(row.get('text'))
         theme = 0.0
         if piracy_purpose and re.search(PIRACY, folded_text):
-            theme += 1.0
+            theme += PIRACY_BOOST
         if piracy_purpose and re.search(BASES, folded_text):
-            theme += 0.5
+            theme += BASES_BOOST
+        homonym = homonym_check(row.get('text') or '', names)
         date = 0.0
         if window:
             in_scope = row.get('years_in_scope') or [y for y in _years(row.get('text') or '') if window[0] <= y <= window[1]]
@@ -149,6 +170,10 @@ def rank(records, target='', aliases=(), date_range='', purpose='', gazetteer=_G
             elif mentioned:
                 date = -0.5
         quality, reasons = _quality(row)
+        if homonym:
+            # Read last among its peers, never dropped: same name, other place.
+            quality += HOMONYM_PENALTY
+            reasons = reasons + ['OTHER_PLACE_HOMONYM:' + homonym['id']]
         title_match = 1.0 if title_terms & set(name_terms) else 0.0
         score = round(3.0 * name + 1.0 * topic + theme + date + quality + title_match, 6)
         scored.append({'row': row, 'index': index, 'score': score,
@@ -191,6 +216,8 @@ def rank(records, target='', aliases=(), date_range='', purpose='', gazetteer=_G
     report = {'policy': POLICY, 'role': 'READING_ORDER_ONLY_NOT_TRUTH_OR_SOURCE_INDEPENDENCE',
               'name_terms': name_terms, 'purpose_terms': purpose_terms,
               'expanded_names': names, 'date_window': list(window) if window else None,
+              'date_window_basis': window_basis, 'piracy_boost': PIRACY_BOOST if piracy_purpose else 0.0,
+              'homonym_penalised': sum(1 for s in scored if any(r.startswith('OTHER_PLACE_HOMONYM') for r in s['reasons'])),
               'ranked': len(ordered), 'distinct': len(leaders), 'near_duplicates_read_last': len(duplicates),
               'near_duplicate_containment': NEAR_DUPLICATE_CONTAINMENT, 'shingle_words': SHINGLE, 'dropped': 0,
               'near_duplicate_ids': [s['row']['evidence_id'] for s in duplicates],

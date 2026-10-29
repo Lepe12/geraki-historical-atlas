@@ -49,6 +49,12 @@ def prepare(require_semantic=False,case_id='',case_file='config/research-baselin
         record('execution_receipts','prepare','case_binding','SUCCEEDED',case_id=case_id,
                case_file_sha256=hashlib.sha256(Path(case_file).read_bytes()).hexdigest(),
                independent_evaluation_ready=case.get('independent_evaluation_ready',False))
+    # Search aid after the case-binding check: the request's own aliases (and so
+    # its identity hash) are unchanged; old names are added in a separate field.
+    from search_priority import search_name_variants
+    variants=search_name_variants(target,ctx['aliases'])
+    normalized['search_name_variants']=[v['name'] for v in variants]
+    normalized['search_name_variant_basis']=variants
     Path('resolved_research_request.json').write_text(json.dumps(normalized,ensure_ascii=False,indent=2)+'\n')
     os.environ['PCT_TARGET']='';os.environ['PCT_REQUEST_FILE']='resolved_research_request.json'
     identity=write_identity()
