@@ -194,6 +194,7 @@ def rank(records, target='', aliases=(), date_range='', purpose='', gazetteer=_G
               'ranked': len(ordered), 'distinct': len(leaders), 'near_duplicates_read_last': len(duplicates),
               'near_duplicate_containment': NEAR_DUPLICATE_CONTAINMENT, 'shingle_words': SHINGLE, 'dropped': 0,
               'near_duplicate_ids': [s['row']['evidence_id'] for s in duplicates],
+              'near_duplicate_of': {s['row']['evidence_id']: s['duplicate_of'] for s in duplicates},
               'scores_logged': min(len(ordered), SCORE_LOG_LIMIT),
               'scores': [{'evidence_id': s['row']['evidence_id'], 'rank': i, 'score': s['score'],
                           **s['parts'], 'quality_reasons': s['reasons'],

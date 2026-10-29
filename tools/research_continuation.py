@@ -86,7 +86,7 @@ class Continuation:
         value=json.loads(path.read_text())
         atomic(path,{**value,'status':'PENDING','phase':phase})
 
-    def inventory(self,records,selected,deferred):
+    def inventory(self,records,selected,deferred,filtered=()):
         pending={r['evidence_id']:r['reason'] for r in deferred}
         completed={r['evidence_id'] for group in selected if self.completed(group) for r in group}
         atomic(self.root/'queue.json',{'schema':'research-continuation-v1',
@@ -95,7 +95,12 @@ class Continuation:
             'items':[{'evidence_id':r['evidence_id'],'source_sha256':digest(r),
                 'status':'EXAMINED' if r['evidence_id'] in completed else 'PENDING',
                 'reason':pending.get(r['evidence_id'],'AWAITING_EXTRACTION') if r['evidence_id'] not in completed else None}
-                for r in records]})
+                for r in records]+[
+                # Pre-filtered excerpts (excerpt_prefilter.py): listed, not
+                # counted in total, never deleted; re-includable by env.
+                {'evidence_id':f['evidence_id'],'status':'FILTERED','reason':f['status'],'detail':f.get('detail')}
+                for f in filtered],
+            'filtered':len(filtered)})
         atomic(self.root.parent/'active.json',{'queue':self.root.name+'/queue.json'})
 
 

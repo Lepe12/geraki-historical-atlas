@@ -92,6 +92,10 @@ def record(root, answer, round_number, analysis_path=None, env=None):
            'supported_claim_ids': supported,
            'answer_paragraphs': len(answer.get('answer_sections') or []),
            'queue_status': counts['status'] if counts else None,
+           'prefilter': {k: (funnel.get('prefilter') or {}).get(k) for k in
+                         ('filtered_out', 'filtered_by_reason', 'kept_excerpts', 'model_units',
+                          'sentence_windows', 'sent_this_pass')} if (funnel.get('prefilter') or {}).get('applied') else None,
+           'collected': (funnel.get('collected') or {}).get('unique_excerpts'),
            'model_calls': len(answer.get('calls') or [])}
     rounds.append(row)
     rounds.sort(key=lambda r: r['round'])
