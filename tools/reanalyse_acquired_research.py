@@ -13,13 +13,37 @@ from research_validation_report import build as validate
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--run-id',required=True)
-    parser.add_argument('--resume-reviewed-claims',action='store_true');args=parser.parse_args()
+    parser.add_argument('--resume-reviewed-claims',action='store_true')
+    # Opt-in parallel reading (semantic_shards > 1); default = one job, unchanged.
+    mode=parser.add_mutually_exclusive_group()
+    mode.add_argument('--prepare-only',action='store_true',help='derive the shared inputs once for every shard')
+    mode.add_argument('--shard',help='I/N: read only this round-robin slice of unread batches (0-based)')
+    mode.add_argument('--merge-shards',type=int,help='N: replay all shard extractions and write the one answer')
+    args=parser.parse_args()
     job=os.environ['GITHUB_RUN_ID']
     if not re.fullmatch(r'\d+',args.run_id) or not re.fullmatch(r'\d+',job):
         raise ValueError('NUMERIC_RUN_IDS_REQUIRED')
     parent=Path('evidence/runs')/args.run_id
     dest=parent/('semantic_reanalysis_'+job)
+    if args.shard or args.merge_shards:
+        if args.resume_reviewed_claims:raise ValueError('SHARDS_DO_NOT_SUPPORT_RESUME')
+        if not (dest/'derived_sources').is_dir():raise ValueError('SHARD_INPUTS_NOT_PREPARED')
+        if args.shard:return run_shard(args,job,parent,dest)
+        try:
+            run(args,job,parent,dest)
+        finally:
+            if (dest/'derived_sources').is_dir():
+                from derived_source_store import compact
+                print(json.dumps({'derived_source_store':compact(parent,dest)}))
+        return
     dest.mkdir(exist_ok=False)
+    if args.prepare_only:
+        if args.resume_reviewed_claims:raise ValueError('SHARDS_DO_NOT_SUPPORT_RESUME')
+        request=read(sorted(parent.glob('*/run_manifest/manifest.json'))[0])['normalized_request']
+        from prepare_acquired_analysis import prepare
+        prepare(parent,dest/'derived_sources',request)
+        print(json.dumps({'shard_inputs_prepared':str(dest)}))
+        return
     try:
         run(args,job,parent,dest)
     finally:
@@ -28,6 +52,54 @@ def main():
         if (dest/'derived_sources').is_dir():
             from derived_source_store import compact
             print(json.dumps({'derived_source_store':compact(parent,dest)}))
+
+
+def question_of(request):
+    question=request['target']+(' ('+request['date_range']+')' if request.get('date_range') else '')
+    if request.get('purpose'):question+='\nResearch scope: '+request['purpose']
+    return question
+
+
+def shard_summary(answer,index,count):
+    funnel=answer.get('research_funnel') or {}
+    report=answer.get('semantic_shard') or {}
+    return {'index':index,'count':count,'status':answer.get('status'),
+            'assigned_batches':report.get('assigned_batches',0),'selected_batches':report.get('selected_batches',0),
+            'selected_excerpts':report.get('selected_excerpts',0),
+            'examined_excerpts':(funnel.get('examined') or {}).get('excerpts',0),
+            'extracted_claims':len(answer.get('claims') or []),
+            'model_calls':len(answer.get('calls') or []),
+            'new_model_calls':sum(not c.get('replayed') for c in answer.get('calls') or []),
+            'claim_reviews':len(answer.get('claim_reviews') or [])}
+
+
+def run_shard(args,job,parent,dest):
+    match=re.fullmatch(r'(\d+)/(\d+)',args.shard or '')
+    if not match:raise ValueError('INVALID_SHARD')
+    index,count=int(match.group(1)),int(match.group(2))
+    request=read(sorted(parent.glob('*/run_manifest/manifest.json'))[0])['normalized_request']
+    os.environ['PCT_SEMANTIC_SHARD']='%d/%d'%(index,count)
+    out=dest/'shards'/('shard_%d'%index)
+    out.mkdir(parents=True,exist_ok=True)
+    # Same derived inputs and queue as the merge pass; extraction batches and
+    # model responses are saved in research_continuation/ for the merge replay.
+    answer=execute(dest/'derived_sources',question_of(request),output_root=out,provenance_root=parent)
+    summary=shard_summary(answer,index,count)
+    (out/'shard_summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n')
+    print(json.dumps(summary,ensure_ascii=False))
+
+
+def merge_summary(dest,count):
+    shards=[]
+    for index in range(count):
+        path=dest/'shards'/('shard_%d'%index)/'shard_summary.json'
+        try:shards.append(json.loads(path.read_text()))
+        except (OSError,ValueError):shards.append({'index':index,'count':count,'status':'SHARD_OUTPUT_MISSING'})
+    keys=('selected_batches','selected_excerpts','examined_excerpts','extracted_claims','model_calls','new_model_calls','claim_reviews')
+    return {'policy':'round-robin-by-rank-v1','count':count,'shards':shards,
+            'total':{k:sum(s.get(k,0) for s in shards) for k in keys},
+            'missing_shards':[s['index'] for s in shards if s.get('status')=='SHARD_OUTPUT_MISSING'],
+            'role':'PARALLEL_READING_METRICS_NOT_HISTORICAL_VERIFICATION'}
 
 
 def run(args,job,parent,dest):
@@ -42,11 +114,17 @@ def run(args,job,parent,dest):
     (dest/'execution_receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
     from prepare_acquired_analysis import prepare
     prepared=parent if args.resume_reviewed_claims else dest/'derived_sources'
-    if not args.resume_reviewed_claims:prepare(parent,prepared,request)
+    merge=bool(getattr(args,'merge_shards',None))
+    if merge:
+        receipt['execution_type']='SHARDED_REAL_MODEL_REANALYSIS_MERGE_NOT_NEW_DISCOVERY'
+        receipt['semantic_shards']=args.merge_shards
+        os.environ['PCT_SEMANTIC_MERGE']='1';os.environ.pop('PCT_SEMANTIC_SHARD',None)
+    elif not args.resume_reviewed_claims:prepare(parent,prepared,request)
     if request.get('purpose'):question+='\nResearch scope: '+request['purpose']
     answer=execute(prepared,question,output_root=dest,provenance_root=parent,
                    resume_reviewed_from=parent/'research_answer/answer.json' if args.resume_reviewed_claims else None)
     answer['execution_receipt']=receipt
+    if merge:answer['semantic_shards']=merge_summary(dest,args.merge_shards)
     # Per-round coverage metrics and the clean stop decision travel with the
     # published answer; the handoff guard reads the same ledger.
     from continuation_rounds import record, round_number

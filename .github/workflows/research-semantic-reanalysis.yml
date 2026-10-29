@@ -11,6 +11,9 @@ on:
       auto_continue:
         type: boolean
         default: true
+      semantic_shards:
+        type: string
+        default: ''
   workflow_dispatch:
     inputs:
       run_id:
@@ -25,11 +28,60 @@ on:
         type: boolean
         default: true
         description: false = run exactly one pass; no follow-up dispatch and the hourly coordinator holds this corpus
+      semantic_shards:
+        type: string
+        default: ''
+        description: 'Opt-in parallel reading on 1-4 free runners (blank = saved choice of this corpus, else 1 = one job as before)'
 permissions:
   contents: write
   actions: write
 jobs:
+  plan:
+    # semantic_shards: input, else the corpus marker research_continuation/semantic_shards.json
+    # (written by pct-parallel-multi-agent.yml or a sharded pass), else 1.
+    # 1 runs the unchanged single analyse job below. Capped at 4 free runners.
+    runs-on: ubuntu-latest
+    name: Plan reading ${{ inputs.run_id }}
+    timeout-minutes: 5
+    outputs:
+      shards: ${{ steps.plan.outputs.shards }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_SHARDS: ${{ inputs.semantic_shards }}
+          PARENT: ${{ inputs.run_id }}
+          RESUME: ${{ inputs.resume_reviewed_claims && '1' || '0' }}
+        run: |
+          python3 - <<'PY'
+          import base64, json, os, re, subprocess
+          requested = (os.environ.get('REQUESTED_SHARDS') or '').strip()
+          parent = os.environ.get('PARENT') or ''
+          source = 'input' if requested else 'default'
+          if not requested and re.fullmatch(r'\d+', parent):
+              try:
+                  raw = subprocess.run(['gh', 'api', 'repos/' + os.environ['GITHUB_REPOSITORY'] + '/contents/evidence/runs/'
+                                        + parent + '/research_continuation/semantic_shards.json?ref=main', '--jq', '.content'],
+                                       capture_output=True, text=True, timeout=60)
+                  if raw.returncode == 0:
+                      requested = str(json.loads(base64.b64decode(raw.stdout)).get('semantic_shards', '')); source = 'marker'
+              except Exception:
+                  requested = ''
+          try:
+              shards = max(1,min(4, int(requested or 1)))
+          except ValueError:
+              shards = 1
+          if os.environ.get('RESUME') == '1' or not re.fullmatch(r'\d+', parent):
+              shards = 1
+          print('SEMANTIC_SHARDS', shards, 'source', source)
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write('shards=%d\nmatrix=%s\n' % (shards, json.dumps(list(range(shards)))))
+          PY
+
   analyse:
+    needs: plan
+    if: ${{ !cancelled() && (needs.plan.outputs.shards || '1') == '1' }}
     runs-on: ubuntu-latest
     name: Reanalyse actual sources ${{ matrix.parent_run }}
     timeout-minutes: 60
@@ -145,3 +197,196 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run research-semantic-reanalysis.yml --repo "$GITHUB_REPOSITORY" --ref main -f "run_id=$PARENT_RESEARCH_RUN"
 
+  # ---- Opt-in parallel reading (semantic_shards 2-4); never runs for 1. ----
+  shard-prepare:
+    needs: plan
+    if: ${{ (needs.plan.outputs.shards || '1') != '1' }}
+    runs-on: ubuntu-latest
+    name: Prepare shards - Reanalyse actual sources ${{ inputs.run_id }}
+    timeout-minutes: 40
+    concurrency:
+      group: research-parent-${{ inputs.run_id }}
+      cancel-in-progress: false
+    outputs:
+      sha: ${{ steps.inputs.outputs.sha }}
+      baseline: ${{ steps.baseline.outputs.baseline }}
+    env:
+      PARENT_RESEARCH_RUN: ${{ inputs.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Capture only this research checkpoint before work
+        id: baseline
+        run: python3 tools/research_continuation_handoff.py baseline --run-id "$PARENT_RESEARCH_RUN"
+      - name: Install the existing public PDF reader
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+      - name: Continue retained bibliography in separate workspaces
+        timeout-minutes: 20
+        run: python3 tools/continue_citation_acquisition.py --run-id "$PARENT_RESEARCH_RUN"
+      - name: Derive the shared PDF reading inputs once for every shard
+        id: inputs
+        run: |
+          PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python3 tools/reanalyse_acquired_research.py --run-id "$PARENT_RESEARCH_RUN" --prepare-only
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          parent="evidence/runs/$PARENT_RESEARCH_RUN"
+          tar -czf "$RUNNER_TEMP/shard-input.tgz" $(ls -d "$parent/semantic_reanalysis_$GITHUB_RUN_ID" "$parent/research_continuation" "$parent"/citation_continuation_* 2>/dev/null)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shard-input-${{ github.run_id }}
+          path: ${{ runner.temp }}/shard-input.tgz
+          compression-level: 0
+          retention-days: 3
+
+  shard-read:
+    needs: [plan, shard-prepare]
+    runs-on: ubuntu-latest
+    name: Shard ${{ matrix.shard }}/${{ needs.plan.outputs.shards }} - Reanalyse actual sources ${{ inputs.run_id }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        shard: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    env:
+      PARENT_RESEARCH_RUN: ${{ inputs.run_id }}
+      PCT_LLM_PROVIDER: local_llama_cpp
+      PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen3-8B-GGUF
+      PCT_LLM_MODEL: Qwen/Qwen3-8B-GGUF
+      PCT_AUTO_CONTINUE: ${{ inputs.auto_continue == false && 'false' || 'true' }}
+      PCT_SEMANTIC_SHARDS: ${{ needs.plan.outputs.shards }}
+      # Same per-pass budget as the single job: each shard reads up to 6 new
+      # batches in 1800 s / 48 calls, so N shards read up to N x 6 per round.
+      PCT_SEMANTIC_BATCHES: '6'
+      PCT_PREFILTER: '1'
+      PCT_PREFILTER_WINDOW_SENTENCES: '2'
+      PCT_CONTINUATION_MAX_ROUNDS: '5'
+      PCT_CONTINUATION_NO_GAIN_ROUNDS: '2'
+      PCT_SEMANTIC_PARTIAL_ANSWER: '1'
+      PCT_SEMANTIC_CALLS_PER_PASS: '48'
+      PCT_SEMANTIC_BUDGET_SECONDS: '1800'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.shard-prepare.outputs.sha }}
+          fetch-depth: 1
+      - uses: ./.github/actions/research-model
+      - uses: actions/download-artifact@v4
+        with:
+          name: shard-input-${{ github.run_id }}
+          path: ${{ runner.temp }}/in
+      - name: Unpack the shared inputs
+        run: tar -xzf "$RUNNER_TEMP/in/shard-input.tgz"
+      - name: Read this shard's round-robin slice of unread excerpts
+        run: |
+          PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python3 tools/reanalyse_acquired_research.py --run-id "$PARENT_RESEARCH_RUN" --shard "${{ matrix.shard }}/$PCT_SEMANTIC_SHARDS"
+      - name: Pack saved extractions, reviews and this shard's receipts
+        if: always()
+        run: |
+          parent="evidence/runs/$PARENT_RESEARCH_RUN"
+          tar -czf "$RUNNER_TEMP/shard-out.tgz" $(ls -d "$parent/research_continuation" "$parent/semantic_reanalysis_$GITHUB_RUN_ID/shards/shard_${{ matrix.shard }}" 2>/dev/null)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shard-out-${{ github.run_id }}-${{ matrix.shard }}
+          path: ${{ runner.temp }}/shard-out.tgz
+          compression-level: 0
+          retention-days: 3
+
+  shard-merge:
+    needs: [plan, shard-prepare, shard-read]
+    if: ${{ !cancelled() && (needs.plan.outputs.shards || '1') != '1' && needs.shard-prepare.result == 'success' }}
+    runs-on: ubuntu-latest
+    name: Merge shards - Reanalyse actual sources ${{ inputs.run_id }}
+    timeout-minutes: 60
+    concurrency:
+      group: research-parent-${{ inputs.run_id }}
+      cancel-in-progress: false
+    env:
+      PARENT_RESEARCH_RUN: ${{ inputs.run_id }}
+      PCT_LLM_PROVIDER: local_llama_cpp
+      PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen3-8B-GGUF
+      PCT_LLM_MODEL: Qwen/Qwen3-8B-GGUF
+      PCT_AUTO_CONTINUE: ${{ inputs.auto_continue == false && 'false' || 'true' }}
+      PCT_SEMANTIC_SHARDS: ${{ needs.plan.outputs.shards }}
+      # Same per-pass budget as the single job: each shard reads up to 6 new
+      # batches in 1800 s / 48 calls, so N shards read up to N x 6 per round.
+      PCT_SEMANTIC_BATCHES: '6'
+      PCT_PREFILTER: '1'
+      PCT_PREFILTER_WINDOW_SENTENCES: '2'
+      PCT_CONTINUATION_MAX_ROUNDS: '5'
+      PCT_CONTINUATION_NO_GAIN_ROUNDS: '2'
+      PCT_SEMANTIC_PARTIAL_ANSWER: '1'
+      PCT_SEMANTIC_CALLS_PER_PASS: '48'
+      PCT_SEMANTIC_BUDGET_SECONDS: '1800'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: ./.github/actions/research-model
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: shard-*-${{ github.run_id }}*
+          path: ${{ runner.temp }}/shards
+      - name: Unpack shared inputs, then every shard's saved work
+        run: |
+          tar -xzf "$RUNNER_TEMP/shards/shard-input-$GITHUB_RUN_ID/shard-input.tgz"
+          for archive in $(ls "$RUNNER_TEMP"/shards/shard-out-"$GITHUB_RUN_ID"-*/shard-out.tgz 2>/dev/null | sort); do
+            tar -xzf "$archive"
+          done
+          # Keep the corpus choice so the hourly coordinator continues in parallel too.
+          printf '{"semantic_shards": %s, "set_by_run": "%s"}\n' "$PCT_SEMANTIC_SHARDS" "$GITHUB_RUN_ID" > "evidence/runs/$PARENT_RESEARCH_RUN/research_continuation/semantic_shards.json"
+      - name: Replay all shard extractions and write the one combined answer
+        run: |
+          PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python3 tools/reanalyse_acquired_research.py --run-id "$PARENT_RESEARCH_RUN" --merge-shards "$PCT_SEMANTIC_SHARDS"
+      - name: Publish the actual continuation status to the existing snapshot
+        if: always()
+        run: |
+          python3 tools/orchestrator/build_command_center_snapshot.py --run-id "$PARENT_RESEARCH_RUN" --output "command-center/live/runs/$PARENT_RESEARCH_RUN.json" --latest command-center/live/latest.json
+      - name: Store derived inputs once by SHA-256 (idempotent)
+        if: always()
+        run: python3 tools/derived_source_store.py compact --run-id "$PARENT_RESEARCH_RUN" --pass "semantic_reanalysis_$GITHUB_RUN_ID"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semantic-reanalysis-${{ inputs.run_id }}
+          path: |
+            evidence/runs/${{ env.PARENT_RESEARCH_RUN }}/semantic_reanalysis_${{ github.run_id }}/
+            evidence/runs/${{ env.PARENT_RESEARCH_RUN }}/research_continuation/
+            evidence/runs/${{ env.PARENT_RESEARCH_RUN }}/citation_continuation_*/
+      - name: Persist actual sharded outcome including failures
+        if: always()
+        run: |
+          set -e
+          dest="evidence/runs/$PARENT_RESEARCH_RUN/semantic_reanalysis_$GITHUB_RUN_ID"
+          if [ ! -d "evidence/runs/$PARENT_RESEARCH_RUN" ]; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          hold="evidence/runs/$PARENT_RESEARCH_RUN/research_continuation/auto_continue.json"
+          if [ "$PCT_AUTO_CONTINUE" = false ] || [ -e "$hold" ]; then
+            mkdir -p "$(dirname "$hold")"
+            printf '{"auto_continue": %s, "set_by_run": "%s"}\n' "$PCT_AUTO_CONTINUE" "$GITHUB_RUN_ID" > "$hold"
+          fi
+          for output in "$dest" "evidence/runs/$PARENT_RESEARCH_RUN/sources" "evidence/runs/$PARENT_RESEARCH_RUN/research_continuation" "command-center/live/runs/$PARENT_RESEARCH_RUN.json" command-center/live/index.json command-center/live/latest.json; do
+            if [ -e "$output" ]; then git add "$output"; fi
+          done
+          git add "evidence/runs/$PARENT_RESEARCH_RUN"/citation_continuation_* 2>/dev/null || true
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Record actual sharded semantic reanalysis with replayed source passages'
+          python3 tools/publish_research_outputs.py
+      - name: Check this published checkpoint independently
+        id: checkpoint
+        if: always() && needs.shard-prepare.outputs.baseline != ''
+        env:
+          BASELINE: ${{ needs.shard-prepare.outputs.baseline }}
+        run: |
+          git fetch origin main
+          git restore --source=origin/main -- "evidence/runs/$PARENT_RESEARCH_RUN"
+          python3 tools/research_continuation_handoff.py handoff --baseline "$BASELINE"
+      - name: Continue this research in parallel without waiting for another
+        if: always() && steps.checkpoint.outputs.restart == 'true' && env.PCT_AUTO_CONTINUE == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run research-semantic-reanalysis.yml --repo "$GITHUB_REPOSITORY" --ref main -f "run_id=$PARENT_RESEARCH_RUN" -f "semantic_shards=$PCT_SEMANTIC_SHARDS"

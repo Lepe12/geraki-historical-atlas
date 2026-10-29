@@ -295,6 +295,28 @@ def plan_batches(records,namesake_ids,budget):
     namesake_groups,namesake_deferred=batches(namesakes,max_batches=len(namesakes)+1,budget=budget)
     return groups+namesake_groups,deferred+namesake_deferred,{id(g) for g in namesake_groups}
 
+def semantic_shard(env=None):
+    """PCT_SEMANTIC_SHARD='i/N' (0-based) -> (i,N); None = normal single-job pass."""
+    value=str((os.environ if env is None else env).get('PCT_SEMANTIC_SHARD','')).strip()
+    if not value:return None
+    match=re.fullmatch(r'(\d+)/(\d+)',value)
+    if not match or not 0<=int(match.group(1))<int(match.group(2))<=8:raise ValueError('INVALID_PCT_SEMANTIC_SHARD')
+    return int(match.group(1)),int(match.group(2))
+
+def shard_groups(groups,completed,index,count):
+    """Deterministic round-robin of the still-unread batches in ranked order.
+
+    Batch k of the pending queue goes to shard k mod N, so every shard starts
+    with top-ranked excerpts. Completed batches are not re-read by any shard;
+    the merge pass replays them from the queue like any continuation round.
+    Returns (this shard's batches, records assigned to other shards).
+    """
+    pending=[g for g in groups if not completed(g)]
+    mine=pending[index::count]
+    others=[{'evidence_id':r['evidence_id'],'reason':'ASSIGNED_TO_OTHER_SHARD'}
+            for k,g in enumerate(pending) if k%count!=index for r in g]
+    return mine,others
+
 def select_groups(groups,namesake_group_ids,batch_limit,completed):
     """Completed batches replay free; new batches within the limit; the rest is recorded, never dropped."""
     grouped=[];skipped=[];new_batches=0
@@ -1069,7 +1091,22 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         and previous[0].get('coverage',{}).get('claims_awaiting_review')
         and any(queue.completed(group) for group in all_groups))
     if review_backlog:batch_limit=0
-    grouped,skipped=select_groups(all_groups,namesake_group_ids,batch_limit,queue.completed);deferred.extend(skipped)
+    # Opt-in parallel reading (research-semantic-reanalysis.yml semantic_shards):
+    # a shard extracts only its round-robin slice of unread batches; the merge
+    # pass reads nothing new and replays every shard's saved extraction.
+    shard=semantic_shard();shard_merge=os.getenv('PCT_SEMANTIC_MERGE')=='1'
+    candidate_groups=all_groups;shard_report=None
+    if shard:
+        review_backlog=False
+        candidate_groups,other_shards=shard_groups(all_groups,queue.completed,*shard)
+        deferred.extend(other_shards)
+    if shard_merge:batch_limit=0
+    grouped,skipped=select_groups(candidate_groups,namesake_group_ids,batch_limit,queue.completed);deferred.extend(skipped)
+    if shard:
+        shard_report={'policy':'round-robin-by-rank-v1','index':shard[0],'count':shard[1],
+                      'pending_batches_all_shards':sum(not queue.completed(g) for g in all_groups),
+                      'assigned_batches':len(candidate_groups),'selected_batches':len(grouped),
+                      'selected_excerpts':sum(len(g) for g in grouped)}
     queue.inventory(all_records,grouped,deferred,filtered_items)
     selected=[r for b in grouped for r in b]
     from research_priority import selection_report
@@ -1086,6 +1123,8 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
          'passage_triage':triage_report,
          'excerpt_ranking':ranking_report,
          'identity_linkage':linkage_report,
+         **({'semantic_shard':shard_report} if shard_report else {}),
+         **({'semantic_shard_merge':True} if shard_merge else {}),
          'limitations':['MODEL_OUTPUT_REQUIRES_REVIEW','ORIGINAL_INSPECTION_NOT_PERFORMED',
                         'SOURCE_INDEPENDENCE_NOT_ESTABLISHED','BOUNDED_EVIDENCE_COVERAGE'],
          'verified':False,'human_reviewed':False}
@@ -1211,7 +1250,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
             out.setdefault('continuation_replays',[]).append(receipt)
         items,rejected=validate_items(payload or {},group,question_kind,requested_range,target_names,identity_linkage,section_records=all_records)
         out['rejected'].extend(rejected)
-        if not items and isinstance(payload,dict) and payload.get('items') and rejected and not review_backlog:
+        if not items and isinstance(payload,dict) and payload.get('items') and rejected and not review_backlog and not shard_merge:
             # A real source can be lost through malformed entity arrays or a
             # sentence selection that omits the named actor. One model repair
             # may correct the proposal; every original byte/date gate is rerun.
@@ -1289,6 +1328,10 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
     out['review']=review
     if out['coverage']['claims_awaiting_review']:queue.pending('REVIEW_AND_SYNTHESIS')
     out['coverage']['new_claim_review_calls']=new_review_calls
+    if shard:
+        # Shards stop before synthesis: the merge pass replays their saved
+        # extractions and reviews and writes the single combined answer.
+        out['status']='SHARD_EXTRACTION_AND_REVIEW_COMPLETE';return out
     supported=set(review['supported_claim_ids'])
     if not supported:
         out['status']='REVIEW_FAILED' if review['invalid_review_claim_ids'] else 'REVIEW_INCOMPLETE' if review['missing_claim_ids'] else 'NO_MODEL_SUPPORTED_CLAIMS'
@@ -1410,6 +1453,12 @@ def render_funnel(funnel,continuation=None):
                       '| Γύρος | Εξετάστηκαν (σύνολο) | Απομένουν | Νέοι υποστηριζόμενοι |','| --- | --- | --- | --- |'])
         for r in continuation.get('rounds',[]):
             lines.append(f"| {r['round']} | {r['examined']} | {r['remaining']} | {r['new_supported_claims']} |")
+        sharded=[r for r in continuation.get('rounds',[]) if r.get('shards')]
+        if sharded:
+            lines.extend(['','Παράλληλη ανάγνωση / Parallel reading (shards):'])
+            for r in sharded:
+                parts=', '.join(f"#{s['index']}: {s.get('examined_excerpts',0)} εξετάστηκαν / {s.get('model_calls',0)} κλήσεις" for s in r['shards'].get('shards',[]))
+                lines.append(f"- Γύρος {r['round']}: {r['shards'].get('count')} παράλληλοι υπολογιστές, σύνολο {r['shards'].get('total',{}).get('examined_excerpts',0)} ({parts})")
         if continuation.get('stop_reason'):lines.append('');lines.append('Λόγος διακοπής / Stop reason: `'+continuation['stop_reason']+'`')
         lines.append('')
     return lines
