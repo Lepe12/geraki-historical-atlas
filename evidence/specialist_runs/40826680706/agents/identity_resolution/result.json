@@ -1,0 +1,4046 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "identity_resolution",
+  "label": "Identity Resolution Agent",
+  "assignment_id": "identity_resolution:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "entity_candidates",
+    "variant_names",
+    "same_entity_assessment",
+    "collision_warnings"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "61a7077a355f2699ab25ca1e513ccf632a48868fd0e47f5de1c5c25db062453b",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "identity_resolution",
+    "assignment_id": "identity_resolution:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:SearchCulture.gr / EKT",
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:OpenArchives.gr / EKT"
+    ],
+    "queries": [
+      "\"Πέτρος Λάντζας\"",
+      "\"Pedro Lantzas\"",
+      "\"Lantzas\"",
+      "\"petros lantzas\"",
+      "\"Pierre Lanza\""
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 130,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 102,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 623, \"response_sha256\": \"e753864b839e82bdfffff365e273c71a66bd6c114003d0b5079f967c52b7f9f9\", \"elapsed_ms\": 689}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pedro Lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pedro+Lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pedro+Lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 609, \"response_sha256\": \"87ed1a874291819526dac36669081a353e33c8253d9a78994d99e019be4527b9\", \"elapsed_ms\": 562}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pedro+Lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Lantzas%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Lantzas%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1493}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Lantzas%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"petros lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22petros+lantzas%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22petros+lantzas%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1494}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22petros+lantzas%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1496}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pedro Lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Pedro+Lantzas%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Pedro+Lantzas%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1499}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Pedro+Lantzas%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pierre Lanza\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Pierre+Lanza%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Pierre+Lanza%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1641}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Pierre+Lanza%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Lantzas\"",
+      "records": [
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb42792560j",
+          "title": "Settlement and social trends in the Argolid and the Methana Peninsula, 1200-900 BC / Katie Lantzas",
+          "creator": [
+            "Lantzas, Katie. Auteur du texte"
+          ],
+          "date": [
+            "2012"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb42792560j",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb42792560j",
+            "ISBN 1407310208"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb444139960",
+          "title": "Beyond Collapse : archaeological perspectives on resilience, revitalization, and transformation in complex societies / edited by Ronald K. Faulseit",
+          "creator": [],
+          "date": [
+            "2016"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb444139960",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb444139960",
+            "ISBN 9780809333998"
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 7343, \"response_sha256\": \"0ed78782908fc7adf3c1423e4eaa73492e99d52f137165943a33979e3772d0dc\", \"elapsed_ms\": 561}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 2, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Lantzas%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22Lantzas%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25521, \"response_sha256\": \"6cadbb860e9ebaa9744595c1d3410a33fcd313a27550504940e87edda833fde5\", \"elapsed_ms\": 372}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22Lantzas%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25617, \"response_sha256\": \"b2279d87ca92cbe1839297f3b8d3d7a410b4d0375fd0aaa685092abcbcb65ddb\", \"elapsed_ms\": 525}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pedro Lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Pedro+Lantzas%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22Pedro+Lantzas%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25529, \"response_sha256\": \"60f3520ccce966604998836e4fa59e0bda250a6f74aa5fc40bb806cfbf252358\", \"elapsed_ms\": 527}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22Pedro+Lantzas%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"petros lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+petros+lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+petros+lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 610, \"response_sha256\": \"693f09f4cff7ea5291cdee5d8fe4dd620de11f5bf903b9496caa9cc3a3ebe8e2\", \"elapsed_ms\": 637}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+petros+lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pierre Lanza\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Pierre+Lanza%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22Pierre+Lanza%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 31568, \"response_sha256\": \"c962a29925e5898d8ebbf90e40a369cda78a842446c75ed02f6187ea23cf094b\", \"elapsed_ms\": 181}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22Pierre+Lanza%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pierre Lanza\"",
+      "records": [
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb330708113",
+          "title": "Pacification ou Mensonge et violence / Lanza Del Vasto",
+          "creator": [
+            "Lanza Del Vasto (1901-1981). Auteur du texte"
+          ],
+          "date": [],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb330708113",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb330708113"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb325089180",
+          "title": "Appel à la conscience des Français . [Signé : Lanza del Vasto, Bernard Gaschard, paysan, Pierre Parodi, médecin. - Appel aux chefs religieux de l'Islam et aux chefs du Front de Libération Nationale d'Algérie. Signé : Lanza del Vasto.]",
+          "creator": [
+            "Gaschard, Bérnard. Auteur du texte / Autrice du texte",
+            "Parodi, Pierre (1923-1989). Auteur du texte / Autrice du texte",
+            "Lanza Del Vasto (1901-1981). Auteur du texte / Autrice du texte"
+          ],
+          "date": [
+            "1957"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb325089180",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb325089180"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb36277746x",
+          "title": "Appel à la conscience des Français. [Signé : Lanza del Vasto, Bernard Gaschard, paysan, Pierre Parodi, médecin. Appel aux chefs religieux de l'Islam et aux chefs du Front de Libération Nationale d'Algérie. Signé : Lanza del Vasto.]",
+          "creator": [
+            "Lanza Del Vasto (1901-1981). Auteur du texte / Autrice du texte",
+            "Gaschard, Bernard. Auteur du texte / Autrice du texte",
+            "Parodi, Pierre (1923-1989). Auteur du texte / Autrice du texte"
+          ],
+          "date": [
+            "1957"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb36277746x",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb36277746x"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb35486663d",
+          "title": "Pour éviter la fin du monde / Lanza Del Vasto ; préf. de Pierre Souyris",
+          "creator": [
+            "Lanza Del Vasto (1901-1981). Auteur du texte"
+          ],
+          "date": [
+            "1991"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb35486663d",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb35486663d",
+            "ISBN 2268012301"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb485660751",
+          "title": "I teatri di Vincenzo Bellini / Ubaldo Mirabelli, Gioacchino Lanza Tomasi, Salvatore Enrico Failla... [et al.]",
+          "creator": [
+            "Mirabelli, Ubaldo (1921-2008). Auteur du texte",
+            "Lanza Tomasi, Gioacchino (1934-2023). Auteur du texte",
+            "Failla, Salvatore Enrico (1938-2008). Auteur du texte"
+          ],
+          "date": [
+            "2001"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb485660751",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb485660751",
+            "ISBN 9788837304102"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb437112332",
+          "title": "La maison dans la montagne / Angelina Lanza Damiani ; illustrations de Pierre-Yves Gabioud ; [traduit de l'italien par Christophe Carraud]",
+          "creator": [
+            "Lanza Damiani, Angelina (1879-1936). Auteur du texte"
+          ],
+          "date": [
+            "2013"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb437112332",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb437112332",
+            "ISBN 9782912771582"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb323476699",
+          "title": "La Quête des hommes, jeu pour le temps de Noël. Lanza del Vasto. Une scène de la Marche des Rois. [Présentation et illustrations de René Joutet, d'après les maquettes originales de Madeleine Barbulée.] / Olivier Hussenot",
+          "creator": [
+            "Hussenot, Olivier (1913-1979). Auteur du texte",
+            "Lanza Del Vasto (1901-1981). Auteur du texte"
+          ],
+          "date": [
+            "1944"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb323476699",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb323476699"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb38556243n",
+          "title": "D'un Céline l'autre / Yannick Bellon, réal. ; Michel Polac, réal., prod., reportage ; Michel Vianey, prod., reportage ; Michel Simon, Jean Renoir, Lanza del Vasto.. . [et al.], participants",
+          "creator": [
+            "Bellon, Yannick (1924-2019). Réalisateur",
+            "Polac, Michel (1930-2012). Réalisateur"
+          ],
+          "date": [
+            "1969"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb38556243n",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb38556243n"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb43093590n",
+          "title": "Chansonnier populaire. 30 Chansons nouvelles ou renouvelées par Lanza del Vasto.... Illustrées [et couv. ill.] d'après les dessins de l'auteur",
+          "creator": [
+            "Lanza Del Vasto (1901-1981). Harmonisateur"
+          ],
+          "date": [
+            "1947"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb43093590n",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb43093590n"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb430935910",
+          "title": "Chansonnier populaire. 30 Chansons nouvelles ou renouvelées par Lanza del Vasto.... Illustrées [et couv. ill.] d'après les dessins de l'auteur",
+          "creator": [
+            "Lanza Del Vasto (1901-1981). Harmonisateur"
+          ],
+          "date": [
+            "1947"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb430935910",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb430935910",
+            "ISBN 2020033933"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb38121726x",
+          "title": "Chansons populaires / Chanterelle, Lanza del Vasto, chant ; Choeur de la Communauté de l'Arche",
+          "creator": [
+            "Lanza Del Vasto (1901-1981). Chant",
+            "Chanterelle. Chant",
+            "Communauté de l'Arche (Le Bousquet d'Orb, Hérault). Chorale. Interprète"
+          ],
+          "date": [
+            "1986"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb38121726x",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb38121726x"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb430103943",
+          "title": "Chansonnaire. Compositions chorales.... Dessins de R. Lapoujade",
+          "creator": [
+            "Geoffray, César (1901-1972). Compositeur"
+          ],
+          "date": [
+            "1948"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb430103943",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb430103943"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb41430708m",
+          "title": "Voyager en Inde : textes choisis / avec Pierre Loti, Rabîndranâth Tagore, Lanza Del Vasto... [et al.], aut. ; lus par Jean-Christophe Doubroff",
+          "creator": [
+            "Loti, Pierre (1850-1923). Auteur du texte",
+            "Lanza Del Vasto (1901-1981). Auteur du texte",
+            "Tagore, Rabindranath (1861-1941). Auteur du texte",
+            "Doubroff, Jean-Christophe. Voix parlée"
+          ],
+          "date": [
+            "2009"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb41430708m",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb41430708m"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb33070801s",
+          "title": "Méthodes chromatographiques de dosage des acides aminés , par F. Busson, R. Carbiener et J. Lanza",
+          "creator": [
+            "Lanza, Jean-Pierre. Auteur du texte",
+            "Carbiener, Roland (1930-....). Auteur du texte",
+            "Busson, Félix-François. Auteur du texte"
+          ],
+          "date": [
+            "1960"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb33070801s",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb33070801s"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb377913892",
+          "title": "Chansons poétiques anciennes et modernes / Jacques Douai avec accompagnement de guitare",
+          "creator": [
+            "White, Daniel (1912-1997). Auteur ou responsable intellectuel",
+            "Verger, Christiane (1903-1974). Auteur ou responsable intellectuel",
+            "Rougeul, Jean (1905-1978). Auteur ou responsable intellectuel",
+            "Marcy, Robert (1920-2024). Auteur ou responsable intellectuel"
+          ],
+          "date": [
+            "1955"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb377913892",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb377913892"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb436838533",
+          "title": "Cosmos / mise en scène Dorian Rossel ; conception Compagnie Super Trop Top ; production Compagnie STT ; avec Paul Courlet, Delphine Lanza, Karim Kadjar... [et al.]",
+          "creator": [
+            "Rossel, Dorian. Metteur en scène",
+            "Lanza, Delphine. Acteur",
+            "Kadjar, Karim. Acteur",
+            "Courlet, Paul. Acteur"
+          ],
+          "date": [
+            "2012"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb436838533",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb436838533"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb38276854v",
+          "title": "Raconte. 7 / Pierre Nivollet, réal. ; Marie-Claire Munka, Marc Normant, voix",
+          "creator": [
+            "Nivollet, Pierre (1926-....). Réalisateur"
+          ],
+          "date": [
+            "1992"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb38276854v",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb38276854v"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb445123650",
+          "title": "30 greatest hits from the world's greatest operettas / Jeanette MacDonald, Nelson Eddy, Mario Lanza... [et al.], chant [acc. voc. et instr.]",
+          "creator": [
+            "MacDonald, Jeanette (1903-1965). Chant",
+            "Eddy, Nelson (1901-1967). Chant",
+            "Lanza, Mario (1921-1959). Chant",
+            "Jones, Allan (1907-1992). Chant"
+          ],
+          "date": [
+            "1974"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb445123650",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb445123650"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb376426339",
+          "title": "Ce qui parle à mon coeur / Pierrot Bovy ; propos transmis par Marie-Pierre Bovy",
+          "creator": [
+            "Bovy, Pierrot (1934-1999). Auteur du texte"
+          ],
+          "date": [
+            "2001"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb376426339",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb376426339",
+            "ISBN 284231171X"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+          "title": "Peter of Auvergne : university master of the 13th century / edited by Christoph Flüeler, Lidia Lanza, Marco Toste",
+          "creator": [],
+          "date": [
+            "2015"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+            "ISBN 3110228483"
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pierre+Lanza+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pierre+Lanza+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 45973, \"response_sha256\": \"fc09b31acf8c5182e183ece508e333b60e05562c65fc52be7b39b5a548a9b1bc\", \"elapsed_ms\": 958}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pierre+Lanza+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 20, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"petros lantzas\"",
+      "records": [
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/908/thesaurus-di-internet-culturale",
+          "title": "Mappa del thesauro",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/908/thesaurus-di-internet-culturale"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1/home",
+          "title": "Home",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1/home"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/76/itinerari",
+          "title": "Itinerari",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/76/itinerari"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/75/mostre",
+          "title": "Mostre",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/75/mostre"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/938/video",
+          "title": "Video",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/938/video"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1038/biblioteca-digitale-italiana",
+          "title": "la BDI",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1038/biblioteca-digitale-italiana"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1048/guida-alla-consultazione",
+          "title": "Guida alla consultazione",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1048/guida-alla-consultazione"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/41/collezioni-digitali",
+          "title": "Collezioni digitali",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/41/collezioni-digitali"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/64/partner",
+          "title": "Partner",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/64/partner"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1114/repositories",
+          "title": "Repositories",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1114/repositories"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/767/manoscritti",
+          "title": "Manoscritti",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/767/manoscritti"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/773/libri",
+          "title": "Libri",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/773/libri"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/825/spartiti",
+          "title": "Spartiti",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/825/spartiti"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/770/carte-geografiche",
+          "title": "Carte geografiche",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/770/carte-geografiche"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/771/immagini",
+          "title": "Immagini",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/771/immagini"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/772/registrazioni-sonore",
+          "title": "Registrazioni sonore",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/772/registrazioni-sonore"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana",
+          "title": "Emeroteca digitale italiana",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=2&paginate_pageNum=1",
+          "title": "Musica",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=2&paginate_pageNum=1"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=3",
+          "title": "Newspaper",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=3"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/753/remi",
+          "title": "Rete della Musica Italiana",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/753/remi"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1120/chi-siamo",
+          "title": "Chi siamo",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1120/chi-siamo"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/15/termini-d-uso",
+          "title": "Termini d'uso",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/15/termini-d-uso"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1227/i-progetti",
+          "title": "I Progetti",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1227/i-progetti"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1000/statistiche",
+          "title": "Statistiche",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1000/statistiche"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/999/scrivi-a",
+          "title": "Scrivi a",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/999/scrivi-a"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22petros+lantzas%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22petros+lantzas%22&instance=magindice&pag=1\", \"content_type\": \"text/html; charset=UTF-8\", \"response_bytes\": 23303, \"response_sha256\": \"2efef405e5f1c8532785102bdca2198d14efa748aabb70e104bd1de93d1c3c3f\", \"elapsed_ms\": 1109}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22petros+lantzas%22&instance=magindice&pag=1\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ERROR",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 998}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ERROR",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 998}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Lantzas\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-203973",
+          "title": "Untersuchungen uber die Salzwiesen des ausgetrockneten Lantza-Salzsees (Nordgriechenland).",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-203973"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Lantzas%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Lantzas%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 111695, \"response_sha256\": \"c8ccd80b55673e8afa8403457c95dd86a57de28fa190e9e2c1e338b88af463cd\", \"elapsed_ms\": 1008}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Lantzas%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 1, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pedro Lantzas\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-203973",
+          "title": "Untersuchungen uber die Salzwiesen des ausgetrockneten Lantza-Salzsees (Nordgriechenland).",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-203973"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Pandemos/000014-123456789_10368",
+          "title": "Το στοιχείο της παρενδυσίας ως σημείο ανατροπής στον κινηματογράφο του Pedro Almodovar The element of drag as a turning point in Pedro Almodovar's cinema",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Pandemos/000014-123456789_10368"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_52342",
+          "title": "Η έκφραση της εθνικής ταυτότητας στον Pedro Henríquez Ureña και στον Ίωνα Δραγούμη La expresión de la identidad nacional en la obra de Pedro Henríquez Urena y de Ion Dragumis",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_52342"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2938009",
+          "title": "Η αποτελεσματικότητα του manual therapy σε αναπνευστικές και κλινικές παραμέτρους ασθενών με χρόνιο οσφυϊκό πόνο: συστηματική ανασκόπηση",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2938009"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_79646",
+          "title": "The Effectiveness of Spinal, Diaphragmatic, and Specific Stabilization Exercise Manual Therapy and Respiratory-Related Interventions in Patients with Chronic Nonspecific Neck Pain: Systematic Review and Meta-Analysis",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_79646"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/elocus/000018-dlib_6_3_2_metadata-dlib-1658723694-774748-5728.tkl",
+          "title": "Τα props στη mise-en-scene του Pedro Almodovar : ο ρόλος των τεχνών, των φωτογραφιών και των θρησκευτικών αντικειμένων από το Όλα για τη μητέρα μου (1999) ως το Πόνος και δόξα (2019) The props in Pedro Almodovar's mise-en-scene : the role of the arts, the photographs and the religious objects from All about my Mother (1999) to Pain and Glory (2019)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/elocus/000018-dlib_6_3_2_metadata-dlib-1658723694-774748-5728.tkl"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3171084",
+          "title": "A pooled analysis of nivolumab for the treatment of advanced non-small-cell lung cancer and the role of PD-L1 as a predictive biomarker",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3171084"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3176590",
+          "title": "La Universidad según Ángel Rama y Pedro Henríquez Ureña",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3176590"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_1543",
+          "title": "¨Το δέρμα που κατοικώ¨: Μια απόπειρα επανάχρησης του πρώην εργοστασίου Ήβη σε χώρο πολιτισμού.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_1543"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2984922",
+          "title": "The Effectiveness of Manual Therapy on Musculoskeletal and Respiratory Parameters in Patients with Chronic Low Back Pain: A Systematic Review",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2984922"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_49549",
+          "title": "Comparison analysis between D&B and mechanical excavation in underground construction",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_49549"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2970365",
+          "title": "Ηλεκτρομυϊκός ερεθισμός σε ολόκληρο το σώμα σε ασθενή πληθυσμό: Μια συστηματική ανασκόπηση",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2970365"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ariadne/000124-20.500.12776_14050",
+          "title": "OpenAIRE Guidelines: supporting interoperability for Literature Repositories, Data Archives and CRIS",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ariadne/000124-20.500.12776_14050"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3370242",
+          "title": "Η επίδραση της υδροθεραπείας στις αυχενικές κακώσεις νωτιαίου μυελού",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3370242"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_29914",
+          "title": "Οικισμοί εκτόπισης: σε αναζήτηση των αρχιτεκτονικών αρχών της άτυπης αστικοποίησης Displacement settlements: In search of the architectural principles of urban informality",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_29914"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_24782",
+          "title": "Η επίδραση της θεραπευτικής άσκησης στη βελτίωση της ισορροπίας και της βάδισης σε ασθενείς με διαβητική περιφερική νευροπάθεια : συστηματική ανασκόπηση Effectiveness of therapeutic exercise on balance and gait in patients with diabetic peripheral neuropathy : a systematic review",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_24782"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_3005",
+          "title": "Η χρήση της Εικονικής Πραγματικότητας σε ασθενείς με Χρόνια Αποφρακτική Πνευμονοπάθεια",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_3005"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_2065",
+          "title": "Τεχνικές νου - σώματος σε αναπνευστικές παθήσεις",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_2065"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_3179",
+          "title": "Η επίδραση του βελονισμού στις ψυχοκοινωνικές παραμέτρους ασθενών με χρόνια οσφυαλγία. Συστηματική ανασκόπηση",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_3179"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2949555",
+          "title": "Φυσικοθεραπευτική αποκατάσταση μετά από κακώσεις νωτιαίου μυελού",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2949555"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3232349",
+          "title": "Η έκφραση της εθνικής ταυτότητας στον Pedro Henríquez Ureña και στον Ίωνα Δραγούμη",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3232349"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3232264",
+          "title": "Η επίδραση της άσκησης σε ασθενείς με σύνδρομο άπνοιας - υπόπνοιας κατά τον ύπνο: συστηματική ανασκόπηση",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3232264"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_7533",
+          "title": "Η επίδραση παρεμβατικών προγραμμάτων εικονικής πραγματικότητας στην κινητική απόδοση παιδιών με αναπτυξιακή διαταραχή κινητικού συντονισμού. Μία συστηματική ανασκόπηση.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_7533"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_5163",
+          "title": "Η επίδραση των ασκήσεων πυγμαχίας στην λειτουργική ικανότητα και στην ποιότητα ζωής ατόμων με νόσο Parkinson",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_5163"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_27811",
+          "title": "Διερεύνηση της αποτελεσματικότητας των εναλλακτικών θεραπευτικών ασκήσεων συγκριτικά ή συνδυαστικά με την εκπαίδευση μυών του πυελικού εδάφους σε γυναίκες με ακράτεια ούρων: συστηματική ανασκόπηση και μετά-ανάλυση",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_27811"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Pedro+Lantzas%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Pedro+Lantzas%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 675345, \"response_sha256\": \"a8d952e82cc14d87b8a16dc468c3b16df623b1c9add25fdb8623d7226fb81bae\", \"elapsed_ms\": 3108}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Pedro+Lantzas%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pierre Lanza\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_13950",
+          "title": "Σύνδρομο Pierre Robin: πρώιμη εγχειρητική αντιμετώπιση της αναπνευστικής δυσχέρειας Pierre Robin syndrome: primary surgical management of the airway obstruction",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_13950"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_25655",
+          "title": "Ματωμένοι έρωτες",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_25655"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_20384",
+          "title": "Serenade: pour Hautbois , clarinette & basson",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_20384"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_20692",
+          "title": "Dialogues Canadiens: pour hautbois et orchestre a codres",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_20692"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3032884",
+          "title": "Relationship between SARS-CoV-2 infection and the incidence of ventilator-associated lower respiratory tract infections: a European multicenter cohort study (vol 47, pg 188, 2021)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3032884"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_16335",
+          "title": "Θεωρητικές προσεγγίσεις στις τεχνολογίες πληροφορίας και επικοινωνίας: το έργο των Jean Baudrillard, Pierre-Andre Taguieff, Neil Postman, John B Thompson, Pierre Levy και Mark Poster",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_16335"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/mnimon/000087-8146",
+          "title": "Essais d'ego-histoire (Maurice Agulhon, Pierre Chaunu, Georges Duby, Raoul Girardet, Jacques Le Goff, Michelle Perrot, René Rémond) réunis et présentés par Pierre Nora",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/mnimon/000087-8146"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3165963",
+          "title": "Development and validation of a prognostic nomogram to predict overall survival (OS) in platinum-resistant ovarian cancer (PROC): An AURELIA substudy.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3165963"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3371593",
+          "title": "Η οντολογική πυκνότητα του συμβολικού. Όψεις της συμβολικής βίας στο έργο του Pierre Bourdieu",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3371593"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3030671",
+          "title": "Relationship between ventilator-associated pneumonia and mortality in COVID-19 patients: a planned ancillary analysis of the coVAPid cohort (vol 25, 177, 2021)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3030671"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_25483",
+          "title": "La politique d' Héraclite d' Éphèse",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_25483"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/kallipos/000065-11419_13008",
+          "title": "Συγκεκριμένη μουσική (musique concrète) και ηλεκτρονική μουσική (elektronische musik) Musique concrete & elektronische musik",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/kallipos/000065-11419_13008"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_7446",
+          "title": "L'art du poète et de l'orateur : nouvelle rhétorique à l'usage des colleges, précédé d'un Essai d'éducation",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_7446"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3031784",
+          "title": "The coral fauna from the Oligocene of Malta: Biodiversity and paleoenvironment (vol 107, 102508, 2021)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3031784"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_28662",
+          "title": "De la vinification : analyse et avenir",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_28662"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-133243",
+          "title": "Τα σχόλια του Petrus Morellus Turonensis στο ποιητικό του έργο De bello Troiano: εισαγωγή, editio princeps, υπομνηματισμός",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-133243"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_23025",
+          "title": "Jean-Claude Anscombre, María Luisa Donaire et Pierre Patrick Haillet (dir.), Opérateurs discursifs du français, 2 : Éléments de description sémantique et pragmatique. (Sciences pour la communication, 123.) Berne : Peter Lang, 2018, 539 pp. 978 3 0343 3285 9 (broché), 978 3 0343 3286 6 (PDF), 978 3 0343 3287 3 (EPUB)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_23025"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3129937",
+          "title": "Pierre-Charles-Alexandre Louis' (1787-1872) numerical method and its contribution to the study of chest diseases [Apport de la « méthode numérique » de Pierre-Charles-Alexandre Louis (1787-1872) dans les maladies de poitrine]",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3129937"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Pandemos/000014-123456789_7877",
+          "title": "Pierre Bourdieu: ο διαπρεπής Γάλλος κοινωνιολόγος",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Pandemos/000014-123456789_7877"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_16526",
+          "title": "Το μαχητικό ένστιχτο / Pierre Bovet ; μετάφραση Γιάννη Ιμβριώτη",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_16526"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_55956",
+          "title": "Το εκδοτικό πεδίο των ελληνικών πολιτικών εκδόσεων κατά τη μακρά δεκατία του '60, το παράδειγμα των «Ιστορικών Εκδόσεων», 1963-1981 The Greek political publishing field during the long 1960s, exemplified by the case of Istorikes Ekdoseis, 1963–1981",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_55956"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/makedonika/000086-5929",
+          "title": "Το μοναστήρι της Μπουνάσιας και τα λιθανάγλυφά του Le monastère de Vounassia et ses bas-reliefs en pierre",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/makedonika/000086-5929"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_28978",
+          "title": "Τα σχόλια του Petrus Morellus Turonensis στο ποιητικό του έργο De Bello Troiano: εισαγωγή, editio princeps, υπομνηματισμός Petrus Morellus Turonensis' scholia on his poetic work De Bello Troiano: introduction, editio princeps, commentary",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_28978"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2950935",
+          "title": "Mitogen-activated protein kinase activation in lung adenocarcinoma: a comparative study between ever smokers and never smokers",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2950935"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2953189",
+          "title": "Mitogen-activated protein kinase activation in lung adenocarcinoma: a comparative study between ever smokers and never smokers",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2953189"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Pierre+Lanza%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Pierre+Lanza%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 1098409, \"response_sha256\": \"e6daa2efc36c75cccf2eb96aacba56a1c8a5a80ca9c83ddf93c0a35a5c066155\", \"elapsed_ms\": 2733}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Pierre+Lanza%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"petros lantzas\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-203973",
+          "title": "Untersuchungen uber die Salzwiesen des ausgetrockneten Lantza-Salzsees (Nordgriechenland).",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-203973"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15258",
+          "title": "Exploring the attitudes of students in Tertiary and Upper Secondary Education towards Electronic Voting and employment of an electronic voting.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15258"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15597",
+          "title": "Διαχείριση λίστας καθημερινών αγορών με χρήση έξυπνων κινητών.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15597"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_17005",
+          "title": "Σχεδιασμός νέων εμπορικών δραστηριοτήτων σε διεθνές περιβάλλον.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_17005"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_7394",
+          "title": "Εξέλιξη βάσεων δεδομένων και συντηρήση εξαρτώμενων εφαρμογών μέσω επανεγγραφής ερωτήσεων Database evolution and maintenance of their dependent applications via query rewriting",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_7394"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_21776",
+          "title": "Μελέτη κι υλοποίηση αλγορίθμων αναζήτησης προτύπου σε κείμενο",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_21776"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_19577",
+          "title": "Βιομηχανικαί δυνατότητες και ενεργειακή πολιτική εν Ελλάδι.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_19577"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15407",
+          "title": "Branding και rebranding της Atebank.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15407"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_18714",
+          "title": "Η θεωρία των Ψυχολογικών Επιχειρήσεων και οι εφαρμογές τους στη Στρατηγική από τον Τρωικό Πόλεμο μέχρι σήμερα.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_18714"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15355",
+          "title": "Οικονομία και πόλεμος.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15355"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_19712",
+          "title": "H συμπεριφορά του καταναλωτή απέναντι στο ελαιόλαδο.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_19712"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_22104",
+          "title": "Why do blockchains exist?",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_22104"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_19605",
+          "title": "Αξιολόγηση και ιεράρχηση μοντέλων ηλεκτρικής κιθάρας με χρήση πολυ-κριτηρίων μεθόδων.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_19605"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_25584",
+          "title": "Νεωτερικότητα και ακροδεξιά στα μετακομμουνιστικά Βαλκάνια - οι περιπτώσεις της Βουλγαρίας, Ρουμανίας και Σερβίας 1989-2020 Modernity and the far right in the post-communist Balkans – the cases of Bulgaria, Romania and Serbia, 1989-2020",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_25584"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_27612",
+          "title": "Εξόρυξη προφίλ χρηστών και ανάλυση συναισθήματος για ένα εμπορικό σήμα με τη χρήση δεδομένων από το κοινωνικό μέσο Twitter User profiling and sentiment analysis for a brand using data from social medium Twitter",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_27612"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_29935",
+          "title": "Δικλείδες ασφαλείας εσωτερικού ελέγχου και λογιστικές απάτες",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_29935"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-105",
+          "title": "Διάταξη οπτικού ερευνητικού κινητήρα εσωτερικής καύσης και μετρήσεις αναφοράς με ισο-οκτάνιο",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-105"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_14805",
+          "title": "O οδικός χάρτης από τα παραδοσιακά καζίνο στα διαδικτυακά καζίνο στην Ελλάδα: από τη συμμόρφωση στην υλοποίηση.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_14805"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_18715",
+          "title": "Η Ανεξαρτητοποίηση του κοσσυφοπεδίου και οι συνέπειες για την Ελληνική ασφάλεια και εξωτερική πολιτική",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_18715"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_21152",
+          "title": "Διεθνή πρότυπα χρηματοοικονομικής αναφοράς: διεθνές λογιστικό πρότυπο 2 αποθέματα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_21152"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_21022",
+          "title": "Πληφοροριακά συστήματα και ψηφιακά εργαλεία για μικρομεσαίες επιχειρήσεις: ένας οδηγός",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_21022"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_20333",
+          "title": "Εκτιμώντας τις συνέπειες των κυβρνοεπιθέσεων σε μια εταιρία και την προστασία της",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_20333"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_20321",
+          "title": "Το ελληνικόν ισοζύγιον πληρωμών των ετών 1948-1957",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_20321"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_7699",
+          "title": "Purification and characterization of a thermostable intracellular Ξ²-xylosidase from the thermophilic fungus Sporotrichum thermophile",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_7699"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_26229",
+          "title": "Digitizing the future of Sustainable Tourism: The MITOS ICT-based tourism platform",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_26229"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22petros+lantzas%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22petros+lantzas%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 1928488, \"response_sha256\": \"9bbbe42c56a5850d931b985354c00e10ebde9c9e8816964ec815925be7d5c1e6\", \"elapsed_ms\": 3098}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22petros+lantzas%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "40826680706",
+    "agent_id": "identity_resolution",
+    "source_leads": [
+      {
+        "id": "lead_d81b5e0b74cabf126f79c408",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb42792560j",
+        "title": "Settlement and social trends in the Argolid and the Methana Peninsula, 1200-900 BC / Katie Lantzas",
+        "query": "\"Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_cf47678171fe83aa48258e82",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb444139960",
+        "title": "Beyond Collapse : archaeological perspectives on resilience, revitalization, and transformation in complex societies / edited by Ronald K. Faulseit",
+        "query": "\"Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_79801e48ae425065ac3bb0bd",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb330708113",
+        "title": "Pacification ou Mensonge et violence / Lanza Del Vasto",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_244a33fc3a4e86c29d19072e",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb325089180",
+        "title": "Appel à la conscience des Français . [Signé : Lanza del Vasto, Bernard Gaschard, paysan, Pierre Parodi, médecin. - Appel aux chefs religieux de l'Islam et aux chefs du Front de Libération Nationale d'Algérie. Signé : Lanza del Vasto.]",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_edb41fd164f24c4b3141f010",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb36277746x",
+        "title": "Appel à la conscience des Français. [Signé : Lanza del Vasto, Bernard Gaschard, paysan, Pierre Parodi, médecin. Appel aux chefs religieux de l'Islam et aux chefs du Front de Libération Nationale d'Algérie. Signé : Lanza del Vasto.]",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_44e539880503554ea0930664",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb35486663d",
+        "title": "Pour éviter la fin du monde / Lanza Del Vasto ; préf. de Pierre Souyris",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fe45ebbac5e0c8d4bcc1d4ca",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb485660751",
+        "title": "I teatri di Vincenzo Bellini / Ubaldo Mirabelli, Gioacchino Lanza Tomasi, Salvatore Enrico Failla... [et al.]",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8c770de47d94b8bec425ea14",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb437112332",
+        "title": "La maison dans la montagne / Angelina Lanza Damiani ; illustrations de Pierre-Yves Gabioud ; [traduit de l'italien par Christophe Carraud]",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_99594d728ceac3af50dc8174",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb323476699",
+        "title": "La Quête des hommes, jeu pour le temps de Noël. Lanza del Vasto. Une scène de la Marche des Rois. [Présentation et illustrations de René Joutet, d'après les maquettes originales de Madeleine Barbulée.] / Olivier Hussenot",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_88ab44d53f6541383ca7128b",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb38556243n",
+        "title": "D'un Céline l'autre / Yannick Bellon, réal. ; Michel Polac, réal., prod., reportage ; Michel Vianey, prod., reportage ; Michel Simon, Jean Renoir, Lanza del Vasto.. . [et al.], participants",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_dc2eb9d852ac1dd4e9e5325a",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb43093590n",
+        "title": "Chansonnier populaire. 30 Chansons nouvelles ou renouvelées par Lanza del Vasto.... Illustrées [et couv. ill.] d'après les dessins de l'auteur",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_dd0781bec614962bee210520",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb430935910",
+        "title": "Chansonnier populaire. 30 Chansons nouvelles ou renouvelées par Lanza del Vasto.... Illustrées [et couv. ill.] d'après les dessins de l'auteur",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9b0d69fde28d66b0763f9bb6",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb38121726x",
+        "title": "Chansons populaires / Chanterelle, Lanza del Vasto, chant ; Choeur de la Communauté de l'Arche",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9dca254ffeb571d6540730ce",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb430103943",
+        "title": "Chansonnaire. Compositions chorales.... Dessins de R. Lapoujade",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_373828b33a42dabbf343fa92",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb41430708m",
+        "title": "Voyager en Inde : textes choisis / avec Pierre Loti, Rabîndranâth Tagore, Lanza Del Vasto... [et al.], aut. ; lus par Jean-Christophe Doubroff",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_99f598919b116ab0018b27c5",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb33070801s",
+        "title": "Méthodes chromatographiques de dosage des acides aminés , par F. Busson, R. Carbiener et J. Lanza",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9f63b6dca48a3a65ad7d10fd",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb377913892",
+        "title": "Chansons poétiques anciennes et modernes / Jacques Douai avec accompagnement de guitare",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a9b65c6523b44169e5e1eab8",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb436838533",
+        "title": "Cosmos / mise en scène Dorian Rossel ; conception Compagnie Super Trop Top ; production Compagnie STT ; avec Paul Courlet, Delphine Lanza, Karim Kadjar... [et al.]",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4a99babc600daa5bdac048d0",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb38276854v",
+        "title": "Raconte. 7 / Pierre Nivollet, réal. ; Marie-Claire Munka, Marc Normant, voix",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_771de6172844842719d379f8",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb445123650",
+        "title": "30 greatest hits from the world's greatest operettas / Jeanette MacDonald, Nelson Eddy, Mario Lanza... [et al.], chant [acc. voc. et instr.]",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_201b3b2f94af8cf6068b3502",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb376426339",
+        "title": "Ce qui parle à mon coeur / Pierrot Bovy ; propos transmis par Marie-Pierre Bovy",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d132fa19ac3faba46e8acfa6",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb443111604",
+        "title": "Peter of Auvergne : university master of the 13th century / edited by Christoph Flüeler, Lidia Lanza, Marco Toste",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_45943dc92c574c808057839d",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/908/thesaurus-di-internet-culturale",
+        "title": "Mappa del thesauro",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8c47e689b506ef6697471994",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1/home",
+        "title": "Home",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_41feca9d54f3eceb210b3483",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/76/itinerari",
+        "title": "Itinerari",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_181eed6e3238eb8f4f7589f4",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/75/mostre",
+        "title": "Mostre",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b5a415a57cd2ac2a24228e2e",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/938/video",
+        "title": "Video",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_12df047e51073ce973dcf7c4",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1038/biblioteca-digitale-italiana",
+        "title": "la BDI",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_415a2b3ca87e092579a2de9f",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1048/guida-alla-consultazione",
+        "title": "Guida alla consultazione",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2d0e07ea22822d4c859991b3",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/41/collezioni-digitali",
+        "title": "Collezioni digitali",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5a930664d54c131a7ba636fd",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/64/partner",
+        "title": "Partner",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a82adb01c2c7da7440c97e74",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1114/repositories",
+        "title": "Repositories",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_22a609e4a1cc91b7551e1373",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/767/manoscritti",
+        "title": "Manoscritti",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d92d72924d755326b5ba1bf4",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/773/libri",
+        "title": "Libri",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0715b9aa6171ecdf0b585b7d",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/825/spartiti",
+        "title": "Spartiti",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2ffafbff42986a302694885f",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/770/carte-geografiche",
+        "title": "Carte geografiche",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6c63de74eb3b482315fbd0c8",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/771/immagini",
+        "title": "Immagini",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5ff71912b3a9ddf7485421e1",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/772/registrazioni-sonore",
+        "title": "Registrazioni sonore",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_973c563bea8e911d7869dd92",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana",
+        "title": "Emeroteca digitale italiana",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9b6108b57c7fdf692a35dd5d",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=2&paginate_pageNum=1",
+        "title": "Musica",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fd110925c3b9ddcdc7f152d7",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=3",
+        "title": "Newspaper",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f4e05822b051e5bb21d1a2f3",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/753/remi",
+        "title": "Rete della Musica Italiana",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6a19e2a582b9608e164aca66",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1120/chi-siamo",
+        "title": "Chi siamo",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5a03c64a0e52622e8ad01f1c",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/15/termini-d-uso",
+        "title": "Termini d'uso",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5d18c25a1f03c941b28f59c3",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1227/i-progetti",
+        "title": "I Progetti",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_cc4cd300011fe0e5e5de64b4",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1000/statistiche",
+        "title": "Statistiche",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ee633c210da87a871972dcc5",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/999/scrivi-a",
+        "title": "Scrivi a",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4d017db03bd247e4b78b3692",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-203973",
+        "title": "Untersuchungen uber die Salzwiesen des ausgetrockneten Lantza-Salzsees (Nordgriechenland).",
+        "query": "\"Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7864e62c5b50a6e3c61ccc07",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Pandemos/000014-123456789_10368",
+        "title": "Το στοιχείο της παρενδυσίας ως σημείο ανατροπής στον κινηματογράφο του Pedro Almodovar The element of drag as a turning point in Pedro Almodovar's cinema",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ac20618bb4d778aa6956bac8",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_52342",
+        "title": "Η έκφραση της εθνικής ταυτότητας στον Pedro Henríquez Ureña και στον Ίωνα Δραγούμη La expresión de la identidad nacional en la obra de Pedro Henríquez Urena y de Ion Dragumis",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_36f807b0dcd8db0f8bda83ab",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2938009",
+        "title": "Η αποτελεσματικότητα του manual therapy σε αναπνευστικές και κλινικές παραμέτρους ασθενών με χρόνιο οσφυϊκό πόνο: συστηματική ανασκόπηση",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_51e48f9f2f434c662f389f7f",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uth_rep/000178-11615_79646",
+        "title": "The Effectiveness of Spinal, Diaphragmatic, and Specific Stabilization Exercise Manual Therapy and Respiratory-Related Interventions in Patients with Chronic Nonspecific Neck Pain: Systematic Review and Meta-Analysis",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_96b6783239f9263477e6ded2",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/elocus/000018-dlib_6_3_2_metadata-dlib-1658723694-774748-5728.tkl",
+        "title": "Τα props στη mise-en-scene του Pedro Almodovar : ο ρόλος των τεχνών, των φωτογραφιών και των θρησκευτικών αντικειμένων από το Όλα για τη μητέρα μου (1999) ως το Πόνος και δόξα (2019) The props in Pedro Almodovar's mise-en-scene : the role of the arts, the photographs and the religious objects from All about my Mother (1999) to Pain and Glory (2019)",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2cfbf2cefb5409e32f815a0b",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3171084",
+        "title": "A pooled analysis of nivolumab for the treatment of advanced non-small-cell lung cancer and the role of PD-L1 as a predictive biomarker",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ab2b2314d07bcfa0805a0ab5",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3176590",
+        "title": "La Universidad según Ángel Rama y Pedro Henríquez Ureña",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_bc4cbb11ada14fd720ed1ac6",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_1543",
+        "title": "¨Το δέρμα που κατοικώ¨: Μια απόπειρα επανάχρησης του πρώην εργοστασίου Ήβη σε χώρο πολιτισμού.",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fa8aa1805ea71c5151947a9a",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2984922",
+        "title": "The Effectiveness of Manual Therapy on Musculoskeletal and Respiratory Parameters in Patients with Chronic Low Back Pain: A Systematic Review",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fe78b37ea1ec0e63f7330744",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_49549",
+        "title": "Comparison analysis between D&B and mechanical excavation in underground construction",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e16818603e78ba084e957f6d",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2970365",
+        "title": "Ηλεκτρομυϊκός ερεθισμός σε ολόκληρο το σώμα σε ασθενή πληθυσμό: Μια συστηματική ανασκόπηση",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a0633c93f639e8b62f949fcf",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ariadne/000124-20.500.12776_14050",
+        "title": "OpenAIRE Guidelines: supporting interoperability for Literature Repositories, Data Archives and CRIS",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7ec3ac29d028dbc0df949da9",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3370242",
+        "title": "Η επίδραση της υδροθεραπείας στις αυχενικές κακώσεις νωτιαίου μυελού",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_48f247e6c31dba3346c944d7",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_29914",
+        "title": "Οικισμοί εκτόπισης: σε αναζήτηση των αρχιτεκτονικών αρχών της άτυπης αστικοποίησης Displacement settlements: In search of the architectural principles of urban informality",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9f51dd06a991cdc15e4c5a02",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_24782",
+        "title": "Η επίδραση της θεραπευτικής άσκησης στη βελτίωση της ισορροπίας και της βάδισης σε ασθενείς με διαβητική περιφερική νευροπάθεια : συστηματική ανασκόπηση Effectiveness of therapeutic exercise on balance and gait in patients with diabetic peripheral neuropathy : a systematic review",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a6fdf779f037a565724b8a53",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_3005",
+        "title": "Η χρήση της Εικονικής Πραγματικότητας σε ασθενείς με Χρόνια Αποφρακτική Πνευμονοπάθεια",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a18c397055e5a0714f503130",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_2065",
+        "title": "Τεχνικές νου - σώματος σε αναπνευστικές παθήσεις",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0198786be77c7830c35aa7f1",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_3179",
+        "title": "Η επίδραση του βελονισμού στις ψυχοκοινωνικές παραμέτρους ασθενών με χρόνια οσφυαλγία. Συστηματική ανασκόπηση",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_847e05c1623644825d31a4c4",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2949555",
+        "title": "Φυσικοθεραπευτική αποκατάσταση μετά από κακώσεις νωτιαίου μυελού",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_88c88c2591e834fd21e2a683",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3232349",
+        "title": "Η έκφραση της εθνικής ταυτότητας στον Pedro Henríquez Ureña και στον Ίωνα Δραγούμη",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3a762d2c8d22cd308a2f0095",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3232264",
+        "title": "Η επίδραση της άσκησης σε ασθενείς με σύνδρομο άπνοιας - υπόπνοιας κατά τον ύπνο: συστηματική ανασκόπηση",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_eaeedc080d320e64cb274eff",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_7533",
+        "title": "Η επίδραση παρεμβατικών προγραμμάτων εικονικής πραγματικότητας στην κινητική απόδοση παιδιών με αναπτυξιακή διαταραχή κινητικού συντονισμού. Μία συστηματική ανασκόπηση.",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_98bf57e850044554cc05ca50",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_5163",
+        "title": "Η επίδραση των ασκήσεων πυγμαχίας στην λειτουργική ικανότητα και στην ποιότητα ζωής ατόμων με νόσο Parkinson",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f72757aaedf0527528073b91",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_27811",
+        "title": "Διερεύνηση της αποτελεσματικότητας των εναλλακτικών θεραπευτικών ασκήσεων συγκριτικά ή συνδυαστικά με την εκπαίδευση μυών του πυελικού εδάφους σε γυναίκες με ακράτεια ούρων: συστηματική ανασκόπηση και μετά-ανάλυση",
+        "query": "\"Pedro Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9500ac0833a68f864d9e5a29",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_13950",
+        "title": "Σύνδρομο Pierre Robin: πρώιμη εγχειρητική αντιμετώπιση της αναπνευστικής δυσχέρειας Pierre Robin syndrome: primary surgical management of the airway obstruction",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6a940f7d271055e86ede6812",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_25655",
+        "title": "Ματωμένοι έρωτες",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_57648a830cd06c6e24015ca3",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_20384",
+        "title": "Serenade: pour Hautbois , clarinette & basson",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f64034d6cb2828674d6b7487",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_20692",
+        "title": "Dialogues Canadiens: pour hautbois et orchestre a codres",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_bb23ca514c3df1b09ce53b87",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3032884",
+        "title": "Relationship between SARS-CoV-2 infection and the incidence of ventilator-associated lower respiratory tract infections: a European multicenter cohort study (vol 47, pg 188, 2021)",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e33b15a72557aa2c7b6a378b",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_16335",
+        "title": "Θεωρητικές προσεγγίσεις στις τεχνολογίες πληροφορίας και επικοινωνίας: το έργο των Jean Baudrillard, Pierre-Andre Taguieff, Neil Postman, John B Thompson, Pierre Levy και Mark Poster",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_66a1de6d60385f74ebd2b977",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/mnimon/000087-8146",
+        "title": "Essais d'ego-histoire (Maurice Agulhon, Pierre Chaunu, Georges Duby, Raoul Girardet, Jacques Le Goff, Michelle Perrot, René Rémond) réunis et présentés par Pierre Nora",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a3abed49abc97160ba035115",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3165963",
+        "title": "Development and validation of a prognostic nomogram to predict overall survival (OS) in platinum-resistant ovarian cancer (PROC): An AURELIA substudy.",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9f1948ab71ab3d63def7b0ec",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3371593",
+        "title": "Η οντολογική πυκνότητα του συμβολικού. Όψεις της συμβολικής βίας στο έργο του Pierre Bourdieu",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f7746fb77cd4a6e7eb4c4221",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3030671",
+        "title": "Relationship between ventilator-associated pneumonia and mortality in COVID-19 patients: a planned ancillary analysis of the coVAPid cohort (vol 25, 177, 2021)",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_da916e62f4791a2ed3aa816f",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_25483",
+        "title": "La politique d' Héraclite d' Éphèse",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_53ec638fba2ff390b8fbf86b",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/kallipos/000065-11419_13008",
+        "title": "Συγκεκριμένη μουσική (musique concrète) και ηλεκτρονική μουσική (elektronische musik) Musique concrete & elektronische musik",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_dde2144c6ec71291da770cf5",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_7446",
+        "title": "L'art du poète et de l'orateur : nouvelle rhétorique à l'usage des colleges, précédé d'un Essai d'éducation",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_503421a6aba22ac9b003c74c",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3031784",
+        "title": "The coral fauna from the Oligocene of Malta: Biodiversity and paleoenvironment (vol 107, 102508, 2021)",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_41f2eea9910138449a302e19",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_28662",
+        "title": "De la vinification : analyse et avenir",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_30b1f19a487df34319db9b16",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-133243",
+        "title": "Τα σχόλια του Petrus Morellus Turonensis στο ποιητικό του έργο De bello Troiano: εισαγωγή, editio princeps, υπομνηματισμός",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_06094d8b1db47f5e46cec3b0",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_23025",
+        "title": "Jean-Claude Anscombre, María Luisa Donaire et Pierre Patrick Haillet (dir.), Opérateurs discursifs du français, 2 : Éléments de description sémantique et pragmatique. (Sciences pour la communication, 123.) Berne : Peter Lang, 2018, 539 pp. 978 3 0343 3285 9 (broché), 978 3 0343 3286 6 (PDF), 978 3 0343 3287 3 (EPUB)",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f90e710e976b6e68e1209519",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3129937",
+        "title": "Pierre-Charles-Alexandre Louis' (1787-1872) numerical method and its contribution to the study of chest diseases [Apport de la « méthode numérique » de Pierre-Charles-Alexandre Louis (1787-1872) dans les maladies de poitrine]",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ac75574909ae226f3d0340b6",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Pandemos/000014-123456789_7877",
+        "title": "Pierre Bourdieu: ο διαπρεπής Γάλλος κοινωνιολόγος",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4b59b62812573b89324c024a",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_16526",
+        "title": "Το μαχητικό ένστιχτο / Pierre Bovet ; μετάφραση Γιάννη Ιμβριώτη",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2caa5fe6122e00b331771c99",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_55956",
+        "title": "Το εκδοτικό πεδίο των ελληνικών πολιτικών εκδόσεων κατά τη μακρά δεκατία του '60, το παράδειγμα των «Ιστορικών Εκδόσεων», 1963-1981 The Greek political publishing field during the long 1960s, exemplified by the case of Istorikes Ekdoseis, 1963–1981",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_cf010b695ed3e8863588d92b",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/makedonika/000086-5929",
+        "title": "Το μοναστήρι της Μπουνάσιας και τα λιθανάγλυφά του Le monastère de Vounassia et ses bas-reliefs en pierre",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0f0776ee94eb409fccbdbdf6",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_28978",
+        "title": "Τα σχόλια του Petrus Morellus Turonensis στο ποιητικό του έργο De Bello Troiano: εισαγωγή, editio princeps, υπομνηματισμός Petrus Morellus Turonensis' scholia on his poetic work De Bello Troiano: introduction, editio princeps, commentary",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c7e745f14a4b61a6a53a4e3c",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2950935",
+        "title": "Mitogen-activated protein kinase activation in lung adenocarcinoma: a comparative study between ever smokers and never smokers",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5c4c8acf873c1fbd9e512369",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2953189",
+        "title": "Mitogen-activated protein kinase activation in lung adenocarcinoma: a comparative study between ever smokers and never smokers",
+        "query": "\"Pierre Lanza\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d805038a026ffe82e0ce0b8c",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15258",
+        "title": "Exploring the attitudes of students in Tertiary and Upper Secondary Education towards Electronic Voting and employment of an electronic voting.",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b0b16bd5c67904b62dad742a",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15597",
+        "title": "Διαχείριση λίστας καθημερινών αγορών με χρήση έξυπνων κινητών.",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9f3fda62b5bcdb23f01f8237",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_17005",
+        "title": "Σχεδιασμός νέων εμπορικών δραστηριοτήτων σε διεθνές περιβάλλον.",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ea841e4c5b09b13dff2a5077",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_7394",
+        "title": "Εξέλιξη βάσεων δεδομένων και συντηρήση εξαρτώμενων εφαρμογών μέσω επανεγγραφής ερωτήσεων Database evolution and maintenance of their dependent applications via query rewriting",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3801aa15a03efa7cd88ca82f",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_21776",
+        "title": "Μελέτη κι υλοποίηση αλγορίθμων αναζήτησης προτύπου σε κείμενο",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_16c2b4bb537d78cb0beeee06",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_19577",
+        "title": "Βιομηχανικαί δυνατότητες και ενεργειακή πολιτική εν Ελλάδι.",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2dd8c3bcbd3d13eccc72ba9e",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15407",
+        "title": "Branding και rebranding της Atebank.",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1ec9ad00040c0b2535278284",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_18714",
+        "title": "Η θεωρία των Ψυχολογικών Επιχειρήσεων και οι εφαρμογές τους στη Στρατηγική από τον Τρωικό Πόλεμο μέχρι σήμερα.",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_51cf86c12d3eac8e859a1048",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15355",
+        "title": "Οικονομία και πόλεμος.",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_212eda614dfcfaaac08953dd",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_19712",
+        "title": "H συμπεριφορά του καταναλωτή απέναντι στο ελαιόλαδο.",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1d6819bf46471488a5411416",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_22104",
+        "title": "Why do blockchains exist?",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c2105385830f921bca6a3c4e",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_19605",
+        "title": "Αξιολόγηση και ιεράρχηση μοντέλων ηλεκτρικής κιθάρας με χρήση πολυ-κριτηρίων μεθόδων.",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b929b3267e704764f149f934",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_25584",
+        "title": "Νεωτερικότητα και ακροδεξιά στα μετακομμουνιστικά Βαλκάνια - οι περιπτώσεις της Βουλγαρίας, Ρουμανίας και Σερβίας 1989-2020 Modernity and the far right in the post-communist Balkans – the cases of Bulgaria, Romania and Serbia, 1989-2020",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b54688a8ccf4ac6efac46cc8",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_27612",
+        "title": "Εξόρυξη προφίλ χρηστών και ανάλυση συναισθήματος για ένα εμπορικό σήμα με τη χρήση δεδομένων από το κοινωνικό μέσο Twitter User profiling and sentiment analysis for a brand using data from social medium Twitter",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8b97783d39ff150c6a6a3f92",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_29935",
+        "title": "Δικλείδες ασφαλείας εσωτερικού ελέγχου και λογιστικές απάτες",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_58f0a5de55d745206dc1558a",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uowm/000126-105",
+        "title": "Διάταξη οπτικού ερευνητικού κινητήρα εσωτερικής καύσης και μετρήσεις αναφοράς με ισο-οκτάνιο",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_65efb1f4b57e5643cd5ce315",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_14805",
+        "title": "O οδικός χάρτης από τα παραδοσιακά καζίνο στα διαδικτυακά καζίνο στην Ελλάδα: από τη συμμόρφωση στην υλοποίηση.",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d64a626f3127aea0d0055b4d",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_18715",
+        "title": "Η Ανεξαρτητοποίηση του κοσσυφοπεδίου και οι συνέπειες για την Ελληνική ασφάλεια και εξωτερική πολιτική",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_bfe3ba1d1d75808521d1b15b",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_21152",
+        "title": "Διεθνή πρότυπα χρηματοοικονομικής αναφοράς: διεθνές λογιστικό πρότυπο 2 αποθέματα",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3e3b2ce8b89406c92db1c198",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_21022",
+        "title": "Πληφοροριακά συστήματα και ψηφιακά εργαλεία για μικρομεσαίες επιχειρήσεις: ένας οδηγός",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_155cfa275fe0cadcd925e2df",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_20333",
+        "title": "Εκτιμώντας τις συνέπειες των κυβρνοεπιθέσεων σε μια εταιρία και την προστασία της",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_31b84c7fd326dc43e1e16f7a",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_20321",
+        "title": "Το ελληνικόν ισοζύγιον πληρωμών των ετών 1948-1957",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_03acb46e396467d7ab13588e",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_7699",
+        "title": "Purification and characterization of a thermostable intracellular Ξ²-xylosidase from the thermophilic fungus Sporotrichum thermophile",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_338b735970dfae640a50c886",
+        "run_id": "40826680706",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_26229",
+        "title": "Digitizing the future of Sustainable Tourism: The MITOS ICT-based tourism platform",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      }
+    ],
+    "connector_errors": [
+      {
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "status": "REMOTE_ERROR",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 998}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      }
+    ],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 123,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
