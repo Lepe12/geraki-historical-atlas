@@ -8,9 +8,14 @@ on:
 jobs:
   discover:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full checkout of this repo takes ~4 min; the connector needs only these paths.
+          sparse-checkout: |
+            connectors
+            tools
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
