@@ -127,6 +127,26 @@ class ActiveRoundTests(unittest.TestCase):
             self.assertEqual(ledger['auto_chain_decisions'][-1]['reason'], 'ACTIVE_ROUND_CHECK_FAILED')
 
 
+class PrefilteredQueueTests(unittest.TestCase):
+    def test_baseline_accepts_listed_filtered_excerpts(self):
+        # Kimolos 40857073690: total 259 kept, 148 FILTERED listed, 407 items.
+        from research_continuation_handoff import state
+        with tempfile.TemporaryDirectory() as tmp:
+            cont = Path(tmp) / 'research_continuation'
+            (cont / 'g').mkdir(parents=True)
+            (cont / 'active.json').write_text(json.dumps({'queue': 'g/queue.json'}))
+            items = ([{'evidence_id': 'e%d' % n, 'status': 'EXAMINED'} for n in range(2)] +
+                     [{'evidence_id': 'p%d' % n, 'status': 'PENDING'} for n in range(3)] +
+                     [{'evidence_id': 'f%d' % n, 'status': 'FILTERED'} for n in range(4)])
+            queue = {'total': 5, 'completed': 2, 'status': 'PENDING', 'filtered': 4, 'items': items}
+            (cont / 'g/queue.json').write_text(json.dumps(queue))
+            self.assertEqual(state(tmp)['completed'], ['e0', 'e1'])
+            queue['filtered'] = 3
+            (cont / 'g/queue.json').write_text(json.dumps(queue))
+            with self.assertRaisesRegex(ValueError, 'INCONSISTENT_QUEUE_COUNTS'):
+                state(tmp)
+
+
 class WorkflowWiringTests(unittest.TestCase):
     def test_reanalysis_rounds_are_serialised_and_guarded(self):
         text = (ROOT / '.github/workflows/research-semantic-reanalysis.yml').read_text()

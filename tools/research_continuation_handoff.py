@@ -28,8 +28,11 @@ def state(root, queue_relative=None):
         raise ValueError('UNSAFE_QUEUE_PATH')
     queue = json.loads(queue_path.read_text())
     ids = [item['evidence_id'] for item in queue['items']]
+    # Pre-filtered excerpts (excerpt_prefilter.py) stay listed but are not in 'total'.
+    filtered = [item for item in queue['items'] if item['status'] == 'FILTERED']
     completed = sorted(item['evidence_id'] for item in queue['items'] if item['status'] == 'EXAMINED')
-    if len(ids) != len(set(ids)) or len(ids) != queue['total'] or len(completed) != queue['completed']:
+    if (len(ids) != len(set(ids)) or len(ids) - len(filtered) != queue['total'] or
+            len(filtered) != queue.get('filtered', 0) or len(completed) != queue['completed']):
         raise ValueError('INCONSISTENT_QUEUE_COUNTS')
     responses = sorted(queue_path.parent.glob('responses/*.json'))
     for path in queue_path.parent.glob('batches/*.json'):
