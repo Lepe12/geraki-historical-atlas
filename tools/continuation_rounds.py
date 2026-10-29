@@ -102,8 +102,11 @@ def record(root, answer, round_number, analysis_path=None, env=None):
         row['shards'] = answer['semantic_shards']
     rounds.append(row)
     rounds.sort(key=lambda r: r['round'])
+    decisions = ledger.get('auto_chain_decisions')  # tools/auto_chain.py log
     ledger = {'schema': SCHEMA, 'caps': cap, 'rounds': rounds,
               'role': 'COVERAGE_METRICS_NOT_HISTORICAL_VERIFICATION'}
+    if decisions:
+        ledger['auto_chain_decisions'] = decisions
     ledger['stop_reason'] = stop_rule(ledger, cap)
     atomic(ledger_path(root), ledger)
     return ledger
