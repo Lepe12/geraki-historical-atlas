@@ -1,0 +1,2414 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "source_genealogy",
+  "label": "Source Genealogy Agent",
+  "assignment_id": "source_genealogy:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "source_chains",
+    "derivative_sources",
+    "independence_warnings",
+    "primary_source_targets"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "88659e2123654e3dcfe265ae38e73650e895be81d2fbdecd8013b6732612cd37",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "source_genealogy",
+    "assignment_id": "source_genealogy:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:Biblioteca Digital Hispánica",
+      "repo:Academia.edu Public Research"
+    ],
+    "queries": [
+      "\"Zerphalon\" cited by",
+      "\"Zerphalon\" bibliography sources",
+      "\"Zerphalon\" edition translation",
+      "\"Zerphalon\" chronicle manuscript",
+      "\"Ζερφαλων\""
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 108,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 100,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 90,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Crossref Scholarly Metadata",
+        "route_type": "repository_dispatch",
+        "repository": "Crossref Scholarly Metadata",
+        "connector_id": null,
+        "score": 86,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\" cited by",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Zerphalon%22+cited+by&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22Zerphalon%22+cited+by&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25537, \"response_sha256\": \"55cc8ae95a27ebae8c80b3222815ec713a96b3415f9360baa7dfec877fed2b10\", \"elapsed_ms\": 557}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22Zerphalon%22+cited+by&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\" bibliography sources",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Zerphalon%22+bibliography+sources&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22Zerphalon%22+bibliography+sources&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25553, \"response_sha256\": \"dd8259edb1edd52cbf2c6b9001c9a19845e2b8274dd6d2cfe4d2bfc7cb63d26b\", \"elapsed_ms\": 60}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22Zerphalon%22+bibliography+sources&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\" cited by",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++cited+by%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++cited+by%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 614, \"response_sha256\": \"b010f6359216d348c0c3b10cdf1f4c93ecfd64a4cdcd0568d0bcb12940c5ba97\", \"elapsed_ms\": 674}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++cited+by%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\" edition translation",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Zerphalon%22+edition+translation&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22Zerphalon%22+edition+translation&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25553, \"response_sha256\": \"e96ffae9a66ee97a960d0efc7721ad41854bc9cea5eb0d18ea9770e0cdb85918\", \"elapsed_ms\": 61}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22Zerphalon%22+edition+translation&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\" edition translation",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++edition+translation%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++edition+translation%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 625, \"response_sha256\": \"2405165c32a487c45cb53f953f9d2438945156d892d26db792c76d146b334aca\", \"elapsed_ms\": 692}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++edition+translation%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ζερφαλων\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 612, \"response_sha256\": \"a61e102d02506a12de7e9cc919e339e23f25afb97dc2db20eae4af7d0f9d46b0\", \"elapsed_ms\": 704}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\" bibliography sources",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++bibliography+sources%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++bibliography+sources%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 626, \"response_sha256\": \"cf62909cc2767146fbc3f6dda71a2f977c763c7f25e6d7d25cb312485f2ffac0\", \"elapsed_ms\": 716}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++bibliography+sources%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\" chronicle manuscript",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++chronicle+manuscript%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++chronicle+manuscript%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 626, \"response_sha256\": \"8948fd805921077bf32e465189318ede6a7367e48b5ac5e9cb9f6660ca3b3e06\", \"elapsed_ms\": 718}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Zerphalon++chronicle+manuscript%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\" chronicle manuscript",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Zerphalon%22+chronicle+manuscript&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22Zerphalon%22+chronicle+manuscript&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 31568, \"response_sha256\": \"c962a29925e5898d8ebbf90e40a369cda78a842446c75ed02f6187ea23cf094b\", \"elapsed_ms\": 82}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22Zerphalon%22+chronicle+manuscript&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Ζερφαλων\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 105}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 105}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\" chronicle manuscript",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Zerphalon%22+AND+alma.all_for_ui%3D%22chronicle%22+AND+alma.all_for_ui%3D%22manuscript%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Zerphalon%22+AND+alma.all_for_ui%3D%22chronicle%22+AND+alma.all_for_ui%3D%22manuscript%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"eba364aae0527d60a784b8d5e8b4c708ec5288d2acc5336fd850c222f7a84531\", \"elapsed_ms\": 889}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Zerphalon%22+AND+alma.all_for_ui%3D%22chronicle%22+AND+alma.all_for_ui%3D%22manuscript%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Ζερφαλων\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"eba364aae0527d60a784b8d5e8b4c708ec5288d2acc5336fd850c222f7a84531\", \"elapsed_ms\": 853}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\" bibliography sources",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Zerphalon%22+AND+alma.all_for_ui%3D%22bibliography%22+AND+alma.all_for_ui%3D%22sources%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Zerphalon%22+AND+alma.all_for_ui%3D%22bibliography%22+AND+alma.all_for_ui%3D%22sources%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"eba364aae0527d60a784b8d5e8b4c708ec5288d2acc5336fd850c222f7a84531\", \"elapsed_ms\": 905}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Zerphalon%22+AND+alma.all_for_ui%3D%22bibliography%22+AND+alma.all_for_ui%3D%22sources%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\" cited by",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Zerphalon%22+AND+alma.all_for_ui%3D%22cited%22+AND+alma.all_for_ui%3D%22by%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Zerphalon%22+AND+alma.all_for_ui%3D%22cited%22+AND+alma.all_for_ui%3D%22by%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"eba364aae0527d60a784b8d5e8b4c708ec5288d2acc5336fd850c222f7a84531\", \"elapsed_ms\": 943}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Zerphalon%22+AND+alma.all_for_ui%3D%22cited%22+AND+alma.all_for_ui%3D%22by%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Zerphalon\" edition translation",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Zerphalon%22+AND+alma.all_for_ui%3D%22edition%22+AND+alma.all_for_ui%3D%22translation%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Zerphalon%22+AND+alma.all_for_ui%3D%22edition%22+AND+alma.all_for_ui%3D%22translation%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"eba364aae0527d60a784b8d5e8b4c708ec5288d2acc5336fd850c222f7a84531\", \"elapsed_ms\": 922}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Zerphalon%22+AND+alma.all_for_ui%3D%22edition%22+AND+alma.all_for_ui%3D%22translation%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Zerphalon\" edition translation",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+edition+translation\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 117}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+edition+translation&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 306}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+edition+translation&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+edition+translation&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1196, \"response_sha256\": \"a474957895221cbd9f82317299d1feaccf39e4d98ca44019ee681ec67233f502\", \"elapsed_ms\": 328}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+edition+translation\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 117}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+edition+translation&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 306}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+edition+translation&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+edition+translation&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1196, \"response_sha256\": \"a474957895221cbd9f82317299d1feaccf39e4d98ca44019ee681ec67233f502\", \"elapsed_ms\": 328}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Ζερφαλων\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 99}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 295}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1183, \"response_sha256\": \"ba10bcca2ba7b0886e245e1695678fb634bd3d9bd1fbb197f4e354d60cd947e9\", \"elapsed_ms\": 447}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 99}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 295}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1183, \"response_sha256\": \"ba10bcca2ba7b0886e245e1695678fb634bd3d9bd1fbb197f4e354d60cd947e9\", \"elapsed_ms\": 447}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverag"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Zerphalon\" bibliography sources",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+bibliography+sources\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 116}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+bibliography+sources&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 310}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+bibliography+sources&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+bibliography+sources&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1200, \"response_sha256\": \"0260f2437ecb50f6df48e522d38a4651bcd4896baa54f2687daf20dda6c4f37b\", \"elapsed_ms\": 457}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+bibliography+sources\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 116}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+bibliography+sources&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 310}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+bibliography+sources&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+bibliography+sources&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1200, \"response_sha256\": \"0260f2437ecb50f6df48e522d38a4651bcd4896baa54f2687daf20dda6c4f37b\", \"elapsed_ms\": 457}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Zerphalon\" cited by",
+      "records": [
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.7717/peerj.6178/table-1",
+          "title": "Table 1: T100 most-cited articles ranked by the number of Times cited.",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.7717/peerj.6178/table-1",
+          "doi": "10.7717/peerj.6178/table-1",
+          "type": "component",
+          "publisher": "PeerJ",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.7717/peerj.6178/supp-4",
+          "title": "Supplemental Information 4: T100 most-cited articles ranked by the number of times cited.",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.7717/peerj.6178/supp-4",
+          "doi": "10.7717/peerj.6178/supp-4",
+          "type": "component",
+          "publisher": "PeerJ",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.4148/npp.32220.cmp.ms35td209",
+          "title": "Works Cited",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.4148/npp.32220.cmp.ms35td209",
+          "doi": "10.4148/npp.32220.cmp.ms35td209",
+          "type": "component",
+          "publisher": "Kansas State University",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.7287/peerj.preprints.27259v1/supp-2",
+          "title": "",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.7287/peerj.preprints.27259v1/supp-2",
+          "doi": "10.7287/peerj.preprints.27259v1/supp-2",
+          "type": "dataset",
+          "publisher": "PeerJ",
+          "container_title": [
+            "Supplemental Information 2: The top 100 most-cited articles ranked by the number of times cited"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2139/ssrn.5431247",
+          "title": "Discourse Synthesis in Academic Writing: Rhetorical Functions at the Cited-Cited Level",
+          "creator": [
+            "Chris Cookson"
+          ],
+          "date": [
+            "2025"
+          ],
+          "url": "https://doi.org/10.2139/ssrn.5431247",
+          "doi": "10.2139/ssrn.5431247",
+          "type": "posted-content",
+          "publisher": "Elsevier BV",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.7287/peerj.preprints.27259/supp-2",
+          "title": "",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.7287/peerj.preprints.27259/supp-2",
+          "doi": "10.7287/peerj.preprints.27259/supp-2",
+          "type": "dataset",
+          "publisher": "PeerJ",
+          "container_title": [
+            "Supplemental Information 2: The top 100 most-cited articles ranked by the number of times cited"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.5555/m4rszqgg5k",
+          "title": "Cited-by",
+          "creator": [],
+          "date": [
+            "2023-10-18"
+          ],
+          "url": "https://doi.org/10.5555/m4rszqgg5k",
+          "doi": "10.5555/m4rszqgg5k",
+          "type": "posted-content",
+          "publisher": "Test accounts",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.7717/peerj.6739/fig-11",
+          "title": "Figure 11: Dates of publication of works cited against the date of publication of the cited work.",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.7717/peerj.6739/fig-11",
+          "doi": "10.7717/peerj.6739/fig-11",
+          "type": "component",
+          "publisher": "PeerJ",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.7717/peerj.18645/supp-4",
+          "title": "Supplemental Information 4: The visualization of co-cited authors (A) and co-cited journals (B) from Scopus.",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.7717/peerj.18645/supp-4",
+          "doi": "10.7717/peerj.18645/supp-4",
+          "type": "component",
+          "publisher": "PeerJ",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.31235/osf.io/8tx3v",
+          "title": "On the Mortality of Cited Works, Cited Authors, and Writing Authors in Sociology",
+          "creator": [
+            "Alec McGail"
+          ],
+          "date": [
+            "2020-6-9"
+          ],
+          "url": "https://doi.org/10.31235/osf.io/8tx3v",
+          "doi": "10.31235/osf.io/8tx3v",
+          "type": "posted-content",
+          "publisher": "Center for Open Science",
+          "container_title": [],
+          "description": "In this study I take a demographic perspective, analyzing age and mortality of books and articles which are cited, the authors that receive citations, and the authors writing the citations in the full published volumes of 73 sociology journals. I give a new operationalization of dates of deathβ for cited authors and cited works, as well as dates of rebirthα and document risk of death0.1 across the life course for cited works, cited authors, and writing authors in these journals. I report the top 1% cited works and cited authors, and on their untimely deaths. I discuss why sociologists should study sociology’s past and provide a Python package knowknow for replication and extension of these findings.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.7717/peerj.6411/supp-3",
+          "title": "Table S1: Raw data of the top 100 most-cited articles ranked by the number of times cited",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.7717/peerj.6411/supp-3",
+          "doi": "10.7717/peerj.6411/supp-3",
+          "type": "component",
+          "publisher": "PeerJ",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.5555/3s3eaxyt7a",
+          "title": "Cited-by",
+          "creator": [],
+          "date": [
+            "2023-10-30"
+          ],
+          "url": "https://doi.org/10.5555/3s3eaxyt7a",
+          "doi": "10.5555/3s3eaxyt7a",
+          "type": "posted-content",
+          "publisher": "Test accounts",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.7717/peerj.5477/table-3",
+          "title": "Table 3: The top 10 authors, co-cited authors, and co-cited references in hepatocellular carcinoma research.",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.7717/peerj.5477/table-3",
+          "doi": "10.7717/peerj.5477/table-3",
+          "type": "component",
+          "publisher": "PeerJ",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.7717/peerj.20765/supp-7",
+          "title": "Supplemental Information 7: The 11 most frequently cited instruments (cited more than twice), categorised according to ICF domains",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.7717/peerj.20765/supp-7",
+          "doi": "10.7717/peerj.20765/supp-7",
+          "type": "component",
+          "publisher": "PeerJ",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2139/ssrn.6391160",
+          "title": "Discourse Synthesis in Academic Writing: A Typology of Rhetorical Relationships at the Cited-Cited Level",
+          "creator": [
+            "Chris Cookson"
+          ],
+          "date": [
+            "2026"
+          ],
+          "url": "https://doi.org/10.2139/ssrn.6391160",
+          "doi": "10.2139/ssrn.6391160",
+          "type": "posted-content",
+          "publisher": "Elsevier BV",
+          "container_title": [],
+          "description": "Although synthesising material from multiple sources is widely recognised as a core skill in academic writing, and one that students often find difficult to master, existing research offers limited pedagogically applicable accounts that capture the diversity of rhetorical functions involved, particularly at the cited-cited level of analysis. This article addresses this gap by proposing a typology of sixteen distinct rhetorical relationships at the cited-cited level, highlighting how sources are interrelated within academic discourse beyond the citing author’s stance alone. The typology was developed through qualitative analysis of journal articles and book chapters in applied linguistics, education, and related fields, from which authentic examples of discourse synthesis were identified and inductively classified. Each relationship is defined and labelled according to its communicative purpose and typical lexico-grammatical patterning, and is illustrated through authentic excerpts accompanied by analytical commentary. While grounded in English academic discourse, the typology is presented as a descriptive framework that offers researchers a conceptual vocabulary for analysing relationships among cited sources and provides pedagogically relevant insights into how discourse synthesis operates in academic writing.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.3726/978-3-653-01677-2/13",
+          "title": "Works Cited",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.3726/978-3-653-01677-2/13",
+          "doi": "10.3726/978-3-653-01677-2/13",
+          "type": "book-chapter",
+          "publisher": "Peter Lang",
+          "container_title": [
+            "Luminous Traversing"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2139/ssrn.6439623",
+          "title": "Discourse Synthesis in Academic Writing: A Typology of Rhetorical Relationships at the Cited-Cited Level",
+          "creator": [
+            "Chris Cookson"
+          ],
+          "date": [
+            "2026"
+          ],
+          "url": "https://doi.org/10.2139/ssrn.6439623",
+          "doi": "10.2139/ssrn.6439623",
+          "type": "posted-content",
+          "publisher": "Elsevier BV",
+          "container_title": [],
+          "description": "Although synthesising material from multiple sources is widely recognised as a core skill in academic writing, and one that students often find difficult to master, existing research offers limited pedagogically applicable accounts that capture the diversity of rhetorical functions involved, particularly at the cited-cited level of analysis. This article addresses this gap by proposing a typology of sixteen distinct rhetorical relationships at the cited-cited level, highlighting how sources are interrelated within academic discourse beyond the citing author’s stance alone. The typology was developed through qualitative analysis of journal articles and book chapters in applied linguistics, education, and related fields, from which authentic examples of discourse synthesis were identified and inductively classified. Each relationship is defined and labelled according to its communicative purpose and typical lexico-grammatical patterning, and is illustrated through authentic excerpts accompanied by analytical commentary. While grounded in English academic discourse, the typology is presented as a descriptive framework that offers researchers a conceptual vocabulary for analysing relationships among cited sources and provides pedagogically relevant insights into how discourse synthesis operates in academic writing.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.3726/978-3-0353-0464-0/9",
+          "title": "Works Cited",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.3726/978-3-0353-0464-0/9",
+          "doi": "10.3726/978-3-0353-0464-0/9",
+          "type": "book-chapter",
+          "publisher": "Peter Lang",
+          "container_title": [
+            "James Kelman"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.7312/jaeg15198-014",
+          "title": "Works Cited",
+          "creator": [],
+          "date": [
+            "2014-1-31"
+          ],
+          "url": "https://doi.org/10.7312/jaeg15198-014",
+          "doi": "10.7312/jaeg15198-014",
+          "type": "book-chapter",
+          "publisher": "Columbia University Press",
+          "container_title": [
+            "Alienation"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://www.degruyter.com/view/books/jaeg15198/jaeg15198-014/jaeg15198-014.xml",
+              "content_type": "text/html",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyter.com/document/doi/10.7312/jaeg15198-014/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.3726/978-3-653-03458-5/9",
+          "title": "Works Cited",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.3726/978-3-653-03458-5/9",
+          "doi": "10.3726/978-3-653-03458-5/9",
+          "type": "book-chapter",
+          "publisher": "Peter Lang",
+          "container_title": [
+            "Bicultural Bodies"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+cited+by\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 131}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+cited+by&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+cited+by&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 69429, \"response_sha256\": \"46329cf0fead9248dadca6b8aa56206983714822bd74a1d86547444d9dd75908\", \"elapsed_ms\": 1031}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+cited+by&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+cited+by&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1152, \"response_sha256\": \"6ead842c6f1a949e030f94d908a7d0b6e3788229b93f849f2b2dd0364957cc34\", \"elapsed_ms\": 540}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 20, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+cited+by\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 131}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+cited+by&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+cited+by&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 69429, \"response_sha256\": \"46329cf0fead9248dadca6b8aa56206983714822bd74a1d86547444d9dd75908\", \"elapsed_ms\": 1031}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+cited+by&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+cited+by&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1152, \"response_sha256\": \"6ead842c6f1a949e030f94d908a7d0b6e3788229b93f849f2b2dd0364957cc34\", \"elapsed_ms\": 540}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\""
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Zerphalon\" chronicle manuscript",
+      "records": [
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.4324/9780203500880-6",
+          "title": "The Metrical Chronicle Family and Manuscript Practice",
+          "creator": [],
+          "date": [
+            "2004-6-1"
+          ],
+          "url": "https://doi.org/10.4324/9780203500880-6",
+          "doi": "10.4324/9780203500880-6",
+          "type": "book-chapter",
+          "publisher": "Routledge",
+          "container_title": [
+            "Worlds Made Flesh"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/2213-2139_emc_emcsim_00675",
+          "title": "Manuscript of Anholt",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/2213-2139_emc_emcsim_00675",
+          "doi": "10.1163/2213-2139_emc_emcsim_00675",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/9789004184640_emc_sim_00675",
+          "title": "Manuscript of Anholt",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/9789004184640_emc_sim_00675",
+          "doi": "10.1163/9789004184640_emc_sim_00675",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/2213-2139_emc_sim_00675",
+          "title": "Manuscript of Anholt",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/2213-2139_emc_sim_00675",
+          "doi": "10.1163/2213-2139_emc_sim_00675",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/2213-2139_emc_sim_01764",
+          "title": "Manuscript production in England",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/2213-2139_emc_sim_01764",
+          "doi": "10.1163/2213-2139_emc_sim_01764",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/2213-2139_emc_sim_01763",
+          "title": "Manuscript patrons and provenance",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/2213-2139_emc_sim_01763",
+          "doi": "10.1163/2213-2139_emc_sim_01763",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/9789004184640_emc_sim_01764",
+          "title": "Manuscript production in England",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/9789004184640_emc_sim_01764",
+          "doi": "10.1163/9789004184640_emc_sim_01764",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/2213-2139_emc_emcsim_01763",
+          "title": "Manuscript patrons and provenance",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/2213-2139_emc_emcsim_01763",
+          "doi": "10.1163/2213-2139_emc_emcsim_01763",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/9789004184640_emc_sim_01763",
+          "title": "Manuscript patrons and provenance",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/9789004184640_emc_sim_01763",
+          "doi": "10.1163/9789004184640_emc_sim_01763",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/2213-2139_emc_emcsim_01764",
+          "title": "Manuscript production in England",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/2213-2139_emc_emcsim_01764",
+          "doi": "10.1163/2213-2139_emc_emcsim_01764",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9781800104426-006",
+          "title": "The chronicle manuscript and its scribe, Luket Nantron (Deborah Ellen Thorpe)",
+          "creator": [],
+          "date": [
+            "2022-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9781800104426-006",
+          "doi": "10.1515/9781800104426-006",
+          "type": "book-chapter",
+          "publisher": "Boydell and Brewer",
+          "container_title": [
+            "A Soldiers' Chronicle of the Hundred Years War"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9781800104426-006/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9781800104426-006/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2307/j.ctv1q26txm.7",
+          "title": "THE CHRONICLE OF 1234:",
+          "creator": [],
+          "date": [
+            "2018-9-4"
+          ],
+          "url": "https://doi.org/10.2307/j.ctv1q26txm.7",
+          "doi": "10.2307/j.ctv1q26txm.7",
+          "type": "book-chapter",
+          "publisher": "Peeters Publishers",
+          "container_title": [
+            "The Anonymous Syriac Chronicle of 1234 and its Sources"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/2213-2139_emc_sim_01872",
+          "title": "Manuscript Utrecht, Gemeentearchief, VII F 5",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/2213-2139_emc_sim_01872",
+          "doi": "10.1163/2213-2139_emc_sim_01872",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/9789004184640_emc_sim_01872",
+          "title": "Manuscript Utrecht, Gemeentearchief, VII F 5",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/9789004184640_emc_sim_01872",
+          "doi": "10.1163/9789004184640_emc_sim_01872",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/2213-2139_emc_emcsim_01872",
+          "title": "Manuscript Utrecht, Gemeentearchief, VII F 5",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/2213-2139_emc_emcsim_01872",
+          "doi": "10.1163/2213-2139_emc_emcsim_01872",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.4324/9780203500880-7",
+          "title": "The Manuscript Challenge to Ideas of Medieval Nationalism",
+          "creator": [],
+          "date": [
+            "2004-6-1"
+          ],
+          "url": "https://doi.org/10.4324/9780203500880-7",
+          "doi": "10.4324/9780203500880-7",
+          "type": "book-chapter",
+          "publisher": "Routledge",
+          "container_title": [
+            "Worlds Made Flesh"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.4324/9780203500880-8",
+          "title": "The Anglo-Saxon Chronicle Manuscripts and Heroic Poetry",
+          "creator": [],
+          "date": [
+            "2004-6-1"
+          ],
+          "url": "https://doi.org/10.4324/9780203500880-8",
+          "doi": "10.4324/9780203500880-8",
+          "type": "book-chapter",
+          "publisher": "Routledge",
+          "container_title": [
+            "Worlds Made Flesh"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2307/26404770",
+          "title": "CHECKLIST OF MANUSCRIPT SOURCES",
+          "creator": [
+            "BRESCIA"
+          ],
+          "date": [
+            "1974"
+          ],
+          "url": "https://doi.org/10.2307/26404770",
+          "doi": "10.2307/26404770",
+          "type": "journal-article",
+          "publisher": "JSTOR",
+          "container_title": [
+            "The Princeton University Library Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2307/26402337",
+          "title": "MEDIEVAL MANUSCRIPT EXHIBITION, 1981",
+          "creator": [
+            "PRESTON"
+          ],
+          "date": [
+            "1981"
+          ],
+          "url": "https://doi.org/10.2307/26402337",
+          "doi": "10.2307/26402337",
+          "type": "journal-article",
+          "publisher": "JSTOR",
+          "container_title": [
+            "The Princeton University Library Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.4324/9780203500880",
+          "title": "Worlds Made Flesh",
+          "creator": [
+            "Lauryn Mayer"
+          ],
+          "date": [
+            "2004-6-1"
+          ],
+          "url": "https://doi.org/10.4324/9780203500880",
+          "doi": "10.4324/9780203500880",
+          "type": "monograph",
+          "publisher": "Routledge",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+chronicle+manuscript\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 115}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+chronicle+manuscript&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+chronicle+manuscript&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 22267, \"response_sha256\": \"831f3c81fd2764fc75e5629487a9289e71d42ecb4bd3576bedce3a6497f788ac\", \"elapsed_ms\": 899}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+chronicle+manuscript&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+chronicle+manuscript&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1201, \"response_sha256\": \"9b42cd3a4e25308b688c2c2d7f52b3cd2c0c89f99f86f6a10ded1a517ec1d382\", \"elapsed_ms\": 322}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 20, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+chronicle+manuscript\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 115}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+chronicle+manuscript&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+chronicle+manuscript&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 22267, \"response_sha256\": \"831f3c81fd2764fc75e5629487a9289e71d42ecb4bd3576bedce3a6497f788ac\", \"elapsed_ms\": 899}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+chronicle+manuscript&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+chronicle+manuscript&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1201, \"response_sha256\": \"9b42cd3a4e25308b688c2c2d7f52b3cd2c0c89f99f86f6a10ded1a517ec1d382\", \"elapsed_ms\": 322}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXE"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "40837723971",
+    "agent_id": "source_genealogy",
+    "source_leads": [
+      {
+        "id": "lead_e12cef7474224accc6acb049",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.7717/peerj.6178/table-1",
+        "title": "Table 1: T100 most-cited articles ranked by the number of Times cited.",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_049d355fc09d66c42622185e",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.7717/peerj.6178/supp-4",
+        "title": "Supplemental Information 4: T100 most-cited articles ranked by the number of times cited.",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6a55f9f64c2b041471f12ae8",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.4148/npp.32220.cmp.ms35td209",
+        "title": "Works Cited",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e745798757ad03d2b2d340df",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.7287/peerj.preprints.27259v1/supp-2",
+        "title": "",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b8b586afa68a42a403ecc7bb",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2139/ssrn.5431247",
+        "title": "Discourse Synthesis in Academic Writing: Rhetorical Functions at the Cited-Cited Level",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2e6bedc50d43041cc1ada248",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.7287/peerj.preprints.27259/supp-2",
+        "title": "",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3304dc04caf0b003f7e3a413",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.5555/m4rszqgg5k",
+        "title": "Cited-by",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_995b9ef19283aff98c904bfe",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.7717/peerj.6739/fig-11",
+        "title": "Figure 11: Dates of publication of works cited against the date of publication of the cited work.",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a070f1e82db011e7a0112607",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.7717/peerj.18645/supp-4",
+        "title": "Supplemental Information 4: The visualization of co-cited authors (A) and co-cited journals (B) from Scopus.",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3d84c21c096c39465fca5509",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.31235/osf.io/8tx3v",
+        "title": "On the Mortality of Cited Works, Cited Authors, and Writing Authors in Sociology",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_78b9170d468ee87074f35fc8",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.7717/peerj.6411/supp-3",
+        "title": "Table S1: Raw data of the top 100 most-cited articles ranked by the number of times cited",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4fe8b056136e88ebe48cb1b0",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.5555/3s3eaxyt7a",
+        "title": "Cited-by",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3503d90e0b139a9d6ca19d5a",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.7717/peerj.5477/table-3",
+        "title": "Table 3: The top 10 authors, co-cited authors, and co-cited references in hepatocellular carcinoma research.",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_79dc8634460281fefeca92d8",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.7717/peerj.20765/supp-7",
+        "title": "Supplemental Information 7: The 11 most frequently cited instruments (cited more than twice), categorised according to ICF domains",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5f46c64ccd3e97de71a06cd1",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2139/ssrn.6391160",
+        "title": "Discourse Synthesis in Academic Writing: A Typology of Rhetorical Relationships at the Cited-Cited Level",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_533dc9cc9f5723e188ca14ca",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.3726/978-3-653-01677-2/13",
+        "title": "Works Cited",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8d55d0b25c3b09d1d2ac8d26",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2139/ssrn.6439623",
+        "title": "Discourse Synthesis in Academic Writing: A Typology of Rhetorical Relationships at the Cited-Cited Level",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d35431c2997ead5ec7d097c5",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.3726/978-3-0353-0464-0/9",
+        "title": "Works Cited",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_dacf0a98f55f6a4fd512a1aa",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.7312/jaeg15198-014",
+        "title": "Works Cited",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ed6b58d353e0a0aa46924963",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.3726/978-3-653-03458-5/9",
+        "title": "Works Cited",
+        "query": "\"Zerphalon\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_aa63819d71999c9926e3d19e",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.4324/9780203500880-6",
+        "title": "The Metrical Chronicle Family and Manuscript Practice",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2ac4185d0efc510a2e1796fe",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/2213-2139_emc_emcsim_00675",
+        "title": "Manuscript of Anholt",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9a271a04d0a8117761caa49a",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/9789004184640_emc_sim_00675",
+        "title": "Manuscript of Anholt",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_57d02e62105ed22c6f16447e",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/2213-2139_emc_sim_00675",
+        "title": "Manuscript of Anholt",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2bc7f2e1dd1ead2a3129608d",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/2213-2139_emc_sim_01764",
+        "title": "Manuscript production in England",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8f18ea4a206c51a1fb4275b5",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/2213-2139_emc_sim_01763",
+        "title": "Manuscript patrons and provenance",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e361bd66a7d1b49a450c82a4",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/9789004184640_emc_sim_01764",
+        "title": "Manuscript production in England",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d487f2589e229020801d4001",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/2213-2139_emc_emcsim_01763",
+        "title": "Manuscript patrons and provenance",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_25a92fc9f57b4e1cedeb2f97",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/9789004184640_emc_sim_01763",
+        "title": "Manuscript patrons and provenance",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_bdbe89056db220bc9a791006",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/2213-2139_emc_emcsim_01764",
+        "title": "Manuscript production in England",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5050fc6f04637d0d7d661c50",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9781800104426-006",
+        "title": "The chronicle manuscript and its scribe, Luket Nantron (Deborah Ellen Thorpe)",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b014531e8c22df664a6bd4c3",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2307/j.ctv1q26txm.7",
+        "title": "THE CHRONICLE OF 1234:",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f03aac3331c1f3956b586582",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/2213-2139_emc_sim_01872",
+        "title": "Manuscript Utrecht, Gemeentearchief, VII F 5",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_22e2563d58cdad8cb0a70c6d",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/9789004184640_emc_sim_01872",
+        "title": "Manuscript Utrecht, Gemeentearchief, VII F 5",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_448ccaa2c3148c099407c2ee",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/2213-2139_emc_emcsim_01872",
+        "title": "Manuscript Utrecht, Gemeentearchief, VII F 5",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_77ff8d7aee26acd87af0193a",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.4324/9780203500880-7",
+        "title": "The Manuscript Challenge to Ideas of Medieval Nationalism",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_705001cd9fbcf310b8e0f1a6",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.4324/9780203500880-8",
+        "title": "The Anglo-Saxon Chronicle Manuscripts and Heroic Poetry",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_258939b07633f3968259ca50",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2307/26404770",
+        "title": "CHECKLIST OF MANUSCRIPT SOURCES",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_26975e9db29e1ac04c9edd04",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2307/26402337",
+        "title": "MEDIEVAL MANUSCRIPT EXHIBITION, 1981",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ce0be39901b1646e3f29325e",
+        "run_id": "40837723971",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.4324/9780203500880",
+        "title": "Worlds Made Flesh",
+        "query": "\"Zerphalon\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      }
+    ],
+    "connector_errors": [
+      {
+        "connector_id": "repo:Internet Culturale",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 105}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+edition+translation\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 117}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+edition+translation&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 306}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+edition+translation&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+edition+translation&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1196, \"response_s"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 99}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 295}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%96%CE%B5%CF%81%CF%86%CE%B1%CE%BB%CF%89%CE%BD%22&per_page=2"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+bibliography+sources\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 116}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+bibliography+sources&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 310}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+bibliography+sources&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+bibliography+sources&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1200, \"respon"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+cited+by\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 131}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+cited+by&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+cited+by&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 69429, \"response_sha256\": \"46329cf0fead9248dadca6b8aa56206983714822bd74a1d86547444d9dd75908\", \"elapsed_ms\": 1031}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+cited+by&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"fin"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Zerphalon%22+chronicle+manuscript\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 115}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+chronicle+manuscript&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Zerphalon%22+chronicle+manuscript&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 22267, \"response_sha256\": \"831f3c81fd2764fc75e5629487a9289e71d42ecb4bd3576bedce3a6497f788ac\", \"elapsed_ms\": 899}, {\"url\": \"https://api.openalex.org/works?search=%22Zerphalon%22+chronicle+manuscript&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"ht"
+      }
+    ],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 40,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
