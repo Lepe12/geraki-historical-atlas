@@ -1,0 +1,1631 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "identity_resolution",
+  "label": "Identity Resolution Agent",
+  "assignment_id": "identity_resolution:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "entity_candidates",
+    "variant_names",
+    "same_entity_assessment",
+    "collision_warnings"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "7b549b266e73a95ab81791794a52a02b3c52c6e33f13bba9deb2814a06df61fa",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "identity_resolution",
+    "assignment_id": "identity_resolution:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:SearchCulture.gr / EKT",
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:OpenArchives.gr / EKT"
+    ],
+    "queries": [
+      "\"Αγαθονήσι\" variant spelling",
+      "\"Αγαθονήσι\" alias OR aliases",
+      "\"Αγαθονήσι\" historical name",
+      "\"Αγαθονήσι\" transliteration",
+      "\"Gaidouronisi\""
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 130,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 102,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Αγαθονήσι\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9++variant+spelling%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9++variant+spelling%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 631, \"response_sha256\": \"5bdf7c445af58b421bfcb879d250aedd8931e6714db8701fea16d1dde0537030\", \"elapsed_ms\": 978}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9++variant+spelling%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Αγαθονήσι\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+alias+OR+aliases\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+alias+OR+aliases\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1173}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+alias+OR+aliases\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Αγαθονήσι\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+transliteration\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+transliteration\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1180}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+transliteration\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Αγαθονήσι\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+variant+spelling\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+variant+spelling\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1182}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+variant+spelling\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Αγαθονήσι\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+historical+name\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+historical+name\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1196}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+historical+name\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Gaidouronisi\"",
+      "records": [
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/DigLaskaridis/000175-42390",
+          "title": "Didymi or Gaidouronisi lighthouse Δίδυμη ή Γαϊδουρονήσι Σύρου",
+          "date": [
+            "1834 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/DigLaskaridis/000175-42390",
+          "digital_url": "https://laskaridisfoundationarchives.org/profile/42390",
+          "rights": "http://creativecommons.org/licenses/by/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/DigLaskaridis/000175-42390\", \"dc_title\": [\"Didymi or Gaidouronisi lighthouse\", \"Δίδυμη ή Γαϊδουρονήσι Σύρου\"], \"ekt_type\": [\"Φάρος\"], \"ekt_subject\": [\"Ναυσιπλοΐα\"], \"ekt_chronology\": [\"1834 \"], \"edm_rights\": \"http://creativecommons.org/licenses/by/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/DigLaskaridis/000175-42390\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ίδρυμα Αικατερίνης Λασκαρίδη\", \"collection\": \"Αρχείο Φάρων Παναγιώτη Κ. Λασκαρίδη\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"https://laskaridisfoundationarchives.org/profile/42390\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/DigLaskaridis/000175-42390",
+            "dc_title": [
+              "Didymi or Gaidouronisi lighthouse",
+              "Δίδυμη ή Γαϊδουρονήσι Σύρου"
+            ],
+            "ekt_type": [
+              "Φάρος"
+            ],
+            "ekt_subject": [
+              "Ναυσιπλοΐα"
+            ],
+            "ekt_chronology": [
+              "1834 "
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/DigLaskaridis/000175-42390",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ίδρυμα Αικατερίνης Λασκαρίδη",
+            "collection": "Αρχείο Φάρων Παναγιώτη Κ. Λασκαρίδη",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "https://laskaridisfoundationarchives.org/profile/42390"
+          }
+        },
+        {
+          "discovery_repository": "SearchCulture.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.searchculture.gr/aggregator/edm/DigLaskaridis/000175-42458",
+          "title": "Psathoura island lighthouse Ο φάρος στην Ψαθούρα, Σποράδες",
+          "date": [
+            "1895 "
+          ],
+          "url": "https://www.searchculture.gr/aggregator/edm/DigLaskaridis/000175-42458",
+          "digital_url": "https://laskaridisfoundationarchives.org/profile/42458",
+          "rights": "http://creativecommons.org/licenses/by/4.0/",
+          "metadata_text": "{\"uri\": \"https://www.searchculture.gr/aggregator/edm/DigLaskaridis/000175-42458\", \"dc_title\": [\"Psathoura island lighthouse\", \"Ο φάρος στην Ψαθούρα, Σποράδες\"], \"ekt_type\": [\"Φάρος\"], \"ekt_subject\": [\"Ναυσιπλοΐα\"], \"ekt_chronology\": [\"1895 \"], \"edm_rights\": \"http://creativecommons.org/licenses/by/4.0/\", \"thumbnail\": \"https://www.searchculture.gr/aggregator/edm/DigLaskaridis/000175-42458\", \"aggregator\": \"Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)\", \"institution\": \"Ίδρυμα Αικατερίνης Λασκαρίδη\", \"collection\": \"Αρχείο Φάρων Παναγιώτη Κ. Λασκαρίδη\", \"edm_type\": \"IMAGE\", \"edm_isShownAt\": \"https://laskaridisfoundationarchives.org/profile/42458\"}",
+          "raw": {
+            "uri": "https://www.searchculture.gr/aggregator/edm/DigLaskaridis/000175-42458",
+            "dc_title": [
+              "Psathoura island lighthouse",
+              "Ο φάρος στην Ψαθούρα, Σποράδες"
+            ],
+            "ekt_type": [
+              "Φάρος"
+            ],
+            "ekt_subject": [
+              "Ναυσιπλοΐα"
+            ],
+            "ekt_chronology": [
+              "1895 "
+            ],
+            "edm_rights": "http://creativecommons.org/licenses/by/4.0/",
+            "thumbnail": "https://www.searchculture.gr/aggregator/edm/DigLaskaridis/000175-42458",
+            "aggregator": "Greek Aggregator SearchCulture.gr | National Documentation Centre (EKT)",
+            "institution": "Ίδρυμα Αικατερίνης Λασκαρίδη",
+            "collection": "Αρχείο Φάρων Παναγιώτη Κ. Λασκαρίδη",
+            "edm_type": "IMAGE",
+            "edm_isShownAt": "https://laskaridisfoundationarchives.org/profile/42458"
+          }
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Gaidouronisi%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Gaidouronisi%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 1601, \"response_sha256\": \"2869456a2dc9904133549b0ea87992d926826338ac8b1ad31105aedcf82215b4\", \"elapsed_ms\": 1277}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Gaidouronisi%22\", \"result_count\": 2, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Αγαθονήσι\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 631, \"response_sha256\": \"6a0cb900ea7919d5d471e6d67313b0605f5322a3c38e965580aa4b07ae392b3c\", \"elapsed_ms\": 638}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Αγαθονήσι\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9++transliteration%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9++transliteration%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 630, \"response_sha256\": \"045758327f56eb6737bb5210c57d3d96b9db7d49e53809f477aa55ba357d9034\", \"elapsed_ms\": 444}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9++transliteration%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Gaidouronisi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Gaidouronisi+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Gaidouronisi+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 608, \"response_sha256\": \"b4ea35a686adda3e45f3cd0d92596e105da1eaf0313d6e453d3edf3a7fe8ba57\", \"elapsed_ms\": 476}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Gaidouronisi+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Αγαθονήσι\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9++historical+name%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9++historical+name%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 630, \"response_sha256\": \"d1c0ca27c9034b67f89666e56a4a9993b469de5f12ed663386f8d2e6f88becf2\", \"elapsed_ms\": 491}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9++historical+name%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Αγαθονήσι\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+alias+OR+aliases&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+alias+OR+aliases&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25609, \"response_sha256\": \"c663c6ccae4a1709bd518c8608b5debaccdc1efef14790c9d830ecab0f9479b1\", \"elapsed_ms\": 496}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+alias+OR+aliases&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Αγαθονήσι\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+variant+spelling&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+variant+spelling&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25609, \"response_sha256\": \"50b7c3fe3227e2269e52c73faaace961a6260c342b4b3ee00e53267ec1c25536\", \"elapsed_ms\": 592}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+variant+spelling&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Αγαθονήσι\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+transliteration&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+transliteration&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25605, \"response_sha256\": \"cddf6ea6668a4840e9bbe2a517907176f3820b703091c46e2c0de754cc0cba04\", \"elapsed_ms\": 219}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+transliteration&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Gaidouronisi\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Gaidouronisi%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 192}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Gaidouronisi%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 192}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Αγαθονήσι\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+historical+name&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+historical+name&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 31568, \"response_sha256\": \"c962a29925e5898d8ebbf90e40a369cda78a842446c75ed02f6187ea23cf094b\", \"elapsed_ms\": 237}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+historical+name&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Gaidouronisi\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_5928",
+          "title": "ΣΥΜΒΟΛΗ ΣΤΗΝ ΕΝΕΡΓΟ ΓΕΩΔΥΝΑΜΙΚΗ ΤΟΥ ΕΛΛΗΝΙΚΟΥ ΤΟΞΟΥ ΜΕ ΒΑΣΗ ΤΗ ΔΙΑΚΡΙΣΗ ΕΝΕΡΓΩΝΡΗΓΜΑΤΩΝ STUDY OF THE ACTIVE GEODYNAMICS OF THE HELLENIC ARC AREA WITH THE RECOGNITION OF ACTIVE FAULTS",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_5928"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Gaidouronisi%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Gaidouronisi%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 112663, \"response_sha256\": \"97dfefde2ae7ae412b53a4d7d4fd5b64f6ab58617a6296587f5616d0d0a5c0a9\", \"elapsed_ms\": 1053}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Gaidouronisi%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 1, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Αγαθονήσι\" variant spelling",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_45132",
+          "title": "Υβριδικό Σύστημα Παραγωγής Ενέργειας και Νερού για το Αγαθονήσι",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_45132"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-10636",
+          "title": "Μέθοδοι μέτρησης νησιωτικότητας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-10636"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_19248",
+          "title": "Πατμιακή βιβλιοθήκη. κατάλογος των εντύπων (15ος-19ος αι.) : Δ' Νέες προσκτήσεις της βιβλιοθήκης, προσθήκες και συμπληρώσεις στους τόμους Α'-Β'-Γ' The Library of Patmos. A Catalogue of documents (15th-19th centuries). Vol. 4: New Acquisitions. With addenda and revisions of volumes 1-3",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_19248"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_50824",
+          "title": "Οι οχυρωματικές εγκαταστάσεις των μιλησιακών νησιών με τα συγκείμενά τους στο Αιγαίο Le installazioni fortificate sulle isole milesie dell'Egeo in contesto",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_50824"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/aua/000039-10329_8113",
+          "title": "Γενετική ταυτοποίηση των Ελληνικών φυλών / πληθυσμών βοοειδών με τη χρήση μοριακών δεικτών Genetic identification of Greek bovine breeds / populations using molecular markers",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/aua/000039-10329_8113"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_56176",
+          "title": "Γενετική ταυτοποίηση των αυτόχθονων πληθυσμών βοοειδών με τη χρήση μοριακών δεικτών Genetic identification of Greek bovine breeds/populations using molecular markers",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_56176"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_56170",
+          "title": "Πεδίο βαρύτητας ελλαδικού χώρου με έμφαση στην περιοχή της Σαντορίνης Gravity field of Greece with emphasis on the Santorini area",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_56170"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+variant+spelling&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+variant+spelling&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 212021, \"response_sha256\": \"93e2e7cf3416a0e7aea68db4f238ad83680b22802343dc78565eb4036289f1ff\", \"elapsed_ms\": 1609}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+variant+spelling&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 7, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Αγαθονήσι\" historical name",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_45132",
+          "title": "Υβριδικό Σύστημα Παραγωγής Ενέργειας και Νερού για το Αγαθονήσι",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_45132"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-10636",
+          "title": "Μέθοδοι μέτρησης νησιωτικότητας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-10636"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_13522",
+          "title": "Συμβολή στην προσωπογραφία της Κύπρου των Ρωμαϊκών χρόνων Contribution to the prosopography of Cyprus in Roman times",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_13522"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_19248",
+          "title": "Πατμιακή βιβλιοθήκη. κατάλογος των εντύπων (15ος-19ος αι.) : Δ' Νέες προσκτήσεις της βιβλιοθήκης, προσθήκες και συμπληρώσεις στους τόμους Α'-Β'-Γ' The Library of Patmos. A Catalogue of documents (15th-19th centuries). Vol. 4: New Acquisitions. With addenda and revisions of volumes 1-3",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_19248"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_50824",
+          "title": "Οι οχυρωματικές εγκαταστάσεις των μιλησιακών νησιών με τα συγκείμενά τους στο Αιγαίο Le installazioni fortificate sulle isole milesie dell'Egeo in contesto",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_50824"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/aua/000039-10329_8113",
+          "title": "Γενετική ταυτοποίηση των Ελληνικών φυλών / πληθυσμών βοοειδών με τη χρήση μοριακών δεικτών Genetic identification of Greek bovine breeds / populations using molecular markers",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/aua/000039-10329_8113"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_56176",
+          "title": "Γενετική ταυτοποίηση των αυτόχθονων πληθυσμών βοοειδών με τη χρήση μοριακών δεικτών Genetic identification of Greek bovine breeds/populations using molecular markers",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_56176"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_56170",
+          "title": "Πεδίο βαρύτητας ελλαδικού χώρου με έμφαση στην περιοχή της Σαντορίνης Gravity field of Greece with emphasis on the Santorini area",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_56170"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_57031",
+          "title": "Αειφόρος ανάδειξη, αξιοποίηση και προστασία των παραδοσιακών οικισμών και του πολιτιστικού αποθέματος στο πλαίσιο της κυκλικής οικονομίας: τα νησιά της Σύμης και του συμπλέγματος της Μεγίστης Sustainable development, utilization and protection of traditional settlements and the cultural reserve in the context of the circular economy, for the islands of Symi and of the Megisti complex",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_57031"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+historical+name&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+historical+name&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 225286, \"response_sha256\": \"8960fc22a13d7611b18132bb218ea39338dee308b06318e21810299a7c327a2f\", \"elapsed_ms\": 1588}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+historical+name&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 9, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Αγαθονήσι\" alias OR aliases",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_45132",
+          "title": "Υβριδικό Σύστημα Παραγωγής Ενέργειας και Νερού για το Αγαθονήσι",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_45132"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-10636",
+          "title": "Μέθοδοι μέτρησης νησιωτικότητας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-10636"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_19248",
+          "title": "Πατμιακή βιβλιοθήκη. κατάλογος των εντύπων (15ος-19ος αι.) : Δ' Νέες προσκτήσεις της βιβλιοθήκης, προσθήκες και συμπληρώσεις στους τόμους Α'-Β'-Γ' The Library of Patmos. A Catalogue of documents (15th-19th centuries). Vol. 4: New Acquisitions. With addenda and revisions of volumes 1-3",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_19248"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_50824",
+          "title": "Οι οχυρωματικές εγκαταστάσεις των μιλησιακών νησιών με τα συγκείμενά τους στο Αιγαίο Le installazioni fortificate sulle isole milesie dell'Egeo in contesto",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_50824"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/aua/000039-10329_8113",
+          "title": "Γενετική ταυτοποίηση των Ελληνικών φυλών / πληθυσμών βοοειδών με τη χρήση μοριακών δεικτών Genetic identification of Greek bovine breeds / populations using molecular markers",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/aua/000039-10329_8113"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_56176",
+          "title": "Γενετική ταυτοποίηση των αυτόχθονων πληθυσμών βοοειδών με τη χρήση μοριακών δεικτών Genetic identification of Greek bovine breeds/populations using molecular markers",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_56176"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_56170",
+          "title": "Πεδίο βαρύτητας ελλαδικού χώρου με έμφαση στην περιοχή της Σαντορίνης Gravity field of Greece with emphasis on the Santorini area",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_56170"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+alias+OR+aliases&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+alias+OR+aliases&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 212021, \"response_sha256\": \"596082553414cbdc9eea658e51d651bbe17c7ba67f70602b7203a5fe59ae69f0\", \"elapsed_ms\": 2175}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+alias+OR+aliases&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 7, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Αγαθονήσι\" transliteration",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_45132",
+          "title": "Υβριδικό Σύστημα Παραγωγής Ενέργειας και Νερού για το Αγαθονήσι",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_45132"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_34437",
+          "title": "Textual phenomena addressing youth: Orthographic, typographic, and ideological aspects of the Greek-Cypriot dialect",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_34437"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_15638",
+          "title": "Ο εξαγγλισμός της Νέας Ελληνικής : μια ποιοτική και ποσοτική μελέτη Evaluating Anglicisation in Modern Greek : a qualitative and quantitative survey",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_15638"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_48416",
+          "title": "Ο εξαγγλισμός της νέας ελληνικής: μία ποιοτική και ποσοτική μελέτη L’anglicisation du grec moderne: une étude qualitative et quantitative",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_48416"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-296959",
+          "title": "Roman-alphabeted Greek and transliteration in the digital language practices of Greek secondary school pupils on Facebook",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-296959"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_4935",
+          "title": "Ανάπτυξη μεθόδου με σκοπό την αναγνώριση και εξαγωγή θεματικών λέξεων κλειδιών από διευθύνσεις ιστοσελίδων του ελληνικού Διαδικτύου Keyword identification within Greek URLs",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_4935"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-123186",
+          "title": "Κοινοί θρησκευτικοί όροι ανάμεσα στην αραμαϊκή επιγραφή της Deir 'Alla και στην Παλαιά Διαθήκη: γλωσσολογική και θρησκειοιστορική συγκριτική μελέτη",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-123186"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2993815",
+          "title": "The Greek and Latin Cherubikon",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2993815"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2993026",
+          "title": "Symptomatology and Modes of Emplotment: Paranoid Tropes",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2993026"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/episteme/000109-27644",
+          "title": "The deconstruction of Byzantine mode-organization and the new Chrysanthine ‘order’",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/episteme/000109-27644"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_21218",
+          "title": "Sentience",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_21218"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_15143",
+          "title": "Generative Solid Modelling Employing Natural Language Understanding and 3D Data",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_15143"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3015666",
+          "title": "Non-english web search: An evaluation of indexing and searching the Greek web",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3015666"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_18636",
+          "title": "Η συσχέτιση των αραβικών σημειώσεων του συγγράμματος του Διοσκουρίδη περί ύλης ιατρικής με την ελληνική περιγραφή των βοτάνων και η διαχρονική φαρμακευτική τους χρησιμότητα The correlation of the Arabic notes on Dioscurides’ book De Materia Medica with the Greek description of the herbs and their diachronic pharmaceutical value",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_18636"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-10636",
+          "title": "Μέθοδοι μέτρησης νησιωτικότητας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-10636"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_7491",
+          "title": "Φύση, αρχιτεκτονική & δηλητήριο: ένα λογικό πείραμα Nature, architecture and poison: a logical experiment",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_7491"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_777",
+          "title": "Η συσχέτιση των αραβικών σημειώσεων του συγγράματος του Διοσκουρίδη περί ύλης ιατρικής με την ελληνική περιγραφή των βοτάνων και η διαχρονική φαρμακευτική τους χρησιμότητα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_777"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_19248",
+          "title": "Πατμιακή βιβλιοθήκη. κατάλογος των εντύπων (15ος-19ος αι.) : Δ' Νέες προσκτήσεις της βιβλιοθήκης, προσθήκες και συμπληρώσεις στους τόμους Α'-Β'-Γ' The Library of Patmos. A Catalogue of documents (15th-19th centuries). Vol. 4: New Acquisitions. With addenda and revisions of volumes 1-3",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_19248"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_20727",
+          "title": "Κοινοί θρησκευτικοί όροι ανάμεσα στην αραμαϊκή επιγραφή της Deir Alla και στην Παλαιά Διαθήκη: γλωσσολογική και θρησκειοϊστορική συγκριτική μελέτη Common religious concepts between the aramaic epigraphy at Deir 'Alla and the Old Testament: linguistic and religious historical comparative study",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_20727"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-38868",
+          "title": "Σημείωμα σχετικά με την πρόσφατη έκδοση του φιρμανιού της μονής Παντοκράτορος Αγίου Όρους του έτους 1569",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-38868"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_50824",
+          "title": "Οι οχυρωματικές εγκαταστάσεις των μιλησιακών νησιών με τα συγκείμενά τους στο Αιγαίο Le installazioni fortificate sulle isole milesie dell'Egeo in contesto",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_50824"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/jiim/000146-37885",
+          "title": "Computer-Assisted Translation of Egyptian-Coptic into Greek",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/jiim/000146-37885"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_7936",
+          "title": "Η ΘΕΑΤΡΙΚΗ ΟΡΟΛΟΓΙΑ ΣΤΟΥΣ ΠΑΤΕΡΕΣ ΤΗΣ ΕΚΚΛΗΣΙΑΣ. ΣΥΜΒΟΛΗ ΣΤΗ ΜΕΛΕΤΗ ΤΗΣ ΣΧΕΣΕΩΣ ΕΚΚΛΗΣΙΑΣ ΚΑΙ ΘΕΑΤΡΟΥ THEATRICAL TERMINOLOGY IN GREEK PATRISTIC TEXTS. A CONTRIBUTION ON THE RELATION BETWEEN CHURCH AND THEATRE",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_7936"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/aua/000039-10329_8113",
+          "title": "Γενετική ταυτοποίηση των Ελληνικών φυλών / πληθυσμών βοοειδών με τη χρήση μοριακών δεικτών Genetic identification of Greek bovine breeds / populations using molecular markers",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/aua/000039-10329_8113"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_56176",
+          "title": "Γενετική ταυτοποίηση των αυτόχθονων πληθυσμών βοοειδών με τη χρήση μοριακών δεικτών Genetic identification of Greek bovine breeds/populations using molecular markers",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_56176"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+transliteration&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+transliteration&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 419667, \"response_sha256\": \"f5077affa6689e7a4482517be9ea0751b60420d02869ed914b834b1fb43fe381\", \"elapsed_ms\": 3732}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%91%CE%B3%CE%B1%CE%B8%CE%BF%CE%BD%CE%AE%CF%83%CE%B9%22+transliteration&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "40842355344",
+    "agent_id": "identity_resolution",
+    "source_leads": [
+      {
+        "id": "lead_2b00f82b6ec331fdaf7eeecd",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/DigLaskaridis/000175-42390",
+        "title": "Didymi or Gaidouronisi lighthouse Δίδυμη ή Γαϊδουρονήσι Σύρου",
+        "query": "\"Gaidouronisi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_955161151426c1478f543963",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "source_url_or_identifier": "https://www.searchculture.gr/aggregator/edm/DigLaskaridis/000175-42458",
+        "title": "Psathoura island lighthouse Ο φάρος στην Ψαθούρα, Σποράδες",
+        "query": "\"Gaidouronisi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e06d1788d29a31f942ac444e",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_5928",
+        "title": "ΣΥΜΒΟΛΗ ΣΤΗΝ ΕΝΕΡΓΟ ΓΕΩΔΥΝΑΜΙΚΗ ΤΟΥ ΕΛΛΗΝΙΚΟΥ ΤΟΞΟΥ ΜΕ ΒΑΣΗ ΤΗ ΔΙΑΚΡΙΣΗ ΕΝΕΡΓΩΝΡΗΓΜΑΤΩΝ STUDY OF THE ACTIVE GEODYNAMICS OF THE HELLENIC ARC AREA WITH THE RECOGNITION OF ACTIVE FAULTS",
+        "query": "\"Gaidouronisi\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fef54f76dd50e6337b16bb88",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_45132",
+        "title": "Υβριδικό Σύστημα Παραγωγής Ενέργειας και Νερού για το Αγαθονήσι",
+        "query": "\"Αγαθονήσι\" variant spelling",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f0edb69a1020e090a7d3921b",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-10636",
+        "title": "Μέθοδοι μέτρησης νησιωτικότητας",
+        "query": "\"Αγαθονήσι\" variant spelling",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a7dc2eaa8da874ac9416d0b9",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_19248",
+        "title": "Πατμιακή βιβλιοθήκη. κατάλογος των εντύπων (15ος-19ος αι.) : Δ' Νέες προσκτήσεις της βιβλιοθήκης, προσθήκες και συμπληρώσεις στους τόμους Α'-Β'-Γ' The Library of Patmos. A Catalogue of documents (15th-19th centuries). Vol. 4: New Acquisitions. With addenda and revisions of volumes 1-3",
+        "query": "\"Αγαθονήσι\" variant spelling",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_eef1ce00393bd55414f77206",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_50824",
+        "title": "Οι οχυρωματικές εγκαταστάσεις των μιλησιακών νησιών με τα συγκείμενά τους στο Αιγαίο Le installazioni fortificate sulle isole milesie dell'Egeo in contesto",
+        "query": "\"Αγαθονήσι\" variant spelling",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6c31f6a0e7fe960ba8be803c",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/aua/000039-10329_8113",
+        "title": "Γενετική ταυτοποίηση των Ελληνικών φυλών / πληθυσμών βοοειδών με τη χρήση μοριακών δεικτών Genetic identification of Greek bovine breeds / populations using molecular markers",
+        "query": "\"Αγαθονήσι\" variant spelling",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_cc80f0d55a5348ab4bd31b9a",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_56176",
+        "title": "Γενετική ταυτοποίηση των αυτόχθονων πληθυσμών βοοειδών με τη χρήση μοριακών δεικτών Genetic identification of Greek bovine breeds/populations using molecular markers",
+        "query": "\"Αγαθονήσι\" variant spelling",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_40827808291433d9682b3575",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_56170",
+        "title": "Πεδίο βαρύτητας ελλαδικού χώρου με έμφαση στην περιοχή της Σαντορίνης Gravity field of Greece with emphasis on the Santorini area",
+        "query": "\"Αγαθονήσι\" variant spelling",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_112a0235a52b3880e3b6d30e",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_13522",
+        "title": "Συμβολή στην προσωπογραφία της Κύπρου των Ρωμαϊκών χρόνων Contribution to the prosopography of Cyprus in Roman times",
+        "query": "\"Αγαθονήσι\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ef57458a302b8e96072a0a9b",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_57031",
+        "title": "Αειφόρος ανάδειξη, αξιοποίηση και προστασία των παραδοσιακών οικισμών και του πολιτιστικού αποθέματος στο πλαίσιο της κυκλικής οικονομίας: τα νησιά της Σύμης και του συμπλέγματος της Μεγίστης Sustainable development, utilization and protection of traditional settlements and the cultural reserve in the context of the circular economy, for the islands of Symi and of the Megisti complex",
+        "query": "\"Αγαθονήσι\" historical name",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7baf786f7a2903ec7244b381",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_34437",
+        "title": "Textual phenomena addressing youth: Orthographic, typographic, and ideological aspects of the Greek-Cypriot dialect",
+        "query": "\"Αγαθονήσι\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_27196cc7172fae97b4be8304",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_15638",
+        "title": "Ο εξαγγλισμός της Νέας Ελληνικής : μια ποιοτική και ποσοτική μελέτη Evaluating Anglicisation in Modern Greek : a qualitative and quantitative survey",
+        "query": "\"Αγαθονήσι\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_42c19ecb9552bc612364877c",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_48416",
+        "title": "Ο εξαγγλισμός της νέας ελληνικής: μία ποιοτική και ποσοτική μελέτη L’anglicisation du grec moderne: une étude qualitative et quantitative",
+        "query": "\"Αγαθονήσι\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f62d1f108391278e873510ab",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-296959",
+        "title": "Roman-alphabeted Greek and transliteration in the digital language practices of Greek secondary school pupils on Facebook",
+        "query": "\"Αγαθονήσι\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ed06d3d0b82913a87a78dfd1",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_4935",
+        "title": "Ανάπτυξη μεθόδου με σκοπό την αναγνώριση και εξαγωγή θεματικών λέξεων κλειδιών από διευθύνσεις ιστοσελίδων του ελληνικού Διαδικτύου Keyword identification within Greek URLs",
+        "query": "\"Αγαθονήσι\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_37b7ea83be66bf015d0da303",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-123186",
+        "title": "Κοινοί θρησκευτικοί όροι ανάμεσα στην αραμαϊκή επιγραφή της Deir 'Alla και στην Παλαιά Διαθήκη: γλωσσολογική και θρησκειοιστορική συγκριτική μελέτη",
+        "query": "\"Αγαθονήσι\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5460e5be312d19ab75a85975",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2993815",
+        "title": "The Greek and Latin Cherubikon",
+        "query": "\"Αγαθονήσι\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a58a505f5676994dd7665352",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2993026",
+        "title": "Symptomatology and Modes of Emplotment: Paranoid Tropes",
+        "query": "\"Αγαθονήσι\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_514bdfbc55ac8de800d5804e",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/episteme/000109-27644",
+        "title": "The deconstruction of Byzantine mode-organization and the new Chrysanthine ‘order’",
+        "query": "\"Αγαθονήσι\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f33e39ede17a321e9e5bea94",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_21218",
+        "title": "Sentience",
+        "query": "\"Αγαθονήσι\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ad57f95a1d77bbf2ed227820",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_15143",
+        "title": "Generative Solid Modelling Employing Natural Language Understanding and 3D Data",
+        "query": "\"Αγαθονήσι\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c9ede38f4ac4f5839d42346c",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3015666",
+        "title": "Non-english web search: An evaluation of indexing and searching the Greek web",
+        "query": "\"Αγαθονήσι\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d973f2cc05f5a3332a64142b",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_18636",
+        "title": "Η συσχέτιση των αραβικών σημειώσεων του συγγράμματος του Διοσκουρίδη περί ύλης ιατρικής με την ελληνική περιγραφή των βοτάνων και η διαχρονική φαρμακευτική τους χρησιμότητα The correlation of the Arabic notes on Dioscurides’ book De Materia Medica with the Greek description of the herbs and their diachronic pharmaceutical value",
+        "query": "\"Αγαθονήσι\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d3b0974003c267a436192c88",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_7491",
+        "title": "Φύση, αρχιτεκτονική & δηλητήριο: ένα λογικό πείραμα Nature, architecture and poison: a logical experiment",
+        "query": "\"Αγαθονήσι\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_40b0c285681140f49f814db5",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_777",
+        "title": "Η συσχέτιση των αραβικών σημειώσεων του συγγράματος του Διοσκουρίδη περί ύλης ιατρικής με την ελληνική περιγραφή των βοτάνων και η διαχρονική φαρμακευτική τους χρησιμότητα",
+        "query": "\"Αγαθονήσι\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7d187a133d316bc431c771b2",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_20727",
+        "title": "Κοινοί θρησκευτικοί όροι ανάμεσα στην αραμαϊκή επιγραφή της Deir Alla και στην Παλαιά Διαθήκη: γλωσσολογική και θρησκειοϊστορική συγκριτική μελέτη Common religious concepts between the aramaic epigraphy at Deir 'Alla and the Old Testament: linguistic and religious historical comparative study",
+        "query": "\"Αγαθονήσι\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7b0fcef0fd32ff9afd2bfc46",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Byzantina/000067-38868",
+        "title": "Σημείωμα σχετικά με την πρόσφατη έκδοση του φιρμανιού της μονής Παντοκράτορος Αγίου Όρους του έτους 1569",
+        "query": "\"Αγαθονήσι\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9bf1f4cbba6c94814f3658c1",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/jiim/000146-37885",
+        "title": "Computer-Assisted Translation of Egyptian-Coptic into Greek",
+        "query": "\"Αγαθονήσι\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5bd85b1c83ce2bd43c947155",
+        "run_id": "40842355344",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_7936",
+        "title": "Η ΘΕΑΤΡΙΚΗ ΟΡΟΛΟΓΙΑ ΣΤΟΥΣ ΠΑΤΕΡΕΣ ΤΗΣ ΕΚΚΛΗΣΙΑΣ. ΣΥΜΒΟΛΗ ΣΤΗ ΜΕΛΕΤΗ ΤΗΣ ΣΧΕΣΕΩΣ ΕΚΚΛΗΣΙΑΣ ΚΑΙ ΘΕΑΤΡΟΥ THEATRICAL TERMINOLOGY IN GREEK PATRISTIC TEXTS. A CONTRIBUTION ON THE RELATION BETWEEN CHURCH AND THEATRE",
+        "query": "\"Αγαθονήσι\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      }
+    ],
+    "connector_errors": [
+      {
+        "connector_id": "repo:Internet Culturale",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Gaidouronisi%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 192}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      }
+    ],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 51,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
