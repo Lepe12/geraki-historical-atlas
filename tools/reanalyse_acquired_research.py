@@ -47,6 +47,10 @@ def run(args,job,parent,dest):
     answer=execute(prepared,question,output_root=dest,provenance_root=parent,
                    resume_reviewed_from=parent/'research_answer/answer.json' if args.resume_reviewed_claims else None)
     answer['execution_receipt']=receipt
+    # Per-round coverage metrics and the clean stop decision travel with the
+    # published answer; the handoff guard reads the same ledger.
+    from continuation_rounds import record, round_number
+    answer['continuation_rounds']=record(parent,answer,round_number(parent,dest.name),str(dest.relative_to(parent)))
     out=dest/'research_answer';out.mkdir(exist_ok=True)
     for filename,value in [('answer.json',answer),('geographic_findings.json',geographic(answer))]:
         (out/filename).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')

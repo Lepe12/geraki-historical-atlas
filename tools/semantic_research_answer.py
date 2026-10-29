@@ -935,7 +935,31 @@ def execute(*args,**kwargs):
     except SemanticBudgetReached as error:answer=error.answer
     from research_priority import claim_assessment
     answer['claim_evidence_assessment']=claim_assessment(answer)
+    answer['research_funnel']=research_funnel(answer)
     return answer
+
+
+SUPPORTED_CLAIM_STATES=('QUOTATION_SUPPORTED_HISTORY_PENDING','SOURCE_ATTRIBUTED_HYPOTHESIS')
+
+
+def research_funnel(answer):
+    """collected -> examined -> supported claims -> provisional synthesis -> human verification."""
+    coverage=answer.get('coverage') or {}
+    deferred={r.get('evidence_id') for r in coverage.get('deferred') or []}
+    selected=[r.get('evidence_id') for r in answer.get('evidence') or []]
+    examined=len([e for e in selected if e not in deferred])
+    states=[c.get('status') for c in (answer.get('claim_evidence_assessment') or {}).get('claims',[])]
+    supported=sum(state in SUPPORTED_CLAIM_STATES for state in states)
+    unique=coverage.get('unique_passages',0)
+    return {'policy':'research-funnel-v1',
+            'collected':{'unique_excerpts':unique,'excluded_before_analysis':len(coverage.get('excluded') or [])},
+            'examined':{'excerpts':examined,'remaining':max(0,unique-examined),
+                        'deferred':len(deferred)},
+            'claims':{'extracted':len(answer.get('claims') or []),'supported_by_quotation':supported,
+                      'rejected_proposals':len(answer.get('rejected') or [])},
+            'provisional_synthesis':{'paragraphs':len(answer.get('answer_sections') or [])},
+            'human_verification':{'performed':bool(answer.get('human_reviewed')),'verified_claims':0},
+            'historical_verification':False}
 
 
 def _execute(run_root, question, caller=call, config=None, output_root=None, provenance_root=None,resume_reviewed_from=None):
@@ -959,6 +983,21 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
     from research_continuation import Continuation
     queue=Continuation(Path(provenance_root or run_root)/'research_continuation',
                        question,Path(__file__).read_bytes(),routing_summary())
+    ranking_report=None
+    if request and all_records and os.getenv('PCT_EXCERPT_RANKING','1')!='0':
+        # Deterministic relevance order (target + aliases + gazetteer old names,
+        # date window, purpose, source quality); near-duplicates read last.
+        # Reading order only: every excerpt stays in the queue and coverage.
+        from excerpt_ranking import rank
+        all_records,ranking_report=rank(all_records,request.get('target',''),request.get('aliases',[]) or [],
+                                        request.get('date_range','') or '',request.get('purpose','') or '')
+        if question_kind=='topic':
+            # Broad topics keep their region/period/event tiers as the primary
+            # key; lexical relevance only orders passages inside a tier.
+            from research_priority import describe
+            late=set(ranking_report['near_duplicate_ids'])
+            all_records.sort(key=lambda r:(r['evidence_id'] in late,describe(r,True)['tier']))
+            ranking_report['topic_tiers_primary']=True
     triage_report=None
     if question_kind=='person' and target_names and all_records:
         # Deterministic, model-free reading order: named/continuation pages,
@@ -1009,6 +1048,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
          'evidence':selected,'calls':[],'rejected':[],
          'selection_priority':selection_report(all_records,selected,question_kind=='topic'),
          'passage_triage':triage_report,
+         'excerpt_ranking':ranking_report,
          'identity_linkage':linkage_report,
          'limitations':['MODEL_OUTPUT_REQUIRES_REVIEW','ORIGINAL_INSPECTION_NOT_PERFORMED',
                         'SOURCE_INDEPENDENCE_NOT_ESTABLISHED','BOUNDED_EVIDENCE_COVERAGE'],
@@ -1314,8 +1354,29 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
                unknowns=answer.get('unknowns',[]),model_limitations=answer.get('limitations',[]))
     return out
 
+def render_funnel(funnel,continuation=None):
+    f=funnel
+    lines=['## Διαδρομή προς την απάντηση / Path to the answer','',
+           '| Στάδιο / Stage | Πλήθος / Count |','| --- | --- |',
+           f"| 1. Συγκεντρώθηκαν / Collected | {f['collected']['unique_excerpts']} μοναδικά αποσπάσματα (+{f['collected']['excluded_before_analysis']} αποκλείστηκαν πριν την ανάλυση) |",
+           f"| 2. Εξετάστηκαν / Examined | {f['examined']['excerpts']} (απομένουν {f['examined']['remaining']}) |",
+           f"| 3. Υποστηριζόμενοι ισχυρισμοί / Supported claims | {f['claims']['supported_by_quotation']} από {f['claims']['extracted']} εξαγμένους |",
+           f"| 4. Προσωρινή σύνθεση / Provisional synthesis | {f['provisional_synthesis']['paragraphs']} παράγραφοι |",
+           f"| 5. Ανθρώπινη επαλήθευση / Human verification | {'έγινε' if f['human_verification']['performed'] else 'εκκρεμεί'} ({f['human_verification']['verified_claims']} επαληθευμένοι) |",
+           '','«Υποστηρίζεται» σημαίνει μόνο ότι το παράθεμα στηρίζει τη διατύπωση· δεν είναι ιστορική επαλήθευση.','']
+    if continuation:
+        lines.extend(['### Γύροι συνέχισης / Continuation rounds','',
+                      '| Γύρος | Εξετάστηκαν (σύνολο) | Απομένουν | Νέοι υποστηριζόμενοι |','| --- | --- | --- | --- |'])
+        for r in continuation.get('rounds',[]):
+            lines.append(f"| {r['round']} | {r['examined']} | {r['remaining']} | {r['new_supported_claims']} |")
+        if continuation.get('stop_reason'):lines.append('');lines.append('Λόγος διακοπής / Stop reason: `'+continuation['stop_reason']+'`')
+        lines.append('')
+    return lines
+
+
 def render(out):
     lines=['# Απάντηση έρευνας','',out['question'],'','Κατάσταση: **'+out['status']+'**','']
+    if out.get('research_funnel'):lines.extend(render_funnel(out['research_funnel'],out.get('continuation_rounds')))
     assessments=out.get('claim_evidence_assessment',{}).get('claims',[])
     if assessments:
         lines.extend(['## Τεκμηρίωση ανά ισχυρισμό','',
@@ -1355,7 +1416,9 @@ def render(out):
         lines.extend(['## Πιθανές αντιφάσεις υπό έλεγχο',''])
         for c in out['review']['contradictions']:lines.append('- '+str(c.get('explanation'))+' ['+', '.join(c['claim_ids'])+']')
     lines.extend(['','## Περιορισμοί','',
-                  ('Ο φάκελος συγκεντρώνει ακριβή αποσπάσματα χωρίς υπηρεσία μοντέλου. Δεν παράγει ερμηνεία ή επιβεβαίωση ιστορικών γεγονότων.' if out.get('answer_mode')=='EXACT_SOURCE_EXTRACTS' else 'Η απάντηση είναι ανάλυση μοντέλου που περιμένει ανθρώπινο έλεγχο. Δεν αποτελεί επαλήθευση ιστορικών γεγονότων.'),
+                  ('Ο φάκελος συγκεντρώνει ακριβή αποσπάσματα χωρίς υπηρεσία μοντέλου. Δεν παράγει ερμηνεία ή επιβεβαίωση ιστορικών γεγονότων.' if out.get('answer_mode')=='EXACT_SOURCE_EXTRACTS' else
+                   'Η απάντηση είναι ανάλυση μοντέλου που περιμένει ανθρώπινο έλεγχο. Δεν αποτελεί επαλήθευση ιστορικών γεγονότων.' if out.get('answer_sections') else
+                   'Δεν υπάρχει ακόμη τελική σύνθεση. Όσοι ισχυρισμοί αναφέρονται παραπάνω είναι εξαγωγή του μοντέλου από αποσπάσματα, όχι απάντηση, και περιμένουν ανθρώπινο έλεγχο.'),
                   'Η επιτυχής αντιστοίχιση παραπομπής δεν αποδεικνύει από μόνη της ότι η ερμηνεία του μοντέλου είναι σωστή.',
                   'Η ανεξαρτησία των πηγών και η εξέταση πρωτοτύπων δεν θεωρούνται ολοκληρωμένες.',
                   f'Κάλυψη μοντέλου: {out["coverage"]["selected_passages"]}/{out["coverage"]["unique_passages"]} μοναδικά αποσπάσματα επιλέχθηκαν για ανάλυση. Αυτό δεν σημαίνει ότι όλα τεκμηριώνουν την τελική απάντηση.'])
@@ -1383,6 +1446,10 @@ def main():
     dest=root/'research_answer';dest.mkdir(exist_ok=True)
     from place_resolver import annotate as annotate_places
     annotate_places(out)
+    if (root/'research_continuation').is_dir():
+        # Round 0 of the continuation ledger: this run's own semantic pass.
+        from continuation_rounds import record
+        out['continuation_rounds']=record(root,out,0,'research_answer')
     (dest/'answer.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (dest/'answer.md').write_text(render(out),encoding='utf-8')
     from persistent_evidence_bundle import write as write_bundle
