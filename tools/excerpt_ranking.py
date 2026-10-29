@@ -182,6 +182,19 @@ def rank(records, target='', aliases=(), date_range='', purpose='', gazetteer=_G
                                  'title_name_match': title_match},
                        'reasons': reasons})
     scored.sort(key=lambda s: (-s['score'], s['index'], s['row']['evidence_id']))
+    # Hybrid retrieval (hybrid_retrieval.py): BM25 order + vector order -> RRF
+    # -> deterministic reranker on the top-K. PCT_HYBRID_RETRIEVAL=0 = lexical only.
+    from hybrid_retrieval import fuse
+    place_fn = None
+    try:
+        from place_context import classify, profile
+        prof = profile(names)
+        if prof['place_ids'] or prof['ambiguous_names']:
+            place_fn = lambda text: classify(text, names, prof)[0]
+    except Exception:  # noqa: BLE001 - context is optional for ranking
+        place_fn = None
+    query = ' '.join(names + purpose_terms)
+    scored, hybrid_report = fuse(scored, query, name_terms, purpose_terms, window, place_fn)
 
     # Near-duplicate guard against already-kept leaders only (inverted index).
     leaders, duplicates, index_by_shingle, leader_shingles = [], [], {}, {}
@@ -213,7 +226,7 @@ def rank(records, target='', aliases=(), date_range='', purpose='', gazetteer=_G
         for s in sh:
             index_by_shingle.setdefault(s, []).append(eid)
     ordered = leaders + duplicates
-    report = {'policy': POLICY, 'role': 'READING_ORDER_ONLY_NOT_TRUTH_OR_SOURCE_INDEPENDENCE',
+    report = {'policy': POLICY, 'hybrid': hybrid_report, 'role': 'READING_ORDER_ONLY_NOT_TRUTH_OR_SOURCE_INDEPENDENCE',
               'name_terms': name_terms, 'purpose_terms': purpose_terms,
               'expanded_names': names, 'date_window': list(window) if window else None,
               'date_window_basis': window_basis, 'piracy_boost': PIRACY_BOOST if piracy_purpose else 0.0,
@@ -225,6 +238,7 @@ def rank(records, target='', aliases=(), date_range='', purpose='', gazetteer=_G
               'scores_logged': min(len(ordered), SCORE_LOG_LIMIT),
               'scores': [{'evidence_id': s['row']['evidence_id'], 'rank': i, 'score': s['score'],
                           **s['parts'], 'quality_reasons': s['reasons'],
+                          **{k: s[k] for k in ('vector', 'rrf', 'rerank', 'rerank_parts') if k in s},
                           **({'near_duplicate_of': s['duplicate_of']} if 'duplicate_of' in s else {})}
                          for i, s in enumerate(ordered[:SCORE_LOG_LIMIT])]}
     return [s['row'] for s in ordered], report
