@@ -13,8 +13,8 @@ from html import unescape
 
 UA={"User-Agent":"Piratecartography-Historical-Research/3.0 (+scholarly catalogue discovery)"}
 
-def _get(url, timeout=20, accept=None):
-    headers=dict(UA)
+def _get(url, timeout=20, accept=None, headers=None):
+    headers=dict(headers or UA)
     if accept: headers["Accept"]=accept
     try:from .http_audit import fetch
     except ImportError:from http_audit import fetch
@@ -507,8 +507,9 @@ def _pares_backoff_delay(attempt,error,base=None,cap=None,rand=None):
 
 def _pares_get(url,timeout=25,sleep=time.sleep,clock=time.monotonic,fetch=None):
     if fetch is None:
-        try:from .http_audit import fetch
-        except ImportError:from http_audit import fetch
+        # Route through the module-level _get so existing tests that patch
+        # _get keep working and no test can reach the live PARES server.
+        fetch=lambda u,headers,timeout:_get(u,timeout=timeout,headers=headers)
     min_delay=_env_float("PCT_PARES_MIN_DELAY_S",3)
     retries=int(_env_float("PCT_PARES_MAX_RETRIES",3))
     budget=_env_float("PCT_PARES_MAX_TOTAL_WAIT_S",90)
