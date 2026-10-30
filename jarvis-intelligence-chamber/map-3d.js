@@ -66,6 +66,8 @@
         scene = s;
         host.querySelector(".map3d-loading")?.remove();
         for (const p of pending.splice(0)) p.resolve(scene.addObject(p.obj, p.opts));
+        // illustrative ship at a fixed sea spot in the Cyclades (3D only, no voyage data)
+        import("./map-3d-ship.js").then((m) => { window.NABOU_MAP3D.ship = m.addShip(window.NABOU_MAP3D); }).catch((e) => console.warn("map3d: ship not loaded", e));
         return s;
       })
       .catch((e) => { console.warn("map3d: could not start the 3D scene", e); loading = null; host?.remove(); host = null; throw e; });
