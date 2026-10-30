@@ -1,5 +1,7 @@
 """Unit tests for evaluation/score_run.py (offline, no network)."""
 import copy
+import gzip
+import hashlib
 import json
 import pathlib
 import sys
@@ -295,17 +297,34 @@ class V2HistorianReview(unittest.TestCase):
 class RealRunRegression(unittest.TestCase):
     """Pins the published baselines when the run snapshots are present in the checkout."""
 
+    def _frozen_snapshot(self, run_id):
+        """Frozen copy of the exact snapshot a baseline was scored on (sha256-pinned), or None."""
+        snaps = HERE / "baselines" / "snapshots"
+        manifest = snaps / "MANIFEST.json"
+        if not manifest.exists():
+            return None
+        entry = json.loads(manifest.read_text(encoding="utf-8"))["snapshots"].get(run_id)
+        if not entry:
+            return None
+        raw = gzip.decompress((snaps / entry["file"]).read_bytes())
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), entry["sha256"], f"frozen snapshot {run_id} changed")
+        return json.loads(raw.decode("utf-8"))
+
     def test_baselines_reproduce(self):
         base = HERE / "baselines"
         checked = 0
         for f in sorted(base.glob("*.json")):
             rep = json.loads(f.read_text(encoding="utf-8"))
-            snap = s.RUNS_DIR / f"{rep['run_id']}.json"
-            if not snap.exists():
-                continue
+            frozen = self._frozen_snapshot(rep["run_id"])
+            if frozen is not None:
+                run = s.normalise_run(frozen, run_ref=rep["run_id"])
+            else:
+                snap = s.RUNS_DIR / f"{rep['run_id']}.json"
+                if not snap.exists():
+                    continue
+                run = s.load_run(str(snap))
             ev = s.load_eval()
             items = {i["id"]: i for i in ev["items"]}
-            run = s.load_run(str(snap))
             for r in rep["reports"]:
                 now = s.score_item(run, items[r["item_id"]], ev["sources"])
                 self.assertEqual(now["metrics"], r["metrics"], (f.name, r["item_id"]))
@@ -313,6 +332,12 @@ class RealRunRegression(unittest.TestCase):
                 checked += 1
         if not checked:
             self.skipTest("run snapshots not in checkout")
+
+    def test_every_baseline_has_frozen_snapshot(self):
+        """The live snapshot can be republished (e1fbd46d2 overwrote 39304929906); baselines must not depend on it."""
+        for f in sorted((HERE / "baselines").glob("*.json")):
+            rid = json.loads(f.read_text(encoding="utf-8"))["run_id"]
+            self.assertIsNotNone(self._frozen_snapshot(rid), f.name)
 
 
 if __name__ == "__main__":
