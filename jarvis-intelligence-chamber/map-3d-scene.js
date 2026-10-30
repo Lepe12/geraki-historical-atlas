@@ -17,7 +17,7 @@ const EXAG = 34;                // vertical exaggeration of the relief (real sca
 const LAND_Y = (m) => (m / (KM_PER_PX * 1000)) * EXAG * S;
 const SEA_Y = (m) => -Math.min(m, 4500) / 4500 * 0.05; // gentle sea-floor dip, under translucent water
 const BOARD = 0.32;             // thickness of the board below sea level
-const DEF = { tilt: 56, rot: -10 }; // degrees from straight down / around north
+const DEF = { tilt: 56, rot: 0 };  // degrees from straight down / around north
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -260,11 +260,13 @@ export async function createScene(host, { view2d } = {}) {
 
   /* camera: orbit like a model. Left drag = rotate/tilt, right drag (or Shift+drag) = pan, wheel/pinch = zoom */
   const controls = new OrbitControls(camera, canvas);
-  controls.enableDamping = !reduce; controls.dampingFactor = 0.09;
-  controls.screenSpacePanning = false;
-  controls.maxPolarAngle = THREE.MathUtils.degToRad(84);
-  controls.minDistance = 0.8; controls.maxDistance = 26;
-  controls.zoomToCursor = true;
+  controls.enableDamping = !reduce; controls.dampingFactor = 0.08; // inertia after a drag
+  controls.rotateSpeed = 0.4;                // slower, steadier rotation (default is 1)
+  controls.screenSpacePanning = false;       // pan along the board, not up into the sky
+  controls.minPolarAngle = 0;
+  controls.maxPolarAngle = THREE.MathUtils.degToRad(80); // never at or below the board's edge
+  controls.minDistance = 0.35; controls.maxDistance = 24;
+  controls.zoomToCursor = false;             // zoom toward the view centre, so the pivot stays the visible centre
   controls.keys = { LEFT: "ArrowLeft", UP: "ArrowUp", RIGHT: "ArrowRight", BOTTOM: "ArrowDown" };
   controls.listenToKeyEvents(host);
 
@@ -286,9 +288,34 @@ export async function createScene(host, { view2d } = {}) {
     return { target, dist: Math.min(controls.maxDistance, dist), tilt: 0.5, rot: 0 };
   }
   function homePose() {
-    const f = flatPose();
-    const target = world(1260, 720, 0); // central / eastern Mediterranean
-    return { target, dist: Math.min(f.dist * 0.8, 13.5), tilt: DEF.tilt, rot: DEF.rot };
+    // the whole board, centred in the canvas: orbit target = board centre
+    // distance: the nearest at which all four board corners are inside the view (binary search)
+    const w = host.clientWidth || 1, h = host.clientHeight || 1, o = new THREE.Vector3(0, 0, 0);
+    const probe = new THREE.PerspectiveCamera(camera.fov, w / h, 0.02, 400), q = new THREE.Vector3();
+    const fits = (d) => {
+      probe.position.setFromSpherical(new THREE.Spherical(d, THREE.MathUtils.degToRad(DEF.tilt), THREE.MathUtils.degToRad(-DEF.rot)));
+      probe.lookAt(o); probe.updateMatrixWorld();
+      for (const [x, z] of [[-BW / 2, -BH / 2], [BW / 2, -BH / 2], [BW / 2, BH / 2], [-BW / 2, BH / 2]]) {
+        q.set(x, 0, z).project(probe);
+        if (Math.abs(q.x) > 0.97 || Math.abs(q.y) > 0.97) return false;
+      }
+      return true;
+    };
+    let lo = 2, hi = controls.maxDistance;
+    for (let i = 0; i < 30; i++) { const m = (lo + hi) / 2; if (fits(m)) hi = m; else lo = m; }
+    return { target: o.clone(), dist: hi, tilt: DEF.tilt, rot: DEF.rot };
+  }
+  /* keep the orbit pivot on the board, at the visible centre of the view, and never let the board leave the view */
+  const fwd = new THREE.Vector3(), shift = new THREE.Vector3();
+  function keepOnBoard() {
+    camera.getWorldDirection(fwd);
+    if (fwd.y < -1e-3) { // pivot = where the centre of the view meets the board plane
+      const k = -camera.position.y / fwd.y;
+      controls.target.copy(camera.position).addScaledVector(fwd, k);
+    }
+    const tx = Math.max(-BW / 2, Math.min(BW / 2, controls.target.x)), tz = Math.max(-BH / 2, Math.min(BH / 2, controls.target.z));
+    shift.set(tx - controls.target.x, 0, tz - controls.target.z);
+    if (shift.lengthSq() > 0) { controls.target.add(shift); camera.position.add(shift); }
   }
   const poseFromCamera = () => {
     const off = camera.position.clone().sub(controls.target), sp = new THREE.Spherical().setFromVector3(off);
@@ -325,7 +352,7 @@ export async function createScene(host, { view2d } = {}) {
       const q = ease(Math.min(1, (now - tween.t0) / tween.ms)), a = tween.from, b = tween.to;
       applyPose({ target: a.target.clone().lerp(b.target, q), dist: a.dist + (b.dist - a.dist) * q, tilt: a.tilt + (b.tilt - a.tilt) * q, rot: a.rot + (b.rot - a.rot) * q });
       if (q >= 1) { const d = tween.done; tween = null; controls.update(); d(); }
-    } else controls.update();
+    } else { controls.update(); keepOnBoard(); }
     for (const m of markers) {
       placeHTML(m.el, m.top, true); placeHTML(m.sealEl, m.base);
       m.flag.swing.rotation.y = Math.atan2(camera.position.x - m.base.x, camera.position.z - m.base.z);
