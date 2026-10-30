@@ -1,17 +1,22 @@
-# Voice assistant — the holographic head
+# Voice assistant — the holographic figure
 
-`athena-hope-points.bin` is a point cloud (53,784 points: horizontal contour lines plus surface points)
-made from a 3D scan of an ancient statue head:
+`cartographer-points.bin` (91,842 points) is the gold line portrait of a 16th-century cartographer
+(beard and moustache, flat beret, pleated ruff, gown; head and shoulders, three-quarter view) turned into glowing points.
 
-- **Object:** Head from the statue "Athena Hope", with helmet decorated with a sphinx and griffins (cast), KAS275.
-- **Owner / scan:** Statens Museum for Kunst (SMK), Copenhagen, Royal Cast Collection. Artist unknown.
-- **Licence:** Public domain (as stated on Wikimedia Commons and by SMK Open).
-- **File:** https://commons.wikimedia.org/wiki/File:Ubekendt,_Hoved_fra_statuen_Athena_Hope_med_hjelm_med_sfinks_og_griffe,_,_KAS275,_Statens_Museum_for_Kunst,_3D_model.stl
+**Where the picture comes from.** It is not a museum object and not a 3D scan. The owner of this project chose a concept
+image made for him with the Grok Bot image tool (the middle, gold panel of three). The same tool redrew that panel alone,
+at higher resolution and without the compass rose and armillary sphere behind the figure, as the owner asked.
+That picture is `source/cartographer-gold.jpg`. It is project-owned artwork made for NABOU//X; no third-party
+licence applies and nobody else's work is copied into it. It shows no real, named person.
 
-How it was made: `python3 tools/build-assistant-points.py <the STL> assets/assistant/athena-hope-points.bin`.
-The script drops the round foot of the scan, scales the head to 2 units high, cuts it with horizontal
-planes every 1.15 mm of the original (the gold "line-work") and adds 26,000 surface points. Nothing was added to the sculpture.
+**Why not a 3D model.** The owner asked for exactly this figure. No free (CC0 / CC-BY / public domain) 3D bust with
+beret, ruff and this face was found, and a different scanned bust would only be an approximation.
 
-Binary layout (little-endian): uint32 N; int16 x,y,z × N (÷32767); int8 normal x,y,z × N (÷127); uint8 kind × N (0 = line, 1 = surface).
+**How it was made.** `python3 tools/build-assistant-figure.py assets/assistant/source/cartographer-gold.jpg assets/assistant/cartographer-points.bin`
+(numpy + Pillow). Each bright pixel of the drawing may become one point, so the lines are the drawing's own lines.
+The drawing has no depth; the script adds a smooth made-up relief (rounded body, rounder head) so the figure can turn a
+little. The head above the ruff has a weight so it can turn and nod on its own.
+
+Binary layout (little-endian): uint32 N; int16 x,y,z × N (÷32767); uint8 brightness × N; uint8 head weight × N.
 
 Loaded only by `assistant/assistant-scene.js`, after the user presses the small assistant button.

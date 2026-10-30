@@ -1,26 +1,27 @@
 /* NABOU voice assistant — holographic scene (loaded only after the user opens the assistant).
-   Idle: a slowly turning golden armillary/compass orb. Active: the same particles gather into
-   the head of the Athena Hope statue (SMK, public domain scan; see ../assets/assistant/README.md). */
+   Idle: a slowly turning golden armillary/compass orb. Active: the same particles gather into the
+   gold line portrait of a 16th-century cartographer (see ../assets/assistant/README.md). */
 import * as THREE from "../vendor/three/three.module.min.js";
 import { EffectComposer } from "../vendor/three/EffectComposer.js";
 import { RenderPass } from "../vendor/three/RenderPass.js";
 import { UnrealBloomPass } from "../vendor/three/UnrealBloomPass.js";
 import { OutputPass } from "../vendor/three/OutputPass.js";
 
-const ASSET = new URL("../assets/assistant/athena-hope-points.bin", import.meta.url);
+const ASSET = new URL("../assets/assistant/cartographer-points.bin", import.meta.url);
 
 async function loadBust() {
   const buf = await (await fetch(ASSET)).arrayBuffer();
   const n = new DataView(buf).getUint32(0, true);
-  const pos = new Int16Array(buf, 4, n * 3), nor = new Int8Array(buf, 4 + n * 6, n * 3), kind = new Uint8Array(buf, 4 + n * 9, n);
-  const p = new Float32Array(n * 3), q = new Float32Array(n * 3);
-  for (let i = 0; i < n * 3; i++) { p[i] = pos[i] / 32767; q[i] = nor[i] / 127; }
-  return { n, p, q, kind };
+  const pos = new Int16Array(buf, 4, n * 3), bright = new Uint8Array(buf, 4 + n * 6, n), head = new Uint8Array(buf, 4 + n * 7, n);
+  const p = new Float32Array(n * 3), b = new Float32Array(n), h = new Float32Array(n);
+  for (let i = 0; i < n * 3; i++) p[i] = pos[i] / 32767;
+  for (let i = 0; i < n; i++) { b[i] = bright[i] / 255; h[i] = head[i] / 255; }
+  return { n, p, b, h };
 }
 
 /* armillary orb: rings sampled by length so every particle has a place */
 function orbPoints(n, rnd) {
-  const R = 0.95, rings = [];
+  const R = 0.78, rings = [];
   const ring = (r, tiltX, tiltZ, y = 0, w = 1) => rings.push({ r, tiltX, tiltZ, y, w, len: 2 * Math.PI * r * w });
   ring(R, 0, 0); ring(R * 0.92, 0, 0, R * 0.39); ring(R * 0.92, 0, 0, -R * 0.39);            // equator + tropics
   ring(R * 0.98, 23.4 * Math.PI / 180, 0, 0, 1.2);                                            // ecliptic (brighter band)
@@ -49,34 +50,29 @@ function orbPoints(n, rnd) {
 
 const vert = /* glsl */`
 uniform float uMorph, uTime, uYaw, uPitch, uPulse, uSize, uPix, uGain;
-attribute vec3 aOrb; attribute vec3 aNormal; attribute float aKind; attribute float aSeed;
+attribute vec3 aOrb; attribute float aBright; attribute float aHead; attribute float aSeed;
 varying float vA; varying float vWarm;
 mat3 rotY(float a){ float c=cos(a), s=sin(a); return mat3(c,0.,-s, 0.,1.,0., s,0.,c); }
 mat3 rotX(float a){ float c=cos(a), s=sin(a); return mat3(1.,0.,0., 0.,c,s, 0.,-s,c); }
 void main(){
-  /* head turn / nod: pivot at the neck, weight rises from the neck to the head */
-  vec3 piv = vec3(0., -0.42, -0.02);
-  float w = smoothstep(-0.75, -0.25, position.y);
-  mat3 R = rotY(uYaw * w) * rotX(uPitch * w);
+  /* head turn / nod: pivot at the neck; aHead = 1 for the head, fading to 0 through the ruff */
+  vec3 piv = vec3(0.02, -0.2, 0.0);
+  mat3 R = rotY(uYaw * aHead) * rotX(uPitch * aHead);
   vec3 b = piv + R * (position - piv);
-  vec3 nb = R * aNormal;
   float d = aSeed * 0.45;
   float k = smoothstep(d, d + 0.55, uMorph);
   vec3 p = mix(aOrb, b, k);
   float swirl = sin(3.14159 * k);
   p += normalize(p + 1e-4) * swirl * 0.22 + vec3(sin(aSeed * 40. + uTime), cos(aSeed * 31. + uTime), 0.) * swirl * 0.05;
-  p += vec3(0., sin(uTime * 0.9 + aSeed * 6.28) * 0.004, 0.);
+  p += vec3(0., sin(uTime * 0.9 + aSeed * 6.28) * 0.003, 0.);
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
-  /* rim light: points whose normal faces sideways glow more (fresnel), the line-work stays bright */
-  vec3 n = normalize(normalMatrix * nb);
-  float fres = pow(1. - abs(dot(n, normalize(-mv.xyz))), 1.6);
-  float lam = max(dot(n, normalize(vec3(-0.45, 0.55, 0.75))), 0.);
-  float bust = aKind < 0.5 ? 0.38 + fres * 0.6 + lam * 0.4 : 0.03 + fres * 0.22 + lam * 0.2;
-  float scan = smoothstep(0.06, 0., abs(fract(position.y * 0.5 - uTime * 0.12) - 0.5) - 0.44) * 0.5;
+  /* slow light sweep down the figure, like a hologram refreshing */
+  float scan = smoothstep(0.08, 0., abs(fract(position.y * 0.35 - uTime * 0.08) - 0.5) - 0.42) * 0.35;
   float orb = 0.55 + 0.25 * sin(aSeed * 50. + uTime * 1.7);
-  vA = mix(orb, bust * (1. + scan + uPulse * 0.55), k) * uGain;
-  vWarm = mix(0.35, max(fres, lam * 0.8), k);
-  gl_PointSize = uSize * uPix * (1.0 + uPulse * 0.25 * k) / -mv.z;
+  float fig = pow(aBright, 0.8) * (1. + scan + uPulse * 0.28 * (0.4 + aHead));
+  vA = mix(orb, fig, k) * uGain;
+  vWarm = mix(0.35, aBright, k);
+  gl_PointSize = uSize * uPix * (1.0 + uPulse * 0.2 * k) / -mv.z;
   gl_Position = projectionMatrix * mv;
 }`;
 const frag = /* glsl */`
@@ -85,7 +81,7 @@ void main(){
   vec2 c = gl_PointCoord - 0.5; float r = dot(c, c);
   if (r > 0.25) discard;
   float a = smoothstep(0.25, 0.0, r) * vA;
-  vec3 gold = mix(vec3(1.0, 0.50, 0.12), vec3(1.0, 0.74, 0.34), vWarm);
+  vec3 gold = mix(vec3(1.0, 0.30, 0.0), vec3(1.0, 0.64, 0.14), vWarm);
   gl_FragColor = vec4(gold * a, a);
 }`;
 
@@ -95,25 +91,25 @@ export async function createHologram(canvas) {
   renderer.setClearColor(0x000000, 1);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
-  camera.position.set(0, 0.0, 4.25);
+  camera.position.set(0, -0.02, 3.7);
   const bust = await loadBust();
   let s = 12345; const rnd = () => ((s = (s * 16807) % 2147483647) / 2147483647);
   const g = new THREE.BufferGeometry();
-  const seed = new Float32Array(bust.n), kind = new Float32Array(bust.n);
-  for (let i = 0; i < bust.n; i++) { seed[i] = rnd(); kind[i] = bust.kind[i]; }
+  const seed = new Float32Array(bust.n);
+  for (let i = 0; i < bust.n; i++) seed[i] = rnd();
   g.setAttribute("position", new THREE.BufferAttribute(bust.p, 3));
-  g.setAttribute("aNormal", new THREE.BufferAttribute(bust.q, 3));
+  g.setAttribute("aBright", new THREE.BufferAttribute(bust.b, 1));
+  g.setAttribute("aHead", new THREE.BufferAttribute(bust.h, 1));
   g.setAttribute("aOrb", new THREE.BufferAttribute(orbPoints(bust.n, rnd), 3));
-  g.setAttribute("aKind", new THREE.BufferAttribute(kind, 1));
   g.setAttribute("aSeed", new THREE.BufferAttribute(seed, 1));
-  const u = { uMorph: { value: 0 }, uTime: { value: 0 }, uYaw: { value: 0 }, uPitch: { value: 0 }, uPulse: { value: 0 }, uSize: { value: 0.03 }, uPix: { value: 1 }, uGain: { value: 0.32 } };
+  const u = { uMorph: { value: 0 }, uTime: { value: 0 }, uYaw: { value: 0 }, uPitch: { value: 0 }, uPulse: { value: 0 }, uSize: { value: 0.03 }, uPix: { value: 1 }, uGain: { value: 0.22 } };
   const mat = new THREE.ShaderMaterial({ uniforms: u, vertexShader: vert, fragmentShader: frag, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
   const pts = new THREE.Points(g, mat); pts.frustumCulled = false;
   const group = new THREE.Group(); group.add(pts); scene.add(group);
 
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.6, 0.45, 0.12);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.45, 0.4, 0.12);
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
 
@@ -142,7 +138,7 @@ export async function createHologram(canvas) {
     const want = st.speaking ? 0.55 + 0.45 * Math.abs(Math.sin(t * 7.3) * Math.sin(t * 3.1 + 1)) : 0;
     st.pulse += (want - st.pulse) * Math.min(1, dt * 8);
     u.uMorph.value = k; u.uTime.value = t; u.uYaw.value = st.yaw + Math.sin(t * 0.5) * 0.04 * k; u.uPitch.value = st.pitch + Math.sin(t * 0.37) * 0.02 * k; u.uPulse.value = st.pulse;
-    bloom.strength = 0.6 + st.pulse * 0.3;
+    bloom.strength = 0.45 + st.pulse * 0.15;
     composer.render();
   }
   st.raf = requestAnimationFrame(frame);
@@ -151,7 +147,7 @@ export async function createHologram(canvas) {
     get morph() { return st.morph; },
     show() { st.target = 1; }, hide() { st.target = 0; },
     jump(v) { st.morph = st.target = v; },
-    turn(dir) { st.tYaw = Math.max(-0.75, Math.min(0.75, dir === 0 ? 0 : st.tYaw + dir * 0.55)); },
+    turn(dir) { st.tYaw = Math.max(-0.45, Math.min(0.45, dir === 0 ? 0 : st.tYaw + dir * 0.3)); },
     look(pitch) { st.tPitch = pitch; },
     nod() { st.nodUntil = performance.now() + 1200; },
     speaking(v) { st.speaking = !!v; },

@@ -7,13 +7,13 @@ const $ = (id) => document.getElementById(id);
 let ui = null, holo = null, holoP = null;
 
 const SAY = {
-  open: "Είμαι εδώ. Πείτε μου τι να ψάξω ή τι να σας δείξω.",
-  close: "Επιστρέφω στη σφαίρα. Είμαι εδώ αν με χρειαστείτε.",
-  hello: "Χαίρετε. Είμαι η Ναμπού, η βοηθός του χάρτη.",
-  who: "Είμαι η Ναμπού, η φωνητική βοηθός του NABOU//X. Ψάχνω στις έρευνες και στα ευρήματα της σελίδας και σας δείχνω τόπους στον χάρτη.",
-  help: "Μπορείτε να πείτε: άνοιξε, κλείσε, γύρνα δεξιά ή αριστερά, ψάξε και μια λέξη, δείξε μου τον Λάντζα, δείξε την Κέρκυρα, τρισδιάστατο ή δισδιάστατο.",
+  open: "Είμαι εδώ. Πες μου τι να ψάξω ή τι να σου δείξω.",
+  close: "Επιστρέφω στη σφαίρα. Είμαι εδώ αν με χρειαστείς.",
+  hello: "Γεια σου. Είμαι ο Ναμπού, ο βοηθός του χάρτη.",
+  who: "Είμαι ο Ναμπού, ο φωνητικός βοηθός του NABOU//X. Ψάχνω στις έρευνες και στα ευρήματα της σελίδας και σου δείχνω τόπους στον χάρτη.",
+  help: "Μπορείς να πεις: άνοιξε, κλείσε, γύρνα δεξιά ή αριστερά, ψάξε και μια λέξη, δείξε μου τον Λάντζα, δείξε την Κέρκυρα, τρισδιάστατο ή δισδιάστατο.",
   thanks: "Παρακαλώ.",
-  unknown: "Συγγνώμη, δεν το κατάλαβα. Πείτε για παράδειγμα «ψάξε Μήλος» ή «δείξε μου τον Λάντζα».",
+  unknown: "Συγγνώμη, δεν το κατάλαβα. Πες για παράδειγμα «ψάξε Μήλος» ή «δείξε μου τον Λάντζα».",
 };
 
 /* ---------- speech out ---------- */
@@ -21,8 +21,10 @@ let voice = null;
 function pickVoice() {
   const all = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
   const el = all.filter((v) => /^el(-|_|$)/i.test(v.lang));
-  const female = /(melina|athina|αθηνα|μελινα|female|γυναικ|google)/i, male = /(stefanos|nestoras|στεφανος|male)/i;
-  voice = el.find((v) => female.test(v.name) && !male.test(v.name)) || el.find((v) => !male.test(v.name)) || null;
+  /* male Greek voice only (the figure is a man): Windows "Microsoft Stefanos", Edge online "Nestoras".
+     Without one the answer stays as text. */
+  const male = /(stefanos|nestoras|στεφανος|νεστορας|\bmale\b)/i, female = /(female|melina|athina|αθηνα|μελινα)/i;
+  voice = el.find((v) => male.test(v.name) && !female.test(v.name)) || null;
   return voice;
 }
 if (window.speechSynthesis) { pickVoice(); speechSynthesis.addEventListener?.("voiceschanged", pickVoice); }
@@ -34,12 +36,12 @@ function say(text) {
   if (window.speechSynthesis && (voice || pickVoice())) {
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = "el-GR"; u.voice = voice; u.rate = 0.98; u.pitch = 1.05;
+    u.lang = "el-GR"; u.voice = voice; u.rate = 0.96; u.pitch = 0.95;
     u.onend = u.onerror = done;
     speechSynthesis.speak(u);
     setStatus(`Φωνή: ${voice.name}`);
   } else {
-    setStatus("Δεν βρέθηκε ελληνική φωνή στη συσκευή· η απάντηση εμφανίζεται ως κείμενο.");
+    setStatus("Δεν βρέθηκε ανδρική ελληνική φωνή στη συσκευή· η απάντηση φαίνεται ως κείμενο.");
     setTimeout(done, Math.min(6000, 900 + text.length * 45));
   }
 }
@@ -48,10 +50,10 @@ function say(text) {
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let rec = null, listening = false, wakeOn = false, armedUntil = 0;
 function startRec(continuous) {
-  if (!SR) { setStatus("Αυτό το πρόγραμμα περιήγησης δεν έχει αναγνώριση ομιλίας· γράψτε την εντολή στο πεδίο."); return; }
+  if (!SR) { setStatus("Αυτό το πρόγραμμα περιήγησης δεν έχει αναγνώριση ομιλίας· γράψε την εντολή στο πεδίο."); return; }
   try { rec?.abort(); } catch {}
   rec = new SR(); rec.lang = "el-GR"; rec.interimResults = true; rec.continuous = continuous; rec.maxAlternatives = 1;
-  rec.onstart = () => { listening = true; ui.root.classList.add("listening"); setStatus(continuous ? "Περιμένω τη λέξη «Ναμπού»…" : "Σας ακούω…"); };
+  rec.onstart = () => { listening = true; ui.root.classList.add("listening"); setStatus(continuous ? "Περιμένω τη λέξη «Ναμπού»…" : "Σε ακούω…"); };
   rec.onresult = (e) => {
     for (let i = e.resultIndex; i < e.results.length; i++) {
       const r = e.results[i], text = r[0].transcript;
@@ -60,11 +62,11 @@ function startRec(continuous) {
       if (!continuous) { handle(text); continue; }
       const rest = afterWake(text);
       if (rest === null) { if (Date.now() < armedUntil) { armedUntil = 0; handle(text); } continue; }
-      if (rest) handle(rest); else { armedUntil = Date.now() + 8000; if (!holo?.active) { holo?.show(); } say("Σας ακούω."); }
+      if (rest) handle(rest); else { armedUntil = Date.now() + 8000; if (!holo?.active) { holo?.show(); morphLabel(true); } say("Σε ακούω."); }
     }
   };
   rec.onerror = (e) => {
-    if (e.error === "not-allowed" || e.error === "service-not-allowed") { wakeOn = false; ui.wake.setAttribute("aria-pressed", "false"); setStatus("Το μικρόφωνο δεν επιτρέπεται. Επιτρέψτε το από τις ρυθμίσεις του προγράμματος περιήγησης."); }
+    if (e.error === "not-allowed" || e.error === "service-not-allowed") { wakeOn = false; ui.wake.setAttribute("aria-pressed", "false"); setStatus("Το μικρόφωνο δεν επιτρέπεται. Επίτρεψέ το από τις ρυθμίσεις του προγράμματος περιήγησης."); }
     else if (e.error === "network") setStatus("Η αναγνώριση ομιλίας χρειάζεται σύνδεση στο διαδίκτυο (την κάνει το πρόγραμμα περιήγησης).");
     else if (e.error !== "no-speech" && e.error !== "aborted") setStatus("Σφάλμα αναγνώρισης: " + e.error);
   };
@@ -87,7 +89,7 @@ function search(query) {
   if (q) q.value = query; // written only; the form is NOT submitted (that would start a new research run)
   const a = setInput($("historySearch"), query), b = setInput($("resultSearch"), query);
   const hist = $("researchHistory"); if (hist && "open" in hist) hist.open = true;
-  say(`Έγραψα «${query}» στο πεδίο ερώτησης και φιλτράρισα τις αποθηκευμένες έρευνες${b ? " και τα ευρήματα" : ""}. Νέα έρευνα ξεκινά μόνο αν πατήσετε εσείς το βέλος «Έναρξη έρευνας».`);
+  say(`Έγραψα «${query}» στο πεδίο ερώτησης και φιλτράρισα τις αποθηκευμένες έρευνες${b ? " και τα ευρήματα" : ""}. Νέα έρευνα ξεκινά μόνο αν πατήσεις εσύ το βέλος «Έναρξη έρευνας».`);
   return { a, b };
 }
 
@@ -122,16 +124,16 @@ async function focus3d(lon, lat, dist = 0.45, tilt = 42) {
 }
 async function showPlace(name) {
   const p = matchPlace(name, await places());
-  if (!p) return say(`Δεν βρήκα τον τόπο «${name}» στον χάρτη. Δοκιμάστε μια διαδρομή, π.χ. Βενετία ή Κέρκυρα.`);
+  if (!p) return say(`Δεν βρήκα τον τόπο «${name}» στον χάρτη. Δοκίμασε μια διαδρομή, π.χ. Βενετία ή Κέρκυρα.`);
   if (p.kind === "lane") {
     const label = document.querySelector(`#nodeLabels .node-label[data-emblem="${p.lane.agentId}"]`);
     label?.click();
     if (window.NABOU_MAP3D?.enabled) await focus3d(p.lon, p.lat);
-    return say(`Σας δείχνω τη διαδρομή «${p.label}».`);
+    return say(`Σου δείχνω τη διαδρομή «${p.label}».`);
   }
   if (p.kind === "science") { document.querySelector(`#nodeLabels .node-label[data-emblem="${p.lane.agentId}"]`)?.click(); return say(`Άνοιξα τη διαδρομή «${p.label}».`); }
   const ok = await focus3d(p.lon, p.lat, 0.35);
-  say(ok ? `Σας δείχνω τη στάση «${p.label}» στη διαδρομή του Λάντζα.` : "Ο τρισδιάστατος χάρτης δεν υποστηρίζεται σε αυτή τη συσκευή.");
+  say(ok ? `Σου δείχνω τη στάση «${p.label}» στη διαδρομή του Λάντζα.` : "Ο τρισδιάστατος χάρτης δεν υποστηρίζεται σε αυτή τη συσκευή.");
 }
 async function showLantzas() {
   if (!(await map3d(true))) return say("Ο τρισδιάστατος χάρτης δεν υποστηρίζεται σε αυτή τη συσκευή.");
@@ -147,11 +149,11 @@ async function handle(text) {
   const it = parse(text);
   switch (it.type) {
     case "none": return;
-    case "open": holo?.show(); return say(SAY.open);
-    case "close": holo?.hide(); return say(SAY.close);
-    case "turn": holo?.show(); holo?.turn(it.dir); return say(it.dir === 0 ? "Κοιτάζω μπροστά." : it.dir > 0 ? "Γυρίζω δεξιά." : "Γυρίζω αριστερά.");
-    case "look": holo?.show(); holo?.look(it.pitch); return say(it.pitch < 0 ? "Κοιτάζω πάνω." : "Κοιτάζω κάτω.");
-    case "nod": holo?.show(); holo?.nod(); return say("Μάλιστα.");
+    case "open": holo?.show(); morphLabel(true); return say(SAY.open);
+    case "close": holo?.hide(); morphLabel(false); return say(SAY.close);
+    case "turn": holo?.show(); morphLabel(true); holo?.turn(it.dir); return say(it.dir === 0 ? "Κοιτάζω μπροστά." : it.dir > 0 ? "Γυρίζω δεξιά." : "Γυρίζω αριστερά.");
+    case "look": holo?.show(); morphLabel(true); holo?.look(it.pitch); return say(it.pitch < 0 ? "Κοιτάζω πάνω." : "Κοιτάζω κάτω.");
+    case "nod": holo?.show(); morphLabel(true); holo?.nod(); return say("Μάλιστα.");
     case "search": return search(it.query);
     case "lantzas": return showLantzas();
     case "place": return showPlace(it.place);
@@ -166,21 +168,22 @@ function bubble(text, who) {
   ui.log.appendChild(b); while (ui.log.children.length > 6) ui.log.firstChild.remove();
   ui.log.scrollTop = ui.log.scrollHeight;
 }
+function morphLabel(on) { const b = ui?.root.querySelector(".nxa-morph"); if (b) b.textContent = on ? "Κρύψε τη μορφή" : "Δείξε τη μορφή"; }
 function setStatus(t) { if (ui) ui.status.textContent = t; }
 
 function build() {
   const root = document.createElement("section");
-  root.id = "nabouAssistant"; root.className = "nxa"; root.setAttribute("role", "dialog"); root.setAttribute("aria-label", "Ναμπού — φωνητική βοηθός");
+  root.id = "nabouAssistant"; root.className = "nxa"; root.setAttribute("role", "dialog"); root.setAttribute("aria-label", "Ναμπού — φωνητικός βοηθός");
   root.innerHTML = `
-    <header class="nxa-head"><span class="nxa-title">ΝΑΜΠΟΥ</span><small>φωνητική βοηθός</small>
+    <header class="nxa-head"><span class="nxa-title">ΝΑΜΠΟΥ</span><small>φωνητικός βοηθός</small>
       <button type="button" class="nxa-x" aria-label="Κλείσιμο βοηθού">×</button></header>
     <div class="nxa-stage"><canvas class="nxa-canvas" aria-hidden="true"></canvas><p class="nxa-heard" aria-live="polite"></p></div>
     <div class="nxa-log" aria-live="polite"></div>
-    <form class="nxa-form"><input class="nxa-text" type="text" autocomplete="off" placeholder="Γράψτε ή πείτε μια εντολή…" aria-label="Εντολή προς τη βοηθό"><button type="submit" class="nxa-send">Στείλε</button></form>
+    <form class="nxa-form"><input class="nxa-text" type="text" autocomplete="off" placeholder="Γράψε ή πες μια εντολή…" aria-label="Εντολή προς τον βοηθό"><button type="submit" class="nxa-send">Στείλε</button></form>
     <div class="nxa-bar">
-      <button type="button" class="nxa-mic" aria-label="Μιλήστε">● Μίλα</button>
-      <button type="button" class="nxa-wake" aria-pressed="false" title="Ακούει συνεχώς για τη λέξη «Ναμπού»">«Ναμπού»</button>
-      <button type="button" class="nxa-morph">Εμφάνιση</button>
+      <button type="button" class="nxa-mic" aria-label="Πάτα και μίλα">● Πάτα και μίλα</button>
+      <button type="button" class="nxa-wake" aria-pressed="false" title="Ακούει συνεχώς· ξεκίνα την εντολή με «Ναμπού»">Να ακούει πάντα</button>
+      <button type="button" class="nxa-morph">Δείξε τη μορφή</button>
     </div>
     <p class="nxa-status"></p>`;
   document.body.appendChild(root);
@@ -192,7 +195,7 @@ function build() {
   q(".nxa-morph").onclick = () => handle(holo?.active ? "κλείσε" : "άνοιξε");
   q(".nxa-form").onsubmit = (e) => { e.preventDefault(); const v = q(".nxa-text").value; q(".nxa-text").value = ""; handle(v); };
   root.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
-  setStatus(SR ? "Πατήστε «Μίλα» ή ενεργοποιήστε τη λέξη «Ναμπού»." : "Η αναγνώριση ομιλίας δεν υπάρχει σε αυτό το πρόγραμμα περιήγησης· γράψτε την εντολή.");
+  setStatus(SR ? "Πάτα «Πάτα και μίλα» και πες μια εντολή, ή άνοιξε το «Να ακούει πάντα» και ξεκίνα με «Ναμπού»." : "Αυτό το πρόγραμμα περιήγησης δεν έχει αναγνώριση ομιλίας· γράψε την εντολή στο πεδίο.");
   holoP = import("./assistant-scene.js").then((m) => m.createHologram(ui.canvas)).then((h) => (holo = h))
     .catch((err) => { root.classList.add("no-webgl"); setStatus("Το ολόγραμμα δεν φορτώθηκε (WebGL): " + err.message); });
 }
