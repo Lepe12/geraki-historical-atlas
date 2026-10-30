@@ -1,8 +1,8 @@
 /* NABOU//X — 3D ship on the 3D main map (loaded only after the 3D scene starts; never in 2D).
- * Model: a 17th-century Mediterranean three-masted xebec (lateen rig), built here from three.js geometry,
- * no external model files. It is an ILLUSTRATION placed at a fixed sea position in the Cyclades (near
- * Milos and Kimolos). It does not travel and shows no historical voyage: voyage legs are not used here.
- * It always floats at sea level: the position is checked against the terrain (groundAt < 0 = sea) and
+ * Model: a late-16th-century galleon (fore and main square-rigged, mizzen and bonaventure lateen), built here from three.js geometry,
+ * no external model files. On its own it floats at a fixed open-sea spot in the Cyclades (near Milos and
+ * Kimolos); map-3d-route.js instead sails it along the Book III (1577) route and moves it every frame.
+ * It always floats at sea level: the fixed spot is checked against the terrain (groundAt < 0 = sea) and
  * moved to the nearest open-sea spot if needed. */
 const SHIP_AT = { lon: 24.72, lat: 36.86 }; // preferred: open water by Milos / Kimolos (not a historical place); nearest open sea is used
 const LEN = 0.16;                            // hull length in world units (the whole board is 18 wide)
@@ -23,107 +23,148 @@ function seaSpot(api) {
 }
 
 function buildShip(T) {
+  /* late-16th-century galleon: low waist between a high forecastle and a tall stern castle, four masts
+     (fore and main square-rigged, mizzen and bonaventure lateen), bowsprit with spritsail, gunports,
+     dark wood with red and gilt trim, pennants and an ensign. Bow = +x, up = +y, beam = z. No oars. */
   const ship = new T.Group();
-  ship.name = "nabou-ship";
-  const wood = new T.MeshStandardMaterial({ color: 0x7a4e2a, emissive: 0x1c0f06, roughness: 0.7 });
-  const darkWood = new T.MeshStandardMaterial({ color: 0x3b2413, roughness: 0.8 });
-  const deckMat = new T.MeshStandardMaterial({ color: 0xa47a4a, roughness: 0.85 });
-  const sailMat = new T.MeshStandardMaterial({ color: 0xf1e4c2, emissive: 0x4a3d26, roughness: 0.9, side: T.DoubleSide });
-  const red = new T.MeshStandardMaterial({ color: 0x9c2219, roughness: 0.6, side: T.DoubleSide });
-  const gold = new T.MeshStandardMaterial({ color: 0xb48d45, roughness: 0.4, metalness: 0.6 });
+  ship.name = "nabou-galleon";
+  const M = (o) => new T.MeshStandardMaterial({ roughness: 0.75, ...o });
+  const wood = M({ color: 0x4a2c16, emissive: 0x140a04 });
+  const darkWood = M({ color: 0x2a190c });
+  const deckMat = M({ color: 0x9a7448, roughness: 0.85 });
+  const redPaint = M({ color: 0x8e1d16, emissive: 0x220504, roughness: 0.6 });
+  const gold = M({ color: 0xc09a4c, roughness: 0.4, metalness: 0.6, emissive: 0x2a1e08 });
+  const portMat = M({ color: 0x0c0705, roughness: 1 });
+  const sailMat = M({ color: 0xf1e4c2, emissive: 0x4a3d26, roughness: 0.9, side: T.DoubleSide });
+  const flagRed = M({ color: 0xb0241a, roughness: 0.6, side: T.DoubleSide });
+  const flagGold = M({ color: 0xd8b558, roughness: 0.6, side: T.DoubleSide });
 
-  /* hull: side profile extruded across the beam, then tapered to a sharp bow, rounded stern and a narrow keel */
-  const L = 1, Hh = 0.16;
-  const prof = new T.Shape();
-  prof.moveTo(-0.5, 0.10);            // stern top
-  prof.lineTo(-0.47, -0.02);
-  prof.quadraticCurveTo(-0.35, -0.09, -0.1, -0.095);
-  prof.lineTo(0.3, -0.09);
-  prof.quadraticCurveTo(0.48, -0.06, 0.6, 0.06); // long overhanging bow (xebec beak)
-  prof.lineTo(0.56, 0.075);
-  prof.quadraticCurveTo(0.2, 0.045, -0.2, 0.06);
-  prof.lineTo(-0.5, 0.10);
-  const hullGeo = new T.ExtrudeGeometry(prof, { depth: 0.2, bevelEnabled: false, curveSegments: 10, steps: 1 });
-  hullGeo.translate(0, 0, -0.1);
-  const p = hullGeo.attributes.position;
-  for (let i = 0; i < p.count; i++) {
-    const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
-    const along = x > 0.15 ? Math.max(0, 1 - ((x - 0.15) / 0.45) ** 1.6) : x < -0.38 ? 0.78 + 0.22 * (1 - (-0.38 - x) / 0.12) : 1;
-    const down = 0.35 + 0.65 * Math.min(1, Math.max(0, (y + 0.095) / 0.13)); // narrower towards the keel
-    p.setZ(i, z * along * down);
+  // hull half-beam at (x, y): sharp bow, broad round stern, narrower at the keel and inward at the castles
+  const HB = 0.105;
+  const along = (x) => (x > 0.18 ? Math.max(0.05, 1 - ((x - 0.18) / 0.34) ** 1.7) : x < -0.36 ? 0.8 + 0.2 * Math.max(0, 1 - (-0.36 - x) / 0.16) : 1);
+  const down = (y) => 0.35 + 0.65 * Math.min(1, Math.max(0, (y + 0.1) / 0.14));
+  const tumble = (y) => (y > 0.09 ? 1 - 0.22 * Math.min(1, (y - 0.09) / 0.22) : 1);
+  const half = (x, y) => HB * along(x) * down(y) * tumble(y);
+  function extrude(shape, mat, grow = 1) {
+    const g = new T.ExtrudeGeometry(shape, { depth: 1, bevelEnabled: false, curveSegments: 10, steps: 1 });
+    g.translate(0, 0, -0.5);
+    const p = g.attributes.position;
+    for (let i = 0; i < p.count; i++) p.setZ(i, p.getZ(i) * 2 * half(p.getX(i), p.getY(i)) * grow);
+    g.computeVertexNormals();
+    const m = new T.Mesh(g, mat); ship.add(m); return m;
   }
-  hullGeo.computeVertexNormals();
-  const hull = new T.Mesh(hullGeo, wood);
-  ship.add(hull);
-  // wale stripes and gold rail along the sheer
-  const stripe = new T.Mesh(new T.BoxGeometry(0.86, 0.012, 0.192), darkWood); stripe.position.set(0.02, 0.035, 0); ship.add(stripe);
-  const rail = new T.Mesh(new T.BoxGeometry(0.98, 0.008, 0.17), gold); rail.position.set(0, 0.078, 0); ship.add(rail);
-  // deck
-  const deck = new T.Mesh(new T.BoxGeometry(0.9, 0.01, 0.15), deckMat); deck.position.set(0.0, 0.066, 0); ship.add(deck);
-  // stern castle with a small cabin
-  const castle = new T.Mesh(new T.BoxGeometry(0.16, 0.06, 0.15), darkWood); castle.position.set(-0.41, 0.12, 0); ship.add(castle);
-  const castleRail = new T.Mesh(new T.BoxGeometry(0.17, 0.008, 0.155), gold); castleRail.position.set(-0.41, 0.153, 0); ship.add(castleRail);
-  // oar ports / oars (xebecs could row in calms)
-  for (const side of [-1, 1]) for (let k = 0; k < 7; k++) {
-    const oar = new T.Mesh(new T.CylinderGeometry(0.003, 0.003, 0.16, 4), darkWood);
-    oar.position.set(-0.22 + k * 0.08, 0.0, side * 0.13);
-    oar.rotation.x = side * 1.05;
-    ship.add(oar);
-  }
+  const shape = (pts) => { const s = new T.Shape(); s.moveTo(...pts[0]); for (const q of pts.slice(1)) q.length === 4 ? s.quadraticCurveTo(...q) : s.lineTo(...q); return s; };
 
-  /* three masts with lateen yards and triangular sails, gently billowed */
-  const masts = [{ x: 0.3, h: 0.5, lean: 0.12 }, { x: 0.02, h: 0.58, lean: 0.06 }, { x: -0.3, h: 0.4, lean: 0.02 }];
-  for (const m of masts) {
-    const mast = new T.Mesh(new T.CylinderGeometry(0.006, 0.009, m.h, 6), darkWood);
-    mast.position.set(m.x, 0.07 + m.h / 2, 0); mast.rotation.z = m.lean * 0.5; ship.add(mast);
-    const yardLen = m.h * 1.25;
-    const yard = new T.Mesh(new T.CylinderGeometry(0.0035, 0.0035, yardLen, 5), darkWood);
-    const top = new T.Vector3(m.x - Math.sin(m.lean * 0.5) * m.h * 0.92, 0.07 + m.h * 0.92, 0.012);
-    yard.position.copy(top).add(new T.Vector3(0.06, -0.06, 0));
-    yard.rotation.z = -1.05; ship.add(yard);
-    // lateen sail: triangle hanging from the yard down to the deck at the mast foot
-    const dir = new T.Vector3(Math.sin(1.05), Math.cos(1.05), 0).multiplyScalar(yardLen / 2); // yard axis after rotation (pointing fore-up)
-    const yA = yard.position.clone().add(dir), yB = yard.position.clone().sub(dir);
-    const foot = new T.Vector3(m.x + 0.02, 0.09, 0.015);
+  // side profile: stern castle (two tiers), low waist, forecastle, keel and a raked stem
+  extrude(shape([[-0.5, 0.31], [-0.47, -0.02], [-0.33, -0.1, -0.08, -0.105], [0.28, -0.1], [0.46, -0.07, 0.52, 0.09],
+    [0.5, 0.2], [0.29, 0.2], [0.28, 0.09], [-0.17, 0.09], [-0.18, 0.21], [-0.33, 0.21], [-0.34, 0.31], [-0.5, 0.31]]), wood);
+  // painted bands that follow the hull: red wale, gilt rails, red castle friezes
+  extrude(shape([[-0.47, 0.055], [0.49, 0.055], [0.49, 0.072], [-0.47, 0.072]]), redPaint, 1.03);
+  extrude(shape([[-0.49, 0.086], [0.5, 0.086], [0.5, 0.094], [-0.49, 0.094]]), gold, 1.03);
+  extrude(shape([[-0.5, 0.15], [-0.18, 0.15], [-0.18, 0.19], [-0.5, 0.19]]), redPaint, 1.03);
+  extrude(shape([[-0.5, 0.255], [-0.34, 0.255], [-0.34, 0.29], [-0.5, 0.29]]), redPaint, 1.03);
+  extrude(shape([[0.29, 0.15], [0.5, 0.15], [0.5, 0.185], [0.29, 0.185]]), redPaint, 1.03);
+  extrude(shape([[-0.5, 0.205], [-0.17, 0.205], [-0.17, 0.214], [-0.5, 0.214]]), gold, 1.03);
+  extrude(shape([[-0.5, 0.305], [-0.33, 0.305], [-0.33, 0.315], [-0.5, 0.315]]), gold, 1.03);
+  extrude(shape([[0.28, 0.195], [0.5, 0.195], [0.5, 0.205], [0.28, 0.205]]), gold, 1.03);
+  // waist deck
+  const deck = new T.Mesh(new T.BoxGeometry(0.46, 0.006, 2 * HB * 0.95), deckMat); deck.position.set(0.05, 0.088, 0); ship.add(deck);
+  // gunports with red lids, two rows on the gun deck and the stern castle
+  const box = (w, h, d, mat, x, y, z) => { const m = new T.Mesh(new T.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); ship.add(m); return m; };
+  for (const side of [-1, 1]) {
+    for (let k = 0; k < 7; k++) { const x = -0.3 + k * 0.085, y = 0.025; const z = side * (half(x, y) + 0.002);
+      box(0.026, 0.022, 0.004, redPaint, x, y, z); box(0.017, 0.014, 0.006, portMat, x, y, z); }
+    for (let k = 0; k < 3; k++) { const x = -0.44 + k * 0.085, y = 0.235; box(0.02, 0.018, 0.006, portMat, x, y, side * (half(x, y) + 0.002)); }
+    for (let k = 0; k < 2; k++) { const x = 0.33 + k * 0.07, y = 0.125; box(0.018, 0.016, 0.006, portMat, x, y, side * (half(x, y) + 0.002)); }
+  }
+  // stern gallery windows and a gilt lantern
+  for (let k = -1; k <= 1; k++) box(0.004, 0.022, 0.022, gold, -0.502, 0.24, k * 0.034);
+  const lantern = new T.Mesh(new T.SphereGeometry(0.012, 8, 6), gold); lantern.position.set(-0.5, 0.345, 0); ship.add(lantern);
+
+  const cyl = (r0, r1, h, mat, x, y, z) => { const m = new T.Mesh(new T.CylinderGeometry(r0, r1, h, 6), mat); m.position.set(x, y, z); ship.add(m); return m; };
+  // square sail: billowed forward (towards the bow), hung below a yard across the ship
+  function squareSail(x, yTop, yBot, wTop, wBot) {
+    const g = new T.PlaneGeometry(1, 1, 8, 8), p = g.attributes.position;
+    for (let i = 0; i < p.count; i++) {
+      const u = p.getX(i), v = p.getY(i) + 0.5;             // u: -0.5..0.5 across, v: 0 bottom .. 1 top
+      const w = wBot + (wTop - wBot) * v;
+      const belly = 0.045 * (1 - 4 * u * u) * Math.sin(Math.PI * Math.min(1, 0.15 + v * 0.85));
+      p.setXYZ(i, belly, yBot + (yTop - yBot) * v, u * w);
+    }
+    g.computeVertexNormals();
+    const m = new T.Mesh(g, sailMat); m.position.x = x; ship.add(m);
+    const yard = cyl(0.004, 0.004, wTop * 1.12, darkWood, x + 0.004, yTop + 0.004, 0); yard.rotation.x = Math.PI / 2;
+  }
+  // lateen sail: triangle from a long slanted yard down to the mast foot
+  function lateen(x, base, h, lean) {
+    const yardLen = h * 1.3, top = new T.Vector3(x, base + h * 0.85, 0.006);
+    const dir = new T.Vector3(Math.sin(1.0), Math.cos(1.0), 0).multiplyScalar(yardLen / 2);
+    const yA = top.clone().add(dir), yB = top.clone().sub(dir), foot = new T.Vector3(x + 0.02, base + 0.03, 0.008);
+    const yard = cyl(0.003, 0.003, yardLen, darkWood, top.x, top.y, top.z); yard.rotation.z = -1.0;
     const g = new T.BufferGeometry(), seg = 8, verts = [], idx = [];
     for (let i = 0; i <= seg; i++) for (let j = 0; j <= seg - i; j++) {
       const u = i / seg, v = j / seg, w = 1 - u - v;
-      const pnt = yA.clone().multiplyScalar(u).add(yB.clone().multiplyScalar(v)).add(foot.clone().multiplyScalar(w));
-      pnt.z += 0.05 * Math.sin(Math.PI * Math.min(1, w * 1.6)) * (1 - Math.abs(u - v)); // belly of the sail
-      verts.push(pnt.x, pnt.y, pnt.z);
+      const q = yA.clone().multiplyScalar(u).add(yB.clone().multiplyScalar(v)).add(foot.clone().multiplyScalar(w));
+      q.z += 0.035 * Math.sin(Math.PI * Math.min(1, w * 1.6)) * (1 - Math.abs(u - v));
+      verts.push(q.x, q.y, q.z);
     }
     const row = (i) => { let o = 0; for (let k = 0; k < i; k++) o += seg - k + 1; return o; };
     for (let i = 0; i < seg; i++) for (let j = 0; j < seg - i; j++) {
-      const a = row(i) + j, b = row(i) + j + 1, c = row(i + 1) + j;
-      idx.push(a, b, c);
-      if (j < seg - i - 1) idx.push(b, row(i + 1) + j + 1, c);
+      idx.push(row(i) + j, row(i) + j + 1, row(i + 1) + j);
+      if (j < seg - i - 1) idx.push(row(i) + j + 1, row(i + 1) + j + 1, row(i + 1) + j);
     }
     g.setIndex(idx); g.setAttribute("position", new T.Float32BufferAttribute(verts, 3)); g.computeVertexNormals();
-    const sail = new T.Mesh(g, sailMat); ship.add(sail);
-    // pennant at the upper yard end
-    const pen = new T.Mesh(new T.PlaneGeometry(0.08, 0.025), red);
-    pen.position.copy(yA).add(new T.Vector3(-0.04, 0.012, 0)); ship.add(pen);
+    ship.add(new T.Mesh(g, sailMat));
   }
-  // stern flag
-  const pole = new T.Mesh(new T.CylinderGeometry(0.003, 0.003, 0.12, 4), darkWood); pole.position.set(-0.49, 0.2, 0); ship.add(pole);
-  const flag = new T.Mesh(new T.PlaneGeometry(0.07, 0.045), red); flag.position.set(-0.53, 0.235, 0); ship.add(flag);
+  const pennant = (x, y, len) => { const m = new T.Mesh(new T.PlaneGeometry(len, 0.014), flagRed); m.position.set(x - len / 2, y, 0); ship.add(m); return m; };
+
+  // foremast and mainmast: course + topsail, fighting tops, pennants at the trucks
+  const rigs = [{ x: 0.3, base: 0.2, h: 0.58, c: [0.48, 0.27, 0.29, 0.31], t: [0.72, 0.53, 0.2, 0.25] },
+                { x: 0.02, base: 0.09, h: 0.8, c: [0.5, 0.19, 0.34, 0.38], t: [0.79, 0.55, 0.24, 0.31] }];
+  const pennants = [];
+  for (const r of rigs) {
+    cyl(0.006, 0.009, r.h, darkWood, r.x, r.base + r.h / 2, 0);
+    cyl(0.022, 0.016, 0.018, darkWood, r.x, r.c[0] + 0.02, 0);           // fighting top
+    squareSail(r.x + 0.012, r.c[0], r.c[1], r.c[2], r.c[3]);
+    squareSail(r.x + 0.01, r.t[0], r.t[1], r.t[2], r.t[3]);
+    pennants.push(pennant(r.x, r.base + r.h + 0.005, 0.12));
+  }
+  // mizzen (on the stern castle) and bonaventure (on the poop): lateen
+  cyl(0.005, 0.007, 0.42, darkWood, -0.25, 0.21 + 0.21, 0); lateen(-0.25, 0.21, 0.42);
+  pennants.push(pennant(-0.25, 0.64, 0.08));
+  cyl(0.004, 0.005, 0.26, darkWood, -0.42, 0.31 + 0.13, 0); lateen(-0.42, 0.31, 0.26);
+  // bowsprit with a spritsail under it
+  const bs = cyl(0.005, 0.007, 0.3, darkWood, 0.6, 0.25, 0); bs.rotation.z = -Math.PI / 2 + 0.5;
+  squareSail(0.64, 0.25, 0.13, 0.17, 0.19);
+  // rigging: shrouds and stays as thin lines
+  const lines = [];
+  const L = (a, b) => lines.push(...a, ...b);
+  for (const r of rigs) for (const side of [-1, 1]) for (const dx of [-0.04, 0, 0.04]) L([r.x, r.c[0], 0], [r.x + dx, 0.095 + (r.x > 0.2 ? 0.1 : 0), side * half(r.x + dx, 0.09)]);
+  L([0.02, 0.88, 0], [0.3, 0.2, 0]); L([0.3, 0.77, 0], [0.72, 0.38, 0]); L([0.02, 0.86, 0], [-0.25, 0.62, 0]); L([-0.25, 0.62, 0], [-0.42, 0.56, 0]);
+  const lg = new T.BufferGeometry(); lg.setAttribute("position", new T.Float32BufferAttribute(lines, 3));
+  ship.add(new T.LineSegments(lg, new T.LineBasicMaterial({ color: 0x2a1a0c, transparent: true, opacity: 0.8 })));
+  // ensign on a staff at the stern: red with a gilt band
+  cyl(0.003, 0.003, 0.14, darkWood, -0.52, 0.37, 0);
+  const flag = new T.Group(); flag.position.set(-0.52, 0.41, 0); ship.add(flag);
+  const f1 = new T.Mesh(new T.PlaneGeometry(0.09, 0.055), flagRed); f1.position.x = -0.045; flag.add(f1);
+  const f2 = new T.Mesh(new T.PlaneGeometry(0.09, 0.012), flagGold); f2.position.set(-0.045, 0, 0.001); flag.add(f2);
 
   ship.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
-  ship.scale.setScalar(LEN / L);
-  return { ship, flag };
+  ship.scale.setScalar(LEN / 1);
+  return { ship, flag, pennants };
 }
 
-export function addShip(api) {
+export function addShip(api, opts = {}) {
   const T = api.THREE;
   if (!T || !api.scene) return null;
-  const at = seaSpot(api);
+  const at = opts.exact && opts.at ? opts.at : seaSpot(api); // exact: the caller moves it along a sea route
   if (!at) { console.warn("map3d ship: no open-sea spot found, ship not placed"); return null; }
-  const { ship, flag } = buildShip(T);
+  const { ship, flag, pennants } = buildShip(T);
   const holder = new T.Group();   // positioned by NABOU_MAP3D.addObject at sea level
   const bob = new T.Group();      // gentle swell motion inside it
   bob.add(ship);
   holder.add(bob);
-  holder.rotation.y = 0.75;       // heading roughly NW, along the channel
+  holder.rotation.y = 0.75;       // heading roughly NW (the route module turns it along its course)
   // wake: soft pale streak on the water behind the stern
   const cv = document.createElement("canvas"); cv.width = 64; cv.height = 256;
   const g = cv.getContext("2d"), gr = g.createLinearGradient(0, 0, 0, 256);
@@ -145,6 +186,7 @@ export function addShip(api) {
     bob.rotation.x = 0.045 * Math.sin(t * 1.1);          // roll
     bob.rotation.z = 0.025 * Math.sin(t * 0.8 + 1.2);    // pitch
     flag.rotation.y = 0.35 * Math.sin(t * 3.1);
+    pennants.forEach((p, i) => { p.rotation.x = 0.4 * Math.sin(t * 2.6 + i); });
   };
   const handle = api.addObject(holder, { lon: at.lon, lat: at.lat, z: 0 });
   holder.position.y = 0; // sea level, not the sea floor

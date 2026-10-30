@@ -2,10 +2,12 @@
  * Terrain: real elevation (NOAA ETOPO1, public domain) from assets/nautical/terrain/mediterranean-elevation.png,
  * on the same Mercator window as the 2D chart. Surface: a raster of the existing 2D chart SVG (read-only copy of
  * the live <svg class="chart">), so the 3D board wears exactly the 2D chart's look. Lanes, seals, emblems and ink
- * routes come from the same data the 2D map uses (window.NABOU_LANES, NABOU_CHART.core / .analysis).
+ * routes come from the same data the 2D map uses (window.NABOU_LANES, NABOU_CHART.core / .analysis); each lane
+ * carries a waving period flag (c. 1577) drawn in code by map-3d-flags.js.
  * Nothing here writes to the 2D chart's DOM. three.js r184 is vendored in ./vendor/three (MIT). */
 import * as THREE from "./vendor/three/three.module.min.js";
 import { OrbitControls } from "./vendor/three/OrbitControls.js";
+import { makeFlag } from "./map-3d-flags.js";
 
 const C = window.NABOU_CHART;
 const S = 0.01;                 // chart px -> world units (board = 18 x 11.05)
@@ -177,10 +179,10 @@ export async function createScene(host, { view2d } = {}) {
     scene.add(line); routeLines.push(line);
   }
 
-  /* lanes: wax seal on the ground, a pole, and the emblem + name standing upright on top (always facing the camera) */
+  /* lanes: wax seal on the ground, a flag pole with a period flag (c. 1577, drawn in map-3d-flags.js) waving
+     on it, turned towards the camera so it reads from any angle, and the name above it */
   const POLE = 0.42;
   const shadowTex = softDisc("rgba(20,10,4,.55)", "rgba(20,10,4,0)");
-  const poleMat = new THREE.LineBasicMaterial({ color: 0x2a190e, transparent: true, opacity: 0.85 });
   const markers = [];
   const pinsFor = (lane) => {
     const seal = [...document.querySelectorAll("#nodeSeals .node-seal")].find((e) => e.dataset.agent === lane.agentId);
@@ -189,8 +191,9 @@ export async function createScene(host, { view2d } = {}) {
   };
   for (const lane of lanes) {
     const gy = Math.max(0, groundY(H, lane.x, lane.y));
-    const base = world(lane.x, lane.y, gy), top = world(lane.x, lane.y, gy + POLE);
-    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([base, top]), poleMat));
+    const base = world(lane.x, lane.y, gy), top = world(lane.x, lane.y, gy + POLE + 0.03);
+    const flag = makeFlag(THREE, renderer, lane.agentId, { pole: POLE });
+    flag.group.position.copy(base); scene.add(flag.group);
     const sh = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.2), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false }));
     sh.rotation.x = -Math.PI / 2; sh.position.copy(base).add(new THREE.Vector3(0.05, 0.006, 0.04)); scene.add(sh);
     const el = document.createElement("button");
@@ -201,7 +204,9 @@ export async function createScene(host, { view2d } = {}) {
     const src = pinsFor(lane);
     el.addEventListener("click", () => src.label?.click());
     sealEl.addEventListener("click", () => src.seal?.click());
-    markers.push({ lane, base, top, el, sealEl, src, sig: "" });
+    flag.cloth.userData.open = () => src.label?.click();
+    el.dataset.flag = flag.info.title;
+    markers.push({ lane, base, top, el, sealEl, src, sig: "", flag });
   }
   const refreshPins = () => {
     for (const m of markers) {
@@ -209,8 +214,7 @@ export async function createScene(host, { view2d } = {}) {
       const sig = (seal?.outerHTML.length || 0) + "|" + (seal?.dataset.state || "") + (seal?.dataset.activity || "") + "|" + (label?.className || "") + (label?.dataset.state || "");
       if (sig === m.sig) continue;
       m.sig = sig;
-      const em = label?.querySelector(".nl-emblem");
-      m.el.querySelector(".map3d-flag").innerHTML = em ? em.innerHTML : "";
+      m.el.querySelector(".map3d-flag").innerHTML = ""; // the 3D flag on the pole replaces the 2D emblem
       m.el.querySelector(".map3d-name").textContent = label?.querySelector(".nl-name")?.textContent || m.lane.name;
       m.el.setAttribute("aria-label", label?.getAttribute("aria-label") || m.lane.name);
       m.el.dataset.state = label?.dataset.state || "";
@@ -225,6 +229,19 @@ export async function createScene(host, { view2d } = {}) {
   };
   refreshPins();
   const pinTimer = setInterval(refreshPins, 1000);
+
+  /* click on a 3D flag = click on its lane name (opens the same panel) */
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  let down = null;
+  canvas.addEventListener("pointerdown", (e) => { down = [e.clientX, e.clientY]; });
+  canvas.addEventListener("pointerup", (e) => {
+    if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;
+    const r = canvas.getBoundingClientRect();
+    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    const hit = ray.intersectObjects(markers.map((m) => m.flag.cloth), false)[0];
+    hit?.object.userData.open?.();
+  });
 
   /* extra objects (the ship, step 2): THREE.Object3D placed in the scene, or an HTML element pinned like the lanes */
   const extras = new Set();
@@ -309,7 +326,11 @@ export async function createScene(host, { view2d } = {}) {
       applyPose({ target: a.target.clone().lerp(b.target, q), dist: a.dist + (b.dist - a.dist) * q, tilt: a.tilt + (b.tilt - a.tilt) * q, rot: a.rot + (b.rot - a.rot) * q });
       if (q >= 1) { const d = tween.done; tween = null; controls.update(); d(); }
     } else controls.update();
-    for (const m of markers) { placeHTML(m.el, m.top, true); placeHTML(m.sealEl, m.base); }
+    for (const m of markers) {
+      placeHTML(m.el, m.top, true); placeHTML(m.sealEl, m.base);
+      m.flag.swing.rotation.y = Math.atan2(camera.position.x - m.base.x, camera.position.z - m.base.z);
+      if (!reduce) m.flag.wave(now / 1000);
+    }
     for (const r of extras) if (r.html) placeHTML(r.obj, r.at);
     renderer.render(scene, camera);
   }
