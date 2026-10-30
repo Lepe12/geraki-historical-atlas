@@ -1,5 +1,9 @@
 # Flag artwork (3D map only)
 
+> Since the change to coats of arms, the 3D map shows the same emblems as the 2D map (map-3d-emblems.js) and these
+> flag files are not loaded. They stay here, with their credits, in case flags are wanted again.
+
+
 Vector files vendored unchanged from Wikimedia Commons, downloaded 2026-10-30. They are rasterised in the browser
 (1024 px wide) by `map-3d-flags.js` only when the 3D view is on. Lanes that are not states (Travellers and the six research
 lanes) carry a plain parchment banner drawn in code; it is not a historical flag.
