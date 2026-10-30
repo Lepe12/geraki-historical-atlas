@@ -4,13 +4,12 @@
  * This is the voyage AS TOLD IN THE BOOK (Βιβλίο Γ' της τριλογίας), not archival history.
  * The line stays on water: the build step keeps the data.json corridor and goes around land where the
  * terrain grid needs it; here every drawn sample is checked again against the terrain (groundAt < 0).
- * A leg recorded as a reconstruction (Corfu → Ragusa) is dashed and marked "αβέβαιο". No page numbers.
+ * Only the port names are shown; all legs are drawn the same solid line (data fields such as "uncertain" stay in the JSON).
  * No side panel: only a small play / pause button sits with the map tools (3D only). The ship sails slowly and is
  * drawn large in open sea; near a harbour it shrinks just enough for the hull to stay on water. */
 import { addShip } from "./map-3d-ship.js";
 
 const SRC = "./assets/nautical/routes/lantzas-1577-book3.json";
-const BOOK = "Από το βιβλίο · Βιβλίο Γ' της τριλογίας (αφήγηση, όχι αρχειακή ιστορία)";
 const SPEED = 0.037;    // world units per second (the whole board is 18 wide) · slow: ~2.6 min for the whole voyage
 const DWELL = 4;        // seconds of calm at each stop
 const BIG = 3.4;        // ship scale in open sea (clearly visible at the whole-board view)
@@ -18,7 +17,9 @@ const SMALL = 0.12;     // smallest scale, only in narrow channels / harbours wh
 const ANCHOR = 1.2;     // the ship waits off each harbour, at the first spot on the leg where it fits at this scale
 const LINE_Y = 0.008, R = 0.011;
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
-const label = (s) => s.atlasLabel || s.historicalNames || s.place;
+const GREEK = { "Corfù / Κέρκυρα": "Κέρκυρα", "Ραγούσα": "Ραγούσα", "Χάνδακας": "Χάνδακας", "Porto Quaglio / Porto Kagio": "Πόρτο Κάγιο" }; // display only; JSON unchanged
+const label0 = (s) => s.atlasLabel || s.historicalNames || s.place;
+const label = (s) => GREEK[label0(s)] || label0(s);
 
 export async function addRoute(api) {
   const T = api.THREE, scene = api.scene;
@@ -33,7 +34,6 @@ export async function addRoute(api) {
   const group = new T.Group(); group.name = "lantzas-route-1577"; scene.add(group);
   group.scale.y = 0.3; // flat ink ribbon lying on the water, so the ship rides over it
   const ink = new T.MeshStandardMaterial({ color: 0x8c1c14, emissive: 0x3a0806, roughness: 0.6 });
-  const inkPale = new T.MeshStandardMaterial({ color: 0x3b2410, emissive: 0x1a0f05, roughness: 0.6 });
   let landSamples = 0;
   const legs = data.legs.map((leg) => {
     const pts = leg.line.map(([la, lo]) => w(la, lo));
@@ -43,46 +43,17 @@ export async function addRoute(api) {
     if (test(curve)) { curve = new T.CurvePath(); for (let i = 1; i < pts.length; i++) curve.add(new T.LineCurve3(pts[i - 1], pts[i])); }
     landSamples += test(curve);
     const len = curve.getLength();
-    if (leg.uncertain) {          // dashed
-      const dash = 0.07, gap = 0.05;
-      for (let s = 0; s < len; s += dash + gap) {
-        const a = s / len, b = Math.min(len, s + dash) / len, sub = [];
-        for (let i = 0; i <= 4; i++) sub.push(curve.getPointAt(a + (b - a) * i / 4));
-        group.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(sub), 4, R, 6), inkPale));
-      }
-    } else group.add(new T.Mesh(new T.TubeGeometry(curve, Math.max(64, Math.round(len * 120)), R, 6, false), ink));
+    group.add(new T.Mesh(new T.TubeGeometry(curve, Math.max(64, Math.round(len * 120)), R, 6, false), ink)); // all legs solid, one style
     return { ...leg, curve, len };
   });
-  // 'αβέβαιο' on the uncertain leg
-  for (const l of legs) if (l.uncertain) {
-    const m = l.curve.getPointAt(0.5), tag = el("div", "map3d-route-tag", "αβέβαιο");
-    tag.title = "Σκέλος που στο data.json είναι ανασύνθεση (STRONG RECONSTRUCTION), όχι ρητό ταξίδι";
-    api.addObject(tag, { lon: (m.x / S + C.W / 2) / C.k + C.lon0, lat: latOf(m.z / S + C.H / 2), z: 0.03 });
-  }
-
-  /* stops: click shows place, year and the book label */
-  const pop = el("div", "map3d-route-pop"); pop.hidden = true; host.appendChild(pop);
-  const close = () => { pop.hidden = true; for (const b of host.querySelectorAll(".map3d-stop.open")) b.classList.remove("open"); };
+  /* stops: only the port name is shown (no notes, numbers or pop-ups) */
   const stops = data.stops.map((s, i) => {
-    const b = el("button", "map3d-stop" + (s.coordinateStatus === "NEEDS RESEARCH" ? " research" : ""));
-    b.type = "button"; b.dataset.place = s.place;
-    b.append(el("span", "map3d-stop-dot", String(i + 1)), el("span", "map3d-stop-name", label(s)));
-    b.setAttribute("aria-label", `${label(s)} · ${s.year}`);
-    b.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const was = b.classList.contains("open"); close(); if (was) return;
-      pop.replaceChildren(el("b", "", label(s)), el("span", "map3d-pop-year", s.year), el("span", "map3d-pop-book", BOOK));
-      if (s.coordinateStatus === "NEEDS RESEARCH") pop.append(el("span", "map3d-pop-flag", "Θέση: χρειάζεται έρευνα"));
-      const x = el("button", "map3d-pop-x", "×"); x.type = "button"; x.setAttribute("aria-label", "Κλείσιμο"); x.onclick = close; pop.append(x);
-      const r = b.getBoundingClientRect(), h = host.getBoundingClientRect();
-      pop.style.left = Math.max(8, Math.min(h.width - 270, r.left - h.left + r.width / 2 - 125)) + "px";
-      pop.style.top = Math.max(8, r.top - h.top - 8) + "px";
-      pop.hidden = false; b.classList.add("open");
-    });
+    const b = el("div", "map3d-stop");
+    b.dataset.place = s.place;
+    b.append(el("span", "map3d-stop-dot"), el("span", "map3d-stop-name", label(s)));
     api.addObject(b, { lon: s.lon, lat: s.lat, z: 0.02 });
     return { ...s, el: b };
   });
-  host.addEventListener("pointerdown", (e) => { if (!pop.hidden && !pop.contains(e.target) && !e.target.closest(".map3d-stop")) close(); });
 
   /* only a small play / pause button among the map tools (shown only in 3D) */
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
