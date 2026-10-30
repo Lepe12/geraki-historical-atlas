@@ -2,7 +2,8 @@
   "schema": "research-continuation-rounds-v1",
   "caps": {
     "max_rounds": 5,
-    "no_gain_rounds": 2
+    "no_gain_rounds": 2,
+    "diminishing_returns": true
   },
   "rounds": [
     {
@@ -598,6 +599,113 @@
         "missing_shards": [],
         "role": "PARALLEL_READING_METRICS_NOT_HISTORICAL_VERIFICATION"
       }
+    },
+    {
+      "round": 6,
+      "analysis_path": "semantic_reanalysis_41022625273",
+      "status": "MODEL_ANSWER_PENDING_HUMAN_REVIEW",
+      "total": 3,
+      "examined": 3,
+      "remaining": 0,
+      "new_examined": 0,
+      "supported_claims": 1,
+      "new_supported_claims": 1,
+      "supported_claim_ids": [
+        "c-1903c3f11f4d816b45fa"
+      ],
+      "claim_ids": [
+        "c-1903c3f11f4d816b45fa"
+      ],
+      "new_claims": null,
+      "answer_paragraphs": 1,
+      "queue_status": "COMPLETE",
+      "prefilter": {
+        "filtered_out": 401,
+        "filtered_by_reason": {
+          "filtered_irrelevant": 5,
+          "filtered_low_quality_table": 26,
+          "filtered_low_quality_metadata": 0,
+          "filtered_low_quality_short": 24,
+          "filtered_near_duplicate": 100,
+          "screened_out_topic": 116,
+          "screened_out_place": 130
+        },
+        "kept_excerpts": 3,
+        "model_units": 3,
+        "sentence_windows": 2,
+        "sent_this_pass": 3
+      },
+      "collected": 404,
+      "model_calls": 5,
+      "shards": {
+        "policy": "round-robin-by-rank-v1",
+        "count": 4,
+        "shards": [
+          {
+            "index": 0,
+            "count": 4,
+            "status": "SHARD_EXTRACTION_AND_REVIEW_COMPLETE",
+            "assigned_batches": 1,
+            "selected_batches": 1,
+            "selected_excerpts": 3,
+            "examined_excerpts": 3,
+            "extracted_claims": 1,
+            "model_calls": 2,
+            "new_model_calls": 2,
+            "claim_reviews": 1
+          },
+          {
+            "index": 1,
+            "count": 4,
+            "status": "INSUFFICIENT_ACQUIRED_EVIDENCE",
+            "assigned_batches": 0,
+            "selected_batches": 0,
+            "selected_excerpts": 0,
+            "examined_excerpts": 0,
+            "extracted_claims": 0,
+            "model_calls": 0,
+            "new_model_calls": 0,
+            "claim_reviews": 0
+          },
+          {
+            "index": 2,
+            "count": 4,
+            "status": "INSUFFICIENT_ACQUIRED_EVIDENCE",
+            "assigned_batches": 0,
+            "selected_batches": 0,
+            "selected_excerpts": 0,
+            "examined_excerpts": 0,
+            "extracted_claims": 0,
+            "model_calls": 0,
+            "new_model_calls": 0,
+            "claim_reviews": 0
+          },
+          {
+            "index": 3,
+            "count": 4,
+            "status": "INSUFFICIENT_ACQUIRED_EVIDENCE",
+            "assigned_batches": 0,
+            "selected_batches": 0,
+            "selected_excerpts": 0,
+            "examined_excerpts": 0,
+            "extracted_claims": 0,
+            "model_calls": 0,
+            "new_model_calls": 0,
+            "claim_reviews": 0
+          }
+        ],
+        "total": {
+          "selected_batches": 1,
+          "selected_excerpts": 3,
+          "examined_excerpts": 3,
+          "extracted_claims": 1,
+          "model_calls": 2,
+          "new_model_calls": 2,
+          "claim_reviews": 1
+        },
+        "missing_shards": [],
+        "role": "PARALLEL_READING_METRICS_NOT_HISTORICAL_VERIFICATION"
+      }
     }
   ],
   "role": "COVERAGE_METRICS_NOT_HISTORICAL_VERIFICATION",
@@ -643,5 +751,5 @@
       "decided_utc": "2026-10-29T16:43:42Z"
     }
   ],
-  "stop_reason": "MAX_CONTINUATION_ROUNDS"
+  "stop_reason": "ALL_EXCERPTS_READ"
 }
