@@ -1,0 +1,2934 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "source_genealogy",
+  "label": "Source Genealogy Agent",
+  "assignment_id": "source_genealogy:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "source_chains",
+    "derivative_sources",
+    "independence_warnings",
+    "primary_source_targets"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "2af9a40789a89474685e301ace1ca0dfaf6b38a9d5ecba99c83c9c241db92c26",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "source_genealogy",
+    "assignment_id": "source_genealogy:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:Biblioteca Digital Hispánica",
+      "repo:Academia.edu Public Research"
+    ],
+    "queries": [
+      "\"Πέτρος Λάντζας\"",
+      "\"Πέτρο Λάντζα\"",
+      "\"Pedro Lantzas\"",
+      "\"Petros Lantzas\"",
+      "\"petros lantzas\""
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 108,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 100,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 90,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Crossref Scholarly Metadata",
+        "route_type": "repository_dispatch",
+        "repository": "Crossref Scholarly Metadata",
+        "connector_id": null,
+        "score": 86,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 623, \"response_sha256\": \"e753864b839e82bdfffff365e273c71a66bd6c114003d0b5079f967c52b7f9f9\", \"elapsed_ms\": 499}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Petros+Lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Petros+Lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 610, \"response_sha256\": \"09ae8e522623dd8ac417590ae011c8e4c44a17c25d4c752efc334f40299c1993\", \"elapsed_ms\": 499}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Petros+Lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"petros lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+petros+lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+petros+lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 610, \"response_sha256\": \"693f09f4cff7ea5291cdee5d8fe4dd620de11f5bf903b9496caa9cc3a3ebe8e2\", \"elapsed_ms\": 498}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+petros+lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 619, \"response_sha256\": \"f41e92f2e01f061d9f90091f735b117d11e40e5752eb53deced1a2caf6cfb9c7\", \"elapsed_ms\": 506}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pedro Lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pedro+Lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pedro+Lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 609, \"response_sha256\": \"87ed1a874291819526dac36669081a353e33c8253d9a78994d99e019be4527b9\", \"elapsed_ms\": 519}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Pedro+Lantzas+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25617, \"response_sha256\": \"9269ecf8da02355511842c46b58f833670ccf590f33da48ebccbb0b6d4876833\", \"elapsed_ms\": 612}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Petros+Lantzas%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22Petros+Lantzas%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25533, \"response_sha256\": \"d93d7da262dafa05cb2517c7f80872ef4432ae45b0bc4253d58912790bd57913\", \"elapsed_ms\": 125}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22Petros+Lantzas%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"petros lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22petros+lantzas%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22petros+lantzas%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25533, \"response_sha256\": \"141da98c2987c508d1fd8c828aceab4eefab238fe53011f69ce2df70adae6345\", \"elapsed_ms\": 122}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22petros+lantzas%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Pedro Lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Pedro+Lantzas%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 155}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Pedro+Lantzas%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 155}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 31568, \"response_sha256\": \"c962a29925e5898d8ebbf90e40a369cda78a842446c75ed02f6187ea23cf094b\", \"elapsed_ms\": 161}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Pedro Lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Pedro+Lantzas%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Pedro+Lantzas%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"457ce1ec088822c140369d397dc46a00beb689e7f74ae7747b966ad5d469e49a\", \"elapsed_ms\": 1127}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Pedro+Lantzas%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Petros Lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Petros+Lantzas%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Petros+Lantzas%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"457ce1ec088822c140369d397dc46a00beb689e7f74ae7747b966ad5d469e49a\", \"elapsed_ms\": 1231}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22Petros+Lantzas%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρο Λάντζα\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"457ce1ec088822c140369d397dc46a00beb689e7f74ae7747b966ad5d469e49a\", \"elapsed_ms\": 1243}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"petros lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22petros+lantzas%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22petros+lantzas%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"457ce1ec088822c140369d397dc46a00beb689e7f74ae7747b966ad5d469e49a\", \"elapsed_ms\": 1216}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22petros+lantzas%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"457ce1ec088822c140369d397dc46a00beb689e7f74ae7747b966ad5d469e49a\", \"elapsed_ms\": 1353}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Pedro Lantzas\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Pedro+Lantzas%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 110}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Pedro+Lantzas%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 117}, {\"url\": \"https://api.openalex.org/works?search=%22Pedro+Lantzas%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Pedro+Lantzas%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1044, \"response_sha256\": \"efffbb8b80546718cfffa25dfcacc50bddfa2af71bcc2882a3ee3c56b5010da8\", \"elapsed_ms\": 548}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Pedro+Lantzas%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 110}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Pedro+Lantzas%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 117}, {\"url\": \"https://api.openalex.org/works?search=%22Pedro+Lantzas%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Pedro+Lantzas%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1044, \"response_sha256\": \"efffbb8b80546718cfffa25dfcacc50bddfa2af71bcc2882a3ee3c56b5010da8\", \"elapsed_ms\": 548}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"petros lantzas\"",
+      "records": [
+        {
+          "discovery_repository": "OpenAlex Scholarly Works",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://openalex.org/W2287415961",
+          "title": "Seigneurs et seigneurie xve–xixe siècle",
+          "creator": [
+            "Νίκος Καραπιδάκης"
+          ],
+          "date": [
+            "2015-01-01"
+          ],
+          "url": "https://doi.org/10.4000/ceb.5656",
+          "doi": "https://doi.org/10.4000/ceb.5656",
+          "type": "article",
+          "cited_by_count": 0,
+          "description": "Au cours d’une longue période qui s’étend du xve à la fin du xviiie siècle – et qui, à un certain degré, va se poursuivre sur le siècle suivant en dépit de la stabilisation relative des États-nations – les zones géographiques de la Macédoine, de l’Épire, de la Grèce centrale, de la mer Ionienne et de l’Égée, de la Crète et de certains rivages de la Morée connaissent une constante remise en question de leur domination, autrement dit, vivent dans des conditions de guerre.Dans ces conditions – une guerre constante – on peut s’attendre à ce que les groupes sociaux qui peuvent faire la guerre, soit directement en y participant eux-mêmes, soit indirectement en la finançant, acquièrent du crédit puisque leur fonction est socialement fondamentale. La place occupée par ces groupes parmi les pouvoirs officiels qui font la guerre, leur permet, ou leur impose, une attitude constamment révisable et révisée puisqu’ils peuvent négocier leur puissance sociale avec l’une ou l’autre force, obtenant un renouvellement de leurs privilèges et/ou une amélioration des avantages qu’ils en retirent.",
+          "description_provenance": "OPENALEX_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://journals.openedition.org/ceb/pdf/5656",
+              "is_oa": true,
+              "license": "cc-by-nc",
+              "version": "publishedVersion"
+            }
+          ],
+          "digital_url": "https://journals.openedition.org/ceb/pdf/5656",
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "OPENALEX_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22petros+lantzas%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 183}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22petros+lantzas%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 265}, {\"url\": \"https://api.openalex.org/works?search=%22petros+lantzas%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22petros+lantzas%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 15778, \"response_sha256\": \"bb7728fbb98005cfabfab0793ad0ff2311b0b111137520a4a9e22b2fa7289190\", \"elapsed_ms\": 407}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 1}]}\", \"result_count\": 1, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22petros+lantzas%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 183}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22petros+lantzas%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 265}, {\"url\": \"https://api.openalex.org/works?search=%22petros+lantzas%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22petros+lantzas%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 15778, \"response_sha256\": \"bb7728fbb98005cfabfab0793ad0ff2311b0b111137520a4a9e22b2fa7289190\", \"elapsed_ms\": 407}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 1}]}\", \"result_count\": 1, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Πέτρος Λάντζας\"",
+      "records": [
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.5040/9781474266680.ch-010",
+          "title": "Κηφας",
+          "creator": [],
+          "date": [
+            "2015"
+          ],
+          "url": "https://doi.org/10.5040/9781474266680.ch-010",
+          "doi": "10.5040/9781474266680.ch-010",
+          "type": "other",
+          "publisher": "Bloomsbury Publishing (UK)",
+          "container_title": [
+            "Essays and Studies in New Testament Textual Criticism"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/26882",
+          "title": "Πέτρος και Παύλος στην Αντιόχεια",
+          "creator": [
+            "Αθανάσιος Μουστάκης"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/26882",
+          "doi": "10.12681/eadd/26882",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2307/1559956",
+          "title": "Κηφᾶς: Σίμων Πέτρος: ὁ Πέτρος: An Examination of New Testament Usage",
+          "creator": [
+            "J. K. Elliott"
+          ],
+          "date": [
+            "1972-10"
+          ],
+          "url": "https://doi.org/10.2307/1559956",
+          "doi": "10.2307/1559956",
+          "type": "journal-article",
+          "publisher": "JSTOR",
+          "container_title": [
+            "Novum Testamentum"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.31234/osf.io/zgpuf",
+          "title": "Ο Πέτρος Πολυχρόνης και η επιστημολογία της ζωής",
+          "creator": [
+            "Αλέξιος Μπράιλας"
+          ],
+          "date": [
+            "2023-2-9"
+          ],
+          "url": "https://doi.org/10.31234/osf.io/zgpuf",
+          "doi": "10.31234/osf.io/zgpuf",
+          "type": "posted-content",
+          "publisher": "Center for Open Science",
+          "container_title": [],
+          "description": "Στα πολύπλοκα συστήματα, το ενιαίο όλον το οποίο συγκροτείται μέσα από τη σύνθετη αλληλεπίδραση και τη συνέργεια των επιμέρους δρώντων μερών, είναι σε θέση να αλληλεπιδρά με τα ίδια τα μέρη που το συγκροτούν, τη στιγμή που το συγκροτούν. Το όλον και τα μέρη είναι σε θέση να τροποποιούν τη συμπεριφορά τους, να προσαρμόζονται και να συνεξελίσσονται, ανάλογα με τη μεταξύ τους δυναμική αλληλεπίδραση και όντας σε συνεχή διάλογο με το ευρύτερο τους συγκείμενο. Μέσα από τις πολύπλοκες συνέργειες που αναπτύσσονται μακράν της ισορροπίας μπορεί να αναδυθεί μια ιδιαίτερα πλούσια και συχνά απροσδόκητη συλλογική δυναμική. Αυτό το άρθρο αποτελεί μια αυτοεθνογραφική επιστημολογική διερεύνηση. Μέσα από τη δουλειά και το έργο του Πέτρου Πολυχρόνη, παιδοψυχίατρου, συστημικού ψυχοθεραπευτή και διευθυντή του ΑΚΜΑ για είκοσι χρόνια, και μέσα από τη σχέση μου μαζί του, παρουσιάζω τους βασικούς άξονες μιας επιστημολογίας των ζωντανών συστημάτων. Οι έννοιες της συνεξέλιξης, της αποσταθεροποίησης, της κρίσης, των δομών σκέδασης, των παράξενων ελκυστών, των διχαλωτών διακλαδώσεων, της εντροπίας και του ριζώματος αποτελούσαν, μεταξύ άλλων, για τον Πέτρο Πολυχρόνη όχι αφηρημένες θεωρητικές κατασκευές αλλά πολύτιμα πρακτικά εργαλεία παρέμβασης για την ενδυνάμωση και την αειφορία των ανθρώπινων συστημάτων σε προσωπικό και συλλογικό επίπεδο.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/makedonika.9220",
+          "title": "Πέτρος Παπαγεωργίου (+1914)",
+          "creator": [
+            "Αλεξ. Ν. Λέτσας"
+          ],
+          "date": [
+            "2017-6-8"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.9220",
+          "doi": "10.12681/makedonika.9220",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μακεδονικά"
+          ],
+          "description": "[χωρίς περίληψη]",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/9220/9439",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/9220/9439",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/53705",
+          "title": "Ο Απόστολος Πέτρος στην Καινή Διαθήκη και στην απόκρυφη χριστιανική γραμματεία",
+          "creator": [
+            "Αναστάσιος Ασλανίδης"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/53705",
+          "doi": "10.12681/eadd/53705",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Ο ρόλος του Πέτρου μέσα στην κανονική γραμματεία ήταν ένας ρόλος ευαίσθητος και σημαντικός. Τόσο, σημαντικός, που οι επόμενες γενιές των χριστιανών συνέχισαν να παράγουν κείμενα που είχαν άμεση σχέση με τον Πέτρο, αναζητώντας την αυθεντία του και την εγκυρότητα του. Στην εργασία μας θα προσπαθήσουμε να δούμε και να διασαφηνίσουμε τις παρεξηγήσεις που έχουν άμεση σχέση με το πρόσωπο του Πέτρου. Ακόμη, η έρευνα μας θα οδηγήσει σε περισσότερα συμπεράσματα όχι μόνο για τον ίδιο τον Πέτρο, αλλά και για την εποχή, τους ανθρώπους και τις πρώτες κοινότητες που γνώρισε και ήρθαν σε επαφή μαζί του. Το στοιχείο της πρόσληψης του μηνύματος του Πέτρου από τις χριστιανικές κοινότητες θα μας απασχολήσει ιδιαίτερα και θα αναλυθεί στην εργασία μας. Ο προβληματισμός μας είναι ότι παρόλο που ο Πέτρος είναι παρών σε μεγάλα γεγονότα, θα τολμούσαμε να πούμε ότι το πρόσωπο του αδικείται και δεν έχει την ανάλογη προσοχή. Διότι, αν και συνοδεύει τον Ιησού σε όλη τη δημόσια δράση του, συμμετέχει στην οργάνωση και τη ζωή των χριστιανικών κοινοτήτων, αλλά και στη μετέπειτα ζωή της εκκλησίας, δεν γνωρίζουμε πολλά για τον απόστολο. Έτσι, σκοπός της εργασίας μας είναι να αναδείξουμε το πρόσωπο του Πέτρου μέσα από την Καινή Διαθήκη και την απόκρυφη γραμματεία, ώστε να συμβάλλουμε και εμείς με τις μικρές μας δυνάμεις στον διάλογο για το πρόσωπο του Πέτρου. Έτσι θα δούμε ότι ο Πέτρος υπήρξε αναμφίβολα μια από τις σημαντικότερες προσωπικότητες της αρχαίας εκκλησίας. Έπαιξε ενεργό ρόλο στην πρώτη ιεραποστολή και την οργάνωση της. Ο Πέτρος είναι το πρόσωπο από τον κύκλο των δώδεκα με τη μεγαλύτερη παρουσία στην Καινή Διαθήκη. Σύμφωνα με την εξέταση της κανονικής και της απόκρυφης γραμματείας που σχετίζεται με τον Πέτρο, μπορούμε να πούμε ότι ο απόστολος ήταν κεντρικό και αγαπητό πρόσωπο μέσα στις χριστιανικές κοινότητες. Όλοι τον γνώριζαν και η ιδιαίτερη προσωπικότητα του ήταν αυτή που τον ξεχώριζε από όλους τους υπόλοιπους. Το πρόσωπο του Πέτρου αναμφίβολα έχει να προσφέρει πολλά στον χώρο της ερμηνείας. Αυτό σημαίνει ότι κάποιος μπορεί να μάθει πολλά για την κατάσταση των κοινοτήτων, το περιβάλλον συγγραφής των κειμένων και των γεγονότων της αρχαίας εκκλησίας, εξετάζοντας το πρόσωπο του Πέτρου. Έτσι, με αυτόν τον τρόπο μπορούμε να εντάξουμε και το πρόσωπο του Πέτρου, όπως άλλωστε και του Παύλου, στο πρίσμα μιας νέας προοπτικής.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/11220",
+          "title": "Ο πολίτης Πέτρος Σκυλίτζης Ομηρίδης 1784-1872",
+          "creator": [
+            "Ιωάννης Κόκκωνας"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/11220",
+          "doi": "10.12681/eadd/11220",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783110865974.88",
+          "title": "Ch. 4. Πέτρος and πέτρα in Mt 16:18",
+          "creator": [],
+          "date": [
+            "1990-1-1"
+          ],
+          "url": "https://doi.org/10.1515/9783110865974.88",
+          "doi": "10.1515/9783110865974.88",
+          "type": "book-chapter",
+          "publisher": "DE GRUYTER",
+          "container_title": [
+            "Peter and the Rock"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://www.degruyter.com/view/books/9783110865974/9783110865974.88/9783110865974.88.xml",
+              "content_type": "text/html",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783110865974.88/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783110865974.88/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783110865974.17",
+          "title": "Ch. 2. Πέτρος, Πέτρα and Derivatives as Names",
+          "creator": [],
+          "date": [
+            "1990-1-1"
+          ],
+          "url": "https://doi.org/10.1515/9783110865974.17",
+          "doi": "10.1515/9783110865974.17",
+          "type": "book-chapter",
+          "publisher": "DE GRUYTER",
+          "container_title": [
+            "Peter and the Rock"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://www.degruyter.com/view/books/9783110865974/9783110865974.17/9783110865974.17.xml",
+              "content_type": "text/html",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783110865974.17/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783110865974.17/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/dchae.1013",
+          "title": "Άγιος Πέτρος Καλυβίων Κουβαρά Αττικής",
+          "creator": [
+            "Ναυσικά ΠΑΝΣΕΛΗΝΟΥ"
+          ],
+          "date": [
+            "1989-1-11"
+          ],
+          "url": "https://doi.org/10.12681/dchae.1013",
+          "doi": "10.12681/dchae.1013",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Δελτίον Χριστιανικής Αρχαιολογικής Εταιρείας"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/deltion/article/viewFile/4648/4424",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/prch.28320",
+          "title": "Ο Παργινός ιατρός και Φιλικός Πέτρος Ηπίτης",
+          "creator": [
+            "Στέφανος Αγάθος"
+          ],
+          "date": [
+            "2015-12-31"
+          ],
+          "url": "https://doi.org/10.12681/prch.28320",
+          "doi": "10.12681/prch.28320",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Πρεβεζάνικα Χρονικά"
+          ],
+          "description": "Ἡ παρούσα μελέτη ἀσχολεῖται μὲ τὸ τμῆμα τοῦ ἀρχείου Ἠπίτη ποὺ ἀφορᾶ στὶς ἐπιστολές, οἱ ὁποῖες καλύπτουν χρονικὰ τὸ διάστημα 1818- 1852.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/prevchr/article/viewFile/28320/22221",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/prevchr/article/viewFile/28320/22221",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.5817/ngb2023-23-11",
+          "title": "[Μαραζόπουλος, Πέτρος. Τα \"Βαλκάνια\" στη Νεοελληνική Κουλτούρα: όψεις της διαχείρισης ενός όρου]",
+          "creator": [
+            "Konstantinos Tsivos"
+          ],
+          "date": [
+            "2023"
+          ],
+          "url": "https://doi.org/10.5817/ngb2023-23-11",
+          "doi": "10.5817/ngb2023-23-11",
+          "type": "journal-article",
+          "publisher": "Masaryk University Press",
+          "container_title": [
+            "Neograeca Bohemica"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://digilib.phil.muni.cz/_flysystem/fedora/pdf/NGB2023-23-11.pdf",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://digilib.phil.muni.cz/_flysystem/fedora/pdf/NGB2023-23-11.pdf",
+              "content_type": "application/pdf",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/makedonika.639",
+          "title": "Ο Πέτρος Παπαγεωργίου και οι απαρχές της λογοτεχνίας στη Θεσσαλονίκη",
+          "creator": [
+            "Χαράλαμπος Μπακιρτζής"
+          ],
+          "date": [
+            "1976-1-1"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.639",
+          "doi": "10.12681/makedonika.639",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μακεδονικά"
+          ],
+          "description": "<p>No abstract</p>",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/6194/5929",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783110829204.94",
+          "title": "Πέτρος χαὶ πέτρα",
+          "creator": [
+            "Henri Clavier"
+          ],
+          "date": [
+            "1978-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9783110829204.94",
+          "doi": "10.1515/9783110829204.94",
+          "type": "book-chapter",
+          "publisher": "DE GRUYTER",
+          "container_title": [
+            "Neutestamentliche Studien für Rudolf Bultmann"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://www.degruyter.com/view/books/9783110829204/9783110829204.94/9783110829204.94.xml",
+              "content_type": "text/html",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783110829204.94/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783110829204.94/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/makedonika.277",
+          "title": "Ο Πέτρος Ν. Παπαγεωργίου και η ιστορία ενός αριστοτελικού κώδικα της Φιλιππούπολης",
+          "creator": [
+            "Παντελής Μ. Νιγδέλης"
+          ],
+          "date": [
+            "2002-1-1"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.277",
+          "doi": "10.12681/makedonika.277",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μακεδονικά"
+          ],
+          "description": "<p>No abstract</p>",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/5838/5577",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/dchae.21820",
+          "title": "Πέτρος επίσκοπος Κεφαλουδίου. Σχόλια σε επιτύμβια επιγραφή απο την Λάρισα του Άργους",
+          "creator": [
+            "Άννα Ι. ΛΑΜΠΡΟΠΟΥΛΟΥ (Anna I. LAMBROPOULOU)"
+          ],
+          "date": [
+            "2019-12-8"
+          ],
+          "url": "https://doi.org/10.12681/dchae.21820",
+          "doi": "10.12681/dchae.21820",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Δελτίον της Χριστιανικής Αρχαιολογικής Εταιρείας"
+          ],
+          "description": "Επιτύμβια επιγραφή που βρέθηκε στην νότια πλευρά του κάστρου της Λάρισας της πόλης του Άργους, αναφέρεται στον Πέτρο, επίσκοπο Κεφαλουδίου. Η επιγραφή χρονολογήθηκε αρχικά στο δεύτερο μισό του 6ου αιώνα ή στα τέλη του 6ου ή τις αρχές του 7ου αιώνα. Η εξέταση των γραμμάτων και η σύγκριση με επακριβώς χρονολογημένες βυζαντινές επιγραφές προσανατολίζουν σε υστερότερη χρονολόγηση, πιθανότατα στο δεύτερο μισό του 9ου αιώνα, εποχή που συμπίπτει με την περίοδο που ακολούθησε την λήξη της εικονομαχικής έριδας.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/deltion/article/download/21820/18740",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/deltion/article/download/21820/18740",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/mnimon.843",
+          "title": "Γιάννης Κόκκωνας, Ο πολίτης Πέτρος Σκυλίτζης Ομηρίδης, 1784-1872. Μελέτη της συμμετοχής ενός ελάσσονος σε γεγονότα μείζονος σημασίας",
+          "creator": [
+            "ΧΡΗΣΤΟΣ ΛΟΥΚΟΣ"
+          ],
+          "date": [
+            "2004-1-1"
+          ],
+          "url": "https://doi.org/10.12681/mnimon.843",
+          "doi": "10.12681/mnimon.843",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μνήμων"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/mnimon/article/viewFile/8537/8872",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/mnimon/article/viewFile/8537/8873",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783110802184-133",
+          "title": "Πέτρος",
+          "creator": [],
+          "date": [
+            "2015-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9783110802184-133",
+          "doi": "10.1515/9783110802184-133",
+          "type": "book-chapter",
+          "publisher": "DE GRUYTER",
+          "container_title": [
+            "P[i] - O[mega]"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/view/book/9783110802184/10.1515/9783110802184-133.xml",
+              "content_type": "text/html",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783110802184-133/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783110802184-133/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "OpenAlex Scholarly Works",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://openalex.org/W2287415961",
+          "title": "Seigneurs et seigneurie xve–xixe siècle",
+          "creator": [
+            "Νίκος Καραπιδάκης"
+          ],
+          "date": [
+            "2015-01-01"
+          ],
+          "url": "https://doi.org/10.4000/ceb.5656",
+          "doi": "https://doi.org/10.4000/ceb.5656",
+          "type": "article",
+          "cited_by_count": 0,
+          "description": "Au cours d’une longue période qui s’étend du xve à la fin du xviiie siècle – et qui, à un certain degré, va se poursuivre sur le siècle suivant en dépit de la stabilisation relative des États-nations – les zones géographiques de la Macédoine, de l’Épire, de la Grèce centrale, de la mer Ionienne et de l’Égée, de la Crète et de certains rivages de la Morée connaissent une constante remise en question de leur domination, autrement dit, vivent dans des conditions de guerre.Dans ces conditions – une guerre constante – on peut s’attendre à ce que les groupes sociaux qui peuvent faire la guerre, soit directement en y participant eux-mêmes, soit indirectement en la finançant, acquièrent du crédit puisque leur fonction est socialement fondamentale. La place occupée par ces groupes parmi les pouvoirs officiels qui font la guerre, leur permet, ou leur impose, une attitude constamment révisable et révisée puisqu’ils peuvent négocier leur puissance sociale avec l’une ou l’autre force, obtenant un renouvellement de leurs privilèges et/ou une amélioration des avantages qu’ils en retirent.",
+          "description_provenance": "OPENALEX_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://journals.openedition.org/ceb/pdf/5656",
+              "is_oa": true,
+              "license": "cc-by-nc",
+              "version": "publishedVersion"
+            }
+          ],
+          "digital_url": "https://journals.openedition.org/ceb/pdf/5656",
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "OPENALEX_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "OpenAlex Scholarly Works",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://openalex.org/W2406561153",
+          "title": "Ηπειρώτες έμποροι στην Ιταλία κατά το 18ο αιώνα (Νέα αρχειακά στοιχεία)",
+          "creator": [
+            "Ελένη Γιαννακοπούλου"
+          ],
+          "date": [
+            "1997-12-30"
+          ],
+          "url": "https://doi.org/10.12681/er.209",
+          "doi": "https://doi.org/10.12681/er.209",
+          "type": "article",
+          "cited_by_count": 0,
+          "description": "",
+          "description_provenance": "OPENALEX_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/eranistis/article/download/1576/1567",
+              "is_oa": true,
+              "license": null,
+              "version": "publishedVersion"
+            }
+          ],
+          "digital_url": "https://ejournals.epublishing.ekt.gr/index.php/eranistis/article/download/1576/1567",
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "OPENALEX_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "OpenAlex Scholarly Works",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://openalex.org/W2343271849",
+          "title": "Ο Αρχιεπίσκοπος Αχρίδος Ιωακείμ και οι συνωμοτικές κινήσεις στη Βόρειο Ήπειρο (1572-1576)",
+          "creator": [
+            "Ι. Κ. Χασιώτης"
+          ],
+          "date": [
+            "1965-01-01"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.549",
+          "doi": "https://doi.org/10.12681/makedonika.549",
+          "type": "article",
+          "cited_by_count": 0,
+          "description": "",
+          "description_provenance": "OPENALEX_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/makedonika/article/download/6110/5848",
+              "is_oa": true,
+              "license": "cc-by-nc-sa",
+              "version": "publishedVersion"
+            }
+          ],
+          "digital_url": "https://ejournals.epublishing.ekt.gr/index.php/makedonika/article/download/6110/5848",
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "OPENALEX_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 304}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 58738, \"response_sha256\": \"0a8baa953ca0a51939adf1bf038529f86130ae034587f8b5d44acde1e6b7a5f5\", \"elapsed_ms\": 1817}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 33896, \"response_sha256\": \"5f1ca1980137248e2f7a9465349165b0609631638f59299ed73e3572c4fbe1dc\", \"elapsed_ms\": 216}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 18}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 3}]}\", \"result_count\": 21, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 304}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 58738, \"response_sha256\": \"0a8baa953ca0a51939adf1bf038529f86130ae034587f8b5d44acde1e6b7a5f5\", \"elapsed_ms\": 1817}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 33896, \"response_sha256\": \"5f1ca1980137248e2f7a9465349"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Πέτρο Λάντζα\"",
+      "records": [
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/35258",
+          "title": "Η Πολιτική ως θεωρία και πράξη κατά τον Πέτρο Βράιλα - Αρμένη",
+          "creator": [
+            "Ησαΐας Τσιτόγλου"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/35258",
+          "doi": "10.12681/eadd/35258",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Ο Πέτρος Βράιλας - Αρμένης είναι μια από τις εξαιρετικές περιπτώσεις νεοέλληνα φιλοσόφου - πολιτικού στοχαστή που η δράση του εκτείνεται στον 19ο αιώνα. Οι σπουδές του στην Ευρώπη και ειδικά στη Γαλλία επηρέασαν τις ιδέες του σε τέτοιο βαθμό που ενστερνίστηκε την θεωρία του εκλεκτισμού που κύρια χαρακτηριστικά είχε την απόπειρα συμφιλίωσης ανάμεσα στον ιδεαλισμό και το ρεαλισμό,τον λόγο και την εμπειρία, τη μεταφυσική με την επιστήμη, τον πλατωνισμό με τον αριστοτελισμό, τον καντιανό υποκειμενισμό με τον εγελειανό αντικειμενισμό και σκωτικό ψυχολογισμό και τη θρησκευτική αποκάλυψη με το φιλοσοφικό συλλογισμό, με κύριο στόχο την περαιτέρω διεργασία και ανέλιξη των ιδεών του. Στην παρούσα μελέτη επιχειρήθηκε η επεξεργασία των κυριότερων πολιτικών θέσεων που εξέφρασε ο κερκυραίος διανοητής. Μεταξύ αυτών η έκδοση δυο εβδομαδιαίων δίγλωσσων εφημερίδων(Ελληνικά-Γαλλικά), μετά την ελευθερία του τύπου(1849) που εδόθη στους Επτανήσιους από την αγγλική Προστασία ο κερκυραίος στοχαστής δραστηριοποιείται περισσότερο και εκφράζεται στοχευμένα, αλλά με μετριοπάθεια- ήταν αρχηγός του μεταρρυθμιστικού κόμματος - σε κατευθύνσεις όπως αυτή της ένωσης με την υπόλοιπη Ελλάδα(21/05/1864), την πραγματική ελευθερία σε όλες τις εκφάνσεις της, την ελευθερία του εκλογικού δικαιώματος και την καθιέρωση της ελληνικής γλώσσας στην Ιόνιο πολιτεία. Είναι επίσης σημαντικό να τονισθεί ότι οι πολιτικές αντιλήψεις του Βράιλα διακατέχονται από ελληνοκεντρικές και χριστιανοκεντρικές θεωρήσεις, κυρίως στα συστατικά τους στοιχεία, όπως της ατομικής και πολιτικής ελευθερίας και της ισότητας. Ο κερκυραίος διανοητής ενίσχυσε το πολιτικό φρόνημα των Επτανησίων, αφουγκράστηκε από νωρίς τις κοινωνικές και οικονομικές συνθήκες που επικρατούσαν στην Ευρώπη και ως υποστηρικτής του φιλελευθερισμού ήταν υπέρμαχος του ελεύθερου ανταγωνισμού στις οικονομικές δραστηριότητες, του δικαιώματος στην εργασία και της βιομηχανικής ανάπτυξης, με γνώμονα βέβαια έναν λελογισμένο κρατικό παρεμβατισμό. Στο πλαίσιο της εθνικής ιδεολογίας και της ιστορικής συνέχειας ο Βράιλας εστιάζει στο δίπτυχο γλώσσα και θρησκεία. Αυτό το δίπτυχο εκφράζει κατ΄αυτόν το αίσθημα πατριωτισμού και εθνικότητας των Επτανησίων, αλλά όλων των Ελλήνων, συνεπώς είναι βασικές αρχές του κοινωνικού ιστού και θεμελιώδεις παράγοντες της ιστορικής συνέχειας και αποστολής του Ελληνισμού, πάντα σε συνάρτηση με το αρχαίο Ελληνικό κάλλος.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/46292",
+          "title": "Η κριτική αποτίμηση φιλοσοφικών συστημάτων από τον Πέτρο Βράιλα Αρμένη (1812 - 1884)",
+          "creator": [
+            "Μαρίνα Κολλάτου"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/46292",
+          "doi": "10.12681/eadd/46292",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Σκοπός της παρούσας διατριβής ήταν να διερευνηθεί το εάν και με ποιον τρόπο ο εκλεκτικός φιλόσοφος Πέτρος Βράιλας Αρμένης (1912-1984) αναπτύσσει κριτικό φιλοσοφικό λόγο κατά την κριτική αποτίμησή του φιλοσοφικών συστημάτων. Ο Βράιλας, θεωρώντας τη φιλοσοφία ως ένα δρόμο σπαρμένο με αλήθειες που ο φιλόσοφος πρέπει να ψάξει και να συλλέξει, αναπτύσσει τον φιλοσοφικό του στοχασμό με τρόπο διαλεκτικό και δια της ιστορικής και κριτικής αντιμετώπισης άλλων φιλοσοφικών συστημάτων. Ο διαλεκτικός τρόπος προσέγγισης των ιδεών προγενέστερων ή συγχρόνων φιλοσόφων προβάλλεται από τους εκλεκτικούς φιλοσόφους ως εγγυητής της κριτικής στάσης τους απέναντι στις απόψεις των άλλων φιλοσόφων και απόδειξη της μη δογματικότητάς τους. Για τη διερεύνηση επίτευξης αυτού του στόχου εκ μέρους του Βράιλα, στην παρούσα διατριβή παρουσιάζονται οι θέσεις του φιλοσόφου και αντιπαρατίθενται οι θέσεις των φιλοσόφων τους οποίους ο Βράιλας αξιοποιεί στην εκλεκτική προσέγγισή του. Η κατ’ αντιδιαστολή παράθεση αυτών των απόψεων συνοδεύεται από κριτική των κυριότερων σημείων τους και εστίαση στην ισχύ των βραϊλιανών επιχειρημάτων. Πρόκειται για μια ερμηνευτική και κριτική προσέγγιση των θέσεων του φιλοσόφου μέσα από την οποία αναδεικνύεται η συλλογιστική μέθοδός του, ελέγχονται οι παραδοχές του και η εγκυρότητα των επιχειρημάτων του. Η ανάλυση των ευρημάτων οδηγεί στην εξαγωγή συμπερασμάτων που μπορούν να συνοψιστούν ως εξής: Ο Βράιλας επιχειρεί να συστηματοποιήσει τη φιλοσοφία σε ένα σύστημα που θα απαντούσε οριστικά στα θεμελιώδη φιλοσοφικά ερωτήματα ελπίζοντας ότι εφαρμόζοντας τα μέσα και τις αρχές της φιλοσοφίας θα επιτύχει να συμβάλλει στη συμφιλίωση θρησκείας και φιλοσοφίας. Η προσήλωσή του στη δημιουργία μιας καλά οχυρωμένης φιλοσοφικής κατασκευής, απαλλαγμένης από πλάνες και λογικές ρωγμές, παγιδεύει το πνεύμα του φιλοσόφου και περιορίζει την ελεύθερη κριτική. Ο Βράιλας ασκεί αυστηρό έλεγχο στις θέσεις των κρινόμενων από αυτόν φιλοσόφων και υπό αυτήν την έννοια ο φιλόσοφος διαθέτει κριτική σκέψη. Ωστόσο ο φιλόσοφος δεν μπορεί να απελευθερωθεί πλήρως από βαρίδια - δεσμά που σχετίζονται με τη θρησκευτικότητα, την πίστη του, το ιστορικό-πολιτικό γίγνεσθαι της εποχής του και τις επιταγές της σχολής που επιλέγει να ακολουθήσει. Εξετάζοντας το σύστημά του ως έναν από τους σταθμούς στην ιστορία της νεοελληνικής φιλοσοφίας, μπορεί να υποστηριχθεί ότι ο φιλοσοφικός λόγος, ο οποίος αναπτύσσεται μέσα σε αυτό, οργανώνει και συστηματοποιεί επιλεκτικά, στοιχεία πνευματοκρατίας και ορθολογισμού. Πρόκειται για ένα σύστημα μέσα στο οποίο η κριτική εξαντλείται στη θωράκιση των θέσεων του φιλοσόφου ώστε να ερμηνεύεται όλη η ανθρώπινη εμπειρία και να μην μένουν αναπάντητα ερωτήματα. Υπό αυτούς τους όρους είναι μάλλον δύσκολο ο φιλοσοφικός λόγος του Βράιλα να εκληφθεί ως γνήσια κριτικός. Ωστόσο αν δει κανείς το φιλοσοφικό του ταξίδι ως αντίδοτο στον εφησυχασμό, τότε μπορεί να υποστηριχθεί ότι η παρουσία του στον χώρο της φιλοσοφίας είναι σημαντική ως παράδειγμα προς τους νεότερους.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/makedonika.975",
+          "title": "Συμπληρωματικά για τον Πέτρο Παπαγεωργίου",
+          "creator": [
+            "Ι. Κ. Βασδραβέλλης"
+          ],
+          "date": [
+            "1967-1-1"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.975",
+          "doi": "10.12681/makedonika.975",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μακεδονικά"
+          ],
+          "description": "No abstract",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/6529/6263",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "OpenAlex Scholarly Works",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://openalex.org/W2406561153",
+          "title": "Ηπειρώτες έμποροι στην Ιταλία κατά το 18ο αιώνα (Νέα αρχειακά στοιχεία)",
+          "creator": [
+            "Ελένη Γιαννακοπούλου"
+          ],
+          "date": [
+            "1997-12-30"
+          ],
+          "url": "https://doi.org/10.12681/er.209",
+          "doi": "https://doi.org/10.12681/er.209",
+          "type": "article",
+          "cited_by_count": 0,
+          "description": "",
+          "description_provenance": "OPENALEX_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://ejournals.epublishing.ekt.gr/index.php/eranistis/article/download/1576/1567",
+              "is_oa": true,
+              "license": null,
+              "version": "publishedVersion"
+            }
+          ],
+          "digital_url": "https://ejournals.epublishing.ekt.gr/index.php/eranistis/article/download/1576/1567",
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "OPENALEX_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 72}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 34395, \"response_sha256\": \"7a4fb06adb9f096073f3f0b3238d442fda5c2c295ba12204805b7074315abb0d\", \"elapsed_ms\": 1037}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 9985, \"response_sha256\": \"0742089ea5c481f671b55c958ce1ab59cb56302267d0642ed159b9c198e63acf\", \"elapsed_ms\": 200}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 3}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 1}]}\", \"result_count\": 4, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 72}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 34395, \"response_sha256\": \"7a4fb06adb9f096073f3f0b3238d442fda5c2c295ba12204805b7074315abb0d\", \"elapsed_ms\": 1037}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 9985, \"response_sha256\": \"0742089ea5c481f671b55c958ce1ab59cb56302267d0642ed159b9c198e63acf\", \"elapsed_ms\": 200}], \""
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Petros Lantzas\"",
+      "records": [
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.3764/ajaonline1182.lantzas",
+          "title": "Individuals and Society in Mycenaean Pylos (Book Review)",
+          "creator": [
+            "Katie Lantzas"
+          ],
+          "date": [
+            "2014-4"
+          ],
+          "url": "https://doi.org/10.3764/ajaonline1182.lantzas",
+          "doi": "10.3764/ajaonline1182.lantzas",
+          "type": "journal-article",
+          "publisher": "University of Chicago Press",
+          "container_title": [
+            "American Journal of Archaeology"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gmo/9781561592630.article.52228",
+          "title": "Bereketes, Petros",
+          "creator": [
+            "Alexander Lingas"
+          ],
+          "date": [
+            "2001"
+          ],
+          "url": "https://doi.org/10.1093/gmo/9781561592630.article.52228",
+          "doi": "10.1093/gmo/9781561592630.article.52228",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Music Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00028158",
+          "title": "Brysakis, Theodore Petros",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00028158",
+          "doi": "10.1093/benz/9780199773787.article.b00028158",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gmo/9781561592630.article.21475",
+          "title": "Petros Peloponnesios",
+          "creator": [
+            "Dimitri Conomos"
+          ],
+          "date": [
+            "2001"
+          ],
+          "url": "https://doi.org/10.1093/gmo/9781561592630.article.21475",
+          "doi": "10.1093/gmo/9781561592630.article.21475",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Music Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gmo/9781561592630.article.21469",
+          "title": "Petridis, Petros",
+          "creator": [
+            "Nikos Maliaras"
+          ],
+          "date": [
+            "2018-7-31"
+          ],
+          "url": "https://doi.org/10.1093/gmo/9781561592630.article.21469",
+          "doi": "10.1093/gmo/9781561592630.article.21469",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Music Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gmo/9781561592630.article.52229",
+          "title": "Petros Byzantios",
+          "creator": [
+            "Alexander Lingas"
+          ],
+          "date": [
+            "2001"
+          ],
+          "url": "https://doi.org/10.1093/gmo/9781561592630.article.52229",
+          "doi": "10.1093/gmo/9781561592630.article.52229",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Music Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/acref/9780195301731.013.49759",
+          "title": "Petros",
+          "creator": [
+            "Mersha Alehegne"
+          ],
+          "date": [
+            "2011-12-8"
+          ],
+          "url": "https://doi.org/10.1093/acref/9780195301731.013.49759",
+          "doi": "10.1093/acref/9780195301731.013.49759",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "African American Studies Center"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00140037",
+          "title": "Petros, Marie Louise",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00140037",
+          "doi": "10.1093/benz/9780199773787.article.b00140037",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.30861/9781407310206",
+          "title": "Settlement and Social Trends in the Argolid and the Methana Peninsula, 1200–900 BC",
+          "creator": [
+            "Katie Lantzas"
+          ],
+          "date": [
+            "2012"
+          ],
+          "url": "https://doi.org/10.30861/9781407310206",
+          "doi": "10.30861/9781407310206",
+          "type": "monograph",
+          "publisher": "University of Michigan Press",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.fulcrum.org/epubs/ks65hf054/file",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/1574-9347_dnp_e916680",
+          "title": "Petros",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/1574-9347_dnp_e916680",
+          "doi": "10.1163/1574-9347_dnp_e916680",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Der Neue Pauly"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/byzs.1905.14.2.529",
+          "title": "Petros Patrikios Magister und Petros Patrikios Barsymes.",
+          "creator": [
+            "J. Haury"
+          ],
+          "date": [
+            "1905"
+          ],
+          "url": "https://doi.org/10.1515/byzs.1905.14.2.529",
+          "doi": "10.1515/byzs.1905.14.2.529",
+          "type": "journal-article",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Byzantinische Zeitschrift"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/byzs.1905.14.2.529/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/acref/9780195301731.013.50196",
+          "title": "Walatta Petros",
+          "creator": [
+            "Claire Bosc-Tiessé"
+          ],
+          "date": [
+            "2011-12-8"
+          ],
+          "url": "https://doi.org/10.1093/acref/9780195301731.013.50196",
+          "doi": "10.1093/acref/9780195301731.013.50196",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "African American Studies Center"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/acref/9780195301731.013.43792",
+          "title": "Walatta Petros, Saint",
+          "creator": [
+            "Robert Fay"
+          ],
+          "date": [
+            "2005-4-7"
+          ],
+          "url": "https://doi.org/10.1093/acref/9780195301731.013.43792",
+          "doi": "10.1093/acref/9780195301731.013.43792",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "African American Studies Center"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.3764/ajaonline1203.lantzas",
+          "title": "Book Review of Vravron: The Mycenaean Cemetery, by Thanasis I. Papadopoulos and Litsa Kontorli-Papadopoulou",
+          "creator": [
+            "Katie Lantzas"
+          ],
+          "date": [
+            "2016-7"
+          ],
+          "url": "https://doi.org/10.3764/ajaonline1203.lantzas",
+          "doi": "10.3764/ajaonline1203.lantzas",
+          "type": "journal-article",
+          "publisher": "University of Chicago Press",
+          "container_title": [
+            "American Journal of Archaeology"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/1877-5888_rpp_sim_124031",
+          "title": "Walatta Petros (Saint)",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/1877-5888_rpp_sim_124031",
+          "doi": "10.1163/1877-5888_rpp_sim_124031",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Religion Past and Present"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/1874-6772_seg_a39_935",
+          "title": "Epitaph of Petros.",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/1874-6772_seg_a39_935",
+          "doi": "10.1163/1874-6772_seg_a39_935",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Supplementum Epigraphicum Graecum"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/1874-6772_seg_a40_500",
+          "title": "Epitaph of Petros.",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/1874-6772_seg_a40_500",
+          "doi": "10.1163/1874-6772_seg_a40_500",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Supplementum Epigraphicum Graecum"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/1874-6772_seg_a54_1662",
+          "title": "Donation of Petros.",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/1874-6772_seg_a54_1662",
+          "doi": "10.1163/1874-6772_seg_a54_1662",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Supplementum Epigraphicum Graecum Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/2213-2139_emc_sim_02044",
+          "title": "Petros Patrikios",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/2213-2139_emc_sim_02044",
+          "doi": "10.1163/2213-2139_emc_sim_02044",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/1874-6772_seg_a35_1589",
+          "title": "Epitaph of Petros.",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/1874-6772_seg_a35_1589",
+          "doi": "10.1163/1874-6772_seg_a35_1589",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Supplementum Epigraphicum Graecum"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "OpenAlex Scholarly Works",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://openalex.org/W2287415961",
+          "title": "Seigneurs et seigneurie xve–xixe siècle",
+          "creator": [
+            "Νίκος Καραπιδάκης"
+          ],
+          "date": [
+            "2015-01-01"
+          ],
+          "url": "https://doi.org/10.4000/ceb.5656",
+          "doi": "https://doi.org/10.4000/ceb.5656",
+          "type": "article",
+          "cited_by_count": 0,
+          "description": "Au cours d’une longue période qui s’étend du xve à la fin du xviiie siècle – et qui, à un certain degré, va se poursuivre sur le siècle suivant en dépit de la stabilisation relative des États-nations – les zones géographiques de la Macédoine, de l’Épire, de la Grèce centrale, de la mer Ionienne et de l’Égée, de la Crète et de certains rivages de la Morée connaissent une constante remise en question de leur domination, autrement dit, vivent dans des conditions de guerre.Dans ces conditions – une guerre constante – on peut s’attendre à ce que les groupes sociaux qui peuvent faire la guerre, soit directement en y participant eux-mêmes, soit indirectement en la finançant, acquièrent du crédit puisque leur fonction est socialement fondamentale. La place occupée par ces groupes parmi les pouvoirs officiels qui font la guerre, leur permet, ou leur impose, une attitude constamment révisable et révisée puisqu’ils peuvent négocier leur puissance sociale avec l’une ou l’autre force, obtenant un renouvellement de leurs privilèges et/ou une amélioration des avantages qu’ils en retirent.",
+          "description_provenance": "OPENALEX_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://journals.openedition.org/ceb/pdf/5656",
+              "is_oa": true,
+              "license": "cc-by-nc",
+              "version": "publishedVersion"
+            }
+          ],
+          "digital_url": "https://journals.openedition.org/ceb/pdf/5656",
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "OPENALEX_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Petros+Lantzas%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 107}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Petros+Lantzas%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Petros+Lantzas%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 23979, \"response_sha256\": \"bb39d96ce5158c2175aaa4783922aedb3afcb888105d7c4228438cf0bc259a31\", \"elapsed_ms\": 1714}, {\"url\": \"https://api.openalex.org/works?search=%22Petros+Lantzas%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Petros+Lantzas%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 15778, \"response_sha256\": \"6dab4d65bb6bb6f4d40e14f208de281a6222f54583a4e0cd27461b055c2665c3\", \"elapsed_ms\": 169}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 1}]}\", \"result_count\": 21, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Petros+Lantzas%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 107}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Petros+Lantzas%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Petros+Lantzas%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 23979, \"response_sha256\": \"bb39d96ce5158c2175aaa4783922aedb3afcb888105d7c4228438cf0bc259a31\", \"elapsed_ms\": 1714}, {\"url\": \"https://api.openalex.org/works?search=%22Petros+Lantzas%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Petros+Lantzas%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 15778, \"response_sha256\": \"6dab4d65bb6bb6f4d40e14f208de281a6222f54583a4e0cd27461b055c2665c3\", \"elapsed_ms\": 169}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTE"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "41032178953",
+    "agent_id": "source_genealogy",
+    "source_leads": [
+      {
+        "id": "lead_cf9f4c14bfe0531c727d13e8",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.4000/ceb.5656",
+        "title": "Seigneurs et seigneurie xve–xixe siècle",
+        "query": "\"petros lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_981947ba28e41ec3381d7767",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.5040/9781474266680.ch-010",
+        "title": "Κηφας",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_47eae7bfd741fb55cc4d8295",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/26882",
+        "title": "Πέτρος και Παύλος στην Αντιόχεια",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_bcd5c10a73b518bb12b0d950",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2307/1559956",
+        "title": "Κηφᾶς: Σίμων Πέτρος: ὁ Πέτρος: An Examination of New Testament Usage",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7d1d8542b279702b9ca15bea",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.31234/osf.io/zgpuf",
+        "title": "Ο Πέτρος Πολυχρόνης και η επιστημολογία της ζωής",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ac4f4f31b1febf8715902075",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/makedonika.9220",
+        "title": "Πέτρος Παπαγεωργίου (+1914)",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_512fa31981ff0ad3d7daf49e",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/53705",
+        "title": "Ο Απόστολος Πέτρος στην Καινή Διαθήκη και στην απόκρυφη χριστιανική γραμματεία",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0b803656f8c090d17fb4b47f",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/11220",
+        "title": "Ο πολίτης Πέτρος Σκυλίτζης Ομηρίδης 1784-1872",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a0d4a08730f6f94f9c33d244",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783110865974.88",
+        "title": "Ch. 4. Πέτρος and πέτρα in Mt 16:18",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6903bce0d2cd4e8b30d5088a",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783110865974.17",
+        "title": "Ch. 2. Πέτρος, Πέτρα and Derivatives as Names",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5b690ed5a94943173f52b54f",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/dchae.1013",
+        "title": "Άγιος Πέτρος Καλυβίων Κουβαρά Αττικής",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_92a0909a9a5074dd8cefcf90",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/prch.28320",
+        "title": "Ο Παργινός ιατρός και Φιλικός Πέτρος Ηπίτης",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2e3284bf42ec14b9cf55da7d",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.5817/ngb2023-23-11",
+        "title": "[Μαραζόπουλος, Πέτρος. Τα \"Βαλκάνια\" στη Νεοελληνική Κουλτούρα: όψεις της διαχείρισης ενός όρου]",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1ffa74c87aaf1403db57e5c9",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/makedonika.639",
+        "title": "Ο Πέτρος Παπαγεωργίου και οι απαρχές της λογοτεχνίας στη Θεσσαλονίκη",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2871f1b3278bb1c2d0858eae",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783110829204.94",
+        "title": "Πέτρος χαὶ πέτρα",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4ffbca3b2b509fb2dcbc367b",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/makedonika.277",
+        "title": "Ο Πέτρος Ν. Παπαγεωργίου και η ιστορία ενός αριστοτελικού κώδικα της Φιλιππούπολης",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_890c26a4fef251a7285f007f",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/dchae.21820",
+        "title": "Πέτρος επίσκοπος Κεφαλουδίου. Σχόλια σε επιτύμβια επιγραφή απο την Λάρισα του Άργους",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f806ab7b84035448e5e2a9a3",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/mnimon.843",
+        "title": "Γιάννης Κόκκωνας, Ο πολίτης Πέτρος Σκυλίτζης Ομηρίδης, 1784-1872. Μελέτη της συμμετοχής ενός ελάσσονος σε γεγονότα μείζονος σημασίας",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a6455fcf551023e70211fbf9",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783110802184-133",
+        "title": "Πέτρος",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_cb212c8c7f775b6f6f6c9079",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/er.209",
+        "title": "Ηπειρώτες έμποροι στην Ιταλία κατά το 18ο αιώνα (Νέα αρχειακά στοιχεία)",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d8effa8244c404012c59c02c",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/makedonika.549",
+        "title": "Ο Αρχιεπίσκοπος Αχρίδος Ιωακείμ και οι συνωμοτικές κινήσεις στη Βόρειο Ήπειρο (1572-1576)",
+        "query": "\"Πέτρος Λάντζας\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fda2f52c8d2d4379eed86e97",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/35258",
+        "title": "Η Πολιτική ως θεωρία και πράξη κατά τον Πέτρο Βράιλα - Αρμένη",
+        "query": "\"Πέτρο Λάντζα\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_21ee75fcf5087ebcbaf7abd7",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/46292",
+        "title": "Η κριτική αποτίμηση φιλοσοφικών συστημάτων από τον Πέτρο Βράιλα Αρμένη (1812 - 1884)",
+        "query": "\"Πέτρο Λάντζα\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_77580a1d9a3593882a75c3ff",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/makedonika.975",
+        "title": "Συμπληρωματικά για τον Πέτρο Παπαγεωργίου",
+        "query": "\"Πέτρο Λάντζα\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_05354f737c4859a0f9d22c4c",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.3764/ajaonline1182.lantzas",
+        "title": "Individuals and Society in Mycenaean Pylos (Book Review)",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b4375be1443753b513383d6d",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gmo/9781561592630.article.52228",
+        "title": "Bereketes, Petros",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e0b4febd1bc00b9e62db2a07",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00028158",
+        "title": "Brysakis, Theodore Petros",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_34fb6da777d7848a0bb54ad2",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gmo/9781561592630.article.21475",
+        "title": "Petros Peloponnesios",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7526485fc31340767ea4d952",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gmo/9781561592630.article.21469",
+        "title": "Petridis, Petros",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3dd0984e816a4d9899275865",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gmo/9781561592630.article.52229",
+        "title": "Petros Byzantios",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_cf08bf44f8320e3461688b87",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/acref/9780195301731.013.49759",
+        "title": "Petros",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_51f8b3ca0222665ea85f76f1",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00140037",
+        "title": "Petros, Marie Louise",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_207c13b04584bed5bc91fe32",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.30861/9781407310206",
+        "title": "Settlement and Social Trends in the Argolid and the Methana Peninsula, 1200–900 BC",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1625b0239cdfdbbe73d94074",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/1574-9347_dnp_e916680",
+        "title": "Petros",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_11b996b1e30a193ade17dac3",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/byzs.1905.14.2.529",
+        "title": "Petros Patrikios Magister und Petros Patrikios Barsymes.",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_cfcce4f4da80bfb063260738",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/acref/9780195301731.013.50196",
+        "title": "Walatta Petros",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_605a66546daf8c34d8c9b4fd",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/acref/9780195301731.013.43792",
+        "title": "Walatta Petros, Saint",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_952f31f1c7ba547e909e9b88",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.3764/ajaonline1203.lantzas",
+        "title": "Book Review of Vravron: The Mycenaean Cemetery, by Thanasis I. Papadopoulos and Litsa Kontorli-Papadopoulou",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_57d0db07a36ad52ab8239a47",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/1877-5888_rpp_sim_124031",
+        "title": "Walatta Petros (Saint)",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0911acb2319804e87730bc7f",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/1874-6772_seg_a39_935",
+        "title": "Epitaph of Petros.",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ea1559fe5c9e5fed607bbf63",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/1874-6772_seg_a40_500",
+        "title": "Epitaph of Petros.",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_14df6e9e888d281c863197ab",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/1874-6772_seg_a54_1662",
+        "title": "Donation of Petros.",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fc19061c1f474b28f93d0ffb",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/2213-2139_emc_sim_02044",
+        "title": "Petros Patrikios",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0262c2c9268cdf50c5a19ac9",
+        "run_id": "41032178953",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/1874-6772_seg_a35_1589",
+        "title": "Epitaph of Petros.",
+        "query": "\"Petros Lantzas\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      }
+    ],
+    "connector_errors": [
+      {
+        "connector_id": "repo:Internet Culturale",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Pedro+Lantzas%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 155}], \"detail\": {\"error_code\": \"HTTP_403\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Pedro+Lantzas%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 110}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Pedro+Lantzas%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 117}, {\"url\": \"https://api.openalex.org/works?search=%22Pedro+Lantzas%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22Pedro+Lantzas%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1044, \"response_sha256\": \"efffbb8b80546718cfffa25dfcacc50bddfa2af71bcc2882a3ee3c5"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22petros+lantzas%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 183}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22petros+lantzas%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 265}, {\"url\": \"https://api.openalex.org/works?search=%22petros+lantzas%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22petros+lantzas%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 15778, \"response_sha256\": \"bb7728fbb98005cfabfab0793ad0ff2311b0b111137520a4a9"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 304}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF%CF%82+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%CF%82%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 58738, \"response_sha256\": \"0a8baa953ca0a51939adf1bf038529f86130ae034587f8b5d44acde1e6b7a5f5\", \"elapsed_ms\": 1817"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 72}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%A0%CE%AD%CF%84%CF%81%CE%BF+%CE%9B%CE%AC%CE%BD%CF%84%CE%B6%CE%B1%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 34395, \"response_sha256\": \"7a4fb06adb9f096073f3f0b3238d442fda5c2c295ba12204805b7074315abb0d\", \"elapsed_ms\": 1037}, {\"url\": \"https://api.openalex.org/"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22Petros+Lantzas%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 107}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22Petros+Lantzas%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22Petros+Lantzas%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 23979, \"response_sha256\": \"bb39d96ce5158c2175aaa4783922aedb3afcb888105d7c4228438cf0bc259a31\", \"elapsed_ms\": 1714}, {\"url\": \"https://api.openalex.org/works?search=%22Petros+Lantzas%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https:"
+      }
+    ],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 47,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
