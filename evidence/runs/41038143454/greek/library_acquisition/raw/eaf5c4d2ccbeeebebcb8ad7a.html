@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="pt-br">
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="theme-color" content="#4E4E7B" />
+		<meta name="GENERATOR" content="MAX's HTML Beauty++ ME">
+		
+		<title>Maxwell</title>
+		<style>
+			#main{
+				background-color:#F3EFE3;
+			}
+			:root{
+				--main-bg-color : #D0CABC;
+			}
+		</style>
+
+<style>
+  /* Estilos para a janela */
+  .janela {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    padding: 10px;
+    z-index: 1000;
+  }
+
+  /* Estilos para o botão de fechar */
+  .fechar {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+  }
+  
+</style>
+
+		
+		<link href="https://www.maxwell.vrac.puc-rio.br/css/novocss.css" rel="stylesheet" type="text/css">
+		<link href="https://www.maxwell.vrac.puc-rio.br/css/novocss_interno.css" rel="stylesheet" type="text/css">
+		<link href="https://www.maxwell.vrac.puc-rio.br/css/nouislider.min.css" rel="stylesheet" type="text/css">
+		<link rel="shortcut icon" href="favicon.ico" />
+		<script tpye=text/javascript>
+			var cor = 'Normal';
+			var tam = '2';
+		</script>
+		<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+		<!--<script src="https://kit.fontawesome.com/f3aeb5b50f.js" crossorigin="anonymous"></script>-->
+		<SCRIPT TYPE="text/javascript" SRC="JS/function.js"></SCRIPT>
+		<SCRIPT TYPE="text/javascript" SRC="JS/graficopizza.js"></SCRIPT>
+		<SCRIPT TYPE="text/javascript" SRC="JS/grafico.js"></SCRIPT>
+		<SCRIPT TYPE="text/javascript" SRC="JS/ajax_daniel.js"></SCRIPT>
+		<SCRIPT TYPE="text/javascript" SRC="JS/nouislider.min.js"></SCRIPT>
+	
+	
+
+		<script tpye=text/javascript>
+			corTexto = "txtNormal txtbaseFont1";
+			corLinha = "linhaNormal";		
+		
+		
+			var segundo=51;
+			var minuto=20;
+			var hora=07;	
+			function tempo(){
+				if(segundo < 59){
+					segundo=segundo + 1;
+					if(segundo == 59){
+						minuto=minuto+1;
+						if(minuto == 59){
+							minuto=0;
+							hora=hora+1;
+						}
+						segundo=0; 
+						if(hora == 24){
+							hora=0;
+							minuto=0;
+							segundo=0;
+						}
+					}
+				}
+	
+			document.getElementById("relogio").innerHTML=(hora+":"+ minuto+":"+segundo);
+		}
+		</script>
+		
+<script>
+function abrirJanela() {
+  var janela = document.getElementById('direitos');
+  janela.style.display = 'block';
+}
+
+function fecharJanela() {
+  var janela = document.getElementById('direitos');
+  janela.style.display = 'none';
+}
+</script>
+
+  	</head>
+  	<body style="margin-top: 0px; overflow:auto; background-color:#4E4E7B; margin-left:0px ;" onload="setInterval('tempo();',1000)"  >
+		<div name="command_latex_braket" style="display: none;">$$\newcommand{\bra}[1]{\left<#1\right|}\newcommand{\ket}[1]{\left|#1\right>}\newcommand{\bk}[2]{\left<#1\middle|#2\right>}\newcommand{\bke}[3]{\left<#1\middle|#2\middle|#3\right>}$$</div>
+		<script>
+		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		  ga('create', 'UA-39957327-1', 'puc-rio.br');
+		  ga('send', 'pageview');
+
+		</script>	
+	
+  		<div id="main">
+			
+			<div class="navbar">
+				<!--<img height="90" title="Logo da PUC-Rio" src="./img/logo_puc.png" border="0" style="float:left;">-->
+				<div style="display:inline-block; left:1px; position:absolute;">
+					<a href="https://www.puc-rio.br" style="display:block; width:50px; height:80px;" title="PUC-RIO">&nbsp;</a>
+				</div>
+				<div style="display:inline-block; left:90px; position:absolute;">
+					<span class="linkBuscaIni"><a href="colecao.php" class="linkBrancoNormal linkFont2">Buscar Cole&ccedil;&atilde;o</a></span>
+				</div>
+				<form action="prog_lang.php" method="post" name="form_lang">
+					<label for="strLang" class="linkBrancoNormal linkFont2">Língua:</label>
+					<select id="strLang" name="strLang" style="margin-top:10px;" onchange="document.form_lang.submit()">
+						<option value="1" selected>Portugu&ecirc;s</option>
+						<option value="2" >English</option>
+					</select>
+				</form>
+				<div class="txtNormal txtFont2"  style="background-color:#4E4E7B; width: 158px; text-align: center; position: relative; left: 43%; top: 6px; border-radius: 5px;"> 
+					<div id="day" name="day" style="color:#fff">30-Oct-2026</div>
+
+					 <div class="txtNormal" style="color:#fff"> <span> Rio:</span> <span class="txtNormal" style="color:#fff" id="relogio" name="relogio"></span><span style="color:#fff"> (GMT-3)</span></div>
+
+				</div>
+				<div style="display:inline-block; top: 0px; right:60px; position:absolute;">
+  <span class="linkBuscaIni">
+    <a href="#" class="linkBrancoNormal  linkFont2" onclick="abrirJanela()">Direitos Autorais</a></span>
+				</div>
+				<!--<a href="index.php"><img id="logoMaxwell" alt="Maxwell" src="./img/logo_maxwell.gif" border="0"></a>-->
+				<div class="navbar-menu" style="line-height: 1;">
+					<a href="https://www.maxwell.vrac.puc-rio.br/index.php"><button class="navbar-buttonNormal navbar-extra" style="width: 60px;" ><span class="buttonAbaNormal">Home</span></button></a><a href="https://www.maxwell.vrac.puc-rio.br/colecao.php"><button class="navbar-buttonOnNormal" style="white-space: nowrap;"><span class="buttonAbaNormal">Cole&ccedil;&atilde;o Digital</span></button></a><a href="#" onclick="document.getElementById('divLogin').style.display = 'block'; document.getElementById('divLogin').style.visibility = 'visible'; document.getElementById('login').focus(); document.getElementById('local').value='estudoonline.php';"><button class="navbar-buttonNormal"><span class="buttonAbaNormal">Estudo On-line</span></button></a><a href="#" onclick="document.getElementById('divLogin').style.display = 'block'; document.getElementById('divLogin').style.visibility = 'visible'; document.getElementById('login').focus(); document.getElementById('local').value='meumaxwell.php';"><button class="navbar-buttonNormal"><span class="buttonAbaNormal">Meu Maxwell</span></button></a><a href="https://www.maxwell.vrac.puc-rio.br/estatisticas.php"><button class="navbar-buttonNormal navbar-extra"><span class="buttonAbaNormal">Estat&iacute;sticas</span></button></a><a href="https://www.maxwell.vrac.puc-rio.br/sobre.php"><button class="navbar-buttonNormal navbar-extra"><span class="buttonAbaNormal">Sobre</span></button></a>
+				</div>
+			</div>
+			<div class="navbar-controlsNormal">
+				<script>
+					var menu_extra_size = 1;
+				</script>			
+				<div id="button-menuextra" class="menu" onmouseleave="closeAllOpenMenus('menu_extra');">
+					<button  class="button-clear"><img src="https://www.maxwell.vrac.puc-rio.br/img/img_menuextra.png" onmouseover="openCloseMenu('menu_extra1')" alt="Logo menu celular"></button>	
+					<ul id="menu_extra1" class="menu_listNormal">
+						<li class="menu_list_item"><a href="index.php" class="menuDireitaFont2 menuDireitaNormal">Home</a></li>
+						<li class="menu_list_item"><a href="estatisticas.php" class="menuDireitaFont2 menuDireitaNormal">Estat&iacute;sticas</a></li>
+						<li class="menu_list_item"><a href="sobre.php" class="menuDireitaFont2 menuDireitaNormal">Sobre</a></li>
+					</ul>
+				</div>			
+			
+			
+				<a href="prog.php?bot=contraste&tam=2&cor=Normal&strSecao=resultado&nrSeq=74608&idi=1"><img src="https://www.maxwell.vrac.puc-rio.br//img/bot_acess_contraste.jpg" alt="Contraste" class="navbar-controls-button" /></a>
+				<a href="prog.php?bot=normal&tam=2&cor=Normal&strSecao=resultado&nrSeq=74608&idi=1"><img src="https://www.maxwell.vrac.puc-rio.br//img/bot_acess_restaurar.jpg" alt="Normal" class="navbar-controls-button"/></a>
+				<a href="prog.php?bot=menor&tam=2&cor=Normal&strSecao=resultado&nrSeq=74608&idi=1"><img src="https://www.maxwell.vrac.puc-rio.br//img/bot_acess_diminuir.jpg" alt="Diminuir letra"class="navbar-controls-button"/></a>	
+				<a href="prog.php?bot=maior&tam=2&cor=Normal&strSecao=resultado&nrSeq=74608&idi=1"><img src="https://www.maxwell.vrac.puc-rio.br//img/bot_acess_aumentar.jpg" alt="Aumentar letra" class="navbar-controls-button"/></a>
+				<div class="menu" style="margin-top: 2px; margin-right: 5px;">
+					<button class="buttonNormal" onclick="document.getElementById('divLogin').style.display = 'block'; document.getElementById('divLogin').style.visibility = 'visible'; document.getElementById('login').focus(); document.getElementById('local').value='colecao.php?strSecao=resultado&nrSeq=74608&idi=1';">Login <img src='https://www.maxwell.vrac.puc-rio.br//img/ico_cadeado.png' width="15px" style="position: relative; float: right; margin-left: 3px;" alt="Entrar"/></button>
+				</div>
+			</div>
+			<div id="direitos" class="janela menlatNormal menlatFont2">
+				<span class="fechar" onclick="fecharJanela()">X</span><center><b>INFORMA&Ccedil;&Otilde;ES SOBRE DIREITOS AUTORAIS</b></center>
+				<br><br>As obras disponibilizadas nesta Biblioteca Digital foram publicadas sob expressa autoriza&ccedil;&atilde;o dos respectivos autores, em conformidade com a Lei 9610/98. 
+<br><br>A consulta aos textos, permitida por seus respectivos autores, &eacute; livre, bem como a impress&atilde;o de trechos ou de um exemplar completo exclusivamente para uso pr&oacute;prio. N&atilde;o s&atilde;o permitidas a impress&atilde;o e a reprodu&ccedil;&atilde;o de obras completas com qualquer outra finalidade que n&atilde;o o uso pr&oacute;prio de quem imprime. 
+<br><br>A reprodu&ccedil;&atilde;o de pequenos trechos, na forma de cita&ccedil;&otilde;es em trabalhos de terceiros que n&atilde;o o pr&oacute;prio autor do texto consultado,&eacute; permitida, na medida justificada para a compreeens&atilde;o da cita&ccedil;&atilde;o e mediante a informa&ccedil;&atilde;o, junto &agrave; cita&ccedil;&atilde;o, do nome do autor do texto original, bem como da fonte da pesquisa. 
+<br><br>A viola&ccedil;&atilde;o de direitos autorais &eacute; pass&iacute;vel de san&ccedil;&otilde;es civis e penais.			</div>
+			<div id="container">
+			
+
+						<div id="area-resultado" style="min-height:120px;padding:16px;">
+				<span class="tit-destaqueNormal tit-destaqueFont2"><em>Verificando sua sessão…</em></span>
+			</div>
+
+			<!-- Carrega API do reCAPTCHA v3 e verifica no endpoint separado -->
+			<script src="https://www.google.com/recaptcha/api.js?render=6LdLwMsrAAAAAEWlUWlZMGJ9HlW1MrFui5KSywVW"></script>
+			<script>
+			(function(){
+			var SITE_KEY = "6LdLwMsrAAAAAEWlUWlZMGJ9HlW1MrFui5KSywVW";
+			var params = new URLSearchParams(window.location.search);
+			grecaptcha.ready(function(){
+				grecaptcha.execute(SITE_KEY, {action:'resultado_load'}).then(function(token){
+				fetch('verificar_recaptcha_v3.php', {
+					method: 'POST',
+					headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+					body: 'token='+encodeURIComponent(token)+'&action=resultado_load'
+				})
+				//.then(r => r.json())
+				.then(function(d){
+					if (d && (d.ok === true || d.success === true || d.status === 'ok')) {
+					const url = new URL(window.location.href);
+					url.searchParams.set('rc','1');
+					window.location.replace(url.toString()); // navega com rc=1, sem criar histórico
+					} else {
+					document.getElementById('area-resultado').innerHTML =
+						'<span style="color:#b91c1c">Error</span>';
+					}
+				})
+				.catch(function(){
+					document.getElementById('area-resultado').innerHTML =
+					'<span style="color:#b91c1c">Falha de rede na verificação.</span>';
+				});
+				});
+			});
+			})();
+			</script>
+			
