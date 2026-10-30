@@ -1,6 +1,6 @@
 /* NABOU//X — coats of arms (οικόσημα) for the 17 lanes of the 3D main map (3D only).
- * The artwork is exactly the emblem the 2D map shows: window.NABOU_EMBLEMS.get(id) from nautical-emblems.js
- * (read only, never changed here). Each emblem SVG is made self-contained (the shared <defs> of the page are
+ * The artwork is the emblem the 2D map shows: window.NABOU_EMBLEMS.get(id) from nautical-emblems.js
+ * (read only, never changed here), except the Ottoman and North African lanes, overridden in 3D only (see OVERRIDES). Each emblem SVG is made self-contained (the shared <defs> of the page are
  * copied in) and rasterised in the browser at 1024 px on its long side into an sRGB texture with mipmaps and
  * anisotropic filtering. The plaque is fully opaque (no blending, no glow), stands upright on a wooden pole
  * with a small plinth and always turns to face the camera, so it reads from any angle. */
@@ -11,7 +11,7 @@ const TITLES = {
   spanish_simancas: "Σταυρός της Βουργουνδίας (Ισπανία των Αψβούργων)", venetian: "Λέων του Αγίου Μάρκου (Βενετία)",
   french: "Κρίνοι της Γαλλίας", british: "Αγγλία", dutch: "Prinsenvlag (Κάτω Χώρες)", german: "Δικέφαλος αετός (Αγία Ρωμαϊκή Αυτοκρατορία)",
   italian_states: "Κλειδιά του Αγίου Πέτρου (Παπικό Κράτος)", greek: "Δικέφαλος αετός (βυζαντινή παράδοση)",
-  ottoman: "Οθωμανική αυτοκρατορία (το ίδιο σήμα με τον 2D χάρτη)", north_african: "Βόρεια Αφρική (το ίδιο σήμα με τον 2D χάρτη)",
+  ottoman: "Τουγρά του Μουράτ Γ΄ (1574–1595), Οθωμανική αυτοκρατορία", north_african: "Κόκκινη σημαία με λευκές ημισελήνους (κουρσάροι της Βόρειας Αφρικής)",
 };
 export const emblemInfo = (id) => ({ title: TITLES[id] || "Οικόσημο λωρίδας (όπως στον 2D χάρτη)" });
 
@@ -22,9 +22,42 @@ function pageDefs() {
   defsCache = d ? new XMLSerializer().serializeToString(d) : "";
   return defsCache;
 }
-// the 2D emblem as a standalone SVG string, drawn at the given pixel size
-function standaloneSVG(id) {
-  const em = window.NABOU_EMBLEMS && window.NABOU_EMBLEMS.get(id);
+/* 3D-only overrides (the 2D map keeps its own emblems from nautical-emblems.js, which is not touched).
+ * Same flag frame, shadow, shading and ink edge as the 2D flag emblems, so they match the other lanes.
+ *  ottoman:       tughra of Murad III, the sultan's emblem in 1577 (Commons File:Tughra_of_Murad_III.svg,
+ *                 public domain, vendored unchanged in assets/nautical/emblems/, see CREDITS.md there), ink on parchment.
+ *  north_african: red field with three white crescents, the Ottoman/corsair naval flag of the period
+ *                 (Martykán, "A history of Ottoman naval flags", 1999; Vicentino, Battle of Lepanto). Drawn here. */
+const INK = "#2a190e", PARCH = "#efe3c4", RED = "#a3342a";
+const FL = "M1.5 1.5H34.5V24.5H1.5Z";
+const flagFrame = (charges) => `<svg xmlns="${NS}" viewBox="0 0 36 26" width="36" height="26">` +
+  `<path d="${FL}" transform="translate(.9 1.3)" fill="rgba(20,10,4,.38)"/>${charges}` +
+  `<path d="${FL}" fill="url(#nxEmShade)"/><path d="M12 1.5V24.5M24 1.5V24.5" stroke="rgba(0,0,0,.08)" stroke-width="5"/>` +
+  `<path d="${FL}" fill="none" stroke="${INK}" stroke-width="1.4"/></svg>`;
+const cres = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${PARCH}"/><circle cx="${x + r * 0.42}" cy="${y - r * 0.08}" r="${r * 0.8}" fill="${RED}"/>`;
+let tughraCache = null;
+function tughraSVG() {
+  if (!tughraCache) tughraCache = fetch(new URL("./assets/nautical/emblems/tughra_murad_iii.svg", import.meta.url))
+    .then((r) => { if (!r.ok) throw new Error("tughra " + r.status); return r.text(); })
+    .then((txt) => {
+      const doc = new DOMParser().parseFromString(txt, "image/svg+xml"), root = doc.documentElement;
+      root.querySelectorAll("metadata").forEach((e) => e.remove());
+      [...root.children].filter((e) => e.localName === "namedview").forEach((e) => e.remove());
+      // fit inside the flag with a margin, keep the aspect
+      root.setAttribute("x", "4.2"); root.setAttribute("y", "3.4"); root.setAttribute("width", "27.6"); root.setAttribute("height", "19.2");
+      root.setAttribute("preserveAspectRatio", "xMidYMid meet");
+      return new XMLSerializer().serializeToString(root).replace(/<\?xml[^>]*>/, "").replace(/fill:#000000/g, "fill:" + INK);
+    });
+  return tughraCache;
+}
+const OVERRIDES = {
+  ottoman: () => tughraSVG().then((t) => ({ w: 36, h: 26, svg: flagFrame(`<path d="${FL}" fill="${PARCH}"/>` + t) })),
+  north_african: () => Promise.resolve({ w: 36, h: 26, svg: flagFrame(`<path d="${FL}" fill="${RED}"/>` + cres(11, 8.4, 4.4) + cres(25, 8.4, 4.4) + cres(18, 17.8, 4.4)) }),
+};
+const emblemSource = (id) => OVERRIDES[id] ? OVERRIDES[id]() : Promise.resolve(window.NABOU_EMBLEMS && window.NABOU_EMBLEMS.get(id));
+
+// the lane emblem as a standalone SVG string, drawn at the given pixel size
+function standaloneSVG(em) {
   if (!em) return null;
   const k = TEX / Math.max(em.w, em.h), W = Math.round(em.w * k), H = Math.round(em.h * k);
   const holder = document.createElement("div"); holder.innerHTML = em.svg;
@@ -35,9 +68,9 @@ function standaloneSVG(id) {
   text = text.replace(/(<svg[^>]*>)/, "$1" + pageDefs());
   return { text, W, H, aspect: em.w / em.h };
 }
-export function emblemCanvas(id) {
-  const s = standaloneSVG(id);
-  if (!s) return Promise.reject(new Error("no 2D emblem for " + id));
+export async function emblemCanvas(id) {
+  const s = standaloneSVG(await emblemSource(id));
+  if (!s) throw new Error("no emblem for " + id);
   return new Promise((ok, bad) => {
     const url = URL.createObjectURL(new Blob([s.text], { type: "image/svg+xml" })), img = new Image();
     img.onload = () => {
