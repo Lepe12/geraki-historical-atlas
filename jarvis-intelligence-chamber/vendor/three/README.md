@@ -6,3 +6,8 @@ Loaded only by map-3d-scene.js when the user turns the main map to 3D.
 GLTFLoader.js (examples/jsm/loaders), BufferGeometryUtils.js and SkeletonUtils.js (examples/jsm/utils) are from the
 same npm three@0.184.0 package; only their imports are changed ("three" -> "./three.module.min.js", "../utils/X.js" -> "./X.js").
 GLTFLoader is loaded only by map-3d-ship.js, after the 3D view starts, to load assets/nautical/models/galleon.glb.
+
+EffectComposer.js, RenderPass.js, ShaderPass.js, MaskPass.js, Pass.js, UnrealBloomPass.js, OutputPass.js (examples/jsm/postprocessing)
+and CopyShader.js, LuminosityHighPassShader.js, OutputShader.js (examples/jsm/shaders) are from the same npm three@0.184.0 package;
+only their imports are changed ("three" -> "./three.module.min.js", "../shaders/X.js" -> "./X.js").
+They are loaded only by assistant/assistant-scene.js, after the user opens the voice assistant.

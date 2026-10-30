@@ -1,0 +1,28 @@
+/* NABOU voice assistant overlay — loaded only on first open */
+.nxa { position: fixed; z-index: 9000; right: 22px; bottom: 64px; width: min(420px, calc(100vw - 32px)); max-height: calc(100vh - 90px);
+  display: flex; flex-direction: column; gap: 8px; padding: 12px 14px 12px; box-sizing: border-box;
+  background: radial-gradient(120% 80% at 50% 30%, #2f2111, #0e0a06);
+  border: 1px solid rgba(214, 170, 92, .55); border-radius: 6px; box-shadow: 0 0 0 1px rgba(0,0,0,.6), 0 18px 50px rgba(0,0,0,.6), inset 0 0 40px rgba(214,160,70,.08);
+  color: #ecd9b0; font-family: "NX Garamond", Georgia, serif; }
+.nxa[hidden] { display: none; }
+.nxa-head { display: flex; align-items: baseline; gap: 10px; border-bottom: 1px solid rgba(214,170,92,.3); padding-bottom: 6px; }
+.nxa-title { font-family: "NX Cinzel", serif; letter-spacing: .28em; color: #f1c86a; font-size: 15px; }
+.nxa-head small { font-style: italic; color: #b9a27a; font-size: 13px; }
+.nxa-x { margin-left: auto; background: none; border: 0; color: #d9b56e; font-size: 22px; line-height: 1; cursor: pointer; padding: 0 4px; }
+.nxa-stage { position: relative; height: min(400px, calc(100vh - 380px)); flex: 0 0 auto; border-radius: 4px; overflow: hidden;
+  background: #000; box-shadow: inset 0 0 0 1px rgba(214,170,92,.18); }
+.nxa-canvas { width: 100%; height: 100%; display: block; }
+.nxa-heard { position: absolute; left: 8px; right: 8px; bottom: 4px; margin: 0; text-align: center; font-style: italic; color: rgba(236, 217, 176, .7); font-size: 14px; min-height: 1.2em; }
+.nxa-log { max-height: 128px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.nxa-msg { margin: 0; padding: 5px 9px; border-radius: 4px; font-size: 15px; line-height: 1.35; }
+.nxa-msg.nabou { background: rgba(214,170,92,.12); border-left: 2px solid #e2b35c; color: #f3e2bd; }
+.nxa-msg.user { align-self: flex-end; color: #c8b490; font-style: italic; }
+.nxa-form { display: flex; gap: 6px; }
+.nxa-text { flex: 1; min-width: 0; background: rgba(0,0,0,.35); border: 1px solid rgba(214,170,92,.4); color: #f0dfba; padding: 6px 8px; font: inherit; font-size: 15px; border-radius: 3px; }
+.nxa button.nxa-send, .nxa-bar button { background: linear-gradient(#3a2914, #22180c); border: 1px solid rgba(214,170,92,.55); color: #f0cf86; font-family: "NX Cinzel", serif; letter-spacing: .08em; font-size: 12px; padding: 6px 10px; border-radius: 3px; cursor: pointer; }
+.nxa-bar { display: flex; gap: 6px; }
+.nxa-bar button { flex: 1; }
+.nxa-wake[aria-pressed="true"], .nxa.listening .nxa-mic { background: linear-gradient(#7a5418, #4a320c); color: #fff3cf; box-shadow: 0 0 12px rgba(240, 190, 90, .45); }
+.nxa-status { margin: 0; font-size: 12.5px; color: #a8936d; min-height: 1.2em; }
+.nxa.no-webgl .nxa-stage { height: 60px; }
+#nabouAssistantLauncher.open { box-shadow: 0 0 14px rgba(240, 190, 90, .55); }
