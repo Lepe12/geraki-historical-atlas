@@ -1,0 +1,255 @@
+{
+  "schema": "pct-semantic-answer-v3",
+  "question": "Πέτρος Λάντζας\nResearch scope: Γιατί φυλακίστηκε ο Πέτρος Λάντζας στη Νάπολη το 1596;",
+  "request_kind": "person",
+  "evidence_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "status": "INSUFFICIENT_ACQUIRED_EVIDENCE",
+  "generated_utc": "2026-10-30T10:34:57.914525+00:00",
+  "model_configuration": {
+    "schema": "pct-llm-routing-summary-v1",
+    "prompt_version": "2026-10-20.1",
+    "routes": {
+      "planner": {
+        "role": "planner",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "fast",
+        "temperature": 0.1,
+        "max_output_tokens": 1800,
+        "fallback": "deterministic_planner",
+        "requires_evidence": false,
+        "prompt_version": "2026-10-20.1"
+      },
+      "query_expander": {
+        "role": "query_expander",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "fast",
+        "temperature": 0.2,
+        "max_output_tokens": 1600,
+        "fallback": "deterministic_query_expander",
+        "requires_evidence": false,
+        "prompt_version": "2026-10-20.1"
+      },
+      "evidence_extractor": {
+        "role": "evidence_extractor",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "precise",
+        "temperature": 0.0,
+        "max_output_tokens": 2600,
+        "fallback": "source_first_extractor",
+        "requires_evidence": true,
+        "prompt_version": "2026-10-20.1"
+      },
+      "synthesis": {
+        "role": "synthesis",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "reasoning",
+        "temperature": 0.1,
+        "max_output_tokens": 4200,
+        "fallback": "source_first_report",
+        "requires_evidence": true,
+        "prompt_version": "2026-10-20.1"
+      },
+      "adversarial_reviewer": {
+        "role": "adversarial_reviewer",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "reasoning",
+        "temperature": 0.1,
+        "max_output_tokens": 3200,
+        "fallback": "deterministic_gap_review",
+        "requires_evidence": true,
+        "prompt_version": "2026-10-20.1"
+      },
+      "replanner": {
+        "role": "replanner",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "reasoning",
+        "temperature": 0.1,
+        "max_output_tokens": 2200,
+        "fallback": "registered_route_replan",
+        "requires_evidence": false,
+        "prompt_version": "2026-10-20.1"
+      }
+    },
+    "verified_promotion_allowed": false
+  },
+  "configuration": {
+    "configured": true,
+    "missing": []
+  },
+  "model_used": false,
+  "claims": [],
+  "answer_sections": [],
+  "coverage": {
+    "collected_unique_passages": 0,
+    "prefilter": null,
+    "screening": null,
+    "original_unique_passages": 0,
+    "unique_passages": 0,
+    "selected_passages": 0,
+    "repeated_occurrences": 0,
+    "deferred": [],
+    "excluded": [
+      {
+        "finding_id": "finding-d28022874657e59979df",
+        "reason": "UNSUITABLE_FOR_AUTOMATIC_SYNTHESIS"
+      },
+      {
+        "finding_id": "finding-ba4595d4d8198f1ea65e",
+        "reason": "CATALOGUE_METADATA_NOT_CONSULTED_DOCUMENT_TEXT"
+      },
+      {
+        "finding_id": "finding-5f62836d4a97dd2495b8",
+        "reason": "UNSUITABLE_FOR_AUTOMATIC_SYNTHESIS"
+      },
+      {
+        "finding_id": "finding-d28022874657e59979df",
+        "reason": "UNSUITABLE_FOR_AUTOMATIC_SYNTHESIS"
+      },
+      {
+        "finding_id": "finding-ba4595d4d8198f1ea65e",
+        "reason": "CATALOGUE_METADATA_NOT_CONSULTED_DOCUMENT_TEXT"
+      },
+      {
+        "finding_id": "finding-5f62836d4a97dd2495b8",
+        "reason": "UNSUITABLE_FOR_AUTOMATIC_SYNTHESIS"
+      },
+      {
+        "finding_id": "finding-2e31220e7330cbabf4a6",
+        "reason": "BIBLIOGRAPHIC_REFERENCE_REQUIRES_CITED_WORK_ACQUISITION"
+      },
+      {
+        "finding_id": "finding-d28022874657e59979df",
+        "reason": "UNSUITABLE_FOR_AUTOMATIC_SYNTHESIS"
+      },
+      {
+        "finding_id": "finding-ba4595d4d8198f1ea65e",
+        "reason": "CATALOGUE_METADATA_NOT_CONSULTED_DOCUMENT_TEXT"
+      },
+      {
+        "finding_id": "finding-5f62836d4a97dd2495b8",
+        "reason": "UNSUITABLE_FOR_AUTOMATIC_SYNTHESIS"
+      },
+      {
+        "finding_id": "finding-021195d4059b613e06b1",
+        "reason": "BIBLIOGRAPHIC_REFERENCE_REQUIRES_CITED_WORK_ACQUISITION"
+      },
+      {
+        "finding_id": "finding-5b36d8332b9a5097ef45",
+        "reason": "BIBLIOGRAPHIC_REFERENCE_REQUIRES_CITED_WORK_ACQUISITION"
+      }
+    ],
+    "pass_priority": "NEW_EXTRACTION"
+  },
+  "evidence": [],
+  "calls": [],
+  "rejected": [],
+  "selection_priority": {
+    "policy": "relevance-before-diversity-v1",
+    "retained_passages": 0,
+    "tier_counts": {},
+    "verification_implied": false,
+    "selected": []
+  },
+  "passage_triage": null,
+  "excerpt_ranking": null,
+  "identity_linkage": null,
+  "limitations": [
+    "MODEL_OUTPUT_REQUIRES_REVIEW",
+    "ORIGINAL_INSPECTION_NOT_PERFORMED",
+    "SOURCE_INDEPENDENCE_NOT_ESTABLISHED",
+    "BOUNDED_EVIDENCE_COVERAGE"
+  ],
+  "verified": false,
+  "human_reviewed": false,
+  "semantic_module_sha256": "173adff120baf63fa611e3beb65659740aa308f52928cd0f777e0c27e60ba57b",
+  "extraction_cache_binding": {
+    "running_module_sha256": "173adff120baf63fa611e3beb65659740aa308f52928cd0f777e0c27e60ba57b",
+    "raw_cache_module_sha256": "173adff120baf63fa611e3beb65659740aa308f52928cd0f777e0c27e60ba57b",
+    "policy": "RAW_PAYLOADS_REVALIDATED_BY_CURRENT_VALIDATORS_NO_VERIFICATION_REUSE"
+  },
+  "software_revision": "be8877ac628e4551de765a941f65f7fc17d75de8",
+  "claim_evidence_assessment": {
+    "corpus_coverage_is_not_claim_sufficiency": true,
+    "automatic_historical_verification": false,
+    "claims": []
+  },
+  "research_funnel": {
+    "policy": "research-funnel-v1",
+    "collected": {
+      "unique_excerpts": 0,
+      "excluded_before_analysis": 12
+    },
+    "prefilter": {
+      "applied": false,
+      "filtered_out": 0,
+      "filtered_by_reason": {},
+      "kept_excerpts": 0,
+      "model_units": 0,
+      "sentence_windows": 0,
+      "chars_full": null,
+      "chars_sent": null,
+      "sent_this_pass": 0
+    },
+    "examined": {
+      "excerpts": 0,
+      "remaining": 0,
+      "deferred": 0
+    },
+    "claims": {
+      "extracted": 0,
+      "supported_by_quotation": 0,
+      "rejected_proposals": 0
+    },
+    "provisional_synthesis": {
+      "paragraphs": 0
+    },
+    "human_verification": {
+      "performed": false,
+      "verified_claims": 0
+    },
+    "historical_verification": false
+  },
+  "research_run_id": "41038163218",
+  "place_links": {
+    "policy": "gazetteer-place-resolver-v1",
+    "gazetteer": "data/gazetteer/mediterranean_gazetteer.v1.json",
+    "passages": {}
+  },
+  "continuation_rounds": {
+    "schema": "research-continuation-rounds-v1",
+    "caps": {
+      "max_rounds": 5,
+      "no_gain_rounds": 2,
+      "diminishing_returns": true
+    },
+    "rounds": [
+      {
+        "round": 0,
+        "analysis_path": "research_answer",
+        "status": "INSUFFICIENT_ACQUIRED_EVIDENCE",
+        "total": 0,
+        "examined": 0,
+        "remaining": 0,
+        "new_examined": 0,
+        "supported_claims": 0,
+        "new_supported_claims": 0,
+        "supported_claim_ids": [],
+        "claim_ids": [],
+        "new_claims": 0,
+        "answer_paragraphs": 0,
+        "queue_status": "COMPLETE",
+        "prefilter": null,
+        "collected": 0,
+        "model_calls": 0
+      }
+    ],
+    "role": "COVERAGE_METRICS_NOT_HISTORICAL_VERIFICATION",
+    "stop_reason": "ALL_EXCERPTS_READ"
+  }
+}
