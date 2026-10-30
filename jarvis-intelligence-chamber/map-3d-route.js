@@ -17,7 +17,9 @@ const SMALL = 0.12;     // smallest scale, only in narrow channels / harbours wh
 const ANCHOR = 1.2;     // the ship waits off each harbour, at the first spot on the leg where it fits at this scale
 const LINE_Y = 0.008, R = 0.011;
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
-const label = (s) => s.atlasLabel || s.historicalNames || s.place;
+const GREEK = { "Corfù / Κέρκυρα": "Κέρκυρα", "Ραγούσα": "Ραγούσα", "Χάνδακας": "Χάνδακας", "Porto Quaglio / Porto Kagio": "Πόρτο Κάγιο" }; // display only; JSON unchanged
+const label0 = (s) => s.atlasLabel || s.historicalNames || s.place;
+const label = (s) => GREEK[label0(s)] || label0(s);
 
 export async function addRoute(api) {
   const T = api.THREE, scene = api.scene;
