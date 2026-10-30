@@ -71,7 +71,7 @@
           .then((r) => { window.NABOU_MAP3D.route = r; })
           .catch((e) => {
             console.warn("map3d: route not loaded, ship stays at its sea spot", e);
-            import("./map-3d-ship.js").then((m) => { window.NABOU_MAP3D.ship = m.addShip(window.NABOU_MAP3D); });
+            import("./map-3d-ship.js?v=map3d-9").then((m) => { window.NABOU_MAP3D.ship = m.addShip(window.NABOU_MAP3D); });
           });
         return s;
       })

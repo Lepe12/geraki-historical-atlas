@@ -11,3 +11,6 @@ EffectComposer.js, RenderPass.js, ShaderPass.js, MaskPass.js, Pass.js, UnrealBlo
 and CopyShader.js, LuminosityHighPassShader.js, OutputShader.js (examples/jsm/shaders) are from the same npm three@0.184.0 package;
 only their imports are changed ("three" -> "./three.module.min.js", "../shaders/X.js" -> "./X.js").
 They are loaded only by assistant/assistant-scene.js, after the user opens the voice assistant.
+
+meshopt_decoder.module.js (examples/jsm/libs, three r184; meshoptimizer, MIT) is copied unchanged. map-3d-ship.js passes it to GLTFLoader
+because galleon.glb is compressed with gltfpack (meshoptimizer) -cc.
