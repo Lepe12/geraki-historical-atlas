@@ -96,7 +96,7 @@ function conflictEvidence(record) {
   );
 }
 function semanticAnswer(data) {
-  if (data?.schema !== "pct-semantic-answer-v1") return "";
+  if (!["pct-semantic-answer-v1", "pct-semantic-answer-v2", "pct-semantic-answer-v3"].includes(data?.schema)) return "";
   if (!["MODEL_ANSWER_PENDING_HUMAN_REVIEW", "SOURCE_DOSSIER_AVAILABLE"].includes(data.status))
     return (
       '<section class="result-item"><b>ΑΠΑΝΤΗΣΗ ΕΡΕΥΝΑΣ</b><p>' +
@@ -110,6 +110,10 @@ function semanticAnswer(data) {
       "</p></section>"
     );
   const claims = new Map((data.claims || []).map((c) => [c.claim_id, c]));
+  const coverageNote =
+    data.answer_scope === "PROVISIONAL_EXAMINED_PASSAGES_ONLY" || data.coverage?.deferred?.length
+      ? "<p>Προσωρινή απάντηση από τα αποσπάσματα που εξετάστηκαν. Η κάλυψη του συνόλου των πηγών παραμένει εκκρεμής.</p>"
+      : "";
   const timeline =
     data.answer_mode === "EXACT_SOURCE_EXTRACTS" && data.documentary_timeline?.length
       ? "<details><summary>Χρονολογικές ενδείξεις στα αποσπάσματα</summary><p>Δεν αποτελούν επαληθευμένο χρονολόγιο γεγονότων.</p>" +
@@ -168,6 +172,7 @@ function semanticAnswer(data) {
         : "Σύνθεση μοντέλου από τις διαθέσιμες πηγές. Εκκρεμεί ιστορική επαλήθευση.",
     ) +
     "</small>" +
+    coverageNote +
     sections +
     timeline +
     (Array.isArray(data.unknowns) && data.unknowns.length
