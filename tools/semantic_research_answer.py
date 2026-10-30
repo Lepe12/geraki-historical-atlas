@@ -329,6 +329,41 @@ def select_groups(groups,namesake_group_ids,batch_limit,completed):
             skipped.extend({'evidence_id':r['evidence_id'],'reason':reason} for r in group)
     return grouped,skipped
 
+def adaptive_reading_settings(env=None):
+    """First-pass adaptive reading (default when PCT_SEMANTIC_BATCHES is not set explicitly).
+
+    The fixed limit of 3 new batches per pass left most first passes at
+    RESEARCH_COVERAGE_PENDING with time to spare (reliability run 2026-10-29:
+    17/24 items, 3-5 extraction calls of ~100-350 s inside an 1800 s pass).
+    Adaptive mode still reads the same first PCT_SEMANTIC_BATCHES (default 3)
+    batches, then keeps reading the next ranked batches while the measured
+    batch time fits inside a reading share of the pass budget, leaving the
+    rest for claim review and synthesis. Nothing is skipped silently: unread
+    batches stay MODEL_CALL_BUDGET in the queue for continuation rounds.
+    """
+    env=os.environ if env is None else env
+    enabled=str(env.get('PCT_SEMANTIC_ADAPTIVE','0' if env.get('PCT_SEMANTIC_BATCHES') else '1')).strip()=='1'
+    return {'enabled':enabled,
+            'max_batches':max(1,int(env.get('PCT_SEMANTIC_MAX_BATCHES','12'))),
+            'read_share':min(0.9,max(0.1,float(env.get('PCT_SEMANTIC_READ_SHARE','0.6')))),
+            'first_batch_estimate_seconds':max(1.0,float(env.get('PCT_SEMANTIC_BATCH_ESTIMATE_SECONDS','300'))),
+            'reserve_calls':max(0,int(env.get('PCT_SEMANTIC_REVIEW_RESERVE_CALLS','12')))}
+
+def reading_allowed(elapsed,batch_seconds,pass_seconds,new_calls,max_new_calls,settings,claims=0):
+    """May one more NEW extraction batch start? Pure function (unit-tested).
+
+    Estimate = slowest batch measured in this pass (conservative), so a batch
+    is only started when even a slow one still ends inside the reading share.
+    Two calls are reserved per batch (extraction + its possible repair).
+    Review time is protected too: about one review call per claim (the claims
+    so far plus the at most 2 the next batch may add) plus synthesis and final
+    review, each estimated at half a batch, must still fit in the pass budget.
+    """
+    estimate=max(batch_seconds) if batch_seconds else settings['first_batch_estimate_seconds']
+    if elapsed+estimate>pass_seconds*settings['read_share']:return False
+    if elapsed+estimate+(claims+2+2)*estimate/2>pass_seconds:return False
+    return new_calls+2<=max_new_calls-settings['reserve_calls']
+
 def fit_passages(records,budget):
     """Split oversized excerpts with exact source offsets and overlapping context."""
     output=[]
@@ -1122,6 +1157,15 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         deferred.extend(other_shards)
     if shard_merge:batch_limit=0
     grouped,skipped=select_groups(candidate_groups,namesake_group_ids,batch_limit,queue.completed);deferred.extend(skipped)
+    adaptive=adaptive_reading_settings()
+    adaptive['enabled']=bool(adaptive['enabled'] and batch_limit and not shard and not resume_reviewed_from)
+    extra_groups=[]
+    if adaptive['enabled'] and adaptive['max_batches']>batch_limit:
+        # Next ranked unread batches, read only if time remains (see the loop).
+        # They stay deferred (MODEL_CALL_BUDGET) unless actually read.
+        chosen={id(g) for g in grouped}
+        widened,_=select_groups(candidate_groups,namesake_group_ids,adaptive['max_batches'],queue.completed)
+        extra_groups=[g for g in widened if id(g) not in chosen and not queue.completed(g) and id(g) not in namesake_group_ids]
     if shard:
         shard_report={'policy':'round-robin-by-rank-v1','index':shard[0],'count':shard[1],
                       'pending_batches_all_shards':sum(not queue.completed(g) for g in all_groups),
@@ -1249,7 +1293,24 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         out['claims']=resumed;out['rejected'].extend(rejections)
         out['reused_semantic_calls']=receipts;out['resume_context']=context
         if not resumed:out['status']='NO_REUSABLE_REVIEWED_SOURCE_CLAIMS';return out
-    for group in ([] if resume_reviewed_from else grouped):
+    new_batches_read=0;batch_seconds=[];extra_read=0;reading_stop=None
+    position=0
+    while not resume_reviewed_from:
+        if position>=len(grouped):
+            if not extra_groups:break
+            if not reading_allowed(time.monotonic()-pass_started,batch_seconds,pass_seconds,new_calls,max_new_calls,adaptive,
+                                   claims=len({c.get('claim_id') for c in out['claims']})):
+                reading_stop={'reason':'READING_SHARE_OR_CALL_RESERVE','after_new_batches':new_batches_read,
+                              'elapsed_seconds':round(time.monotonic()-pass_started,1),'unread_extra_batches':len(extra_groups)}
+                break
+            # Adaptive reading: the next ranked batch leaves the deferred list
+            # only now that it is actually being read.
+            extra=extra_groups.pop(0);ids={r['evidence_id'] for r in extra}
+            out['coverage']['deferred'][:]=[d for d in out['coverage']['deferred'] if d['evidence_id'] not in ids]
+            grouped.append(extra);extra_read+=1
+        group=grouped[position];position+=1
+        is_new=not queue.completed(group)
+        batch_started=time.monotonic()
         prompt=RULES+'\nExtraction language: English. QUESTION: '+question+'\nReturn {"items":[{"passage_kind":"NARRATIVE_EVIDENCE","statement":"The consulted source reports ...","evidence_id":"copy supplied evidence_id","passage_ids":[0],"kind":"source_statement","source_type":"UNVERIFIED","actors":[],"places":[],"dates":[],"usage_type":"UNRESOLVED","uncertainty":[]}]}. Select at most 2 claims directly relevant to the question. For a person question, prioritize the named person, identity and sourced activities; a named place is optional. For a place or geographic topic, prioritize named-place claims. Choose 1-4 adjacent passage_ids from ONE evidence item. Do NOT output a quote: the engine copies the selected original text. Copy entity spellings literally from those selected passages; do not translate names. Dates must be strings copied from the selected passages or date_evidence. Empty arrays are valid. Leave unspecified actors, dates and places empty. State only what the selected passage actually supports, with source attribution. Distinguish an actual base from a raid site, and an intention from an executed action. usage_type may be BASE, ANCHORAGE, REFUGE, RAID_LOCATION, OTHER, UNRESOLVED. Modern studies are SECONDARY_SOURCE; contemporary authorship must be established for PRIMARY_SOURCE. Never infer location or dates from a book title.\nEVIDENCE_JSON:\n'+json.dumps([model_evidence(row) for row in group],ensure_ascii=False)
         if any(r.get('model_view')=='compact' for r in group):
             from excerpt_prefilter import COMPACT_HEADER
@@ -1289,6 +1350,19 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         else:
             out['coverage']['deferred'].extend({'evidence_id':r['evidence_id'],'reason':'EXTRACTION_RESPONSE_FAILED'} for r in group)
         out['claims'].extend(items)
+        if is_new:
+            new_batches_read+=1;batch_seconds.append(time.monotonic()-batch_started)
+    if adaptive['enabled']:
+        if extra_read:
+            # Evidence and counts describe exactly what this pass read.
+            selected=[r for b in grouped for r in b]
+            out['evidence']=selected
+            out['coverage']['selected_passages']=len(selected)
+            out['selection_priority']=selection_report(all_records,selected,question_kind=='topic')
+        out['coverage']['adaptive_reading']={'policy':'adaptive-reading-v1','guaranteed_new_batches':batch_limit,
+            'max_new_batches':adaptive['max_batches'],'read_share':adaptive['read_share'],
+            'pass_budget_seconds':pass_seconds,'new_batches_read':new_batches_read,'extra_batches_read':extra_read,
+            'batch_seconds':[round(s,1) for s in batch_seconds],'stopped':reading_stop}
     queue.inventory(all_records,grouped,out['coverage']['deferred'],filtered_items)
     if out['coverage']['deferred'] and not (os.getenv('PCT_SEMANTIC_PARTIAL_ANSWER')=='1' and out['claims']):
         out['status']='EXTRACTION_FAILED_OR_UNSUPPORTED' if not out['claims'] and any(r['reason']=='EXTRACTION_RESPONSE_FAILED' for r in out['coverage']['deferred']) else 'RESEARCH_COVERAGE_PENDING'
