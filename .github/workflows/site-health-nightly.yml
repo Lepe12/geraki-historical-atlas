@@ -1,0 +1,88 @@
+name: Site health (nightly)
+# Read-only nightly check of the live GitHub Pages site (03:00 Athens winter time = 01:00 UTC).
+# Loads the page and the 3D map in headless Chromium, checks links, images and assets for 404s,
+# and fails on uncaught JS errors. It blocks every non-GET request the page attempts, so it never
+# POSTs to any backend. On failure it opens (or updates) one issue labelled `site-health`;
+# when the site is healthy again it comments on that issue and closes it.
+on:
+  schedule:
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+  # Runs once on PRs that change the check itself (no issue is opened/closed for PR runs).
+  pull_request:
+    paths:
+      - 'tools/site_health/**'
+      - '.github/workflows/site-health-nightly.yml'
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: site-health
+  cancel-in-progress: false
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/site_health/
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Check live site
+        id: check
+        env:
+          SITE_URL: https://lepe12.github.io/geraki-historical-atlas/jarvis-intelligence-chamber/
+        run: node tools/site_health/check_site.mjs site-health-report.json
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-health-report
+          path: |
+            site-health-report.json
+            site-health-map3d.png
+          if-no-files-found: warn
+      - name: Open or update the site-health issue
+        if: failure() && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh label create site-health --color B60205 --description "Nightly live-site health check" 2>/dev/null || true
+          {
+            echo "Nightly site health check failed on $(date -u '+%Y-%m-%d %H:%M UTC'). Run: $RUN_URL"
+            echo
+            if [ -f site-health-report.json ]; then
+              echo '```'
+              node -e 'const r=require("./site-health-report.json");for(const p of r.problems)console.log(JSON.stringify(p));' | head -40
+              echo '```'
+            else
+              echo "No report was produced (the check crashed before finishing); see the run log."
+            fi
+          } > body.md
+          num=$(gh issue list --label site-health --state open --json number --jq '.[0].number')
+          if [ -n "$num" ]; then
+            gh issue comment "$num" --body-file body.md
+          else
+            gh issue create --title "Live site health check failing" --label site-health --body-file body.md
+          fi
+      - name: Close the site-health issue when healthy again
+        if: success() && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          num=$(gh issue list --label site-health --state open --json number --jq '.[0].number' 2>/dev/null || true)
+          if [ -n "$num" ]; then
+            gh issue close "$num" --comment "Site healthy again: $RUN_URL"
+          fi
