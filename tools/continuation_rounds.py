@@ -85,7 +85,7 @@ def stop_rule(ledger, cap):
     tail = continuation[-cap['no_gain_rounds']:]
     if len(tail) == cap['no_gain_rounds'] and all(r['new_supported_claims'] == 0 for r in tail):
         return 'NO_NEW_SUPPORTED_CLAIMS'
-    if (cap.get('diminishing_returns', True) and last['round'] >= 1 and last.get('new_examined', 0) > 0
+    if (cap.get('diminishing_returns', True) and last['round'] >= 1 and last.get('new_examined') is not None and last['new_examined'] > 0
             and last.get('new_claims') == 0):
         return 'DIMINISHING_RETURNS'
     return None
