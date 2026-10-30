@@ -13,6 +13,9 @@ on:
       auto_continue:
         type: boolean
         default: true
+      skip_citation_acquisition:
+        type: boolean
+        default: false
       semantic_shards:
         type: string
         default: ''
@@ -30,6 +33,9 @@ on:
         type: boolean
         default: true
         description: false = run exactly one pass; no follow-up dispatch and the hourly coordinator holds this corpus
+      skip_citation_acquisition:
+        type: boolean
+        default: false
       semantic_shards:
         type: string
         default: ''
@@ -141,6 +147,7 @@ jobs:
           print('ACTUAL_LLAMA_CPP_SCHEMA_GRAMMARS_PASS; NOT_HISTORICAL_RESEARCH_ACCEPTANCE')
           PYSCHEMA
       - name: Continue retained bibliography in separate workspaces
+        if: inputs.skip_citation_acquisition != true
         timeout-minutes: 20
         run: python3 tools/continue_citation_acquisition.py --run-id "$PARENT_RESEARCH_RUN"
       - name: Derive PDF reading order and run all real semantic stages
@@ -246,6 +253,7 @@ jobs:
       - name: Install the existing public PDF reader
         run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
       - name: Continue retained bibliography in separate workspaces
+        if: inputs.skip_citation_acquisition != true
         timeout-minutes: 20
         run: python3 tools/continue_citation_acquisition.py --run-id "$PARENT_RESEARCH_RUN"
       - name: Derive the shared PDF reading inputs once for every shard

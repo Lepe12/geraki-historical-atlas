@@ -471,6 +471,9 @@ jobs:
       cancel-in-progress: false
     runs-on: ubuntu-latest
     env:
+      # Publish reviewed, source-attributed findings while corpus coverage stays pending.
+      # This does not promote evidence or relax historical verification.
+      PCT_SEMANTIC_PARTIAL_ANSWER: '1'
       PCT_LOCAL_MODEL_REPOSITORY: ${{ vars.PCT_LLM_MODEL || 'Qwen/Qwen3-8B-GGUF' }}
       PCT_LLM_MODEL: ${{ vars.PCT_LLM_MODEL || 'Qwen/Qwen3-8B-GGUF' }}
       PCT_LLM_EXTRACTOR_MODEL: ${{ vars.PCT_LLM_EXTRACTOR_MODEL || vars.PCT_LLM_MODEL || 'Qwen/Qwen3-8B-GGUF' }}

@@ -37,6 +37,18 @@ class ManualResumeTests(unittest.TestCase):
         self.assertEqual(self.run_request()['status'], 'ALREADY_RECORDED')
         self.dispatch.assert_called_once()
 
+    def test_acquired_only_request_skips_citation_downloads(self):
+        self.request['skip_citation_acquisition'] = True
+        result = self.run_request()
+        self.assertTrue(result['skip_citation_acquisition'])
+        self.assertIn('skip_citation_acquisition=true', self.dispatch.call_args.args[0])
+
+    def test_acquisition_flag_rejects_string_boolean(self):
+        self.request['skip_citation_acquisition'] = 'false'
+        with self.assertRaisesRegex(ValueError, 'SKIP_ACQUISITION_MUST_BE_BOOLEAN'):
+            self.run_request()
+        self.dispatch.assert_not_called()
+
     def test_active_research_is_not_dispatched_twice(self):
         with self.assertRaisesRegex(ValueError, 'RESEARCH_ALREADY_RUNNING'):
             self.run_request(active={'789'})
