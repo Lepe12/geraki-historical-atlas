@@ -63,8 +63,8 @@ export function addShip(api, opts = {}) {
   gr.addColorStop(0, "rgba(255,250,235,.75)"); gr.addColorStop(1, "rgba(255,250,235,0)");
   g.fillStyle = gr; g.beginPath(); g.moveTo(26, 0); g.lineTo(38, 0); g.lineTo(64, 256); g.lineTo(0, 256); g.fill();
   const wakeTex = new T.CanvasTexture(cv);
-  const wake = new T.Mesh(new T.PlaneGeometry(LEN * 0.5, LEN * 1.6), new T.MeshBasicMaterial({ map: wakeTex, transparent: true, depthWrite: false }));
-  wake.rotation.x = -Math.PI / 2; wake.rotation.z = -Math.PI / 2; wake.position.set(-LEN * 1.25, 0.003, 0);
+  const wake = new T.Mesh(new T.PlaneGeometry(LEN * 0.42, LEN * 0.95), new T.MeshBasicMaterial({ map: wakeTex, transparent: true, opacity: 0.8, depthWrite: false }));
+  wake.rotation.x = -Math.PI / 2; wake.rotation.z = -Math.PI / 2; wake.position.set(-LEN * 0.95, 0.003, 0); // short wake (the route draws the ship large)
   holder.add(wake);
 
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;

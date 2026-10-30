@@ -56,3 +56,10 @@ Matching is substring-based on accent-, case- and final-sigma-normalised text. E
 **Ελληνικά.** Μόνο για αξιολόγηση. Με `eval_fast_mode=true` το workflow `pct-parallel-multi-agent.yml` τρέχει 2–3 αρχεία (lanes) ανά ερώτημα αντί για 11, βάζει όρια χρόνου στη συλλογή και στη σύνθεση, και ένα `INCOMPLETE` στον τελικό έλεγχο γράφεται ως προειδοποίηση αντί να αποτυγχάνει το run. Το `eval_fast_lane_map.json` ορίζει τα lanes για καθένα από τα 24 ερωτήματα που βαθμολογούνται, με σύντομη αιτιολόγηση που αναφέρει μόνο πηγές που υπάρχουν ήδη στο σύνολο αξιολόγησης. Η κανονική έρευνα δεν αλλάζει.
 
 **English.** Evaluation only. Dispatch with `-f eval_fast_mode=true -f selected_agents=<lanes from the map>`. Fast mode requires 1–3 explicit lanes, runs the specialist wave only when `travellers` is selected (the only lane that consumes it), caps lane acquisition (`PCT_DISCOVERY_PASSES=2`, `PCT_MAX_ACQUISITION_CANDIDATES=15`, `PCT_ACQUISITION_BATCHES=1`, `PCT_ACQUISITION_BUDGET_SECONDS=180`, `PCT_CITATION_QUERY_LIMIT=3`) and the synthesis pass (`PCT_SEMANTIC_BUDGET_SECONDS=600`), skips archive escalation, and reports an `INCOMPLETE` end-to-end validation as a warning with `research_answer/eval_fast_mode.json`. Fast-mode recall is a lower bound on a full run: a gold source reachable only from an excluded lane will be missed. `python3 tools/eval_fast_mode.py lanes <item_id>` prints the lanes for one item; the map is validated by `tools/test_eval_fast_mode.py`.
+
+## Frozen baseline snapshots
+
+`evaluation/baselines/snapshots/` holds gzip copies of the exact run snapshots the baselines were scored on, pinned by
+sha256 in `MANIFEST.json`. `command-center/live/runs/<id>.json` is republished by the publish workflow and can change
+(commit e1fbd46d2 overwrote 39304929906 with a re-published answer), so `test_baselines_reproduce` scores the frozen copy
+and only falls back to the live file when no frozen copy exists.
