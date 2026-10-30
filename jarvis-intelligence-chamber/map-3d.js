@@ -66,8 +66,13 @@
         scene = s;
         host.querySelector(".map3d-loading")?.remove();
         for (const p of pending.splice(0)) p.resolve(scene.addObject(p.obj, p.opts));
-        // illustrative ship at a fixed sea spot in the Cyclades (3D only, no voyage data)
-        import("./map-3d-ship.js").then((m) => { window.NABOU_MAP3D.ship = m.addShip(window.NABOU_MAP3D); }).catch((e) => console.warn("map3d: ship not loaded", e));
+        // the ship sails the Book III (1577) voyage of Petros Lantzas, as told in the book (3D only)
+        import("./map-3d-route.js").then((m) => m.addRoute(window.NABOU_MAP3D))
+          .then((r) => { window.NABOU_MAP3D.route = r; })
+          .catch((e) => {
+            console.warn("map3d: route not loaded, ship stays at its sea spot", e);
+            import("./map-3d-ship.js").then((m) => { window.NABOU_MAP3D.ship = m.addShip(window.NABOU_MAP3D); });
+          });
         return s;
       })
       .catch((e) => { console.warn("map3d: could not start the 3D scene", e); loading = null; host?.remove(); host = null; throw e; });
