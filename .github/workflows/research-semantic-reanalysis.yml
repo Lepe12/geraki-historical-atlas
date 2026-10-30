@@ -13,6 +13,9 @@ on:
       auto_continue:
         type: boolean
         default: true
+      replay_shards_from:
+        type: string
+        default: ''
       skip_citation_acquisition:
         type: boolean
         default: false
@@ -33,6 +36,9 @@ on:
         type: boolean
         default: true
         description: false = run exactly one pass; no follow-up dispatch and the hourly coordinator holds this corpus
+      replay_shards_from:
+        type: string
+        default: ''
       skip_citation_acquisition:
         type: boolean
         default: false
@@ -65,6 +71,7 @@ jobs:
           REQUESTED_SHARDS: ${{ inputs.semantic_shards }}
           PARENT: ${{ inputs.run_id }}
           RESUME: ${{ inputs.resume_reviewed_claims && '1' || '0' }}
+          REPLAY_SHARDS_FROM: ${{ inputs.replay_shards_from }}
         run: |
           python3 - <<'PY'
           import base64, json, os, re, subprocess
@@ -84,7 +91,10 @@ jobs:
               shards = max(1,min(4, int(requested or 1)))
           except ValueError:
               shards = 1
-          if os.environ.get('RESUME') == '1' or not re.fullmatch(r'\d+', parent):
+          replay = os.environ.get('REPLAY_SHARDS_FROM') or ''
+          if replay and not re.fullmatch(r'\d+', replay):
+              raise ValueError('NUMERIC_REPLAY_ANALYSIS_REQUIRED')
+          if replay or os.environ.get('RESUME') == '1' or not re.fullmatch(r'\d+', parent):
               shards = 1
           print('SEMANTIC_SHARDS', shards, 'source', source)
           with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
@@ -110,6 +120,7 @@ jobs:
       PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen3-8B-GGUF
       PCT_LLM_MODEL: Qwen/Qwen3-8B-GGUF
       PCT_RESUME_REVIEWED_CLAIMS: ${{ inputs.resume_reviewed_claims && '1' || '0' }}
+      PCT_REPLAY_SHARDS_FROM: ${{ inputs.replay_shards_from }}
       PCT_AUTO_CONTINUE: ${{ inputs.auto_continue == false && 'false' || 'true' }}
       # Continuation rounds read the next best-ranked excerpts (excerpt_ranking.py).
       # The 1800 s / 48-call pass budget below still bounds each round.
@@ -152,7 +163,9 @@ jobs:
         run: python3 tools/continue_citation_acquisition.py --run-id "$PARENT_RESEARCH_RUN"
       - name: Derive PDF reading order and run all real semantic stages
         run: |
-          if [ "$PCT_RESUME_REVIEWED_CLAIMS" = 1 ]; then
+          if [ -n "$PCT_REPLAY_SHARDS_FROM" ]; then
+            PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python3 tools/reanalyse_acquired_research.py --run-id "$PARENT_RESEARCH_RUN" --replay-shards-from "$PCT_REPLAY_SHARDS_FROM"
+          elif [ "$PCT_RESUME_REVIEWED_CLAIMS" = 1 ]; then
             PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python3 tools/reanalyse_acquired_research.py --run-id "$PARENT_RESEARCH_RUN" --resume-reviewed-claims
           else
             PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python3 tools/reanalyse_acquired_research.py --run-id "$PARENT_RESEARCH_RUN"

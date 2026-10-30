@@ -19,6 +19,7 @@ def main():
     mode.add_argument('--prepare-only',action='store_true',help='derive the shared inputs once for every shard')
     mode.add_argument('--shard',help='I/N: read only this round-robin slice of unread batches (0-based)')
     mode.add_argument('--merge-shards',type=int,help='N: replay all shard extractions and write the one answer')
+    mode.add_argument('--replay-shards-from',help='Replay an existing analysis shard set; no new extraction')
     args=parser.parse_args()
     job=os.environ['GITHUB_RUN_ID']
     if not re.fullmatch(r'\d+',args.run_id) or not re.fullmatch(r'\d+',job):
@@ -114,17 +115,37 @@ def run(args,job,parent,dest):
     (dest/'execution_receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
     from prepare_acquired_analysis import prepare
     prepared=parent if args.resume_reviewed_claims else dest/'derived_sources'
-    merge=bool(getattr(args,'merge_shards',None))
+    replay_from=getattr(args,'replay_shards_from',None)
+    merge=bool(getattr(args,'merge_shards',None) or replay_from)
+    if replay_from and args.resume_reviewed_claims:raise ValueError('SHARDS_DO_NOT_SUPPORT_RESUME')
+    if replay_from:
+        prepare(parent,prepared,request)
+        from research_continuation import Continuation
+        from semantic_research_answer import routing_summary
+        from research_shard_replay import recover
+        queue=Continuation(parent/'research_continuation',question_of(request),
+                           Path(__file__).with_name('semantic_research_answer.py').read_bytes(),routing_summary())
+        recovery=recover(parent,replay_from,queue)
+        (dest/'shard_replay_recovery.json').write_text(json.dumps(recovery,ensure_ascii=False,indent=2)+'\n')
+        args.merge_shards=recovery['shard_count']
+        receipt['replayed_analysis_id']=replay_from
+        receipt['new_extraction_calls_allowed']=False
     if merge:
         receipt['execution_type']='SHARDED_REAL_MODEL_REANALYSIS_MERGE_NOT_NEW_DISCOVERY'
         receipt['semantic_shards']=args.merge_shards
         os.environ['PCT_SEMANTIC_MERGE']='1';os.environ.pop('PCT_SEMANTIC_SHARD',None)
     elif not args.resume_reviewed_claims:prepare(parent,prepared,request)
+    (dest/'execution_receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
     if request.get('purpose'):question+='\nResearch scope: '+request['purpose']
     answer=execute(prepared,question,output_root=dest,provenance_root=parent,
                    resume_reviewed_from=parent/'research_answer/answer.json' if args.resume_reviewed_claims else None)
     answer['execution_receipt']=receipt
-    if merge:answer['semantic_shards']=merge_summary(dest,args.merge_shards)
+    if merge:
+        summary_root=parent/('semantic_reanalysis_'+replay_from) if replay_from else dest
+        answer['semantic_shards']=merge_summary(summary_root,args.merge_shards)
+        if replay_from:
+            answer['semantic_shards']['replayed_analysis_id']=replay_from
+            answer['shard_replay_recovery']=recovery
     # Per-round coverage metrics and the clean stop decision travel with the
     # published answer; the handoff guard reads the same ledger.
     from continuation_rounds import record, round_number

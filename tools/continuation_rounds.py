@@ -61,7 +61,10 @@ def queue_counts(root):
     root = Path(root) / 'research_continuation'
     try:
         queue = json.loads((root / json.loads((root / 'active.json').read_text())['queue']).read_text())
-        return {'total': queue['total'], 'examined': queue['completed'], 'status': queue.get('status')}
+        return {'total': queue['total'], 'examined': queue['completed'], 'status': queue.get('status'),
+                'generation':json.loads((root/'active.json').read_text())['queue'],
+                'examined_ids':sorted(r['evidence_id'] for r in queue.get('items',[])
+                                      if r.get('status')=='EXAMINED')}
     except (OSError, ValueError, KeyError, TypeError):
         return None
 
@@ -74,7 +77,7 @@ def stop_rule(ledger, cap):
     last = rounds[-1]
     if last['remaining'] <= 0 or last.get('queue_status') == 'COMPLETE':
         return 'ALL_EXCERPTS_READ'
-    if last['round'] >= 1 and last.get('new_examined', 1) <= 0:
+    if last['round'] >= 1 and last.get('new_examined', 1) is not None and last.get('new_examined', 1) <= 0:
         return 'NO_NEW_EXCERPTS_READ'
     continuation = [r for r in rounds if r['round'] >= 1]
     if last['round'] >= cap['max_rounds']:
@@ -95,17 +98,29 @@ def record(root, answer, round_number, analysis_path=None, env=None):
     ledger = load(root)
     rounds = [r for r in ledger['rounds'] if r['round'] != round_number]
     previous_supported = {cid for r in rounds for cid in r.get('supported_claim_ids', [])}
-    previous_examined = max([r['examined'] for r in rounds] or [0])
     previous_claims = {cid for r in rounds for cid in r.get('claim_ids', [])}
     funnel = answer.get('research_funnel') or {}
     counts = queue_counts(root)
     total = counts['total'] if counts else (funnel.get('collected') or {}).get('unique_excerpts', 0)
     examined = counts['examined'] if counts else (funnel.get('examined') or {}).get('excerpts', 0)
+    comparable=[r for r in rounds if counts and r.get('queue_generation')==counts['generation']
+                and isinstance(r.get('examined_evidence_ids'),list)]
+    if comparable:
+        previous_ids={eid for r in comparable for eid in r['examined_evidence_ids']}
+        new_examined=len(set(counts['examined_ids'])-previous_ids)
+    elif rounds:
+        # Legacy totals mix different filtering generations (259 -> 3 -> 121).
+        # A missing same-generation baseline is unknown, never zero progress.
+        new_examined=None
+    else:
+        new_examined=examined
     supported = supported_ids(answer)
     claims = claim_ids(answer)
     row = {'round': round_number, 'analysis_path': analysis_path, 'status': answer.get('status'),
            'total': total, 'examined': examined, 'remaining': max(0, total - examined),
-           'new_examined': max(0, examined - previous_examined),
+           'new_examined': new_examined,
+           'queue_generation':counts['generation'] if counts else None,
+           'examined_evidence_ids':counts['examined_ids'] if counts else None,
            'supported_claims': len(supported),
            'new_supported_claims': len(set(supported) - previous_supported),
            'supported_claim_ids': supported,

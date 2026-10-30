@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'tools/research_continuation.py'
+      - 'tools/research_shard_replay.py'
+      - 'tools/test_research_shard_replay.py'
       - 'tools/cited_work_acquisition.py'
       - 'tools/continue_citation_acquisition.py'
       - 'tools/test_research_continuation.py'
@@ -62,6 +64,8 @@ jobs:
         run: node server/command-center-live/learning-integration-test.js
       - name: Actual acquired PDF reading order and constrained response protocols
         run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=.:tools:tools/llm python3 -m unittest -v tools.test_acquired_analysis tools.test_source_acquisition_routes tools.test_research_response_schema tools.test_semantic_research_answer tools.test_claim_fidelity_guard tools.test_relevance_filter tools.test_research_continuation tools.test_surname_section_anchor tools.test_adjacent_sentence_identity
+      - name: Source-bound shard replay and continuation regressions
+        run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=.:tools:tools/llm python3 -m unittest tools.test_research_shard_replay tools.test_semantic_shards tools.test_research_continuation tools.test_excerpt_ranking_continuation tools.test_research_manual_resume tools.test_research_continuation_handoff
       - name: Actual image-only PDF OCR and bounding boxes
         run: |
           python3 -m pip install 'Pillow==12.0.0'
@@ -111,3 +115,4 @@ jobs:
           path: |
             /tmp/evidence-database-test.json
             /tmp/evidence-schema-request-test.json
+

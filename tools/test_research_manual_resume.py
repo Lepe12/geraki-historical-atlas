@@ -49,6 +49,24 @@ class ManualResumeTests(unittest.TestCase):
             self.run_request()
         self.dispatch.assert_not_called()
 
+    def test_saved_shards_dispatch_only_one_acquired_only_merge(self):
+        self.request.update(semantic_shards=1,skip_citation_acquisition=True,replay_shards_from='789')
+        result=self.run_request()
+        self.assertEqual(result['replay_shards_from'],'789')
+        command=self.dispatch.call_args.args[0]
+        self.assertIn('replay_shards_from=789',command)
+        self.assertIn('semantic_shards=1',command)
+        self.assertIn('skip_citation_acquisition=true',command)
+
+    def test_saved_shards_reject_arbitrary_paths_or_new_reading_requests(self):
+        self.request['replay_shards_from']='../789'
+        with self.assertRaisesRegex(ValueError,'NUMERIC_REPLAY_ANALYSIS_REQUIRED'):
+            self.run_request()
+        self.request['replay_shards_from']='789'
+        with self.assertRaisesRegex(ValueError,'SAVED_SHARD_REPLAY_REQUIRES_SINGLE_ACQUIRED_ONLY_MERGE'):
+            self.run_request()
+        self.dispatch.assert_not_called()
+
     def test_active_research_is_not_dispatched_twice(self):
         with self.assertRaisesRegex(ValueError, 'RESEARCH_ALREADY_RUNNING'):
             self.run_request(active={'789'})

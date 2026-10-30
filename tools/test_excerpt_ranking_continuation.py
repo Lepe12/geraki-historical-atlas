@@ -89,7 +89,8 @@ class RoundTests(unittest.TestCase):
 
     def queue(self, examined, total=398):
         status = 'COMPLETE' if examined >= total else 'PENDING'
-        (self.cont / 'g/queue.json').write_text(json.dumps({'total': total, 'completed': examined, 'status': status}))
+        (self.cont / 'g/queue.json').write_text(json.dumps({'total': total, 'completed': examined, 'status': status,
+            'items':[{'evidence_id':'e%d'%i,'status':'EXAMINED' if i<examined else 'PENDING'} for i in range(total)]}))
 
     def test_metrics_per_round(self):
         self.queue(8); record(self.root, answer(unsupported=['c1', 'c2']), 0, 'research_answer', self.env)
