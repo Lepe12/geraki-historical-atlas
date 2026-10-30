@@ -22,8 +22,6 @@
 <radialGradient id="nxEmBrass" cx=".38" cy=".3"><stop offset="0" stop-color="#f4dc98"/><stop offset=".55" stop-color="#b48d45"/><stop offset="1" stop-color="#6e5222"/></radialGradient>
 <radialGradient id="nxEmRust" cx=".38" cy=".3"><stop offset="0" stop-color="#c9624a"/><stop offset=".55" stop-color="#8e231b"/><stop offset="1" stop-color="#4f0f0b"/></radialGradient>
 <symbol id="nxFleur" viewBox="0 0 10 10"><path d="M5 .2C6.4 1.6 6.5 3.5 5.6 5.3V6.3H4.4V5.3C3.5 3.5 3.6 1.6 5 .2Z"/><path d="M4.3 6.4C3.7 4.4 1.7 3.5.6 4.6-.3 5.6.6 7.2 1.9 6.6 1.7 7.9 3 8.3 4.3 7.4Z"/><path d="M5.7 6.4C6.3 4.4 8.3 3.5 9.4 4.6 10.3 5.6 9.4 7.2 8.1 6.6 8.3 7.9 7 8.3 5.7 7.4Z"/><rect x="2.9" y="6.2" width="4.2" height="1.2" rx=".3"/><path d="M4.4 7.4 5 9.9 5.6 7.4Z"/></symbol>
-<symbol id="nxEagleHalf" viewBox="0 0 24 24"><path d="M12 7.2C12.9 5.6 14 4.6 15.1 4.3 15.4 3.1 16.6 2.6 17.5 3.2L19.4 3.3 17.9 4.3C18 5.4 17.2 6.1 16.3 6.1 15.3 6.4 14.5 7.5 14.1 9 15.7 8.1 17.6 7.2 19.6 6.6 21.1 6.2 22.7 6.4 23.7 7.2 22.7 7.6 22.9 8.4 23.7 8.9 22.5 9.4 22.5 10.2 23.3 10.8 22 11.2 21.7 12 22.3 12.7 20.7 12.9 20 13.6 20.1 14.5 18.5 14.3 16.7 14.4 15.1 15 14.7 16.2 14.7 17.3 15.3 18.4L17.7 21.6 15.5 21.2 15.3 23 13.5 20.6 12 22.8Z"/></symbol>
-<symbol id="nxEagle" viewBox="0 0 24 24"><use href="#nxEagleHalf" width="24" height="24"/><use href="#nxEagleHalf" width="24" height="24" transform="translate(24 0) scale(-1 1)"/></symbol>
 <symbol id="nxKey" viewBox="0 0 6 24"><circle cx="3" cy="19.6" r="2.3" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="2.35" y="2.2" width="1.3" height="15.2"/><rect x="3.4" y="2.4" width="2.3" height="1.3"/><rect x="3.4" y="4.8" width="2.3" height="1.3"/><rect x="4.6" y="3.4" width="1.1" height="1.6"/></symbol>
 <symbol id="nxShip" viewBox="0 0 24 24"><path d="M2.6 15.2H21.6L19.4 19.4H5.6Z"/><path d="M16.2 12.8H21.4V15.2H16.2ZM2.6 13.6H6V15.2H2.6Z"/><path d="M8.4 3.2V15.2M13.2 2V15.2M18.2 5.2V12.8" stroke="currentColor" stroke-width=".8"/><path d="M5.4 5.4C7.4 5 9.4 5 11.4 5.4 11.8 7.4 11.6 9.4 11 11.4 9.2 11 7.2 11 5.2 11.4 5.8 9.4 5.8 7.4 5.4 5.4ZM10.2 3.8C12 3.4 14.4 3.4 16.2 3.8 16.6 6.4 16.4 9.2 15.8 11.8 14 11.4 12 11.4 10 11.8 10.6 9.2 10.6 6.4 10.2 3.8ZM16.4 6.6C17.6 6.4 19.2 6.4 20.4 6.6 20.6 8.2 20.4 9.8 20 11.2 18.8 11 17.6 11 16.2 11.2 16.8 9.8 16.8 8.2 16.4 6.6Z" fill="${PARCH}" stroke="currentColor" stroke-width=".6"/><path d="M13.2 2 15.8 1.2 13.2.6" fill="${RED}"/></symbol>
 </defs></svg>`;
@@ -82,20 +80,26 @@
   const barbary = banner({ field: RED, cloth: `<path d="${CLOTH}" transform="translate(20 31) scale(.8 .84) translate(-20 -31)" fill="${GREEN}"/>`,
     charge: `<g transform="translate(20 31.5) rotate(-90) scale(1.25) translate(-18 -13)"><path d="M10.5 12.2 28 11.4 31.4 9.2 29.2 13 31.4 16.8 28 14.6 10.5 13.8Z" fill="${WHITE}" stroke="${INK}" stroke-width=".5"/>` +
     `<rect x="8.8" y="9.4" width="1.7" height="7.2" rx=".5" fill="${GOLD}" stroke="${INK}" stroke-width=".3"/><rect x="5.6" y="12.1" width="3.3" height="1.8" rx=".7" fill="${GOLD}" stroke="${INK}" stroke-width=".3"/></g>` });
-  // Lion of St Mark, winged and haloed, striding (andante), in gold on red; drawn large so it fills the cloth
-  const LION = `<g transform="translate(7 12) scale(0.095)" stroke-linejoin="round"><g transform="translate(-26 -50) scale(1.38)"><circle cx="62" cy="128" r="46" fill="#f6dc8e" fill-opacity=".22" stroke="#d9b057" stroke-width="5"/><circle cx="62" cy="128" r="48.5" fill="none" stroke="#4a2208" stroke-width="1.2"/></g><path d="M236 200C262 186 266 156 250 136C240 124 244 104 256 98" fill="none" stroke="#4a2208" stroke-width="12" stroke-linecap="round"/><path d="M236 200C262 186 266 156 250 136C240 124 244 104 256 98" fill="none" stroke="#d9b057" stroke-width="7" stroke-linecap="round"/><path d="M256 98C250 88 254 78 262 74C260 84 268 86 272 80C272 92 266 100 256 98Z" fill="#d9b057" stroke="#4a2208" stroke-width="3"/><path d="M95 165C130 170 175 168 205 166C232 164 246 186 242 212C240 228 232 236 226 242C230 262 232 290 238 306C246 312 252 318 250 326H216C214 316 212 300 208 284C204 270 198 262 190 258C192 280 194 300 200 312C206 318 206 324 204 327H170C170 316 168 300 164 280C162 270 160 264 156 262C140 266 122 266 108 260C108 280 110 300 116 312C122 318 124 324 120 327H88C88 316 86 296 84 276C82 266 80 260 78 256C70 262 60 268 50 274C40 280 34 284 32 290C30 296 22 298 16 296C12 294 12 286 18 282C22 276 30 272 38 266C46 258 52 250 56 240C58 222 64 200 72 186Z" fill="#d9b057" stroke="#4a2208" stroke-width="3.2"/><path d="M118 246Q142 254 160 248M198 240Q216 230 222 210M96 200Q88 226 94 248M226 242Q214 250 208 270" fill="none" stroke="#4a2208" stroke-width="2.4" stroke-linecap="round"/><path d="M228 318L230 326M240 318L240 326M182 318L184 327M194 318L193 327M98 318L99 327M110 318L109 327M22 286L24 296" stroke="#4a2208" stroke-width="2"/><path d="M112 182C108 128 148 62 228 16C226 40 220 54 210 62C220 70 214 84 202 86C210 96 203 108 192 109C198 120 190 130 179 130C184 142 176 152 166 152C169 163 162 172 152 176C140 182 124 186 112 182Z" fill="#f6dc8e" stroke="#4a2208" stroke-width="3.2"/><path d="M120 176C140 140 170 100 210 62M126 178C146 150 172 118 202 86M134 180C152 158 172 136 192 109M142 180C158 166 170 150 179 130M150 178C158 172 162 164 166 152M118 150C138 120 168 80 220 34" fill="none" stroke="#4a2208" stroke-width="1.8" stroke-linecap="round"/><g transform="translate(-26 -50) scale(1.38)"><path d="M43 155Q20 153 38 142Q19 130 40 128Q28 108 47 116Q46 93 59 109Q69 88 73 108Q91 94 86 114Q109 109 95 125Q118 131 98 139Q115 155 94 152Q103 174 85 163Q82 186 72 168Q59 187 58 166Z" fill="#c08f3a" stroke="#4a2208" stroke-width="2.4"/><path d="M49 145Q41 150 31 147M48 136Q39 136 31 129M51 127Q43 123 39 113M58 120Q53 114 54 103M67 118Q65 109 71 100M77 120Q79 111 88 106M84 126Q90 119 101 119M88 134Q96 131 106 136M87 144Q96 145 103 153M82 152Q90 157 92 167M75 157Q79 165 76 175M65 158Q66 167 58 175" fill="none" stroke="#4a2208" stroke-width="1.4" stroke-linecap="round"/><path d="M80 112C82 102 90 98 96 102C96 110 90 116 82 118Z" fill="#d9b057" stroke="#4a2208" stroke-width="2.2"/><path d="M82 116C70 108 52 110 40 120L26 128C20 132 20 140 25 143L30 147C27 153 32 160 41 160C54 162 68 158 80 148C88 138 88 124 82 116Z" fill="#d9b057" stroke="#4a2208" stroke-width="2.4"/><path d="M44 126Q51 121 58 126Q51 129 44 126Z" fill="#4a2208"/><path d="M40 121Q50 115 62 121" fill="none" stroke="#4a2208" stroke-width="2.4" stroke-linecap="round"/><path d="M22 132Q27 129 30 133Q26 137 22 135Z" fill="#4a2208"/><path d="M27 146Q36 145 44 150M30 147L36 152" fill="none" stroke="#4a2208" stroke-width="2.2" stroke-linecap="round"/><path d="M62 134Q60 146 50 152" fill="none" stroke="#4a2208" stroke-width="1.6"/></g></g>`;
-  const venice = banner({ field: RED, charge: LION });
+  // Lion of St Mark: the winged, haloed lion with the open book, cut out of the approved generated Venice banner sample
+  // (assets/nautical/emblems/venice_lion_st_mark.webp, see CREDITS.md), in gold on Venetian red
+  const RASTER = {
+    lion: "./assets/nautical/emblems/venice_lion_st_mark.webp",
+    eagleGold: "./assets/nautical/emblems/double_eagle_gold.webp",
+    eagleBlack: "./assets/nautical/emblems/double_eagle_black.webp",
+  };
+  const raster = (key, x, y, w, h) => `<image href="${RASTER[key]}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid meet"/>`;
+  const venice = banner({ field: RED, charge: raster("lion", 6.4, 15.2, 27.2, 25.2) });
   // Royal arms of France: three gold fleurs-de-lis on blue (2 and 1)
   const france = banner({ field: BLUE, charge: inShield([[6, 5.5], [16, 5.5], [11, 16]].map(([x, y]) => `<use href="#nxFleur" x="${x}" y="${y}" width="8" height="8" fill="${GOLD}"/>`).join(""), 1.32) });
-  // Holy Roman Empire: black double-headed eagle on gold
-  const hre = banner({ field: "#d9ad4a", charge: inShield(`<use href="#nxEagle" x="3" y="6" width="24" height="22" fill="${INK}"/>`, 1.38) });
+  // Holy Roman Empire: black double-headed eagle (crowned) on gold — generated eagle artwork recoloured black, crown kept gold
+  const hre = banner({ field: "#d9ad4a", charge: raster("eagleBlack", 6.6, 11.6, 26.8, 26.8) });
   // Papal States / Rome: crossed keys, gold and silver, on white; each key outlined in ink so the silver one reads on white
   const key = (rot, fill) => `<g transform="rotate(${rot} 20 28.4)"><g transform="translate(20 28.4) scale(.98) translate(-20 -29.7)">` +
     `<path d="M18.6 13.4H21.4V38.6H18.6ZM21.4 13.8H25.6V16.2H21.4ZM21.4 18.2H25.6V20.6H21.4ZM23.4 16.2H25.6V18.2H23.4Z" fill="${fill}" stroke="${INK}" stroke-width=".55" stroke-linejoin="round"/>` +
     `<path d="M20 37.2A4.4 4.4 0 1 1 20 46 4.4 4.4 0 1 1 20 37.2ZM20 39.6A2 2 0 1 0 20 43.6 2 2 0 1 0 20 39.6Z" fill="${fill}" fill-rule="evenodd" stroke="${INK}" stroke-width=".55"/></g></g>`;
   const papal = banner({ field: WHITE, charge: key(32, "url(#nxBnGold)") + key(-32, "url(#nxBnSilver)") });
-  // Greek lane: double-headed eagle of the Ecumenical Patriarchate (Byzantine tradition) — gold on dark red; no state is invented
-  const greek = banner({ field: OX, charge: inShield(`<use href="#nxEagle" x="3" y="6" width="24" height="22" fill="${GOLD}" stroke="#5a3a10" stroke-width=".3"/>`, 1.38) });
+  // Greek lane: crowned double-headed eagle (Byzantine tradition, Ecumenical Patriarchate) — gold on dark red; no state is invented
+  const greek = banner({ field: OX, charge: raster("eagleGold", 6.6, 11.6, 26.8, 26.8) });
   // non-state lanes keep their 2D medallion, on a deep sea-green cloth
   const SEA = "#2c5446";
   const ship = banner({ field: SEA, charge: medal("url(#nxEmRust)", `<use href="#nxShip" x="5" y="5" width="22" height="22"/><path d="M6 22.6C9 21.6 11 23.6 14 22.6S19 21.6 26 22.6" fill="none" stroke-width=".8"/>`) });
@@ -130,7 +134,14 @@
       } catch (e) { console.warn("emblems: tughra", e); }
       done();
     };
-    const go = () => { mountDefs(); fetch("./assets/nautical/emblems/tughra_murad_iii.svg").then((r) => r.ok ? r.text() : "").then(add, () => done()); };
+    // the raster charges are inlined as data: URLs once loaded, so the SVG stays self-contained (the 3D map draws it
+    // as an <img>, which cannot fetch external files); until then the 2D map shows them from their file
+    const toData = (url) => fetch(url).then((r) => r.ok ? r.blob() : null).then((b) => b && new Promise((ok) => { const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.onerror = () => ok(null); fr.readAsDataURL(b); })).catch(() => null);
+    const inline = () => Promise.all(Object.values(RASTER).map((url) => toData(url).then((data) => {
+      if (!data) return;
+      for (const em of new Set([...Object.values(map), fallback])) em.svg = em.svg.split(`href="${url}"`).join(`href="${data}"`);
+    })));
+    const go = () => { mountDefs(); Promise.all([fetch("./assets/nautical/emblems/tughra_murad_iii.svg").then((r) => r.ok ? r.text() : "").catch(() => ""), inline()]).then(([t]) => add(t), () => done()); };
     if (document.body) go(); else document.addEventListener("DOMContentLoaded", go);
   });
   window.NABOU_EMBLEMS = { get: (id) => map[id] || fallback, ids: Object.keys(map), ready };
