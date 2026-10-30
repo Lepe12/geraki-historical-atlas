@@ -23,11 +23,12 @@ function seaSpot(api) {
   return null;
 }
 
-const MODEL = "./assets/nautical/models/galleon.glb";
+const MODEL = "./assets/nautical/models/galleon.glb?v=meshopt-1";
 const WATERLINE_M = 2.6, LENGTH_M = 29.85; // from the model's manifest: waterline 2.6 m above the keel, 29.85 m long
 
 function loadGalleon(T, bob) {
-  return import("./vendor/three/GLTFLoader.js").then(({ GLTFLoader }) => new GLTFLoader().loadAsync(MODEL)).then((gltf) => {
+  return Promise.all([import("./vendor/three/GLTFLoader.js"), import("./vendor/three/meshopt_decoder.module.js")])
+    .then(([{ GLTFLoader }, { MeshoptDecoder }]) => new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(MODEL)).then((gltf) => {
     const m = gltf.scene;
     const box = new T.Box3().setFromObject(m), size = box.getSize(new T.Vector3());
     const len = Math.max(size.x, size.z), k = LEN / len;
