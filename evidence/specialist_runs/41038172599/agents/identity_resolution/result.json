@@ -1,0 +1,3049 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "identity_resolution",
+  "label": "Identity Resolution Agent",
+  "assignment_id": "identity_resolution:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "entity_candidates",
+    "variant_names",
+    "same_entity_assessment",
+    "collision_warnings"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "b23bdf875f8dec24befbcd8fa6cd0cb7a9be55213a4b69d3a28536c60be688ab",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "identity_resolution",
+    "assignment_id": "identity_resolution:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:SearchCulture.gr / EKT",
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:OpenArchives.gr / EKT"
+    ],
+    "queries": [
+      "\"Hugues Creveliers\"",
+      "\"Creveliers\"",
+      "\"Crevelier\"",
+      "\"Κρεβελιέ\"",
+      "\"Crevelier\" history"
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 130,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 102,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Hugues Creveliers\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Hugues+Creveliers+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Hugues+Creveliers+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 613, \"response_sha256\": \"3964e6c438514fca8e30d64c1f8227e48a2d791f8641ea9d99376014a34d39a8\", \"elapsed_ms\": 891}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Hugues+Creveliers+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κρεβελιέ\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%AD%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%AD%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1080}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%AD%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Hugues Creveliers\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Hugues+Creveliers%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Hugues+Creveliers%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1083}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Hugues+Creveliers%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Crevelier\" history",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Crevelier%22+history\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Crevelier%22+history\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1081}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Crevelier%22+history\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Creveliers\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Creveliers%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Creveliers%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1106}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Creveliers%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Crevelier\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Crevelier%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Crevelier%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1107}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22Crevelier%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Crevelier\" history",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Crevelier++history%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Crevelier++history%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 613, \"response_sha256\": \"1bf436ab41f72992df33f42a505e19e2d0b51e0fd2c66fb48acebbb321ffb231\", \"elapsed_ms\": 597}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Crevelier++history%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Creveliers\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Creveliers%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22Creveliers%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25525, \"response_sha256\": \"7746b3d9d83eb6bc15b7d122a7be81f089003105082382a4b49244ab5365ef12\", \"elapsed_ms\": 577}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22Creveliers%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Creveliers\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Creveliers+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Creveliers+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 606, \"response_sha256\": \"537355a4ad8bb2c2fbf01ede078d29f8fd0afece9d90560e0b217f24400f4941\", \"elapsed_ms\": 791}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Creveliers+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κρεβελιέ\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%AD+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%AD+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 612, \"response_sha256\": \"96384eafb57b45bd8b3451b47e562d0b44efcb5936391c1fa2050c5c23292f73\", \"elapsed_ms\": 612}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%AD+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κρεβελιέ\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%AD%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%AD%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25577, \"response_sha256\": \"7647f188084620f500ba58987596a502df6a4750f20fdf4bb4da80d5945e9985\", \"elapsed_ms\": 160}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%AD%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Crevelier\" history",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Crevelier%22+history&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22Crevelier%22+history&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25537, \"response_sha256\": \"c6eaa5d6097f3c23be7abc1446776396c77d3d0f79d64e421a66879680a3d017\", \"elapsed_ms\": 160}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22Crevelier%22+history&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Crevelier\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Crevelier%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22Crevelier%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 31568, \"response_sha256\": \"c962a29925e5898d8ebbf90e40a369cda78a842446c75ed02f6187ea23cf094b\", \"elapsed_ms\": 167}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22Crevelier%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κρεβελιέ\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%AD%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%AD%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 67060, \"response_sha256\": \"1cb541790e953d3136a9a2d381e2211fbe4340ee471bddd7d7256afaee2df3bd\", \"elapsed_ms\": 781}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CF%81%CE%B5%CE%B2%CE%B5%CE%BB%CE%B9%CE%AD%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Creveliers\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18865",
+          "title": "Με αφορμή τον θάνατο του Creveliers στην Αστυπάλαια. Ο ρόλος του νησιού στις καταδρομικές επιχειρήσεις των καθολικών κουρσάρων κατά τον 17ο αιώνα Occasioned by the death of Creveliers off Astypalaia: The island's role in the raids by Catholic corsairs during the 17th century",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18865"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Creveliers%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Creveliers%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 114695, \"response_sha256\": \"46e90d0960dc4e2f66ee434dfea7934b9f3dc1d28722a334cdbbf0c7f6b26bb3\", \"elapsed_ms\": 1023}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Creveliers%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 1, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Hugues Creveliers\"",
+      "records": [
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/908/thesaurus-di-internet-culturale",
+          "title": "Mappa del thesauro",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/908/thesaurus-di-internet-culturale"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1/home",
+          "title": "Home",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1/home"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/76/itinerari",
+          "title": "Itinerari",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/76/itinerari"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/75/mostre",
+          "title": "Mostre",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/75/mostre"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/938/video",
+          "title": "Video",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/938/video"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1038/biblioteca-digitale-italiana",
+          "title": "la BDI",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1038/biblioteca-digitale-italiana"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1048/guida-alla-consultazione",
+          "title": "Guida alla consultazione",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1048/guida-alla-consultazione"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/41/collezioni-digitali",
+          "title": "Collezioni digitali",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/41/collezioni-digitali"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/64/partner",
+          "title": "Partner",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/64/partner"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1114/repositories",
+          "title": "Repositories",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1114/repositories"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/767/manoscritti",
+          "title": "Manoscritti",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/767/manoscritti"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/773/libri",
+          "title": "Libri",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/773/libri"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/825/spartiti",
+          "title": "Spartiti",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/825/spartiti"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/770/carte-geografiche",
+          "title": "Carte geografiche",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/770/carte-geografiche"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/771/immagini",
+          "title": "Immagini",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/771/immagini"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/772/registrazioni-sonore",
+          "title": "Registrazioni sonore",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/772/registrazioni-sonore"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana",
+          "title": "Emeroteca digitale italiana",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=2&paginate_pageNum=1",
+          "title": "Musica",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=2&paginate_pageNum=1"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=3",
+          "title": "Newspaper",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=3"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/753/remi",
+          "title": "Rete della Musica Italiana",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/753/remi"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1120/chi-siamo",
+          "title": "Chi siamo",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1120/chi-siamo"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/15/termini-d-uso",
+          "title": "Termini d'uso",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/15/termini-d-uso"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1227/i-progetti",
+          "title": "I Progetti",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1227/i-progetti"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1000/statistiche",
+          "title": "Statistiche",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1000/statistiche"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/999/scrivi-a",
+          "title": "Scrivi a",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/999/scrivi-a"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22Hugues+Creveliers%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22Hugues+Creveliers%22&instance=magindice&pag=1\", \"content_type\": \"text/html; charset=UTF-8\", \"response_bytes\": 23306, \"response_sha256\": \"83e5b975925a8062e3ecfa61e6f70b8e277193197f2f416523202258417675b3\", \"elapsed_ms\": 1777}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22Hugues+Creveliers%22&instance=magindice&pag=1\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Crevelier\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18865",
+          "title": "Με αφορμή τον θάνατο του Creveliers στην Αστυπάλαια. Ο ρόλος του νησιού στις καταδρομικές επιχειρήσεις των καθολικών κουρσάρων κατά τον 17ο αιώνα Occasioned by the death of Creveliers off Astypalaia: The island's role in the raids by Catholic corsairs during the 17th century",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18865"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Crevelier%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Crevelier%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 114693, \"response_sha256\": \"0cacee8804595fceb1107de635363fba73e90c9fa815fff7425c0172d6e1f04c\", \"elapsed_ms\": 1031}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Crevelier%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 1, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Hugues Creveliers\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18865",
+          "title": "Με αφορμή τον θάνατο του Creveliers στην Αστυπάλαια. Ο ρόλος του νησιού στις καταδρομικές επιχειρήσεις των καθολικών κουρσάρων κατά τον 17ο αιώνα Occasioned by the death of Creveliers off Astypalaia: The island's role in the raids by Catholic corsairs during the 17th century",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18865"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_28809",
+          "title": "Voyage de la Grece",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_28809"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_28808",
+          "title": "Histoire de la regeneration de la Grece : comprenant le precis des evenements depuis 1740 jusqu'en 1824,v.3",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_28808"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_28937",
+          "title": "Optical fiber communications/National fiber optic engineers conference 2009",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_28937"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_28903",
+          "title": "Field Experiments With a Grooming Switch for OTDM Meshed Networking",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_28903"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_430",
+          "title": "Πρόβλεψη παραμόρφωσης των μαλακών ιστών για σχεδιασμό χειρουργικής προσώπου Soft-tissue deformation prediction for maxillo-facial surgical planning",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_430"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-307493",
+          "title": "WDM routing for edge data centers and disaggregated computing",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-307493"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-226466",
+          "title": "(Committee for Advanced Therapies (CAT), CAT Scientific Secretariat), Challenges with advanced therapy medicinal products and how to meet them",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-226466"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_3378",
+          "title": "Απεικόνιση κοκκίδωσης λέιζερ : χωρο-χρονική βελτίωση εικόνας Laser speckle imaging : spatio-temporal image enhancement",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_3378"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-295103",
+          "title": "Genome-wide association analysis identifies TXNRD2, ATXN2 and FOXC1 as susceptibility loci for primary open-angle glaucoma: Letter",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-295103"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_26569",
+          "title": "Απεικόνιση κοκκίδωσης λέιζερ: χωρο-χρονική βελτίωση εικόνας Laser speckle imaging: spatio-temporal image enhancement",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_26569"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3161657",
+          "title": "Genome-wide association study identifies 25 known breast cancer susceptibility loci as risk factors for triple-negative breast cancer",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3161657"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_49946",
+          "title": "Multi-scale modelling and experimental analysis of ALD alumina: Interplay of process dynamics, chemistry and interfacial phenomena",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_49946"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_6072",
+          "title": "Τα \"Πιστοποιητικά Προέλευσης\" (Certificat's de Origine) των εμπορευμάτων ως πηγή της οικονομικής ιστορίας του Πασαλικίου Ιωαννίνων (1811-1814)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_6072"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3155948",
+          "title": "Underlying Event measurements in pp collisions at root s=0.9 and 7 TeV with the ALICE experiment at the LHC",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3155948"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3154375",
+          "title": "Measurement of prompt J/psi and beauty hadron production cross sections at mid-rapidity in pp collisions at root s=7 TeV",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3154375"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Hugues+Creveliers%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Hugues+Creveliers%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 328121, \"response_sha256\": \"98d1de55d55363cbab0ffb9c731acbcaf9acdcf0cd45e94b116eb326545c033e\", \"elapsed_ms\": 2315}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Hugues+Creveliers%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 16, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Crevelier\"",
+      "records": [
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb43446724s",
+          "title": "L'élixir de tante Ermolina / Liliane Korb et Laurence Lefèvre ; Illustrations de Solvej Crévelier",
+          "creator": [
+            "Korb, Liliane. Auteur du texte",
+            "Lefèvre, Laurence. Auteur du texte"
+          ],
+          "date": [
+            "1998"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb43446724s",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb43446724s",
+            "ISBN 2081644045"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb35747460r",
+          "title": "Un arbre / France Guillain ; ill. de Solvej Crévelier",
+          "creator": [
+            "Guillain, France (1942-....). Auteur du texte"
+          ],
+          "date": [
+            "1995"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb35747460r",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb35747460r",
+            "ISBN 2081629887"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb34740353c",
+          "title": "Les Tambours de la nuit / Nicole Ciravegna ; illustrations de Solveg Crévelier",
+          "creator": [
+            "Ciravégna, Nicole (1925-2011). Auteur du texte"
+          ],
+          "date": [
+            "1982"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb34740353c",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb34740353c",
+            "ISBN 221099103X"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb349085808",
+          "title": "Pas de bruit, Julie / Hélène Ray, Solvej Crévelier",
+          "creator": [
+            "Crévelier, Solvej (1947-....). Auteur du texte",
+            "Ray, Hélène. Auteur du texte"
+          ],
+          "date": [
+            "1987"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb349085808",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb349085808",
+            "ISBN 2040167862"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb348796655",
+          "title": "Un Tigre dans la théière / Betty Yurdin ; ill. de Solvej Crévelier",
+          "creator": [
+            "Yurdin, Betty. Auteur du texte"
+          ],
+          "date": [
+            "1986"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb348796655",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb348796655",
+            "ISBN 2081625164"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb35574891p",
+          "title": "Petit froid, grand froid / France Guillain ; ill. de Solvej Crévelier",
+          "creator": [
+            "Guillain, France (1942-....). Auteur du texte"
+          ],
+          "date": [
+            "1993"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb35574891p",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb35574891p",
+            "ISBN 2081626039"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb358088268",
+          "title": "L'année rase-bitume / Philippe Barbeau ; ill. de Solvej Crévelier",
+          "creator": [
+            "Barbeau, Philippe (1952-....). Auteur du texte"
+          ],
+          "date": [
+            "1996"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb358088268",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb358088268",
+            "ISBN 2081641453"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb358305175",
+          "title": "L'odeur de la mer / Philippe Barbeau ; ill. de Solvej Crévelier",
+          "creator": [
+            "Barbeau, Philippe (1952-....). Auteur du texte"
+          ],
+          "date": [
+            "1996"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb358305175",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb358305175",
+            "ISBN 2724295412"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb347821387",
+          "title": "Peur, pas peur / texte de Jeanne-Marie Pubellier, images de Solvej Crévelier",
+          "creator": [
+            "Pubellier, Jeanne Marie (1933-....). Auteur du texte"
+          ],
+          "date": [
+            "1985"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb347821387",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb347821387",
+            "ISBN 2081627124"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb34911940n",
+          "title": "La Reine de l'île / Anne-Marie Pol ; ill. de Solvej Crévelier",
+          "creator": [
+            "Pol, Anne-Marie. Auteur du texte"
+          ],
+          "date": [
+            "1986"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb34911940n",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb34911940n",
+            "ISBN 2081618532"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb35574881c",
+          "title": "De toutes les couleurs / France Guillain ; ill. de Solvej Crévelier",
+          "creator": [
+            "Guillain, France (1942-....). Auteur du texte"
+          ],
+          "date": [
+            "1993"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb35574881c",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb35574881c",
+            "ISBN 2081626020"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb358140416",
+          "title": "Une maison, ma maison / France Guillain ; ill. de Solvej Crévelier",
+          "creator": [
+            "Guillain, France (1942-....). Auteur du texte"
+          ],
+          "date": [
+            "1996"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb358140416",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb358140416",
+            "ISBN 2081628066"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb349994536",
+          "title": "Les Manèges de la vie : [nouvelles] / Andrée Chedid ; ill. de Solvej Crévelier",
+          "creator": [
+            "Chedid, Andrée (1920-2011). Auteur du texte"
+          ],
+          "date": [
+            "1989"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb349994536",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb349994536",
+            "ISBN 2081619849"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb34638704t",
+          "title": "Viron, virette : comptine / illustrée par Solvej Crévelier",
+          "creator": [],
+          "date": [
+            "1979"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb34638704t",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb34638704t",
+            "ISBN 2859360158"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb354767446",
+          "title": "Voyage d'un nuage / texte de France Guillain ; ill. de Solvej Crévelier",
+          "creator": [
+            "Guillain, France (1942-....). Auteur du texte"
+          ],
+          "date": [
+            "1991"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb354767446",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb354767446",
+            "ISBN 2081629119"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb35574894q",
+          "title": "Un fruit / texte de France Guillain ; ill. de Solvej Crévelier",
+          "creator": [
+            "Guillain, France (1942-....). Auteur du texte"
+          ],
+          "date": [
+            "1993"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb35574894q",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb35574894q",
+            "ISBN 2081626063"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb355301344",
+          "title": "Les tambours de la nuit / Nicole Ciravegna... ; ill... de Solveg Crèvelier",
+          "creator": [
+            "Ciravégna, Nicole (1925-2011). Auteur du texte"
+          ],
+          "date": [
+            "1991"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb355301344",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb355301344",
+            "ISBN 2210988047"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb35003807d",
+          "title": "Le Cartable à moteur / texte de Jean-Pierre Fily ; ill. par Solvej Crevelier",
+          "creator": [
+            "Fily, Jean-Pierre (1953-....). Auteur du texte"
+          ],
+          "date": [
+            "1987"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb35003807d",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb35003807d",
+            "ISBN 2244011070"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb35574887f",
+          "title": "Couché dans l'herbe / France Guillain ; ill. de Solvej Crévelier",
+          "creator": [
+            "Guillain, France (1942-....). Auteur du texte"
+          ],
+          "date": [
+            "1993"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb35574887f",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb35574887f",
+            "ISBN 2081626012"
+          ]
+        },
+        {
+          "discovery_repository": "BnF General Catalogue",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "http://catalogue.bnf.fr/ark:/12148/cb35574897r",
+          "title": "Voyage d'un nuage / France Guillain ; ill. de Solvej Crévelier",
+          "creator": [
+            "Guillain, France (1942-....). Auteur du texte"
+          ],
+          "date": [
+            "1993"
+          ],
+          "url": "http://catalogue.bnf.fr/ark:/12148/cb35574897r",
+          "identifiers": [
+            "http://catalogue.bnf.fr/ark:/12148/cb35574897r",
+            "ISBN 208162611X"
+          ]
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Crevelier+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Crevelier+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 35467, \"response_sha256\": \"26fbc016a17309ab0624ffeb8bb829f609ac628b13ab9f266973cc18c4002a18\", \"elapsed_ms\": 3324}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+Crevelier+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 20, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Crevelier\" history",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18865",
+          "title": "Με αφορμή τον θάνατο του Creveliers στην Αστυπάλαια. Ο ρόλος του νησιού στις καταδρομικές επιχειρήσεις των καθολικών κουρσάρων κατά τον 17ο αιώνα Occasioned by the death of Creveliers off Astypalaia: The island's role in the raids by Catholic corsairs during the 17th century",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18865"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8760",
+          "title": "“Απόψε θα γίνει Ταϊλάνδη”: Η ερμηνεία ενός “εξωτικού” συνθήματος της εξέγερσης του Πολυτεχνείου “Tonight will be Thailand”: Interpretation of an “exotic” slogan of the Polytechnic Uprising (eng)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8760"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_15700",
+          "title": "Θαλάσσιο εμπόριο στη βενετοκρατούμενη Κέρκυρα (1496-1538) Maritime trade in venetian ruled Corfu (1496-1538)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_15700"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8762",
+          "title": "Γεώργιος Παπαδόπουλος, Τάγματα Ασφαλείας και “Χ”: Μια απόπειρα συγκέντρωσης και επανεκτίμησης του παλαιότερου και νεότερου τεκμηριωτικού υλικού Georgios Papadopoulos: Security Battalions and “X”: An attempt to gather and reevaluate earlier and more recent evidence (gre)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8762"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8787",
+          "title": "A Century of Revolutions: The Cretan Question between European and Near East Politics",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8787"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8700",
+          "title": "Η Κρήτη μεταξύ δύο επαναστάσεων (1829-1869) Crete between two revolutions (1829-1869) (eng)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8700"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_15342",
+          "title": "Κατάλογος των Παλαιών Εντύπων της Δημοτικής Βιβλιοθήκης Τυρνάβου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_15342"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8699",
+          "title": "Το άρμα που έμεινε στην ιστορία The Armored Tank that remained in History (eng)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8699"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8782",
+          "title": "Πολυτεχνείο '73: Το ζήτημα των θυμάτων: Νεκροί και τραυματίες Polytechnic School '73: The question of the victims: dead and injured (eng)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8782"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8770",
+          "title": "Ο θάνατος ενός ταξίαρχου The Death of a Brigadier (gre)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8770"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8772",
+          "title": "Σαράντα χρόνια από τη γένεση του Κινήματος για την Ελεύθερη Έκφραση: Πανεπιστήμιο Berkeley, 1-2 Οκτωβρίου 1964 Forty years since the birth of the Free Speech Movement: University of Berkeley, 1-2 October 1964 (eng)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8772"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8784",
+          "title": "Επταετία: Σοβαρό έλλειμα στην ιστορική έρευνα Dictatorship: A Serious Gap In Historical Research (eng)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8784"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_14046",
+          "title": "Opramoas",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_14046"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8795",
+          "title": "Τα «βρεσίματα» και τα «τζακίσματα» στο Αιγαίο: μέ αφορμή ένα περιστατικό του 17ου αιώνα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8795"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8688",
+          "title": "Το “σαμποτάζ” του Έβρου χωρίς ζάχαρη: Μια απόπειρα αναψηλάφησης The Evros' “sabotage” minus the sugar: An attempt of reinvestigation",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8688"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8757",
+          "title": "Η Μάχη της Κρήτης μέσα από τις σελίδες του απόρρητου προσωπικού ημερολογίου του Γερμανού υπουργού προπαγάνδας Joseph Goebbels The battle of Crete according to German Minister of Propaganda Joseph Goebbels' secret diary (eng)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8757"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_14368",
+          "title": "Ο Ελληνικός Κόσμος ιδωμένος από τους Ταξιδιώτες (15ος-αρχές 20ού αι.): Ιστορικό Σημείωμα The Greek world as seen by Travellers 15th - 20th centuries: Historical Introduction",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_14368"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_16693",
+          "title": "Η διοίκηση του Αγίου Όρους: 1600-1927: σύντομη ιστορική επισκόπηση The administration of Mount Athos: 1600-1927: a brief historical survey",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_16693"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_3896",
+          "title": "Κατάλογος των κωδίκων της Δημοτικής Βιβλιοθήκης Τυρνάβου Catalogue of manuscripts of the Tyrnavos Municipal Library",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_3896"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/elocus/000018-dlib_0_c_d_metadata-dlib-c26fc2bc81db3f69e0e1e93ab54bd579_1248161989.tkl",
+          "title": "Από τους μετακινούμενους κτηνοτρόφους στους \"κλεφταρματολούς\" : όψεις της εξέλιξης και ιστοριογραφικές αναγνώσεις του θεσμού",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/elocus/000018-dlib_0_c_d_metadata-dlib-c26fc2bc81db3f69e0e1e93ab54bd579_1248161989.tkl"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8890",
+          "title": "Ήχοι και απόηχοι: Κοινωνική ιστορία του ροκ εν ρολ φαινομένου στην Ελλάδα, 1956-1967",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8890"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8792",
+          "title": "Gustave Flourens (1838-1871) et la Grèce",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8792"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_14357",
+          "title": "Humanising Economic History",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_14357"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8893",
+          "title": "Η συγκρότηση της ιστορικής επιστήμης και η διδασκαλία της ιστορίας στο πανεπιστήμιο Αθηνών (1837-1932)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8893"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_15358",
+          "title": "Βιβλιοδέτηση και ανακαίνιση κωδίκων στη Μονή Παντοκράτορος του Αγίου Όρους τον 16ο αι.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_15358"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Crevelier%22+history&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Crevelier%22+history&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 2733665, \"response_sha256\": \"3690432a431bff259680cdce42b1f16d400262e9c99801a8bf94dce8dec537e1\", \"elapsed_ms\": 4820}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22Crevelier%22+history&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "41038172599",
+    "agent_id": "identity_resolution",
+    "source_leads": [
+      {
+        "id": "lead_b014524f4e9020d2b8ee1397",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_18865",
+        "title": "Με αφορμή τον θάνατο του Creveliers στην Αστυπάλαια. Ο ρόλος του νησιού στις καταδρομικές επιχειρήσεις των καθολικών κουρσάρων κατά τον 17ο αιώνα Occasioned by the death of Creveliers off Astypalaia: The island's role in the raids by Catholic corsairs during the 17th century",
+        "query": "\"Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_827c00e53e8def0c35f93b9c",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/908/thesaurus-di-internet-culturale",
+        "title": "Mappa del thesauro",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_344d1a43e5fedf48a91dd87b",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1/home",
+        "title": "Home",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d316b833b52e4e72c1a68cf5",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/76/itinerari",
+        "title": "Itinerari",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b9e196f14bfd04ebc9ff3bdf",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/75/mostre",
+        "title": "Mostre",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4138468d28396950403d3dc5",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/938/video",
+        "title": "Video",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ff48e941420c1eb9fd5681a6",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1038/biblioteca-digitale-italiana",
+        "title": "la BDI",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_75e6f157ce24394c1ecb230f",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1048/guida-alla-consultazione",
+        "title": "Guida alla consultazione",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_899ce90728a22790f99c5510",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/41/collezioni-digitali",
+        "title": "Collezioni digitali",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9d35cea02dc3a16c994815db",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/64/partner",
+        "title": "Partner",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_64734382687d20c9716b1fee",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1114/repositories",
+        "title": "Repositories",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_14967155b376d1a8e2215bd3",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/767/manoscritti",
+        "title": "Manoscritti",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d6bfab5ffd308e2451dba4d4",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/773/libri",
+        "title": "Libri",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2c0e6961ac4b1d5bc92e81a0",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/825/spartiti",
+        "title": "Spartiti",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9ce90b8281464ba3444bf107",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/770/carte-geografiche",
+        "title": "Carte geografiche",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1e60dc17711e55de5515d6e2",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/771/immagini",
+        "title": "Immagini",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6b8de0a60fb93836b41d6268",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/772/registrazioni-sonore",
+        "title": "Registrazioni sonore",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_76b0cf56c7cc68ebbbe1f740",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana",
+        "title": "Emeroteca digitale italiana",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a0451d15da5b67c1231be32b",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=2&paginate_pageNum=1",
+        "title": "Musica",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ab42621e2d868ba5d8f92f5f",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=3",
+        "title": "Newspaper",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3feb9519211ba7786e920d8c",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/753/remi",
+        "title": "Rete della Musica Italiana",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a2c01572f1918e2ca21e2493",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1120/chi-siamo",
+        "title": "Chi siamo",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1a408f2d69ec421788c83418",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/15/termini-d-uso",
+        "title": "Termini d'uso",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e9bc2786c630347207739f15",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1227/i-progetti",
+        "title": "I Progetti",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c9e33adbfb0338318e0364c2",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1000/statistiche",
+        "title": "Statistiche",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e0c9b26ea2f6f47dcbbc24bf",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/999/scrivi-a",
+        "title": "Scrivi a",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_69b2c86c5a2f156131b8097b",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_28809",
+        "title": "Voyage de la Grece",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_32d69b82e4f84fadc724d52e",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_28808",
+        "title": "Histoire de la regeneration de la Grece : comprenant le precis des evenements depuis 1740 jusqu'en 1824,v.3",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fbda2c8a01c9bbbc3e08f6fa",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_28937",
+        "title": "Optical fiber communications/National fiber optic engineers conference 2009",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3604b10e3321e1c8cd96edf2",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_28903",
+        "title": "Field Experiments With a Grooming Switch for OTDM Meshed Networking",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5cf39880b6031406c49018e3",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_430",
+        "title": "Πρόβλεψη παραμόρφωσης των μαλακών ιστών για σχεδιασμό χειρουργικής προσώπου Soft-tissue deformation prediction for maxillo-facial surgical planning",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fcf62c2b6a009e0907095a4c",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-307493",
+        "title": "WDM routing for edge data centers and disaggregated computing",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_288dd2a3f31000d3c512db44",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-226466",
+        "title": "(Committee for Advanced Therapies (CAT), CAT Scientific Secretariat), Challenges with advanced therapy medicinal products and how to meet them",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7a4e10215f1333e14d3ab967",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_3378",
+        "title": "Απεικόνιση κοκκίδωσης λέιζερ : χωρο-χρονική βελτίωση εικόνας Laser speckle imaging : spatio-temporal image enhancement",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3b5aba923aa04e74ac6dc650",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-295103",
+        "title": "Genome-wide association analysis identifies TXNRD2, ATXN2 and FOXC1 as susceptibility loci for primary open-angle glaucoma: Letter",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8949751ffbd7582cdc49009f",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_26569",
+        "title": "Απεικόνιση κοκκίδωσης λέιζερ: χωρο-χρονική βελτίωση εικόνας Laser speckle imaging: spatio-temporal image enhancement",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9a57ae5a5f7bc9d21c2d09e6",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3161657",
+        "title": "Genome-wide association study identifies 25 known breast cancer susceptibility loci as risk factors for triple-negative breast cancer",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_88222e476b677465e55f642e",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_49946",
+        "title": "Multi-scale modelling and experimental analysis of ALD alumina: Interplay of process dynamics, chemistry and interfacial phenomena",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_de55a3c22aa74e916eae6c46",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_6072",
+        "title": "Τα \"Πιστοποιητικά Προέλευσης\" (Certificat's de Origine) των εμπορευμάτων ως πηγή της οικονομικής ιστορίας του Πασαλικίου Ιωαννίνων (1811-1814)",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6d0c9d2bc4c7e88f1d4ca0ca",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3155948",
+        "title": "Underlying Event measurements in pp collisions at root s=0.9 and 7 TeV with the ALICE experiment at the LHC",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_89d959d2110b57dd6cf888fc",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3154375",
+        "title": "Measurement of prompt J/psi and beauty hadron production cross sections at mid-rapidity in pp collisions at root s=7 TeV",
+        "query": "\"Hugues Creveliers\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_14dc5b22a2828bee6b53f15a",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb43446724s",
+        "title": "L'élixir de tante Ermolina / Liliane Korb et Laurence Lefèvre ; Illustrations de Solvej Crévelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_98fd81a673e5a9144ecb0ad2",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb35747460r",
+        "title": "Un arbre / France Guillain ; ill. de Solvej Crévelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e25dece646a3c0d7bb92023e",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb34740353c",
+        "title": "Les Tambours de la nuit / Nicole Ciravegna ; illustrations de Solveg Crévelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_88afff65b9ea0fe83f14f5f5",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb349085808",
+        "title": "Pas de bruit, Julie / Hélène Ray, Solvej Crévelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_17877ef094ec7d1de4621c63",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb348796655",
+        "title": "Un Tigre dans la théière / Betty Yurdin ; ill. de Solvej Crévelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a6ad263c13ea5c1ccf6d2069",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb35574891p",
+        "title": "Petit froid, grand froid / France Guillain ; ill. de Solvej Crévelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3d73da1d092ea5ec63a86fc2",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb358088268",
+        "title": "L'année rase-bitume / Philippe Barbeau ; ill. de Solvej Crévelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6528cda942275b1df108df06",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb358305175",
+        "title": "L'odeur de la mer / Philippe Barbeau ; ill. de Solvej Crévelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9b024d0a8e5b84e35243a98f",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb347821387",
+        "title": "Peur, pas peur / texte de Jeanne-Marie Pubellier, images de Solvej Crévelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_effa2833afcf0fe34fcb7bf0",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb34911940n",
+        "title": "La Reine de l'île / Anne-Marie Pol ; ill. de Solvej Crévelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d113837948a59d06863142a6",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb35574881c",
+        "title": "De toutes les couleurs / France Guillain ; ill. de Solvej Crévelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_bfd7ee8ade2d6552b0e9cf1a",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb358140416",
+        "title": "Une maison, ma maison / France Guillain ; ill. de Solvej Crévelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1478a52ac4adad9a5120d099",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb349994536",
+        "title": "Les Manèges de la vie : [nouvelles] / Andrée Chedid ; ill. de Solvej Crévelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2539039e5525da0406996d05",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb34638704t",
+        "title": "Viron, virette : comptine / illustrée par Solvej Crévelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_86e589d3e752f3a0452044f6",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb354767446",
+        "title": "Voyage d'un nuage / texte de France Guillain ; ill. de Solvej Crévelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_34d27d98e99a93b6fa9eba2c",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb35574894q",
+        "title": "Un fruit / texte de France Guillain ; ill. de Solvej Crévelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e6f603fb49801b27d934ec4c",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb355301344",
+        "title": "Les tambours de la nuit / Nicole Ciravegna... ; ill... de Solveg Crèvelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_10f3220b34a7af9eaf68a4b3",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb35003807d",
+        "title": "Le Cartable à moteur / texte de Jean-Pierre Fily ; ill. par Solvej Crevelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2e2c40b28604a7d0d4dc628d",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb35574887f",
+        "title": "Couché dans l'herbe / France Guillain ; ill. de Solvej Crévelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e2e8ecf35b77bca6e3431d19",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Gallica/BnF",
+        "source_url_or_identifier": "http://catalogue.bnf.fr/ark:/12148/cb35574897r",
+        "title": "Voyage d'un nuage / France Guillain ; ill. de Solvej Crévelier",
+        "query": "\"Crevelier\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_55a88c183fdca99824abad4d",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8760",
+        "title": "“Απόψε θα γίνει Ταϊλάνδη”: Η ερμηνεία ενός “εξωτικού” συνθήματος της εξέγερσης του Πολυτεχνείου “Tonight will be Thailand”: Interpretation of an “exotic” slogan of the Polytechnic Uprising (eng)",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_13e085af2556c72040febf9c",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_15700",
+        "title": "Θαλάσσιο εμπόριο στη βενετοκρατούμενη Κέρκυρα (1496-1538) Maritime trade in venetian ruled Corfu (1496-1538)",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5a52a3f1ffd79c49bd90d4bf",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8762",
+        "title": "Γεώργιος Παπαδόπουλος, Τάγματα Ασφαλείας και “Χ”: Μια απόπειρα συγκέντρωσης και επανεκτίμησης του παλαιότερου και νεότερου τεκμηριωτικού υλικού Georgios Papadopoulos: Security Battalions and “X”: An attempt to gather and reevaluate earlier and more recent evidence (gre)",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_78756dbe4b4232c7b33114a2",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8787",
+        "title": "A Century of Revolutions: The Cretan Question between European and Near East Politics",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_340ef0f0196eec1982f24607",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8700",
+        "title": "Η Κρήτη μεταξύ δύο επαναστάσεων (1829-1869) Crete between two revolutions (1829-1869) (eng)",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6a1b0290fd60e1184e1c5228",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_15342",
+        "title": "Κατάλογος των Παλαιών Εντύπων της Δημοτικής Βιβλιοθήκης Τυρνάβου",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_aef45391af64c77f97e4edcc",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8699",
+        "title": "Το άρμα που έμεινε στην ιστορία The Armored Tank that remained in History (eng)",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2a6eabf1e6d2ddc091a203a6",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8782",
+        "title": "Πολυτεχνείο '73: Το ζήτημα των θυμάτων: Νεκροί και τραυματίες Polytechnic School '73: The question of the victims: dead and injured (eng)",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e6e774b2cce8e0a627b8610b",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8770",
+        "title": "Ο θάνατος ενός ταξίαρχου The Death of a Brigadier (gre)",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_060393fb4efdde0853265820",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8772",
+        "title": "Σαράντα χρόνια από τη γένεση του Κινήματος για την Ελεύθερη Έκφραση: Πανεπιστήμιο Berkeley, 1-2 Οκτωβρίου 1964 Forty years since the birth of the Free Speech Movement: University of Berkeley, 1-2 October 1964 (eng)",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a6797c5b3cd3436b336c6a49",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8784",
+        "title": "Επταετία: Σοβαρό έλλειμα στην ιστορική έρευνα Dictatorship: A Serious Gap In Historical Research (eng)",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9e72ab7f4e8a1c9ab6dd69ff",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_14046",
+        "title": "Opramoas",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5b52e952acb0a08062b1d090",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8795",
+        "title": "Τα «βρεσίματα» και τα «τζακίσματα» στο Αιγαίο: μέ αφορμή ένα περιστατικό του 17ου αιώνα",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_20770ff52e276d281778ba00",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8688",
+        "title": "Το “σαμποτάζ” του Έβρου χωρίς ζάχαρη: Μια απόπειρα αναψηλάφησης The Evros' “sabotage” minus the sugar: An attempt of reinvestigation",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b2c0028605caea33f5ef94d7",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8757",
+        "title": "Η Μάχη της Κρήτης μέσα από τις σελίδες του απόρρητου προσωπικού ημερολογίου του Γερμανού υπουργού προπαγάνδας Joseph Goebbels The battle of Crete according to German Minister of Propaganda Joseph Goebbels' secret diary (eng)",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0f3b4acc225f8f87ae02ae12",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_14368",
+        "title": "Ο Ελληνικός Κόσμος ιδωμένος από τους Ταξιδιώτες (15ος-αρχές 20ού αι.): Ιστορικό Σημείωμα The Greek world as seen by Travellers 15th - 20th centuries: Historical Introduction",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fbb7e058b07077d9add0e0f9",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_16693",
+        "title": "Η διοίκηση του Αγίου Όρους: 1600-1927: σύντομη ιστορική επισκόπηση The administration of Mount Athos: 1600-1927: a brief historical survey",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_93075332305113322c49808e",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_3896",
+        "title": "Κατάλογος των κωδίκων της Δημοτικής Βιβλιοθήκης Τυρνάβου Catalogue of manuscripts of the Tyrnavos Municipal Library",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_16955d14933eae1db80b90c7",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/elocus/000018-dlib_0_c_d_metadata-dlib-c26fc2bc81db3f69e0e1e93ab54bd579_1248161989.tkl",
+        "title": "Από τους μετακινούμενους κτηνοτρόφους στους \"κλεφταρματολούς\" : όψεις της εξέλιξης και ιστοριογραφικές αναγνώσεις του θεσμού",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d6fbae9ce0a2b496fbdf1ba8",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8890",
+        "title": "Ήχοι και απόηχοι: Κοινωνική ιστορία του ροκ εν ρολ φαινομένου στην Ελλάδα, 1956-1967",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_baaa0c5d07a52d594cf37911",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8792",
+        "title": "Gustave Flourens (1838-1871) et la Grèce",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7c81241e4cc618b544f731cc",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_14357",
+        "title": "Humanising Economic History",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ffaf8ddf134ff409e4331283",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_8893",
+        "title": "Η συγκρότηση της ιστορικής επιστήμης και η διδασκαλία της ιστορίας στο πανεπιστήμιο Αθηνών (1837-1932)",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2713f0f3d8bf532ea6b8214e",
+        "run_id": "41038172599",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_15358",
+        "title": "Βιβλιοδέτηση και ανακαίνιση κωδίκων στη Μονή Παντοκράτορος του Αγίου Όρους τον 16ο αι.",
+        "query": "\"Crevelier\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      }
+    ],
+    "connector_errors": [],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 88,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
