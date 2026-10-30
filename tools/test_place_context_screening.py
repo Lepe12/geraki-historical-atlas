@@ -115,7 +115,7 @@ class DiminishingReturnsTests(unittest.TestCase):
         self.env = {'PCT_CONTINUATION_MAX_ROUNDS': '5', 'PCT_CONTINUATION_NO_GAIN_ROUNDS': '2'}
 
     def queue(self, n):
-        (self.cont / 'g/queue.json').write_text(json.dumps({'total': 398, 'completed': n, 'status': 'PENDING'}))
+        (self.cont / 'g/queue.json').write_text(json.dumps({'total': 398, 'completed': n, 'status': 'PENDING', 'items': [{'evidence_id': str(i), 'status': 'EXAMINED'} for i in range(n)]}))
 
     def answer(self, sup=(), uns=()):
         cl = [{'claim_id': c, 'status': 'QUOTATION_SUPPORTED_HISTORY_PENDING'} for c in sup]

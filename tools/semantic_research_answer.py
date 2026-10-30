@@ -1157,6 +1157,16 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         deferred.extend(other_shards)
     if shard_merge:batch_limit=0
     grouped,skipped=select_groups(candidate_groups,namesake_group_ids,batch_limit,queue.completed);deferred.extend(skipped)
+    replay_holds=[]
+    if shard_merge:
+        # Replay the exact saved groups from EVERY shard. Neural ranking can
+        # differ across runners; recomputed batch boundaries cannot select
+        # which completed scientific work survives the merge.
+        saved,replay_holds=queue.replay_groups(all_records)
+        by_binding={queue.binding(g):g for g in [*grouped,*saved]}
+        grouped=list(by_binding.values())
+        covered={r['evidence_id'] for g in grouped for r in g}
+        deferred=[r for r in deferred if r['evidence_id'] not in covered]
     adaptive=adaptive_reading_settings()
     adaptive['enabled']=bool(adaptive['enabled'] and batch_limit and not shard and not resume_reviewed_from)
     extra_groups=[]
@@ -1172,7 +1182,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
                       'assigned_batches':len(candidate_groups),'selected_batches':len(grouped),
                       'selected_excerpts':sum(len(g) for g in grouped)}
     queue.inventory(all_records,grouped,deferred,filtered_items)
-    selected=[r for b in grouped for r in b]
+    selected=list({r['evidence_id']:r for b in grouped for r in b}.values())
     from research_priority import selection_report
     conf=configuration() if config is None else config
     out={'schema':VERSION,'question':question,'request_kind':question_kind,'evidence_hash':digest(all_records),'status':'BLOCKED_CONFIGURATION',
@@ -1188,7 +1198,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
          'excerpt_ranking':ranking_report,
          'identity_linkage':linkage_report,
          **({'semantic_shard':shard_report} if shard_report else {}),
-         **({'semantic_shard_merge':True} if shard_merge else {}),
+         **({'semantic_shard_merge':True,'source_group_replay_holds':replay_holds} if shard_merge else {}),
          'limitations':['MODEL_OUTPUT_REQUIRES_REVIEW','ORIGINAL_INSPECTION_NOT_PERFORMED',
                         'SOURCE_INDEPENDENCE_NOT_ESTABLISHED','BOUNDED_EVIDENCE_COVERAGE'],
          'verified':False,'human_reviewed':False}

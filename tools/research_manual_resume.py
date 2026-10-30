@@ -34,6 +34,11 @@ def submit(path, base, repository, current_run, active_check=None, dispatch=None
     skip_acquisition = request.get('skip_citation_acquisition', False)
     if type(skip_acquisition) is not bool:
         raise ValueError('SKIP_ACQUISITION_MUST_BE_BOOLEAN')
+    replay_from = request.get('replay_shards_from', '')
+    if not isinstance(replay_from, str) or (replay_from and not re.fullmatch(r'[0-9]+', replay_from)):
+        raise ValueError('NUMERIC_REPLAY_ANALYSIS_REQUIRED')
+    if replay_from and (shards != 1 or not skip_acquisition):
+        raise ValueError('SAVED_SHARD_REPLAY_REQUIRES_SINGLE_ACQUIRED_ONLY_MERGE')
     root = base / 'evidence/runs' / run_id
     if not (root / 'research_continuation/active.json').is_file():
         raise ValueError('EXISTING_RESEARCH_CHECKPOINT_REQUIRED')
@@ -51,11 +56,14 @@ def submit(path, base, repository, current_run, active_check=None, dispatch=None
                '-f', 'semantic_shards=' + str(shards), '-f', 'auto_continue=false']
     if skip_acquisition:
         command.extend(['-f', 'skip_citation_acquisition=true'])
+    if replay_from:
+        command.extend(['-f', 'replay_shards_from=' + replay_from])
     record = {'schema': 'research-manual-resume-receipt-v1', 'run_id': run_id,
               'request_path': str(path.relative_to(base)), 'coordinator_run': str(current_run),
               'created_utc': datetime.now(timezone.utc).isoformat(),
               'semantic_shards': shards, 'auto_continue': False,
               'skip_citation_acquisition': skip_acquisition,
+              'replay_shards_from': replay_from,
               'status': 'SUBMITTING', 'historical_verified': False}
     receipt.parent.mkdir(parents=True, exist_ok=True)
     receipt.write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n')

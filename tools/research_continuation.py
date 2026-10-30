@@ -56,6 +56,39 @@ class Continuation:
     def save(self,group,payload):
         atomic(self.path(group),{'source_sha256':self.binding(group),'payload':payload,
             'payload_sha256':digest(payload),'verified':False})
+        self.register_group(group)
+
+    def register_group(self,group):
+        """Keep the exact source-bound group; ranking is not a cache identity."""
+        if self.load(group) is None:
+            raise ValueError('SOURCE_GROUP_HAS_NO_VALID_EXTRACTION')
+        key=self.binding(group)
+        atomic(self.root/'groups'/(key+'.json'),
+               {'source_sha256':key,'source_group':group,'verified':False})
+
+    def source_binding(self,record):
+        # These fields are reading/prompt metadata, not acquired evidence.
+        # Text, offsets, source checksums, bibliography and window identity
+        # must still match the CURRENT source-validated collection exactly.
+        return self.binding([{k:v for k,v in record.items()
+                              if k not in ('sampling_features','screening','model_view')}])
+
+    def replay_groups(self,records):
+        current={r['evidence_id']:r for r in records}
+        groups=[];holds=[]
+        for path in sorted((self.root/'groups').glob('*.json')):
+            row=json.loads(path.read_text())
+            group=row.get('source_group')
+            if not isinstance(group,list) or not group or self.binding(group)!=path.stem or row.get('source_sha256')!=path.stem:
+                raise ValueError('INVALID_SOURCE_GROUP_BINDING')
+            if self.load(group) is None:
+                raise ValueError('INVALID_SOURCE_GROUP_EXTRACTION')
+            if any(r.get('evidence_id') not in current or
+                   self.source_binding(r)!=self.source_binding(current[r['evidence_id']]) for r in group):
+                holds.append({'source_sha256':path.stem,'reason':'CURRENT_SOURCE_OR_SELECTION_CHANGED'})
+                continue
+            groups.append(group)
+        return groups,holds
 
     def receipt(self,group):
         # A later model repair can replace the current batch payload. Preserve
