@@ -48,12 +48,13 @@ new ResizeObserver(() => body.style.setProperty("--composer-height", composer.ge
 const months = ["ΙΑΝ", "ΦΕΒ", "ΜΑΡ", "ΑΠΡ", "ΜΑΪ", "ΙΟΥΝ", "ΙΟΥΛ", "ΑΥΓ", "ΣΕΠ", "ΟΚΤ", "ΝΟΕ", "ΔΕΚ"];
 function tickDate() {
   const d = new Date();
-  $("clkDate").textContent = d.getUTCDate() + " " + months[d.getUTCMonth()] + " " + d.getUTCFullYear();
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Athens", day: "numeric", month: "numeric", year: "numeric" }).formatToParts(d).map((x) => [x.type, x.value]));
+  $("clkDate").textContent = p.day + " " + months[p.month - 1] + " " + p.year;
 }
 tickDate();
 setInterval(tickDate, 60000);
 // live clock: the map's render loop only refreshes it while animating, so tick it every second here too
-function tickClock() { $("clock").textContent = new Date().toISOString().slice(11, 19) + " UTC"; }
+function tickClock() { $("clock").textContent = new Date().toLocaleTimeString("el-GR", { timeZone: "Europe/Athens", hour12: false }) + " ώρα Ελλάδας"; }
 tickClock();
 setInterval(tickClock, 1000);
 

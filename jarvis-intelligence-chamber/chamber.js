@@ -368,25 +368,17 @@
     return { left, top, right, bottom, w: right - left, h: bottom - top };
   }
   function fit(immediate) {
-    // Fit the 17 lanes (plus the core rose) into the frame, like the mockup's Mediterranean view.
+    // Opening view: the Mediterranean (Gibraltar to the Levant, North African coast to the head of the
+    // Adriatic), where the research is, rather than the lanes' full spread into northern Europe.
+    // Contain that box, but never leave empty parchment margins around the chart (fills full-width frames).
     const r = freeRegion();
-    const pts = [...sectors.map((q) => [q.x, q.y]), [core.x, core.y]];
-    const pad = W <= 800 ? 40 : 70;
-    const x0 = Math.min(...pts.map((p) => p[0])) - pad, x1 = Math.max(...pts.map((p) => p[0])) + pad;
-    const y0 = Math.min(...pts.map((p) => p[1])) - pad, y1 = Math.max(...pts.map((p) => p[1])) + pad;
+    const merc = (lat) => (Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360)) * 180) / Math.PI;
+    const px = (lon) => (lon - C.lon0) * C.k, py = (lat) => (C.my1 - merc(lat)) * C.k;
+    const x0 = px(-6), x1 = px(36), y0 = py(46), y1 = py(30);
     let s = Math.min(r.w / (x1 - x0), r.h / (y1 - y0));
-    // never leave empty margins above/below the chart. Left/right: fill the frame up to the 16:9 desktop
-    // frame width (1096 px); on wider full-width frames keep that same zoom (same area as at 16:9, every
-    // banner visible) and let parchment margins show at the sides instead of cutting off the north/south.
-    s = Math.max(s, H / C.H, Math.min(W, 1096) / C.W);
-    const cx = (x0 + x1) / 2;
-    let cy = (y0 + y1) / 2;
-    if (s * (y1 - y0) > r.h) {
-      // the frame is too wide/short for every lane at the minimum scale: keep all lane seals in view
-      // (centre on the lanes only) and let the core rose sit nearer the edge instead
-      const ly = sectors.map((q) => q.y);
-      cy = (Math.min(...ly) + Math.max(...ly)) / 2;
-    }
+    if (W <= 800) s = Math.max(s, (0.8 * r.h) / (y1 - y0)); // phones: tall frame, fill it with the sea's height
+    s = Math.max(s, W / C.W, H / C.H);
+    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
     fitScale = s;
     target = clampView({ s, x: r.left + r.w / 2 - cx * s, y: r.top + r.h / 2 - cy * s });
     if (immediate) view = { ...target };
@@ -674,7 +666,7 @@
     fps = Math.round(1 / Math.max(dt, 0.001));
     if (frame % 35 === 0) {
       $("fps").textContent = fps + " FPS";
-      $("clock").textContent = new Date().toISOString().slice(11, 19) + " UTC";
+      $("clock").textContent = new Date().toLocaleTimeString("el-GR", { timeZone: "Europe/Athens", hour12: false }) + " ώρα Ελλάδας";
     }
     const k = reduce ? 1 : Math.min(dt * 9, 1);
     const moving = Math.abs(target.s - view.s) > 1e-4 || Math.abs(target.x - view.x) > 0.3 || Math.abs(target.y - view.y) > 0.3;
