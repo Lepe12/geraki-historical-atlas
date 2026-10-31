@@ -5,7 +5,7 @@ The user supplies the research problem. JARVIS owns agent selection unless an
 explicit manual override is supplied.
 """
 from __future__ import annotations
-import argparse, hashlib, json, re
+import argparse, hashlib, json, re, sys
 from pathlib import Path
 from typing import Any
 
@@ -184,6 +184,8 @@ def main() -> None:
     p.add_argument("--audit-root", type=Path, default=Path("evidence/jarvis/dispatch_audit"))
     p.add_argument("--github-output", type=Path)
     p.add_argument("--write-audit", type=Path)
+    p.add_argument("--book-index", type=Path, help="private local book SQLite index (opt-in)")
+    p.add_argument("--book-output", type=Path, help="private candidate evidence output (opt-in)")
     args = p.parse_args()
     if not args.run_id.isdigit():
         raise ValueError("INVALID_RUN_ID")
@@ -194,6 +196,31 @@ def main() -> None:
     audit = build_audit(args.request, payload, args.run_id,args.request_id or request.get('request_id',''))
     if duplicate_submission(audit,args.audit_root):
         raise ValueError("DUPLICATE_DISPATCH_REQUEST")
+
+    # Book discovery is a subordinate read-only step after controlled-dispatch validation.
+    # It does not affect lane selection, verify claims, or expose the private index.
+    if bool(args.book_index) != bool(args.book_output):
+        raise ValueError("BOOK_INDEX_AND_OUTPUT_REQUIRED_TOGETHER")
+    if args.book_index:
+        if not args.book_index.is_file():
+            raise ValueError("BOOK_INDEX_NOT_FOUND")
+        if args.book_output.resolve() == args.book_index.resolve():
+            raise ValueError("BOOK_OUTPUT_OVERLAPS_INDEX")
+        books_dir = Path(__file__).resolve().parents[1] / "books"
+        sys.path.insert(0, str(books_dir))
+        from nabou_books import connect
+        from jarvis_book_bridge import retrieve
+        db = connect(args.book_index)
+        try:
+            book_result = retrieve(db, {
+                "research_job_id": args.run_id,
+                "target": payload["target"],
+                "aliases": payload["aliases"]
+            })
+        finally:
+            db.close()
+        args.book_output.parent.mkdir(parents=True, exist_ok=True)
+        args.book_output.write_text(json.dumps(book_result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     matrix = json.dumps(payload["selected_agents"], separators=(",", ":"))
     if args.github_output:
