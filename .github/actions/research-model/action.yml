@@ -25,12 +25,59 @@ runs:
       with:
         path: ${{ env.NABOU_MODEL_CACHE_DIR }}
         key: ${{ env.NABOU_MODEL_CACHE_KEY }}
+    # llama-cpp-python 0.3.16 is compiled from source on the runner (~2 min).
+    # Keep the built wheel (and its pinned dependency wheels) in an Actions
+    # cache. The key includes the runner image, Python version and a hash of
+    # the CPU model+flags, because the default build is tuned to the host CPU:
+    # a wheel is only ever reused on an identical CPU, so builds and outputs
+    # stay the same as a fresh install. Any cache problem falls back to the
+    # original install command.
+    - name: Key the CPU inference wheel cache to this runner
+      if: env.PCT_LLM_PROVIDER == 'local_llama_cpp'
+      id: wheel-key
+      shell: bash
+      run: |
+        py=$(python3 -c 'import sys;print("%d.%d.%d"%sys.version_info[:3])')
+        cpu=$( (grep -m1 '^model name' /proc/cpuinfo; grep -m1 '^flags' /proc/cpuinfo) | sha256sum | cut -c1-16)
+        echo "key=nabou-wheels-llama-cpp-python-0.3.16-hfhub-0.36.0-${ImageOS:-linux}-${ImageVersion:-0}-py${py}-cpu${cpu}-v1" >> "$GITHUB_OUTPUT"
+    - uses: actions/cache/restore@v4
+      if: env.PCT_LLM_PROVIDER == 'local_llama_cpp'
+      id: wheel-cache
+      continue-on-error: true
+      with:
+        path: ~/.cache/nabou-wheels
+        key: ${{ steps.wheel-key.outputs.key }}
     - name: Install CPU inference dependencies
       if: env.PCT_LLM_PROVIDER == 'local_llama_cpp'
+      id: wheel-install
       shell: bash
       env:
         CMAKE_BUILD_PARALLEL_LEVEL: '2'
-      run: python3 -m pip install --quiet 'llama-cpp-python==0.3.16' --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu 'huggingface-hub==0.36.0'
+        WHEEL_CACHE_HIT: ${{ steps.wheel-cache.outputs.cache-hit }}
+      run: |
+        dir="$HOME/.cache/nabou-wheels"
+        pkgs=('llama-cpp-python==0.3.16' 'huggingface-hub==0.36.0')
+        index=(--extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu)
+        if [ "$WHEEL_CACHE_HIT" = "true" ] && python3 -m pip install --quiet --no-index --find-links "$dir" "${pkgs[@]}"; then
+          echo "CPU_INFERENCE_WHEELS_FROM_CACHE"
+          exit 0
+        fi
+        rm -rf "$dir"; mkdir -p "$dir"
+        if python3 -m pip wheel --quiet --wheel-dir "$dir" "${index[@]}" "${pkgs[@]}" \
+           && python3 -m pip install --quiet --no-index --find-links "$dir" "${pkgs[@]}"; then
+          echo "save=true" >> "$GITHUB_OUTPUT"
+          echo "CPU_INFERENCE_WHEELS_BUILT"
+        else
+          echo "CPU_INFERENCE_WHEEL_CACHE_UNAVAILABLE: original install"
+          rm -rf "$dir"
+          python3 -m pip install --quiet 'llama-cpp-python==0.3.16' --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu 'huggingface-hub==0.36.0'
+        fi
+    - uses: actions/cache/save@v4
+      if: env.PCT_LLM_PROVIDER == 'local_llama_cpp' && steps.wheel-install.outputs.save == 'true'
+      continue-on-error: true
+      with:
+        path: ~/.cache/nabou-wheels
+        key: ${{ steps.wheel-key.outputs.key }}
     - name: Verify every model shard against the official immutable revision
       if: env.PCT_LLM_PROVIDER == 'local_llama_cpp'
       shell: bash
