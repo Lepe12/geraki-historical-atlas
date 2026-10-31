@@ -10,22 +10,27 @@ const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const fmt = (n) => (Number.isFinite(n) ? n.toLocaleString("el-GR") : "—");
 const mobile = () => innerWidth <= 800;
 
-/* ---------- desktop artboard scaling (1672 × 941, like the mockup) ---------- */
+/* ---------- desktop artboard scaling (1672 × 941, like the mockup) ----------
+   The artboard is scaled to the window height; on windows wider than 16:9 it grows sideways
+   (--nx-dw extra artboard px), so the page fills the screen edge to edge instead of a centred column.
+   The map and the card row take the extra width; the right column stays pinned to the right edge. */
+const ART_W = 1672, ART_H = 941;
+const stageW = () => ART_W + (parseFloat(stage.style.getPropertyValue("--nx-dw")) || 0);
 function scaleStage() {
   if (mobile()) {
-    stage.style.removeProperty("--nx-k");
-    stage.style.removeProperty("--nx-x");
-    stage.style.removeProperty("--nx-y");
+    for (const v of ["--nx-k", "--nx-x", "--nx-y", "--nx-dw"]) stage.style.removeProperty(v);
     return;
   }
-  const k = Math.min(innerWidth / 1672, innerHeight / 941);
+  const k = Math.min(innerWidth / ART_W, innerHeight / ART_H);
+  const dw = Math.max(0, innerWidth / k - ART_W);
   stage.style.setProperty("--nx-k", k.toFixed(5));
-  stage.style.setProperty("--nx-x", ((innerWidth - 1672 * k) / 2).toFixed(1) + "px");
-  stage.style.setProperty("--nx-y", ((innerHeight - 941 * k) / 2).toFixed(1) + "px");
+  stage.style.setProperty("--nx-dw", dw.toFixed(1) + "px");
+  stage.style.setProperty("--nx-x", ((innerWidth - (ART_W + dw) * k) / 2).toFixed(1) + "px");
+  stage.style.setProperty("--nx-y", ((innerHeight - ART_H * k) / 2).toFixed(1) + "px");
 }
 addEventListener("resize", scaleStage);
 scaleStage();
-const stageScale = () => (mobile() ? 1 : stage.getBoundingClientRect().width / 1672 || 1);
+const stageScale = () => (mobile() ? 1 : stage.getBoundingClientRect().width / (stage.offsetWidth || ART_W) || 1);
 // composer height for the stacked mobile layout (panels sit between the bars)
 const composer = $("operatorCommand");
 new ResizeObserver(() => body.style.setProperty("--composer-height", composer.getBoundingClientRect().height + "px")).observe(composer);
@@ -43,10 +48,15 @@ new ResizeObserver(() => body.style.setProperty("--composer-height", composer.ge
 const months = ["ΙΑΝ", "ΦΕΒ", "ΜΑΡ", "ΑΠΡ", "ΜΑΪ", "ΙΟΥΝ", "ΙΟΥΛ", "ΑΥΓ", "ΣΕΠ", "ΟΚΤ", "ΝΟΕ", "ΔΕΚ"];
 function tickDate() {
   const d = new Date();
-  $("clkDate").textContent = d.getUTCDate() + " " + months[d.getUTCMonth()] + " " + d.getUTCFullYear();
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Athens", day: "numeric", month: "numeric", year: "numeric" }).formatToParts(d).map((x) => [x.type, x.value]));
+  $("clkDate").textContent = p.day + " " + months[p.month - 1] + " " + p.year;
 }
 tickDate();
 setInterval(tickDate, 60000);
+// live clock: the map's render loop only refreshes it while animating, so tick it every second here too
+function tickClock() { $("clock").textContent = new Date().toLocaleTimeString("el-GR", { timeZone: "Europe/Athens", hour12: false }) + " ώρα Ελλάδας"; }
+tickClock();
+setInterval(tickClock, 1000);
 
 /* ---------- navigation: mockup items → the page's real views ---------- */
 const dock = (view) => document.querySelector(`.nxs-dock [data-nxs-view="${view}"]`);
@@ -83,13 +93,13 @@ function closePop() {
 }
 const layer = (cls, label) => `<label><input type="checkbox" data-cls="${cls}" ${body.classList.contains(cls) ? "" : "checked"} /> ${label}</label>`;
 function layersHtml() {
-  return `<button class="close" type="button" aria-label="Κλείσιμο">✕</button><h2>MAP LAYERS</h2><p>Επίπεδα του ναυτικού χάρτη.</p>` +
+  return `<button class="close" type="button" aria-label="Κλείσιμο">✕</button><h2>ΕΠΙΠΕΔΑ ΧΑΡΤΗ</h2><p>Επίπεδα του ναυτικού χάρτη.</p>` +
     layer("nx-no-seals", "Σφραγίδες ερευνητών (17)") + layer("nx-no-labels", "Ονόματα ερευνητών") + layer("nx-no-routes", "Διαδρομές και ζωντανοί παλμοί") +
     layer("nx-no-rhumbs", "Ρόμβοι (γραμμές πυξίδας)") + layer("nx-no-names", "Λατινικά τοπωνύμια") + layer("nx-no-pictures", "Πλοία και θαλάσσια τέρατα");
 }
 function settingsHtml() {
   const feed = body.dataset.researchFeed || body.dataset.researchUi || "—";
-  return `<button class="close" type="button" aria-label="Κλείσιμο">✕</button><h2>SETTINGS</h2>` +
+  return `<button class="close" type="button" aria-label="Κλείσιμο">✕</button><h2>ΡΥΘΜΙΣΕΙΣ</h2>` +
     `<p>Σύνδεση: ${esc(GR.status(feed))} · Έρευνα #${esc(body.dataset.currentResearchRun || "—")}</p>` +
     `<label><input type="checkbox" data-motion ${body.classList.contains("nx-no-motion") ? "checked" : ""} /> Χωρίς κινήσεις και εφέ</label>` +
     `<p style="margin-top:12px"><button class="btn-l" type="button" data-latest>Άνοιγμα της πιο πρόσφατης έρευνας</button></p>` +
@@ -197,8 +207,8 @@ function placeBelow(el, anchor, align = "left") {
   const s = stage.getBoundingClientRect();
   let x = (a.left - s.left) / k, y = (a.bottom - s.top) / k + 6;
   if (align === "right") { x = (a.right - s.left) / k + 12; y = (a.top - s.top) / k; }
-  el.style.left = Math.min(x, 1672 - el.offsetWidth - 10) + "px";
-  el.style.top = Math.min(y, 941 - el.offsetHeight - 10) + "px";
+  el.style.left = Math.min(x, stageW() - el.offsetWidth - 10) + "px";
+  el.style.top = Math.min(y, ART_H - el.offsetHeight - 10) + "px";
 }
 function openMenu(btn) {
   const key = btn.dataset.key;
@@ -301,11 +311,11 @@ function renderStatus() {
   const records = s ? (s.discoveries?.length || 0) + (s.claims?.length || 0) : NaN;
   const conflicts = s ? (Array.isArray(s.contradictions?.records) ? s.contradictions.records.length : 0) : NaN;
   const rows = [
-    ["AGENTS", s ? (act ? act + " / " : "") + done + " / " + agents.length : "—", agents.length ? (7 * (done + act)) / agents.length : 0,
+    ["ΕΡΕΥΝΗΤΕΣ", s ? (act ? act + " / " : "") + done + " / " + agents.length : "—", agents.length ? (7 * (done + act)) / agents.length : 0,
       s ? `${done} ολοκληρωμένοι, ${act} ενεργοί, ${agents.length} ερευνητές συνολικά` : "Δεν υπάρχει φορτωμένη έρευνα"],
-    ["SOURCES", s && nRepos ? fmt(nRepos) : "—", nRepos ? (7 * reposHit.size) / nRepos : 0, provisional ? "Τα συγκεντρωτικά δεδομένα δεν έχουν δημοσιευτεί ακόμη" : s ? `${nRepos} αποθετήρια ερωτήθηκαν · ${reposHit.size} με αποτελέσματα` : ""],
-    ["RECORDS", provisional ? "—" : fmt(records), provisional ? 0 : logMeter(records), provisional ? "Τα τελικά ευρήματα δεν έχουν δημοσιευτεί ακόμη" : s ? `${s.discoveries?.length || 0} καταγεγραμμένες πηγές · ${s.claims?.length || 0} ισχυρισμοί` : ""],
-    ["CONFLICTS", provisional ? "—" : fmt(conflicts), provisional ? 0 : Math.min(7, conflicts || 0), provisional ? "Οι αντιφάσεις και τα εμπόδια δεν έχουν συγκεντρωθεί ακόμη" : s ? `${conflicts} καταγεγραμμένες αντιφάσεις · ${s.blockers?.length || 0} εμπόδια πρόσβασης` : ""],
+    ["ΠΗΓΕΣ", s && nRepos ? fmt(nRepos) : "—", nRepos ? (7 * reposHit.size) / nRepos : 0, provisional ? "Τα συγκεντρωτικά δεδομένα δεν έχουν δημοσιευτεί ακόμη" : s ? `${nRepos} αποθετήρια ερωτήθηκαν · ${reposHit.size} με αποτελέσματα` : ""],
+    ["ΕΓΓΡΑΦΕΣ", provisional ? "—" : fmt(records), provisional ? 0 : logMeter(records), provisional ? "Τα τελικά ευρήματα δεν έχουν δημοσιευτεί ακόμη" : s ? `${s.discoveries?.length || 0} καταγεγραμμένες πηγές · ${s.claims?.length || 0} ισχυρισμοί` : ""],
+    ["ΑΝΤΙΦΑΣΕΙΣ", provisional ? "—" : fmt(conflicts), provisional ? 0 : Math.min(7, conflicts || 0), provisional ? "Οι αντιφάσεις και τα εμπόδια δεν έχουν συγκεντρωθεί ακόμη" : s ? `${conflicts} καταγεγραμμένες αντιφάσεις · ${s.blockers?.length || 0} εμπόδια πρόσβασης` : ""],
   ];
   $("statRows").innerHTML = rows.map(([k, n, lit, title]) => `<div class="srow" title="${esc(title)}"><span class="k">${k}</span><span class="n">${esc(n)}</span>${meter(lit)}</div>`).join("");
   $("agentsDot").hidden = !act;
@@ -411,7 +421,7 @@ function renderNodes() {
     c.querySelector("title").textContent = laneName(id) + " — " + (a ? GR.status(a.status) : "χωρίς δεδομένα");
     g.querySelector(".mx").toggleAttribute("hidden", cls !== "BLOCKED");
   });
-  $("nodeCount").textContent = lanes.length + " NODES" + (snapshot ? " · " + (active ? active + " ενεργοί" : agents.length + " στην έρευνα") : "");
+  $("nodeCount").textContent = lanes.length + " κόμβοι" + (snapshot ? " · " + (active ? active + " ενεργοί" : agents.length + " στην έρευνα") : "");
 }
 function renderCards() {
   const s = snapshot;

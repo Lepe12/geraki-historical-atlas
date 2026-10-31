@@ -10,7 +10,7 @@
     FAILED: "Απέτυχε", ERROR: "Σφάλμα", BLOCKED: "Εμπόδιο", BLOCKED_CONFIGURATION: "Εκκρεμεί ρύθμιση",
     INSUFFICIENT_EVIDENCE: "Ανεπαρκή τεκμήρια", INSUFFICIENT_ACQUIRED_EVIDENCE: "Ανεπαρκή τεκμήρια",
     CANCELLED: "Ακυρώθηκε", CANCELED: "Ακυρώθηκε", SKIPPED: "Παραλείφθηκε", UNAVAILABLE: "Μη διαθέσιμο",
-    IDLE: "Ανενεργός", STANDBY: "Σε αναμονή", READY: "Έτοιμο", UNKNOWN: "Άγνωστο", RECORDED: "Καταγεγραμμένο",
+    IDLE: "Ανενεργός", STANDBY: "Σε αναμονή", READY: "Έτοιμο", RESEARCH_COVERAGE_PENDING: "Εκκρεμεί η κάλυψη της έρευνας", UNKNOWN: "Άγνωστο", RECORDED: "Καταγεγραμμένο",
     LIVE: "Ζωντανά", SNAPSHOT: "Αποθηκευμένα δεδομένα", OFFLINE: "Χωρίς σύνδεση", CONNECTING: "Σύνδεση…",
     RECONNECTING: "Επανασύνδεση…", WAITING: "Αναμονή νέας έρευνας", "RUN RECEIVED": "Η έρευνα παραλήφθηκε",
     ACQUIRED: "Αποκτήθηκε", CANDIDATE: "Υποψήφιο", UNVERIFIED: "Ανεπιβεβαίωτο", VERIFIED: "Επαληθευμένο",
