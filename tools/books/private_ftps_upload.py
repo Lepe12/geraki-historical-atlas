@@ -27,11 +27,16 @@ def inspect_archive(path):
             entries=manifest.get("files",manifest.get("images"))
         else: entries=None
         if not isinstance(entries,list): raise ValueError("ARCHIVE_MANIFEST_UNKNOWN_FORMAT")
+        by_name={x.get("name"):x for x in entries if isinstance(x,dict)}
+        if set(by_name)!=set(images) or len(by_name)!=len(entries):
+            raise ValueError("MANIFEST_IMAGE_MISMATCH")
         digests={}
         for n in images:
             data=z.read(n)
             if len(data)>30_000_000:raise ValueError("IMAGE_TOO_LARGE")
             digests[n]=hashlib.sha256(data).hexdigest()
+            if by_name[n].get("sha256")!=digests[n] or by_name[n].get("bytes")!=len(data):
+                raise ValueError("MANIFEST_CHECKSUM_MISMATCH")
         return z, images, digests, manifest
 
 def upload(archive, ftp, dry_run=False):
