@@ -10,22 +10,27 @@ const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const fmt = (n) => (Number.isFinite(n) ? n.toLocaleString("el-GR") : "—");
 const mobile = () => innerWidth <= 800;
 
-/* ---------- desktop artboard scaling (1672 × 941, like the mockup) ---------- */
+/* ---------- desktop artboard scaling (1672 × 941, like the mockup) ----------
+   The artboard is scaled to the window height; on windows wider than 16:9 it grows sideways
+   (--nx-dw extra artboard px), so the page fills the screen edge to edge instead of a centred column.
+   The map and the card row take the extra width; the right column stays pinned to the right edge. */
+const ART_W = 1672, ART_H = 941;
+const stageW = () => ART_W + (parseFloat(stage.style.getPropertyValue("--nx-dw")) || 0);
 function scaleStage() {
   if (mobile()) {
-    stage.style.removeProperty("--nx-k");
-    stage.style.removeProperty("--nx-x");
-    stage.style.removeProperty("--nx-y");
+    for (const v of ["--nx-k", "--nx-x", "--nx-y", "--nx-dw"]) stage.style.removeProperty(v);
     return;
   }
-  const k = Math.min(innerWidth / 1672, innerHeight / 941);
+  const k = Math.min(innerWidth / ART_W, innerHeight / ART_H);
+  const dw = Math.max(0, innerWidth / k - ART_W);
   stage.style.setProperty("--nx-k", k.toFixed(5));
-  stage.style.setProperty("--nx-x", ((innerWidth - 1672 * k) / 2).toFixed(1) + "px");
-  stage.style.setProperty("--nx-y", ((innerHeight - 941 * k) / 2).toFixed(1) + "px");
+  stage.style.setProperty("--nx-dw", dw.toFixed(1) + "px");
+  stage.style.setProperty("--nx-x", ((innerWidth - (ART_W + dw) * k) / 2).toFixed(1) + "px");
+  stage.style.setProperty("--nx-y", ((innerHeight - ART_H * k) / 2).toFixed(1) + "px");
 }
 addEventListener("resize", scaleStage);
 scaleStage();
-const stageScale = () => (mobile() ? 1 : stage.getBoundingClientRect().width / 1672 || 1);
+const stageScale = () => (mobile() ? 1 : stage.getBoundingClientRect().width / (stage.offsetWidth || ART_W) || 1);
 // composer height for the stacked mobile layout (panels sit between the bars)
 const composer = $("operatorCommand");
 new ResizeObserver(() => body.style.setProperty("--composer-height", composer.getBoundingClientRect().height + "px")).observe(composer);
@@ -197,8 +202,8 @@ function placeBelow(el, anchor, align = "left") {
   const s = stage.getBoundingClientRect();
   let x = (a.left - s.left) / k, y = (a.bottom - s.top) / k + 6;
   if (align === "right") { x = (a.right - s.left) / k + 12; y = (a.top - s.top) / k; }
-  el.style.left = Math.min(x, 1672 - el.offsetWidth - 10) + "px";
-  el.style.top = Math.min(y, 941 - el.offsetHeight - 10) + "px";
+  el.style.left = Math.min(x, stageW() - el.offsetWidth - 10) + "px";
+  el.style.top = Math.min(y, ART_H - el.offsetHeight - 10) + "px";
 }
 function openMenu(btn) {
   const key = btn.dataset.key;

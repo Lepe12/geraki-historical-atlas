@@ -410,3 +410,21 @@ body.nx-mock #chartView .node-seal[data-state="idle"] .seal-wax { background: #e
 body.nx-mock #chartView .node-seal[data-state="absent"] .seal-wax { background: #b9ad94; box-shadow: none; }
 body.nx-mock #chartView .node-seal:hover .seal-wax { transform: scale(1.2); }
 @media (prefers-reduced-motion: reduce) { body.nx-mock #chartView .node-label.active .nl-emblem { animation: none; } }
+
+/* ---------- full-width desktop (wider than 16:9) ----------
+   nautical-dashboard.js sets --nx-dw = extra artboard width so the stage fills the window edge to edge.
+   Map, card row and overlay panels widen; header/query stay centred over the map; the right column stays at the right edge. */
+@media (min-width: 801px) {
+  #stage, #topbar { width: calc(1672px + var(--nx-dw, 0px)); }
+  #topnav { left: calc(410px + var(--nx-dw, 0px) / 2); }
+  body.nx-mock #topbar .nxs-status { left: calc(1170px + var(--nx-dw, 0px)) !important; }
+  #compass { left: calc(1466px + var(--nx-dw, 0px)); }
+  #topOrn { left: calc(1540px + var(--nx-dw, 0px)); }
+  #banner { left: calc(560px + var(--nx-dw, 0px) / 2); }
+  body.nx-mock #operatorCommand { left: calc(432px + var(--nx-dw, 0px) / 2) !important; }
+  #chartFrame { width: calc(1124px + var(--nx-dw, 0px)); }
+  #cards { width: calc(1122px + var(--nx-dw, 0px)); }
+  #hero, #status, #activityBox, #nodesBox { left: calc(1338px + var(--nx-dw, 0px)); }
+  body.nx-mock #stage .nxs-workspace, body.nx-mock #stage .results-drawer, body.nx-mock #stage .learning-panel, body.nx-mock #stage .activity-strip { width: calc(1124px + var(--nx-dw, 0px)) !important; }
+  body.nx-mock #stage .detail-panel { left: calc(1338px + var(--nx-dw, 0px)) !important; }
+}
