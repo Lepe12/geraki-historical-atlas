@@ -375,7 +375,10 @@
     const x0 = Math.min(...pts.map((p) => p[0])) - pad, x1 = Math.max(...pts.map((p) => p[0])) + pad;
     const y0 = Math.min(...pts.map((p) => p[1])) - pad, y1 = Math.max(...pts.map((p) => p[1])) + pad;
     let s = Math.min(r.w / (x1 - x0), r.h / (y1 - y0));
-    s = Math.max(s, Math.max(r.w / C.W, r.h / C.H)); // never leave empty margins around the chart
+    // never leave empty margins above/below the chart. Left/right: fill the frame up to the 16:9 desktop
+    // frame width (1096 px); on wider full-width frames keep that same zoom (same area as at 16:9, every
+    // banner visible) and let parchment margins show at the sides instead of cutting off the north/south.
+    s = Math.max(s, H / C.H, Math.min(W, 1096) / C.W);
     const cx = (x0 + x1) / 2;
     let cy = (y0 + y1) / 2;
     if (s * (y1 - y0) > r.h) {
@@ -390,15 +393,15 @@
     viewDirty = layoutDirty = true;
   }
   function clampView(v) {
-    const minS = Math.max(W / C.W, H / C.H);
+    const minS = Math.min(fitScale || Infinity, Math.max(W / C.W, H / C.H));
     const s = Math.max(minS, Math.min(fitScale * 9, v.s));
     const r = { left: 0, top: 0, right: W, bottom: H, w: W, h: H }, mw = C.W * s, mh = C.H * s, keep = 1;
-    const x = Math.min(r.right - Math.min(mw, r.w) * keep, Math.max(r.left + Math.min(mw, r.w) * keep - mw, v.x));
+    const x = mw < r.w ? (r.w - mw) / 2 : Math.min(r.right - Math.min(mw, r.w) * keep, Math.max(r.left + Math.min(mw, r.w) * keep - mw, v.x));
     const y = Math.min(r.bottom - Math.min(mh, r.h) * keep, Math.max(r.top + Math.min(mh, r.h) * keep - mh, v.y));
     return { s, x, y };
   }
   function zoomAt(factor, px, py) {
-    const s = Math.max(Math.max(W / C.W, H / C.H), Math.min(fitScale * 9, target.s * factor));
+    const s = Math.max(Math.min(fitScale || Infinity, Math.max(W / C.W, H / C.H)), Math.min(fitScale * 9, target.s * factor));
     const k = s / target.s;
     target = clampView({ s, x: px - (px - target.x) * k, y: py - (py - target.y) * k });
     viewDirty = true;

@@ -52,6 +52,10 @@ function tickDate() {
 }
 tickDate();
 setInterval(tickDate, 60000);
+// live clock: the map's render loop only refreshes it while animating, so tick it every second here too
+function tickClock() { $("clock").textContent = new Date().toISOString().slice(11, 19) + " UTC"; }
+tickClock();
+setInterval(tickClock, 1000);
 
 /* ---------- navigation: mockup items → the page's real views ---------- */
 const dock = (view) => document.querySelector(`.nxs-dock [data-nxs-view="${view}"]`);
@@ -88,13 +92,13 @@ function closePop() {
 }
 const layer = (cls, label) => `<label><input type="checkbox" data-cls="${cls}" ${body.classList.contains(cls) ? "" : "checked"} /> ${label}</label>`;
 function layersHtml() {
-  return `<button class="close" type="button" aria-label="Κλείσιμο">✕</button><h2>MAP LAYERS</h2><p>Επίπεδα του ναυτικού χάρτη.</p>` +
+  return `<button class="close" type="button" aria-label="Κλείσιμο">✕</button><h2>ΕΠΙΠΕΔΑ ΧΑΡΤΗ</h2><p>Επίπεδα του ναυτικού χάρτη.</p>` +
     layer("nx-no-seals", "Σφραγίδες ερευνητών (17)") + layer("nx-no-labels", "Ονόματα ερευνητών") + layer("nx-no-routes", "Διαδρομές και ζωντανοί παλμοί") +
     layer("nx-no-rhumbs", "Ρόμβοι (γραμμές πυξίδας)") + layer("nx-no-names", "Λατινικά τοπωνύμια") + layer("nx-no-pictures", "Πλοία και θαλάσσια τέρατα");
 }
 function settingsHtml() {
   const feed = body.dataset.researchFeed || body.dataset.researchUi || "—";
-  return `<button class="close" type="button" aria-label="Κλείσιμο">✕</button><h2>SETTINGS</h2>` +
+  return `<button class="close" type="button" aria-label="Κλείσιμο">✕</button><h2>ΡΥΘΜΙΣΕΙΣ</h2>` +
     `<p>Σύνδεση: ${esc(GR.status(feed))} · Έρευνα #${esc(body.dataset.currentResearchRun || "—")}</p>` +
     `<label><input type="checkbox" data-motion ${body.classList.contains("nx-no-motion") ? "checked" : ""} /> Χωρίς κινήσεις και εφέ</label>` +
     `<p style="margin-top:12px"><button class="btn-l" type="button" data-latest>Άνοιγμα της πιο πρόσφατης έρευνας</button></p>` +
@@ -306,11 +310,11 @@ function renderStatus() {
   const records = s ? (s.discoveries?.length || 0) + (s.claims?.length || 0) : NaN;
   const conflicts = s ? (Array.isArray(s.contradictions?.records) ? s.contradictions.records.length : 0) : NaN;
   const rows = [
-    ["AGENTS", s ? (act ? act + " / " : "") + done + " / " + agents.length : "—", agents.length ? (7 * (done + act)) / agents.length : 0,
+    ["ΕΡΕΥΝΗΤΕΣ", s ? (act ? act + " / " : "") + done + " / " + agents.length : "—", agents.length ? (7 * (done + act)) / agents.length : 0,
       s ? `${done} ολοκληρωμένοι, ${act} ενεργοί, ${agents.length} ερευνητές συνολικά` : "Δεν υπάρχει φορτωμένη έρευνα"],
-    ["SOURCES", s && nRepos ? fmt(nRepos) : "—", nRepos ? (7 * reposHit.size) / nRepos : 0, provisional ? "Τα συγκεντρωτικά δεδομένα δεν έχουν δημοσιευτεί ακόμη" : s ? `${nRepos} αποθετήρια ερωτήθηκαν · ${reposHit.size} με αποτελέσματα` : ""],
-    ["RECORDS", provisional ? "—" : fmt(records), provisional ? 0 : logMeter(records), provisional ? "Τα τελικά ευρήματα δεν έχουν δημοσιευτεί ακόμη" : s ? `${s.discoveries?.length || 0} καταγεγραμμένες πηγές · ${s.claims?.length || 0} ισχυρισμοί` : ""],
-    ["CONFLICTS", provisional ? "—" : fmt(conflicts), provisional ? 0 : Math.min(7, conflicts || 0), provisional ? "Οι αντιφάσεις και τα εμπόδια δεν έχουν συγκεντρωθεί ακόμη" : s ? `${conflicts} καταγεγραμμένες αντιφάσεις · ${s.blockers?.length || 0} εμπόδια πρόσβασης` : ""],
+    ["ΠΗΓΕΣ", s && nRepos ? fmt(nRepos) : "—", nRepos ? (7 * reposHit.size) / nRepos : 0, provisional ? "Τα συγκεντρωτικά δεδομένα δεν έχουν δημοσιευτεί ακόμη" : s ? `${nRepos} αποθετήρια ερωτήθηκαν · ${reposHit.size} με αποτελέσματα` : ""],
+    ["ΕΓΓΡΑΦΕΣ", provisional ? "—" : fmt(records), provisional ? 0 : logMeter(records), provisional ? "Τα τελικά ευρήματα δεν έχουν δημοσιευτεί ακόμη" : s ? `${s.discoveries?.length || 0} καταγεγραμμένες πηγές · ${s.claims?.length || 0} ισχυρισμοί` : ""],
+    ["ΑΝΤΙΦΑΣΕΙΣ", provisional ? "—" : fmt(conflicts), provisional ? 0 : Math.min(7, conflicts || 0), provisional ? "Οι αντιφάσεις και τα εμπόδια δεν έχουν συγκεντρωθεί ακόμη" : s ? `${conflicts} καταγεγραμμένες αντιφάσεις · ${s.blockers?.length || 0} εμπόδια πρόσβασης` : ""],
   ];
   $("statRows").innerHTML = rows.map(([k, n, lit, title]) => `<div class="srow" title="${esc(title)}"><span class="k">${k}</span><span class="n">${esc(n)}</span>${meter(lit)}</div>`).join("");
   $("agentsDot").hidden = !act;
@@ -416,7 +420,7 @@ function renderNodes() {
     c.querySelector("title").textContent = laneName(id) + " — " + (a ? GR.status(a.status) : "χωρίς δεδομένα");
     g.querySelector(".mx").toggleAttribute("hidden", cls !== "BLOCKED");
   });
-  $("nodeCount").textContent = lanes.length + " NODES" + (snapshot ? " · " + (active ? active + " ενεργοί" : agents.length + " στην έρευνα") : "");
+  $("nodeCount").textContent = lanes.length + " κόμβοι" + (snapshot ? " · " + (active ? active + " ενεργοί" : agents.length + " στην έρευνα") : "");
 }
 function renderCards() {
   const s = snapshot;

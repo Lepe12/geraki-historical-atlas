@@ -428,3 +428,26 @@ body.nx-mock #chartView .node-seal:hover .seal-wax { transform: scale(1.2); }
   body.nx-mock #stage .nxs-workspace, body.nx-mock #stage .results-drawer, body.nx-mock #stage .learning-panel, body.nx-mock #stage .activity-strip { width: calc(1124px + var(--nx-dw, 0px)) !important; }
   body.nx-mock #stage .detail-panel { left: calc(1338px + var(--nx-dw, 0px)) !important; }
 }
+
+/* ---------- Greek labels, framed view list, full-length texts (desktop) ---------- */
+@media (min-width: 801px) {
+  #logo .ls { letter-spacing: 1.2px; }
+  #topnav .nav-item { letter-spacing: 2px; }
+  body.nx-mock #sidenav .side-item span { top: 50% !important; transform: translateY(-50%); width: 82px; white-space: normal !important; line-height: 1.15; letter-spacing: 1.2px !important; }
+  .srow .k { letter-spacing: 1px; }
+  /* view list (ΙΣΤΟΡΙΑ / ΕΔΑΦΗ / ΠΡΟΣΩΠΑ / ΠΛΗΡΟΦΟΡΙΕΣ): a small brass-framed panel beside the menu */
+  #histList { left: 206px; top: 88px; width: 212px; height: 106px; }
+  #histList .hist { left: 44px; margin-top: 17px; letter-spacing: 2px; z-index: 1; }
+  #histDash { left: 22px; margin-top: 17px; z-index: 1; }
+  /* commandState: italic glyphs were clipped ("Έτοιμ") */
+  body.nx-mock #commandState { padding: 0 4px 0 2px; }
+  /* moon box status: wrap instead of "…" */
+  #moon .mt1 { top: 172px; } #moon .mt2 { top: 190px; }
+  #moon .mphase { top: 212px; white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; font-size: 11.5px; }
+  /* recent activity: full titles, wrapped; the list scrolls if longer than the box */
+  #activityLive { overflow-y: auto; scrollbar-width: thin; scrollbar-color: #5a4426 transparent; }
+  #activityLive .row { height: auto; min-height: 36px; padding: 0 0 6px 66px; box-sizing: border-box; width: 282px; }
+  #activityLive .row > .ti, #activityLive .row > .su { position: static; display: block; max-width: none; white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.2; }
+  #activityLive .row::after { top: 24px; height: calc(100% - 22px); }
+}
+@media (max-width: 800px) { #histList.box { background: none; box-shadow: none; } #histList.frame::before { display: none; } }
