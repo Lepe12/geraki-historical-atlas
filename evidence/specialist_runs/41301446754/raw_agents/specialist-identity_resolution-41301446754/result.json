@@ -1,0 +1,1927 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "identity_resolution",
+  "label": "Identity Resolution Agent",
+  "assignment_id": "identity_resolution:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "entity_candidates",
+    "variant_names",
+    "same_entity_assessment",
+    "collision_warnings"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "2b03fb10d2d3e0984e7515e605b32824922ae28c255eec49a5d7088f44482c23",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "identity_resolution",
+    "assignment_id": "identity_resolution:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:SearchCulture.gr / EKT",
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:OpenArchives.gr / EKT"
+    ],
+    "queries": [
+      "\"Καψή\" variant spelling",
+      "\"Καψή\" alias OR aliases",
+      "\"Καψή\" historical name",
+      "\"Καψή\" transliteration"
+    ],
+    "operation": "search",
+    "search_budget": 16,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 130,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 102,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 4,
+    "total_search_budget": 16,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 621, \"response_sha256\": \"71e74bb9fa7090c3972b54b077a98fefb91cec1fc59ef000767005d58d579456\", \"elapsed_ms\": 802}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE++alias+OR+aliases%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE++variant+spelling%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE++variant+spelling%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 621, \"response_sha256\": \"8210108692c97ead201c27af5a2f46b7fc2cd311f53d9b9c4255f5c2eba8f4c9\", \"elapsed_ms\": 847}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE++variant+spelling%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ERROR",
+      "query": "\"Καψή\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%B1%CF%88%CE%AE%22+alias+OR+aliases\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 911}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ERROR",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%B1%CF%88%CE%AE%22+alias+OR+aliases\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 911}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%B1%CF%88%CE%AE%22+transliteration\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%B1%CF%88%CE%AE%22+transliteration\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 978}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%B1%CF%88%CE%AE%22+transliteration\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%B1%CF%88%CE%AE%22+variant+spelling\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%B1%CF%88%CE%AE%22+variant+spelling\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1053}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%B1%CF%88%CE%AE%22+variant+spelling\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%B1%CF%88%CE%AE%22+historical+name\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%B1%CF%88%CE%AE%22+historical+name\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1280}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%B1%CF%88%CE%AE%22+historical+name\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE++historical+name%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE++historical+name%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 620, \"response_sha256\": \"62f4e3d3a49c07fb43803444a99f71cd05d065d5eb6b28209cbcb01cf9258b53\", \"elapsed_ms\": 609}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE++historical+name%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE++transliteration%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE++transliteration%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 620, \"response_sha256\": \"457175a0affc372cccaa88e3d0568b018d262a16a93438453b5eb079d6477497\", \"elapsed_ms\": 569}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE++transliteration%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" variant spelling",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%22+variant+spelling&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%22+variant+spelling&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25569, \"response_sha256\": \"b471e051ec29d26dcb0858b1f53a6e2fc93799c165e65b7a206fe0670c638534\", \"elapsed_ms\": 575}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%22+variant+spelling&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" alias OR aliases",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%22+alias+OR+aliases&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%22+alias+OR+aliases&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25569, \"response_sha256\": \"5ff8c5b7b99df618b5ba7416d74fbb1ead4a1c40325111311e4d445f39eb2daa\", \"elapsed_ms\": 509}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%22+alias+OR+aliases&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" historical name",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%22+historical+name&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%22+historical+name&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25565, \"response_sha256\": \"6c558894feb64cca93d8bbb31861b34f2af6540a5254bc113fb4b4b8fe343b88\", \"elapsed_ms\": 437}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%22+historical+name&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" transliteration",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%22+transliteration&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%22+transliteration&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 31568, \"response_sha256\": \"c962a29925e5898d8ebbf90e40a369cda78a842446c75ed02f6187ea23cf094b\", \"elapsed_ms\": 213}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%22+transliteration&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" transliteration",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_34437",
+          "title": "Textual phenomena addressing youth: Orthographic, typographic, and ideological aspects of the Greek-Cypriot dialect",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_34437"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_15638",
+          "title": "Ο εξαγγλισμός της Νέας Ελληνικής : μια ποιοτική και ποσοτική μελέτη Evaluating Anglicisation in Modern Greek : a qualitative and quantitative survey",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_15638"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_48416",
+          "title": "Ο εξαγγλισμός της νέας ελληνικής: μία ποιοτική και ποσοτική μελέτη L’anglicisation du grec moderne: une étude qualitative et quantitative",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_48416"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-296959",
+          "title": "Roman-alphabeted Greek and transliteration in the digital language practices of Greek secondary school pupils on Facebook",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-296959"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_4935",
+          "title": "Ανάπτυξη μεθόδου με σκοπό την αναγνώριση και εξαγωγή θεματικών λέξεων κλειδιών από διευθύνσεις ιστοσελίδων του ελληνικού Διαδικτύου Keyword identification within Greek URLs",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_4935"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34323",
+          "title": "Ολυμπιακή Αεροπορία : οριστικό τέλος",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34323"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34336",
+          "title": "Ο τουρισμός του μέλλοντος : αφιέρωμα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34336"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36199",
+          "title": "Νέες υπηρεσίες και προϊόντα για τις γυναίκες",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36199"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34349",
+          "title": "Ελληνικές μεταλλευτικές επιχειρήσεις : νέες επιχειρηματικές συμφωνίες και επέκταση στο εξωτερικό",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34349"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34351",
+          "title": "Entreprpreneur of the Year : ένας καταξιωμένος επιχειρηματικός θεσμός στην Ελλάδα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34351"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36198",
+          "title": "Θετικό, αλλά με πιο βραδείς ρυθμούς ανάπτυξης το 2005 : διεθνής τουρισμός.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36198"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34335",
+          "title": "Επιστροφή στην πραγματικότητα : η ελληνική οικονομία και η παρακαταθήκη των αγώνων",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34335"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34354",
+          "title": "71η Διεθνής Έκθεση Θεσσαλονίκης : το \"αύριο\" στην ελληνική οικονομία: αφιέρωμα.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34354"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34355",
+          "title": "Περισσότερα \"αστέρια\" στη Θεσσαλονίκη : νέες επενδύσεις σε αστικό και συνεδριακό τουρισμό",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34355"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34346",
+          "title": "Κυπριακή απόβαση στην Ελλάδα : διπλασιάστηκαν σε αριθμό οι επενδύσεις την τελευταία πενταετία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34346"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34370",
+          "title": "Ακόμη μια καλή χρονιά για τα ευρωπαϊκά ξενοδοχεία : εντυπωσιακά τα αποτελέσματα και σε παγκόσμιο επίπεδο",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34370"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34350",
+          "title": "Το κοινωνικό πρόσωπο των επιχειρήσεων : η εταιρική κοινωνική ευθύνη και η ελληνική εμπειρία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34350"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34340",
+          "title": "Πέντε προϋποθέσεις για επιχειρηματικά δάνεια : μεγάλο εύρος χρηματοδοτικών προϊόντων προσφέρουν οι τράπεζες στις επιχειρήσεις",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34340"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34368",
+          "title": "Συμφωνίες μαμούθ 2 δισ,. ευρώ : επιχειρηματικά σχέδια, συνεργασίες και πωλήσεις δίνουν πνοή στις εισηγμένες τουριστικές εταιρείες",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34368"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36215",
+          "title": "Δημόσια έργα σε ιδιώτες με συμβάσεις παραχώρησης : αποκλειστική συνέντευξη του υφυπουργού Οικονομίας Χρήστου Φώλια",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36215"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34361",
+          "title": "Θερινές-- μονομαχίες : εταιρείες παραγωγής αναψυκτικών, χυμών και εμφιαλωμένου νερού σε θέσεις μάχης για μεγαλύτερα μερίδια",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34361"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34343",
+          "title": "Έντονο επιχειρηματικό ενδιαφέρον για τον τουρισμό : αναμένονται σημαντικές θεσμικές παρεμβάσεις για θέματα χωροταξίας και πολεοδομίας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34343"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34344",
+          "title": "Ελληνικές επενδύσεις στην Κίνα : αλήθειες και μύθοι: οι μεγάλες ευκαιρίες, τα εμπόδια και οι προκλήσεις",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34344"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34362",
+          "title": "Ευαίσθητες-- επιχειρήσεις : υστερεί η Ελλάδα στην κοινωνική ευθύνη των επιχειρήσεων έναντι του ευρωπαϊκού μέσου όρου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34362"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34359",
+          "title": "Οι 14 αλλαγές στην αγορά πετρελαιοειδών : απελευθερώνεται το ωράριο, πώληση καυσίμων και από σούπερ μάρκετ",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34359"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%B1%CF%88%CE%AE%22+transliteration&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%B1%CF%88%CE%AE%22+transliteration&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 936970, \"response_sha256\": \"6408ec038620e39e2c7b3a155793e984a7520f810f8fb4182bbb5f087f91d24b\", \"elapsed_ms\": 3156}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%B1%CF%88%CE%AE%22+transliteration&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" variant spelling",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34323",
+          "title": "Ολυμπιακή Αεροπορία : οριστικό τέλος",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34323"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34336",
+          "title": "Ο τουρισμός του μέλλοντος : αφιέρωμα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34336"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36199",
+          "title": "Νέες υπηρεσίες και προϊόντα για τις γυναίκες",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36199"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34349",
+          "title": "Ελληνικές μεταλλευτικές επιχειρήσεις : νέες επιχειρηματικές συμφωνίες και επέκταση στο εξωτερικό",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34349"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34351",
+          "title": "Entreprpreneur of the Year : ένας καταξιωμένος επιχειρηματικός θεσμός στην Ελλάδα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34351"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36198",
+          "title": "Θετικό, αλλά με πιο βραδείς ρυθμούς ανάπτυξης το 2005 : διεθνής τουρισμός.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36198"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34335",
+          "title": "Επιστροφή στην πραγματικότητα : η ελληνική οικονομία και η παρακαταθήκη των αγώνων",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34335"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34354",
+          "title": "71η Διεθνής Έκθεση Θεσσαλονίκης : το \"αύριο\" στην ελληνική οικονομία: αφιέρωμα.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34354"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34355",
+          "title": "Περισσότερα \"αστέρια\" στη Θεσσαλονίκη : νέες επενδύσεις σε αστικό και συνεδριακό τουρισμό",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34355"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34346",
+          "title": "Κυπριακή απόβαση στην Ελλάδα : διπλασιάστηκαν σε αριθμό οι επενδύσεις την τελευταία πενταετία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34346"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34370",
+          "title": "Ακόμη μια καλή χρονιά για τα ευρωπαϊκά ξενοδοχεία : εντυπωσιακά τα αποτελέσματα και σε παγκόσμιο επίπεδο",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34370"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34350",
+          "title": "Το κοινωνικό πρόσωπο των επιχειρήσεων : η εταιρική κοινωνική ευθύνη και η ελληνική εμπειρία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34350"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34340",
+          "title": "Πέντε προϋποθέσεις για επιχειρηματικά δάνεια : μεγάλο εύρος χρηματοδοτικών προϊόντων προσφέρουν οι τράπεζες στις επιχειρήσεις",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34340"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34368",
+          "title": "Συμφωνίες μαμούθ 2 δισ,. ευρώ : επιχειρηματικά σχέδια, συνεργασίες και πωλήσεις δίνουν πνοή στις εισηγμένες τουριστικές εταιρείες",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34368"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36215",
+          "title": "Δημόσια έργα σε ιδιώτες με συμβάσεις παραχώρησης : αποκλειστική συνέντευξη του υφυπουργού Οικονομίας Χρήστου Φώλια",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36215"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34361",
+          "title": "Θερινές-- μονομαχίες : εταιρείες παραγωγής αναψυκτικών, χυμών και εμφιαλωμένου νερού σε θέσεις μάχης για μεγαλύτερα μερίδια",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34361"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34343",
+          "title": "Έντονο επιχειρηματικό ενδιαφέρον για τον τουρισμό : αναμένονται σημαντικές θεσμικές παρεμβάσεις για θέματα χωροταξίας και πολεοδομίας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34343"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34344",
+          "title": "Ελληνικές επενδύσεις στην Κίνα : αλήθειες και μύθοι: οι μεγάλες ευκαιρίες, τα εμπόδια και οι προκλήσεις",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34344"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34362",
+          "title": "Ευαίσθητες-- επιχειρήσεις : υστερεί η Ελλάδα στην κοινωνική ευθύνη των επιχειρήσεων έναντι του ευρωπαϊκού μέσου όρου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34362"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34359",
+          "title": "Οι 14 αλλαγές στην αγορά πετρελαιοειδών : απελευθερώνεται το ωράριο, πώληση καυσίμων και από σούπερ μάρκετ",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34359"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34341",
+          "title": "Το μετέωρο βήμα των μικρομεσαίων επιχειρήσεων : απειλή οι μεγάλες εταιρείες και οι μικρομεσαίοι των αναπτυσσόμενων χωρών",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34341"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36732",
+          "title": "Πώς θα διατηρηθεί η δυναμική : συνέντευξη της υπουργού Τουριστικής Ανάπτυξης Φάνης Πάλλη-Πετραλιά",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36732"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34327",
+          "title": "Ελλάδα-Τουρκία : κοινό επιχειρηματικό μέλλον, υπό πρϋποθέσεις: σε αναζήτηση νέου μοντέλου οικονομικής συνεργασίας οδηγούν τις δύο χώρες οι εξελίξεις",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34327"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34325",
+          "title": "Η Ελλάδα συνεδριακός προορισμός, αλλά με ελλιπή υποδομή : προχωρεί το Athens Convention Bureau- καθυστερεί το Συνεδριακό Κέντρο της Αθήνας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34325"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34329",
+          "title": "Χωρίς ουσιαστική αύξηση κινήτρων για τον τουρισμό ο νέος αναπτυξιακός νόμος : σωρεία παρατηρήσεων έχουν υποβάλει οι τουριστικοί φορείς",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34329"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%B1%CF%88%CE%AE%22+variant+spelling&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%B1%CF%88%CE%AE%22+variant+spelling&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 880112, \"response_sha256\": \"8fdadb86e552fdfb497fe1458c65fcb7335b707aeed9813dbd8a27e992d8d994\", \"elapsed_ms\": 3410}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%B1%CF%88%CE%AE%22+variant+spelling&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" alias OR aliases",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34323",
+          "title": "Ολυμπιακή Αεροπορία : οριστικό τέλος",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34323"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34336",
+          "title": "Ο τουρισμός του μέλλοντος : αφιέρωμα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34336"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36199",
+          "title": "Νέες υπηρεσίες και προϊόντα για τις γυναίκες",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36199"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34349",
+          "title": "Ελληνικές μεταλλευτικές επιχειρήσεις : νέες επιχειρηματικές συμφωνίες και επέκταση στο εξωτερικό",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34349"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34351",
+          "title": "Entreprpreneur of the Year : ένας καταξιωμένος επιχειρηματικός θεσμός στην Ελλάδα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34351"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36198",
+          "title": "Θετικό, αλλά με πιο βραδείς ρυθμούς ανάπτυξης το 2005 : διεθνής τουρισμός.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36198"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34335",
+          "title": "Επιστροφή στην πραγματικότητα : η ελληνική οικονομία και η παρακαταθήκη των αγώνων",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34335"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34354",
+          "title": "71η Διεθνής Έκθεση Θεσσαλονίκης : το \"αύριο\" στην ελληνική οικονομία: αφιέρωμα.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34354"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34355",
+          "title": "Περισσότερα \"αστέρια\" στη Θεσσαλονίκη : νέες επενδύσεις σε αστικό και συνεδριακό τουρισμό",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34355"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34346",
+          "title": "Κυπριακή απόβαση στην Ελλάδα : διπλασιάστηκαν σε αριθμό οι επενδύσεις την τελευταία πενταετία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34346"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34370",
+          "title": "Ακόμη μια καλή χρονιά για τα ευρωπαϊκά ξενοδοχεία : εντυπωσιακά τα αποτελέσματα και σε παγκόσμιο επίπεδο",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34370"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34350",
+          "title": "Το κοινωνικό πρόσωπο των επιχειρήσεων : η εταιρική κοινωνική ευθύνη και η ελληνική εμπειρία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34350"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34340",
+          "title": "Πέντε προϋποθέσεις για επιχειρηματικά δάνεια : μεγάλο εύρος χρηματοδοτικών προϊόντων προσφέρουν οι τράπεζες στις επιχειρήσεις",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34340"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34368",
+          "title": "Συμφωνίες μαμούθ 2 δισ,. ευρώ : επιχειρηματικά σχέδια, συνεργασίες και πωλήσεις δίνουν πνοή στις εισηγμένες τουριστικές εταιρείες",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34368"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36215",
+          "title": "Δημόσια έργα σε ιδιώτες με συμβάσεις παραχώρησης : αποκλειστική συνέντευξη του υφυπουργού Οικονομίας Χρήστου Φώλια",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36215"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34361",
+          "title": "Θερινές-- μονομαχίες : εταιρείες παραγωγής αναψυκτικών, χυμών και εμφιαλωμένου νερού σε θέσεις μάχης για μεγαλύτερα μερίδια",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34361"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34343",
+          "title": "Έντονο επιχειρηματικό ενδιαφέρον για τον τουρισμό : αναμένονται σημαντικές θεσμικές παρεμβάσεις για θέματα χωροταξίας και πολεοδομίας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34343"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34344",
+          "title": "Ελληνικές επενδύσεις στην Κίνα : αλήθειες και μύθοι: οι μεγάλες ευκαιρίες, τα εμπόδια και οι προκλήσεις",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34344"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34362",
+          "title": "Ευαίσθητες-- επιχειρήσεις : υστερεί η Ελλάδα στην κοινωνική ευθύνη των επιχειρήσεων έναντι του ευρωπαϊκού μέσου όρου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34362"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34359",
+          "title": "Οι 14 αλλαγές στην αγορά πετρελαιοειδών : απελευθερώνεται το ωράριο, πώληση καυσίμων και από σούπερ μάρκετ",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34359"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34341",
+          "title": "Το μετέωρο βήμα των μικρομεσαίων επιχειρήσεων : απειλή οι μεγάλες εταιρείες και οι μικρομεσαίοι των αναπτυσσόμενων χωρών",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34341"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36732",
+          "title": "Πώς θα διατηρηθεί η δυναμική : συνέντευξη της υπουργού Τουριστικής Ανάπτυξης Φάνης Πάλλη-Πετραλιά",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36732"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34327",
+          "title": "Ελλάδα-Τουρκία : κοινό επιχειρηματικό μέλλον, υπό πρϋποθέσεις: σε αναζήτηση νέου μοντέλου οικονομικής συνεργασίας οδηγούν τις δύο χώρες οι εξελίξεις",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34327"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34325",
+          "title": "Η Ελλάδα συνεδριακός προορισμός, αλλά με ελλιπή υποδομή : προχωρεί το Athens Convention Bureau- καθυστερεί το Συνεδριακό Κέντρο της Αθήνας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34325"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34329",
+          "title": "Χωρίς ουσιαστική αύξηση κινήτρων για τον τουρισμό ο νέος αναπτυξιακός νόμος : σωρεία παρατηρήσεων έχουν υποβάλει οι τουριστικοί φορείς",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34329"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%B1%CF%88%CE%AE%22+alias+OR+aliases&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%B1%CF%88%CE%AE%22+alias+OR+aliases&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 880112, \"response_sha256\": \"7942dbdc7716595901178bc489f31dd7d3938d2d1544b6d7364953bb3c3407a3\", \"elapsed_ms\": 3644}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%B1%CF%88%CE%AE%22+alias+OR+aliases&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψή\" historical name",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34323",
+          "title": "Ολυμπιακή Αεροπορία : οριστικό τέλος",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34323"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34336",
+          "title": "Ο τουρισμός του μέλλοντος : αφιέρωμα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34336"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36199",
+          "title": "Νέες υπηρεσίες και προϊόντα για τις γυναίκες",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36199"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34349",
+          "title": "Ελληνικές μεταλλευτικές επιχειρήσεις : νέες επιχειρηματικές συμφωνίες και επέκταση στο εξωτερικό",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34349"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34351",
+          "title": "Entreprpreneur of the Year : ένας καταξιωμένος επιχειρηματικός θεσμός στην Ελλάδα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34351"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36198",
+          "title": "Θετικό, αλλά με πιο βραδείς ρυθμούς ανάπτυξης το 2005 : διεθνής τουρισμός.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36198"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34335",
+          "title": "Επιστροφή στην πραγματικότητα : η ελληνική οικονομία και η παρακαταθήκη των αγώνων",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34335"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34354",
+          "title": "71η Διεθνής Έκθεση Θεσσαλονίκης : το \"αύριο\" στην ελληνική οικονομία: αφιέρωμα.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34354"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34355",
+          "title": "Περισσότερα \"αστέρια\" στη Θεσσαλονίκη : νέες επενδύσεις σε αστικό και συνεδριακό τουρισμό",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34355"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34346",
+          "title": "Κυπριακή απόβαση στην Ελλάδα : διπλασιάστηκαν σε αριθμό οι επενδύσεις την τελευταία πενταετία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34346"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34370",
+          "title": "Ακόμη μια καλή χρονιά για τα ευρωπαϊκά ξενοδοχεία : εντυπωσιακά τα αποτελέσματα και σε παγκόσμιο επίπεδο",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34370"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34350",
+          "title": "Το κοινωνικό πρόσωπο των επιχειρήσεων : η εταιρική κοινωνική ευθύνη και η ελληνική εμπειρία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34350"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34340",
+          "title": "Πέντε προϋποθέσεις για επιχειρηματικά δάνεια : μεγάλο εύρος χρηματοδοτικών προϊόντων προσφέρουν οι τράπεζες στις επιχειρήσεις",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34340"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34368",
+          "title": "Συμφωνίες μαμούθ 2 δισ,. ευρώ : επιχειρηματικά σχέδια, συνεργασίες και πωλήσεις δίνουν πνοή στις εισηγμένες τουριστικές εταιρείες",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34368"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36215",
+          "title": "Δημόσια έργα σε ιδιώτες με συμβάσεις παραχώρησης : αποκλειστική συνέντευξη του υφυπουργού Οικονομίας Χρήστου Φώλια",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36215"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34361",
+          "title": "Θερινές-- μονομαχίες : εταιρείες παραγωγής αναψυκτικών, χυμών και εμφιαλωμένου νερού σε θέσεις μάχης για μεγαλύτερα μερίδια",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34361"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34343",
+          "title": "Έντονο επιχειρηματικό ενδιαφέρον για τον τουρισμό : αναμένονται σημαντικές θεσμικές παρεμβάσεις για θέματα χωροταξίας και πολεοδομίας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34343"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34344",
+          "title": "Ελληνικές επενδύσεις στην Κίνα : αλήθειες και μύθοι: οι μεγάλες ευκαιρίες, τα εμπόδια και οι προκλήσεις",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34344"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34362",
+          "title": "Ευαίσθητες-- επιχειρήσεις : υστερεί η Ελλάδα στην κοινωνική ευθύνη των επιχειρήσεων έναντι του ευρωπαϊκού μέσου όρου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34362"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34359",
+          "title": "Οι 14 αλλαγές στην αγορά πετρελαιοειδών : απελευθερώνεται το ωράριο, πώληση καυσίμων και από σούπερ μάρκετ",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34359"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34341",
+          "title": "Το μετέωρο βήμα των μικρομεσαίων επιχειρήσεων : απειλή οι μεγάλες εταιρείες και οι μικρομεσαίοι των αναπτυσσόμενων χωρών",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34341"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36732",
+          "title": "Πώς θα διατηρηθεί η δυναμική : συνέντευξη της υπουργού Τουριστικής Ανάπτυξης Φάνης Πάλλη-Πετραλιά",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36732"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34327",
+          "title": "Ελλάδα-Τουρκία : κοινό επιχειρηματικό μέλλον, υπό πρϋποθέσεις: σε αναζήτηση νέου μοντέλου οικονομικής συνεργασίας οδηγούν τις δύο χώρες οι εξελίξεις",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34327"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34325",
+          "title": "Η Ελλάδα συνεδριακός προορισμός, αλλά με ελλιπή υποδομή : προχωρεί το Athens Convention Bureau- καθυστερεί το Συνεδριακό Κέντρο της Αθήνας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34325"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34329",
+          "title": "Χωρίς ουσιαστική αύξηση κινήτρων για τον τουρισμό ο νέος αναπτυξιακός νόμος : σωρεία παρατηρήσεων έχουν υποβάλει οι τουριστικοί φορείς",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34329"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%B1%CF%88%CE%AE%22+historical+name&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%B1%CF%88%CE%AE%22+historical+name&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 884102, \"response_sha256\": \"f5557de2007d02c06a0a7a646494ef96bcca92f92fd5338d447a4ef46d9e9499\", \"elapsed_ms\": 3919}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9A%CE%B1%CF%88%CE%AE%22+historical+name&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "41301446754",
+    "agent_id": "identity_resolution",
+    "source_leads": [
+      {
+        "id": "lead_97d46ed130a7b2ba5b7f04c9",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ktisis/000029-20.500.14279_34437",
+        "title": "Textual phenomena addressing youth: Orthographic, typographic, and ideological aspects of the Greek-Cypriot dialect",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e86f995f7bad3d6f86feff2d",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_15638",
+        "title": "Ο εξαγγλισμός της Νέας Ελληνικής : μια ποιοτική και ποσοτική μελέτη Evaluating Anglicisation in Modern Greek : a qualitative and quantitative survey",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_cfd1ac903234c1fc1982d2bd",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_48416",
+        "title": "Ο εξαγγλισμός της νέας ελληνικής: μία ποιοτική και ποσοτική μελέτη L’anglicisation du grec moderne: une étude qualitative et quantitative",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7ab04074b65515dd052af467",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-296959",
+        "title": "Roman-alphabeted Greek and transliteration in the digital language practices of Greek secondary school pupils on Facebook",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_99fc63776c622de4a0761e98",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_4935",
+        "title": "Ανάπτυξη μεθόδου με σκοπό την αναγνώριση και εξαγωγή θεματικών λέξεων κλειδιών από διευθύνσεις ιστοσελίδων του ελληνικού Διαδικτύου Keyword identification within Greek URLs",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_cc939675459e42c341cbd9c0",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34323",
+        "title": "Ολυμπιακή Αεροπορία : οριστικό τέλος",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1d013319a8676ec8d40af038",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34336",
+        "title": "Ο τουρισμός του μέλλοντος : αφιέρωμα",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f2065c42be9f05d9258bd350",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36199",
+        "title": "Νέες υπηρεσίες και προϊόντα για τις γυναίκες",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_333afcd99c6ae2ead2fc375c",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34349",
+        "title": "Ελληνικές μεταλλευτικές επιχειρήσεις : νέες επιχειρηματικές συμφωνίες και επέκταση στο εξωτερικό",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_87ed40975463b211c4654793",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34351",
+        "title": "Entreprpreneur of the Year : ένας καταξιωμένος επιχειρηματικός θεσμός στην Ελλάδα",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0ce92cc6c9f6a778a5ec3ee3",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36198",
+        "title": "Θετικό, αλλά με πιο βραδείς ρυθμούς ανάπτυξης το 2005 : διεθνής τουρισμός.",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6944f92222e109d52149d9f4",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34335",
+        "title": "Επιστροφή στην πραγματικότητα : η ελληνική οικονομία και η παρακαταθήκη των αγώνων",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_485c6815466153d81c62414e",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34354",
+        "title": "71η Διεθνής Έκθεση Θεσσαλονίκης : το \"αύριο\" στην ελληνική οικονομία: αφιέρωμα.",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9dc78e523d5b14f4b57bbc47",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34355",
+        "title": "Περισσότερα \"αστέρια\" στη Θεσσαλονίκη : νέες επενδύσεις σε αστικό και συνεδριακό τουρισμό",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d6c22a1f3ddd66f710ac448c",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34346",
+        "title": "Κυπριακή απόβαση στην Ελλάδα : διπλασιάστηκαν σε αριθμό οι επενδύσεις την τελευταία πενταετία",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8b3f842f6ec2cc909ee4704d",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34370",
+        "title": "Ακόμη μια καλή χρονιά για τα ευρωπαϊκά ξενοδοχεία : εντυπωσιακά τα αποτελέσματα και σε παγκόσμιο επίπεδο",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a0930c88af24fed3da09d0b1",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34350",
+        "title": "Το κοινωνικό πρόσωπο των επιχειρήσεων : η εταιρική κοινωνική ευθύνη και η ελληνική εμπειρία",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_43fb1b0dba001f68df458f7e",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34340",
+        "title": "Πέντε προϋποθέσεις για επιχειρηματικά δάνεια : μεγάλο εύρος χρηματοδοτικών προϊόντων προσφέρουν οι τράπεζες στις επιχειρήσεις",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fa2f7e350815caac63e04e37",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34368",
+        "title": "Συμφωνίες μαμούθ 2 δισ,. ευρώ : επιχειρηματικά σχέδια, συνεργασίες και πωλήσεις δίνουν πνοή στις εισηγμένες τουριστικές εταιρείες",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d9285247a9bf5a82a705e3d1",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36215",
+        "title": "Δημόσια έργα σε ιδιώτες με συμβάσεις παραχώρησης : αποκλειστική συνέντευξη του υφυπουργού Οικονομίας Χρήστου Φώλια",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a97ff6c858de73fa14b1d5e1",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34361",
+        "title": "Θερινές-- μονομαχίες : εταιρείες παραγωγής αναψυκτικών, χυμών και εμφιαλωμένου νερού σε θέσεις μάχης για μεγαλύτερα μερίδια",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_282bdd67b6a703ae8b06fcb9",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34343",
+        "title": "Έντονο επιχειρηματικό ενδιαφέρον για τον τουρισμό : αναμένονται σημαντικές θεσμικές παρεμβάσεις για θέματα χωροταξίας και πολεοδομίας",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_123497c4bafe4028affc8f54",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34344",
+        "title": "Ελληνικές επενδύσεις στην Κίνα : αλήθειες και μύθοι: οι μεγάλες ευκαιρίες, τα εμπόδια και οι προκλήσεις",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3cdd2f0b30a2e24a9c83b20a",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34362",
+        "title": "Ευαίσθητες-- επιχειρήσεις : υστερεί η Ελλάδα στην κοινωνική ευθύνη των επιχειρήσεων έναντι του ευρωπαϊκού μέσου όρου",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_690a19c01071dc54e54d790d",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34359",
+        "title": "Οι 14 αλλαγές στην αγορά πετρελαιοειδών : απελευθερώνεται το ωράριο, πώληση καυσίμων και από σούπερ μάρκετ",
+        "query": "\"Καψή\" transliteration",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5704c5b6fb66860c06beaa21",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34341",
+        "title": "Το μετέωρο βήμα των μικρομεσαίων επιχειρήσεων : απειλή οι μεγάλες εταιρείες και οι μικρομεσαίοι των αναπτυσσόμενων χωρών",
+        "query": "\"Καψή\" variant spelling",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_811f57b74537cf53d8437f5d",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_36732",
+        "title": "Πώς θα διατηρηθεί η δυναμική : συνέντευξη της υπουργού Τουριστικής Ανάπτυξης Φάνης Πάλλη-Πετραλιά",
+        "query": "\"Καψή\" variant spelling",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_87c9d1b50b1144f05e0af3f6",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34327",
+        "title": "Ελλάδα-Τουρκία : κοινό επιχειρηματικό μέλλον, υπό πρϋποθέσεις: σε αναζήτηση νέου μοντέλου οικονομικής συνεργασίας οδηγούν τις δύο χώρες οι εξελίξεις",
+        "query": "\"Καψή\" variant spelling",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_efa78d16fac4f0556a978dc8",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34325",
+        "title": "Η Ελλάδα συνεδριακός προορισμός, αλλά με ελλιπή υποδομή : προχωρεί το Athens Convention Bureau- καθυστερεί το Συνεδριακό Κέντρο της Αθήνας",
+        "query": "\"Καψή\" variant spelling",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f3475a487a4668dd1c15c9b2",
+        "run_id": "41301446754",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_34329",
+        "title": "Χωρίς ουσιαστική αύξηση κινήτρων για τον τουρισμό ο νέος αναπτυξιακός νόμος : σωρεία παρατηρήσεων έχουν υποβάλει οι τουριστικοί φορείς",
+        "query": "\"Καψή\" variant spelling",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      }
+    ],
+    "connector_errors": [
+      {
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "status": "REMOTE_ERROR",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9A%CE%B1%CF%88%CE%AE%22+alias+OR+aliases\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 911}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      }
+    ],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 100,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
