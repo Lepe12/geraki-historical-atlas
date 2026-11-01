@@ -1,0 +1,3533 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "source_genealogy",
+  "label": "Source Genealogy Agent",
+  "assignment_id": "source_genealogy:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "source_chains",
+    "derivative_sources",
+    "independence_warnings",
+    "primary_source_targets"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "478a0a23ed1d35ddf48c941853322cb6fee4aa71552a515630ffbb15f54a20c5",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "source_genealogy",
+    "assignment_id": "source_genealogy:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:Biblioteca Digital Hispánica",
+      "repo:Academia.edu Public Research"
+    ],
+    "queries": [
+      "\"Καψής\" cited by",
+      "\"Καψής\" bibliography sources",
+      "\"Καψής\" edition translation",
+      "\"Καψής\" chronicle manuscript"
+    ],
+    "operation": "search",
+    "search_budget": 16,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 108,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 100,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 90,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Crossref Scholarly Metadata",
+        "route_type": "repository_dispatch",
+        "repository": "Crossref Scholarly Metadata",
+        "connector_id": null,
+        "score": 86,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 4,
+    "total_search_budget": 16,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψής\" cited by",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+cited+by&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+cited+by&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25565, \"response_sha256\": \"7e44d5594a0ec4bd2db5f311f5c49db564e38a57d85df7d173cdd2c0964e521e\", \"elapsed_ms\": 605}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+cited+by&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψής\" bibliography sources",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+bibliography+sources&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+bibliography+sources&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25581, \"response_sha256\": \"ccab02ef5aadbe6eb6bbc714f1451926440d53359d9fb369691f9ef160207aab\", \"elapsed_ms\": 606}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+bibliography+sources&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψής\" cited by",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE%CF%82++cited+by%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE%CF%82++cited+by%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 615, \"response_sha256\": \"736c25dafe9416a9a08c234e043faeff1ccdda1c3cf5b03fb76ecd093354ad57\", \"elapsed_ms\": 660}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE%CF%82++cited+by%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψής\" bibliography sources",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE%CF%82++bibliography+sources%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE%CF%82++bibliography+sources%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 627, \"response_sha256\": \"e4aa152239001d6f9eaf432ef7dc3515bde9afd383a4ba71fba22a8303fe0ab9\", \"elapsed_ms\": 664}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE%CF%82++bibliography+sources%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψής\" edition translation",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE%CF%82++edition+translation%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE%CF%82++edition+translation%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 626, \"response_sha256\": \"9054a8e4a0dfb1c787bb7cdbc3dfed0f6edefb98fa25099df7c5eb02990aed03\", \"elapsed_ms\": 677}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE%CF%82++edition+translation%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψής\" chronicle manuscript",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE%CF%82++chronicle+manuscript%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE%CF%82++chronicle+manuscript%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 627, \"response_sha256\": \"ca9eca0d7a4c36080771cd09b1af8de72acb1189fbd683dd0f48a283fd555cdb\", \"elapsed_ms\": 677}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%B1%CF%88%CE%AE%CF%82++chronicle+manuscript%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψής\" edition translation",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+edition+translation&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+edition+translation&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25581, \"response_sha256\": \"49f068f4978aefbc0e896b88a891bb71ef881f85d377f8826f087138efbb634e\", \"elapsed_ms\": 192}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+edition+translation&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψής\" chronicle manuscript",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+chronicle+manuscript&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+chronicle+manuscript&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 31568, \"response_sha256\": \"c962a29925e5898d8ebbf90e40a369cda78a842446c75ed02f6187ea23cf094b\", \"elapsed_ms\": 214}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+chronicle+manuscript&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψής\" bibliography sources",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+AND+alma.all_for_ui%3D%22bibliography%22+AND+alma.all_for_ui%3D%22sources%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+AND+alma.all_for_ui%3D%22bibliography%22+AND+alma.all_for_ui%3D%22sources%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"bfe70a79a35518a079843d3fc2ef092242f3d7c4258e3ba40e9c769d97f432cc\", \"elapsed_ms\": 1245}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+AND+alma.all_for_ui%3D%22bibliography%22+AND+alma.all_for_ui%3D%22sources%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψής\" chronicle manuscript",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+AND+alma.all_for_ui%3D%22chronicle%22+AND+alma.all_for_ui%3D%22manuscript%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+AND+alma.all_for_ui%3D%22chronicle%22+AND+alma.all_for_ui%3D%22manuscript%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"bfe70a79a35518a079843d3fc2ef092242f3d7c4258e3ba40e9c769d97f432cc\", \"elapsed_ms\": 1268}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+AND+alma.all_for_ui%3D%22chronicle%22+AND+alma.all_for_ui%3D%22manuscript%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Καψής\" bibliography sources",
+      "records": [
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.5040/9781350554771.0011",
+          "title": "Selected and Annotated Bibliography of Primary Sources, Secondary Sources, and Background Sources",
+          "creator": [],
+          "date": [
+            "1985"
+          ],
+          "url": "https://doi.org/10.5040/9781350554771.0011",
+          "doi": "10.5040/9781350554771.0011",
+          "type": "other",
+          "publisher": "Greenwood Publishing Group, Inc.",
+          "container_title": [
+            "German and Austrian Expressionism in the United States, 1900-1939"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.3726/978-3-0353-0816-7/27",
+          "title": "Sources and Bibliography",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.3726/978-3-0353-0816-7/27",
+          "doi": "10.3726/978-3-0353-0816-7/27",
+          "type": "book-chapter",
+          "publisher": "Peter Lang",
+          "container_title": [
+            "The Vanished Musicians"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/56651",
+          "title": "MIMO optical satellite systems",
+          "creator": [
+            "Θεόδωρος Καψής"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/56651",
+          "doi": "10.12681/eadd/56651",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Τα ασύρματα δίκτυα πέμπτης γενιάς (fifth-generation, 5G) έχουν σχεδιαστεί για να ανταποκρίνονται στις ολοένα και πιο απαιτητικές ανάγκες των διαφορετικών αναδυόμενων υπηρεσιών με ξεχωριστές απαιτήσεις: Ευρυζωνικές υπηρεσίες υψηλής ταχύτητας, ετερογενείς, εξαιρετικά αξιόπιστες, ασφαλείς και χαμηλής καθυστέρησης. Στα ασύρματα δίκτυα πέρα από το 5G (beyond 5G, B5G), οι δορυφορικές επικοινωνίες και γενικά τα μη-επίγεια δίκτυα θεωρούνται τεχνολογίες ενεργοποίησης λόγω της δυνατότητας παροχής παγκόσμιας κάλυψης, της συνδεσιμότητας απομακρυσμένων περιοχών, της επεκτασιμότητας και της ανθεκτικότητάς τους. Οι δορυφορικές τεχνολογίες είναι ήδη αρκετά ώριμες για ζεύξεις υποστήριξης (backhauling) και για εφαρμογές Διαδικτύου των Πραγμάτων κάνοντας χρήση δορυφόρων υψηλής ρυθμαπόδοσης στη ζώνη Ka (20/30 GHz). Επίσης, αρκετές εθνικές και πολυεθνικές διαστημικές υπηρεσίες συμμετέχουν στην εξερεύνηση του βαθέως διαστήματος, κοντά στη Γη, της Σελήνης και του Άρη και σχεδιάζουν και άλλες αποστολές. Η βελτιστοποίηση των δορυφορικών επικοινωνιών είναι ένας ακόμη σημαντικός τομέας στη βιομηχανία του νέου διαστήματος. Λόγω του περιορισμένου διαθέσιμου φάσματος, οι παραδοσιακές ζεύξεις ραδιοεπικοινωνιών (radio frequency, RF) αδυνατούν να παρέχουν τόσο υψηλή ρυθμαπόδοση. Η οπτική επικοινωνία ελευθέρου χώρου (free space optical, FSO) είναι μια εναλλακτική με ποικίλα πλεονεκτήματα έναντι της RF που έχει κερδίσει αυξημένη προσοχή στη δορυφορική κοινότητα. Ωστόσο, η FSO είναι ευάλωτη στις σοβαρές επιπτώσεις των ατμοσφαιρικών στροβιλισμών, των σφαλμάτων στόχευσης και των σπινθηρισμών. Η παρούσα Διατριβή επικεντρώνεται στην μελέτη των οπτικών δορυφορικών συστημάτων επικοινωνιών και ειδικότερα στην μοντελοποίηση του οπτικού διαύλου κάτω ζεύξης (downlink, DL) και στη βελτιστοποίηση της κατανομής ισχύος σε οπτικά δορυφορικά δίκτυα πολλαπλών εισόδων - εξόδων (multi-input multi-output, MIMO). Δίνεται έμφαση στα δυσμενή φαινόμενα που αντιμετωπίζει η δέσμη φωτός κατά τη διάδοση στη γήινη ατμόσφαιρα και στις τεχνικές άμβλυνσης των φαινομένων αυτών. Αρχικά, για την ακριβή πρόβλεψη του σπινθηρισμού έντασης ακτινοβολίας του DL οπτικού καναλιού αναπτύχθηκε μεθοδολογία που παράγει χρονοσειρές με χρήση στοχαστικών διαφορικών εξισώσεων η οποία επικυρώθηκε και επιβεβαιώθηκε ως προς τα στατιστικά πρώτης και δεύτερης τάξης (συνάρτηση πυκνότητας πιθανότητας, αθροιστική συνάρτηση κατανομής, φασματική πυκνότητα ισχύος) με πειραματικά δεδομένα. Στη συνέχεια, εξετάζονται σενάρια αμιγώς οπτικών δορυφορικών συστημάτων ΜΙΜΟ και προτείνονται αλγόριθμοι βέλτιστης και αποδοτικής εκχώρησης ισχύος. Το κύριο πρόβλημα διατυπώνεται ως κυρτό πρόβλημα βελτιστοποίησης με περιορισμούς μέγιστης επιτρεπτής εκπομπής ισχύος με σκοπό την μεγιστοποίηση της χωρητικότητας και κατόπιν αποσυντίθεται σε ανεξάρτητα κυρτά υποπροβλήματα. Η όλη προτεινόμενη μεθοδολογία είναι βασισμένη στον αλγόριθμο υδροπλήρωσης και ικανοποιεί τις συνθήκες Karush-Kuhn-Tucker. Επίσης, διερευνάται ο βέλτιστος έλεγχος ισχύος σε υβριδικά δορυφορικά δίκτυα (χρήση επιγείου relay). Θεωρείται η οπτική DL ζεύξη αποκωδικοποίησης-και-προώθησης διπλής αναπήδησης για μια γεωστατική δορυφορική πηγή. Λαμβάνονται υπόψη η χωρική συσχέτιση, οι μήτρες και συντελεστές συσχέτισης. Ακόμη, το πρόβλημα βελτιστοποίησης ισχύος διατυπώνεται και επιλύεται μη-γραμμικά για σχήματα υβριδικής αυτόματης αίτησης επανεκπομπής σε χαμηλής τροχιάς δορυφόρους. Ακολούθως, το πρόβλημα βελτιστοποίησης ισχύος ενσωματώνει τα σφάλματα στόχευσης και προτείνεται εύρωστη μεθοδολογία για την αντιμετώπιση της αβεβαιότητας της οπτικής διακύμανσης. Τέλος, η Διατριβή ολοκληρώνεται με την μελέτη αλγορίθμων νευρωνικών δικτύων, μηχανικής, βαθιάς και ενισχυτικής μάθησης. Προτείνεται αλγόριθμος χωρίς μοντέλο που με ακρίβεια προβλέπει τη βέλτιστη κατανομή ισχύος σε κάθε οπτικό κανάλι.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9780773593718-058",
+          "title": "56 Some Sources of the Sources: Bibliography",
+          "creator": [],
+          "date": [
+            "1982-1-1"
+          ],
+          "url": "https://doi.org/10.1515/9780773593718-058",
+          "doi": "10.1515/9780773593718-058",
+          "type": "book-chapter",
+          "publisher": "McGill-Queen's University Press",
+          "container_title": [
+            "Sherlock Holmes"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9780773593718-058/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9780773593718-058/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/9789004320079_fjo_bibliography_of_primary_sources",
+          "title": "Bibliography of Primary Sources",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/9789004320079_fjo_bibliography_of_primary_sources",
+          "doi": "10.1163/9789004320079_fjo_bibliography_of_primary_sources",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Flavius Josephus Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.3726/978-3-0353-0371-1/11",
+          "title": "Sources and Bibliography",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.3726/978-3-0353-0371-1/11",
+          "doi": "10.3726/978-3-0353-0371-1/11",
+          "type": "book-chapter",
+          "publisher": "Peter Lang",
+          "container_title": [
+            "Professionals, Amateurs and Performance"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783111713700-007",
+          "title": "List of Sources",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1515/9783111713700-007",
+          "doi": "10.1515/9783111713700-007",
+          "type": "book-chapter",
+          "publisher": "DE GRUYTER",
+          "container_title": [
+            "Bibliography of Arabic linguistics"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783111713700-007/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.4159/9780674974470-036",
+          "title": "Sources and Bibliography",
+          "creator": [],
+          "date": [
+            "2016-12-31"
+          ],
+          "url": "https://doi.org/10.4159/9780674974470-036",
+          "doi": "10.4159/9780674974470-036",
+          "type": "book-chapter",
+          "publisher": "Harvard University Press",
+          "container_title": [
+            "Flaubert"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://hup.degruyter.com/view/book/9780674974470/10.4159/9780674974470-036.xml",
+              "content_type": "text/html",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyter.com/document/doi/10.4159/9780674974470-036/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.3726/978-3-0353-0295-0/12",
+          "title": "Bibliography of Secondary Sources 183",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.3726/978-3-0353-0295-0/12",
+          "doi": "10.3726/978-3-0353-0295-0/12",
+          "type": "book-chapter",
+          "publisher": "Peter Lang",
+          "container_title": [
+            "Music, Poetry, Propaganda"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9781620977378-058",
+          "title": "Bibliography: Sources",
+          "creator": [],
+          "date": [
+            "2021-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9781620977378-058",
+          "doi": "10.1515/9781620977378-058",
+          "type": "book-chapter",
+          "publisher": "The New Press",
+          "container_title": [
+            "Inside U.S.A."
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9781620977378-058/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9781620977378-058/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.5040/9781838712938.0007",
+          "title": "Bibliography and Sources",
+          "creator": [],
+          "date": [
+            "2003"
+          ],
+          "url": "https://doi.org/10.5040/9781838712938.0007",
+          "doi": "10.5040/9781838712938.0007",
+          "type": "other",
+          "publisher": "British Film Institute",
+          "container_title": [
+            "The Idiots"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.3726/978-3-0353-0295-0/11",
+          "title": "Bibliography of Primary Sources 171",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.3726/978-3-0353-0295-0/11",
+          "doi": "10.3726/978-3-0353-0295-0/11",
+          "type": "book-chapter",
+          "publisher": "Peter Lang",
+          "container_title": [
+            "Music, Poetry, Propaganda"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9781846154492-004",
+          "title": "Sources Used in Compiling the Bibliography",
+          "creator": [],
+          "date": [
+            "2003-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9781846154492-004",
+          "doi": "10.1515/9781846154492-004",
+          "type": "book-chapter",
+          "publisher": "Boydell and Brewer",
+          "container_title": [
+            "A Bibliography of Modern Arthuriana (1500-2000)"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9781846154492-004/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9781846154492-004/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.5040/9798400618734.ch-001",
+          "title": "Manuscript Sources, Archival Sources, and Oral Histories",
+          "creator": [],
+          "date": [
+            "2002"
+          ],
+          "url": "https://doi.org/10.5040/9798400618734.ch-001",
+          "doi": "10.5040/9798400618734.ch-001",
+          "type": "other",
+          "publisher": "Greenwood Publishing Group, Inc.",
+          "container_title": [
+            "Bill Clinton"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1111/1468-2281.12174",
+          "title": "Bibliography of Secondary Sources",
+          "creator": [],
+          "date": [
+            "2017-2"
+          ],
+          "url": "https://doi.org/10.1111/1468-2281.12174",
+          "doi": "10.1111/1468-2281.12174",
+          "type": "journal-article",
+          "publisher": "Oxford University Press (OUP)",
+          "container_title": [
+            "Historical Research"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://api.wiley.com/onlinelibrary/tdm/v1/articles/10.1111%2F1468-2281.12174",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "http://onlinelibrary.wiley.com/wol1/doi/10.1111/1468-2281.12174/fullpdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.3726/978-1-4539-0888-4/9",
+          "title": "Bibliography of Primary Textual Sources 161",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.3726/978-1-4539-0888-4/9",
+          "doi": "10.3726/978-1-4539-0888-4/9",
+          "type": "book-chapter",
+          "publisher": "Peter Lang",
+          "container_title": [
+            "Trinity of Discord"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2307/j.ctv24w65q5.39",
+          "title": "Sources and Bibliography",
+          "creator": [],
+          "date": [
+            "2016-10-17"
+          ],
+          "url": "https://doi.org/10.2307/j.ctv24w65q5.39",
+          "doi": "10.2307/j.ctv24w65q5.39",
+          "type": "book-chapter",
+          "publisher": "Harvard University Press",
+          "container_title": [
+            "Flaubert"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1016/b978-0-08-094364-0.50028-7",
+          "title": "Bibliography",
+          "creator": [],
+          "date": [
+            "1991"
+          ],
+          "url": "https://doi.org/10.1016/b978-0-08-094364-0.50028-7",
+          "doi": "10.1016/b978-0-08-094364-0.50028-7",
+          "type": "book-chapter",
+          "publisher": "Elsevier",
+          "container_title": [
+            "Confidential Information Sources"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://api.elsevier.com/content/article/PII:B9780080943640500287?httpAccept=text/xml",
+              "content_type": "text/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://api.elsevier.com/content/article/PII:B9780080943640500287?httpAccept=text/plain",
+              "content_type": "text/plain",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2307/j.ctt3fgpbg.24",
+          "title": "Select Bibliography",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.2307/j.ctt3fgpbg.24",
+          "doi": "10.2307/j.ctt3fgpbg.24",
+          "type": "book-chapter",
+          "publisher": "Catholic University of America Press",
+          "container_title": [
+            "The Sources of Christian Ethics"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.3138/9781442677197-011",
+          "title": "VIII. Various Sources",
+          "creator": [],
+          "date": [
+            "1989-1-31"
+          ],
+          "url": "https://doi.org/10.3138/9781442677197-011",
+          "doi": "10.3138/9781442677197-011",
+          "type": "book-chapter",
+          "publisher": "University of Toronto Press",
+          "container_title": [
+            "Medieval Rhetoric"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://www.degruyter.com/view/books/9781442677197/9781442677197-011/9781442677197-011.xml",
+              "content_type": "text/html",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyter.com/document/doi/10.3138/9781442677197-011/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+bibliography+sources\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 186}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+bibliography+sources&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+bibliography+sources&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 185897, \"response_sha256\": \"d3e52f308a5f4a29f76e74cefe6e75499f761658864d1b4afd9389a6dd4e8a96\", \"elapsed_ms\": 494}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+bibliography+sources&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+bibliography+sources&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1285, \"response_sha256\": \"56532d2a5ad3d8e2d5df64c5323b2427cf3b6b93c8db0278c26c2bef9604b3e6\", \"elapsed_ms\": 452}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 20, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+bibliography+sources\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 186}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+bibliography+sources&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+bibliography+sources&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 185897, \"response_sha256\": \"d3e52f308a5f4a29f76e74cefe6e75499f761658864d1b4afd9389a6dd4e8a96\", \"elapsed_ms\": 494}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+bibliography+sources&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+bibliography+sources&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1285, \"response_sha256\": \"56532d2a5ad3d8e2d5df64c5323b2427cf3b6b93c8db0278c26c2bef9604b3e6\", \"elapsed_ms\": 452}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONT"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψής\" edition translation",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+AND+alma.all_for_ui%3D%22edition%22+AND+alma.all_for_ui%3D%22translation%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+AND+alma.all_for_ui%3D%22edition%22+AND+alma.all_for_ui%3D%22translation%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"bfe70a79a35518a079843d3fc2ef092242f3d7c4258e3ba40e9c769d97f432cc\", \"elapsed_ms\": 1292}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+AND+alma.all_for_ui%3D%22edition%22+AND+alma.all_for_ui%3D%22translation%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Καψής\" cited by",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+AND+alma.all_for_ui%3D%22cited%22+AND+alma.all_for_ui%3D%22by%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+AND+alma.all_for_ui%3D%22cited%22+AND+alma.all_for_ui%3D%22by%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"bfe70a79a35518a079843d3fc2ef092242f3d7c4258e3ba40e9c769d97f432cc\", \"elapsed_ms\": 1340}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+AND+alma.all_for_ui%3D%22cited%22+AND+alma.all_for_ui%3D%22by%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Καψής\" cited by",
+      "records": [
+        {
+          "discovery_repository": "OpenAlex Scholarly Works",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://openalex.org/W4390053384",
+          "title": "Manuscripts of disciples of Ioannikios and Sophronios Likhudes (new information)",
+          "creator": [
+            "Dzhamilia N. Ramazanova"
+          ],
+          "date": [
+            "2023-12-15"
+          ],
+          "url": "https://doi.org/10.52607/26587157_2023_17_25",
+          "doi": "https://doi.org/10.52607/26587157_2023_17_25",
+          "type": "article",
+          "cited_by_count": 1,
+          "description": "Статья посвящена изучению двух греческих кодексов из собрания Российской национальной библиотеки и Научной библиотеки им. Лобачевского Казанского Федерального университета. В статье выявляется и доказывается связь рукописей с деятельностью Иоанникия и Софрония Лихудов, а также их учеников в конце XVII — первой трети XVIII в. в Москве и Великом Новгороде. Определяется круг лиц, с чьей деятельностью могло быть связано создание этих кодексов. Выявленные учебники являются новыми источниками по истории школ Лихудов и их учеников, расширяющими наши знания о географии распространения книжного наследия Лихудов. The article is devoted to the study of two Greek manuscripts from the collections of the Russian National Library and Scientific Library of Kazan Federal University. The article reveals and proves the connection of the manuscripts with the activities of Ioannikios and Sophronios Likhudes, as well as their disciples at the end of the 17th — first third of the 18th century in Moscow and Novgorod. The circle of persons whose activities could be associated with the creation of these codes is determined. The revealed textbooks represent new sources on the history of Likhudes’ schools and their students, expanding our knowledge about the geography of the distribution of the Likhudes brothers book heritage.",
+          "description_provenance": "OPENALEX_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://doi.org/10.52607/26587157_2023_17_25",
+              "is_oa": true,
+              "license": null,
+              "version": "publishedVersion"
+            }
+          ],
+          "digital_url": "https://doi.org/10.52607/26587157_2023_17_25",
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "OPENALEX_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+cited+by\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 205}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+cited+by&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 351}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+cited+by&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+cited+by&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 17657, \"response_sha256\": \"a6218105a7d9d336d9f008345dfe85b484e24bd38c3eeb4e1facbb3fa47c9aff\", \"elapsed_ms\": 678}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 1}]}\", \"result_count\": 1, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+cited+by\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 205}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+cited+by&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 351}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+cited+by&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+cited+by&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 17657, \"response_sha256\": \"a6218105a7d9d336d9f008345dfe85b484e24bd38c3eeb4e1facbb3fa47c9aff\", \"elapsed_ms\": 678}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 1}]}\", \"result_count\": 1, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"ver"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Καψής\" chronicle manuscript",
+      "records": [
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.4324/9780203500880-6",
+          "title": "The Metrical Chronicle Family and Manuscript Practice",
+          "creator": [],
+          "date": [
+            "2004-6-1"
+          ],
+          "url": "https://doi.org/10.4324/9780203500880-6",
+          "doi": "10.4324/9780203500880-6",
+          "type": "book-chapter",
+          "publisher": "Routledge",
+          "container_title": [
+            "Worlds Made Flesh"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/2213-2139_emc_emcsim_00675",
+          "title": "Manuscript of Anholt",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/2213-2139_emc_emcsim_00675",
+          "doi": "10.1163/2213-2139_emc_emcsim_00675",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/2213-2139_emc_sim_00675",
+          "title": "Manuscript of Anholt",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/2213-2139_emc_sim_00675",
+          "doi": "10.1163/2213-2139_emc_sim_00675",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/9789004184640_emc_sim_00675",
+          "title": "Manuscript of Anholt",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/9789004184640_emc_sim_00675",
+          "doi": "10.1163/9789004184640_emc_sim_00675",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/2213-2139_emc_sim_01764",
+          "title": "Manuscript production in England",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/2213-2139_emc_sim_01764",
+          "doi": "10.1163/2213-2139_emc_sim_01764",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/2213-2139_emc_sim_01763",
+          "title": "Manuscript patrons and provenance",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/2213-2139_emc_sim_01763",
+          "doi": "10.1163/2213-2139_emc_sim_01763",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9781800104426-006",
+          "title": "The chronicle manuscript and its scribe, Luket Nantron (Deborah Ellen Thorpe)",
+          "creator": [],
+          "date": [
+            "2022-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9781800104426-006",
+          "doi": "10.1515/9781800104426-006",
+          "type": "book-chapter",
+          "publisher": "Boydell and Brewer",
+          "container_title": [
+            "A Soldiers' Chronicle of the Hundred Years War"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9781800104426-006/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9781800104426-006/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/2213-2139_emc_emcsim_01763",
+          "title": "Manuscript patrons and provenance",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/2213-2139_emc_emcsim_01763",
+          "doi": "10.1163/2213-2139_emc_emcsim_01763",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/9789004184640_emc_sim_01763",
+          "title": "Manuscript patrons and provenance",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/9789004184640_emc_sim_01763",
+          "doi": "10.1163/9789004184640_emc_sim_01763",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/2213-2139_emc_emcsim_01764",
+          "title": "Manuscript production in England",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/2213-2139_emc_emcsim_01764",
+          "doi": "10.1163/2213-2139_emc_emcsim_01764",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/9789004184640_emc_sim_01764",
+          "title": "Manuscript production in England",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/9789004184640_emc_sim_01764",
+          "doi": "10.1163/9789004184640_emc_sim_01764",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2307/j.ctv1q26txm.7",
+          "title": "THE CHRONICLE OF 1234:",
+          "creator": [],
+          "date": [
+            "2018-9-4"
+          ],
+          "url": "https://doi.org/10.2307/j.ctv1q26txm.7",
+          "doi": "10.2307/j.ctv1q26txm.7",
+          "type": "book-chapter",
+          "publisher": "Peeters Publishers",
+          "container_title": [
+            "The Anonymous Syriac Chronicle of 1234 and its Sources"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/9789004184640_emc_sim_01872",
+          "title": "Manuscript Utrecht, Gemeentearchief, VII F 5",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/9789004184640_emc_sim_01872",
+          "doi": "10.1163/9789004184640_emc_sim_01872",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/2213-2139_emc_sim_01872",
+          "title": "Manuscript Utrecht, Gemeentearchief, VII F 5",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/2213-2139_emc_sim_01872",
+          "doi": "10.1163/2213-2139_emc_sim_01872",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/2213-2139_emc_emcsim_01872",
+          "title": "Manuscript Utrecht, Gemeentearchief, VII F 5",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/2213-2139_emc_emcsim_01872",
+          "doi": "10.1163/2213-2139_emc_emcsim_01872",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "Encyclopedia of the Medieval Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.4324/9780203500880-7",
+          "title": "The Manuscript Challenge to Ideas of Medieval Nationalism",
+          "creator": [],
+          "date": [
+            "2004-6-1"
+          ],
+          "url": "https://doi.org/10.4324/9780203500880-7",
+          "doi": "10.4324/9780203500880-7",
+          "type": "book-chapter",
+          "publisher": "Routledge",
+          "container_title": [
+            "Worlds Made Flesh"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.4324/9780203500880-8",
+          "title": "The Anglo-Saxon Chronicle Manuscripts and Heroic Poetry",
+          "creator": [],
+          "date": [
+            "2004-6-1"
+          ],
+          "url": "https://doi.org/10.4324/9780203500880-8",
+          "doi": "10.4324/9780203500880-8",
+          "type": "book-chapter",
+          "publisher": "Routledge",
+          "container_title": [
+            "Worlds Made Flesh"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2307/26402337",
+          "title": "MEDIEVAL MANUSCRIPT EXHIBITION, 1981",
+          "creator": [
+            "PRESTON"
+          ],
+          "date": [
+            "1981"
+          ],
+          "url": "https://doi.org/10.2307/26402337",
+          "doi": "10.2307/26402337",
+          "type": "journal-article",
+          "publisher": "JSTOR",
+          "container_title": [
+            "The Princeton University Library Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2307/26404770",
+          "title": "CHECKLIST OF MANUSCRIPT SOURCES",
+          "creator": [
+            "BRESCIA"
+          ],
+          "date": [
+            "1974"
+          ],
+          "url": "https://doi.org/10.2307/26404770",
+          "doi": "10.2307/26404770",
+          "type": "journal-article",
+          "publisher": "JSTOR",
+          "container_title": [
+            "The Princeton University Library Chronicle"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.4324/9780203500880",
+          "title": "Worlds Made Flesh",
+          "creator": [
+            "Lauryn Mayer"
+          ],
+          "date": [
+            "2004-6-1"
+          ],
+          "url": "https://doi.org/10.4324/9780203500880",
+          "doi": "10.4324/9780203500880",
+          "type": "monograph",
+          "publisher": "Routledge",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "OpenAlex Scholarly Works",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "https://openalex.org/W4390053384",
+          "title": "Manuscripts of disciples of Ioannikios and Sophronios Likhudes (new information)",
+          "creator": [
+            "Dzhamilia N. Ramazanova"
+          ],
+          "date": [
+            "2023-12-15"
+          ],
+          "url": "https://doi.org/10.52607/26587157_2023_17_25",
+          "doi": "https://doi.org/10.52607/26587157_2023_17_25",
+          "type": "article",
+          "cited_by_count": 1,
+          "description": "Статья посвящена изучению двух греческих кодексов из собрания Российской национальной библиотеки и Научной библиотеки им. Лобачевского Казанского Федерального университета. В статье выявляется и доказывается связь рукописей с деятельностью Иоанникия и Софрония Лихудов, а также их учеников в конце XVII — первой трети XVIII в. в Москве и Великом Новгороде. Определяется круг лиц, с чьей деятельностью могло быть связано создание этих кодексов. Выявленные учебники являются новыми источниками по истории школ Лихудов и их учеников, расширяющими наши знания о географии распространения книжного наследия Лихудов. The article is devoted to the study of two Greek manuscripts from the collections of the Russian National Library and Scientific Library of Kazan Federal University. The article reveals and proves the connection of the manuscripts with the activities of Ioannikios and Sophronios Likhudes, as well as their disciples at the end of the 17th — first third of the 18th century in Moscow and Novgorod. The circle of persons whose activities could be associated with the creation of these codes is determined. The revealed textbooks represent new sources on the history of Likhudes’ schools and their students, expanding our knowledge about the geography of the distribution of the Likhudes brothers book heritage.",
+          "description_provenance": "OPENALEX_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://doi.org/10.52607/26587157_2023_17_25",
+              "is_oa": true,
+              "license": null,
+              "version": "publishedVersion"
+            }
+          ],
+          "digital_url": "https://doi.org/10.52607/26587157_2023_17_25",
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "OPENALEX_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+chronicle+manuscript\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 84}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+chronicle+manuscript&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+chronicle+manuscript&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 22268, \"response_sha256\": \"a9f1edec6bf5bcd1a952c07967d4024ea55b032f1593fdd064272e21e4f76e77\", \"elapsed_ms\": 402}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+chronicle+manuscript&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+chronicle+manuscript&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 17703, \"response_sha256\": \"0ef1f6381a9c523f5f10f99115ebb1a7b43c9449ec2567e9a849e44800655b7d\", \"elapsed_ms\": 231}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 1}]}\", \"result_count\": 21, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+chronicle+manuscript\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 84}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+chronicle+manuscript&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+chronicle+manuscript&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 22268, \"response_sha256\": \"a9f1edec6bf5bcd1a952c07967d4024ea55b032f1593fdd064272e21e4f76e77\", \"elapsed_ms\": 402}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+chronicle+manuscript&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+chronicle+manuscript&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 17703, \"response_sha256\": \"0ef1f6381a9c523f5f10f99115ebb1a7b43c9449ec2567e9a849e44800655b7d\", \"elapsed_ms\": 231}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTR"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Καψής\" edition translation",
+      "records": [
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783110896664.79",
+          "title": "The Letters. Edition and Translation",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1515/9783110896664.79",
+          "doi": "10.1515/9783110896664.79",
+          "type": "book-chapter",
+          "publisher": "DE GRUYTER",
+          "container_title": [
+            "Letters"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783110896664.79/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/56651",
+          "title": "MIMO optical satellite systems",
+          "creator": [
+            "Θεόδωρος Καψής"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/56651",
+          "doi": "10.12681/eadd/56651",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "Τα ασύρματα δίκτυα πέμπτης γενιάς (fifth-generation, 5G) έχουν σχεδιαστεί για να ανταποκρίνονται στις ολοένα και πιο απαιτητικές ανάγκες των διαφορετικών αναδυόμενων υπηρεσιών με ξεχωριστές απαιτήσεις: Ευρυζωνικές υπηρεσίες υψηλής ταχύτητας, ετερογενείς, εξαιρετικά αξιόπιστες, ασφαλείς και χαμηλής καθυστέρησης. Στα ασύρματα δίκτυα πέρα από το 5G (beyond 5G, B5G), οι δορυφορικές επικοινωνίες και γενικά τα μη-επίγεια δίκτυα θεωρούνται τεχνολογίες ενεργοποίησης λόγω της δυνατότητας παροχής παγκόσμιας κάλυψης, της συνδεσιμότητας απομακρυσμένων περιοχών, της επεκτασιμότητας και της ανθεκτικότητάς τους. Οι δορυφορικές τεχνολογίες είναι ήδη αρκετά ώριμες για ζεύξεις υποστήριξης (backhauling) και για εφαρμογές Διαδικτύου των Πραγμάτων κάνοντας χρήση δορυφόρων υψηλής ρυθμαπόδοσης στη ζώνη Ka (20/30 GHz). Επίσης, αρκετές εθνικές και πολυεθνικές διαστημικές υπηρεσίες συμμετέχουν στην εξερεύνηση του βαθέως διαστήματος, κοντά στη Γη, της Σελήνης και του Άρη και σχεδιάζουν και άλλες αποστολές. Η βελτιστοποίηση των δορυφορικών επικοινωνιών είναι ένας ακόμη σημαντικός τομέας στη βιομηχανία του νέου διαστήματος. Λόγω του περιορισμένου διαθέσιμου φάσματος, οι παραδοσιακές ζεύξεις ραδιοεπικοινωνιών (radio frequency, RF) αδυνατούν να παρέχουν τόσο υψηλή ρυθμαπόδοση. Η οπτική επικοινωνία ελευθέρου χώρου (free space optical, FSO) είναι μια εναλλακτική με ποικίλα πλεονεκτήματα έναντι της RF που έχει κερδίσει αυξημένη προσοχή στη δορυφορική κοινότητα. Ωστόσο, η FSO είναι ευάλωτη στις σοβαρές επιπτώσεις των ατμοσφαιρικών στροβιλισμών, των σφαλμάτων στόχευσης και των σπινθηρισμών. Η παρούσα Διατριβή επικεντρώνεται στην μελέτη των οπτικών δορυφορικών συστημάτων επικοινωνιών και ειδικότερα στην μοντελοποίηση του οπτικού διαύλου κάτω ζεύξης (downlink, DL) και στη βελτιστοποίηση της κατανομής ισχύος σε οπτικά δορυφορικά δίκτυα πολλαπλών εισόδων - εξόδων (multi-input multi-output, MIMO). Δίνεται έμφαση στα δυσμενή φαινόμενα που αντιμετωπίζει η δέσμη φωτός κατά τη διάδοση στη γήινη ατμόσφαιρα και στις τεχνικές άμβλυνσης των φαινομένων αυτών. Αρχικά, για την ακριβή πρόβλεψη του σπινθηρισμού έντασης ακτινοβολίας του DL οπτικού καναλιού αναπτύχθηκε μεθοδολογία που παράγει χρονοσειρές με χρήση στοχαστικών διαφορικών εξισώσεων η οποία επικυρώθηκε και επιβεβαιώθηκε ως προς τα στατιστικά πρώτης και δεύτερης τάξης (συνάρτηση πυκνότητας πιθανότητας, αθροιστική συνάρτηση κατανομής, φασματική πυκνότητα ισχύος) με πειραματικά δεδομένα. Στη συνέχεια, εξετάζονται σενάρια αμιγώς οπτικών δορυφορικών συστημάτων ΜΙΜΟ και προτείνονται αλγόριθμοι βέλτιστης και αποδοτικής εκχώρησης ισχύος. Το κύριο πρόβλημα διατυπώνεται ως κυρτό πρόβλημα βελτιστοποίησης με περιορισμούς μέγιστης επιτρεπτής εκπομπής ισχύος με σκοπό την μεγιστοποίηση της χωρητικότητας και κατόπιν αποσυντίθεται σε ανεξάρτητα κυρτά υποπροβλήματα. Η όλη προτεινόμενη μεθοδολογία είναι βασισμένη στον αλγόριθμο υδροπλήρωσης και ικανοποιεί τις συνθήκες Karush-Kuhn-Tucker. Επίσης, διερευνάται ο βέλτιστος έλεγχος ισχύος σε υβριδικά δορυφορικά δίκτυα (χρήση επιγείου relay). Θεωρείται η οπτική DL ζεύξη αποκωδικοποίησης-και-προώθησης διπλής αναπήδησης για μια γεωστατική δορυφορική πηγή. Λαμβάνονται υπόψη η χωρική συσχέτιση, οι μήτρες και συντελεστές συσχέτισης. Ακόμη, το πρόβλημα βελτιστοποίησης ισχύος διατυπώνεται και επιλύεται μη-γραμμικά για σχήματα υβριδικής αυτόματης αίτησης επανεκπομπής σε χαμηλής τροχιάς δορυφόρους. Ακολούθως, το πρόβλημα βελτιστοποίησης ισχύος ενσωματώνει τα σφάλματα στόχευσης και προτείνεται εύρωστη μεθοδολογία για την αντιμετώπιση της αβεβαιότητας της οπτικής διακύμανσης. Τέλος, η Διατριβή ολοκληρώνεται με την μελέτη αλγορίθμων νευρωνικών δικτύων, μηχανικής, βαθιάς και ενισχυτικής μάθησης. Προτείνεται αλγόριθμος χωρίς μοντέλο που με ακρίβεια προβλέπει τη βέλτιστη κατανομή ισχύος σε κάθε οπτικό κανάλι.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2307/jj.38238727.7",
+          "title": "The﻿ Middle Dutch Brut:",
+          "creator": [],
+          "date": [
+            "2021-4-1"
+          ],
+          "url": "https://doi.org/10.2307/jj.38238727.7",
+          "doi": "10.2307/jj.38238727.7",
+          "type": "book-chapter",
+          "publisher": "Liverpool University Press",
+          "container_title": [
+            "The Middle Dutch Brut"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/actrade/9780199600519.book.1",
+          "title": "Alberico Gentili: The Wars of the Romans: A Critical Edition and Translation of De Armis Romanis",
+          "creator": [
+            "Alberico Gentili"
+          ],
+          "date": [
+            "2011-2-24"
+          ],
+          "url": "https://doi.org/10.1093/actrade/9780199600519.book.1",
+          "doi": "10.1093/actrade/9780199600519.book.1",
+          "type": "edited-book",
+          "publisher": "Oxford University Press",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783110262087.145",
+          "title": "Translation Questions",
+          "creator": [],
+          "date": [
+            "2011-10-28"
+          ],
+          "url": "https://doi.org/10.1515/9783110262087.145",
+          "doi": "10.1515/9783110262087.145",
+          "type": "book-chapter",
+          "publisher": "DE GRUYTER",
+          "container_title": [
+            "Many Pious Women"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://www.degruyter.com/view/books/9783110262087/9783110262087.145/9783110262087.145.xml",
+              "content_type": "text/html",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783110262087.145/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783110262087.145/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783110896664.xv",
+          "title": "Contents",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1515/9783110896664.xv",
+          "doi": "10.1515/9783110896664.xv",
+          "type": "book-chapter",
+          "publisher": "DE GRUYTER",
+          "container_title": [
+            "Letters"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783110896664.xv/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783110896664.fm",
+          "title": "Frontmatter",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1515/9783110896664.fm",
+          "doi": "10.1515/9783110896664.fm",
+          "type": "book-chapter",
+          "publisher": "DE GRUYTER",
+          "container_title": [
+            "Letters"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783110896664.fm/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783110896664.183",
+          "title": "Bibliography",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1515/9783110896664.183",
+          "doi": "10.1515/9783110896664.183",
+          "type": "book-chapter",
+          "publisher": "DE GRUYTER",
+          "container_title": [
+            "Letters"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783110896664.183/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783110896664.vii",
+          "title": "Foreword",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1515/9783110896664.vii",
+          "doi": "10.1515/9783110896664.vii",
+          "type": "book-chapter",
+          "publisher": "DE GRUYTER",
+          "container_title": [
+            "Letters"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783110896664.vii/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783110896664.193",
+          "title": "Index",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1515/9783110896664.193",
+          "doi": "10.1515/9783110896664.193",
+          "type": "book-chapter",
+          "publisher": "DE GRUYTER",
+          "container_title": [
+            "Letters"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783110896664.193/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783110896664.167",
+          "title": "Appendices",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1515/9783110896664.167",
+          "doi": "10.1515/9783110896664.167",
+          "type": "book-chapter",
+          "publisher": "DE GRUYTER",
+          "container_title": [
+            "Letters"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783110896664.167/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783111692357-007",
+          "title": "Edition 2: The Scholia Photiana: Critical Edition and Translation",
+          "creator": [],
+          "date": [
+            "2025-8-18"
+          ],
+          "url": "https://doi.org/10.1515/9783111692357-007",
+          "doi": "10.1515/9783111692357-007",
+          "type": "book-chapter",
+          "publisher": "De Gruyter",
+          "container_title": [
+            "The Pseudo-Oecumenian Catena on Ephesians"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783111692357-007/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783111692357-007/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.5040/9781408179734.ch-016",
+          "title": "Shakespeare and Translation",
+          "creator": [
+            "Dirk Delabastita"
+          ],
+          "date": [
+            "2012"
+          ],
+          "url": "https://doi.org/10.5040/9781408179734.ch-016",
+          "doi": "10.5040/9781408179734.ch-016",
+          "type": "other",
+          "publisher": "Bloomsbury Publishing Plc",
+          "container_title": [
+            "Shakespeare and the Language of Translation"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783110550368-003",
+          "title": "Edition and translation",
+          "creator": [],
+          "date": [
+            "2018-12-17"
+          ],
+          "url": "https://doi.org/10.1515/9783110550368-003",
+          "doi": "10.1515/9783110550368-003",
+          "type": "book-chapter",
+          "publisher": "De Gruyter",
+          "container_title": [
+            "ʿĪsā ibn ʿAlī's Book on the Useful Properties of Animal Parts"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://www.degruyter.com/view/books/9783110550368/9783110550368-003/9783110550368-003.xml",
+              "content_type": "text/html",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783110550368-003/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9783110550368-003/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1075/btl.123.04ch4",
+          "title": "Translation strategies",
+          "creator": [],
+          "date": [
+            "2016-2-25"
+          ],
+          "url": "https://doi.org/10.1075/btl.123.04ch4",
+          "doi": "10.1075/btl.123.04ch4",
+          "type": "book-chapter",
+          "publisher": "John Benjamins Publishing Company",
+          "container_title": [
+            "Benjamins Translation Library",
+            "Memes of Translation"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/9789004458086_005",
+          "title": "Edition &amp; English Translation",
+          "creator": [
+            "Luisa Lesage Gárriga"
+          ],
+          "date": [
+            "2021-5-3"
+          ],
+          "url": "https://doi.org/10.1163/9789004458086_005",
+          "doi": "10.1163/9789004458086_005",
+          "type": "book-chapter",
+          "publisher": "BRILL",
+          "container_title": [
+            "De facie quae in orbe lunae apparet"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://brill.com/view/book/9789004458086/BP000004.xml",
+              "content_type": "text/html",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://brill.com/downloadpdf/title/59829",
+              "content_type": "text/html",
+              "intended_application": "syndication",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2307/j.ctv30pnv1n.15",
+          "title": "Conclusion, Presentation of the Edition and Translation",
+          "creator": [],
+          "date": [
+            "2022-9-1"
+          ],
+          "url": "https://doi.org/10.2307/j.ctv30pnv1n.15",
+          "doi": "10.2307/j.ctv30pnv1n.15",
+          "type": "book-chapter",
+          "publisher": "Medieval Institute Publications",
+          "container_title": [
+            "Blandin de Cornoalha: A Comic Occitan Romance"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1075/btl.123.05ch5",
+          "title": "Translation as theory",
+          "creator": [],
+          "date": [
+            "2016-2-25"
+          ],
+          "url": "https://doi.org/10.1075/btl.123.05ch5",
+          "doi": "10.1075/btl.123.05ch5",
+          "type": "book-chapter",
+          "publisher": "John Benjamins Publishing Company",
+          "container_title": [
+            "Benjamins Translation Library",
+            "Memes of Translation"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9783110982381-015",
+          "title": "Translation",
+          "creator": [],
+          "date": [
+            "2023-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9783110982381-015",
+          "doi": "10.1515/9783110982381-015",
+          "type": "book-chapter",
+          "publisher": "De Gruyter",
+          "container_title": [
+            "The ›Epigramma Paulini‹"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783110982381-015/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9783110982381-015/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:source_genealogy",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1075/btl.123.07ch7",
+          "title": "On translation ethics",
+          "creator": [],
+          "date": [
+            "2016-2-25"
+          ],
+          "url": "https://doi.org/10.1075/btl.123.07ch7",
+          "doi": "10.1075/btl.123.07ch7",
+          "type": "book-chapter",
+          "publisher": "John Benjamins Publishing Company",
+          "container_title": [
+            "Benjamins Translation Library",
+            "Memes of Translation"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+edition+translation\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 82}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+edition+translation&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+edition+translation&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 192751, \"response_sha256\": \"7e9d15cd0d6ee513ab3a929d20c71e98a039e4c23a81bdcb822a4a2a4e71256d\", \"elapsed_ms\": 414}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+edition+translation&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+edition+translation&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1282, \"response_sha256\": \"6c076718cd5d500e7764b60de5fc217443e5e2410f537c872fff9fafc6170aa4\", \"elapsed_ms\": 351}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 20, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+edition+translation\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 82}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+edition+translation&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+edition+translation&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 192751, \"response_sha256\": \"7e9d15cd0d6ee513ab3a929d20c71e98a039e4c23a81bdcb822a4a2a4e71256d\", \"elapsed_ms\": 414}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+edition+translation&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+edition+translation&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1282, \"response_sha256\": \"6c076718cd5d500e7764b60de5fc217443e5e2410f537c872fff9fafc6170aa4\", \"elapsed_ms\": 351}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; n"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "source_genealogy",
+      "assignment_id": "source_genealogy:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "41301898235",
+    "agent_id": "source_genealogy",
+    "source_leads": [
+      {
+        "id": "lead_013838591ef48792add88b21",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.5040/9781350554771.0011",
+        "title": "Selected and Annotated Bibliography of Primary Sources, Secondary Sources, and Background Sources",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_10a95eeb88bc4787bcf9c814",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.3726/978-3-0353-0816-7/27",
+        "title": "Sources and Bibliography",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9b0003356dc3925c6dd2a041",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/56651",
+        "title": "MIMO optical satellite systems",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_18783bb295923c866d983f70",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9780773593718-058",
+        "title": "56 Some Sources of the Sources: Bibliography",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_bd8a2fdc3e1c96146a93d89c",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/9789004320079_fjo_bibliography_of_primary_sources",
+        "title": "Bibliography of Primary Sources",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_200f52715ce0d235b165b9f9",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.3726/978-3-0353-0371-1/11",
+        "title": "Sources and Bibliography",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fbdae1d974e9de056c35f9f4",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783111713700-007",
+        "title": "List of Sources",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_26b89e639b426ef9f4a0c758",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.4159/9780674974470-036",
+        "title": "Sources and Bibliography",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c5d53c456cb0e27a7d7b304b",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.3726/978-3-0353-0295-0/12",
+        "title": "Bibliography of Secondary Sources 183",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_003986f0b5d4efd853770cf2",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9781620977378-058",
+        "title": "Bibliography: Sources",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5227ce1e912bac844e46a624",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.5040/9781838712938.0007",
+        "title": "Bibliography and Sources",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9397c340b5c3d62e7218de90",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.3726/978-3-0353-0295-0/11",
+        "title": "Bibliography of Primary Sources 171",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_55664f17049283b22500b0f7",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9781846154492-004",
+        "title": "Sources Used in Compiling the Bibliography",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_74ed5fb0d3cdac7bb55682a4",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.5040/9798400618734.ch-001",
+        "title": "Manuscript Sources, Archival Sources, and Oral Histories",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_cacce8b413242f54e3f2ed44",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1111/1468-2281.12174",
+        "title": "Bibliography of Secondary Sources",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3a833f3f2ff337bae171e98d",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.3726/978-1-4539-0888-4/9",
+        "title": "Bibliography of Primary Textual Sources 161",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6632c2d2518ff3d2e48a3d66",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2307/j.ctv24w65q5.39",
+        "title": "Sources and Bibliography",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d47ca9cb944b63e1136e0323",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1016/b978-0-08-094364-0.50028-7",
+        "title": "Bibliography",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_cee579ea02733dcf87774293",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2307/j.ctt3fgpbg.24",
+        "title": "Select Bibliography",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ce3082e86be924f4e8f37ced",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.3138/9781442677197-011",
+        "title": "VIII. Various Sources",
+        "query": "\"Καψής\" bibliography sources",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_aa229eec33f382441cbddec9",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.52607/26587157_2023_17_25",
+        "title": "Manuscripts of disciples of Ioannikios and Sophronios Likhudes (new information)",
+        "query": "\"Καψής\" cited by",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_79ba8bab69b74f5f993a422b",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.4324/9780203500880-6",
+        "title": "The Metrical Chronicle Family and Manuscript Practice",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c4ce09484d3a834286cf6fc0",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/2213-2139_emc_emcsim_00675",
+        "title": "Manuscript of Anholt",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c1bc8cb2788d1d80d2118c2f",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/2213-2139_emc_sim_00675",
+        "title": "Manuscript of Anholt",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c9bee44cd125573dbde1cb40",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/9789004184640_emc_sim_00675",
+        "title": "Manuscript of Anholt",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ab86d93e52b7e6ef396d6829",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/2213-2139_emc_sim_01764",
+        "title": "Manuscript production in England",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6153a4809d2f9b2005c91f3a",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/2213-2139_emc_sim_01763",
+        "title": "Manuscript patrons and provenance",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6cbdd399f106389e61f7822a",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9781800104426-006",
+        "title": "The chronicle manuscript and its scribe, Luket Nantron (Deborah Ellen Thorpe)",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ea1ce396a9afc355eb3ea3c4",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/2213-2139_emc_emcsim_01763",
+        "title": "Manuscript patrons and provenance",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0254995a6ecf99f4711ca764",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/9789004184640_emc_sim_01763",
+        "title": "Manuscript patrons and provenance",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ae86b31f42e982e60cb1f9b6",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/2213-2139_emc_emcsim_01764",
+        "title": "Manuscript production in England",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c1922e5681346c6de051bef3",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/9789004184640_emc_sim_01764",
+        "title": "Manuscript production in England",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c748aabcfadbd20d06a6172b",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2307/j.ctv1q26txm.7",
+        "title": "THE CHRONICLE OF 1234:",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_612f3a8f85fcc20d3aec1b08",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/9789004184640_emc_sim_01872",
+        "title": "Manuscript Utrecht, Gemeentearchief, VII F 5",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a81b74603d461c068a22ccce",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/2213-2139_emc_sim_01872",
+        "title": "Manuscript Utrecht, Gemeentearchief, VII F 5",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ad320f76277b4e3487a3259c",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/2213-2139_emc_emcsim_01872",
+        "title": "Manuscript Utrecht, Gemeentearchief, VII F 5",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_625ceef7cabb7ee1940fb1bb",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.4324/9780203500880-7",
+        "title": "The Manuscript Challenge to Ideas of Medieval Nationalism",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_050fd758313bf2a6f051834b",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.4324/9780203500880-8",
+        "title": "The Anglo-Saxon Chronicle Manuscripts and Heroic Poetry",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5136504297dcab5bc67ab5b0",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2307/26402337",
+        "title": "MEDIEVAL MANUSCRIPT EXHIBITION, 1981",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9fed19c6e927adbb4707967c",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2307/26404770",
+        "title": "CHECKLIST OF MANUSCRIPT SOURCES",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_94250ef39711eba479a9e0a4",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.4324/9780203500880",
+        "title": "Worlds Made Flesh",
+        "query": "\"Καψής\" chronicle manuscript",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_442fe50f4da721f4c2760cf3",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783110896664.79",
+        "title": "The Letters. Edition and Translation",
+        "query": "\"Καψής\" edition translation",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4e3bc7049e7347f402237b8c",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2307/jj.38238727.7",
+        "title": "The﻿ Middle Dutch Brut:",
+        "query": "\"Καψής\" edition translation",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_08f23fa896e6b68520ac6590",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/actrade/9780199600519.book.1",
+        "title": "Alberico Gentili: The Wars of the Romans: A Critical Edition and Translation of De Armis Romanis",
+        "query": "\"Καψής\" edition translation",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_af6fa5e9ea5229a6688010ce",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783110262087.145",
+        "title": "Translation Questions",
+        "query": "\"Καψής\" edition translation",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_de08de45beb7dbd5b6812951",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783110896664.xv",
+        "title": "Contents",
+        "query": "\"Καψής\" edition translation",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e7a5cb81207a440513f78670",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783110896664.fm",
+        "title": "Frontmatter",
+        "query": "\"Καψής\" edition translation",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ff4283521071d1f62f9b7d62",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783110896664.183",
+        "title": "Bibliography",
+        "query": "\"Καψής\" edition translation",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_449e28795b6cc7b3bd1ba7ad",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783110896664.vii",
+        "title": "Foreword",
+        "query": "\"Καψής\" edition translation",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3565b6f7e538407f4506a93d",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783110896664.193",
+        "title": "Index",
+        "query": "\"Καψής\" edition translation",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_59097f051162d57294df004d",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783110896664.167",
+        "title": "Appendices",
+        "query": "\"Καψής\" edition translation",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_63636430d34dbcc01b4e2445",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783111692357-007",
+        "title": "Edition 2: The Scholia Photiana: Critical Edition and Translation",
+        "query": "\"Καψής\" edition translation",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_84cea8f17437388bbf759c65",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.5040/9781408179734.ch-016",
+        "title": "Shakespeare and Translation",
+        "query": "\"Καψής\" edition translation",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7f3a9e10ad1095b2c177b9b0",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783110550368-003",
+        "title": "Edition and translation",
+        "query": "\"Καψής\" edition translation",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6918c5cb3a05e3ab088f0586",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1075/btl.123.04ch4",
+        "title": "Translation strategies",
+        "query": "\"Καψής\" edition translation",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_238a3653ca272563d856c45b",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/9789004458086_005",
+        "title": "Edition &amp; English Translation",
+        "query": "\"Καψής\" edition translation",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_672fc5241bbcc9fd1910c3fa",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2307/j.ctv30pnv1n.15",
+        "title": "Conclusion, Presentation of the Edition and Translation",
+        "query": "\"Καψής\" edition translation",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3ab289b8e9c719364ce26139",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1075/btl.123.05ch5",
+        "title": "Translation as theory",
+        "query": "\"Καψής\" edition translation",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4b89ea97ec98049338e37cfa",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9783110982381-015",
+        "title": "Translation",
+        "query": "\"Καψής\" edition translation",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0bf1afb63c93b178205b54c9",
+        "run_id": "41301898235",
+        "agent_id": "source_genealogy",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1075/btl.123.07ch7",
+        "title": "On translation ethics",
+        "query": "\"Καψής\" edition translation",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      }
+    ],
+    "connector_errors": [
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+bibliography+sources\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 186}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+bibliography+sources&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+bibliography+sources&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 185897, \"response_sha256\": \"d3e52f308a5f4a29f76e74cefe6e75499f761658864d1b4afd9389a6dd4e8a96\", \"elapsed_ms\": 494}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+cited+by\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 205}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+cited+by&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 351}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+cited+by&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+cited+by&per_page=20\", \"content_type\": \"application/js"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+chronicle+manuscript\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 84}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+chronicle+manuscript&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+chronicle+manuscript&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 22268, \"response_sha256\": \"a9f1edec6bf5bcd1a952c07967d4024ea55b032f1593fdd064272e21e4f76e77\", \"elapsed_ms\": 402}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+edition+translation\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 82}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+edition+translation&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+edition+translation&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 192751, \"response_sha256\": \"7e9d15cd0d6ee513ab3a929d20c71e98a039e4c23a81bdcb822a4a2a4e71256d\", \"elapsed_ms\": 414}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%9A%CE%B1%CF%88%CE%AE%CF%82%22+e"
+      }
+    ],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 62,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
