@@ -94,7 +94,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
           filter: blob:none
           sparse-checkout: |
             tools
@@ -176,6 +176,9 @@ jobs:
       target_type: ${{ needs.prepare.outputs.target_type }}
 
   research-lanes:
+    permissions:
+      contents: read
+      id-token: write
     needs: [prepare, specialist-research]
     if: always() && needs.prepare.result == 'success'
     strategy:
@@ -198,7 +201,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/evidence/runs/
+            /evidence/runs/${{ github.run_id }}/
+            !/evidence/specialist_runs/
+            /evidence/specialist_runs/${{ github.run_id }}/
+            !/backups/
       - uses: actions/download-artifact@v4
         if: matrix.lane == 'travellers' && needs.specialist-research.result != 'skipped'
         continue-on-error: true
@@ -281,23 +293,17 @@ jobs:
           mkdir -p system_health
           printf '%s\n' '{"execution_status":"${{ job.status }}"}' > system_health/workflow_execution.json
           python3 tools/preserve_run_evidence.py --run-id "$PCT_RUN_ID" --lane "$PCT_RESEARCH_LANE"
-          if [ "$GITHUB_REF" != "refs/heads/main" ]; then
-            echo "ARTIFACTS_ONLY: production publication skipped"
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if [ "$PCT_AUTO_CONTINUE" != "true" ]; then
-            # Hold before the first lane output reaches main: the hourly
-            # coordinator must never see this corpus without its marker.
-            mkdir -p "evidence/runs/$PCT_RUN_ID/research_continuation"
-            printf '{"auto_continue": false, "set_by_run": "%s"}\n' "$PCT_RUN_ID" > "evidence/runs/$PCT_RUN_ID/research_continuation/auto_continue.json"
-            git add "evidence/runs/$PCT_RUN_ID/research_continuation/auto_continue.json"
-          fi
-          git add "evidence/runs/$PCT_RUN_ID/$PCT_RESEARCH_LANE/"
-          git diff --cached --quiet && exit 0
-          git commit -m "Preserve evidence: run $PCT_RUN_ID lane $PCT_RESEARCH_LANE"
-          python3 tools/research_stage.py --stage publication -- python3 tools/publish_research_outputs.py
+      - name: Package checksum-bound evidence for the single publisher
+        if: always()
+        run: python3 tools/research_lane_handoff.py pack --run-id "${{ github.run_id }}" --lane "${{ matrix.lane }}" --output lane_handoff
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pct-lane-handoff-${{ github.run_id }}-${{ matrix.lane }}
+          path: lane_handoff/
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 90
       - name: Announce lane completion to Command Center
         if: success()
         run: |
@@ -311,36 +317,77 @@ jobs:
         with:
           name: pct-${{ matrix.lane }}-${{ github.run_id }}
           path: |
-            evidence/runs/${{ github.run_id }}/${{ matrix.lane }}/
             execution_receipts/
-            research_lanes/${{ matrix.lane }}.json
             resolved_research_request.json
             research_request_identity.json
-            repository_plans/${{ matrix.lane }}.json
-            lane_discovery/${{ matrix.lane }}.json
-            research_discovery/
-            fulltext_discovery/
-            iiif_candidate_requests/
-            library_discovery/
-            citation_chase_candidates/
-            library_acquisition/
-            citation_chase_hits/
-            event_first_hits/
-            exact_page_acquisition/
-            original_inspection/
-            source_genealogy/
-            corroboration/
-            verification/
-            qa/
-            structured_output/
-            human_review/
-            research_dossier/
-            run_manifest/
             system_health/
+          # Full evidence (including chunked binaries) travels once in the
+          # checksum-bound handoff; this artifact retains runtime diagnostics.
           if-no-files-found: warn
 
-  aggregate-health:
+  publish-lanes:
     needs: [prepare, research-lanes]
+    if: always() && needs.prepare.result == 'success' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pct-research-lane-publisher-${{ github.run_id }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/evidence/runs/
+            /evidence/runs/${{ github.run_id }}/
+            !/evidence/specialist_runs/
+            /evidence/specialist_runs/${{ github.run_id }}/
+            !/backups/
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          pattern: pct-lane-handoff-${{ github.run_id }}-*
+          path: lane_handoffs
+      - name: Verify and recover every available lane (including failed lanes)
+        env:
+          EXPECTED_LANES: ${{ needs.prepare.outputs.matrix }}
+        run: python3 tools/research_lane_handoff.py merge --run-id "$GITHUB_RUN_ID" --expected "$EXPECTED_LANES" --incoming lane_handoffs
+      - name: Publish recovered evidence once and verify durable readback
+        run: |
+          if [ "$PCT_AUTO_CONTINUE" != "true" ]; then
+            mkdir -p "evidence/runs/$GITHUB_RUN_ID/research_continuation"
+            printf '{"auto_continue": false, "set_by_run": "%s"}\n' "$GITHUB_RUN_ID" > "evidence/runs/$GITHUB_RUN_ID/research_continuation/auto_continue.json"
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "evidence/runs/$GITHUB_RUN_ID/"
+          if ! git diff --cached --quiet; then
+            git commit -m "Preserve all available lane evidence: run $GITHUB_RUN_ID"
+            python3 tools/research_stage.py --stage publication -- python3 tools/publish_research_outputs.py
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pct-lane-publication-${{ github.run_id }}
+          path: |
+            publication_receipt.json
+            evidence/runs/${{ github.run_id }}/LANE_HANDOFF.json
+          retention-days: 90
+      - name: Report missing lane transports after preserving available evidence
+        run: |
+          python3 - <<'PYHANDOFF'
+          import json, os
+          from pathlib import Path
+          report=json.loads((Path('evidence/runs')/os.environ['GITHUB_RUN_ID']/'LANE_HANDOFF.json').read_text())
+          if report['missing_lanes']:
+              raise SystemExit('LANE_HANDOFF_MISSING: '+','.join(report['missing_lanes']))
+          PYHANDOFF
+
+  aggregate-health:
+    needs: [prepare, publish-lanes]
     if: always() && needs.prepare.result == 'success' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     env:
@@ -351,7 +398,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-          fetch-depth: 0
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/evidence/runs/
+            /evidence/runs/${{ github.run_id }}/
+            !/evidence/specialist_runs/
+            /evidence/specialist_runs/${{ github.run_id }}/
+            !/backups/
       - name: Refresh durable lane evidence
         run: git pull --rebase origin main
       - name: Build cross-lane source genealogy
@@ -418,7 +474,7 @@ jobs:
 
 
   jarvis-escalation-check:
-    needs: [prepare, research-lanes]
+    needs: [prepare, publish-lanes]
     if: always() && needs.prepare.result == 'success' && github.ref == 'refs/heads/main' && inputs.selected_agents != '' && inputs.eval_fast_mode != true
     runs-on: ubuntu-latest
     permissions:
@@ -427,7 +483,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-          fetch-depth: 0
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/evidence/runs/
+            /evidence/runs/${{ github.run_id }}/
+            !/evidence/specialist_runs/
+            /evidence/specialist_runs/${{ github.run_id }}/
+            !/backups/
       - name: Refresh durable lane evidence
         run: git pull --rebase origin main
       - name: Evaluate archive escalation
@@ -464,7 +529,7 @@ jobs:
 
 
   jarvis-state-board:
-    needs: [prepare, research-lanes]
+    needs: [prepare, publish-lanes]
     if: always() && needs.prepare.result == 'success' && github.ref == 'refs/heads/main'
     concurrency:
       group: pct-command-center-research-${{ github.run_id }}
@@ -486,7 +551,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-          fetch-depth: 0
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/evidence/runs/
+            /evidence/runs/${{ github.run_id }}/
+            !/evidence/specialist_runs/
+            /evidence/specialist_runs/${{ github.run_id }}/
+            !/backups/
       - name: Refresh durable evidence
         run: git pull --rebase origin main
       - uses: ./.github/actions/research-model
@@ -593,3 +667,4 @@ jobs:
           PCT_RUN_ID: ${{ github.run_id }}
           GH_TOKEN: ${{ github.token }}
         run: PYTHONPATH=tools python3 tools/auto_chain.py dispatch --run-id "$PCT_RUN_ID" --shards "${{ steps.chain.outputs.shards }}"
+

@@ -8,7 +8,7 @@ runs:
       shell: bash
       run: |
         python3 - <<'PY'
-        import os,pathlib
+        import os,pathlib,sys
         models={'Qwen/Qwen2.5-3B-Instruct-GGUF':('qwen2.5-3b','nabou-qwen2.5-3b-q4km-7dabda4d-v2'),
                 'Qwen/Qwen2.5-7B-Instruct-GGUF':('qwen2.5-7b','nabou-official-qwen2.5-7b-q4km-bb5d59e0-v2'),
                 'Qwen/Qwen3-8B-GGUF':('qwen3-8b','nabou-official-qwen3-8b-q4km-7c41481f-v1')}
@@ -18,6 +18,7 @@ runs:
             out.write('PCT_LOCAL_MODEL_REPOSITORY='+repo+'\n')
             out.write('NABOU_MODEL_CACHE_DIR='+str(pathlib.Path.home()/'.cache/nabou-models'/folder)+'\n')
             out.write('NABOU_MODEL_CACHE_KEY='+key+'\n')
+            out.write('NABOU_PYTHON_TAG='+str(sys.version_info.major)+'.'+str(sys.version_info.minor)+'\n')
         PY
     - uses: actions/cache/restore@v4
       if: env.PCT_LLM_PROVIDER == 'local_llama_cpp'
@@ -25,6 +26,11 @@ runs:
       with:
         path: ${{ env.NABOU_MODEL_CACHE_DIR }}
         key: ${{ env.NABOU_MODEL_CACHE_KEY }}
+    - uses: actions/cache@v4
+      if: env.PCT_LLM_PROVIDER == 'local_llama_cpp'
+      with:
+        path: ~/.cache/pip
+        key: research-pip-${{ runner.os }}-${{ runner.arch }}-py${{ env.NABOU_PYTHON_TAG }}-${{ hashFiles('.github/actions/research-model/action.yml') }}
     - name: Install CPU inference dependencies
       if: env.PCT_LLM_PROVIDER == 'local_llama_cpp'
       shell: bash
@@ -64,3 +70,4 @@ runs:
       with:
         path: ~/.cache/nabou-models/multilingual-e5-small
         key: nabou-embed-multilingual-e5-small-onnx-int8-761b726d-v1
+

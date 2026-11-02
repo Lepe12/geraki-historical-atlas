@@ -187,9 +187,13 @@ class HandoffTests(unittest.TestCase):
         self.assertLess(commit.index('research_continuation/auto_continue.json'), commit.index('git add'))
         self.assertIn('"auto_continue": false', commit)
         self.assertNotIn('gh workflow run', text)
-        lane = text.split('- name: Preserve durable evidence in GitHub', 1)[1].split('- name:', 1)[0]
-        self.assertLess(lane.index('research_continuation/auto_continue.json'), lane.index('git commit'))
-        self.assertIn('if [ "$PCT_AUTO_CONTINUE" != "true" ]', lane)
+        # Lane workers now hand off evidence; the hold marker must exist
+        # before the single publisher exposes any corpus evidence to main.
+        workers = text.split('  research-lanes:', 1)[1].split('  publish-lanes:', 1)[0]
+        self.assertNotIn('publish_research_outputs.py', workers)
+        publication = text.split('- name: Publish recovered evidence once and verify durable readback', 1)[1].split('- uses:', 1)[0]
+        self.assertLess(publication.index('research_continuation/auto_continue.json'), publication.index('git commit'))
+        self.assertIn('if [ "$PCT_AUTO_CONTINUE" != "true" ]', publication)
 
     def test_reanalysis_workflow_gates_every_self_dispatch_on_auto_continue(self):
         # Text check: the coordinator runs this suite without PyYAML.
@@ -230,5 +234,6 @@ class HandoffTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
 
 
