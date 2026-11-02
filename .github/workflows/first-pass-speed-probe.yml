@@ -1,0 +1,203 @@
+name: Actual first-pass speed comparison
+run-name: One versus four GitHub runners — Sonnini OCR
+on:
+  push:
+    branches: [main]
+    paths: ['first_pass_speed_requests/*.json']
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  PYTHONPATH: tools:tools/llm
+  PCT_LLM_PROVIDER: local_llama_cpp
+  PCT_LLM_MODEL: Qwen/Qwen3-8B-GGUF
+  PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen3-8B-GGUF
+  PCT_PREFILTER: '0'
+  PCT_SCREENING: '0'
+  PCT_EXCERPT_RANKING: '0'
+  PCT_SEMANTIC_BATCH_CHARS: '2200'
+  PCT_SEMANTIC_CALLS_PER_PASS: '48'
+  PCT_SEMANTIC_BATCHES: '4'
+  PCT_SEMANTIC_BUDGET_SECONDS: '1800'
+  PCT_SEMANTIC_PARTIAL_ANSWER: '0'
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            tools
+            data
+            first_pass_speed_requests
+      - name: Validate the explicit bounded public-source comparison request
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('first_pass_speed_requests/sonnini-one-vs-four.json')
+          value=json.loads(p.read_text())
+          assert value['action']=='compare_same_public_ocr_one_vs_four'
+          assert value['fixture']=='data/research_benchmarks/first_pass_speed.json'
+          assert value['new_discovery'] is False
+          PY
+      - name: Check identical inputs and prepare exactly four cold batches without inference
+        run: |
+          python3 -m unittest tools.test_first_pass_speed_probe -v
+          python3 tools/run_first_pass_speed_probe.py prepare --output seed
+      - uses: actions/upload-artifact@v4
+        with:
+          name: first-pass-speed-seed-${{ github.run_id }}
+          path: seed/
+          retention-days: 90
+  serial:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            tools
+            data
+            .github/actions
+      - uses: actions/download-artifact@v4
+        with:
+          name: first-pass-speed-seed-${{ github.run_id }}
+          path: seed
+      - run: python3 tools/run_first_pass_speed_probe.py restore --input seed
+      - name: Start the elapsed-time measurement before inference setup
+        run: python3 tools/run_first_pass_speed_probe.py clock --output start.json
+      - uses: ./.github/actions/research-model
+      - name: Actual single-runner extraction, claim review and synthesis
+        run: python3 tools/run_first_pass_speed_probe.py serial --start start.json --output serial-result
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: first-pass-speed-result-serial-${{ github.run_id }}
+          path: serial-result/
+          retention-days: 90
+  readers:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        reader: [0, 1, 2, 3]
+    env:
+      PCT_SEMANTIC_BATCHES: '1'
+      PCT_SEMANTIC_PARTIAL_ANSWER: '1'
+      PCT_SEMANTIC_BUDGET_SECONDS: '900'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            tools
+            data
+            .github/actions
+      - uses: actions/download-artifact@v4
+        with:
+          name: first-pass-speed-seed-${{ github.run_id }}
+          path: seed
+      - run: python3 tools/run_first_pass_speed_probe.py restore --input seed
+      - name: Start this reader's elapsed-time measurement before inference setup
+        run: python3 tools/run_first_pass_speed_probe.py clock --output start.json
+      - uses: ./.github/actions/research-model
+      - name: Actual extraction and claim review for this one source batch
+        run: python3 tools/run_first_pass_speed_probe.py read --start start.json --index "${{ matrix.reader }}"
+      - name: Package this reader's checkpoint and timing
+        if: always()
+        run: python3 tools/first_pass_semantics.py pack --repo probe-work --run-id "$GITHUB_RUN_ID" --index "${{ matrix.reader }}" --count 4 --output reader-result
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: first-pass-speed-reader-${{ github.run_id }}-${{ matrix.reader }}
+          path: reader-result/
+          retention-days: 90
+  merge:
+    needs: [prepare, readers]
+    if: '!cancelled() && needs.readers.result == ''success'''
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PCT_SEMANTIC_BUDGET_SECONDS: '900'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            tools
+            data
+            .github/actions
+      - uses: actions/download-artifact@v4
+        with:
+          name: first-pass-speed-seed-${{ github.run_id }}
+          path: seed
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: first-pass-speed-reader-${{ github.run_id }}-*
+          path: reader-transports
+      - run: python3 tools/run_first_pass_speed_probe.py restore --input seed
+      - run: python3 tools/run_first_pass_speed_probe.py clock --output start.json
+      - uses: ./.github/actions/research-model
+      - name: Actual combined synthesis and final review without new extraction
+        run: python3 tools/run_first_pass_speed_probe.py merge --start start.json --incoming reader-transports --output parallel-result
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: first-pass-speed-result-parallel-${{ github.run_id }}
+          path: parallel-result/
+          retention-days: 90
+  report:
+    needs: [serial, merge]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            data
+            evidence/configuration/${{ github.run_id }}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: first-pass-speed-result-*-${{ github.run_id }}
+          path: measured-results
+      - uses: actions/download-artifact@v4
+        with:
+          name: first-pass-speed-seed-${{ github.run_id }}
+          path: shared-input
+      - name: Compare actual times only for identical bound inputs
+        run: python3 tools/run_first_pass_speed_probe.py compare --incoming measured-results --output "evidence/configuration/$GITHUB_RUN_ID/first-pass-speed"
+      - name: Preserve the measured results, source derivation and model responses
+        if: always()
+        run: |
+          destination="evidence/configuration/$GITHUB_RUN_ID/first-pass-speed"
+          mkdir -p "$destination"
+          if [ -d measured-results ]; then cp -R measured-results "$destination/"; fi
+          if [ -d shared-input ]; then cp -R shared-input "$destination/"; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: first-pass-speed-comparison-${{ github.run_id }}
+          path: evidence/configuration/${{ github.run_id }}/first-pass-speed/
+          retention-days: 90
+      - name: Durably publish the observed comparison and verify readback
+        if: always()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "evidence/configuration/$GITHUB_RUN_ID/first-pass-speed/"
+          if ! git diff --cached --quiet; then
+            git commit -m "Record measured one-vs-four GitHub inference comparison $GITHUB_RUN_ID"
+            python3 tools/publish_research_outputs.py
+          fi
