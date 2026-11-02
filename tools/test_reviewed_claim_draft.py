@@ -10,6 +10,17 @@ from test_semantic_shards import fixture,Caller,CONFIG,BASE_ENV,response
 
 
 class DraftTests(unittest.TestCase):
+    def test_local_default_avoids_rewrite_and_explicit_model_override_still_works(self):
+        for override in (None,'model'):
+            with self.subTest(override=override),tempfile.TemporaryDirectory() as tmp:
+                root=Path(tmp);fixture(root);caller=Caller()
+                with patch.dict(os.environ,{**BASE_ENV,'PCT_LLM_PROVIDER':'local_llama_cpp'}):
+                    os.environ.pop('PCT_SYNTHESIS_MODE',None)
+                    if override is not None:os.environ['PCT_SYNTHESIS_MODE']=override
+                    out=engine.execute(root,'Historical research',caller=caller,config=CONFIG)
+                self.assertEqual(out['status'],'MODEL_ANSWER_PENDING_HUMAN_REVIEW')
+                self.assertEqual('synthesis' in caller.calls,override=='model')
+
     def test_copy_citations_uncertainty_context_and_no_mutation(self):
         claims=[{'claim_id':'a','statement':'The author conjectures a refuge.','kind':'hypothesis','relevance_status':'CONTEXTUAL'},
                 {'claim_id':'b','statement':'An inference, not an established event.','kind':'inference'}]

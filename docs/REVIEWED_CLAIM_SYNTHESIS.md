@@ -2,8 +2,10 @@
 
 `PCT_SYNTHESIS_MODE=reviewed_claims` copies up to four currently supported claim
 statements into cited paragraphs rather than asking a model to rewrite them.
-The default remains `model` until the real comparison passes. This is an opt-in
-path in the existing engine, not a separate research system.
+For local inference this is the default; `PCT_SYNTHESIS_MODE=model` restores the
+model-written narrative. Other providers keep their existing model default.
+This is a path in the existing engine, not a separate research system. Enablement
+requires a successful same-runner real comparison and negative control.
 
 The source-bound extraction replay, current claim validation, fidelity and
 relevance holds, claim model reviews, final answer model review, final paragraph
