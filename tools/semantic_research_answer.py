@@ -1498,7 +1498,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
     synthesis_rules+=' Do not pad the answer with gap paragraphs. Put every gap in unknowns or limitations. Do not repeat a date or century from a claim unless that temporal statement occurs in its actual quotation; leave dates supplied only by context unresolved in the answer prose.'
     synthesis_prompt=synthesis_rules+'\nCLAIMS_AND_REVIEW_JSON:\n'+json.dumps(synthesis_context,ensure_ascii=False)
     from reviewed_claim_draft import draft as reviewed_claim_draft
-    mode=os.getenv('PCT_SYNTHESIS_MODE','model')
+    mode=os.getenv('PCT_SYNTHESIS_MODE','reviewed_claims' if os.getenv('PCT_LLM_PROVIDER')=='local_llama_cpp' else 'model')
     if mode not in ('model','reviewed_claims'):raise ValueError('INVALID_SYNTHESIS_MODE')
     answer=reviewed_claim_draft(synthesis_claims) if mode=='reviewed_claims' else None
     if answer is not None:
