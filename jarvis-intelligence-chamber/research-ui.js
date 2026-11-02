@@ -675,7 +675,8 @@ function updateDetail() {
     box = document.createElement("div");
     box.id = "detailLive";
     box.className = "detail-live agent-overview";
-    $("detailPanel").insertBefore(box, $("focusButton"));
+    const ref = $("focusButton"), host = ref?.parentNode || $("detailPanel"); // v2: το περιεχόμενο κυλά μέσα σε .v2-scroll
+    if (host) host.insertBefore(box, ref?.parentNode === host ? ref : null);
   }
   $("detailState").textContent =
     gr(document.body.dataset.researchUi || "RECORDED") + " · " + gr(a.status || "UNKNOWN");

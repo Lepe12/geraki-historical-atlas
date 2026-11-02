@@ -365,6 +365,7 @@ body.nx-v2 .learning-item .learning-actions { margin-top: 10px; }
 body.nx-v2 .learning-item .learning-actions button { min-height: 44px; padding: 6px 14px; font-size: 13px; }
 /* ο βοηθός δεν πρέπει να καλύπτει το υποσέλιδο των πάνελ */
 body.nx-v2.v2-panel-open #nabouAssistantLauncher { right: calc(min(780px, 100vw - var(--v2-rail)) + 20px) !important; }
+@media (min-width: 1181px) { body.nx-v2.v2-panel-open #nabouAssistantLauncher { right: calc(var(--v2-panel-w) + 20px) !important; } }
 @media (max-width: 800px) { body.nx-v2.v2-panel-open #nabouAssistantLauncher { right: 20px !important; display: none !important; } }
 
 body.nx-v2 [tabindex="-1"]:focus, body.nx-v2 [tabindex="-1"]:focus-visible { outline: none !important; }
@@ -412,3 +413,9 @@ body.nx-v2 #resultsDrawer small, body.nx-v2 #learningPanel small, body.nx-v2 #nx
 body.nx-v2 .nxa-canvas { mix-blend-mode: screen; background: transparent; }
 /* Το κουμπί χαιρετισμού είναι αόρατο κάλυμμα πάνω από το ολόγραμμα — να μην το καλύπτει με φόντο κουμπιού */
 body.nx-v2 .nxa button.nxa-greet, body.nx-v2 .nxa .nxa-greet:hover { background: transparent !important; border: 0 !important; box-shadow: none !important; min-height: 0; }
+
+/* πάνελ 530px (≥1181px): το chip κατάστασης πηγαίνει σε δική του γραμμή και δεν πατά το «✕» */
+@media (min-width: 1181px) {
+  body.nx-v2.v2-panel-wide .activity-head > div:not(.nxs-index) { flex: 1 1 100%; }
+  body.nx-v2.v2-panel-wide .activity-head #missionState { margin: 6px 0 0 0; }
+}

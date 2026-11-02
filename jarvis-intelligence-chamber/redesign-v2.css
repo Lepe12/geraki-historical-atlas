@@ -7,7 +7,7 @@
   --v2-line: rgba(217, 181, 110, .26); --v2-line2: rgba(217, 181, 110, .5);
   --v2-head: "EB Garamond", "NX Garamond", Georgia, serif; --v2-body: "Source Serif 4", "EB Garamond", Georgia, serif;
   --v2-ui: "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif; --v2-logo: "Cinzel", "NX Cinzel", Georgia, serif;
-  --v2-rail: 80px; --v2-aside: 344px; --v2-tab: 62px;
+  --v2-rail: 80px; --v2-aside: 344px; --v2-panel-w: 530px; --v2-tab: 62px;
   --fell: var(--v2-body); --gar: var(--v2-head); --fellsc: var(--v2-head); --cin: var(--v2-ui);
   --dim: #B9A98A; --dim2: #A39373; --txt: #F1E6CC; --brass2: #D9B56E;
 }
@@ -167,6 +167,18 @@ body.nx-v2.nx-mock #stage .nxs-workspace, body.nx-v2.nx-mock #stage .results-dra
   position: fixed !important; left: auto !important; right: 0 !important; top: 0 !important; bottom: 0 !important; width: min(780px, calc(100vw - var(--v2-rail))) !important; height: auto !important; max-height: none !important; z-index: 70 !important;
   border-left: 1px solid var(--v2-line2) !important; box-shadow: -24px 0 60px rgba(0, 0, 0, .6) !important; }
 body.nx-v2.nx-mock #stage .detail-panel { width: min(400px, calc(100vw - var(--v2-rail))) !important; z-index: 72 !important; }
+/* ≥1181px: το πάνελ παίρνει τη θέση της δεξιάς στήλης (530px) και ο χάρτης/το ερώτημα στενεύουν — καμία επικάλυψη με το composer */
+@media (min-width: 1181px) {
+  body.nx-v2.v2-panel-wide #stage { grid-template-columns: var(--v2-rail) minmax(0, 1fr) var(--v2-panel-w) !important; }
+  body.nx-v2.v2-panel-slim { --v2-panel-w: 400px; }
+  body.nx-v2.v2-panel-wide .v2-aside { display: none !important; }
+  body.nx-v2.v2-panel-wide .v2-aside-toggle { display: none !important; }
+  body.nx-v2.v2-panel-wide.nx-mock #clock { white-space: nowrap; font-size: 15px !important; }
+  body.nx-v2.v2-panel-wide #cards { gap: 8px; }
+  body.nx-v2.v2-panel-wide #cards .card .cnt { display: none; }
+  body.nx-v2.v2-panel-wide #cards .card .lbl { letter-spacing: .06em; left: 10px; }
+  body.nx-v2.nx-mock #stage .nxs-workspace, body.nx-v2.nx-mock #stage .results-drawer, body.nx-v2.nx-mock #stage .learning-panel, body.nx-v2.nx-mock #stage .activity-strip { width: var(--v2-panel-w) !important; }
+}
 
 /* ---------- popovers / μενού ---------- */
 body.nx-v2 #ddMenu, body.nx-v2 .nx-pop { position: fixed; z-index: 85 !important; }

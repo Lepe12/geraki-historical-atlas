@@ -67,6 +67,14 @@
       }
     }
     body.classList.toggle("v2-panel-open", PANELS.some((p) => { const e = $(p.id); return e && isOpen(e); }));
+    const wide = PANELS.some((p) => { const e = $(p.id); return e && isOpen(e); });
+    const slim = wide && !PANELS.some((p) => { const e = $(p.id); return p.id !== "detailPanel" && e && isOpen(e); }); // μόνο το πάνελ λεπτομερειών (400px)
+    body.classList.toggle("v2-panel-slim", slim);
+    if (body.classList.contains("v2-panel-wide") !== wide || body.dataset.v2Slim !== String(slim)) {
+      body.dataset.v2Slim = String(slim);
+      body.classList.toggle("v2-panel-wide", wide);
+      requestAnimationFrame(() => window.dispatchEvent(new Event("resize"))); // ο χάρτης προσαρμόζεται στο νέο πλάτος
+    }
   });
   let lastFocus = null;
   document.addEventListener("focusin", (e) => { if (!e.target.closest?.("#nxsAgentsPage,#resultsDrawer,#learningPanel,#activityStrip,#detailPanel")) lastFocus = e.target; }, true);
