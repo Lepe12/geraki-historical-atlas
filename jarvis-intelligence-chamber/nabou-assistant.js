@@ -15,8 +15,8 @@
     busy = true;
     try {
       if (!mod) {
-        const css = document.createElement("link"); css.rel = "stylesheet"; css.href = "./assistant/assistant.css?v=v2-phase2-1"; document.head.appendChild(css);
-        mod = await import("./assistant/assistant.js?v=v2-phase2-1");
+        const css = document.createElement("link"); css.rel = "stylesheet"; css.href = "./assistant/assistant.css?v=v2-phase3-2"; document.head.appendChild(css);
+        mod = await import("./assistant/assistant.js?v=v2-phase3-2");
         document.addEventListener("nabou:assistant", (e) => b.classList.toggle("open", e.detail.open));
       }
       mod.open();

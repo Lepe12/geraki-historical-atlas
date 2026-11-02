@@ -39,6 +39,7 @@ function say(text) {
     u.lang = "el-GR"; u.voice = voice; u.rate = 0.96; u.pitch = 0.95;
     utterance = u;
     u.onend = done;
+    u.onboundary = () => { try { holo?.kick?.(); } catch {} };
     u.onerror = () => { if (session !== speechSession) return; done(); setStatus("Η φωνή δεν ξεκίνησε. Πάτα ξανά το ολόγραμμα για να δοκιμάσεις."); };
     try { speechSynthesis.speak(u); } catch { u.onerror(); }
     setStatus(`Φωνή: ${voice.name}`);
@@ -201,7 +202,7 @@ function build() {
   q(".nxa-form").onsubmit = (e) => { e.preventDefault(); const v = q(".nxa-text").value; q(".nxa-text").value = ""; handle(v); };
   root.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
   setStatus(SR ? "Πάτα «Πάτα και μίλα» και πες μια εντολή, ή άνοιξε το «Να ακούει πάντα» και ξεκίνα με «Ναμπού»." : "Αυτό το πρόγραμμα περιήγησης δεν έχει αναγνώριση ομιλίας· γράψε την εντολή στο πεδίο.");
-  holoP = import("./assistant-scene.js").then((m) => m.createHologram(ui.canvas)).then((h) => { holo = h; h.show(); morphLabel(true); return h; }) /* το ολόγραμμα φαίνεται από την αρχή */
+  holoP = import("./assistant-scene.js?v=v2-phase3-2").then((m) => m.createHologram(ui.canvas)).then((h) => { holo = h; h.show(); morphLabel(true); return h; }) /* το ολόγραμμα φαίνεται από την αρχή */
     .catch((err) => { root.classList.add("no-webgl"); setStatus("Το ολόγραμμα δεν φορτώθηκε (WebGL): " + err.message); });
 }
 

@@ -14,16 +14,19 @@ else if (root) {
     if (done) return;
     done = true;
     try { sessionStorage.setItem("nx-v2-seen", "1"); } catch {}
-    root.classList.add("leaving");
     app?.removeAttribute("inert");
     app?.removeAttribute("aria-hidden");
+    // Έξοδος ≤ ~700ms: το ολόγραμμα διαλύεται σε σωματίδια (~520ms) και το fade ξεκινά πριν τελειώσει
+    const burst = !reduce && holo;
+    if (burst) { try { holo.dissolve(480); } catch {} }
+    setTimeout(() => root.classList.add("leaving"), burst ? 240 : 0);
     setTimeout(() => {
       cancelAnimationFrame(raf);
       try { holo?.dispose(); } catch {}
       html.classList.remove("v2-welcome-on");
       root.remove();
       if (matchMedia("(hover: hover) and (pointer: fine)").matches) document.getElementById("operatorQuery")?.focus({ preventScroll: true });
-    }, reduce ? 20 : 420);
+    }, reduce ? 20 : 620);
   }
   btn.addEventListener("click", enter);
   const muteBtn = document.getElementById("v2wMute");
@@ -42,19 +45,20 @@ else if (root) {
   function applySpeaking() {
     if (!holo) return;
     try { if (!reduce) holo.speaking(speakingNow); } catch {}
-    if (reduce) holo.tune(speakingNow ? { uGain: 0.8, uSize: 0.046, strength: 0.95 } : { uGain: 0.62, uSize: 0.04, strength: 0.7 });
+    if (reduce) holo.tune(speakingNow ? { uGain: 0.23, uSize: 0.042 } : { uGain: 0.21, uSize: 0.04 });
   }
 
   const hasGL = () => { try { const c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); } catch { return false; } };
   if (!hasGL()) root.classList.add("no-webgl");
   else {
-    import("./assistant/assistant-scene.js")
-      .then((m) => m.createHologram(canvas))
+    import("./assistant/assistant-scene.js?v=v2-phase3-2")
+      .then((m) => m.createHologram(canvas, { stage: true }))
       .then((h) => {
         if (done) { h.dispose(); return; }
         holo = h;
-        h.jump(1); // πορτραίτο του χαρτογράφου από το νέφος σημείων
-        h.tune({ uGain: 0.62, uSize: 0.04 });
+        // ξεκινά ως σφαίρα και μαζεύεται στο πρόσωπο σε ~1.8s (reduced-motion: κατευθείαν το πορτραίτο)
+        if (reduce) h.jump(1); else h.show(1.8);
+        h.tune({ uGain: 0.21, uSize: 0.04 });
         applySpeaking();
         if (reduce) { h.freeze(2.2); return; }
         const t0 = performance.now();
@@ -62,8 +66,8 @@ else if (root) {
           const s = Math.sin((now - t0) / 1000 * 1.05);
           if (speakingNow) {
             const p = Math.sin((now - t0) / 1000 * 7.5), k = now < kickUntil ? 1 : 0.55;
-            h.tune({ uGain: 0.8 + 0.16 * p * k, uSize: 0.046 + 0.006 * p * k, strength: 0.95 + 0.2 * p * k });
-          } else h.tune({ uGain: 0.62 + 0.14 * s, uSize: 0.04 + 0.004 * s, strength: 0.7 + 0.12 * s });
+            h.tune({ uGain: 0.21 + 0.03 * p * k, uSize: 0.044 + 0.004 * p * k });
+          } else h.tune({ uGain: 0.21 + 0.07 * s, uSize: 0.04 + 0.004 * s });
           raf = requestAnimationFrame(loop);
         };
         raf = requestAnimationFrame(loop);
@@ -119,7 +123,7 @@ else if (root) {
     u.lang = "el-GR"; if (voice) u.voice = voice; u.rate = 0.96; u.pitch = 0.95;
     utter = u;
     u.onstart = () => speakState(true);
-    u.onboundary = () => { kickUntil = performance.now() + 220; };
+    u.onboundary = () => { kickUntil = performance.now() + 220; try { holo?.kick(); } catch {} };
     u.onend = () => { if (utter === u) { utter = null; speakState(false); } };
     u.onerror = (ev) => {
       if (utter === u) { utter = null; speakState(false); }
