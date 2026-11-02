@@ -267,7 +267,7 @@ function renderActivityV2(src) {
 }
 function renderActivity() {
   const src = events.slice(-30).reverse();
-  if (document.body.classList.contains("nx-v2")) return renderActivityV2(src);
+  if (document.body?.classList?.contains("nx-v2")) return renderActivityV2(src);
   activity.innerHTML = src.length
     ? src
         .map(
