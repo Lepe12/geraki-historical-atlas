@@ -15,7 +15,6 @@ on:
   push:
     branches: [main]
     paths:
-      - '.github/workflows/research-extraction-speed.yml'
       - 'inference_speed_requests/*.json'
   workflow_dispatch:
     inputs:
@@ -29,11 +28,13 @@ jobs:
   regression:
     outputs:
       source_run: ${{ steps.request.outputs.source_run }}
+      publish_only: ${{ steps.request.outputs.publish_only }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
+          filter: blob:none
           sparse-checkout: |
             tools
             data
@@ -48,16 +49,20 @@ jobs:
           import json,os,re,subprocess
           from pathlib import Path
           source=os.environ.get('SOURCE_RUN_ID','').strip()
+          publish_only=False
           request='inference_speed_requests/review-existing-extraction.json'
           if os.environ['GITHUB_EVENT_NAME']=='push':
               changed=subprocess.check_output(['git','diff-tree','--no-commit-id','--name-only','-r','HEAD'],text=True).splitlines()
               if request in changed:
                   value=json.loads(Path(request).read_text())
                   assert value['schema']=='research-extraction-review-resume-v1'
-                  assert value['action']=='review_existing_extraction_only'
+                  assert value['action'] in ('review_existing_extraction_only','publish_existing_comparison_only')
+                  publish_only=value['action']=='publish_existing_comparison_only'
                   source=value['source_run_id']
           if source and not re.fullmatch(r'[0-9]+',source):raise ValueError('INVALID_SOURCE_RUN_ID')
-          with open(os.environ['GITHUB_OUTPUT'],'a') as out:out.write('source_run='+source+'\n')
+          with open(os.environ['GITHUB_OUTPUT'],'a') as out:
+              out.write('source_run='+source+'\n')
+              out.write('publish_only='+str(publish_only).lower()+'\n')
           PYREQUEST
       - name: Verify incremental source reuse and unchanged extraction prompts
         env:
@@ -114,7 +119,7 @@ jobs:
           retention-days: 90
   compare:
     needs: [regression, extract]
-    if: always() && github.event_name != 'pull_request' && needs.regression.result == 'success' && (needs.extract.result != 'skipped' || needs.regression.outputs.source_run != '')
+    if: always() && github.event_name != 'pull_request' && needs.regression.result == 'success' && needs.regression.outputs.publish_only != 'true' && (needs.extract.result != 'skipped' || needs.regression.outputs.source_run != '')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -128,11 +133,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
+          filter: blob:none
           sparse-checkout: |
             tools
             data
             .github/actions/research-model
             evidence/configuration/${{ needs.regression.outputs.source_run || github.run_id }}
+            evidence/configuration/${{ github.run_id }}
       - uses: actions/download-artifact@v4
         if: needs.regression.outputs.source_run == ''
         with:
@@ -168,5 +175,67 @@ jobs:
           git add "evidence/configuration/$GITHUB_RUN_ID/extraction-speed/"
           if ! git diff --cached --quiet; then
             git commit -m "Record actual extraction speed and fidelity comparison $GITHUB_RUN_ID"
+            python3 tools/publish_research_outputs.py
+          fi
+
+  publish-comparison:
+    needs: regression
+    if: github.event_name != 'pull_request' && needs.regression.outputs.publish_only == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: read
+    env:
+      SOURCE_RUN_ID: ${{ needs.regression.outputs.source_run }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            data/research_benchmarks
+            evidence/configuration/${{ needs.regression.outputs.source_run }}
+      - name: Wait only for the explicitly requested saved comparison artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          export ARTIFACT_NAME="extraction-speed-comparison-$SOURCE_RUN_ID"
+          for attempt in $(seq 1 20); do
+            count=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN_ID/artifacts" --jq '[.artifacts[] | select(.name == env.ARTIFACT_NAME)] | length')
+            if [ "$count" = 1 ]; then exit 0; fi
+            sleep 30
+          done
+          echo 'COMPARISON_ARTIFACT_NOT_AVAILABLE'
+          exit 1
+      - uses: actions/download-artifact@v4
+        with:
+          name: extraction-speed-comparison-${{ needs.regression.outputs.source_run }}
+          run-id: ${{ needs.regression.outputs.source_run }}
+          github-token: ${{ github.token }}
+          path: evidence/configuration/${{ needs.regression.outputs.source_run }}/extraction-speed
+      - name: Validate the saved diagnostic comparison before durable publication
+        run: |
+          python3 - <<'PYPRESERVE'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path('evidence/configuration')/os.environ['SOURCE_RUN_ID']/'extraction-speed'
+          report=json.loads((root/'comparison.json').read_text())
+          expected=hashlib.sha256(Path('data/research_benchmarks/extraction_speed.json').read_bytes()).hexdigest()
+          assert report['schema']=='research-extraction-speed-comparison-v1'
+          assert report['fixture_sha256']==expected
+          assert report['active_model_changed'] is False
+          assert report['historical_verified'] is False
+          print(json.dumps({k:report[k] for k in ('seconds','candidate_baseline_ratio','quality','recommendation','active_model_changed')}))
+          PYPRESERVE
+      - name: Publish and verify the saved comparison without any model call
+        timeout-minutes: 4
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "evidence/configuration/$SOURCE_RUN_ID/extraction-speed/"
+          if ! git diff --cached --quiet; then
+            git commit -m "Preserve completed extraction comparison $SOURCE_RUN_ID without repeating inference"
             python3 tools/publish_research_outputs.py
           fi
