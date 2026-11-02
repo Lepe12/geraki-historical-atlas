@@ -1,0 +1,68 @@
+name: Research speed and evidence handoff
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/pct-parallel-multi-agent.yml'
+      - '.github/workflows/jarvis-specialist-research.yml'
+      - '.github/workflows/research-speed-check.yml'
+      - '.github/actions/research-model/action.yml'
+      - 'tools/research_lane_handoff.py'
+      - 'tools/test_research_lane_handoff.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/pct-parallel-multi-agent.yml'
+      - '.github/workflows/jarvis-specialist-research.yml'
+      - '.github/workflows/research-speed-check.yml'
+      - '.github/actions/research-model/action.yml'
+      - 'tools/research_lane_handoff.py'
+      - 'tools/test_research_lane_handoff.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  checkout-and-handoff:
+    name: Checkout ${{ matrix.profile }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - profile: previous-full-history
+            depth: 0
+            filter: ''
+            sparse: ''
+          - profile: current-run-only
+            depth: 2
+            filter: 'blob:none'
+            sparse: |
+              /*
+              !/evidence/runs/
+              /evidence/runs/${{ github.run_id }}/
+              !/evidence/specialist_runs/
+              /evidence/specialist_runs/${{ github.run_id }}/
+              !/backups/
+    steps:
+      - id: clock
+        name: Start checkout measurement
+        run: echo "start=$(date +%s)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: ${{ matrix.depth }}
+          filter: ${{ matrix.filter }}
+          sparse-checkout-cone-mode: false
+          sparse-checkout: ${{ matrix.sparse }}
+      - name: Record measured checkout duration and materialized size
+        env:
+          CHECKOUT_START: ${{ steps.clock.outputs.start }}
+          PROFILE: ${{ matrix.profile }}
+        run: |
+          elapsed=$(( $(date +%s) - CHECKOUT_START ))
+          size=$(du -sm --exclude=.git . | cut -f1)
+          printf '### Checkout %s\n\nElapsed: %s seconds. Working files: %s MiB.\n' "$PROFILE" "$elapsed" "$size" >> "$GITHUB_STEP_SUMMARY"
+      - name: Verify byte-preserving transport and actual durable Git publication
+        if: matrix.profile == 'current-run-only'
+        env:
+          PYTHONPATH: tools
+        run: python3 -m unittest tools.test_research_lane_handoff tools.test_publish_research_outputs -v
