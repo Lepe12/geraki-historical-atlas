@@ -1497,7 +1497,17 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
     synthesis_rules+=' Unresolved identity establishes NEITHER that two name forms are the same person NOR that they are distinct individuals. Do not assert either relationship without a supported claim explicitly establishing it. Keep each paragraph to one short finding, at most35 words.'
     synthesis_rules+=' Do not pad the answer with gap paragraphs. Put every gap in unknowns or limitations. Do not repeat a date or century from a claim unless that temporal statement occurs in its actual quotation; leave dates supplied only by context unresolved in the answer prose.'
     synthesis_prompt=synthesis_rules+'\nCLAIMS_AND_REVIEW_JSON:\n'+json.dumps(synthesis_context,ensure_ascii=False)
-    answer=invoke('synthesis',synthesis_prompt,schemas.synthesis(sorted(supported)))
+    from reviewed_claim_draft import draft as reviewed_claim_draft
+    mode=os.getenv('PCT_SYNTHESIS_MODE','model')
+    if mode not in ('model','reviewed_claims'):raise ValueError('INVALID_SYNTHESIS_MODE')
+    answer=reviewed_claim_draft(synthesis_claims) if mode=='reviewed_claims' else None
+    if answer is not None:
+        out['synthesis_method']='REVIEWED_CLAIMS_VERBATIM_REQUIRES_FINAL_REVIEW'
+        cited={cid for section in answer['answer_sections'] for cid in section['claim_ids']}
+        out['synthesis_coverage']['not_selected_for_verbatim_answer_claim_ids']=[c['claim_id'] for c in synthesis_claims if c['claim_id'] not in cited]
+    else:
+        answer=invoke('synthesis',synthesis_prompt,schemas.synthesis(sorted(supported)))
+        out['synthesis_method']='MODEL_GENERATED_REQUIRES_FINAL_REVIEW'
     if not valid_synthesis(answer,supported) and out['calls'][-1]['status']=='COMPLETED':
         original=answer
         answer=invoke('synthesis',synthesis_prompt+'\nFORMAT REPAIR: write the concrete finding, including the source-supported subject and action. A phrase such as an attribution prefix with no finding is invalid. Return only actual supported findings in answer_sections. Each paragraph requires at least one supplied supporting claim ID. Gaps and limitations must not be answer paragraphs. Do not invent citations.\nINVALID_DRAFT_JSON:\n'+json.dumps(original,ensure_ascii=False),schemas.synthesis(sorted(supported)))

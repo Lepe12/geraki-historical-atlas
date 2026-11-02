@@ -1,0 +1,101 @@
+name: Actual synthesis speed comparison
+run-name: Reviewed claims versus model rewrite — real final review
+on:
+  push:
+    branches: [main]
+    paths: ['synthesis_speed_requests/*.json']
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  PYTHONPATH: tools:tools/llm
+  PCT_LLM_PROVIDER: local_llama_cpp
+  PCT_LLM_MODEL: Qwen/Qwen3-8B-GGUF
+  PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen3-8B-GGUF
+  PCT_PREFILTER: '0'
+  PCT_SCREENING: '0'
+  PCT_EXCERPT_RANKING: '0'
+  PCT_SEMANTIC_BATCH_CHARS: '2200'
+  PCT_SEMANTIC_CALLS_PER_PASS: '48'
+  PCT_SEMANTIC_BATCHES: '4'
+  PCT_SEMANTIC_BUDGET_SECONDS: '1500'
+  PCT_SEMANTIC_PARTIAL_ANSWER: '0'
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [model, reviewed_claims]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            data
+            .github/actions
+            synthesis_speed_requests
+            evidence/configuration/41437163921/first-pass-speed
+      - name: Validate the bounded retained-public-source request
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          value=json.loads(Path('synthesis_speed_requests/sonnini-reviewed-draft.json').read_text())
+          assert value=={'schema':'synthesis-speed-request-v1','parent_run':'41437163921','new_discovery':False,'historical_verified':False}
+          PY
+          python3 -m unittest tools.test_reviewed_claim_draft -v
+      - uses: ./.github/actions/research-model
+      - name: Measure actual synthesis and final review with the same retained claims
+        run: python3 tools/benchmark_reviewed_synthesis.py run --profile "${{ matrix.profile }}" --output result
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: synthesis-speed-${{ matrix.profile }}-${{ github.run_id }}
+          path: result/
+          retention-days: 90
+  report:
+    needs: measure
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            evidence/configuration/${{ github.run_id }}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: synthesis-speed-*-${{ github.run_id }}
+          path: measured-results
+      - name: Compare measured times, source bindings and the negative control
+        run: python3 tools/benchmark_reviewed_synthesis.py compare --incoming measured-results --output "evidence/configuration/$GITHUB_RUN_ID/synthesis-speed"
+      - name: Retain the actual model outputs even if comparison is incomplete
+        if: always()
+        run: |
+          destination="evidence/configuration/$GITHUB_RUN_ID/synthesis-speed"
+          mkdir -p "$destination"
+          if [ -d measured-results ]; then cp -R measured-results "$destination/"; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: synthesis-comparison-${{ github.run_id }}
+          path: evidence/configuration/${{ github.run_id }}/synthesis-speed/
+          retention-days: 90
+      - name: Publish observed results and verify readback
+        if: always()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "evidence/configuration/$GITHUB_RUN_ID/synthesis-speed/"
+          if ! git diff --cached --quiet; then
+            git commit -m "Record measured synthesis comparison $GITHUB_RUN_ID"
+            python3 tools/publish_research_outputs.py
+          fi
