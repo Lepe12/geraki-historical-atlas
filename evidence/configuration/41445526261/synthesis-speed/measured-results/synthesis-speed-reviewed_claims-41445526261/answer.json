@@ -1,0 +1,1593 @@
+{
+  "schema": "pct-semantic-answer-v3",
+  "question": "Argentiera\nResearch scope: What does Sonnini report about the island names, merchant anchorage, harbour and water supply?",
+  "request_kind": "place",
+  "evidence_hash": "5321a531fb5820f1742b605c4bfbd72527e184a785b85aaa7aa1df160cc76ad6",
+  "status": "MODEL_ANSWER_PENDING_HUMAN_REVIEW",
+  "generated_utc": "2026-11-02T12:33:38.761433+00:00",
+  "model_configuration": {
+    "schema": "pct-llm-routing-summary-v1",
+    "prompt_version": "2026-10-20.1",
+    "routes": {
+      "planner": {
+        "role": "planner",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "fast",
+        "temperature": 0.1,
+        "max_output_tokens": 1800,
+        "fallback": "deterministic_planner",
+        "requires_evidence": false,
+        "prompt_version": "2026-10-20.1"
+      },
+      "query_expander": {
+        "role": "query_expander",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "fast",
+        "temperature": 0.2,
+        "max_output_tokens": 1600,
+        "fallback": "deterministic_query_expander",
+        "requires_evidence": false,
+        "prompt_version": "2026-10-20.1"
+      },
+      "evidence_extractor": {
+        "role": "evidence_extractor",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "precise",
+        "temperature": 0.0,
+        "max_output_tokens": 2600,
+        "fallback": "source_first_extractor",
+        "requires_evidence": true,
+        "prompt_version": "2026-10-20.1"
+      },
+      "synthesis": {
+        "role": "synthesis",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "reasoning",
+        "temperature": 0.1,
+        "max_output_tokens": 4200,
+        "fallback": "source_first_report",
+        "requires_evidence": true,
+        "prompt_version": "2026-10-20.1"
+      },
+      "adversarial_reviewer": {
+        "role": "adversarial_reviewer",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "reasoning",
+        "temperature": 0.1,
+        "max_output_tokens": 3200,
+        "fallback": "deterministic_gap_review",
+        "requires_evidence": true,
+        "prompt_version": "2026-10-20.1"
+      },
+      "replanner": {
+        "role": "replanner",
+        "provider": "local_llama_cpp",
+        "model": "Qwen/Qwen3-8B-GGUF",
+        "tier": "reasoning",
+        "temperature": 0.1,
+        "max_output_tokens": 2200,
+        "fallback": "registered_route_replan",
+        "requires_evidence": false,
+        "prompt_version": "2026-10-20.1"
+      }
+    },
+    "verified_promotion_allowed": false
+  },
+  "source_group_reuse": {
+    "saved_batches": 0,
+    "saved_excerpts": 0,
+    "holds": []
+  },
+  "configuration": {
+    "configured": true,
+    "missing": []
+  },
+  "model_used": true,
+  "claims": [
+    {
+      "claim_id": "c-634690ef53620633c277",
+      "statement": "The consulted source reports that trading vessels anchor between the islands of Argentiera and San Georgio, nearer to Argentiera.",
+      "kind": "source_statement",
+      "passage_kind": "NARRATIVE_EVIDENCE",
+      "evidence_id": "e-45c686ca9246d3325eef",
+      "quote": " Trading veffds anchor be* \ntween the Iflands of Argentiera and San \nGeorgio, but nearer to the former, to Wjtich \nthey commonly carry, put a-haw^r to fervc \nas moorings.",
+      "quote_offset_in_excerpt": 182,
+      "actors": [],
+      "places": [
+        "Argentiera",
+        "San \nGeorgio"
+      ],
+      "dates": [],
+      "source_occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/travelsingreece00sonngoog",
+          "title": "Travels in Greece and Turkey: Undertaken by Order of Louis XVI, and with the ...",
+          "source_bibliography": {
+            "creator": [
+              "Charles Sigisbert Sonnini"
+            ],
+            "date": [
+              1801
+            ],
+            "source_type": "OCR_CONTEXT",
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "travellers/library_acquisition/sonnini-excerpt-2.txt",
+          "finding_id": "e-45c686ca9246d3325eef",
+          "locator": {
+            "start_char": 182,
+            "end_char": 352,
+            "start_line": 5,
+            "end_line": 9,
+            "offset_unit": "UNICODE_CODE_POINTS",
+            "span_semantics": "EXACT_QUOTE"
+          },
+          "source_text_sha256": "d1783b890f7410ed1b281e006a5e91238fc77e6a62e4adacc13585dfa26e7e97",
+          "page_boundaries": [],
+          "reported_archival_reference": null,
+          "context_locator": {
+            "start_char": 0,
+            "end_char": 649,
+            "start_line": 1,
+            "end_line": 15
+          }
+        }
+      ],
+      "entity_surface_corrections": [
+        {
+          "field": "places",
+          "proposed": "San Georgio",
+          "source_surface": "San \nGeorgio",
+          "method": "UNICODE_CASE_AND_WHITESPACE_ONLY"
+        }
+      ],
+      "date_evidence": null,
+      "date_basis": "UNRESOLVED",
+      "uncertainty": [
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED"
+      ],
+      "source_uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED",
+        "DERIVED_PUBLIC_OCR_EXCERPT_NOT_ORIGINAL_INSPECTION"
+      ],
+      "model_analysis": true,
+      "verified": false,
+      "source_classification": "UNVERIFIED",
+      "model_proposed_source_classification": "UNVERIFIED",
+      "classification_status": "MODEL_PROVISIONAL_REQUIRES_SOURCE_CRITICISM",
+      "usage_type": "ANCHORAGE",
+      "assertion_class": "SOURCE_STATEMENT",
+      "verification_status": "UNVERIFIED",
+      "fidelity_status": "NO_CLAIMED_YEARS",
+      "claim_fidelity": {
+        "policy": "claim-fidelity-guard-v1",
+        "claimed_years": [],
+        "findings": [],
+        "status": "NO_CLAIMED_YEARS"
+      },
+      "relevance_status": "DIRECT",
+      "relevance": {
+        "policy": "relevance-filter-v1",
+        "status": "DIRECT",
+        "reasons": [
+          "SUBJECT_NAMED_IN_CLAIM"
+        ],
+        "evidence": {
+          "period": "NOT_STATED",
+          "claimed_years": [],
+          "subject_places": [],
+          "neighbour_places": [],
+          "region_places": [],
+          "other_places": [],
+          "subject_name_matches": [
+            "argentier",
+            "argentiera"
+          ],
+          "piracy_terms": false,
+          "base_terms": false
+        }
+      }
+    },
+    {
+      "claim_id": "c-022899df69e05c1dddf8",
+      "statement": "The consulted source reports that there is a spring of good water on the island of Argentiera.",
+      "kind": "source_statement",
+      "passage_kind": "NARRATIVE_EVIDENCE",
+      "evidence_id": "e-9e4157445f71dacd5eb9",
+      "quote": " In one, there is a fpring \nof good water, which, in this retired fpot, is \nufelefs to the inhabitants of Argentiera.",
+      "quote_offset_in_excerpt": 58,
+      "actors": [],
+      "places": [
+        "Argentiera"
+      ],
+      "dates": [],
+      "source_occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/travelsingreece00sonngoog",
+          "title": "Travels in Greece and Turkey: Undertaken by Order of Louis XVI, and with the ...",
+          "source_bibliography": {
+            "creator": [
+              "Charles Sigisbert Sonnini"
+            ],
+            "date": [
+              1801
+            ],
+            "source_type": "OCR_CONTEXT",
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "travellers/library_acquisition/sonnini-excerpt-4.txt",
+          "finding_id": "e-9c5620aa46d19bd7e4a9",
+          "locator": {
+            "start_char": 58,
+            "end_char": 175,
+            "start_line": 2,
+            "end_line": 4,
+            "offset_unit": "UNICODE_CODE_POINTS",
+            "span_semantics": "EXACT_QUOTE"
+          },
+          "source_text_sha256": "31af1069ecffec54b3d73e31135bf826149e43fd7acba1e130b7654d4a4f9f63",
+          "page_boundaries": [],
+          "reported_archival_reference": null,
+          "context_locator": {
+            "start_char": 0,
+            "end_char": 790,
+            "start_line": 1,
+            "end_line": 18
+          }
+        }
+      ],
+      "entity_surface_corrections": [],
+      "date_evidence": null,
+      "date_basis": "UNRESOLVED",
+      "uncertainty": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED",
+        "DERIVED_PUBLIC_OCR_EXCERPT_NOT_ORIGINAL_INSPECTION"
+      ],
+      "source_uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED",
+        "DERIVED_PUBLIC_OCR_EXCERPT_NOT_ORIGINAL_INSPECTION"
+      ],
+      "model_analysis": true,
+      "verified": false,
+      "source_classification": "UNVERIFIED",
+      "model_proposed_source_classification": "UNVERIFIED",
+      "classification_status": "MODEL_PROVISIONAL_REQUIRES_SOURCE_CRITICISM",
+      "usage_type": "UNRESOLVED",
+      "assertion_class": "SOURCE_STATEMENT",
+      "verification_status": "UNVERIFIED",
+      "fidelity_status": "NO_CLAIMED_YEARS",
+      "claim_fidelity": {
+        "policy": "claim-fidelity-guard-v1",
+        "claimed_years": [],
+        "findings": [],
+        "status": "NO_CLAIMED_YEARS"
+      },
+      "relevance_status": "DIRECT",
+      "relevance": {
+        "policy": "relevance-filter-v1",
+        "status": "DIRECT",
+        "reasons": [
+          "SUBJECT_NAMED_IN_CLAIM"
+        ],
+        "evidence": {
+          "period": "NOT_STATED",
+          "claimed_years": [],
+          "subject_places": [],
+          "neighbour_places": [],
+          "region_places": [],
+          "other_places": [],
+          "subject_name_matches": [
+            "argentier",
+            "argentiera"
+          ],
+          "piracy_terms": false,
+          "base_terms": false
+        }
+      }
+    },
+    {
+      "claim_id": "c-c56ac20c03fbc2026163",
+      "statement": "The consulted source reports that the island was named Kimolos by the ancients.",
+      "kind": "source_statement",
+      "passage_kind": "NARRATIVE_EVIDENCE",
+      "evidence_id": "e-ff88dd3ec7e755a31b95",
+      "quote": "  The  ancients  named  it  Kimolos; \nthey  were  alfo  acquainted  with  it  under  the  name  of  Echinussa,  Viper \nIsland*,  on  account  of  the  great  quantity  of  thofe  reptiles  which  it \nfed,  at  a  time  when,  little  frequented  by  men,  it  was  covered  only  by \nrocks,  forefts,  or  brambles.",
+      "quote_offset_in_excerpt": 299,
+      "actors": [],
+      "places": [
+        "Kimolos"
+      ],
+      "dates": [],
+      "source_occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/travelsingreecet00sonn",
+          "title": "Travels in Greece and Turkey, undertaken by order of Louis XVI, and with the authority of the Ottoman court",
+          "source_bibliography": {
+            "creator": [
+              "Sonnini, C. S. (Charles Sigisbert), 1751-1812",
+              "Longman and Rees (London, England)",
+              "Woodfall, George, 1767-1844"
+            ],
+            "date": [
+              "1801-01-01T00:00:00Z"
+            ],
+            "source_type": "OCR_CONTEXT",
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "travellers/library_acquisition/sonnini-excerpt-1.txt",
+          "finding_id": "e-ff88dd3ec7e755a31b95",
+          "locator": {
+            "start_char": 299,
+            "end_char": 614,
+            "start_line": 4,
+            "end_line": 8,
+            "offset_unit": "UNICODE_CODE_POINTS",
+            "span_semantics": "EXACT_QUOTE"
+          },
+          "source_text_sha256": "4c47907d664c9cf25e7575688e86789c4ac1e4954b82c247c09d0f611e7fc07f",
+          "page_boundaries": [],
+          "reported_archival_reference": null,
+          "context_locator": {
+            "start_char": 0,
+            "end_char": 845,
+            "start_line": 1,
+            "end_line": 11
+          }
+        }
+      ],
+      "entity_surface_corrections": [],
+      "date_evidence": null,
+      "date_basis": "UNRESOLVED",
+      "uncertainty": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED",
+        "DERIVED_PUBLIC_OCR_EXCERPT_NOT_ORIGINAL_INSPECTION"
+      ],
+      "source_uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED",
+        "DERIVED_PUBLIC_OCR_EXCERPT_NOT_ORIGINAL_INSPECTION"
+      ],
+      "model_analysis": true,
+      "verified": false,
+      "source_classification": "UNVERIFIED",
+      "model_proposed_source_classification": "UNVERIFIED",
+      "classification_status": "MODEL_PROVISIONAL_REQUIRES_SOURCE_CRITICISM",
+      "usage_type": "UNRESOLVED",
+      "assertion_class": "SOURCE_STATEMENT",
+      "verification_status": "UNVERIFIED",
+      "fidelity_status": "NO_CLAIMED_YEARS",
+      "claim_fidelity": {
+        "policy": "claim-fidelity-guard-v1",
+        "claimed_years": [],
+        "findings": [],
+        "status": "NO_CLAIMED_YEARS"
+      },
+      "relevance_status": "DIRECT",
+      "relevance": {
+        "policy": "relevance-filter-v1",
+        "status": "DIRECT",
+        "reasons": [
+          "SUBJECT_NAMED_IN_CLAIM"
+        ],
+        "evidence": {
+          "period": "NOT_STATED",
+          "claimed_years": [],
+          "subject_places": [
+            {
+              "surface": "Kimolos",
+              "place_id": "gz:Q919194"
+            },
+            {
+              "surface": "Kimolos",
+              "place_id": "gz:Q919194"
+            }
+          ],
+          "neighbour_places": [],
+          "region_places": [],
+          "other_places": [],
+          "subject_name_matches": [
+            "kimolo",
+            "kimolos"
+          ],
+          "piracy_terms": false,
+          "base_terms": false
+        }
+      }
+    },
+    {
+      "claim_id": "c-cb0edba9a642dca909c1",
+      "statement": "The consulted source reports that the island was called Echinussa, or Viper Island, due to the abundance of reptiles.",
+      "kind": "source_statement",
+      "passage_kind": "NARRATIVE_EVIDENCE",
+      "evidence_id": "e-ff88dd3ec7e755a31b95",
+      "quote": " \nthey  were  alfo  acquainted  with  it  under  the  name  of  Echinussa,  Viper \nIsland*,  on  account  of  the  great  quantity  of  thofe  reptiles  which  it \nfed,  at  a  time  when,  little  frequented  by  men,  it  was  covered  only  by \nrocks,  forefts,  or  brambles.",
+      "quote_offset_in_excerpt": 335,
+      "actors": [],
+      "places": [
+        "Echinussa"
+      ],
+      "dates": [],
+      "source_occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/travelsingreecet00sonn",
+          "title": "Travels in Greece and Turkey, undertaken by order of Louis XVI, and with the authority of the Ottoman court",
+          "source_bibliography": {
+            "creator": [
+              "Sonnini, C. S. (Charles Sigisbert), 1751-1812",
+              "Longman and Rees (London, England)",
+              "Woodfall, George, 1767-1844"
+            ],
+            "date": [
+              "1801-01-01T00:00:00Z"
+            ],
+            "source_type": "OCR_CONTEXT",
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "travellers/library_acquisition/sonnini-excerpt-1.txt",
+          "finding_id": "e-ff88dd3ec7e755a31b95",
+          "locator": {
+            "start_char": 335,
+            "end_char": 614,
+            "start_line": 4,
+            "end_line": 8,
+            "offset_unit": "UNICODE_CODE_POINTS",
+            "span_semantics": "EXACT_QUOTE"
+          },
+          "source_text_sha256": "4c47907d664c9cf25e7575688e86789c4ac1e4954b82c247c09d0f611e7fc07f",
+          "page_boundaries": [],
+          "reported_archival_reference": null,
+          "context_locator": {
+            "start_char": 0,
+            "end_char": 845,
+            "start_line": 1,
+            "end_line": 11
+          }
+        }
+      ],
+      "entity_surface_corrections": [],
+      "date_evidence": null,
+      "date_basis": "UNRESOLVED",
+      "uncertainty": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED",
+        "DERIVED_PUBLIC_OCR_EXCERPT_NOT_ORIGINAL_INSPECTION"
+      ],
+      "source_uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED",
+        "DERIVED_PUBLIC_OCR_EXCERPT_NOT_ORIGINAL_INSPECTION"
+      ],
+      "model_analysis": true,
+      "verified": false,
+      "source_classification": "UNVERIFIED",
+      "model_proposed_source_classification": "UNVERIFIED",
+      "classification_status": "MODEL_PROVISIONAL_REQUIRES_SOURCE_CRITICISM",
+      "usage_type": "UNRESOLVED",
+      "assertion_class": "SOURCE_STATEMENT",
+      "verification_status": "UNVERIFIED",
+      "fidelity_status": "NO_CLAIMED_YEARS",
+      "claim_fidelity": {
+        "policy": "claim-fidelity-guard-v1",
+        "claimed_years": [],
+        "findings": [],
+        "status": "NO_CLAIMED_YEARS"
+      },
+      "relevance_status": "CONTEXTUAL",
+      "relevance": {
+        "policy": "relevance-filter-v1",
+        "status": "CONTEXTUAL",
+        "reasons": [
+          "SAME_PASSAGE_NAMES_SUBJECT"
+        ],
+        "evidence": {
+          "period": "NOT_STATED",
+          "claimed_years": [],
+          "subject_places": [],
+          "neighbour_places": [],
+          "region_places": [],
+          "other_places": [],
+          "subject_name_matches": [],
+          "piracy_terms": false,
+          "base_terms": false
+        }
+      }
+    }
+  ],
+  "answer_sections": [
+    {
+      "text": "According to the consulted source: The consulted source reports that there is a spring of good water on the island of Argentiera.",
+      "claim_ids": [
+        "c-022899df69e05c1dddf8"
+      ],
+      "relevance_status": "DIRECT"
+    },
+    {
+      "text": "According to the consulted source: The consulted source reports that trading vessels anchor between the islands of Argentiera and San Georgio, nearer to Argentiera.",
+      "claim_ids": [
+        "c-634690ef53620633c277"
+      ],
+      "relevance_status": "DIRECT"
+    },
+    {
+      "text": "According to the consulted source: The consulted source reports that the island was named Kimolos by the ancients.",
+      "claim_ids": [
+        "c-c56ac20c03fbc2026163"
+      ],
+      "relevance_status": "DIRECT"
+    },
+    {
+      "text": "Background context. According to the consulted source: The consulted source reports that the island was called Echinussa, or Viper Island, due to the abundance of reptiles.",
+      "claim_ids": [
+        "c-cb0edba9a642dca909c1"
+      ],
+      "relevance_status": "CONTEXTUAL"
+    }
+  ],
+  "coverage": {
+    "collected_unique_passages": 4,
+    "prefilter": null,
+    "screening": {
+      "policy": "explicit-criteria-screening-v2",
+      "applied": false,
+      "criteria": {
+        "kind": "place",
+        "names": [
+          "Argentiera",
+          "Kimolos"
+        ],
+        "themes": [
+          "bases"
+        ],
+        "window": null,
+        "window_basis": null,
+        "identity_question": false
+      },
+      "reason": "DISABLED"
+    },
+    "original_unique_passages": 4,
+    "unique_passages": 4,
+    "selected_passages": 4,
+    "reading_batches": 4,
+    "pending_reading_batches": 0,
+    "repeated_occurrences": 0,
+    "deferred": [],
+    "excluded": [],
+    "pass_priority": "NEW_EXTRACTION",
+    "claims_awaiting_review": [],
+    "new_claim_review_calls": 0
+  },
+  "evidence": [
+    {
+      "evidence_id": "e-45c686ca9246d3325eef",
+      "text": "This road of Augentieba is formed by \nthe Ifle of MiLO. to the fouth M^fid, by that \nof Argextie&a to the north, ami by the \nfmall Ifiands of San Georgio and of Po- \nuvo to the eaft. Trading veffds anchor be* \ntween the Iflands of Argentiera and San \nGeorgio, but nearer to the former, to Wjtich \nthey commonly carry, put a-haw^r to fervc \nas moorings. In thi^pofitipn, wherie^ v^eb \nare iheltered from the wind a^d the fea from \nthe north, as muqh ^ it is poffibk;. to be in \nthis road, they lie quite, clofe tp^ the foot of \na high mountain whioh conce^h the view \nof the village, and; np trace of habitation or \nculture is there to be djfcoverecL",
+      "similar_text_fingerprint": "a11fa1f04a4872207c61055544dbac0d1682170a677308773735f3d2de55cb85",
+      "years_in_scope": [],
+      "date_basis": "UNRESOLVED",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": [
+          "Charles Sigisbert Sonnini"
+        ],
+        "date": [
+          1801
+        ],
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED",
+        "DERIVED_PUBLIC_OCR_EXCERPT_NOT_ORIGINAL_INSPECTION"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/travelsingreece00sonngoog",
+          "title": "Travels in Greece and Turkey: Undertaken by Order of Louis XVI, and with the ...",
+          "source_bibliography": {
+            "creator": [
+              "Charles Sigisbert Sonnini"
+            ],
+            "date": [
+              1801
+            ],
+            "source_type": "OCR_CONTEXT",
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "travellers/library_acquisition/sonnini-excerpt-2.txt",
+          "finding_id": "e-45c686ca9246d3325eef",
+          "locator": {
+            "start_char": 0,
+            "end_char": 649,
+            "start_line": 1,
+            "end_line": 15
+          },
+          "source_text_sha256": "d1783b890f7410ed1b281e006a5e91238fc77e6a62e4adacc13585dfa26e7e97",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 0,
+        "title_period_hint": true,
+        "in_scope_century_context": false,
+        "direct_use_vocabulary": false,
+        "conjecture_context": false,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-9e4157445f71dacd5eb9",
+      "text": "the rock, and which appear to have ferved \nas habitations. In one, there is a fpring \nof good water, which, in this retired fpot, is \nufelefs to the inhabitants of Argentiera. \nThey affert that thiefe excavations ferved their \nanceftors for melting the iron ore which they \ndrew from the neighbouring mountains. A \nnarrow recefs of the fea permitted boats to \nland on this coaft, and it is to be prefumed \nthat, if the roadftead of Argentiera had \nnot become the general rendezvous of all the \nveffels which navigate in the feas of the Le- \nvant, the prefent inhabitants would not have \nabandoned the . weft coaft, where they would \nhave found a foil lefs ungrateful, fmall coves \nfit for the reception of their boats, and a co- \npious fpring. But, among civilized nations, \ncommerce is ah!",
+      "similar_text_fingerprint": "8d0a40a7f37dc42c049f096ed524e422db6294aec7b59298cdee226a59c92b08",
+      "years_in_scope": [],
+      "date_basis": "UNRESOLVED",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": [
+          "Charles Sigisbert Sonnini"
+        ],
+        "date": [
+          1801
+        ],
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED",
+        "DERIVED_PUBLIC_OCR_EXCERPT_NOT_ORIGINAL_INSPECTION"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/travelsingreece00sonngoog",
+          "title": "Travels in Greece and Turkey: Undertaken by Order of Louis XVI, and with the ...",
+          "source_bibliography": {
+            "creator": [
+              "Charles Sigisbert Sonnini"
+            ],
+            "date": [
+              1801
+            ],
+            "source_type": "OCR_CONTEXT",
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "travellers/library_acquisition/sonnini-excerpt-4.txt",
+          "finding_id": "e-9c5620aa46d19bd7e4a9",
+          "locator": {
+            "start_char": 0,
+            "end_char": 790,
+            "start_line": 1,
+            "end_line": 18
+          },
+          "source_text_sha256": "31af1069ecffec54b3d73e31135bf826149e43fd7acba1e130b7654d4a4f9f63",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 0,
+        "title_period_hint": true,
+        "in_scope_century_context": false,
+        "direct_use_vocabulary": false,
+        "conjecture_context": false,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-ff88dd3ec7e755a31b95",
+      "text": "IF  the  little  Ifland  of  Argentiera  neither  affords  the  comforts  nor  con- \nveniences of  life,  Nature  has  made  it  an  interefting  place,  from  its  fitua- \ntion,  and  the  fubftances  which  it  contains  in  its  bofom,  or  which  it  pro- \nduces fpontaneouily  on  its  furface.  The  ancients  named  it  Kimolos; \nthey  were  alfo  acquainted  with  it  under  the  name  of  Echinussa,  Viper \nIsland*,  on  account  of  the  great  quantity  of  thofe  reptiles  which  it \nfed,  at  a  time  when,  little  frequented  by  men,  it  was  covered  only  by \nrocks,  forefts,  or  brambles.  The  Greeks  ftill  call  it  at  this  day  Kimoli. \nThe  Europeans  difcovered  there  fdver  mines,  whence  has  arifen  the  deno- \nmination of  Argentiera,  by  which  they  have  not  fince  ceafed  to  diftin- \nguiih  it.",
+      "similar_text_fingerprint": "feb03647418cd839c4704baf0ab47d2f6f080f747c9ab9cfcfce630b6ed88d90",
+      "years_in_scope": [],
+      "date_basis": "UNRESOLVED",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": [
+          "Sonnini, C. S. (Charles Sigisbert), 1751-1812",
+          "Longman and Rees (London, England)",
+          "Woodfall, George, 1767-1844"
+        ],
+        "date": [
+          "1801-01-01T00:00:00Z"
+        ],
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED",
+        "DERIVED_PUBLIC_OCR_EXCERPT_NOT_ORIGINAL_INSPECTION"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/travelsingreecet00sonn",
+          "title": "Travels in Greece and Turkey, undertaken by order of Louis XVI, and with the authority of the Ottoman court",
+          "source_bibliography": {
+            "creator": [
+              "Sonnini, C. S. (Charles Sigisbert), 1751-1812",
+              "Longman and Rees (London, England)",
+              "Woodfall, George, 1767-1844"
+            ],
+            "date": [
+              "1801-01-01T00:00:00Z"
+            ],
+            "source_type": "OCR_CONTEXT",
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "travellers/library_acquisition/sonnini-excerpt-1.txt",
+          "finding_id": "e-ff88dd3ec7e755a31b95",
+          "locator": {
+            "start_char": 0,
+            "end_char": 845,
+            "start_line": 1,
+            "end_line": 11
+          },
+          "source_text_sha256": "4c47907d664c9cf25e7575688e86789c4ac1e4954b82c247c09d0f611e7fc07f",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 0,
+        "title_period_hint": true,
+        "in_scope_century_context": false,
+        "direct_use_vocabulary": false,
+        "conjecture_context": false,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    },
+    {
+      "evidence_id": "e-88daad5030efa79a6afa",
+      "text": "W  HEN  you  quit  the  narrow  and  fandy  fliore,  which  is  below  the  village \nof  Argent i era^  in  order  to  repair  to  \"the  Ifland  of  Milo,  iituated  to \nthe  fouth,  you  enter  into  a  confined  channel,  between  the  Iflets  of  San \nGiorgio  and  Sant  Eustachio  and  the  Ifland  of  Argentiera.  itfelf; \nthis  channel  forms  the  harbour  for  merchant-veflels.  Very  near  to  the \ncoaft,  a  rock  projects  into  the  fea,  and  although  it  has  there  opened  itfelf  a \npauage,  the  fpace  which  feparates  it  from  the  ifland  is  fo  narrow,  that \nit  is  impoffible  for  the  fmalleft  boats  to  pafs.  On  the  rock,  which  is- \ncalled  Pyscui,  is  to  be  feen  a  remnant  of  an  ancient  building ;  there  it  is,, \nif  we  muft  credit  the  prefent  iflanders,  that  the  princes  of  the  ifland  fixed, \ntheir  abode.",
+      "similar_text_fingerprint": "23430040be6839f5222f6e7b501a82cd5fb84e7482219b91772ddda857cc6539",
+      "years_in_scope": [],
+      "date_basis": "UNRESOLVED",
+      "date_evidence": null,
+      "source_bibliography": {
+        "creator": [
+          "Sonnini, C. S. (Charles Sigisbert), 1751-1812",
+          "Longman and Rees (London, England)",
+          "Woodfall, George, 1767-1844"
+        ],
+        "date": [
+          "1801-01-01T00:00:00Z"
+        ],
+        "source_type": "OCR_CONTEXT",
+        "rights": null,
+        "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+      },
+      "uncertainties": [
+        "ORIGINAL_NOT_INSPECTED",
+        "SOURCE_GENEALOGY_PENDING",
+        "INDEPENDENCE_UNRESOLVED",
+        "EVENT_DATE_UNRESOLVED",
+        "ACTION_UNRESOLVED",
+        "DERIVED_PUBLIC_OCR_EXCERPT_NOT_ORIGINAL_INSPECTION"
+      ],
+      "occurrences": [
+        {
+          "lane": "travellers",
+          "url": "https://archive.org/details/travelsingreecet00sonn",
+          "title": "Travels in Greece and Turkey, undertaken by order of Louis XVI, and with the authority of the Ottoman court",
+          "source_bibliography": {
+            "creator": [
+              "Sonnini, C. S. (Charles Sigisbert), 1751-1812",
+              "Longman and Rees (London, England)",
+              "Woodfall, George, 1767-1844"
+            ],
+            "date": [
+              "1801-01-01T00:00:00Z"
+            ],
+            "source_type": "OCR_CONTEXT",
+            "rights": null,
+            "date_field_meaning": "PUBLICATION_OR_CATALOGUE_METADATA_NOT_EVENT_DATE"
+          },
+          "source_pdf": null,
+          "acquired_text_path": "travellers/library_acquisition/sonnini-excerpt-3.txt",
+          "finding_id": "e-88daad5030efa79a6afa",
+          "locator": {
+            "start_char": 0,
+            "end_char": 875,
+            "start_line": 1,
+            "end_line": 11
+          },
+          "source_text_sha256": "7a394f2c864a077ffe61c5db83204b3e1779286739610254fc48f3af0de93f5d",
+          "page_boundaries": [],
+          "reported_archival_reference": null
+        }
+      ],
+      "source_independence": "UNKNOWN_NOT_ESTABLISHED",
+      "sampling_features": {
+        "strong_region_match": true,
+        "event_and_use_match": true,
+        "in_scope_year_fraction": 0,
+        "title_period_hint": true,
+        "in_scope_century_context": false,
+        "direct_use_vocabulary": false,
+        "conjecture_context": false,
+        "role": "SAMPLING_HEURISTICS_NOT_HISTORICAL_VERIFICATION"
+      }
+    }
+  ],
+  "calls": [
+    {
+      "role": "adversarial_reviewer",
+      "status": "COMPLETED",
+      "replayed": true,
+      "response_cache_path": "research_continuation/3cef1b667c7ce385cba26f12b6335f0c5709ca4e8f7b9db467f949c18c992c2a/responses/5f8a4a5882d6e5c7598b96a77920e8a25cc1e4335bbfc83f2bb1d07ba835d285.json",
+      "response_cache_sha256": "43af5dfb089f5bbfe81254b67192d88f0528e387e1de0445cbc3bd223fa4e2b6",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF"
+    },
+    {
+      "role": "adversarial_reviewer",
+      "status": "COMPLETED",
+      "replayed": true,
+      "response_cache_path": "research_continuation/3cef1b667c7ce385cba26f12b6335f0c5709ca4e8f7b9db467f949c18c992c2a/responses/a9e11fc8521efbf7667c1620e40f4ffe3434446a72ef2bcbd491b33f826fb16d.json",
+      "response_cache_sha256": "fb050f935ca5a23361376404b0d5da157a10dab223610824c8709f068b8bd20f",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF"
+    },
+    {
+      "role": "adversarial_reviewer",
+      "status": "COMPLETED",
+      "replayed": true,
+      "response_cache_path": "research_continuation/3cef1b667c7ce385cba26f12b6335f0c5709ca4e8f7b9db467f949c18c992c2a/responses/939c23b1f80690aee3055039f58ce59763805a886353bb039ae88c3ab9ab1836.json",
+      "response_cache_sha256": "694b1601ae391eff919cade01617f1f6a4b66dbb5b710cddace27900c4d2dd18",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF"
+    },
+    {
+      "role": "adversarial_reviewer",
+      "status": "COMPLETED",
+      "replayed": true,
+      "response_cache_path": "research_continuation/3cef1b667c7ce385cba26f12b6335f0c5709ca4e8f7b9db467f949c18c992c2a/responses/e3c9e7601503b6956a94c54657fb05b9e6ba2bbff6821f6858dfc5503b93a45d.json",
+      "response_cache_sha256": "aae57649dccfd556fc4c2525ead87c890bb6f65707b0136626a28a8dc012aa06",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF"
+    },
+    {
+      "role": "adversarial_reviewer",
+      "status": "COMPLETED",
+      "requested_model": "Qwen/Qwen3-8B-GGUF",
+      "started_utc": "2026-11-02T12:33:39.091395+00:00",
+      "prompt_sha256": "7fafb8cb3942294f64816579e3dd6747372433b4b28f68aa42e713929feb3e38",
+      "response_schema_sha256": "f627b79bdeef872d18c765880579eba8868616caf999120b10b81b5c2d05d56b",
+      "prompt_file": "model_responses/5-adversarial_reviewer.prompt.txt",
+      "provider": "local_llama_cpp",
+      "model": "Qwen/Qwen3-8B-GGUF",
+      "error": null,
+      "model_identity": {
+        "repository": "Qwen/Qwen3-8B-GGUF",
+        "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+        "filename": "Qwen3-8B-Q4_K_M.gguf",
+        "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+        "files": [
+          {
+            "filename": "Qwen3-8B-Q4_K_M.gguf",
+            "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+            "lfs_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785"
+          }
+        ],
+        "provider": "local_llama_cpp",
+        "external_api_key_required": false,
+        "model_url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/tree/7c41481f57cb95916b40956ab2f0b139b296d974",
+        "file": "Qwen3-8B-Q4_K_M.gguf"
+      },
+      "usage": {
+        "prompt_tokens": 1686,
+        "completion_tokens": 222,
+        "total_tokens": 1908
+      },
+      "wire_prompt_sha256": "4215f84d5f3fb028ce39ec50c94dac713d37d32288f2563769368ab6508f72d6",
+      "chat_mode": "CHATML_NO_THINK",
+      "finish_reason": "stop",
+      "elapsed_seconds": 196.88,
+      "response_sha256": "c1fb42d026de42a89946f444c8cacd5583eaebdc35570e04f9d65df8c2ba5d54",
+      "prompt_version": "2026-10-20.1",
+      "completed_utc": "2026-11-02T12:37:06.766006+00:00"
+    }
+  ],
+  "rejected": [
+    {
+      "reason": "ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE",
+      "evidence_id": "e-45c686ca9246d3325eef",
+      "field": "places",
+      "proposed_values": [
+        "Argentiera"
+      ],
+      "selected_passage_ids": [
+        4
+      ]
+    },
+    {
+      "reason": "PLACE_USAGE_NOT_STATED_IN_SELECTED_QUOTE",
+      "evidence_id": "e-9e4157445f71dacd5eb9",
+      "proposed_item": {
+        "passage_kind": "NARRATIVE_EVIDENCE",
+        "statement": "The consulted source reports that a narrow recess of the sea permitted boats to land on the west coast of Argentiera.",
+        "evidence_id": "e-9e4157445f71dacd5eb9",
+        "passage_ids": [
+          3
+        ],
+        "kind": "source_statement",
+        "source_type": "UNVERIFIED",
+        "actors": [],
+        "places": [
+          "Argentiera"
+        ],
+        "dates": [],
+        "usage_type": "ANCHORAGE",
+        "uncertainty": [
+          "ORIGINAL_NOT_INSPECTED",
+          "SOURCE_GENEALOGY_PENDING",
+          "INDEPENDENCE_UNRESOLVED",
+          "EVENT_DATE_UNRESOLVED",
+          "ACTION_UNRESOLVED",
+          "DERIVED_PUBLIC_OCR_EXCERPT_NOT_ORIGINAL_INSPECTION"
+        ]
+      }
+    },
+    {
+      "reason": "PLACE_USAGE_NOT_STATED_IN_SELECTED_QUOTE",
+      "evidence_id": "e-88daad5030efa79a6afa",
+      "proposed_item": {
+        "passage_kind": "NARRATIVE_EVIDENCE",
+        "statement": "The consulted source reports that the channel between the islets of San Giorgio and Sant Eustachio and the island of Argentiera forms the harbour for merchant vessels.",
+        "evidence_id": "e-88daad5030efa79a6afa",
+        "passage_ids": [
+          0,
+          1
+        ],
+        "kind": "source_statement",
+        "source_type": "UNVERIFIED",
+        "actors": [],
+        "places": [
+          "San Giorgio",
+          "Sant Eustachio",
+          "Argentiera"
+        ],
+        "dates": [],
+        "usage_type": "ANCHORAGE",
+        "uncertainty": [
+          "EVENT_DATE_UNRESOLVED",
+          "ACTION_UNRESOLVED"
+        ]
+      }
+    },
+    {
+      "reason": "ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE",
+      "evidence_id": "e-88daad5030efa79a6afa",
+      "field": "places",
+      "proposed_values": [
+        "Argentiera"
+      ],
+      "selected_passage_ids": [
+        2
+      ]
+    }
+  ],
+  "selection_priority": {
+    "policy": "relevance-before-diversity-v1",
+    "retained_passages": 4,
+    "tier_counts": {
+      "5": 4
+    },
+    "verification_implied": false,
+    "selected": [
+      {
+        "evidence_id": "e-45c686ca9246d3325eef",
+        "tier": 5,
+        "reason": "CONTEXT_OR_SCOPE_UNRESOLVED",
+        "genre": "NARRATIVE_CONTEXT",
+        "temporal_coherence": false,
+        "primary_source_metadata_hint": false,
+        "conjecture_retained": false,
+        "role": "READING_PRIORITY_NOT_TRUTH_OR_SOURCE_INDEPENDENCE"
+      },
+      {
+        "evidence_id": "e-9e4157445f71dacd5eb9",
+        "tier": 5,
+        "reason": "CONTEXT_OR_SCOPE_UNRESOLVED",
+        "genre": "NARRATIVE_CONTEXT",
+        "temporal_coherence": false,
+        "primary_source_metadata_hint": false,
+        "conjecture_retained": false,
+        "role": "READING_PRIORITY_NOT_TRUTH_OR_SOURCE_INDEPENDENCE"
+      },
+      {
+        "evidence_id": "e-ff88dd3ec7e755a31b95",
+        "tier": 5,
+        "reason": "CONTEXT_OR_SCOPE_UNRESOLVED",
+        "genre": "NARRATIVE_CONTEXT",
+        "temporal_coherence": false,
+        "primary_source_metadata_hint": false,
+        "conjecture_retained": false,
+        "role": "READING_PRIORITY_NOT_TRUTH_OR_SOURCE_INDEPENDENCE"
+      },
+      {
+        "evidence_id": "e-88daad5030efa79a6afa",
+        "tier": 5,
+        "reason": "CONTEXT_OR_SCOPE_UNRESOLVED",
+        "genre": "NARRATIVE_CONTEXT",
+        "temporal_coherence": false,
+        "primary_source_metadata_hint": false,
+        "conjecture_retained": false,
+        "role": "READING_PRIORITY_NOT_TRUTH_OR_SOURCE_INDEPENDENCE"
+      }
+    ]
+  },
+  "passage_triage": null,
+  "excerpt_ranking": null,
+  "identity_linkage": null,
+  "semantic_shard_merge": true,
+  "source_group_replay_holds": [],
+  "limitations": [
+    "MODEL_OUTPUT_REQUIRES_REVIEW",
+    "ORIGINAL_INSPECTION_NOT_PERFORMED",
+    "SOURCE_INDEPENDENCE_NOT_ESTABLISHED",
+    "BOUNDED_EVIDENCE_COVERAGE"
+  ],
+  "verified": false,
+  "human_reviewed": false,
+  "semantic_module_sha256": "3aa0ff51452f1737e01f789aa17ce5a6644a94197a6ac4974bcde0fb4d741504",
+  "extraction_cache_binding": {
+    "running_module_sha256": "3aa0ff51452f1737e01f789aa17ce5a6644a94197a6ac4974bcde0fb4d741504",
+    "raw_cache_module_sha256": "173adff120baf63fa611e3beb65659740aa308f52928cd0f777e0c27e60ba57b",
+    "policy": "RAW_PAYLOADS_REVALIDATED_BY_CURRENT_VALIDATORS_NO_VERIFICATION_REUSE"
+  },
+  "software_revision": "d352300b0d088065095ca35e36303b1bdd2e50e6",
+  "continuation_replays": [
+    {
+      "batch_path": "research_continuation/3cef1b667c7ce385cba26f12b6335f0c5709ca4e8f7b9db467f949c18c992c2a/replays/6f02c2ebcdf7b92914d55948071fadc50e4b5467c65ee7afa0ba937f7365715c/ad20192494131d22624d536cc82555c9c88e375b976b65bc08752173469f1406.json",
+      "source_sha256": "6f02c2ebcdf7b92914d55948071fadc50e4b5467c65ee7afa0ba937f7365715c",
+      "payload_sha256": "ad20192494131d22624d536cc82555c9c88e375b976b65bc08752173469f1406",
+      "historical_verification": false
+    },
+    {
+      "batch_path": "research_continuation/3cef1b667c7ce385cba26f12b6335f0c5709ca4e8f7b9db467f949c18c992c2a/replays/515b037969981e4f05781d946ba3b369463aec5850096163bdc8a21a9fe430d5/44bb159ab738aa20b19371eca2fd72746990a54e492d1c0fcd37cba6ae830c5d.json",
+      "source_sha256": "515b037969981e4f05781d946ba3b369463aec5850096163bdc8a21a9fe430d5",
+      "payload_sha256": "44bb159ab738aa20b19371eca2fd72746990a54e492d1c0fcd37cba6ae830c5d",
+      "historical_verification": false
+    },
+    {
+      "batch_path": "research_continuation/3cef1b667c7ce385cba26f12b6335f0c5709ca4e8f7b9db467f949c18c992c2a/replays/3986519f3893c3e10b0406db0cb81b0647c12415b87a80550ad96c0689419a9b/1d7cb212fd66d1cd6531bc11db63f296ed131e2790a5c3665321f96ad2c78ac4.json",
+      "source_sha256": "3986519f3893c3e10b0406db0cb81b0647c12415b87a80550ad96c0689419a9b",
+      "payload_sha256": "1d7cb212fd66d1cd6531bc11db63f296ed131e2790a5c3665321f96ad2c78ac4",
+      "historical_verification": false
+    },
+    {
+      "batch_path": "research_continuation/3cef1b667c7ce385cba26f12b6335f0c5709ca4e8f7b9db467f949c18c992c2a/replays/b05a4781c875734734721a23fd0cf8ef12caeebba97eaf469edaf65e18047b40/f8d7cf06b6c3de19a742f4dbbedbf32b08f7c4ab5c945456509fd6d0512a7d27.json",
+      "source_sha256": "b05a4781c875734734721a23fd0cf8ef12caeebba97eaf469edaf65e18047b40",
+      "payload_sha256": "f8d7cf06b6c3de19a742f4dbbedbf32b08f7c4ab5c945456509fd6d0512a7d27",
+      "historical_verification": false
+    }
+  ],
+  "claim_fidelity": {
+    "policy": "claim-fidelity-guard-v1",
+    "checked": 4,
+    "flagged_claim_ids": [],
+    "by_status": {
+      "NO_CLAIMED_YEARS": 4
+    }
+  },
+  "relevance_filter": {
+    "policy": "relevance-filter-v1",
+    "profile": {
+      "policy": "relevance-filter-v1",
+      "kind": "place",
+      "names": [
+        "Argentiera",
+        "Kimolos",
+        "Cimolos",
+        "Kímolos",
+        "Αρζαντιέρα",
+        "Αρτζιαντέρα",
+        "Κίμωλος",
+        "Νήσος Κίμωλος"
+      ],
+      "window": null,
+      "place_ids": [
+        "gz:Q919194"
+      ],
+      "neighbour_place_ids": {
+        "gz:Q203979": {
+          "of": "gz:Q919194",
+          "km": 12.9
+        },
+        "gz:Q212029": {
+          "of": "gz:Q919194",
+          "km": 23.7
+        }
+      },
+      "regions": [],
+      "topic_requires": {
+        "piracy": false,
+        "base": true
+      },
+      "basis": "REQUEST_DERIVED_SCOPE_NOT_SOURCE_EVIDENCE"
+    },
+    "checked": 4,
+    "by_status": {
+      "DIRECT": 3,
+      "CONTEXTUAL": 1
+    },
+    "held_claim_ids": [],
+    "rule": "OFF_TOPIC claims are kept but held from synthesis; CONTEXTUAL is background, not a fact about the subject; when unsure the filter chooses CONTEXTUAL."
+  },
+  "claim_reviews": [
+    {
+      "claim_id": "c-634690ef53620633c277",
+      "review": {
+        "supported_claim_ids": [
+          "c-634690ef53620633c277"
+        ],
+        "flagged_claims": [],
+        "contradictions": [],
+        "limitations": [
+          "Unclear if the source is about the same Argentiera and San Georgio as in the research question.",
+          "The text has some typographical errors which may affect interpretation.",
+          "The source is from a different region (Greece and Turkey) which may not be directly relevant to the island of Argentiera in the Mediterranean."
+        ],
+        "missing_claim_ids": []
+      }
+    },
+    {
+      "claim_id": "c-022899df69e05c1dddf8",
+      "review": {
+        "supported_claim_ids": [
+          "c-022899df69e05c1dddf8"
+        ],
+        "flagged_claims": [],
+        "contradictions": [],
+        "limitations": [
+          "ORIGINAL_NOT_INSPECTED",
+          "SOURCE_GENEALOGY_PENDING",
+          "INDEPENDENCE_UNRESOLVED",
+          "EVENT_DATE_UNRESOLVED",
+          "ACTION_UNRESOLVED"
+        ],
+        "missing_claim_ids": []
+      }
+    },
+    {
+      "claim_id": "c-c56ac20c03fbc2026163",
+      "review": {
+        "supported_claim_ids": [
+          "c-c56ac20c03fbc2026163"
+        ],
+        "flagged_claims": [],
+        "contradictions": [],
+        "limitations": [
+          "ORIGINAL_NOT_INSPECTED",
+          "SOURCE_GENEALOGY_PENDING",
+          "INDEPENDENCE_UNRESOLVED",
+          "EVENT_DATE_UNRESOLVED",
+          "ACTION_UNRESOLVED"
+        ],
+        "missing_claim_ids": []
+      }
+    },
+    {
+      "claim_id": "c-cb0edba9a642dca909c1",
+      "review": {
+        "supported_claim_ids": [
+          "c-cb0edba9a642dca909c1"
+        ],
+        "flagged_claims": [],
+        "contradictions": [],
+        "limitations": [
+          "ORIGINAL_NOT_INSPECTED",
+          "SOURCE_GENEALOGY_PENDING",
+          "INDEPENDENCE_UNRESOLVED",
+          "EVENT_DATE_UNRESOLVED",
+          "ACTION_UNRESOLVED"
+        ],
+        "missing_claim_ids": []
+      }
+    }
+  ],
+  "review": {
+    "supported_claim_ids": [
+      "c-634690ef53620633c277",
+      "c-022899df69e05c1dddf8",
+      "c-c56ac20c03fbc2026163",
+      "c-cb0edba9a642dca909c1"
+    ],
+    "flagged_claims": [],
+    "contradictions": [],
+    "limitations": [
+      "CLAIM_FIDELITY_REVIEWED_SEPARATELY; CROSS_SOURCE_CORROBORATION_NOT_ESTABLISHED",
+      "Unclear if the source is about the same Argentiera and San Georgio as in the research question.",
+      "The text has some typographical errors which may affect interpretation.",
+      "The source is from a different region (Greece and Turkey) which may not be directly relevant to the island of Argentiera in the Mediterranean.",
+      "ORIGINAL_NOT_INSPECTED",
+      "SOURCE_GENEALOGY_PENDING",
+      "INDEPENDENCE_UNRESOLVED",
+      "EVENT_DATE_UNRESOLVED",
+      "ACTION_UNRESOLVED",
+      "ORIGINAL_NOT_INSPECTED",
+      "SOURCE_GENEALOGY_PENDING",
+      "INDEPENDENCE_UNRESOLVED",
+      "EVENT_DATE_UNRESOLVED",
+      "ACTION_UNRESOLVED",
+      "ORIGINAL_NOT_INSPECTED",
+      "SOURCE_GENEALOGY_PENDING",
+      "INDEPENDENCE_UNRESOLVED",
+      "EVENT_DATE_UNRESOLVED",
+      "ACTION_UNRESOLVED"
+    ],
+    "missing_claim_ids": [],
+    "invalid_review_claim_ids": []
+  },
+  "synthesis_coverage": {
+    "reviewed_supported_claims": 4,
+    "summary_input_claims": 4,
+    "omitted_from_summary_claim_ids": [],
+    "fidelity_held_claim_ids": [],
+    "relevance_held_claim_ids": [],
+    "rule": "BOUNDED_NARRATIVE_SUMMARY_ALL_REVIEWED_CLAIMS_RETAINED",
+    "not_selected_for_verbatim_answer_claim_ids": []
+  },
+  "synthesis_method": "REVIEWED_CLAIMS_VERBATIM_REQUIRES_FINAL_REVIEW",
+  "requested_answer_language": "en",
+  "greek_translation_status": "NOT_GENERATED_OR_VALIDATED",
+  "final_answer_attempts": [
+    {
+      "sections": [
+        {
+          "text": "According to the consulted source: The consulted source reports that there is a spring of good water on the island of Argentiera.",
+          "claim_ids": [
+            "c-022899df69e05c1dddf8"
+          ],
+          "relevance_status": "DIRECT"
+        },
+        {
+          "text": "According to the consulted source: The consulted source reports that trading vessels anchor between the islands of Argentiera and San Georgio, nearer to Argentiera.",
+          "claim_ids": [
+            "c-634690ef53620633c277"
+          ],
+          "relevance_status": "DIRECT"
+        },
+        {
+          "text": "According to the consulted source: The consulted source reports that the island was named Kimolos by the ancients.",
+          "claim_ids": [
+            "c-c56ac20c03fbc2026163"
+          ],
+          "relevance_status": "DIRECT"
+        },
+        {
+          "text": "Background context. According to the consulted source: The consulted source reports that the island was called Echinussa, or Viper Island, due to the abundance of reptiles.",
+          "claim_ids": [
+            "c-cb0edba9a642dca909c1"
+          ],
+          "relevance_status": "CONTEXTUAL"
+        }
+      ],
+      "review": {
+        "supported_section_indexes": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "flagged_sections": [],
+        "section_decisions": [
+          {
+            "section_index": 0,
+            "source_support_reason": "The source mentions a spring of good water on Argentiera, which directly supports the claim about the water supply.",
+            "unsupported_answer_spans": [],
+            "decision": "SUPPORTED"
+          },
+          {
+            "section_index": 1,
+            "source_support_reason": "The source states that trading vessels anchor between Argentiera and San Georgio, closer to Argentiera, supporting the claim about merchant anchorage.",
+            "unsupported_answer_spans": [],
+            "decision": "SUPPORTED"
+          },
+          {
+            "section_index": 2,
+            "source_support_reason": "The source states that the island was named Kimolos by the ancients, supporting the claim about the island names.",
+            "unsupported_answer_spans": [],
+            "decision": "SUPPORTED"
+          },
+          {
+            "section_index": 3,
+            "source_support_reason": "The source states that the island was called Echinussa or Viper Island due to reptiles, supporting the claim about the island names.",
+            "unsupported_answer_spans": [],
+            "decision": "SUPPORTED"
+          }
+        ]
+      }
+    }
+  ],
+  "final_answer_review": {
+    "supported_section_indexes": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "flagged_sections": [],
+    "section_decisions": [
+      {
+        "section_index": 0,
+        "source_support_reason": "The source mentions a spring of good water on Argentiera, which directly supports the claim about the water supply.",
+        "unsupported_answer_spans": [],
+        "decision": "SUPPORTED"
+      },
+      {
+        "section_index": 1,
+        "source_support_reason": "The source states that trading vessels anchor between Argentiera and San Georgio, closer to Argentiera, supporting the claim about merchant anchorage.",
+        "unsupported_answer_spans": [],
+        "decision": "SUPPORTED"
+      },
+      {
+        "section_index": 2,
+        "source_support_reason": "The source states that the island was named Kimolos by the ancients, supporting the claim about the island names.",
+        "unsupported_answer_spans": [],
+        "decision": "SUPPORTED"
+      },
+      {
+        "section_index": 3,
+        "source_support_reason": "The source states that the island was called Echinussa or Viper Island due to reptiles, supporting the claim about the island names.",
+        "unsupported_answer_spans": [],
+        "decision": "SUPPORTED"
+      }
+    ]
+  },
+  "answer_section_fidelity": [
+    {
+      "section_index": 0,
+      "status": "NO_CLAIMED_YEARS",
+      "fidelity": {
+        "policy": "claim-fidelity-guard-v1",
+        "claimed_years": [],
+        "findings": [],
+        "status": "NO_CLAIMED_YEARS"
+      }
+    },
+    {
+      "section_index": 1,
+      "status": "NO_CLAIMED_YEARS",
+      "fidelity": {
+        "policy": "claim-fidelity-guard-v1",
+        "claimed_years": [],
+        "findings": [],
+        "status": "NO_CLAIMED_YEARS"
+      }
+    },
+    {
+      "section_index": 2,
+      "status": "NO_CLAIMED_YEARS",
+      "fidelity": {
+        "policy": "claim-fidelity-guard-v1",
+        "claimed_years": [],
+        "findings": [],
+        "status": "NO_CLAIMED_YEARS"
+      }
+    },
+    {
+      "section_index": 3,
+      "status": "NO_CLAIMED_YEARS",
+      "fidelity": {
+        "policy": "claim-fidelity-guard-v1",
+        "claimed_years": [],
+        "findings": [],
+        "status": "NO_CLAIMED_YEARS"
+      }
+    }
+  ],
+  "answer_section_relevance": [
+    {
+      "section_index": 0,
+      "status": "DIRECT",
+      "text_class": "DIRECT",
+      "cited_claim_classes": [
+        "DIRECT"
+      ]
+    },
+    {
+      "section_index": 1,
+      "status": "DIRECT",
+      "text_class": "DIRECT",
+      "cited_claim_classes": [
+        "DIRECT"
+      ]
+    },
+    {
+      "section_index": 2,
+      "status": "DIRECT",
+      "text_class": "DIRECT",
+      "cited_claim_classes": [
+        "DIRECT"
+      ]
+    },
+    {
+      "section_index": 3,
+      "status": "CONTEXTUAL",
+      "text_class": "OFF_TOPIC",
+      "cited_claim_classes": [
+        "CONTEXTUAL"
+      ]
+    }
+  ],
+  "unknowns": [],
+  "model_limitations": [
+    "This provisional answer reproduces selected reviewed claims; original-page inspection, source genealogy, corroboration and human review remain pending."
+  ],
+  "claim_evidence_assessment": {
+    "corpus_coverage_is_not_claim_sufficiency": true,
+    "automatic_historical_verification": false,
+    "claims": [
+      {
+        "claim_id": "c-634690ef53620633c277",
+        "status": "QUOTATION_SUPPORTED_HISTORY_PENDING",
+        "label_el": "Υποστηρίζεται από το παράθεμα· εκκρεμεί ιστορικός έλεγχος",
+        "review_reason": null,
+        "historical_verification": false,
+        "source_independence": "NOT_ESTABLISHED_BY_DOCUMENT_COUNT",
+        "missing_historical_gates": [
+          "ORIGINAL_INSPECTION_NOT_DOCUMENTED",
+          "SOURCE_GENEALOGY_NOT_DOCUMENTED",
+          "INDEPENDENT_CORROBORATION_NOT_DOCUMENTED",
+          "CONTRADICTION_SEARCH_NOT_DOCUMENTED",
+          "HUMAN_REVIEW_PENDING"
+        ]
+      },
+      {
+        "claim_id": "c-022899df69e05c1dddf8",
+        "status": "QUOTATION_SUPPORTED_HISTORY_PENDING",
+        "label_el": "Υποστηρίζεται από το παράθεμα· εκκρεμεί ιστορικός έλεγχος",
+        "review_reason": null,
+        "historical_verification": false,
+        "source_independence": "NOT_ESTABLISHED_BY_DOCUMENT_COUNT",
+        "missing_historical_gates": [
+          "ORIGINAL_INSPECTION_NOT_DOCUMENTED",
+          "SOURCE_GENEALOGY_NOT_DOCUMENTED",
+          "INDEPENDENT_CORROBORATION_NOT_DOCUMENTED",
+          "CONTRADICTION_SEARCH_NOT_DOCUMENTED",
+          "HUMAN_REVIEW_PENDING"
+        ]
+      },
+      {
+        "claim_id": "c-c56ac20c03fbc2026163",
+        "status": "QUOTATION_SUPPORTED_HISTORY_PENDING",
+        "label_el": "Υποστηρίζεται από το παράθεμα· εκκρεμεί ιστορικός έλεγχος",
+        "review_reason": null,
+        "historical_verification": false,
+        "source_independence": "NOT_ESTABLISHED_BY_DOCUMENT_COUNT",
+        "missing_historical_gates": [
+          "ORIGINAL_INSPECTION_NOT_DOCUMENTED",
+          "SOURCE_GENEALOGY_NOT_DOCUMENTED",
+          "INDEPENDENT_CORROBORATION_NOT_DOCUMENTED",
+          "CONTRADICTION_SEARCH_NOT_DOCUMENTED",
+          "HUMAN_REVIEW_PENDING"
+        ]
+      },
+      {
+        "claim_id": "c-cb0edba9a642dca909c1",
+        "status": "QUOTATION_SUPPORTED_HISTORY_PENDING",
+        "label_el": "Υποστηρίζεται από το παράθεμα· εκκρεμεί ιστορικός έλεγχος",
+        "review_reason": null,
+        "historical_verification": false,
+        "source_independence": "NOT_ESTABLISHED_BY_DOCUMENT_COUNT",
+        "missing_historical_gates": [
+          "ORIGINAL_INSPECTION_NOT_DOCUMENTED",
+          "SOURCE_GENEALOGY_NOT_DOCUMENTED",
+          "INDEPENDENT_CORROBORATION_NOT_DOCUMENTED",
+          "CONTRADICTION_SEARCH_NOT_DOCUMENTED",
+          "HUMAN_REVIEW_PENDING"
+        ]
+      }
+    ]
+  },
+  "research_funnel": {
+    "policy": "research-funnel-v1",
+    "collected": {
+      "unique_excerpts": 4,
+      "excluded_before_analysis": 0
+    },
+    "prefilter": {
+      "applied": false,
+      "filtered_out": 0,
+      "filtered_by_reason": {},
+      "kept_excerpts": 4,
+      "model_units": 4,
+      "sentence_windows": 0,
+      "chars_full": null,
+      "chars_sent": null,
+      "sent_this_pass": 4
+    },
+    "examined": {
+      "excerpts": 4,
+      "remaining": 0,
+      "deferred": 0
+    },
+    "claims": {
+      "extracted": 4,
+      "supported_by_quotation": 4,
+      "rejected_proposals": 4
+    },
+    "provisional_synthesis": {
+      "paragraphs": 4
+    },
+    "human_verification": {
+      "performed": false,
+      "verified_claims": 0
+    },
+    "historical_verification": false
+  }
+}
