@@ -9,6 +9,8 @@ const GR = window.NABOU_GR || { status: (x) => String(x || ""), ui: (x) => Strin
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const fmt = (n) => (Number.isFinite(n) ? n.toLocaleString("el-GR") : "—");
 const mobile = () => innerWidth <= 800;
+// redesign v2: η διάταξη είναι ρευστή (CSS grid) — δεν υπάρχει πια κλιμακούμενος καμβάς 1672×941
+const V2 = body.classList.contains("nx-v2");
 
 /* ---------- desktop artboard scaling (1672 × 941, like the mockup) ----------
    The artboard is scaled to the window height; on windows wider than 16:9 it grows sideways
@@ -17,7 +19,7 @@ const mobile = () => innerWidth <= 800;
 const ART_W = 1672, ART_H = 941;
 const stageW = () => ART_W + (parseFloat(stage.style.getPropertyValue("--nx-dw")) || 0);
 function scaleStage() {
-  if (mobile()) {
+  if (V2 || mobile()) {
     for (const v of ["--nx-k", "--nx-x", "--nx-y", "--nx-dw"]) stage.style.removeProperty(v);
     return;
   }
@@ -30,7 +32,7 @@ function scaleStage() {
 }
 addEventListener("resize", scaleStage);
 scaleStage();
-const stageScale = () => (mobile() ? 1 : stage.getBoundingClientRect().width / (stage.offsetWidth || ART_W) || 1);
+const stageScale = () => (V2 || mobile() ? 1 : stage.getBoundingClientRect().width / (stage.offsetWidth || ART_W) || 1);
 // composer height for the stacked mobile layout (panels sit between the bars)
 const composer = $("operatorCommand");
 new ResizeObserver(() => body.style.setProperty("--composer-height", composer.getBoundingClientRect().height + "px")).observe(composer);
@@ -197,7 +199,17 @@ function options(key) {
 }
 function placeBelow(el, anchor, align = "left") {
   if (!anchor) return;
-  const k = stageScale(), a = anchor.getBoundingClientRect();
+  const k = stageScale();
+  let a = anchor.getBoundingClientRect();
+  if (V2 && !a.width) a = ($("v2ToolsBtn") || anchor).getBoundingClientRect();
+  if (V2 && !mobile()) {
+    // σταθερή (fixed) τοποθέτηση σε συντεταγμένες παραθύρου
+    let x = a.left, y = a.bottom + 6;
+    if (align === "right") { x = a.right + 12; y = a.top; }
+    el.style.left = Math.max(8, Math.min(x, innerWidth - el.offsetWidth - 10)) + "px";
+    el.style.top = Math.max(8, Math.min(y, innerHeight - el.offsetHeight - 10)) + "px";
+    return;
+  }
   if (mobile()) {
     el.style.left = Math.max(8, Math.min(a.left, innerWidth - el.offsetWidth - 8)) + "px";
     const above = a.top - el.offsetHeight - 6;

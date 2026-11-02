@@ -74,7 +74,7 @@
     reader.hidden = !current.pages.length;
     const readable = current.pages.filter((p) => p.text.trim().length >= 40).length;
     coverage.textContent = current.pages.length
-      ? `${current.pages.length} / ${current.pages.length} pages read · ${readable} with text · ${current.pages.length - readable} blank or requiring OCR. Αριθμός σελίδας PDFs; printed pagination unverified.`
+      ? `${current.pages.length} / ${current.pages.length} σελίδες διαβάστηκαν · ${readable} με κείμενο · ${current.pages.length - readable} κενές ή χρειάζονται OCR. Η αρίθμηση είναι των σελίδων του PDF· η έντυπη σελιδαρίθμηση δεν έχει επαληθευτεί.`
       : "";
     showPage();
     reviewPage = Math.min(reviewPage, Math.max(0, Math.ceil(current.items.length / batchSize) - 1));

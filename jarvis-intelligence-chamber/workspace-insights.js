@@ -1,6 +1,6 @@
 import { connectResearchFeed } from "./live-bridge.js";
 import { overview, historyEntry, mergeHistory, statusLabel } from "./research-overview.js";
-import { dossierMarkup } from "./research-dossier.js";
+import { dossierMarkup } from "./research-dossier.js?v=v2-phase2-1";
 const $ = (id) => document.getElementById(id);
 const summary = $("researchOverview"),
   list = $("historyList"),
@@ -30,12 +30,17 @@ function dateLabel(value) {
     ? "Ημερομηνία μη διαθέσιμη"
     : new Intl.DateTimeFormat("el-GR", { dateStyle: "medium", timeStyle: "short" }).format(date);
 }
+// Αναζήτηση χωρίς τόνους/πεζά-κεφαλαία: NFD + αφαίρεση διακριτικών, ς → σ.
+const fold = (v) =>
+  String(v ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("el")
+    .replace(/ς/g, "σ");
 function renderHistory() {
   const all = mergeHistory(catalog, recent),
-    q = search.value.trim().toLocaleLowerCase("el");
-  const rows = all.filter((r) =>
-    [r.target, r.run_id, r.date_range].join(" ").toLocaleLowerCase("el").includes(q),
-  );
+    q = fold(search.value.trim());
+  const rows = all.filter((r) => fold([r.target, r.run_id, r.date_range].join(" ")).includes(q));
   status.textContent =
     (unavailable
       ? "Ο κατάλογος δεν είναι διαθέσιμος. Εμφανίζονται μόνο έρευνες που έχουν προβληθεί εδώ. "

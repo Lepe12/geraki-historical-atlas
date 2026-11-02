@@ -48,5 +48,56 @@
     for (const [re, out] of messages) if (re.test(raw)) return raw.replace(re, out);
     return status(raw);
   }
-  window.NABOU_GR = { status, ui };
+  /* ---- Κεντρικό λεξικό για τη «Πορεία»: ερευνητές, γεγονότα, μηνύματα καταγραφής ----
+     Κάθε άγνωστο τεχνικό μήνυμα εμφανίζεται με ελληνική γενική περιγραφή· το αρχικό κείμενο μένει
+     διαθέσιμο ως «τεχνική λεπτομέρεια». */
+  const agents = {
+    JARVIS: "Συντονιστής έρευνας", NABOU: "Συντονιστής έρευνας", SYSTEM: "Σύστημα",
+    greek: "Ελλάδα", spanish_simancas: "Ισπανία / Simancas", venetian: "Βενετία", french: "Γαλλία",
+    british: "Βρετανία", dutch: "Ολλανδία", german: "Γερμανικά κράτη", italian_states: "Ιταλικά κράτη",
+    ottoman: "Οθωμανική αυτοκρατορία", north_african: "Βόρεια Αφρική", travellers: "Περιηγητές & αφηγήσεις",
+    source_genealogy: "Γενεαλογία πηγών", identity_resolution: "Ταυτοποίηση", contradiction: "Αντιφάσεις",
+    relationship_network: "Δίκτυα σχέσεων", timeline: "Χρονολόγιο", pirate_base: "Πειρατικές βάσεις",
+    pirate_biography: "Βιογραφία πειρατή",
+  };
+  const events = {
+    RUN_STARTED: "Έναρξη έρευνας", RUN_COMPLETED: "Η έρευνα ολοκληρώθηκε", RUN_FAILED: "Η έρευνα απέτυχε",
+    AGENT_STARTED: "Ο ερευνητής ξεκίνησε", AGENT_COMPLETED: "Ο ερευνητής ολοκλήρωσε", AGENT_FAILED: "Ο ερευνητής απέτυχε",
+    SEARCH_STARTED: "Έναρξη αναζήτησης", SEARCH_COMPLETED: "Η αναζήτηση ολοκληρώθηκε",
+    SOURCE_BLOCKED: "Η πηγή απέρριψε το αίτημα", PERMIT_ISSUED: "Εκδόθηκε άδεια ανάγνωσης",
+  };
+  const logs = [
+    [/^(\d+) candidate events?; (\d+) blockers?$/i, (m) => m[1] + " υποψήφια γεγονότα · " + m[2] + " εμπόδια πρόσβασης"],
+    [/^(\d+) discovery records?; permit ([\w-]+)$/i, (m) => m[1] + " εγγραφές ευρημάτων · άδεια " + m[2]],
+    [/^repo:(.+?)\s+"(.*)"(?:\s+(associates|history))?$/i, (m) =>
+      "Αναζήτηση στο αρχείο «" + m[1] + "» για «" + m[2] + "»" + (m[3] ? (/assoc/i.test(m[3]) ? " (σχέσεις)" : " (ιστορικό)") : "")],
+    [/^repo:(.+)$/i, (m) => "Αναζήτηση στο αρχείο «" + m[1] + "»"],
+    [/^run (started|received)$/i, () => "Η έρευνα παραλήφθηκε"],
+    [/^run completed$/i, () => "Η έρευνα ολοκληρώθηκε"],
+    [/^(\d+) lines? (?:completed|done)$/i, (m) => m[1] + " γραμμές ολοκληρώθηκαν"],
+  ];
+  const hasGreek = (t) => /[\u0370-\u03FF\u1F00-\u1FFF]/.test(t);
+  function agent(id) {
+    const raw = String(id ?? "").trim();
+    if (!raw) return agents.JARVIS;
+    return agents[raw] || agents[raw.toUpperCase()] || raw.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase());
+  }
+  /* Επιστρέφει { who, text, state, raw } για ένα γεγονός της πορείας. */
+  function event(e) {
+    e = e || {};
+    const rawText = String(e.detail ?? "").trim();
+    const code = e.phase || e.status || e.event_type || "";
+    let text = "";
+    if (rawText) {
+      for (const [re, fn] of logs) { const m = rawText.match(re); if (m) { text = fn(m); break; } }
+      if (!text) text = hasGreek(rawText) ? rawText : ui(rawText);
+      if (!hasGreek(text)) text = "Ενημέρωση συστήματος (τεχνικό μήνυμα — δείτε τις λεπτομέρειες)";
+    } else {
+      text = events[String(e.event_type || "").toUpperCase()] || status(code) || "Ενημέρωση συστήματος";
+    }
+    const st = String(e.status || e.phase || "").toUpperCase();
+    const state = /FAIL|ERROR|BLOCK|UNAVAIL|CANCEL/.test(st) ? "bad" : /COMPLETE|DONE/.test(st) ? "ok" : /RUN|ACTIVE|START|PREPAR|QUEUE/.test(st) ? "run" : "info";
+    return { who: agent(e.agent_id), text, state, raw: rawText, code };
+  }
+  window.NABOU_GR = { status, ui, agent, event };
 })();

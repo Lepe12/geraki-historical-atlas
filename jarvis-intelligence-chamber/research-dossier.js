@@ -157,16 +157,24 @@ export function dossierMarkup(snapshot) {
   const events = Array.isArray(snapshot.events) ? snapshot.events : [];
   const updates = [...events]
     .reverse()
-    .map(
-      (e) =>
+    .map((e) => {
+      // Ελληνική απόδοση μέσω του κεντρικού λεξικού· το αρχικό μήνυμα μένει σε αναδιπλούμενες λεπτομέρειες
+      const ev = globalThis.NABOU_GR?.event ? globalThis.NABOU_GR.event(e) : null;
+      const raw = e.detail || "";
+      return (
         "<li><strong>" +
         escape(agentName(e.agent_id)) +
         "</strong><p>" +
-        escape(e.detail || e.phase || statusLabel(e.status)) +
+        escape(ev ? ev.text : e.detail || e.phase || statusLabel(e.status)) +
         "</p><time>" +
         escape(date(e.created_utc || e.timestamp || e.at)) +
-        "</time></li>",
-    );
+        "</time>" +
+        (ev && raw && raw !== ev.text
+          ? "<details><summary>Τεχνικές λεπτομέρειες</summary><p>" + escape(raw) + "</p></details>"
+          : "") +
+        "</li>"
+      );
+    });
   return {
     progress:
       (p.total

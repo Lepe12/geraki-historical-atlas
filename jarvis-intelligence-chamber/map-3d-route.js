@@ -12,7 +12,7 @@ import { addShip } from "./map-3d-ship.js";
 const SRC = "./assets/nautical/routes/lantzas-1577-book3.json";
 const SPEED = 0.037;    // world units per second (the whole board is 18 wide) · slow: ~2.6 min for the whole voyage
 const DWELL = 4;        // seconds of calm at each stop
-const BIG = 3.4;        // ship scale in open sea (clearly visible at the whole-board view)
+const BIG = 4.5;        // ship scale in open sea (clearly visible at the whole-board view)
 const SMALL = 0.12;     // smallest scale, only in narrow channels / harbours where a bigger hull would touch land
 const ANCHOR = 1.2;     // the ship waits off each harbour, at the first spot on the leg where it fits at this scale
 const LINE_Y = 0.008, R = 0.011;
@@ -131,6 +131,7 @@ export async function addRoute(api) {
     scale = snap || dip < 0.05 ? k : scale + (k - scale) * 0.08; snap = false;
     ship.object.scale.setScalar(Math.max(1e-3, scale * dip));
     ship.object.visible = scale * dip > 0.01;
+    ship.sync?.();
   }
   if (ship) {
     place();

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="theme-color" content="#140d08" />
+    <meta name="theme-color" content="#14100B" />
     <meta name="description" content="NABOU//X — χάρτης ιστορικής έρευνας για την πειρατεία και την κουρσάρικη δράση στη Μεσόγειο του 16ου–17ου αιώνα, με αρχειακούς ερευνητές, πηγές και τεκμήρια." />
     <meta property="og:title" content="NABOU//X — Χάρτης ιστορικής έρευνας" />
     <meta property="og:description" content="Από το ερώτημα στην πηγή: αρχεία, ευρήματα και τεκμήρια πάνω σε έναν πορτολάνο της Μεσογείου." />
@@ -13,15 +13,84 @@
     <link rel="stylesheet" href="./nabou-shell.css?v=evidence-v5-20261019" />
     <link rel="stylesheet" href="./nautical.css?v=portolan-2" />
     <link rel="stylesheet" href="./nautical-layout.css?v=fullwidth-3" />
-    <link rel="stylesheet" href="./map-3d.css?v=map3d-10" />
+    <link rel="stylesheet" href="./map-3d.css?v=map3d-11" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Noto+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" />
+    <link rel="stylesheet" href="./redesign-v2.css?v=v2-phase3-6" />
+    <link rel="stylesheet" href="./redesign-v2-panels.css?v=v2-phase3-4" />
+    <script>
+      /* Σελίδα καλωσορίσματος: μία φορά ανά συνεδρία· όχι σε άμεσους συνδέσμους έρευνας (?run=…) ή με ?skip */
+      (function () {
+        var q = location.search, force = /[?&]welcome=1/.test(q);
+        var skip = /[?&](run|skip|view)=?/.test(q) || (location.hash && location.hash.length > 1);
+        var seen = false;
+        try { seen = sessionStorage.getItem("nx-v2-seen") === "1"; } catch (e) { /* αποθήκευση μη διαθέσιμη: θεωρείται πρώτη επίσκεψη, εκτός αν ζητήθηκε ?skip */ }
+        if (force || (!skip && !seen)) document.documentElement.classList.add("v2-welcome-on");
+      })();
+    </script>
     <link rel="preload" href="./assets/nautical/fonts/EBGaramond.woff2" as="font" type="font/woff2" crossorigin />
     <script type="importmap">
       { "imports": { "./live-bridge.js": "./live-bridge.js?v=startup-feedback-20261016-2" } }
     </script>
   </head>
-  <body class="nxs-active nx-mock">
-    <div id="viewport">
+  <body class="nxs-active nx-mock nx-v2">
+    <div id="v2welcome" role="dialog" aria-modal="true" aria-labelledby="v2wTitle" aria-describedby="v2wLine">
+    <canvas id="v2wCanvas" aria-hidden="true"></canvas>
+    <svg class="v2w-fallback" viewBox="-12 -12 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width=".35"><circle r="9"/><ellipse rx="9" ry="3.2"/><ellipse rx="3.2" ry="9"/><ellipse rx="9" ry="3.2" transform="rotate(-23)"/><ellipse rx="9" ry="3.2" transform="rotate(23)"/><circle r="10.4" stroke-dasharray=".4 .8"/><circle r=".9" fill="currentColor"/></svg>
+    <button type="button" id="v2wMute" class="v2w-mute" aria-pressed="false" aria-label="Σίγαση φωνής του χαρτογράφου" title="Σίγαση φωνής του χαρτογράφου" hidden>🔊</button>
+    <div class="v2w-copy">
+      <h1 id="v2wTitle" class="v2w-title"><span class="v2w-brand">NABOU//X</span></h1>
+      <p id="v2wLine" class="v2w-tagline">AI Ιστορικής Έρευνας</p>
+      <button id="v2wEnter" class="v2w-enter" type="button" aria-keyshortcuts="Enter">Είσοδος</button>
+    </div>
+  </div>
+  <div id="viewport">
     <div id="stage">
+      <!-- ===== v2: αριστερή ράγα (5 ενότητες) ===== -->
+      <nav id="v2rail" aria-label="Κύρια πλοήγηση">
+        <button type="button" class="v2-logo" data-nx-go="home" aria-label="NABOU//X — αρχική προβολή χάρτη"><img src="./assets/nautical/img/astrolabe.png" alt="" /></button>
+<button type="button" class="v2-nav" data-v2="map" data-nx-go="map"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg><span>Χάρτης</span></button>
+<button type="button" class="v2-nav" data-v2="research" data-nx-go="research"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span>Έρευνα</span></button>
+<button type="button" class="v2-nav" data-v2="sources" data-nx-go="sourcelist"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg><span>Πηγές</span></button>
+<button type="button" class="v2-nav" data-v2="agents" data-nx-go="agents"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 3-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.2c2.5 0 4.5 1.8 4.5 5"/></svg><span>Ερευνητές</span></button>
+<span class="v2-spacer"></span>
+<button type="button" class="v2-nav v2-tools-btn" data-v2="tools" id="v2ToolsBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="v2ToolsMenu"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="2.5"/><circle cx="8" cy="17" r="2.5"/></svg><span>Εργαλεία</span></button>
+      </nav>
+      <div hidden class="v2-legacy" aria-hidden="true">
+      <!-- ===== SIDEBAR: the 4 original dock views + mockup sections ===== -->
+      <div id="sidenav" class="frame">
+          <button type="button" class="side-item" data-nx-go="targets" data-order="2"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/><path d="M12,1.5v5M12,17.5v5M1.5,12h5M17.5,12h5"/></svg><span>ΣΤΟΧΟΙ</span></button>
+          <button type="button" class="side-item" data-nx-go="sources" data-order="4"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6,4h11a2,2 0 0 1 0,4H6"/><path d="M6,4a2,2 0 0 0 0,4v11a2,2 0 0 0 2,2h11V8"/><path d="M9,12h7M9,15.5h7"/></svg><span>ΠΗΓΕΣ</span></button>
+          <button type="button" class="side-item" data-nx-go="layers" data-order="7"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12,3l9,4.5-9,4.5-9-4.5z"/><path d="M3,12l9,4.5 9-4.5"/><path d="M3,16.5l9,4.5 9-4.5"/></svg><span>ΕΠΙΠΕΔΑ ΧΑΡΤΗ</span></button>
+          <button type="button" class="side-item" data-nx-go="settings" data-order="8"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.2"/><circle cx="12" cy="12" r="1.8"/><path d="M12,1.5v20.9M1.5,12h20.9M4.6,4.6l14.8,14.8M19.4,4.6L4.6,19.4"/></svg><span>ΡΥΘΜΙΣΕΙΣ</span></button>
+        <nav class="nxs-dock" aria-label="Κύρια πλοήγηση">
+          <button type="button" class="side-item" data-nxs-view="universe" aria-current="page" data-order="1"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4,21c1-4.5 4-6.5 8-6.5s7,2 8,6.5"/><path d="M8.5,6.2h7"/></svg><span>ΧΕΙΡΙΣΤΗΣ</span></button>
+          <button type="button" class="side-item" data-nxs-view="agents" data-order="3"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.6"/><path d="M5.5,20.5c.6-4.2 3-6.2 6.5-6.2s5.9,2 6.5,6.2"/><path d="M7.5,5.2l4.5-2.7 4.5,2.7"/></svg><span>ΕΡΕΥΝΗΤΕΣ</span><i class="dot" id="agentsDot" hidden></i></button>
+          <button type="button" class="side-item" data-nxs-view="findings" data-order="6"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6,2.5h8.5l4,4v15H6z"/><path d="M14.5,2.5v4h4"/><path d="M8.8,9.5h6M8.8,12.5h6"/><circle cx="14.5" cy="17" r="2.4" class="seal"/></svg><span>ΤΕΚΜΗΡΙΑ</span></button>
+          <button type="button" class="side-item" data-nxs-view="pdf" data-order="5"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12,6.5C9.5,4.6 6,4.3 2.5,5v13c3.5-.7 7-.4 9.5,1.5 2.5-1.9 6-2.2 9.5-1.5V5C18,4.3 14.5,4.6 12,6.5z"/><path d="M12,6.5v13"/></svg><span>ΜΑΘΗΣΗ</span></button>
+        </nav>
+      </div>
+
+      <button id="moon" class="frame" type="button" data-nx-go="theater" aria-label="Θέατρο Μεσογείου: επαναφορά χάρτη">
+        <span class="astro"><img src="./assets/nautical/img/astrolabe.png" alt="" /></span>
+        <span class="mt1">ΜΕΣΟΓΕΙΟΣ <b>+</b></span>
+        <span class="mt2">Ιστορικό Θέατρο</span>
+        <span class="mphase" id="moonPhase">—</span>
+      </button>
+
+      <div id="banner" aria-hidden="true">
+        <svg viewBox="0 0 600 70">
+          <path class="rb-tail" d="M40,22H100V54H40L54,38Z"/><path class="rb-tail" d="M560,22H500V54H560L546,38Z"/>
+          <path class="rb-fold" d="M100,54L88,46V26L100,22Z"/><path class="rb-fold" d="M500,54L512,46V26L500,22Z"/>
+          <path class="rb-main" d="M88,16Q300,2 512,16V48Q300,34 88,48Z"/>
+          <path id="rbText" d="M96,37Q300,23 504,37" fill="none"/>
+          <text class="rb-t"><textPath href="#rbText" startOffset="50%" text-anchor="middle">THEATRUM · MARIS · MEDITERRANEI</textPath></text>
+        </svg>
+      </div>
+      </div>
+
+      <div class="v2-main" id="v2main">
       <!-- ===== TOP BAR (mockup chrome) ===== -->
       <header id="topbar">
         <section class="nxs-identity" aria-label="NABOU X">
@@ -60,48 +129,9 @@
             <circle r="2.4" class="c-hub"/>
           </svg>
         </button>
+<button id="v2AsideToggle" class="v2-aside-toggle" type="button" aria-controls="v2aside" aria-expanded="true"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M14.5 4.5v15"/></svg><span>Πίνακας</span></button>
         <div id="topOrn" aria-hidden="true"><i></i><b></b><i></i></div>
       </header>
-
-      <!-- ===== SIDEBAR: the 4 original dock views + mockup sections ===== -->
-      <div id="sidenav" class="frame">
-          <button type="button" class="side-item" data-nx-go="targets" data-order="2"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/><path d="M12,1.5v5M12,17.5v5M1.5,12h5M17.5,12h5"/></svg><span>ΣΤΟΧΟΙ</span></button>
-          <button type="button" class="side-item" data-nx-go="sources" data-order="4"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6,4h11a2,2 0 0 1 0,4H6"/><path d="M6,4a2,2 0 0 0 0,4v11a2,2 0 0 0 2,2h11V8"/><path d="M9,12h7M9,15.5h7"/></svg><span>ΠΗΓΕΣ</span></button>
-          <button type="button" class="side-item" data-nx-go="layers" data-order="7"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12,3l9,4.5-9,4.5-9-4.5z"/><path d="M3,12l9,4.5 9-4.5"/><path d="M3,16.5l9,4.5 9-4.5"/></svg><span>ΕΠΙΠΕΔΑ ΧΑΡΤΗ</span></button>
-          <button type="button" class="side-item" data-nx-go="settings" data-order="8"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.2"/><circle cx="12" cy="12" r="1.8"/><path d="M12,1.5v20.9M1.5,12h20.9M4.6,4.6l14.8,14.8M19.4,4.6L4.6,19.4"/></svg><span>ΡΥΘΜΙΣΕΙΣ</span></button>
-        <nav class="nxs-dock" aria-label="Κύρια πλοήγηση">
-          <button type="button" class="side-item" data-nxs-view="universe" aria-current="page" data-order="1"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4,21c1-4.5 4-6.5 8-6.5s7,2 8,6.5"/><path d="M8.5,6.2h7"/></svg><span>ΧΕΙΡΙΣΤΗΣ</span></button>
-          <button type="button" class="side-item" data-nxs-view="agents" data-order="3"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.6"/><path d="M5.5,20.5c.6-4.2 3-6.2 6.5-6.2s5.9,2 6.5,6.2"/><path d="M7.5,5.2l4.5-2.7 4.5,2.7"/></svg><span>ΕΡΕΥΝΗΤΕΣ</span><i class="dot" id="agentsDot" hidden></i></button>
-          <button type="button" class="side-item" data-nxs-view="findings" data-order="6"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6,2.5h8.5l4,4v15H6z"/><path d="M14.5,2.5v4h4"/><path d="M8.8,9.5h6M8.8,12.5h6"/><circle cx="14.5" cy="17" r="2.4" class="seal"/></svg><span>ΤΕΚΜΗΡΙΑ</span></button>
-          <button type="button" class="side-item" data-nxs-view="pdf" data-order="5"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12,6.5C9.5,4.6 6,4.3 2.5,5v13c3.5-.7 7-.4 9.5,1.5 2.5-1.9 6-2.2 9.5-1.5V5C18,4.3 14.5,4.6 12,6.5z"/><path d="M12,6.5v13"/></svg><span>ΜΑΘΗΣΗ</span></button>
-        </nav>
-      </div>
-
-      <button id="moon" class="frame" type="button" data-nx-go="theater" aria-label="Θέατρο Μεσογείου: επαναφορά χάρτη">
-        <span class="astro"><img src="./assets/nautical/img/astrolabe.png" alt="" /></span>
-        <span class="mt1">ΜΕΣΟΓΕΙΟΣ <b>+</b></span>
-        <span class="mt2">Ιστορικό Θέατρο</span>
-        <span class="mphase" id="moonPhase">—</span>
-      </button>
-
-      <!-- ===== CENTRE ===== -->
-      <div id="histList" class="box frame" role="group" aria-label="Προβολές">
-        <i id="histDash"></i>
-        <button type="button" class="hist" data-nx-go="history" data-i="0">ΙΣΤΟΡΙΑ</button>
-        <button type="button" class="hist" data-nx-go="territory" data-i="1">ΕΔΑΦΗ</button>
-        <button type="button" class="hist" data-nx-go="people" data-i="2">ΠΡΟΣΩΠΑ</button>
-        <button type="button" class="hist" data-nx-go="intelligence" data-i="3">ΠΛΗΡΟΦΟΡΙΕΣ</button>
-      </div>
-
-      <div id="banner" aria-hidden="true">
-        <svg viewBox="0 0 600 70">
-          <path class="rb-tail" d="M40,22H100V54H40L54,38Z"/><path class="rb-tail" d="M560,22H500V54H560L546,38Z"/>
-          <path class="rb-fold" d="M100,54L88,46V26L100,22Z"/><path class="rb-fold" d="M500,54L512,46V26L500,22Z"/>
-          <path class="rb-main" d="M88,16Q300,2 512,16V48Q300,34 88,48Z"/>
-          <path id="rbText" d="M96,37Q300,23 504,37" fill="none"/>
-          <text class="rb-t"><textPath href="#rbText" startOffset="50%" text-anchor="middle">THEATRUM · MARIS · MEDITERRANEI</textPath></text>
-        </svg>
-      </div>
 
       <!-- OPERATOR QUERY = their research dispatch form -->
       <form id="operatorCommand" autocomplete="off">
@@ -122,7 +152,13 @@
           <button type="button" class="dd" id="advBtn" data-key="advanced"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3,7h11M18,7h3M3,17h4M11,17h10"/><circle cx="16" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg><span class="v">Σύνθετη</span></button>
         </div>
       </form>
-
+      <div id="histList" class="box frame" role="group" aria-label="Προβολές">
+        <i id="histDash"></i>
+        <button type="button" class="hist" data-nx-go="history" data-i="0">ΙΣΤΟΡΙΑ</button>
+        <button type="button" class="hist" data-nx-go="territory" data-i="1">ΕΔΑΦΗ</button>
+        <button type="button" class="hist" data-nx-go="people" data-i="2">ΠΡΟΣΩΠΑ</button>
+        <button type="button" class="hist" data-nx-go="intelligence" data-i="3">ΠΛΗΡΟΦΟΡΙΕΣ</button>
+      </div>
       <!-- SEA CHART (their 17 lanes) -->
       <div id="chartFrame">
         <div class="bandH"></div><div class="bandV"></div>
@@ -162,7 +198,9 @@
         <button type="button" class="card" data-nx-go="people"><span class="pic" style="background-image:url(./assets/nautical/img/card_people.jpg)"></span><span class="lbl">ΠΡΟΣΩΠΑ</span><span class="cnt" id="cardPeople">—</span></button>
         <button type="button" class="card" data-nx-go="sourcelist"><span class="pic" style="background-image:url(./assets/nautical/img/card_sources.jpg)"></span><span class="lbl">ΠΗΓΕΣ</span><span class="cnt" id="cardSources">—</span></button>
       </div>
+      </div>
 
+      <aside class="v2-aside" id="v2aside" aria-label="Κατάσταση και πορεία">
       <!-- ===== RIGHT COLUMN ===== -->
       <button id="hero" type="button" data-nx-go="research" aria-label="NABOU//X: άνοιγμα της τρέχουσας έρευνας">
         <span class="pic"></span>
@@ -196,6 +234,24 @@
         </button>
       </section>
 
+      </aside>
+
+      <!-- ===== v2: κάτω μπάρα καρτελών (κινητό) ===== -->
+      <nav id="v2tabbar" aria-label="Κύρια πλοήγηση (κινητό)">
+<button type="button" class="v2-nav" data-v2="map" data-nx-go="map"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg><span>Χάρτης</span></button>
+<button type="button" class="v2-nav" data-v2="research" data-nx-go="research"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span>Έρευνα</span></button>
+<button type="button" class="v2-nav" data-v2="sources" data-nx-go="sourcelist"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg><span>Πηγές</span></button>
+<button type="button" class="v2-nav" data-v2="agents" data-nx-go="agents"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 3-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.2c2.5 0 4.5 1.8 4.5 5"/></svg><span>Ερευνητές</span></button>
+<button type="button" class="v2-nav v2-tools-btn" data-v2="tools" id="v2MoreBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="v2ToolsMenu"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18.5" cy="12" r="1.6"/></svg><span>Εργαλεία</span></button>
+      </nav>
+      <div id="v2ToolsMenu" class="v2-menu" role="menu" aria-label="Εργαλεία" hidden>
+        <button type="button" role="menuitem" data-nx-go="layers"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg><span>Επίπεδα χάρτη</span></button>
+        <button type="button" role="menuitem" data-nx-go="learning"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4M10 13h6M10 17h6"/></svg><span>Έλεγχος ψηφιακού εγγράφου</span></button>
+        <button type="button" role="menuitem" data-nx-go="history"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>Προηγούμενες έρευνες</span></button>
+        <button type="button" role="menuitem" data-nx-go="settings"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="2.5"/><circle cx="8" cy="17" r="2.5"/></svg><span>Ρυθμίσεις</span></button>
+        <a role="menuitem" href="./classic.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8M4 4v4h4"/></svg><span>Παλιά εμφάνιση</span></a>
+      </div>
+
       <section class="workspace-welcome" id="workspaceWelcome" hidden>
         <span>Ο ΧΩΡΟΣ ΕΡΕΥΝΑΣ ΣΑΣ</span>
         <h1>Από το ερώτημα στην πηγή.</h1>
@@ -228,6 +284,7 @@
           <button type="button" data-agent-filter="archive">Αρχεία</button>
           <button type="button" data-agent-filter="analysis">Ανάλυση</button>
         </div>
+        <p class="nxs-agent-summary" id="nxsAgentSummary" role="status">Δεν έχει φορτωθεί έρευνα — οι ερευνητές είναι σε αναμονή.</p>
         <div class="nxs-workspace-scroll">
           <div class="nxs-agent-groups" id="nxsAgentGroups"></div>
         </div>
@@ -447,18 +504,21 @@
     </div>
     </div>
 
-    <script src="./nautical-i18n.js?v=portolan-2" defer></script>
+    <script src="./nautical-i18n.js?v=v2-phase2-1" defer></script>
     <script src="./nautical-chart.js?v=portolan-1" defer></script>
     <script src="./nautical-emblems.js?v=banners-3" defer></script>
     <script src="./chamber.js?v=portolan-7" defer></script>
     <script src="./gpu-field.js?v=portolan-1" defer></script>
-    <script src="./map-3d.js?v=map3d-10" defer></script>
-    <script src="./nabou-assistant.js?v=greeting-20261102" defer></script>
+    <script src="./map-3d.js?v=map3d-11" defer></script>
+    <script src="./nabou-assistant.js?v=v2-phase2-1" defer></script>
     <script src="./operator-command.js?v=dispatch-timeout-20261020" defer></script>
-    <script type="module" src="./research-ui.js?v=provisional-v3-20261030"></script>
-    <script src="./learning-review.js?v=usability-20261016-4" defer></script>
-    <script type="module" src="./nabou-shell.js?v=mobile-v4-20261018"></script>
-    <script type="module" src="./workspace-insights.js?v=1"></script>
-    <script type="module" src="./nautical-dashboard.js?v=fullwidth-4"></script>
+    <script type="module" src="./research-ui.js?v=v2-phase2-2"></script>
+    <script src="./learning-review.js?v=v2-phase2-1" defer></script>
+    <script type="module" src="./nabou-shell.js?v=v2-phase2-1"></script>
+    <script type="module" src="./workspace-insights.js?v=v2-phase2-1"></script>
+    <script type="module" src="./nautical-dashboard.js?v=v2-phase2-1"></script>
+    <script src="./redesign-v2.js?v=v2-phase1-1" defer></script>
+    <script src="./redesign-v2-panels.js?v=v2-phase2-3" defer></script>
+    <script type="module" src="./redesign-v2-welcome.js?v=v2-phase3-2"></script>
   </body>
 </html>
