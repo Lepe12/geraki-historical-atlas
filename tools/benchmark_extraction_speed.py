@@ -29,8 +29,9 @@ def checks(case, accepted, rejected, payload):
     forbidden=any(re.search(r'pirat|corsair|privateer',c['statement'],re.I)
                   and not re.search(r'pirat|corsair|privateer',c['quote'],re.I) for c in accepted)
     invented_date=any(year not in c['quote'] for c in accepted for year in re.findall(r'(?<!\d)(?:1\d{3}|20\d{2})(?!\d)',c['statement']))
+    rejected_errors=[r for r in rejected if not (case['expect']=='index_is_not_narrative' and r.get('reason')=='DISCOVERY_LEAD_NOT_NARRATIVE_EVIDENCE' and r.get('passage_kind') in ('INDEX_ENTRY','BIBLIOGRAPHIC_REFERENCE'))]
     good={'valid_protocol':isinstance(payload,dict) and isinstance(payload.get('items'),list),
-          'no_rejected_proposals':not rejected,'no_unquoted_piracy':not forbidden,
+          'no_invalid_proposals':not rejected_errors,'no_unquoted_piracy':not forbidden,
           'no_invented_dates':not invented_date and not any(c.get('dates') for c in accepted)}
     kind=case['expect']
     if kind=='named_identity':good['required_finding']='kimolos' in text and bool(accepted)

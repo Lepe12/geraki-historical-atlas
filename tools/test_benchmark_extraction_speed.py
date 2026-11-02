@@ -23,6 +23,13 @@ class Qualification(unittest.TestCase):
         result=checks({'expect':'merchant_anchorage'},[{'statement':'Ships anchor near Argentiera in 1677.','quote':'Trading ships anchor near Argentiera.','dates':[],'usage_type':'ANCHORAGE'}],[],{'items':[{}]})
         self.assertFalse(result['no_invented_dates'])
 
+    def test_correct_index_classification_counts_as_safe_abstention(self):
+        rejected=[{'reason':'DISCOVERY_LEAD_NOT_NARRATIVE_EVIDENCE','passage_kind':'INDEX_ENTRY'}]
+        result=checks({'expect':'index_is_not_narrative'},[],rejected,{'items':[{}]})
+        self.assertTrue(all(result.values()))
+        result=checks({'expect':'index_is_not_narrative'},[],[{'reason':'ENTITY_OR_DATE_NOT_IN_CITED_EVIDENCE'}],{'items':[{}]})
+        self.assertFalse(result['no_invalid_proposals'])
+
     def test_empty_output_is_not_a_successful_identity_answer(self):
         self.assertFalse(checks({'expect':'named_identity'},[],[],{'items':[]})['required_finding'])
         self.assertTrue(checks({'expect':'index_is_not_narrative'},[],[],{'items':[]})['required_finding'])
