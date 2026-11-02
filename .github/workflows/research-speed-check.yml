@@ -60,7 +60,7 @@ jobs:
         run: |
           elapsed=$(( $(date +%s) - CHECKOUT_START ))
           size=$(du -sm --exclude=.git . | cut -f1)
-          printf '### Checkout %s\n\nElapsed: %s seconds. Working files: %s MiB.\n' "$PROFILE" "$elapsed" "$size" >> "$GITHUB_STEP_SUMMARY"
+          printf '### Checkout %s\n\nElapsed: %s seconds. Working files: %s MiB.\n' "$PROFILE" "$elapsed" "$size" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Verify byte-preserving transport and actual durable Git publication
         if: matrix.profile == 'current-run-only'
         env:
