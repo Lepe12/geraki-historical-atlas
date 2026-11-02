@@ -1033,6 +1033,21 @@ def research_funnel(answer):
             'historical_verification':False}
 
 
+def extraction_request(group, question, question_kind):
+    prompt=RULES+'\nExtraction language: English. QUESTION: '+question+'\nReturn {"items":[{"passage_kind":"NARRATIVE_EVIDENCE","statement":"The consulted source reports ...","evidence_id":"copy supplied evidence_id","passage_ids":[0],"kind":"source_statement","source_type":"UNVERIFIED","actors":[],"places":[],"dates":[],"usage_type":"UNRESOLVED","uncertainty":[]}]}. Select at most 2 claims directly relevant to the question. For a person question, prioritize the named person, identity and sourced activities; a named place is optional. For a place or geographic topic, prioritize named-place claims. Choose 1-4 adjacent passage_ids from ONE evidence item. Do NOT output a quote: the engine copies the selected original text. Copy entity spellings literally from those selected passages; do not translate names. Dates must be strings copied from the selected passages or date_evidence. Empty arrays are valid. Leave unspecified actors, dates and places empty. State only what the selected passage actually supports, with source attribution. Distinguish an actual base from a raid site, and an intention from an executed action. usage_type may be BASE, ANCHORAGE, REFUGE, RAID_LOCATION, OTHER, UNRESOLVED. Modern studies are SECONDARY_SOURCE; contemporary authorship must be established for PRIMARY_SOURCE. Never infer location or dates from a book title.\nEVIDENCE_JSON:\n'+json.dumps([model_evidence(row) for row in group],ensure_ascii=False)
+    if any(r.get('model_view')=='compact' for r in group):
+        from excerpt_prefilter import COMPACT_HEADER
+        prompt+='\n'+COMPACT_HEADER.strip()
+    prompt+='\nClassify passage_kind before proposing a claim. Index entries, bibliography citations, catalogue descriptions and lists of names are discovery leads, not narrative evidence for a historical event. Only NARRATIVE_EVIDENCE may support an answer. Relevant means answering the requested subject, activity and period, not merely repeating its spelling. Do not turn medieval background or a modern namesake into the requested historical finding.'
+    prompt+=' Each statement should express ONE short source-attributed fact, at most30 words. Do not retell several people\'s conversations or a whole chronology in one claim. Historical narrative in a footnote may be NARRATIVE_EVIDENCE; a citation listing a work without its consulted content is a BIBLIOGRAPHIC_REFERENCE.'
+    if question_kind=='person':prompt+=' Every item MUST contain a literal actor mention in actors from the selected passages. Select the sentence actually naming that actor. If an event date is absent from those sentences, leave it out of BOTH dates and statement.'
+    if question_kind in ('place','topic'):
+        prompt+=' Every proposed item MUST contain at least one literal place from the selected passages. If no relevant named-place narrative is available, return an empty items array. Unresolved dates are allowed but must remain unresolved.'
+        prompt+=' Distinguish a human eponym from the full spatial name named after that person. Copy the explicit port/bay/place designation where a personal name is ambiguous. An ambush site or a harbor name is not automatically a raid location. Bind each place, use and date to its own clause; comparisons between different islands must not transfer one island\'s attributes to another.'
+    schema=schemas.extraction([r['evidence_id'] for r in group],question_kind)
+    return prompt, schema
+
+
 def _execute(run_root, question, caller=call, config=None, output_root=None, provenance_root=None,resume_reviewed_from=None):
     from research_focus import decompose
     all_records,excluded=collect(run_root,provenance_root)
@@ -1133,6 +1148,21 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
             all_records=[{**r,'model_view':'compact'} for r in all_records]
     all_records=fit_passages(all_records,model_budget)
     all_groups,deferred,namesake_group_ids=plan_batches(all_records,namesake_ids,model_budget)
+    # Ranking is scheduling, not evidence identity. Normal continuation must
+    # reuse exact source-bound groups just as a shard merge does, otherwise a
+    # reordered ranking changes batch boundaries and repeats acquired work.
+    source_reuse={'saved_batches':0,'saved_excerpts':0,'holds':[]}
+    if not semantic_shard() and os.getenv('PCT_SEMANTIC_MERGE')!='1':
+        saved,holds=queue.replay_groups(all_records)
+        covered={r['evidence_id'] for group in saved for r in group}
+        if saved:
+            unread=[r for r in all_records if r['evidence_id'] not in covered]
+            pending,pending_deferred,pending_namesakes=plan_batches(unread,namesake_ids,model_budget)
+            all_groups=[*saved,*pending]
+            deferred=pending_deferred
+            namesake_group_ids=pending_namesakes | {id(g) for g in saved
+                if all((r.get('parent_evidence_id') or r['evidence_id']) in namesake_ids for r in g)}
+        source_reuse={'saved_batches':len(saved),'saved_excerpts':len(covered),'holds':holds}
     batch_limit=max(1,int(os.getenv('PCT_SEMANTIC_BATCHES','3')))
     from research_continuation import latest_analysis
     previous=latest_analysis(provenance_root or run_root)
@@ -1188,6 +1218,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
     out={'schema':VERSION,'question':question,'request_kind':question_kind,'evidence_hash':digest(all_records),'status':'BLOCKED_CONFIGURATION',
          'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
          'model_configuration':routing_summary(),
+         'source_group_reuse':source_reuse,
          'configuration':conf,'model_used':False,'claims':[],'answer_sections':[],
          'coverage':{'collected_unique_passages':collected_count,'prefilter':prefilter_report,'screening':screening_report,
                      'original_unique_passages':original_passage_count,'unique_passages':len(all_records),'selected_passages':len(selected),
@@ -1321,17 +1352,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         group=grouped[position];position+=1
         is_new=not queue.completed(group)
         batch_started=time.monotonic()
-        prompt=RULES+'\nExtraction language: English. QUESTION: '+question+'\nReturn {"items":[{"passage_kind":"NARRATIVE_EVIDENCE","statement":"The consulted source reports ...","evidence_id":"copy supplied evidence_id","passage_ids":[0],"kind":"source_statement","source_type":"UNVERIFIED","actors":[],"places":[],"dates":[],"usage_type":"UNRESOLVED","uncertainty":[]}]}. Select at most 2 claims directly relevant to the question. For a person question, prioritize the named person, identity and sourced activities; a named place is optional. For a place or geographic topic, prioritize named-place claims. Choose 1-4 adjacent passage_ids from ONE evidence item. Do NOT output a quote: the engine copies the selected original text. Copy entity spellings literally from those selected passages; do not translate names. Dates must be strings copied from the selected passages or date_evidence. Empty arrays are valid. Leave unspecified actors, dates and places empty. State only what the selected passage actually supports, with source attribution. Distinguish an actual base from a raid site, and an intention from an executed action. usage_type may be BASE, ANCHORAGE, REFUGE, RAID_LOCATION, OTHER, UNRESOLVED. Modern studies are SECONDARY_SOURCE; contemporary authorship must be established for PRIMARY_SOURCE. Never infer location or dates from a book title.\nEVIDENCE_JSON:\n'+json.dumps([model_evidence(row) for row in group],ensure_ascii=False)
-        if any(r.get('model_view')=='compact' for r in group):
-            from excerpt_prefilter import COMPACT_HEADER
-            prompt+='\n'+COMPACT_HEADER.strip()
-        prompt+='\nClassify passage_kind before proposing a claim. Index entries, bibliography citations, catalogue descriptions and lists of names are discovery leads, not narrative evidence for a historical event. Only NARRATIVE_EVIDENCE may support an answer. Relevant means answering the requested subject, activity and period, not merely repeating its spelling. Do not turn medieval background or a modern namesake into the requested historical finding.'
-        prompt+=' Each statement should express ONE short source-attributed fact, at most30 words. Do not retell several people\'s conversations or a whole chronology in one claim. Historical narrative in a footnote may be NARRATIVE_EVIDENCE; a citation listing a work without its consulted content is a BIBLIOGRAPHIC_REFERENCE.'
-        if question_kind=='person':prompt+=' Every item MUST contain a literal actor mention in actors from the selected passages. Select the sentence actually naming that actor. If an event date is absent from those sentences, leave it out of BOTH dates and statement.'
-        if question_kind in ('place','topic'):
-            prompt+=' Every proposed item MUST contain at least one literal place from the selected passages. If no relevant named-place narrative is available, return an empty items array. Unresolved dates are allowed but must remain unresolved.'
-            prompt+=' Distinguish a human eponym from the full spatial name named after that person. Copy the explicit port/bay/place designation where a personal name is ambiguous. An ambush site or a harbor name is not automatically a raid location. Bind each place, use and date to its own clause; comparisons between different islands must not transfer one island\'s attributes to another.'
-        schema=schemas.extraction([r['evidence_id'] for r in group],question_kind)
+        prompt,schema=extraction_request(group,question,question_kind)
         cached=queue.load(group)
         payload=cached['payload'] if cached else invoke('evidence_extractor',prompt,schema)
         if cached:
@@ -1443,7 +1464,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
     fidelity_held=[c['claim_id'] for c in claims if c['claim_id'] in supported and (c.get('fidelity_status') in FIDELITY_FLAGGED or (c.get('place_fidelity') or {}).get('status')=='PLACE_NOT_IN_QUOTE')]
     relevance_held=[c['claim_id'] for c in claims if c['claim_id'] in supported and c['claim_id'] not in fidelity_held and c.get('relevance_status')==RELEVANCE_OFF]
     all_synthesis_claims=[c for c in claims if c['claim_id'] in supported and c['claim_id'] not in fidelity_held and c['claim_id'] not in relevance_held]
-    all_synthesis_claims.sort(key=lambda c:c['claim_id'] not in fresh_supported)
+    all_synthesis_claims.sort(key=lambda c:(c['claim_id'] not in fresh_supported,c['claim_id']))
     synthesis_claims=[];summary_size=0
     for claim in all_synthesis_claims:
         size=len(json.dumps(model_claim(claim),ensure_ascii=False))
@@ -1654,6 +1675,7 @@ def main():
     print('SEMANTIC_ANSWER',out['status'],'model_used',out['model_used'],'claims',len(out['claims']))
 
 if __name__=='__main__':main()
+
 
 
 

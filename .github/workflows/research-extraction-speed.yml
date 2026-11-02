@@ -1,0 +1,134 @@
+name: Incremental reading and extraction speed
+on:
+  pull_request:
+    paths:
+      - 'tools/semantic_research_answer.py'
+      - 'tools/research_checkpoint_compatibility.json'
+      - 'tools/test_incremental_reading.py'
+      - 'tools/benchmark_extraction_speed.py'
+      - 'tools/test_benchmark_extraction_speed.py'
+      - 'data/research_benchmarks/extraction_speed.json'
+      - '.github/workflows/research-extraction-speed.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research-extraction-speed.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            tools
+            data
+            .github
+      - name: Verify incremental source reuse and unchanged extraction prompts
+        env:
+          PYTHONPATH: tools:tools/llm
+        run: |
+          python3 -m unittest tools.test_incremental_reading tools.test_benchmark_extraction_speed tools.test_research_continuation tools.test_research_shard_replay tools.test_semantic_shards tools.test_semantic_research_answer -q
+          python3 - <<'PY'
+          import hashlib
+          from benchmark_extraction_speed import load_fixture
+          from semantic_research_answer import extraction_request
+          fixture,_=load_fixture()
+          for case in fixture['cases']:
+              prompt,_=extraction_request([case['record']],case['question'],case['question_kind'])
+              assert hashlib.sha256(prompt.encode()).hexdigest()==case['production_prompt_sha256']
+          print('Frozen production extraction prompts are byte-identical')
+          PY
+  extract:
+    needs: regression
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - model: Qwen/Qwen3-8B-GGUF
+            slug: baseline
+          - model: Qwen/Qwen2.5-3B-Instruct-GGUF
+            slug: candidate
+    env:
+      PCT_LLM_PROVIDER: local_llama_cpp
+      PCT_LLM_MODEL: ${{ matrix.model }}
+      PCT_LLM_EXTRACTOR_MODEL: ${{ matrix.model }}
+      PCT_LOCAL_MODEL_REPOSITORY: ${{ matrix.model }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            tools
+            data
+            .github/actions/research-model
+      - uses: ./.github/actions/research-model
+      - name: Measure actual extraction on identical acquired OCR
+        env:
+          PYTHONPATH: tools:tools/llm
+        run: python3 tools/benchmark_extraction_speed.py run --output extraction-result
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: extraction-${{ matrix.slug }}-${{ github.run_id }}
+          path: extraction-result/
+          if-no-files-found: error
+          retention-days: 90
+  compare:
+    needs: extract
+    if: always() && github.event_name != 'pull_request' && needs.extract.result != 'skipped'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    env:
+      PCT_LLM_PROVIDER: local_llama_cpp
+      PCT_LLM_MODEL: Qwen/Qwen3-8B-GGUF
+      PCT_LLM_ADVERSARIAL_MODEL: Qwen/Qwen3-8B-GGUF
+      PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen3-8B-GGUF
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          sparse-checkout: |
+            tools
+            data
+            .github/actions/research-model
+            evidence/configuration
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: extraction-*-${{ github.run_id }}
+          path: extraction-results
+      - uses: ./.github/actions/research-model
+      - name: Larger-model review and measured comparison (no automatic promotion)
+        env:
+          PYTHONPATH: tools:tools/llm
+        run: python3 tools/benchmark_extraction_speed.py compare --incoming extraction-results --output "evidence/configuration/$GITHUB_RUN_ID/extraction-speed"
+      - name: Preserve measured inputs and outputs with the comparison
+        if: always()
+        run: |
+          destination="evidence/configuration/$GITHUB_RUN_ID/extraction-speed"
+          mkdir -p "$destination"
+          if [ -d extraction-results ]; then cp -R extraction-results "$destination/"; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: extraction-speed-comparison-${{ github.run_id }}
+          path: evidence/configuration/${{ github.run_id }}/extraction-speed/
+          retention-days: 90
+      - name: Publish diagnostic receipts without changing research pointers or model defaults
+        if: always() && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "evidence/configuration/$GITHUB_RUN_ID/extraction-speed/"
+          if ! git diff --cached --quiet; then
+            git commit -m "Record actual extraction speed and fidelity comparison $GITHUB_RUN_ID"
+            python3 tools/publish_research_outputs.py
+          fi
