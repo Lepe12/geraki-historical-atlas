@@ -7,7 +7,7 @@ const $ = (id) => document.getElementById(id);
 let ui = null, holo = null, holoP = null;
 
 const SAY = {
-  open: "Είμαι εδώ. Πες μου τι να ψάξω ή τι να σου δείξω.",
+  open: "Καλώς ήρθες στο Ναμπού! Εδώ εξερευνούμε την ιστορία της Μεσογείου μέσα από χάρτες, ιστορικές πηγές και τεκμήρια. Γράψε το ερώτημά σου για να ξεκινήσεις.",
   close: "Επιστρέφω στη σφαίρα. Είμαι εδώ αν με χρειαστείς.",
   hello: "Γεια σου. Είμαι ο Ναμπού, ο βοηθός του χάρτη.",
   who: "Είμαι ο Ναμπού, ο φωνητικός βοηθός του NABOU//X. Ψάχνω στις έρευνες και στα ευρήματα της σελίδας και σου δείχνω τόπους στον χάρτη.",
@@ -17,31 +17,33 @@ const SAY = {
 };
 
 /* ---------- speech out ---------- */
-let voice = null;
+let voice = null, utterance = null, speechSession = 0;
 function pickVoice() {
   const all = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
   const el = all.filter((v) => /^el(-|_|$)/i.test(v.lang));
-  /* male Greek voice only (the figure is a man): Windows "Microsoft Stefanos", Edge online "Nestoras".
-     Without one the answer stays as text. */
+  /* Prefer a Greek male voice, then any available Greek voice. */
   const male = /(stefanos|nestoras|στεφανος|νεστορας|\bmale\b)/i, female = /(female|melina|athina|αθηνα|μελινα)/i;
-  voice = el.find((v) => male.test(v.name) && !female.test(v.name)) || null;
+  voice = el.find((v) => male.test(v.name) && !female.test(v.name)) || el[0] || null;
   return voice;
 }
 if (window.speechSynthesis) { pickVoice(); speechSynthesis.addEventListener?.("voiceschanged", pickVoice); }
 
 function say(text) {
   bubble(text, "nabou");
-  const done = () => { holo?.speaking(false); ui?.root.classList.remove("speaking"); };
+  const session = ++speechSession;
+  const done = () => { if (session !== speechSession) return; utterance = null; holo?.speaking(false); ui?.root.classList.remove("speaking"); };
   holo?.speaking(true); ui?.root.classList.add("speaking");
   if (window.speechSynthesis && (voice || pickVoice())) {
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = "el-GR"; u.voice = voice; u.rate = 0.96; u.pitch = 0.95;
-    u.onend = u.onerror = done;
-    speechSynthesis.speak(u);
+    utterance = u;
+    u.onend = done;
+    u.onerror = () => { if (session !== speechSession) return; done(); setStatus("Η φωνή δεν ξεκίνησε. Πάτα ξανά το ολόγραμμα για να δοκιμάσεις."); };
+    try { speechSynthesis.speak(u); } catch { u.onerror(); }
     setStatus(`Φωνή: ${voice.name}`);
   } else {
-    setStatus("Δεν βρέθηκε ανδρική ελληνική φωνή στη συσκευή· η απάντηση φαίνεται ως κείμενο.");
+    setStatus("Δεν βρέθηκε ελληνική φωνή στη συσκευή· ο χαιρετισμός εμφανίζεται ως κείμενο.");
     setTimeout(done, Math.min(6000, 900 + text.length * 45));
   }
 }
@@ -177,12 +179,13 @@ function build() {
   root.innerHTML = `
     <header class="nxa-head"><span class="nxa-title">ΝΑΜΠΟΥ</span><small>φωνητικός βοηθός</small>
       <button type="button" class="nxa-x" aria-label="Κλείσιμο βοηθού">×</button></header>
-    <div class="nxa-stage"><canvas class="nxa-canvas" aria-hidden="true"></canvas><p class="nxa-heard" aria-live="polite"></p></div>
+    <div class="nxa-stage"><canvas class="nxa-canvas" aria-hidden="true"></canvas><button type="button" class="nxa-greet" aria-label="Άκου τον χαιρετισμό και τι είναι το Ναμπού" title="Πάτα για να ακούσεις τι είναι το Ναμπού"></button><p class="nxa-heard" aria-live="polite"></p></div>
     <div class="nxa-log" aria-live="polite"></div>
     <form class="nxa-form"><input class="nxa-text" type="text" autocomplete="off" placeholder="Γράψε ή πες μια εντολή…" aria-label="Εντολή προς τον βοηθό"><button type="submit" class="nxa-send">Στείλε</button></form>
     <div class="nxa-bar">
       <button type="button" class="nxa-mic" aria-label="Πάτα και μίλα">● Πάτα και μίλα</button>
       <button type="button" class="nxa-wake" aria-pressed="false" title="Ακούει συνεχώς· ξεκίνα την εντολή με «Ναμπού»">Να ακούει πάντα</button>
+      <button type="button" class="nxa-stop">Διακοπή φωνής</button>
       <button type="button" class="nxa-morph">Δείξε τη μορφή</button>
     </div>
     <p class="nxa-status"></p>`;
@@ -190,6 +193,8 @@ function build() {
   const q = (s) => root.querySelector(s);
   ui = { root, log: q(".nxa-log"), heard: q(".nxa-heard"), status: q(".nxa-status"), wake: q(".nxa-wake"), canvas: q(".nxa-canvas") };
   q(".nxa-x").onclick = () => close();
+  q(".nxa-greet").onclick = () => say(SAY.open);
+  q(".nxa-stop").onclick = () => { stopSpeech(); setStatus("Η φωνή σταμάτησε."); };
   q(".nxa-mic").onclick = () => { wakeOn = false; ui.wake.setAttribute("aria-pressed", "false"); listening ? rec?.stop() : startRec(false); };
   ui.wake.onclick = () => { wakeOn = !wakeOn; ui.wake.setAttribute("aria-pressed", String(wakeOn)); if (wakeOn) startRec(true); else { try { rec?.stop(); } catch {} setStatus(""); } };
   q(".nxa-morph").onclick = () => handle(holo?.active ? "κλείσε" : "άνοιξε");
@@ -200,18 +205,25 @@ function build() {
     .catch((err) => { root.classList.add("no-webgl"); setStatus("Το ολόγραμμα δεν φορτώθηκε (WebGL): " + err.message); });
 }
 
+function stopSpeech() {
+  speechSession++; utterance = null;
+  window.speechSynthesis?.cancel();
+  holo?.speaking(false); ui?.root.classList.remove("speaking");
+}
+
 export function open() {
   if (!ui) build();
   ui.root.hidden = false; holo?.resume();
   document.dispatchEvent(new CustomEvent("nabou:assistant", { detail: { open: true } }));
   ui.root.querySelector(".nxa-text").focus({ preventScroll: true });
+  say(SAY.open);
   return holoP;
 }
 export function close() {
   if (!ui) return;
   wakeOn = false; ui.wake.setAttribute("aria-pressed", "false");
   try { rec?.abort(); } catch {}
-  window.speechSynthesis?.cancel();
+  stopSpeech();
   ui.root.hidden = true; holo?.pause();
   document.dispatchEvent(new CustomEvent("nabou:assistant", { detail: { open: false } }));
 }
