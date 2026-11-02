@@ -170,7 +170,7 @@ function bubble(text, who) {
   ui.log.appendChild(b); while (ui.log.children.length > 6) ui.log.firstChild.remove();
   ui.log.scrollTop = ui.log.scrollHeight;
 }
-function morphLabel(on) { const b = ui?.root.querySelector(".nxa-morph"); if (b) b.textContent = on ? "Κρύψε τη μορφή" : "Δείξε τη μορφή"; }
+function morphLabel(on) { const b = ui?.root.querySelector(".nxa-morph .nxa-l"); if (b) b.textContent = on ? "Κρύψε μορφή" : "Δείξε μορφή"; }
 function setStatus(t) { if (ui) ui.status.textContent = t; }
 
 function build() {
@@ -183,10 +183,10 @@ function build() {
     <div class="nxa-log" aria-live="polite"></div>
     <form class="nxa-form"><input class="nxa-text" type="text" autocomplete="off" placeholder="Γράψε ή πες μια εντολή…" aria-label="Εντολή προς τον βοηθό"><button type="submit" class="nxa-send">Στείλε</button></form>
     <div class="nxa-bar">
-      <button type="button" class="nxa-mic" aria-label="Πάτα και μίλα">● Πάτα και μίλα</button>
-      <button type="button" class="nxa-wake" aria-pressed="false" title="Ακούει συνεχώς· ξεκίνα την εντολή με «Ναμπού»">Να ακούει πάντα</button>
-      <button type="button" class="nxa-stop">Διακοπή φωνής</button>
-      <button type="button" class="nxa-morph">Δείξε τη μορφή</button>
+      <button type="button" class="nxa-mic" aria-label="Πάτα και μίλα" title="Πάτα και μίλα"><svg class="nxa-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM6 11a6 6 0 0 0 12 0M12 17v4"/></svg><span class="nxa-l">Μίλα</span></button>
+      <button type="button" class="nxa-wake" aria-pressed="false" aria-label="Να ακούει πάντα" title="Ακούει συνεχώς· ξεκίνα την εντολή με «Ναμπού»"><svg class="nxa-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3l2-6 4 12 3-9 2 3h4"/></svg><span class="nxa-l">Ακούει</span></button>
+      <button type="button" class="nxa-stop" aria-label="Διακοπή φωνής" title="Διακοπή φωνής"><svg class="nxa-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h12v12H6z"/></svg><span class="nxa-l">Σίγαση</span></button>
+      <button type="button" class="nxa-morph" aria-label="Εμφάνιση ή απόκρυψη της μορφής" title="Εμφάνιση ή απόκρυψη της μορφής"><svg class="nxa-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span class="nxa-l">Δείξε μορφή</span></button>
     </div>
     <p class="nxa-status"></p>`;
   document.body.appendChild(root);
@@ -201,7 +201,7 @@ function build() {
   q(".nxa-form").onsubmit = (e) => { e.preventDefault(); const v = q(".nxa-text").value; q(".nxa-text").value = ""; handle(v); };
   root.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
   setStatus(SR ? "Πάτα «Πάτα και μίλα» και πες μια εντολή, ή άνοιξε το «Να ακούει πάντα» και ξεκίνα με «Ναμπού»." : "Αυτό το πρόγραμμα περιήγησης δεν έχει αναγνώριση ομιλίας· γράψε την εντολή στο πεδίο.");
-  holoP = import("./assistant-scene.js").then((m) => m.createHologram(ui.canvas)).then((h) => (holo = h))
+  holoP = import("./assistant-scene.js").then((m) => m.createHologram(ui.canvas)).then((h) => { holo = h; h.show(); morphLabel(true); return h; }) /* το ολόγραμμα φαίνεται από την αρχή */
     .catch((err) => { root.classList.add("no-webgl"); setStatus("Το ολόγραμμα δεν φορτώθηκε (WebGL): " + err.message); });
 }
 
