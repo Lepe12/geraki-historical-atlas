@@ -1,0 +1,880 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Cycladia Travel Guides | Sightseeing</title>
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    
+    <link rel="shortcut icon" href="//www.cycladia.com/favicon.ico" />
+<link href="//www.cycladia.com/css/style.css" rel="stylesheet" type="text/css" media="all" />
+
+<script type="text/javascript" src="//www.cycladia.com/js/jquery-1.6.4.min.js"></script>
+<script type="text/javascript">
+	var websiteURL="//www.cycladia.com/";
+	var tracking_page="/travel-guides-greece/milos-guide-tips/sightseeing/";
+</script>
+
+<script type="text/javascript" src="//www.cycladia.com/js/jquery.cycle.min.js"></script>
+<script type="text/javascript" src="//www.cycladia.com/js/functions.js"></script>
+<script type="text/javascript" src="//www.cycladia.com/js/scroll.js"></script>
+<script type="text/javascript" src="//www.cycladia.com/js/swfobject.js"></script>
+<script type="text/javascript" src="//www.cycladia.com/js/jquery.contextMenu.js"></script>
+
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCl4NS8eV4iqtKcoatwUvfym7ZlYfnj0Ts&sensor=false"></script>
+<script type="text/javascript">
+	var map_id_div = 'ajax_reply_map';
+	var map;
+	var greece = new google.maps.LatLng(37.985003, 24.959106);	//lat, lon
+	var mapDiv = document.getElementById(map_id_div);
+	
+	/* === HOME control === */
+	
+	function HomeControl(controlDiv, map) {
+	  controlDiv.style.padding = '5px';
+	
+	  // Set CSS for the control border
+	  var controlUI = document.createElement('DIV');
+	  controlUI.style.backgroundColor = 'white';
+	  controlUI.style.borderStyle = 'solid';
+	  controlUI.style.borderWidth = '2px';
+	  controlUI.style.cursor = 'pointer';
+	  controlUI.style.textAlign = 'center';
+	  controlUI.title = 'Click to set the map to Home';
+	  controlDiv.appendChild(controlUI);
+	
+	  // Set CSS for the control interior
+	  var controlText = document.createElement('DIV');
+	  controlText.style.fontFamily = 'Arial,sans-serif';
+	  controlText.style.fontSize = '12px';
+	  controlText.style.paddingLeft = '4px';
+	  controlText.style.paddingRight = '4px';
+	  controlText.innerHTML = '<b>Home</b>';
+	  controlUI.appendChild(controlText);
+	
+	  // Setup the click event listeners: simply set the map to dot
+	  google.maps.event.addDomListener(controlUI, 'click', function() {
+		map.setCenter(greece);
+		map.setZoom(6);
+		//marker_hotel.setMap(null);
+		
+		$(".gmap_legendsbox").css("display", "none");
+		
+		for (i in markers_details)
+		   markers_details[i].setMap(null);
+
+		setMarkers_destinations(map, dots); 
+	  });
+	
+	}
+	
+		
+	var dots = [
+	  ['Mykonos', 37.445426, 25.372181, 5],['Santorini', 36.402632, 25.452375, 5],['Kimolos', 36.809560, 24.554729, 5],['Ios', 36.717972, 25.333242, 5],['Spetses', 37.261211, 23.130999, 5],['Serifos', 37.165720, 24.478898, 5],['Paros', 37.058465, 25.180950, 5],['Naxos', 37.073806, 25.520496, 5],['Sifnos', 36.966627, 24.708738, 5],['Rhodes', 36.208823, 27.950363, 5],['Folegandros', 36.626825, 24.908409, 5],['Corfu', 39.729898, 19.764290, 5],['Rethymno', 35.270289, 24.548492, 5],['Chania', 35.389050, 23.824997, 5],['Kefalonia', 38.233865, 20.564804, 5],['Kos', 36.866712, 27.240543, 5],['Milos', 36.686041, 24.371395, 5],['Patmos', 37.308058, 26.544585, 5],['Lefkada', 38.713376, 20.645943, 5],['Lasithi', 35.090698, 25.710297, 5],['Heraklion', 35.181666, 24.999161, 5],['Athens', 37.993998, 23.752212, 5],['Thessaloniki', 40.656160, 22.946205, 5],['Zante', 37.786996, 20.757179, 5],['Halkidiki', 40.415587, 23.460846, 5],['Andros', 37.861302, 24.847527, 5],['Tinos', 37.590839, 25.144844, 5],['Thassos', 40.698861, 24.657326, 5],['Skiathos', 39.171328, 23.454781, 5],['Skopelos', 39.132723, 23.681030, 5],['Amorgos', 36.843911, 25.894775, 5],['Alonissos', 39.210044, 23.914833, 5],['Kythira', 36.269743, 22.976303, 5],['Syros', 37.430705, 24.915562, 5],['Kea', 37.619670, 24.327450, 5],['Aegina', 37.746015, 23.442707, 5],['Poros', 37.522252, 23.487682, 5],['Small Cyclades', 36.886760, 25.548592, 5],['Skyros', 38.907599, 24.544716, 5],['Ithaca', 38.384728, 20.671360, 5],['Kythnos', 37.413187, 24.430798, 5],['Samos', 37.715331, 26.830570, 5],['Chios', 38.440682, 26.027584, 5],['Paxi', 39.208049, 20.168295, 5],['Antiparos', 37.040928, 25.081437, 5],['Pelion', 39.438343, 23.047497, 5],['Sikinos', 36.678883, 25.121899, 5],['Hydra', 37.350237, 23.467140, 5],['Lesvos', 39.186498, 26.373825, 5],['Limnos', 39.932907, 25.143471, 5],['Evia', 38.565348, 23.864593, 5],['Corinth', 37.939053, 22.932930, 5]	];
+	
+	var marker;
+	var marker_hotel;
+	var markers_array = [];
+	var markers_count = 0;
+	var loc_move = [];
+	var markers_details = [];
+	
+	function setMarkers_destinations(map, locations) {						
+	  // Add markers to the map
+	  var image = new google.maps.MarkerImage('https://www.cycladia.com/images/map-5.png', new google.maps.Size(25, 35), new google.maps.Point(0,0), new google.maps.Point(0, 35));
+
+	  //markers_count = locations.length;
+		
+	  for (i = 0; i < locations.length; i++) {
+		  var loc = locations[i];
+		  var myLatLng = new google.maps.LatLng(loc[1], loc[2]);
+		  marker = new google.maps.Marker({
+			  position: myLatLng,
+			  map: map,
+			  icon: image,
+			  title: loc[0],
+			  zIndex: loc[3]
+		  });
+		  markers_array[i] = marker;
+
+		  google.maps.event.addListener(markers_array[i], 'click', function() {
+				map.setCenter(this.getPosition()); 
+				map.setZoom(11);
+				load_island(this, this.getTitle());
+		  });
+		  
+	  }	  
+		
+	}
+	
+	var infowindow = new google.maps.InfoWindow();
+	
+	/* ============== */
+	
+	function load_island(thismarker, name)
+	{
+		if (thismarker!="")
+			thismarker.setMap(null);
+		
+		$.ajax({
+		  url: websiteURL+'maps_api/ajax_find_hotels.php',
+		  type: 'GET',
+		  dataType: 'html',
+		  data: '&destination='+name,
+		  cache: false,
+		  beforeSend: function(){
+		  },
+		  error: function(){
+		  },
+		  success: function(reply) {				  
+			  setMarkers_table(reply, "hotels");
+		  }
+	   });
+	   
+	   $.ajax({
+		  url: websiteURL+'maps_api/ajax_find_eatdrink.php',
+		  type: 'GET',
+		  dataType: 'html',
+		  data: '&destination='+name,
+		  cache: false,
+		  beforeSend: function(){
+		  },
+		  error: function(){
+		  },
+		  success: function(reply) {
+			  setMarkers_table(reply, "eatdrink");
+		  }
+	   });
+	   
+	   $.ajax({
+		  url: websiteURL+'maps_api/ajax_find_swim.php',
+		  type: 'GET',
+		  dataType: 'html',
+		  data: '&destination='+name,
+		  cache: false,
+		  beforeSend: function(){
+		  },
+		  error: function(){
+		  },
+		  success: function(reply) {
+			  setMarkers_table(reply, "swim");
+		  }
+	   });
+	   
+	   $.ajax({
+		  url: websiteURL+'maps_api/ajax_find_port_airport.php',
+		  type: 'GET',
+		  dataType: 'html',
+		  data: '&destination='+name,
+		  cache: false,
+		  beforeSend: function(){
+		  },
+		  error: function(){
+		  },
+		  success: function(reply) {
+			  setMarkers_extra(map, reply);
+		  }
+	   });
+	   
+	   $(".gmap_legendsbox").css("display", "block");
+	   //$("#legends_box").html('<img src="http://www.cycladia.com/icons/hotels.png" alt="" /> Hotels<br/><img src="http://www.cycladia.com/icons/eatdrink.png" alt="" /> Eat &amp; Drink<br/><img src="http://www.cycladia.com/icons/swim.png" alt="" /> Swim<br/><img src="http://www.cycladia.com/icons/port.png" alt="" /> Port<br/><img src="http://www.cycladia.com/icons/airport.png" alt="" /> Airport');
+	   
+	   //setMarkers_extra(map, '', 'port');
+	   //setMarkers_extra(map, '', 'airport');
+	}
+	
+	/**/
+	
+	function setMarkers_table(dotslist, table) {						
+		  var image = new google.maps.MarkerImage('https://www.cycladia.com/icons/'+table+'.png', new google.maps.Size(25, 35), new google.maps.Point(0,0), new google.maps.Point(0, 35));
+
+		  var hotels_ar = dotslist.split("***");		 
+
+		  //alert(hotels_ar.length);
+		  for (i = 0; i < hotels_ar.length; i++) {
+		
+			if (hotels_ar[i]!="")
+			{				
+				  var loc = hotels_ar[i].split(", ");
+				  var myLatLng = new google.maps.LatLng(Number(loc[1]), Number(loc[2]));
+				  marker_hotel = new google.maps.Marker({
+					  position: myLatLng,
+					  map: map,
+					  icon: image,
+					  title: loc[0],
+					  zIndex: Number(loc[3])
+				  });
+				  
+				  if (hotels_ar.length==1)
+				  {
+					  map.setCenter(myLatLng); 
+			  		  map.setZoom(11);
+				  }
+				  
+				  markers_details.push(marker_hotel);
+						
+				  google.maps.event.addListener(marker_hotel, 'click', function() {						
+					  infowindow.close();
+					  
+					  var hotel_id=this.getZIndex();
+					  $.ajax({
+						  url: websiteURL+'maps_api/ajax_'+ table +'_infowindow.php',
+						  type: 'GET',
+						  dataType: 'html',
+						  data: '&hotel_id='+hotel_id,
+						  cache: false,
+						  beforeSend: function(){
+						  },
+						  error: function(){
+						  },
+						  success: function(reply) {
+							  infowindow.setContent(reply);
+						  }
+					   });
+		   
+					   infowindow.open(map,this);
+				  });
+			}
+		  }
+	}
+	
+	function setMarkers_extra(map, dotslist) {									  
+		  //port,lat,lon***
+		  var hotels_ar = dotslist.split("***");
+		  for (i = 0; i < hotels_ar.length; i++) 
+		  {
+			if (hotels_ar[i]!="")
+			{
+				  var loc = hotels_ar[i].split(", ");
+				  
+				  var image = new google.maps.MarkerImage('https://www.cycladia.com/icons/'+loc[0]+'.png', new google.maps.Size(25, 35), new google.maps.Point(0,0), new google.maps.Point(0, 35));
+				  
+				  var myLatLng = new google.maps.LatLng(Number(loc[1]), Number(loc[2]));
+				  marker_hotel = new google.maps.Marker({
+					  position: myLatLng,
+					  map: map,
+					  icon: image,
+					  title: loc[0],
+					  zIndex: 5000
+				  });
+				  
+				  markers_details.push(marker_hotel);
+			}
+		  }
+	}
+	
+	function showmap_island(dest_id, sectionid)
+	{
+		$.ajax({
+		  url: websiteURL+'maps_api/ajax_find_destname.php',
+		  type: 'GET',
+		  dataType: 'html',
+		  data: '&dest_id='+dest_id,
+		  cache: false,
+		  beforeSend: function(){
+		  },
+		  error: function(){
+		  },
+		  success: function(reply) {
+			  //load_island(null, reply);
+			  var dest_details = reply.split(", ");
+			  var dest_name = dest_details[0];
+			  var selected_dest = new google.maps.LatLng(dest_details[1], dest_details[2]);
+
+			  map.setCenter(selected_dest); 
+			  if (sectionid==10)
+				  map.setZoom(11);
+			  else
+				  map.setZoom(10);
+		
+			  if (sectionid==1 || sectionid==10)
+			  {
+				  $.ajax({
+					  url: websiteURL+'maps_api/ajax_find_hotels.php',
+					  type: 'GET',
+					  dataType: 'html',
+					  data: '&destination='+dest_name,
+					  cache: false,
+					  beforeSend: function(){
+					  },
+					  error: function(){
+					  },
+					  success: function(reply) {				  
+						  setMarkers_table(reply, "hotels");
+					  }
+				   });
+			  }
+			  
+			  if (sectionid==2 || sectionid==10)
+			  {
+				   $.ajax({
+					  url: websiteURL+'maps_api/ajax_find_eatdrink.php',
+					  type: 'GET',
+					  dataType: 'html',
+					  data: '&destination='+dest_name,
+					  cache: false,
+					  beforeSend: function(){
+					  },
+					  error: function(){
+					  },
+					  success: function(reply) {
+						  setMarkers_table(reply, "eatdrink");
+					  }
+				   });
+			  }
+			   
+			  if (sectionid==3 || sectionid==10)
+			  {
+				   $.ajax({
+					  url: websiteURL+'maps_api/ajax_find_swim.php',
+					  type: 'GET',
+					  dataType: 'html',
+					  data: '&destination='+dest_name,
+					  cache: false,
+					  beforeSend: function(){
+					  },
+					  error: function(){
+					  },
+					  success: function(reply) {
+						  setMarkers_table(reply, "swim");
+					  }
+				   });
+			  }
+			   
+			  if (sectionid==10)
+			  {
+				 $.ajax({
+					  url: websiteURL+'maps_api/ajax_find_port_airport.php',
+					  type: 'GET',
+					  dataType: 'html',
+					  data: '&destination='+dest_name,
+					  cache: false,
+					  beforeSend: function(){
+					  },
+					  error: function(){
+					  },
+					  success: function(reply) {
+						  setMarkers_extra(map, reply);
+					  }
+				   });
+			  }
+			 
+			   $(".gmap_legendsbox").css("display", "block");
+			  
+		  }
+	   });
+	}
+	  
+	  
+	  
+	/* ======= */
+	
+	function initialize() {
+	  var mapDiv = document.getElementById(map_id_div);
+	  var myOptions = {
+		zoom: 6,
+		center: greece,
+		mapTypeId: google.maps.MapTypeId.ROADMAP	
+		//SATELLITE, HYBRID, TERRAIN 
+	  }
+	  map = new google.maps.Map(mapDiv, myOptions);
+
+	  var homeControlDiv = document.createElement('DIV');
+	  var homeControl = new HomeControl(homeControlDiv, map);
+	
+	  homeControlDiv.index = 1;
+	  map.controls[google.maps.ControlPosition.TOP_RIGHT].push(homeControlDiv);
+	  
+	  //MULTI MARKERS
+	  setMarkers_destinations(map, dots); 
+	
+	}
+  
+	//google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+
+<!--<div id="map_canvas"></div>
+
+<div class="gmap_legendsbox">
+    <p>Legend</p>
+    <div id="legends_box">
+        <img src="http://www.cycladia.com/icons/hotels.png" alt="" /> Hotels<br/>
+        <img src="http://www.cycladia.com/icons/eatdrink.png" alt="" /> Eat &amp; Drink<br/>
+        <img src="http://www.cycladia.com/icons/swim.png" alt="" /> Swim<br/>
+        <img src="http://www.cycladia.com/icons/port.png" alt="" /> Port<br/>
+        <img src="http://www.cycladia.com/icons/airport.png" alt="" /> Airport
+    </div>
+</div> -->
+
+<script type="text/javascript" src="//www.cycladia.com/js/jquery.scrollTo-min.js"></script>
+
+<script type="text/javascript">
+	// <![CDATA[
+	$(function() {	
+		var img_count = $(".slide_div_inner img").length;
+		if (img_count>1)
+		{		
+			function do_after_slide(curr, next, opts) {
+				var index = opts.currSlide;
+				
+				var legend = $(".slide_div_inner img:eq("+index+")").attr("alt");
+				var linkval = $(".slide_div .displaynone .slidelink:eq("+index+")").html();
+				if (linkval!="" && linkval!=null)
+					legend = legend + linkval;
+				$(".slide_legend_inner").html(legend);
+			}
+			
+			$('.slide_div_inner').cycle({
+				timeout:8000,
+				speed:900,		
+				prev:".slide_prev",	
+				next:".slide_next",
+				after: do_after_slide
+			});	
+		}
+		if (img_count<=1)
+			$(".slide_next, .slide_prev").css("display", "none");
+		
+				
+		/*$('img').contextMenu('clickblockpopup', {
+            'This image has Cycladia Copyright!': {
+                click: function(element) {},
+            },
+			}, {
+			  disable_native_context_menu: true,
+        });*/
+		
+		$(".close_mapdiv").click(function(){
+			$("#ajax_reply_map, #gallerylink, #ajax_reply_maptop, .close_mapdiv").css("display", "none");
+			$(".slide_div_inner, .slide_legend, .slide_banner, #maplink").css("display", "block");	
+		});
+		
+		$("#selall_2").click(function(){
+			$("[id^='sidechk2']").attr('checked', true);
+		});
+		$("#unselall_2").click(function(){
+			$("[id^='sidechk2']").attr('checked', false);
+		});
+		
+		$("#selall_3").click(function(){
+			$("[id^='sidechk3']").attr('checked', true);
+		});
+		$("#unselall_3").click(function(){
+			$("[id^='sidechk3']").attr('checked', false);
+		});
+		
+	});
+	// ]]> 
+</script>	
+
+<meta name="p:domain_verify" content="6a4784f7e0c79d47a6dfd1036062df62" />
+
+<script type="text/javascript" src="//www.cycladia.com/base64.js"></script>
+
+<meta property="fb:page_id" content="170580346286701" />
+<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+		new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+		j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+		'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+	})(window,document,'script','dataLayer','GTM-WB7GP3J');</script>
+<!-- End Google Tag Manager -->
+
+<script type="text/javascript">
+//<![CDATA[
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-6879101-58']);
+
+  // _gaq.push(['_setCustomVar', 1, 'memberlevel', '2', 3]);
+  _gaq.push(['_trackPageview']);
+
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+//]]>
+</script>    
+    <script type="text/javascript" src="//www.cycladia.com//js/jquery.ui.core.js"></script>
+	<script type="text/javascript" src="//www.cycladia.com//js/jquery.ui.widget.js"></script>
+	<script type="text/javascript" src="//www.cycladia.com//js/jquery.ui.accordion.js"></script>
+	<script type="text/javascript" src="//www.cycladia.com//js/jquery.ui.button.js"></script>
+
+    
+    <script type="text/javascript">
+		// <![CDATA[
+		$(function() {
+		
+			var icons = {
+				header: "acrd_li",
+				headerSelected: "acrd_li_loc"
+			};
+			$(".accordion").accordion({
+				header: ".accordion_header",
+				icons: icons,
+				autoHeight: false,
+				navigation: true
+			});
+						
+		});
+		// ]]> 
+	</script>
+    
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript>
+	<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WB7GP3J" height="0" width="0"
+	        style="display:none;visibility:hidden"></iframe>
+</noscript> <!-- End Google Tag Manager (noscript) -->
+
+<div class="container">
+
+	
+<div class="player"><div id="flashmusicplayer"></div></div>
+<br clear="all" />
+<!--
+<script type="text/javascript">
+	// <![CDATA[
+	var flashvars = { 
+		websiteurl:"//www.cycladia.com/"       	
+	};
+	var params = {
+	};
+	var attributes = {};
+	
+	swfobject.embedSWF("//www.cycladia.com/swf/player.swf", "flashmusicplayer", "355", "30", "9.0.0", false, flashvars, params, attributes);
+	// ]]> 
+</script> -->
+<!--
+# <div class="logo_div">
+#    <div class="logo">
+#        <a href="//www.cycladia.com/" name="top"><img src="//www.cycladia.com/images/logo.png" alt="" /></a>
+#    </div>
+#    
+#    <div class="logo_right">
+#    	<div class="logoform_1">
+#            <span class="blue_letters">NEWSLETTER</span> SUBSCRIPTION
+#            <form action="//www.cycladia.com/newsletter.php" method="post">
+#                <input type="submit" class="ns_button" value="" />
+#                <input type="text" name="email" class="ns_input" value="type your email" onfocus="click_clear_new(this);" onblur="click_clear_new(this);" />
+#                <br clear="all" />
+#            </form>
+#        </div>
+#        
+#        <div class="logoform_2">
+#        	#                <div style="margin:0 0 5px 0">CYCLADIA CLUB </div>
+#                <a href="//www.cycladia.com/eclub-profile.php" rel="nofollow" class="blue_letters">Your Club Profile</a> &nbsp;|&nbsp; 
+#                <a href="//www.cycladia.com/eclub-logoff.php" rel="nofollow" class="blue_letters">LOG OUT</a>
+#                #				CYCLADIA CLUB <span class="blue_letters">LOGIN</span>
+#				<form action="//www.cycladia.com/eclub_login_check.php" method="post">
+#					<input type="hidden" name="back" value="/travel-guides-greece/milos-guide-tips/sightseeing/" />
+#					<input type="submit" class="ns_button" value="" />
+#					<input type="password" name="password" class="eclubtop_pass" value="Password" onfocus="click_clear_new(this);" onblur="click_clear_new(this);" tabindex="2" />
+#					<input type="text" name="username" class="eclubtop_input" value="Username" onfocus="click_clear_new(this);" onblur="click_clear_new(this);" tabindex="1" />
+#					<br clear="all" />
+#				</form>
+#				#        </div>
+#        <br clear="all" />
+#    </div>
+#    <br clear="all" />
+#</div>
+-->
+
+<div class="menu_top">
+    <a href="//www.cycladia.com/" >Home</a>
+    <a href="//www.cycladia.com/best-holidays-greece.php" >About Cycladia</a>    
+    <!--<a href="tourism-career-jobs-greece/" >Hospitality Careers</a> -->
+    
+    <!--<a href="#" >Greece Image Bank</a> -->
+    
+    <a href="//www.cycladia.com/videos.php" >Videos</a>
+    
+    <a href="//www.cycladia.com/blog/" target="_blank">Cycladia Blog</a>
+</div>
+<div class="top_media">
+	<!-- <span class="google_plus1"><g:plusone size="standard" count="true"></g:plusone></span> -->
+    <a href="https://pinterest.com/cycladia/" target="_blank" onclick="trackev_ga('pinterest-button');"><img src="//www.cycladia.com/images/pinterest-logo.jpg" alt="" /></a>
+    <!-- <a href="" target="_blank" onclick="trackev_ga('gplus-button');"><img src="images/gplus.png" alt="" /></a> -->
+    <a href="https://www.facebook.com/pages/Cycladia/170580346286701" target="_blank" rel="nofollow" onclick="trackev_ga('facebook-button');"><img src="//www.cycladia.com/images/facebook.png" alt="" /></a>
+    <a href="https://twitter.com/cycladia" target="_blank" rel="nofollow" onclick="trackev_ga('twitter-button');"><img src="//www.cycladia.com/images/twitter.png" alt="" /></a>
+    <a href="https://www.youtube.com/user/CYCLADIA" target="_blank" rel="nofollow" onclick="trackev_ga('youtube-button');"><img src="//www.cycladia.com/images/youtube.png" alt="" /></a>
+    <a href="http://www.flickr.com/photos/cycladia" target="_blank" rel="nofollow" onclick="trackev_ga('flickr-button');"><img src="//www.cycladia.com/images/flickr.png" alt="" /></a>
+    <a href="http://www.thefancy.com/Cycladia" target="_blank" rel="nofollow" onclick="trackev_ga('fancy-button');"><img src="//www.cycladia.com/images/fancy.png" alt="" /></a>
+    <!--<a href="//www.cycladia.com/blog/" target="_blank" rel="nofollow" onclick="trackev_ga('blog-button');"><img src="//www.cycladia.com/images/blogger.png" alt="" /></a> -->
+    <br clear="all" />
+</div>
+<br clear="all" />
+
+<div class="main_menu">
+    <a href="//www.cycladia.com/best-hotels-stay-greece/" >Stay</a>|  
+    <a href="//www.cycladia.com/best-restaurants-guide-greece/" >Eat &amp; Drink</a>| 
+    <a href="//www.cycladia.com/best-beaches-greece/" >Swim</a>| 
+    <a href="//www.cycladia.com/travel-guides-greece/" class="loc">Travel Guides</a>|   
+    <a href="//www.cycladia.com/experience-greece/"  rel="nofollow">Offers &amp; Experience</a>|  
+    <a href="//www.cycladia.com/greece-hotels-deals/" >Cycladia Deals</a>|     
+    <a href="//www.cycladia.com/travel-club-benefits-deals.php"  rel="nofollow">Cycladia Club</a>   
+    
+</div>
+
+<input type="hidden" id="map_dest_id" value="0" />
+
+    
+    
+<div class="slide_div">
+    <div class="slide_div_inner">
+        <img src="//www.cycladia.com/uploaded/milos/travel_guides/banners/large/sightseeing.jpg" alt="" class="img" />    </div>
+    <div class="slide_legend">
+		<div class="slide_legend_inner"></div>
+    </div>
+    <div class="displaynone"></div>        
+    
+    </div>
+
+<div class="breadcrumbs">
+	<span class="blue_arrow_sm">&rsaquo;</span> 
+    
+    <a href="//www.cycladia.com/travel-guides-greece/" rel="nofollow">Travel Guides</a> <span class="blue_arrow_sm">&rsaquo;</span> <a href="//www.cycladia.com/travel-guides-greece/milos-guide-tips/" rel="nofollow">Milos </a> <span class="blue_arrow_sm">&rsaquo;</span> <a href="//www.cycladia.com/travel-guides-greece/milos-guide-tips/sightseeing" rel="nofollow">Sightseeing</a> </div>
+	<div class="main_col">
+
+                
+        <div class="title_browngrad">
+        	<div class="heading_white_dot heading_float_wide">Milos Sightseeing</div>
+           
+            <div class="back_in_title"><a href="//www.cycladia.com/travel-guides-greece/milos-guide-tips/" rel="nofollow"><img src="//www.cycladia.com/images/arrow_left_blue.png" alt="" />&nbsp; BACK TO LIST</a></div>
+            <br clear="all" />
+        </div>
+        
+        <div class="grey_text_div_nopad">
+
+        
+        	<div class="accordion">
+            
+            	                        <div class="accordion_header  lightgrey_bg">Milos Beauties</div>
+                        <div class="accordion_content  lightgrey_bg">
+                            <div class="acrd_left_text">
+                                The stunning island of Milos is also known as the island of colors due to its volcanic origin providing magical landscapes painted in mystical colors, amazing rock formations and striking water nuances. It is an island blessed with spectacular natural beauty, rich historical legacy and culture and some of the most gorgeous and unique beaches in the insular complex of the Cyclades. Following there is a list of the most important attractions and sights to visit while in the island:<br />                            </div>
+                            <div class="acrd_right_img">
+                            	                                
+                            </div>
+                            <br clear="all" />
+                        </div>
+                                                <div class="accordion_header ">Archaeological Museum</div>
+                        <div class="accordion_content ">
+                            <div class="acrd_left_text">
+                                A visit to the Archeological Museum of Milos will take visitors on a journey through the island’s past. At the entrance there is a replica of the renowned statue of Aphrodite. Situated in the capital of Plaka, the museum hosts collections of prehistoric findings from the excavations of Phylakopi, sculptures, obsidian gemstones preserved from the volcanic deposits, ancient inscriptions and tools used in everyday life as well as ancient handmade vessels.<br />                            </div>
+                            <div class="acrd_right_img">
+                            	                                
+                            </div>
+                            <br clear="all" />
+                        </div>
+                                                <div class="accordion_header  lightgrey_bg">Folk Museum</div>
+                        <div class="accordion_content  lightgrey_bg">
+                            <div class="acrd_left_text">
+                                Situated in Plaka the Folk Museum of Milos will travel visitors through the island’s fold tradition. Resembling a traditional home from the 19th century the museum features traditional costumes, embroidery, home utensils and appliances, traditional drawings and artifacts.<br />                            </div>
+                            <div class="acrd_right_img">
+                            	                                
+                            </div>
+                            <br clear="all" />
+                        </div>
+                                                <div class="accordion_header ">Mining Museum</div>
+                        <div class="accordion_content ">
+                            <div class="acrd_left_text">
+                                Located in Neochori, the Mining Museum of Milos offers an extensive collection of mining equipment, rocks and minerals introducing visitors to the mining history and geophysical heritage of the volcanic island of Milos.<br />For more info, please visit www.milosminingmuseum.com<br />                            </div>
+                            <div class="acrd_right_img">
+                            	                                
+                            </div>
+                            <br clear="all" />
+                        </div>
+                                                <div class="accordion_header  lightgrey_bg">Ecclesiastical Museum</div>
+                        <div class="accordion_content  lightgrey_bg">
+                            <div class="acrd_left_text">
+                                The church of Saint Trinity in Adamas hosts the Ecclesiastical Museum of Milos. Visitors can admire exhibits from the artistic and holy painting traditions as well as objects and relics of ecclesiastical interest.<br />                            </div>
+                            <div class="acrd_right_img">
+                            	                                
+                            </div>
+                            <br clear="all" />
+                        </div>
+                                                <div class="accordion_header ">Naval Museum</div>
+                        <div class="accordion_content ">
+                            <div class="acrd_left_text">
+                                Located in Adamas the Naval Museum holds exhibits related to the naval past of the island, including artifacts from the prehistoric period, obsidian tools, historical displays from battles, rare maps as well as a locally crafted wooden boat.<br />                            </div>
+                            <div class="acrd_right_img">
+                            	                                
+                            </div>
+                            <br clear="all" />
+                        </div>
+                                                <div class="accordion_header  lightgrey_bg">Prehistoric Settlements of Phylakopi</div>
+                        <div class="accordion_content  lightgrey_bg">
+                            <div class="acrd_left_text">
+                                It is considered to be one of the most significant Bronze Age settlements not only in the Cyclades but the entire Aegean due to its continuous habitation during that era.<br />                            </div>
+                            <div class="acrd_right_img">
+                            	                                
+                            </div>
+                            <br clear="all" />
+                        </div>
+                                                <div class="accordion_header ">Ancient town of Klima</div>
+                        <div class="accordion_content ">
+                            <div class="acrd_left_text">
+                                Klima was the first port of the island and visitors will now be able to admire the ruins of the old town, the fortification walls and the old market together with other preserved ancient remnants. Here you will also be able to visit the exact spot where the world renowned statue of Aphrodite was found.  <br />                            </div>
+                            <div class="acrd_right_img">
+                            	                                
+                            </div>
+                            <br clear="all" />
+                        </div>
+                                                <div class="accordion_header  lightgrey_bg">Ancient Roman Theater</div>
+                        <div class="accordion_content  lightgrey_bg">
+                            <div class="acrd_left_text">
+                                The remains of the island’s ancient marble open theater dated back to the 3rd century. The view from the theater to the port of Adamas is absolutely breathtaking.<br />                            </div>
+                            <div class="acrd_right_img">
+                            	                                
+                            </div>
+                            <br clear="all" />
+                        </div>
+                                                <div class="accordion_header ">Catacombs</div>
+                        <div class="accordion_content ">
+                            <div class="acrd_left_text">
+                                Situated in the village of Trypiti, the Catacombs of Milos are among the three most important catacombs of Christianity along with the catacombs in the Holy land and the ones in Rome. Dating back to the 1st century the Catacombs of Milos where the first place of Christian worship and the first communal cemetery of the island.<br />                            </div>
+                            <div class="acrd_right_img">
+                            	                                
+                            </div>
+                            <br clear="all" />
+                        </div>
+                                                <div class="accordion_header  lightgrey_bg">Churches</div>
+                        <div class="accordion_content  lightgrey_bg">
+                            <div class="acrd_left_text">
+                                <p>There are many churches of great importance scattered around the island of Milos. Some of the churches and monasteries worth visiting are: </p><ul><li>The Church of Panagia Korfiatissa in Plaka</li><li>The Church of Panagia ton Rodon (Holy Mary of Roses) in Plaka</li><li>The Church of Panagia Thalassitra in Kastro</li><li>The Church of Agia Triada in Adamas  </li><li>The Dormition of the Virgin &amp; Agios Haralambos in Adamas</li><li>The Catholic church of Agios Nikolaos in Adamas</li><li>The Church of Agios Nikolaos in Trypiti</li><li>The Church of Agios Haralambos in Plaka</li><li>The Church of Agios Georgios in Pera Triovassalos</li><li>The Church of Panagia Portiani in Zefyria</li><li>The Church of Panagia in Kipos</li><li>The Monastery of Agios Ioannis Siderianos</li><li>The Monastery of Agia Marina on Mount Halakas</li></ul>                            </div>
+                            <div class="acrd_right_img">
+                            	                                
+                            </div>
+                            <br clear="all" />
+                        </div>
+                                                <div class="accordion_header ">Kastro</div>
+                        <div class="accordion_content ">
+                            <div class="acrd_left_text">
+                                Situated in Plaka, Kastro (meaning Castle in Greek) was built during the 13th century to protect the island’s residents from pirate attacks.  Now it is a great spot to enjoy the breathtaking view of the gulf and the magical sunset.<br /><br /><br />                            </div>
+                            <div class="acrd_right_img">
+                            	                                
+                            </div>
+                            <br clear="all" />
+                        </div>
+                                                <div class="accordion_header  lightgrey_bg">Thiorihia</div>
+                        <div class="accordion_content  lightgrey_bg">
+                            <div class="acrd_left_text">
+                                The first sulfur mine in Greece was situated at Paliorema. Now visitors can swim into the crystalline waters of the beach and marvel the colorful rock formations as well as the old mine remains that will travel them back in time.<br />                            </div>
+                            <div class="acrd_right_img">
+                            	                                
+                            </div>
+                            <br clear="all" />
+                        </div>
+                                                <div class="accordion_header ">Sarakiniko</div>
+                        <div class="accordion_content ">
+                            <div class="acrd_left_text">
+                                The astonishing beach of Sarakiniko is a must see. The lunar like landscape with the white rocks and the emerald waters of the sea will just remained scarred in your memory forever!<br />                            </div>
+                            <div class="acrd_right_img">
+                            	                                
+                            </div>
+                            <br clear="all" />
+                        </div>
+                                                <div class="accordion_header  lightgrey_bg">Kleftiko</div>
+                        <div class="accordion_content  lightgrey_bg">
+                            <div class="acrd_left_text">
+                                Kleftiko is another amazing beach with striking natural rock formations and crystalline waters. Only accessible by boat, a tour through its exotic, supernatural beauty is definitely a must do!<br />                            </div>
+                            <div class="acrd_right_img">
+                            	                                
+                            </div>
+                            <br clear="all" />
+                        </div>
+                                                <div class="accordion_header ">Hot Springs</div>
+                        <div class="accordion_content ">
+                            <div class="acrd_left_text">
+                                <p>The island of Milos is full with natural hot springs. Visitors can take advantage of the therapeutic effects of the island’s hot springs that are situated in the following areas:</p><ul><li>Lakou Adamas</li><li>Harou Adamas</li><li>Alykes</li><li>Provatas</li><li>Paleochori</li><li>Tria Pigadia</li><li>Kanava</li><li>Kinopi</li></ul>                            </div>
+                            <div class="acrd_right_img">
+                            	                                
+                            </div>
+                            <br clear="all" />
+                        </div>
+                                                	
+            </div>
+            
+        </div>
+        
+        <div class="back_block">
+        	<a href="//www.cycladia.com/travel-guides-greece/milos-guide-tips/" rel="nofollow"><img src="//www.cycladia.com/images/arrow_left_blue.png" alt="" />&nbsp; BACK TO LIST</a>
+        </div>
+        
+        
+        <br/>
+        
+                
+        
+    </div>
+    
+    <!-- -->
+    
+    <div class="right_col">
+    
+        
+		<div class="latest_blog_post">
+			<div class="blog_title"><a href="//www.cycladia.com/blog/2021/tourism-insight/tis-the-season-to-be-jolly-in-greece" target="_blank" rel="nofollow">'Tis the Season to be Jolly in Greece</a></div>
+            <div class="blog_text">
+				Christmas in Greece is an experience in itself as it is a holiday celebrate...            </div>
+			<a href="//www.cycladia.com/blog/2021/tourism-insight/tis-the-season-to-be-jolly-in-greece" target="_blank" class="bloglink" rel="nofollow">Read more <span class="blue_arrow">&rsaquo;</span></a>
+		</div>
+		    
+    <!-- ================ -->
+    
+            <a href="https://www.facebook.com/Cycladia" target="_blank" rel="nofollow"><img src="//www.cycladia.com/images/like_btn.jpg" alt="" class="banner_right" /></a>
+            
+    
+    <!--<a href="http://www.portomykonos.gr" target="_blank" rel="nofollow" onclick="trackpage_ga('cycladia-banner-portomykonos');"><img src="//www.cycladia.com/images/banners_right/pom_adwords_banner_cycladia.jpg" alt="Mykonos Town Hotel" class="banner_right" /></a>
+    
+    <a href="http://www.katikies.com/summerlicious-contest.php" target="_blank" rel="nofollow" onclick="trackpage_ga('cycladia-banner-katikies');"><img src="//www.cycladia.com/images/banners_right/summerlicious_banner.jpg" alt="" class="banner_right" /></a>
+    
+    <a href="http://www.webseoanalytics.com" target="_blank" rel="nofollow" onclick="trackpage_ga('cycladia-banner3');"><img src="//www.cycladia.com/images/banners_right/banner_right_3.jpg" alt="SEO Tools" class="banner_right" /></a> -->
+    
+</div>
+&nbsp;
+<br clear="all" />    
+    
+    <div class="footer">        
+    
+    <div class="footer_menu">
+	    <a href="//www.cycladia.com/smart-web.php"  rel="nofollow">Cycladia Smart Web</a>
+        <a href="//www.cycladia.com/advertize.php"  rel="nofollow" onclick="setga_var(1, 'Advertise', 'clicked', 3)">Advertise@Cycladia</a>
+        <a href="//www.cycladia.com/join-cycladia.php"  rel="nofollow" onclick="setga_var(2, 'Listing', 'clicked', 3)">Enter Cycladia Listing</a>
+        <a href="//www.cycladia.com/terms-conditions.php"  rel="nofollow">Terms &amp; Conditions</a>
+        <a href="//www.cycladia.com/contact.php"  rel="nofollow">Contact</a>
+        <a href="//www.cycladia.com/sitemap.php"  rel="nofollow">Sitemap</a>
+    </div>
+    
+    <div class="footer_media">
+    	<a href="https://pinterest.com/cycladia/" target="_blank" onclick="trackev_ga('pinterest-button');"><img src="//www.cycladia.com/images/pinterest-logo.jpg" alt="" /></a>
+        <!-- <a href="" target="_blank" onclick="trackev_ga('gplus-button');"><img src="images/gplus.png" alt="" /></a> -->
+        <a href="https://www.facebook.com/pages/Cycladia/170580346286701" target="_blank" rel="nofollow" onclick="trackev_ga('facebook-button');"><img src="//www.cycladia.com/images/facebook.png" alt="" /></a>
+        <a href="https://twitter.com/cycladia" target="_blank" rel="nofollow" onclick="trackev_ga('twitter-button');"><img src="//www.cycladia.com/images/twitter.png" alt="" /></a>
+        <a href="https://www.youtube.com/user/CYCLADIA" target="_blank" rel="nofollow" onclick="trackev_ga('youtube-button');"><img src="//www.cycladia.com/images/youtube.png" alt="" /></a>
+        <a href="http://www.flickr.com/photos/cycladia" target="_blank" rel="nofollow" onclick="trackev_ga('flickr-button');"><img src="//www.cycladia.com/images/flickr.png" alt="" /></a>        
+        <a href="http://www.thefancy.com/Cycladia" target="_blank" rel="nofollow" onclick="trackev_ga('fancy-button');"><img src="//www.cycladia.com/images/fancy.png" alt="" /></a>
+        <a href="//www.cycladia.com/blog/" target="_blank" rel="nofollow" onclick="trackev_ga('blog-button');"><img src="//www.cycladia.com/images/blogger.png" alt="" /></a>
+        
+        <!-- <span class="google_plus1_footer"><g:plusone size="medium" count="false"></g:plusone></span> -->
+        <br clear="all" />
+    </div>
+
+    <div class="moz_sign">
+        All rights reserved. &copy; 2010-2026 Cycladia. 
+    </div>
+    <br clear="all"/>
+
+</div>    
+</div>
+   
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5430cce49ebb648',t:'MTc5MzYyMTU3Mg=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5430cce49ebb648',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"a1a8e9dde7b84cad9db149562713d458","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
+
+
