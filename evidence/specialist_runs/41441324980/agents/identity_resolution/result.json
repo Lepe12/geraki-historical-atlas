@@ -1,0 +1,3304 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "identity_resolution",
+  "label": "Identity Resolution Agent",
+  "assignment_id": "identity_resolution:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "entity_candidates",
+    "variant_names",
+    "same_entity_assessment",
+    "collision_warnings"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "29bce843c8f2cb66cabde5471b5baba26301bb0c538acb31e02921c262081252",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "identity_resolution",
+    "assignment_id": "identity_resolution:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:SearchCulture.gr / EKT",
+      "repo:Gallica/BnF",
+      "repo:Internet Culturale",
+      "repo:OpenArchives.gr / EKT"
+    ],
+    "queries": [
+      "\"Μήλος 1650 πειρατεία\"",
+      "\"milos 1650 peirateia\"",
+      "\"πειρατεία, Μήλος\"",
+      "\"peirateia, milos\"",
+      "\"milos 1650 peirateia\" biography"
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:SearchCulture.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "SearchCulture.gr / EKT",
+        "connector_id": null,
+        "score": 130,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Internet Culturale",
+        "route_type": "repository_dispatch",
+        "repository": "Internet Culturale",
+        "connector_id": null,
+        "score": 104,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 102,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Nationaal Archief",
+        "route_type": "repository_dispatch",
+        "repository": "Nationaal Archief",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ERROR",
+      "query": "\"milos 1650 peirateia\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22milos+1650+peirateia%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 805}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ERROR",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22milos+1650+peirateia%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 805}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ERROR",
+      "query": "\"Μήλος 1650 πειρατεία\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 807}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ERROR",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 807}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"peirateia, milos\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22peirateia%2C+milos%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22peirateia%2C+milos%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 854}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22peirateia%2C+milos%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"milos 1650 peirateia\" biography",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22milos+1650+peirateia%22+biography\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22milos+1650+peirateia%22+biography\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 988}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22milos+1650+peirateia%22+biography\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:SearchCulture.gr / EKT",
+      "repository": "SearchCulture.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πειρατεία, Μήλος\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22\", \"content_type\": \"application/json;charset=UTF-8\", \"response_bytes\": 102, \"response_sha256\": \"0c573ae3d1341651a37c4aaf8239f9478e9333d1da07ee974f09e1b5ad061a5d\", \"elapsed_ms\": 1109}], \"detail\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος 1650 πειρατεία\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 630, \"response_sha256\": \"d66bc5aec1dd8879686fbe9ae1dcb097bb8141f6dc313e5c06c9641d78822ac2\", \"elapsed_ms\": 1183}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πειρατεία, Μήλος\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 626, \"response_sha256\": \"e3dae3ef1bc7cd6e77c9616b57aa8f5924a93a2e3df5e4c88da2ed4e61e77bd7\", \"elapsed_ms\": 545}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"milos 1650 peirateia\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+milos+1650+peirateia+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+milos+1650+peirateia+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 616, \"response_sha256\": \"b58c9e35f1918feff3b84bd6aca47097d7c5b61c529fd702ffa8de0600e88668\", \"elapsed_ms\": 548}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+milos+1650+peirateia+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"peirateia, milos\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+peirateia%2C+milos+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+peirateia%2C+milos+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 612, \"response_sha256\": \"a771a832dcaaf722c0c5723dab4bef4016ec6481f80edf48a18a6724823243f3\", \"elapsed_ms\": 496}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+peirateia%2C+milos+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος 1650 πειρατεία\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25633, \"response_sha256\": \"4d19ad2e2d98f8cb756c726f4432a939ab6efa470f3bd8c0cacb74ad798690f5\", \"elapsed_ms\": 289}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"milos 1650 peirateia\" biography",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+milos+1650+peirateia++biography%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+milos+1650+peirateia++biography%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 626, \"response_sha256\": \"86d85729fd467574d5974d558e1050dcad1faee58b2e9175d98da7dd0b81dd16\", \"elapsed_ms\": 418}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+milos+1650+peirateia++biography%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πειρατεία, Μήλος\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25629, \"response_sha256\": \"49c53c032606180b9851de9234bb503f662c5db4cf8242b810111b3bf64ba9ad\", \"elapsed_ms\": 135}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"milos 1650 peirateia\" biography",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22milos+1650+peirateia%22+biography&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22milos+1650+peirateia%22+biography&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 25553, \"response_sha256\": \"a5484e9a10659687320b64c9a9356e34cedc8b673b3377ee6f708d8daefe4f8d\", \"elapsed_ms\": 134}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22milos+1650+peirateia%22+biography&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"peirateia, milos\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22peirateia%2C+milos%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22peirateia%2C+milos%22&instance=magindice&pag=1\", \"content_type\": \"text/html\", \"response_bytes\": 31568, \"response_sha256\": \"c962a29925e5898d8ebbf90e40a369cda78a842446c75ed02f6187ea23cf094b\", \"elapsed_ms\": 136}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22peirateia%2C+milos%22&instance=magindice&pag=1\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Internet Culturale",
+      "repository": "Internet Culturale",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"milos 1650 peirateia\"",
+      "records": [
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/908/thesaurus-di-internet-culturale",
+          "title": "Mappa del thesauro",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/908/thesaurus-di-internet-culturale"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1/home",
+          "title": "Home",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1/home"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/76/itinerari",
+          "title": "Itinerari",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/76/itinerari"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/75/mostre",
+          "title": "Mostre",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/75/mostre"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/938/video",
+          "title": "Video",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/938/video"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1038/biblioteca-digitale-italiana",
+          "title": "la BDI",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1038/biblioteca-digitale-italiana"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1048/guida-alla-consultazione",
+          "title": "Guida alla consultazione",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1048/guida-alla-consultazione"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/41/collezioni-digitali",
+          "title": "Collezioni digitali",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/41/collezioni-digitali"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/64/partner",
+          "title": "Partner",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/64/partner"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1114/repositories",
+          "title": "Repositories",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1114/repositories"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/767/manoscritti",
+          "title": "Manoscritti",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/767/manoscritti"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/773/libri",
+          "title": "Libri",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/773/libri"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/825/spartiti",
+          "title": "Spartiti",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/825/spartiti"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/770/carte-geografiche",
+          "title": "Carte geografiche",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/770/carte-geografiche"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/771/immagini",
+          "title": "Immagini",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/771/immagini"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/772/registrazioni-sonore",
+          "title": "Registrazioni sonore",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/772/registrazioni-sonore"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana",
+          "title": "Emeroteca digitale italiana",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=2&paginate_pageNum=1",
+          "title": "Musica",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=2&paginate_pageNum=1"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=3",
+          "title": "Newspaper",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=3"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/753/remi",
+          "title": "Rete della Musica Italiana",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/753/remi"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1120/chi-siamo",
+          "title": "Chi siamo",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1120/chi-siamo"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/15/termini-d-uso",
+          "title": "Termini d'uso",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/15/termini-d-uso"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1227/i-progetti",
+          "title": "I Progetti",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1227/i-progetti"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/1000/statistiche",
+          "title": "Statistiche",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/1000/statistiche"
+        },
+        {
+          "discovery_repository": "Internet Culturale",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.internetculturale.it/it/999/scrivi-a",
+          "title": "Scrivi a",
+          "date": [],
+          "url": "https://www.internetculturale.it/it/999/scrivi-a"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Internet Culturale\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.internetculturale.it/it/16/search?q=%22milos+1650+peirateia%22&instance=magindice&pag=1\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.internetculturale.it/it/16/search?q=%22milos+1650+peirateia%22&instance=magindice&pag=1\", \"content_type\": \"text/html; charset=UTF-8\", \"response_bytes\": 23309, \"response_sha256\": \"82b2ebec3c29702ec56a39741f7368b4a40b0c0b366052c6d7d9bf34b06bf7b7\", \"elapsed_ms\": 1123}], \"detail\": \"https://www.internetculturale.it/it/16/search?q=%22milos+1650+peirateia%22&instance=magindice&pag=1\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "REMOTE_ERROR",
+      "query": "\"milos 1650 peirateia\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22milos+1650+peirateia%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 1741}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ERROR",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22milos+1650+peirateia%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 1741}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"peirateia, milos\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_17810",
+          "title": "Τηνιακοί μετανάστες θύματα πειρατών στα χρόνια της Επανάστασης. Οικονομία της αγοράς και οικονομία της βίας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_17810"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_17781",
+          "title": "Τα πρόσωπα της πειρατείας και οι ελληνικές κοινωνίες στα χρόνια της ελληνικής επανάστασης",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_17781"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_13513",
+          "title": "Η πειρατεία στο Αιγαίο. Όψεις και αντιφάσεις των στερεοτύπων",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_13513"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_44654",
+          "title": "Modelling of Milos geothermal field in Greece",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_44654"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-256224",
+          "title": "International workshop on Possibilities of Geothermal Energy Development in the Aegean Islands region (5-7 September 2002 : Milos island, Greece)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-256224"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-253612",
+          "title": "Updating of the geological and geothermal research on Milos island",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-253612"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-253616",
+          "title": "An integrated model for the geothermal field of Milos from geophysical experiments",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-253616"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_385",
+          "title": "Milos Bay Luxury Villas Lefkada σχεδιασμός ιστοσελίδας, εταιρικής ταυτότητας και προωθητικής ενέργειας.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_385"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3018988",
+          "title": "The milos island earthquake of March 20, 1992 and its tectonic significance",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3018988"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/geosociety/000068-17706",
+          "title": "Paleomagnetism and magnetic fabrics of the Almopias, Thessaly and Milos volcanics. Implications for the regional deformation",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/geosociety/000068-17706"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3005916",
+          "title": "Biogenicity of an early quaternary iron formation, Milos Island, Greece",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3005916"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-62464",
+          "title": "A mineralogical petrographic and geochemical study of samples from wells in the geothermal field of Milos Island (Greece)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-62464"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3070250",
+          "title": "Shallow submarine epithermal Pb-Zn-Cu-Au-Ag-Te mineralization on western Milos Island, Aegean Volcanic Arc, Greece: Mineralogical, geological and geochemical constraints",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3070250"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_5578",
+          "title": "Βήματα αισθητικής ανάπλασης του ορυχείου \"Ραλλάκι\" στη δυτική Μήλο Steps forward aesthetic reclamation of the mine \"Rallaki\" in the western Milos island",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_5578"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/geosociety/000068-11636",
+          "title": "NATURAL DEGASSING OF CARBON DIOXIDE AND HYDROGEN SULPHIDE AND ITS ENVIRONMENTAL IMPACT AT MILOS ISLAND, GREECE",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/geosociety/000068-11636"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098",
+          "title": "ΓΕΩΦΥΣΙΚΗ ΔΙΑΣΚΟΠΗΣΗ ΤΩΝ ΝΗΣΙΩΝ ΜΗΛΟΣ ΚΑΙ ΚΙΜΩΛΟΣ A GEOPHYSICAL STUDY OF MILOS AND KIMOLOS ISLANDS",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3070404",
+          "title": "Submarine volcanoes along the aegean volcanic arc",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3070404"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3017823",
+          "title": "Late Neogene evolution of the western South Aegean volcanic arc: Sedimentary imprint of volcanicity around Milos",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3017823"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2977740",
+          "title": "A mineralogical petrographic and geochemical study of samples from wells in the geothermal field of Milos Island (Greece)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2977740"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3069728",
+          "title": "New boron isotopic evidence for sedimentary and magmatic fluid influence in the shallow hydrothermal vent system of Milos Island (Aegean Sea, Greece)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3069728"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2885693",
+          "title": "CRITICAL METALS IN GREECE: MINERALOGICAL AND GEOCHEMICAL IMPLICATIONS IN CHALKIDIKI, ANAFI, MILOS AND LAVRIO",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2885693"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_3699",
+          "title": "Η γεωθερμική έρευνα στη Νήσο Μήλο - Αξιολόγηση γεωθερμικών δεδομένων Geothermal research in Milos island - Evaluation of drilling data",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_3699"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_20903",
+          "title": "Το περίφυτο και ο εποικισμός του σε θαλάσσιες περιοχές της Μήλου με υδροθερμικά φαινόμενα Periphyton and its colonization in marine hydrothermal regions of island Milos (Greece)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_20903"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0984",
+          "title": "ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΧΑΡΑΚΤΗΡΙΣΤΙΚΩΝ ΤΩΝ ΓΕΩΘΕΡΜΙΚΩΝ ΠΗΓΩΝ ΜΕ ΧΡΗΣΗ ΜΟΝΤΕΛΩΝ ΓΙΑ ΒΕΛΤΙΣΤΗ ΑΞΙΟΠΟΙΗΣΗ ΤΟΥΣ. ΕΦΑΡΜΟΓΕΣ ΣΤΟΝ ΕΛΛΗΝΙΚΟ ΧΩΡΟ STUDY OF THE GEOTHERMAL SOURCES CHARACTERISTICS BY MEANS OF MODELS FOR THEIR OPTIMUM EXPLOITATION. APPLICATION TO A GREEK GEOTHERMAL FIELD",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0984"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-255517",
+          "title": "Interpretation of the Bouguer anomaly of Milos island (Greece)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-255517"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22peirateia%2C+milos%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22peirateia%2C+milos%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 800137, \"response_sha256\": \"2b235d9878277ba198a8509770e613cf9e2d7a919688e020c8115069b46b1439\", \"elapsed_ms\": 3525}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22peirateia%2C+milos%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"milos 1650 peirateia\" biography",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3033130",
+          "title": "The Medial Offshore Record of Explosive Volcanism Along the Central to Eastern Aegean Volcanic Arc: 1. Tephrostratigraphic Correlations",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3033130"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_17810",
+          "title": "Τηνιακοί μετανάστες θύματα πειρατών στα χρόνια της Επανάστασης. Οικονομία της αγοράς και οικονομία της βίας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_17810"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_17781",
+          "title": "Τα πρόσωπα της πειρατείας και οι ελληνικές κοινωνίες στα χρόνια της ελληνικής επανάστασης",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_17781"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/edulll/000044-10795_1650",
+          "title": "Π1.1 Σχεδιασμός εκπαιδευτικών δραστηριοτήτων & υλικού της ‘ΣΥΝΘΕΣΗ’ : Υποέργο 1 «Σχεδιασμός, Υλοποίηση, Αξιολόγηση, Δημοσιότητα»",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/edulll/000044-10795_1650"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_24789",
+          "title": "D. Ivn. Ivvenalis et Avli Persii Flacci Satyrae",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_24789"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_13513",
+          "title": "Η πειρατεία στο Αιγαίο. Όψεις και αντιφάσεις των στερεοτύπων",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_13513"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-1650",
+          "title": "Ψευδάργυρος και κράματα ψευδαργύρου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-1650"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_44654",
+          "title": "Modelling of Milos geothermal field in Greece",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_44654"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-256224",
+          "title": "International workshop on Possibilities of Geothermal Energy Development in the Aegean Islands region (5-7 September 2002 : Milos island, Greece)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-256224"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-253612",
+          "title": "Updating of the geological and geothermal research on Milos island",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-253612"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_1650",
+          "title": "Οικονομική επισκόπησις των πλουτοπαραγωγικών κλάδων. Μέρος Α'. Γνώμαι Οικονομικών Ιδρυμάτων της Χώρας. 2. Οικονομική θέσις της Ελλάδος",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_1650"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/sophia/000060-123456789_1650",
+          "title": "Μουσικοθεραπεία στα πρόωρα νεογνά.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/sophia/000060-123456789_1650"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/eranistis/000088-1650",
+          "title": "Περιεχόμενα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/eranistis/000088-1650"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-253616",
+          "title": "An integrated model for the geothermal field of Milos from geophysical experiments",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-253616"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pasithee/000038-_1719",
+          "title": "Κυριαρχία και απόφαση",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pasithee/000038-_1719"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3069592",
+          "title": "Source of the tsunami generated by the 1650 AD eruption of Kolumbo submarine volcano (Aegean Sea, Greece)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3069592"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_385",
+          "title": "Milos Bay Luxury Villas Lefkada σχεδιασμός ιστοσελίδας, εταιρικής ταυτότητας και προωθητικής ενέργειας.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_385"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/sophia/000060-123456789_2168",
+          "title": "Το βιολοντσέλο και ανάλυση κομματιών σύγχρονης μουσικής με βυζαντινές επιρροές από το τσελιστικό ρεπερτόριο. (Paul Constantinescu, Sonata Bizantină)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/sophia/000060-123456789_2168"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-136242",
+          "title": "Βασικά προβλήματα της ποινικής προστασίας του περιβάλλοντος στο πλαίσιο του Ν. 1650/1986",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-136242"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/spoudai/000010-article_1576",
+          "title": "Ελληνικόν ναυτεργατικόν δίκαιον (συνέχεια εκ του τεύχους 3-4)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/spoudai/000010-article_1576"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3018988",
+          "title": "The milos island earthquake of March 20, 1992 and its tectonic significance",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3018988"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_1650",
+          "title": "Τα έντομα στον κόσμο των παιδιών",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_1650"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/eranistis/000088-1659",
+          "title": "Η αυτοβιογραφική επιγραφή του Νικόδημου Β΄ Μεταξά στα Μεταξάτα της Κεφαλονιάς (1642)",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/eranistis/000088-1659"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/geosociety/000068-17706",
+          "title": "Paleomagnetism and magnetic fabrics of the Almopias, Thessaly and Milos volcanics. Implications for the regional deformation",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/geosociety/000068-17706"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3005916",
+          "title": "Biogenicity of an early quaternary iron formation, Milos Island, Greece",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3005916"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22milos+1650+peirateia%22+biography&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22milos+1650+peirateia%22+biography&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 1565030, \"response_sha256\": \"da37db37dd9cb7538320b54706c7b4f2d58f1081744dbe3ac587eb270360b9bc\", \"elapsed_ms\": 6152}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22milos+1650+peirateia%22+biography&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πειρατεία, Μήλος\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-48319",
+          "title": "Νοταριακά και διοικητικά έγγραφα στην γαλλική γλώσσα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-48319"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-45741",
+          "title": "Διοικητικά έγγραφα βενετικών και οθωμανικών αρχών σχετικά με την άσκηση πειρατείας στην ιταλική γλώσσα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-45741"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_13038",
+          "title": "Παγκόσμιο σύστημα θαλάσσιας μεταφοράς πετρελαίου και πειρατεία: μια δύσκολη σχέση",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_13038"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_9371",
+          "title": "Θαλάσσια πειρατεία στις ανοιχτές θάλασσες: περίπτωση μελέτης: Σομαλία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_9371"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_14893",
+          "title": "Προσδιορισμός και αξιολόγηση των οικονομικών επιπτώσεων της πειρατείας λογισμικού.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_14893"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_20424",
+          "title": "Θαλάσσια πειρατεία: φαινόμενο και επικρατούσα κατάσταση Maritime piracy: phenomenon and domestic situation",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_20424"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_9680",
+          "title": "Οι πολεμικοί κίνδυνοι και κίνδυνοι πειρατείας στο Ιδιωτικό Ναυτικό Δίκαιο",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_9680"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_12871",
+          "title": "Το φαινόμενο της σύγχρονης πειρατείας ειδικότερα γύρω από την περιοχή του κόλπου του Άντεν: κίνδυνοι και πρακτικές αντιμετώπισης",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_12871"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-9187",
+          "title": "Internet και μουσική βιομηχανία: η μουσική πειρατεία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-9187"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-15957",
+          "title": "Πειρατεία στην ναυτιλία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-15957"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_19836",
+          "title": "Διαχείριση κινδύνου στη περίπτωση της πειρατείας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_19836"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-9314",
+          "title": "Οι οικονομικές επιπτώσεις στην ελληνική ναυτιλία από την πειρατεία στον κόλπο του Άντεν",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-9314"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_19245",
+          "title": "Διαχείριση ναυτικού ρίσκου για την ανθρώπινη ασφάλεια και την πειρατεία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_19245"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21778",
+          "title": "Piracy and its financial impact on shipping",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21778"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_10336",
+          "title": "Σύγχρονη πειρατεία: προκλήσεις και λύσεις- Η χρήση των ιδιωτών ενόπλων φρουρών για την προστασία της εμπορικής ναυτιλίας.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_10336"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-16720",
+          "title": "Η εξέλιξη της πειρατείας στο διαδίκτυο και της τεχνολογίας της The evolution of Internet piracy and its technology",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-16720"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_17725",
+          "title": "Η επίδραση της πειρατείας στη λειτουργική διαχείριση",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_17725"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-10910",
+          "title": "Διεθνές και ευρωπαϊκό νομικό πλαίσιο και οικονομικό κόστος της θαλάσσιας πειρατείας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-10910"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_8645",
+          "title": "Η πειρατεία στη μουσική βιομηχανία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_8645"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15601",
+          "title": "Πειρατεία λογισμικού: οικονομικές επιπτώσεις και μέσα προστασίας ψηφιακού περιεχομένου.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15601"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_24532",
+          "title": "Μπαρμπαρόσα ο Πειρατής",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_24532"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_17846",
+          "title": "Η επίδραση της πειρατείας στην διαμόρφωση των ναυλοσυμφώνων",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_17846"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_18903",
+          "title": "Διερεύνηση και αποτίμηση των οικονομικών επιπτώσεων της πειρατείας λογισμικού",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_18903"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-4384",
+          "title": "Μουσική βιομηχανία και διαδικτυακή πειρατεία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-4384"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_4471",
+          "title": "Μελέτη των νομικών θεμάτων – ποινικών ευθυνών σε ζητήματα πειρατείας και η αποτροπή με ένστολο προσωπικό ασφάλειας πλοίου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_4471"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 1589826, \"response_sha256\": \"96b6678daa0f72c45848507dec5275315495deb8d986ac3f64e4a75bafa8cfd8\", \"elapsed_ms\": 6856}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:OpenArchives.gr / EKT",
+      "repository": "OpenArchives.gr / EKT",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος 1650 πειρατεία\"",
+      "records": [
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-48319",
+          "title": "Νοταριακά και διοικητικά έγγραφα στην γαλλική γλώσσα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-48319"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-45741",
+          "title": "Διοικητικά έγγραφα βενετικών και οθωμανικών αρχών σχετικά με την άσκηση πειρατείας στην ιταλική γλώσσα",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-45741"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_13038",
+          "title": "Παγκόσμιο σύστημα θαλάσσιας μεταφοράς πετρελαίου και πειρατεία: μια δύσκολη σχέση",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_13038"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_9371",
+          "title": "Θαλάσσια πειρατεία στις ανοιχτές θάλασσες: περίπτωση μελέτης: Σομαλία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_9371"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_14893",
+          "title": "Προσδιορισμός και αξιολόγηση των οικονομικών επιπτώσεων της πειρατείας λογισμικού.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_14893"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/edulll/000044-10795_1650",
+          "title": "Π1.1 Σχεδιασμός εκπαιδευτικών δραστηριοτήτων & υλικού της ‘ΣΥΝΘΕΣΗ’ : Υποέργο 1 «Σχεδιασμός, Υλοποίηση, Αξιολόγηση, Δημοσιότητα»",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/edulll/000044-10795_1650"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_20424",
+          "title": "Θαλάσσια πειρατεία: φαινόμενο και επικρατούσα κατάσταση Maritime piracy: phenomenon and domestic situation",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_20424"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_9680",
+          "title": "Οι πολεμικοί κίνδυνοι και κίνδυνοι πειρατείας στο Ιδιωτικό Ναυτικό Δίκαιο",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_9680"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_24789",
+          "title": "D. Ivn. Ivvenalis et Avli Persii Flacci Satyrae",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_24789"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_12871",
+          "title": "Το φαινόμενο της σύγχρονης πειρατείας ειδικότερα γύρω από την περιοχή του κόλπου του Άντεν: κίνδυνοι και πρακτικές αντιμετώπισης",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_12871"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-9187",
+          "title": "Internet και μουσική βιομηχανία: η μουσική πειρατεία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-9187"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-1650",
+          "title": "Ψευδάργυρος και κράματα ψευδαργύρου",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-1650"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-15957",
+          "title": "Πειρατεία στην ναυτιλία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-15957"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_19836",
+          "title": "Διαχείριση κινδύνου στη περίπτωση της πειρατείας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_19836"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-9314",
+          "title": "Οι οικονομικές επιπτώσεις στην ελληνική ναυτιλία από την πειρατεία στον κόλπο του Άντεν",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-9314"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_19245",
+          "title": "Διαχείριση ναυτικού ρίσκου για την ανθρώπινη ασφάλεια και την πειρατεία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_19245"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21778",
+          "title": "Piracy and its financial impact on shipping",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21778"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_10336",
+          "title": "Σύγχρονη πειρατεία: προκλήσεις και λύσεις- Η χρήση των ιδιωτών ενόπλων φρουρών για την προστασία της εμπορικής ναυτιλίας.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_10336"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-16720",
+          "title": "Η εξέλιξη της πειρατείας στο διαδίκτυο και της τεχνολογίας της The evolution of Internet piracy and its technology",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-16720"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_17725",
+          "title": "Η επίδραση της πειρατείας στη λειτουργική διαχείριση",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_17725"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-10910",
+          "title": "Διεθνές και ευρωπαϊκό νομικό πλαίσιο και οικονομικό κόστος της θαλάσσιας πειρατείας",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-10910"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_8645",
+          "title": "Η πειρατεία στη μουσική βιομηχανία",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_8645"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15601",
+          "title": "Πειρατεία λογισμικού: οικονομικές επιπτώσεις και μέσα προστασίας ψηφιακού περιεχομένου.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15601"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_1650",
+          "title": "Οικονομική επισκόπησις των πλουτοπαραγωγικών κλάδων. Μέρος Α'. Γνώμαι Οικονομικών Ιδρυμάτων της Χώρας. 2. Οικονομική θέσις της Ελλάδος",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_1650"
+        },
+        {
+          "discovery_repository": "OpenArchives.gr / EKT",
+          "discovery_lane": "specialist:identity_resolution",
+          "connector_status": "EXECUTED",
+          "identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/sophia/000060-123456789_1650",
+          "title": "Μουσικοθεραπεία στα πρόωρα νεογνά.",
+          "date": [],
+          "url": "https://www.openarchives.gr/aggregator-openarchives/edm/sophia/000060-123456789_1650"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"content_type\": \"text/html;charset=UTF-8\", \"response_bytes\": 1752360, \"response_sha256\": \"226a2658775a4f1210f1f6383324a6d692901a0cfe071e00c464ab41f56cb281\", \"elapsed_ms\": 7261}], \"detail\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en ; native public catalogue; first page only\", \"result_count\": 25, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "identity_resolution",
+      "assignment_id": "identity_resolution:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "41441324980",
+    "agent_id": "identity_resolution",
+    "source_leads": [
+      {
+        "id": "lead_10d420064fce49e1653528c3",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/908/thesaurus-di-internet-culturale",
+        "title": "Mappa del thesauro",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2a2fd4bab4a2eae295811539",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1/home",
+        "title": "Home",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_3a32ca616591117bfce616ae",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/76/itinerari",
+        "title": "Itinerari",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b0f6951efa370fc8e78acdb3",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/75/mostre",
+        "title": "Mostre",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4791f022059bd65224d0a5a8",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/938/video",
+        "title": "Video",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_809516c2d2e78a52de3f2d22",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1038/biblioteca-digitale-italiana",
+        "title": "la BDI",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_cbfdf89f046a50f4f6a53199",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1048/guida-alla-consultazione",
+        "title": "Guida alla consultazione",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5aa79aba93d12b8525c7c104",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/41/collezioni-digitali",
+        "title": "Collezioni digitali",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_da83a8e0f036dc7eed45e308",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/64/partner",
+        "title": "Partner",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_eb6d1e44dea7899dba23a70e",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1114/repositories",
+        "title": "Repositories",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c9d3c9c9ed34be077875d7a5",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/767/manoscritti",
+        "title": "Manoscritti",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fb51ac2b8814133786542a6f",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/773/libri",
+        "title": "Libri",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b9e7bd469bda6c06f2506f05",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/825/spartiti",
+        "title": "Spartiti",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b7f0bb6883c80edab70aaaeb",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/770/carte-geografiche",
+        "title": "Carte geografiche",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2b6c27bde62c8050e13a57f7",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/771/immagini",
+        "title": "Immagini",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a8ab1a3968df3297db7339ed",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/772/registrazioni-sonore",
+        "title": "Registrazioni sonore",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_86aa59ff55805f6262c4cd1c",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana",
+        "title": "Emeroteca digitale italiana",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_76a55ec26ee34ad614cb75f7",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=2&paginate_pageNum=1",
+        "title": "Musica",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f69c5ba937aaece70c90d984",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/913/emeroteca-digitale-italiana/periodic/?iniziale=&regione=&materia=&q=&filterPeriodic=3",
+        "title": "Newspaper",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6b0e092f92f7939e45286845",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/753/remi",
+        "title": "Rete della Musica Italiana",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fce09a8efe658f2c64023aea",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1120/chi-siamo",
+        "title": "Chi siamo",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_23b7cf7d57bab00b935f2778",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/15/termini-d-uso",
+        "title": "Termini d'uso",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_005ac5f3197ca194c97e04ac",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1227/i-progetti",
+        "title": "I Progetti",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_30abed0b95b6e224b75f1b3b",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/1000/statistiche",
+        "title": "Statistiche",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_414b5c164f6de1197545ee36",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:Internet Culturale",
+        "source_url_or_identifier": "https://www.internetculturale.it/it/999/scrivi-a",
+        "title": "Scrivi a",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e36ee2083938090368b41dd9",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_17810",
+        "title": "Τηνιακοί μετανάστες θύματα πειρατών στα χρόνια της Επανάστασης. Οικονομία της αγοράς και οικονομία της βίας",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_34c6a646a86923e22981692e",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_17781",
+        "title": "Τα πρόσωπα της πειρατείας και οι ελληνικές κοινωνίες στα χρόνια της ελληνικής επανάστασης",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_016712c0ac516a1588c57e0e",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/helios/000024-10442_13513",
+        "title": "Η πειρατεία στο Αιγαίο. Όψεις και αντιφάσεις των στερεοτύπων",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a3bac4cfd75ed552fde08dd4",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_44654",
+        "title": "Modelling of Milos geothermal field in Greece",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a8595d3108e16fe53c3b902a",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-256224",
+        "title": "International workshop on Possibilities of Geothermal Energy Development in the Aegean Islands region (5-7 September 2002 : Milos island, Greece)",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8c17961fae4cf051494593e4",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-253612",
+        "title": "Updating of the geological and geothermal research on Milos island",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4e1aaca8d40f31eeb6e92ef1",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-253616",
+        "title": "An integrated model for the geothermal field of Milos from geophysical experiments",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f91445f67dc4dbc7d5cd8fd8",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_385",
+        "title": "Milos Bay Luxury Villas Lefkada σχεδιασμός ιστοσελίδας, εταιρικής ταυτότητας και προωθητικής ενέργειας.",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ea296aaacd18686878ec018e",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3018988",
+        "title": "The milos island earthquake of March 20, 1992 and its tectonic significance",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_346cec61658abc8b6c93e683",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/geosociety/000068-17706",
+        "title": "Paleomagnetism and magnetic fabrics of the Almopias, Thessaly and Milos volcanics. Implications for the regional deformation",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ab74ea5aab89ad1c9b38b9de",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3005916",
+        "title": "Biogenicity of an early quaternary iron formation, Milos Island, Greece",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9f62a2d207762a75fd31b32f",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/dias/000058-62464",
+        "title": "A mineralogical petrographic and geochemical study of samples from wells in the geothermal field of Milos Island (Greece)",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5120c5eb296ab449b93f5d1f",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3070250",
+        "title": "Shallow submarine epithermal Pb-Zn-Cu-Au-Ag-Te mineralization on western Milos Island, Aegean Volcanic Arc, Greece: Mineralogical, geological and geochemical constraints",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_eeed25a67c3870c43ccd2f30",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_5578",
+        "title": "Βήματα αισθητικής ανάπλασης του ορυχείου \"Ραλλάκι\" στη δυτική Μήλο Steps forward aesthetic reclamation of the mine \"Rallaki\" in the western Milos island",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_eb12226756e4948e06ac89d6",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/geosociety/000068-11636",
+        "title": "NATURAL DEGASSING OF CARBON DIOXIDE AND HYDROGEN SULPHIDE AND ITS ENVIRONMENTAL IMPACT AT MILOS ISLAND, GREECE",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c6228e66d510967c3a5b3b51",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0098",
+        "title": "ΓΕΩΦΥΣΙΚΗ ΔΙΑΣΚΟΠΗΣΗ ΤΩΝ ΝΗΣΙΩΝ ΜΗΛΟΣ ΚΑΙ ΚΙΜΩΛΟΣ A GEOPHYSICAL STUDY OF MILOS AND KIMOLOS ISLANDS",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c010975cb7deac9554c5d4c6",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3070404",
+        "title": "Submarine volcanoes along the aegean volcanic arc",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_df5c5df5bf749eb44763ccc7",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3017823",
+        "title": "Late Neogene evolution of the western South Aegean volcanic arc: Sedimentary imprint of volcanicity around Milos",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_22708a1ae5f4231f8d3521cf",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2977740",
+        "title": "A mineralogical petrographic and geochemical study of samples from wells in the geothermal field of Milos Island (Greece)",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8a1ce0461d410aa3f2e43a2e",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3069728",
+        "title": "New boron isotopic evidence for sedimentary and magmatic fluid influence in the shallow hydrothermal vent system of Milos Island (Aegean Sea, Greece)",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_abb008f2d121cabdd4245f66",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A2885693",
+        "title": "CRITICAL METALS IN GREECE: MINERALOGICAL AND GEOCHEMICAL IMPLICATIONS IN CHALKIDIKI, ANAFI, MILOS AND LAVRIO",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2c7982154197ca1e5b9660b3",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_3699",
+        "title": "Η γεωθερμική έρευνα στη Νήσο Μήλο - Αξιολόγηση γεωθερμικών δεδομένων Geothermal research in Milos island - Evaluation of drilling data",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ec7a6ccc805b1616f8c05949",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_20903",
+        "title": "Το περίφυτο και ο εποικισμός του σε θαλάσσιες περιοχές της Μήλου με υδροθερμικά φαινόμενα Periphyton and its colonization in marine hydrothermal regions of island Milos (Greece)",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_08de6b2cea47d307b916774f",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/phdtheses/000040-10442_0984",
+        "title": "ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΧΑΡΑΚΤΗΡΙΣΤΙΚΩΝ ΤΩΝ ΓΕΩΘΕΡΜΙΚΩΝ ΠΗΓΩΝ ΜΕ ΧΡΗΣΗ ΜΟΝΤΕΛΩΝ ΓΙΑ ΒΕΛΤΙΣΤΗ ΑΞΙΟΠΟΙΗΣΗ ΤΟΥΣ. ΕΦΑΡΜΟΓΕΣ ΣΤΟΝ ΕΛΛΗΝΙΚΟ ΧΩΡΟ STUDY OF THE GEOTHERMAL SOURCES CHARACTERISTICS BY MEANS OF MODELS FOR THEIR OPTIMUM EXPLOITATION. APPLICATION TO A GREEK GEOTHERMAL FIELD",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_587403211d42ff2b74e7a1b3",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-255517",
+        "title": "Interpretation of the Bouguer anomaly of Milos island (Greece)",
+        "query": "\"peirateia, milos\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_c1209cc89bb38ccf8312bb24",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3033130",
+        "title": "The Medial Offshore Record of Explosive Volcanism Along the Central to Eastern Aegean Volcanic Arc: 1. Tephrostratigraphic Correlations",
+        "query": "\"milos 1650 peirateia\" biography",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_66a7e24185a43e9567ed3ce8",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/edulll/000044-10795_1650",
+        "title": "Π1.1 Σχεδιασμός εκπαιδευτικών δραστηριοτήτων & υλικού της ‘ΣΥΝΘΕΣΗ’ : Υποέργο 1 «Σχεδιασμός, Υλοποίηση, Αξιολόγηση, Δημοσιότητα»",
+        "query": "\"milos 1650 peirateia\" biography",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ebc2fedac19e3c262d25d783",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/uoi/000030-123456789_24789",
+        "title": "D. Ivn. Ivvenalis et Avli Persii Flacci Satyrae",
+        "query": "\"milos 1650 peirateia\" biography",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_bcad0b5f15a81a5a1f44702b",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-1650",
+        "title": "Ψευδάργυρος και κράματα ψευδαργύρου",
+        "query": "\"milos 1650 peirateia\" biography",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_eb0de637cea5510320e94f73",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/ntua/000011-123456789_1650",
+        "title": "Οικονομική επισκόπησις των πλουτοπαραγωγικών κλάδων. Μέρος Α'. Γνώμαι Οικονομικών Ιδρυμάτων της Χώρας. 2. Οικονομική θέσις της Ελλάδος",
+        "query": "\"milos 1650 peirateia\" biography",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_6c3cf0922639eecffa8db318",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/sophia/000060-123456789_1650",
+        "title": "Μουσικοθεραπεία στα πρόωρα νεογνά.",
+        "query": "\"milos 1650 peirateia\" biography",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1d292c2525c3a07fafd7d233",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/eranistis/000088-1650",
+        "title": "Περιεχόμενα",
+        "query": "\"milos 1650 peirateia\" biography",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b7df07bbbe8c5d94681261d4",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pasithee/000038-_1719",
+        "title": "Κυριαρχία και απόφαση",
+        "query": "\"milos 1650 peirateia\" biography",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e8b1efc16a8d9864216d83be",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/pergamos/000005-uoadl%3A3069592",
+        "title": "Source of the tsunami generated by the 1650 AD eruption of Kolumbo submarine volcano (Aegean Sea, Greece)",
+        "query": "\"milos 1650 peirateia\" biography",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a9fe59b65c46e8d45d474024",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/sophia/000060-123456789_2168",
+        "title": "Το βιολοντσέλο και ανάλυση κομματιών σύγχρονης μουσικής με βυζαντινές επιρροές από το τσελιστικό ρεπερτόριο. (Paul Constantinescu, Sonata Bizantină)",
+        "query": "\"milos 1650 peirateia\" biography",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ef5ecf5bbca9c64d99574518",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/IKEE_AUT/000097-136242",
+        "title": "Βασικά προβλήματα της ποινικής προστασίας του περιβάλλοντος στο πλαίσιο του Ν. 1650/1986",
+        "query": "\"milos 1650 peirateia\" biography",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_38706befe41d02e7fca8b18d",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/spoudai/000010-article_1576",
+        "title": "Ελληνικόν ναυτεργατικόν δίκαιον (συνέχεια εκ του τεύχους 3-4)",
+        "query": "\"milos 1650 peirateia\" biography",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8ad4bc68681ebf6a85a113c8",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_1650",
+        "title": "Τα έντομα στον κόσμο των παιδιών",
+        "query": "\"milos 1650 peirateia\" biography",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_624e190755ef9dd118e450e7",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/eranistis/000088-1659",
+        "title": "Η αυτοβιογραφική επιγραφή του Νικόδημου Β΄ Μεταξά στα Μεταξάτα της Κεφαλονιάς (1642)",
+        "query": "\"milos 1650 peirateia\" biography",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d461e13e508cfb5d10aba719",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-48319",
+        "title": "Νοταριακά και διοικητικά έγγραφα στην γαλλική γλώσσα",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e13b6a0cc96d99d947321dcf",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/KEIED/000105-45741",
+        "title": "Διοικητικά έγγραφα βενετικών και οθωμανικών αρχών σχετικά με την άσκηση πειρατείας στην ιταλική γλώσσα",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_28950c2b0a682c231020c75a",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_13038",
+        "title": "Παγκόσμιο σύστημα θαλάσσιας μεταφοράς πετρελαίου και πειρατεία: μια δύσκολη σχέση",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_632300e50add3b0466d99ba6",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_9371",
+        "title": "Θαλάσσια πειρατεία στις ανοιχτές θάλασσες: περίπτωση μελέτης: Σομαλία",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5c3617ed7cdf0582561e7a74",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_14893",
+        "title": "Προσδιορισμός και αξιολόγηση των οικονομικών επιπτώσεων της πειρατείας λογισμικού.",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_490434fae65c5734bdec4435",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_20424",
+        "title": "Θαλάσσια πειρατεία: φαινόμενο και επικρατούσα κατάσταση Maritime piracy: phenomenon and domestic situation",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f2839cfab02231142ec768f7",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_9680",
+        "title": "Οι πολεμικοί κίνδυνοι και κίνδυνοι πειρατείας στο Ιδιωτικό Ναυτικό Δίκαιο",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_903521ff6c8a16d9dc17647c",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_12871",
+        "title": "Το φαινόμενο της σύγχρονης πειρατείας ειδικότερα γύρω από την περιοχή του κόλπου του Άντεν: κίνδυνοι και πρακτικές αντιμετώπισης",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_96b65ceca2f990a7fd4655b4",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-9187",
+        "title": "Internet και μουσική βιομηχανία: η μουσική πειρατεία",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e646408142729b94bb048669",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/estia/000015-15957",
+        "title": "Πειρατεία στην ναυτιλία",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_566a739f7222a4d145fcf402",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_19836",
+        "title": "Διαχείριση κινδύνου στη περίπτωση της πειρατείας",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_96bea9a8c836902b381880ac",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-9314",
+        "title": "Οι οικονομικές επιπτώσεις στην ελληνική ναυτιλία από την πειρατεία στον κόλπο του Άντεν",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fd4d1ddea835eb387e6ddd57",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_19245",
+        "title": "Διαχείριση ναυτικού ρίσκου για την ανθρώπινη ασφάλεια και την πειρατεία",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_96bd8f780d30d77a6e070c8b",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_21778",
+        "title": "Piracy and its financial impact on shipping",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f813901bf6020b82c628e3f6",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/repo_duth/000179-123456789_10336",
+        "title": "Σύγχρονη πειρατεία: προκλήσεις και λύσεις- Η χρήση των ιδιωτών ενόπλων φρουρών για την προστασία της εμπορικής ναυτιλίας.",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d4faa3ed4550c380e163b59f",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-16720",
+        "title": "Η εξέλιξη της πειρατείας στο διαδίκτυο και της τεχνολογίας της The evolution of Internet piracy and its technology",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_49ef82e830c4b2b85bea1148",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_17725",
+        "title": "Η επίδραση της πειρατείας στη λειτουργική διαχείριση",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_af48166a156b994187868d9c",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/Dione/000013-10910",
+        "title": "Διεθνές και ευρωπαϊκό νομικό πλαίσιο και οικονομικό κόστος της θαλάσσιας πειρατείας",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f75e84c92cd9fb33a7bd7e58",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/nemertes/000009-10889_8645",
+        "title": "Η πειρατεία στη μουσική βιομηχανία",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b94122b9cfc8b4605436aea4",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_15601",
+        "title": "Πειρατεία λογισμικού: οικονομικές επιπτώσεις και μέσα προστασίας ψηφιακού περιεχομένου.",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5fbd0d90efe0a670b57f4c59",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_24532",
+        "title": "Μπαρμπαρόσα ο Πειρατής",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_f01669885f012f515f1b05c2",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/hellanicus/000100-11610_17846",
+        "title": "Η επίδραση της πειρατείας στην διαμόρφωση των ναυλοσυμφώνων",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_656ccdeffaec80c07e652eed",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/psepheda/000004-2159_18903",
+        "title": "Διερεύνηση και αποτίμηση των οικονομικών επιπτώσεων της πειρατείας λογισμικού",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ba83720782986cfeb5333f22",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/anaktisis/000020-4384",
+        "title": "Μουσική βιομηχανία και διαδικτυακή πειρατεία",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5f940492888c948a12a7e841",
+        "run_id": "41441324980",
+        "agent_id": "identity_resolution",
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "source_url_or_identifier": "https://www.openarchives.gr/aggregator-openarchives/edm/polynoe/000125-11400_4471",
+        "title": "Μελέτη των νομικών θεμάτων – ποινικών ευθυνών σε ζητήματα πειρατείας και η αποτροπή με ένστολο προσωπικό ασφάλειας πλοίου",
+        "query": "\"πειρατεία, Μήλος\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      }
+    ],
+    "connector_errors": [
+      {
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "status": "REMOTE_ERROR",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22milos+1650+peirateia%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 805}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:SearchCulture.gr / EKT",
+        "status": "REMOTE_ERROR",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"SearchCulture.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.searchculture.gr/aggregator/api/search.json?apiKey=REDACTED&page=1&pageSize=25&general_term=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 807}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      },
+      {
+        "connector_id": "repo:OpenArchives.gr / EKT",
+        "status": "REMOTE_ERROR",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"OpenArchives.gr / EKT\", \"status\": \"REMOTE_ERROR\", \"http_attempts\": [{\"url\": \"https://www.openarchives.gr/aggregator-openarchives/portal/advancedSearch/search?portalSearches%5B0%5D.keywords%5B0%5D.value=%22milos+1650+peirateia%22&portalSearches%5B0%5D.keywords%5B0%5D.field=&portalSearches%5B0%5D.booleanOperator=OR&language=en\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 500, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_500\", \"elapsed_ms\": 1741}], \"detail\": {\"error_code\": \"HTTP_500\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+      }
+    ],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 125,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}

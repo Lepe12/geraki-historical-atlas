@@ -1,0 +1,3398 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "pirate_biography",
+  "label": "Pirate Biography Agent",
+  "assignment_id": "pirate_biography:wave1",
+  "assignment_wave": 1,
+  "requested_outputs": [
+    "identity",
+    "aliases",
+    "chronology",
+    "ships",
+    "associates",
+    "bases",
+    "operations",
+    "death",
+    "uncertainties"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "c2e9cdf7951803d275b7ca3454c697bded0d6e1fd4ffd922a064abf73225a504",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "pirate_biography",
+    "assignment_id": "pirate_biography:wave1",
+    "assignment_wave": 1,
+    "route_ids": [
+      "repo:PARES / Archivo General de Simancas",
+      "repo:Gallica/BnF",
+      "repo:Biblioteca Digital Hispánica",
+      "repo:Academia.edu Public Research"
+    ],
+    "queries": [
+      "\"Μήλος 1650 πειρατεία\"",
+      "\"milos 1650 peirateia\"",
+      "\"πειρατεία, Μήλος\"",
+      "\"peirateia, milos\"",
+      "\"milos 1650 peirateia\" history"
+    ],
+    "operation": "search",
+    "search_budget": 20,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "context_aware_deterministic_v1",
+    "routes": [
+      {
+        "route_id": "repo:PARES / Archivo General de Simancas",
+        "route_type": "repository_dispatch",
+        "repository": "PARES / Archivo General de Simancas",
+        "connector_id": null,
+        "score": 100,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 100,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Biblioteca Digital Hispánica",
+        "route_type": "repository_dispatch",
+        "repository": "Biblioteca Digital Hispánica",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 96,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:OpenAlex Scholarly Works",
+        "route_type": "repository_dispatch",
+        "repository": "OpenAlex Scholarly Works",
+        "connector_id": null,
+        "score": 92,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 90,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:The National Archives Public Content",
+        "route_type": "repository_dispatch",
+        "repository": "The National Archives Public Content",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Crossref Scholarly Metadata",
+        "route_type": "repository_dispatch",
+        "repository": "Crossref Scholarly Metadata",
+        "connector_id": null,
+        "score": 86,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 20,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος 1650 πειρατεία\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 630, \"response_sha256\": \"d66bc5aec1dd8879686fbe9ae1dcb097bb8141f6dc313e5c06c9641d78822ac2\", \"elapsed_ms\": 733}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"milos 1650 peirateia\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+milos+1650+peirateia+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+milos+1650+peirateia+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 616, \"response_sha256\": \"b58c9e35f1918feff3b84bd6aca47097d7c5b61c529fd702ffa8de0600e88668\", \"elapsed_ms\": 400}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+milos+1650+peirateia+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πειρατεία, Μήλος\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 626, \"response_sha256\": \"e3dae3ef1bc7cd6e77c9616b57aa8f5924a93a2e3df5e4c88da2ed4e61e77bd7\", \"elapsed_ms\": 511}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"peirateia, milos\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+peirateia%2C+milos+%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+peirateia%2C+milos+%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 612, \"response_sha256\": \"a771a832dcaaf722c0c5723dab4bef4016ec6481f80edf48a18a6724823243f3\", \"elapsed_ms\": 525}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+peirateia%2C+milos+%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"milos 1650 peirateia\" history",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+milos+1650+peirateia++history%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+milos+1650+peirateia++history%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 624, \"response_sha256\": \"1573b98e8ccf6e05035dc8b37c433738643d3df20825bb501b3286c7bb952481\", \"elapsed_ms\": 410}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+milos+1650+peirateia++history%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Μήλος 1650 πειρατεία\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"659f7163638980cbd52e71d0896e5b8c57d58742e9d3431067ef0788c9e8a9fb\", \"elapsed_ms\": 1328}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"milos 1650 peirateia\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22milos+1650+peirateia%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22milos+1650+peirateia%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"f77191df33dc7c5d69c328b7d1240ace2b2f39a92b6071583230f21d5d2897fc\", \"elapsed_ms\": 1036}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22milos+1650+peirateia%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"πειρατεία, Μήλος\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"a7aabefd845b9ee5a72c57729e12f5a3d8705223511c713fee80ee34404bf704\", \"elapsed_ms\": 1091}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"peirateia, milos\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22peirateia%2C+milos%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22peirateia%2C+milos%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"3f93ffa2216dddb10a68411d8f8fa74ca09a48ac7e737a1e5873ce2c4009eac5\", \"elapsed_ms\": 1112}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22peirateia%2C+milos%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Biblioteca Digital Hispánica",
+      "repository": "Biblioteca Digital Hispánica",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"milos 1650 peirateia\" history",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Biblioteca Digital Hispánica\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22milos+1650+peirateia%22+AND+alma.all_for_ui%3D%22history%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22milos+1650+peirateia%22+AND+alma.all_for_ui%3D%22history%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 420, \"response_sha256\": \"8e119d7d3fd1692933c4176614eda3d660736a60f9038e5c7330aca56ac4f6ca\", \"elapsed_ms\": 1155}], \"detail\": \"https://catalogo.bne.es/view/sru/34BNE_INST?version=1.2&operation=searchRetrieve&query=alma.all_for_ui%3D%22milos+1650+peirateia%22+AND+alma.all_for_ui%3D%22history%22&recordSchema=marcxml&startRecord=1&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"Μήλος 1650 πειρατεία\"",
+      "records": [
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/makedonika.798",
+          "title": "Η πειρατεία εις τα παράλια της Μακεδονίας κατά την Τουρκοκρατίαν",
+          "creator": [
+            "Ι. Κ. Βασδραβέλλης"
+          ],
+          "date": [
+            "1963-1-1"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.798",
+          "doi": "10.12681/makedonika.798",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μακεδονικά"
+          ],
+          "description": "<p>No abstract</p>",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/6353/6088",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/makedonika.131",
+          "title": "Πειρατεία σε βάρος μοναχών της μονής Χελανδαρίου στη Νότια Ελλάδα τον Ιούλιο του 1822",
+          "creator": [
+            "Απόστολος Ε. Βακαλόπουλος"
+          ],
+          "date": [
+            "1992-1-1"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.131",
+          "doi": "10.12681/makedonika.131",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μακεδονικά"
+          ],
+          "description": "<p>No abstract</p>",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/5692/5431",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.58837/chula.rarebook.5224",
+          "title": "อภิธรรมวิภังค์ ผูก 9",
+          "creator": [],
+          "date": [
+            "1650"
+          ],
+          "url": "https://doi.org/10.58837/chula.rarebook.5224",
+          "doi": "10.58837/chula.rarebook.5224",
+          "type": "monograph",
+          "publisher": "No publisher",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1016/c2014-0-02735-9",
+          "title": "Passiones Animæ",
+          "creator": [],
+          "date": [
+            "1650"
+          ],
+          "url": "https://doi.org/10.1016/c2014-0-02735-9",
+          "doi": "10.1016/c2014-0-02735-9",
+          "type": "edited-book",
+          "publisher": "Elsevier",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://api.elsevier.com/content/article/PII:C20140027359?httpAccept=text/xml",
+              "content_type": "text/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://api.elsevier.com/content/article/PII:C20140027359?httpAccept=text/plain",
+              "content_type": "text/plain",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1016/b978-1-4933-0407-3.50001-3",
+          "title": "Front Matter",
+          "creator": [],
+          "date": [
+            "1650"
+          ],
+          "url": "https://doi.org/10.1016/b978-1-4933-0407-3.50001-3",
+          "doi": "10.1016/b978-1-4933-0407-3.50001-3",
+          "type": "book-chapter",
+          "publisher": "Elsevier",
+          "container_title": [
+            "Passiones Animæ"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://api.elsevier.com/content/article/PII:B9781493304073500013?httpAccept=text/xml",
+              "content_type": "text/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://api.elsevier.com/content/article/PII:B9781493304073500013?httpAccept=text/plain",
+              "content_type": "text/plain",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.15358/0340-1650",
+          "title": "WiSt - Wirtschaftswissenschaftliches Studium",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.15358/0340-1650",
+          "doi": "10.15358/0340-1650",
+          "type": "journal",
+          "publisher": "Verlag C.H.Beck GmbH & Co. KG",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1016/b978-1-4933-0407-3.50219-x",
+          "title": "Responsio ad Secundam Epistolam",
+          "creator": [],
+          "date": [
+            "1650"
+          ],
+          "url": "https://doi.org/10.1016/b978-1-4933-0407-3.50219-x",
+          "doi": "10.1016/b978-1-4933-0407-3.50219-x",
+          "type": "book-chapter",
+          "publisher": "Elsevier",
+          "container_title": [
+            "Passiones Animæ"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://api.elsevier.com/content/article/PII:B978149330407350219X?httpAccept=text/xml",
+              "content_type": "text/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://api.elsevier.com/content/article/PII:B978149330407350219X?httpAccept=text/plain",
+              "content_type": "text/plain",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1007/978-3-540-69000-9_101625",
+          "title": "Solar Keratoses",
+          "creator": [],
+          "date": [
+            "2018"
+          ],
+          "url": "https://doi.org/10.1007/978-3-540-69000-9_101625",
+          "doi": "10.1007/978-3-540-69000-9_101625",
+          "type": "book-chapter",
+          "publisher": "Springer Berlin Heidelberg",
+          "container_title": [
+            "Encyclopedia of Ophthalmology"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://link.springer.com/content/pdf/10.1007/978-3-540-69000-9_101625",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.9785/9783504389017-096",
+          "title": "§ 12a Übergangsvorschriften",
+          "creator": [],
+          "date": [
+            "2024-12-31"
+          ],
+          "url": "https://doi.org/10.9785/9783504389017-096",
+          "doi": "10.9785/9783504389017-096",
+          "type": "book-chapter",
+          "publisher": "Verlag Dr. Otto Schmidt",
+          "container_title": [
+            "Wertpapiererwerbs- und Übernahmegesetz"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.9785/9783504389017-096/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyter.com/document/doi/10.9785/9783504389017-096/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1016/b978-1-4933-0407-3.50215-2",
+          "title": "Amicus Authoris ad Lectorem",
+          "creator": [],
+          "date": [
+            "1650"
+          ],
+          "url": "https://doi.org/10.1016/b978-1-4933-0407-3.50215-2",
+          "doi": "10.1016/b978-1-4933-0407-3.50215-2",
+          "type": "book-chapter",
+          "publisher": "Elsevier",
+          "container_title": [
+            "Passiones Animæ"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://api.elsevier.com/content/article/PII:B9781493304073502152?httpAccept=text/xml",
+              "content_type": "text/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://api.elsevier.com/content/article/PII:B9781493304073502152?httpAccept=text/plain",
+              "content_type": "text/plain",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1021/bi00809a900",
+          "title": "",
+          "creator": [],
+          "date": [
+            "1970-3-31"
+          ],
+          "url": "https://doi.org/10.1021/bi00809a900",
+          "doi": "10.1021/bi00809a900",
+          "type": "journal-article",
+          "publisher": "American Chemical Society (ACS)",
+          "container_title": [
+            "Biochemistry"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1007/978-3-031-25984-5_300990",
+          "title": "Fundraising",
+          "creator": [],
+          "date": [
+            "2023"
+          ],
+          "url": "https://doi.org/10.1007/978-3-031-25984-5_300990",
+          "doi": "10.1007/978-3-031-25984-5_300990",
+          "type": "book-chapter",
+          "publisher": "Springer International Publishing",
+          "container_title": [
+            "Encyclopedia of Sustainable Management"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://link.springer.com/content/pdf/10.1007/978-3-031-25984-5_300990",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1007/978-3-540-69000-9_101624",
+          "title": "Social Disease",
+          "creator": [],
+          "date": [
+            "2018"
+          ],
+          "url": "https://doi.org/10.1007/978-3-540-69000-9_101624",
+          "doi": "10.1007/978-3-540-69000-9_101624",
+          "type": "book-chapter",
+          "publisher": "Springer Berlin Heidelberg",
+          "container_title": [
+            "Encyclopedia of Ophthalmology"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://link.springer.com/content/pdf/10.1007/978-3-540-69000-9_101624",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1007/978-0-387-79948-3_5219",
+          "title": "Modified FAI",
+          "creator": [],
+          "date": [
+            "2011"
+          ],
+          "url": "https://doi.org/10.1007/978-0-387-79948-3_5219",
+          "doi": "10.1007/978-0-387-79948-3_5219",
+          "type": "book-chapter",
+          "publisher": "Springer New York",
+          "container_title": [
+            "Encyclopedia of Clinical Neuropsychology"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://link.springer.com/content/pdf/10.1007/978-0-387-79948-3_5219",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1007/978-981-97-4618-7_300680",
+          "title": "Productivity Increase",
+          "creator": [],
+          "date": [
+            "2025"
+          ],
+          "url": "https://doi.org/10.1007/978-981-97-4618-7_300680",
+          "doi": "10.1007/978-981-97-4618-7_300680",
+          "type": "book-chapter",
+          "publisher": "Springer Nature Singapore",
+          "container_title": [
+            "Encyclopedia of Green Materials"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://link.springer.com/content/pdf/10.1007/978-981-97-4618-7_300680",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1007/978-3-540-69000-9_101626",
+          "title": "Solar Keratosis",
+          "creator": [],
+          "date": [
+            "2018"
+          ],
+          "url": "https://doi.org/10.1007/978-3-540-69000-9_101626",
+          "doi": "10.1007/978-3-540-69000-9_101626",
+          "type": "book-chapter",
+          "publisher": "Springer Berlin Heidelberg",
+          "container_title": [
+            "Encyclopedia of Ophthalmology"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://link.springer.com/content/pdf/10.1007/978-3-540-69000-9_101626",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1007/978-3-031-25984-5_300989",
+          "title": "Fund",
+          "creator": [],
+          "date": [
+            "2023"
+          ],
+          "url": "https://doi.org/10.1007/978-3-031-25984-5_300989",
+          "doi": "10.1007/978-3-031-25984-5_300989",
+          "type": "book-chapter",
+          "publisher": "Springer International Publishing",
+          "container_title": [
+            "Encyclopedia of Sustainable Management"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://link.springer.com/content/pdf/10.1007/978-3-031-25984-5_300989",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1016/b978-1-4933-0407-3.50002-5",
+          "title": "Interpetis Præfatiuncula ad Lectorem",
+          "creator": [],
+          "date": [
+            "1650"
+          ],
+          "url": "https://doi.org/10.1016/b978-1-4933-0407-3.50002-5",
+          "doi": "10.1016/b978-1-4933-0407-3.50002-5",
+          "type": "book-chapter",
+          "publisher": "Elsevier",
+          "container_title": [
+            "Passiones Animæ"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://api.elsevier.com/content/article/PII:B9781493304073500025?httpAccept=text/xml",
+              "content_type": "text/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://api.elsevier.com/content/article/PII:B9781493304073500025?httpAccept=text/plain",
+              "content_type": "text/plain",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1007/978-3-540-69000-9_101623",
+          "title": "Snellen Ratio",
+          "creator": [],
+          "date": [
+            "2018"
+          ],
+          "url": "https://doi.org/10.1007/978-3-540-69000-9_101623",
+          "doi": "10.1007/978-3-540-69000-9_101623",
+          "type": "book-chapter",
+          "publisher": "Springer Berlin Heidelberg",
+          "container_title": [
+            "Encyclopedia of Ophthalmology"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://link.springer.com/content/pdf/10.1007/978-3-540-69000-9_101623",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.5040/9781472599599.ch-005",
+          "title": "Bridges, 1650–1760",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.5040/9781472599599.ch-005",
+          "doi": "10.5040/9781472599599.ch-005",
+          "type": "book-chapter",
+          "publisher": "Bloomsbury Academic",
+          "container_title": [
+            "English Counties And Public Building 1650–1830"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 119}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 34436, \"response_sha256\": \"0c378f870cc02b0e009507477a42058bec34e9cc58811444d0c9564a376f28cc\", \"elapsed_ms\": 907}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1351, \"response_sha256\": \"bed318105edb8b59e9b85854475c57a15ae038fb73f0519bce0fe2cc67b5ca58\", \"elapsed_ms\": 348}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 20, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 119}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 34436, \"response_sha256\": \"0c378f870cc02b0e009507477a42058bec34e9cc58811444d0c9564a376f28cc\", \"elapsed_ms\": 907}, {\"url\": \"https://api.openalex.org/works?search=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": "
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"milos 1650 peirateia\"",
+      "records": [
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.5040/9781350920552",
+          "title": "Milos Forman",
+          "creator": [],
+          "date": [
+            "1966"
+          ],
+          "url": "https://doi.org/10.5040/9781350920552",
+          "doi": "10.5040/9781350920552",
+          "type": "other",
+          "publisher": "Bloomsbury Publishing (UK)",
+          "container_title": [
+            "Milos Forman"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.5040/9781350923683",
+          "title": "Milos Forman",
+          "creator": [],
+          "date": [
+            "1986"
+          ],
+          "url": "https://doi.org/10.5040/9781350923683",
+          "doi": "10.5040/9781350923683",
+          "type": "other",
+          "publisher": "Bloomsbury Publishing (UK)",
+          "container_title": [
+            "Milos Forman"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gmo/9781561592630.article.51847",
+          "title": "Milos, André",
+          "creator": [],
+          "date": [
+            "2001"
+          ],
+          "url": "https://doi.org/10.1093/gmo/9781561592630.article.51847",
+          "doi": "10.1093/gmo/9781561592630.article.51847",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Music Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00180905",
+          "title": "Tenkovic, Milos",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00180905",
+          "doi": "10.1093/benz/9780199773787.article.b00180905",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00067029",
+          "title": "France, Milos",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00067029",
+          "doi": "10.1093/benz/9780199773787.article.b00067029",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00187191",
+          "title": "Urbasek, Milos",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00187191",
+          "doi": "10.1093/benz/9780199773787.article.b00187191",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00095690",
+          "title": "Jonic, Milos",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00095690",
+          "doi": "10.1093/benz/9780199773787.article.b00095690",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00099917",
+          "title": "Kodjoman, Milos",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00099917",
+          "doi": "10.1093/benz/9780199773787.article.b00099917",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00010328",
+          "title": "Bajic, Milos",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00010328",
+          "doi": "10.1093/benz/9780199773787.article.b00010328",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00095034",
+          "title": "Jiranek, Milos",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00095034",
+          "doi": "10.1093/benz/9780199773787.article.b00095034",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00171445",
+          "title": "Sobajic, Milos",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00171445",
+          "doi": "10.1093/benz/9780199773787.article.b00171445",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00202857",
+          "title": "Cvach, Milos",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00202857",
+          "doi": "10.1093/benz/9780199773787.article.b00202857",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00160666",
+          "title": "Santho, Milos or Nikolaus",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00160666",
+          "doi": "10.1093/benz/9780199773787.article.b00160666",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00014339",
+          "title": "Bazovsky, Milos or Mikulas Alexander",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00014339",
+          "doi": "10.1093/benz/9780199773787.article.b00014339",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2514/6.1997-2479",
+          "title": "Gas permeability of rigid fibrous refractory insulations",
+          "creator": [
+            "Jochen Marshall",
+            "Frank Milos"
+          ],
+          "date": [
+            "1997-6-23"
+          ],
+          "url": "https://doi.org/10.2514/6.1997-2479",
+          "doi": "10.2514/6.1997-2479",
+          "type": "proceedings-article",
+          "publisher": "American Institute of Aeronautics and Astronautics",
+          "container_title": [
+            "32nd Thermophysics Conference"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://arc.aiaa.org/doi/pdf/10.2514/6.1997-2479",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/oso/9780190096786.003.0013",
+          "title": "Being milos",
+          "creator": [
+            "Filippo Bonini Baraldi"
+          ],
+          "date": [
+            "2021-5-27"
+          ],
+          "url": "https://doi.org/10.1093/oso/9780190096786.003.0013",
+          "doi": "10.1093/oso/9780190096786.003.0013",
+          "type": "book-chapter",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Roma Music and Emotion"
+          ],
+          "description": "This chapter examines the semantic ramifications of the Romanian term milă (pity, compassion, empathy) and the type of intersubjective relationships it evokes. It is shown that in Ceuaş the milă structures several types of relationships: those that are based on disinterested generosity and compassion; on social obligation and the power dynamics of the Roma community; and on the clever subterfuges that are required of Roma interacting with Gaje. According to the Roma of Ceuaş, “being milos ” (empathic) is a central feature of their identity and it explains why they cry so often with music. It is suggested that the Roma of Ceuaş may be considered an “emotional minority,” at odds with the organization of affects in the Gaji (non-Roma) society.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2514/6.1997-141",
+          "title": "Comprehensive model for multicomponent ablation thermochemistry",
+          "creator": [
+            "F. Milos",
+            "Y.-K. Chen"
+          ],
+          "date": [
+            "1997-1-6"
+          ],
+          "url": "https://doi.org/10.2514/6.1997-141",
+          "doi": "10.2514/6.1997-141",
+          "type": "proceedings-article",
+          "publisher": "American Institute of Aeronautics and Astronautics",
+          "container_title": [
+            "35th Aerospace Sciences Meeting and Exhibit"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://arc.aiaa.org/doi/pdf/10.2514/6.1997-141",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1163/1570-6664_iyb_sim_person_57246",
+          "title": "Bukejlovic, Milos",
+          "creator": [],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.1163/1570-6664_iyb_sim_person_57246",
+          "doi": "10.1163/1570-6664_iyb_sim_person_57246",
+          "type": "dataset",
+          "publisher": "Walter de Gruyter GmbH",
+          "container_title": [
+            "International Year Book and Statesmen's Who's Who"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.29302/oeconomica.2014.16.2.20",
+          "title": "\"A Survey Regarding The Quality Of Financialstatements \"",
+          "creator": [
+            "Laura Raisa Milos",
+            "Marius Cristian Milos"
+          ],
+          "date": [
+            "2014-12-31"
+          ],
+          "url": "https://doi.org/10.29302/oeconomica.2014.16.2.20",
+          "doi": "10.29302/oeconomica.2014.16.2.20",
+          "type": "journal-article",
+          "publisher": "Universitatea 1 Decembrie 1918 din Alba Iulia / 1 Decembrie 1918 University of Alba Iulia",
+          "container_title": [
+            "Annales Universitatis Apulensis Series Oeconomica"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/eadd/44654",
+          "title": "Modelling of Milos geothermal field in Greece",
+          "creator": [
+            "Δημήτριος Μενδρινός"
+          ],
+          "date": [
+            "None"
+          ],
+          "url": "https://doi.org/10.12681/eadd/44654",
+          "doi": "10.12681/eadd/44654",
+          "type": "dissertation",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22milos+1650+peirateia%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 66}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22milos+1650+peirateia%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22milos+1650+peirateia%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 30435, \"response_sha256\": \"c5a470b36df0b511c9290b115f27311b7b141ef9a7acf82d49c02f04c81298a6\", \"elapsed_ms\": 672}, {\"url\": \"https://api.openalex.org/works?search=%22milos+1650+peirateia%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22milos+1650+peirateia%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1072, \"response_sha256\": \"3e45c99f7ff12c5cc6c694790636f1c37fdd8b86596a2ff4b72ac5054e0f7053\", \"elapsed_ms\": 202}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 20, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22milos+1650+peirateia%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 66}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22milos+1650+peirateia%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22milos+1650+peirateia%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 30435, \"response_sha256\": \"c5a470b36df0b511c9290b115f27311b7b141ef9a7acf82d49c02f04c81298a6\", \"elapsed_ms\": 672}, {\"url\": \"https://api.openalex.org/works?search=%22milos+1650+peirateia%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22milos+1650+peirateia%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1072, \"response_sha256\": \"3e45c99f7ff12c5cc6c694790636f1c37fdd8b86596a2ff4b72ac5054e0f7053\", \"elapsed_ms\": 202}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAl"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"πειρατεία, Μήλος\"",
+      "records": [
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/makedonika.798",
+          "title": "Η πειρατεία εις τα παράλια της Μακεδονίας κατά την Τουρκοκρατίαν",
+          "creator": [
+            "Ι. Κ. Βασδραβέλλης"
+          ],
+          "date": [
+            "1963-1-1"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.798",
+          "doi": "10.12681/makedonika.798",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μακεδονικά"
+          ],
+          "description": "<p>No abstract</p>",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/6353/6088",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.12681/makedonika.131",
+          "title": "Πειρατεία σε βάρος μοναχών της μονής Χελανδαρίου στη Νότια Ελλάδα τον Ιούλιο του 1822",
+          "creator": [
+            "Απόστολος Ε. Βακαλόπουλος"
+          ],
+          "date": [
+            "1992-1-1"
+          ],
+          "url": "https://doi.org/10.12681/makedonika.131",
+          "doi": "10.12681/makedonika.131",
+          "type": "journal-article",
+          "publisher": "National Documentation Centre (EKT)",
+          "container_title": [
+            "Μακεδονικά"
+          ],
+          "description": "<p>No abstract</p>",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "http://ejournals.epublishing.ekt.gr/index.php/makedonika/article/viewFile/5692/5431",
+              "content_type": "application/pdf",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 80}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 4875, \"response_sha256\": \"1efab4cc98bf5d2070992de7390f6173668b8ad2ae773f4737360de8eaae7d52\", \"elapsed_ms\": 567}, {\"url\": \"https://api.openalex.org/works?search=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1336, \"response_sha256\": \"5cf2b1943a720f189d91ddd873f72158c2b03b37d306adb66b089133febc6a2e\", \"elapsed_ms\": 256}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 2}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 2, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 80}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 4875, \"response_sha256\": \"1efab4cc98bf5d2070992de7390f6173668b8ad2ae773f4737360de8eaae7d52\", \"elapsed_ms\": 567}, {\"url\": \"https://api.openalex.org/works?search=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1336, \"respo"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"peirateia, milos\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22peirateia%2C+milos%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 65}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22peirateia%2C+milos%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 198}, {\"url\": \"https://api.openalex.org/works?search=%22peirateia%2C+milos%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22peirateia%2C+milos%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1055, \"response_sha256\": \"b120249cdcd52095fbed77166ad039569e5911fc968232332f60c30797401b3d\", \"elapsed_ms\": 173}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22peirateia%2C+milos%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 65}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22peirateia%2C+milos%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 198}, {\"url\": \"https://api.openalex.org/works?search=%22peirateia%2C+milos%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22peirateia%2C+milos%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1055, \"response_sha256\": \"b120249cdcd52095fbed77166ad039569e5911fc968232332f60c30797401b3d\", \"elapsed_ms\": 173}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"FAILED\\\", \\\"error_type\\\": \\\"HTTPError\\\"}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:Academia.edu Public Research",
+      "repository": "Academia.edu Public Research",
+      "operation": "search",
+      "status": "REMOTE_ACCESS_BLOCKED",
+      "query": "\"milos 1650 peirateia\" history",
+      "records": [
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.5040/9781350920552",
+          "title": "Milos Forman",
+          "creator": [],
+          "date": [
+            "1966"
+          ],
+          "url": "https://doi.org/10.5040/9781350920552",
+          "doi": "10.5040/9781350920552",
+          "type": "other",
+          "publisher": "Bloomsbury Publishing (UK)",
+          "container_title": [
+            "Milos Forman"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.5040/9781350923683",
+          "title": "Milos Forman",
+          "creator": [],
+          "date": [
+            "1986"
+          ],
+          "url": "https://doi.org/10.5040/9781350923683",
+          "doi": "10.5040/9781350923683",
+          "type": "other",
+          "publisher": "Bloomsbury Publishing (UK)",
+          "container_title": [
+            "Milos Forman"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/gmo/9781561592630.article.51847",
+          "title": "Milos, André",
+          "creator": [],
+          "date": [
+            "2001"
+          ],
+          "url": "https://doi.org/10.1093/gmo/9781561592630.article.51847",
+          "doi": "10.1093/gmo/9781561592630.article.51847",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Oxford Music Online"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00180905",
+          "title": "Tenkovic, Milos",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00180905",
+          "doi": "10.1093/benz/9780199773787.article.b00180905",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00067029",
+          "title": "France, Milos",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00067029",
+          "doi": "10.1093/benz/9780199773787.article.b00067029",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00187191",
+          "title": "Urbasek, Milos",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00187191",
+          "doi": "10.1093/benz/9780199773787.article.b00187191",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00095690",
+          "title": "Jonic, Milos",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00095690",
+          "doi": "10.1093/benz/9780199773787.article.b00095690",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00099917",
+          "title": "Kodjoman, Milos",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00099917",
+          "doi": "10.1093/benz/9780199773787.article.b00099917",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00010328",
+          "title": "Bajic, Milos",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00010328",
+          "doi": "10.1093/benz/9780199773787.article.b00010328",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00095034",
+          "title": "Jiranek, Milos",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00095034",
+          "doi": "10.1093/benz/9780199773787.article.b00095034",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9780691194318-006",
+          "title": "1600–1650",
+          "creator": [],
+          "date": [
+            "2019-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9780691194318-006",
+          "doi": "10.1515/9780691194318-006",
+          "type": "book-chapter",
+          "publisher": "Princeton University Press",
+          "container_title": [
+            "A History of Art History"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://princetonup.degruyter.com/view/book/9780691194318/10.1515/9780691194318-006.xml",
+              "content_type": "text/html",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9780691194318-006/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9780691194318-006/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00171445",
+          "title": "Sobajic, Milos",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00171445",
+          "doi": "10.1093/benz/9780199773787.article.b00171445",
+          "type": "reference-entry",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2307/j.ctvdf0jr3.8",
+          "title": "1600–1650",
+          "creator": [],
+          "date": [
+            "2019-9-3"
+          ],
+          "url": "https://doi.org/10.2307/j.ctvdf0jr3.8",
+          "doi": "10.2307/j.ctvdf0jr3.8",
+          "type": "book-chapter",
+          "publisher": "Princeton University Press",
+          "container_title": [
+            "A History of Art History"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.2307/j.ctvdf0jr3.9",
+          "title": "1650–1700",
+          "creator": [],
+          "date": [
+            "2019-9-3"
+          ],
+          "url": "https://doi.org/10.2307/j.ctvdf0jr3.9",
+          "doi": "10.2307/j.ctvdf0jr3.9",
+          "type": "book-chapter",
+          "publisher": "Princeton University Press",
+          "container_title": [
+            "A History of Art History"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00202857",
+          "title": "Cvach, Milos",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00202857",
+          "doi": "10.1093/benz/9780199773787.article.b00202857",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9780691194318-007",
+          "title": "1650–1700",
+          "creator": [],
+          "date": [
+            "2019-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9780691194318-007",
+          "doi": "10.1515/9780691194318-007",
+          "type": "book-chapter",
+          "publisher": "Princeton University Press",
+          "container_title": [
+            "A History of Art History"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://princetonup.degruyter.com/view/book/9780691194318/10.1515/9780691194318-007.xml",
+              "content_type": "text/html",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9780691194318-007/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyterbrill.com/document/doi/10.1515/9780691194318-007/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00160666",
+          "title": "Santho, Milos or Nikolaus",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00160666",
+          "doi": "10.1093/benz/9780199773787.article.b00160666",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1093/benz/9780199773787.article.b00014339",
+          "title": "Bazovsky, Milos or Mikulas Alexander",
+          "creator": [],
+          "date": [
+            "2011-10-31"
+          ],
+          "url": "https://doi.org/10.1093/benz/9780199773787.article.b00014339",
+          "doi": "10.1093/benz/9780199773787.article.b00014339",
+          "type": "reference-book",
+          "publisher": "Oxford University Press",
+          "container_title": [
+            "Benezit Dictionary of Artists"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.1515/9781787440081-006",
+          "title": "2. Naval Seamen, 1650–1700",
+          "creator": [
+            "Bernard Capp"
+          ],
+          "date": [
+            "2017-12-31"
+          ],
+          "url": "https://doi.org/10.1515/9781787440081-006",
+          "doi": "10.1515/9781787440081-006",
+          "type": "book-chapter",
+          "publisher": "Boydell and Brewer",
+          "container_title": [
+            "The Social History of English Seamen, 1650-1815"
+          ],
+          "description": "",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9781787440081-006/xml",
+              "content_type": "application/xml",
+              "intended_application": "text-mining",
+              "access_status": "UNVERIFIED"
+            },
+            {
+              "url": "https://www.degruyter.com/document/doi/10.1515/9781787440081-006/pdf",
+              "content_type": "unspecified",
+              "intended_application": "similarity-checking",
+              "access_status": "UNVERIFIED"
+            }
+          ],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        },
+        {
+          "discovery_repository": "Crossref Scholarly Metadata",
+          "discovery_lane": "specialist:pirate_biography",
+          "connector_status": "EXECUTED",
+          "identifier": "10.5194/gchron-2020-30",
+          "title": "Eruptive history and 40Ar/39Ar geochronology of the Milos volcanic\nfield, Greece",
+          "creator": [
+            "Xiaolong Zhou",
+            "Klaudia Kuiper",
+            "Jan Wijbrans",
+            "Katharina Boehm",
+            "Pieter Vroon"
+          ],
+          "date": [
+            "2020-10-13"
+          ],
+          "url": "https://doi.org/10.5194/gchron-2020-30",
+          "doi": "10.5194/gchron-2020-30",
+          "type": "posted-content",
+          "publisher": "Copernicus GmbH",
+          "container_title": [],
+          "description": "Abstract. High-resolution geochronology is essential to determine the growth-rate of volcanoes, which is one of the key factors to establish the periodicity of explosive volcanic eruptions. However, there are less high-resolution eruptive histories (> 106 years) determined for long-lived submarine arc volcanic complexes than for subaerial complexes, since the submarine volcanoes are far more difficult to observe than subaerial ones. In this study, high-resolution geochronology and major element data are presented for Milos Volcanic Field (VF) in the South Aegean Volcanic Arc, Greece. The Milos VF has been active for over 3 Myrs, and the first two million years of its eruptive history occurred in a submarine setting that has emerged above sea level nowadays. The long submarine volcanic history of the Milos VF makes it an excellent natural laboratory to study the growth-rate of a long-lived submarine arc volcanic complex. This study reports twenty-one new high-precision 40Ar/39Ar ages and major element compositions for eleven volcanic units of the Milos VF. This allows us to refine the volcanic evolution of Milos into nine phases and five volcanic quiescence periods of longer than 200 kyrs, on the basis of age, composition, volcano type and location. Phase 1–5 (~ 3.34–1.60 Ma) contributed ~ 85 % by volume to the Milos VF, whereas the volcanoes of Phase 6–9 only erupted small volumes (2–6 km3 in DRE) rhyolitic magmas. Although there are exceptions of the felsic cone volcanoes of Phase 1–2, in general the Milos VF becomes more rhyolitic in composition from Phase 1 to Phase 9. In particular, the last three phases (Phase 7–9) only contain rhyolites. Moreover, the high-resolution geochronology suggests that there are at least three periods of different long term volumetric volcanic output rate (Qe). In the Milos VF, the Qe varies between 0.2 and 6.6 × 10−5 km3 yr−1, 2–3 orders of magnitude lower than the average for rhyolitic systems and continental arcs.",
+          "description_provenance": "CROSSREF_ABSTRACT_METADATA_NOT_INSPECTED_FULLTEXT",
+          "fulltext_links": [],
+          "evidence_level": "SECONDARY_DISCOVERY_ONLY",
+          "verification_status": "UNVERIFIED_DISCOVERY",
+          "acquisition_policy": "METADATA_DISCOVERY_THEN_INSPECT_UNDERLYING_WORK",
+          "discovery_route": "CROSSREF_REST_API",
+          "fallback_for": "Academia.edu Public Research",
+          "fallback_basis": "INDEPENDENT_PUBLIC_METADATA_NOT_ACADEMIA_ACCESS"
+        }
+      ],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22milos+1650+peirateia%22+history\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 60}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22milos+1650+peirateia%22+history&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22milos+1650+peirateia%22+history&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 28224, \"response_sha256\": \"7b1c97859946d5d39a028f64f78ee2fd3d896bbd8dbb638982df88b8a9bb7a5a\", \"elapsed_ms\": 714}, {\"url\": \"https://api.openalex.org/works?search=%22milos+1650+peirateia%22+history&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22milos+1650+peirateia%22+history&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1192, \"response_sha256\": \"632091eb7e4100bd6d256463d0100f2a6a2f65d8207d39a44a10452e70a2a108\", \"elapsed_ms\": 193}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 20}, {\\\"catalogue\\\": \\\"OpenAlex\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\"records\\\": 0}]}\", \"result_count\": 20, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_ACCESS_BLOCKED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22milos+1650+peirateia%22+history\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 60}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22milos+1650+peirateia%22+history&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22milos+1650+peirateia%22+history&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 28224, \"response_sha256\": \"7b1c97859946d5d39a028f64f78ee2fd3d896bbd8dbb638982df88b8a9bb7a5a\", \"elapsed_ms\": 714}, {\"url\": \"https://api.openalex.org/works?search=%22milos+1650+peirateia%22+history&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22milos+1650+peirateia%22+history&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1192, \"response_sha256\": \"632091eb7e4100bd6d256463d0100f2a6a2f65d8207d39a44a10452e70a2a108\", \"elapsed_ms\": 193}], \"detail\": \"{\\\"native_http_status\\\": 403, \\\"reason\\\": \\\"PUBLIC_SEARCH_ACCESS_CONTROL; no CAPTCHA bypass attempted\\\", \\\"alternate_routes\\\": [{\\\"catalogue\\\": \\\"Crossref\\\", \\\"status\\\": \\\"EXECUTED\\\", \\\""
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"πειρατεία, Μήλος\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 591}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 528}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 519}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 591}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 528}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 519}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"peirateia, milos\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22peirateia%2C+milos%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 585}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22peirateia%2C+milos%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 530}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22peirateia%2C+milos%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 505}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22peirateia%2C+milos%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 585}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22peirateia%2C+milos%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 530}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22peirateia%2C+milos%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 505}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"Μήλος 1650 πειρατεία\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 605}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 483}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 492}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 605}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 483}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 492}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"milos 1650 peirateia\" history",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22+history\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 605}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22+history\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 539}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22+history\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 598}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22+history\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 605}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22+history\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 539}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22+history\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 598}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"milos 1650 peirateia\"",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 598}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 521}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 546}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 540}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 598}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 521}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 546}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 540}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_biography",
+      "assignment_id": "pirate_biography:wave1",
+      "assignment_wave": 1
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "41441324980",
+    "agent_id": "pirate_biography",
+    "source_leads": [
+      {
+        "id": "lead_0308b88d4d28cfca2cd50ad1",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/makedonika.798",
+        "title": "Η πειρατεία εις τα παράλια της Μακεδονίας κατά την Τουρκοκρατίαν",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d840b5eee2969a3c97bad023",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/makedonika.131",
+        "title": "Πειρατεία σε βάρος μοναχών της μονής Χελανδαρίου στη Νότια Ελλάδα τον Ιούλιο του 1822",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_18899fd851cb82e265414f01",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.58837/chula.rarebook.5224",
+        "title": "อภิธรรมวิภังค์ ผูก 9",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_881ade8634357390ea13ebcd",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1016/c2014-0-02735-9",
+        "title": "Passiones Animæ",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5d11ec385177c09a953266f1",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1016/b978-1-4933-0407-3.50001-3",
+        "title": "Front Matter",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_33a8b4cf6aa5afb80f21ed84",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.15358/0340-1650",
+        "title": "WiSt - Wirtschaftswissenschaftliches Studium",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ffe649e15552d8ded918e9b5",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1016/b978-1-4933-0407-3.50219-x",
+        "title": "Responsio ad Secundam Epistolam",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_a55d32444999a3b870135858",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1007/978-3-540-69000-9_101625",
+        "title": "Solar Keratoses",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_56f155c6687b8974c292ad3c",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.9785/9783504389017-096",
+        "title": "§ 12a Übergangsvorschriften",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_5a4c3041fc86c69af238764c",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1016/b978-1-4933-0407-3.50215-2",
+        "title": "Amicus Authoris ad Lectorem",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ed8dcc86e89c2e3eadda373d",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1021/bi00809a900",
+        "title": "",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_41e9b132a19c82857a834028",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1007/978-3-031-25984-5_300990",
+        "title": "Fundraising",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4c67ef3b85ad321b84865e8a",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1007/978-3-540-69000-9_101624",
+        "title": "Social Disease",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_660196754d93c0a65776a145",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1007/978-0-387-79948-3_5219",
+        "title": "Modified FAI",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_da4c132497db16d70c8ecc32",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1007/978-981-97-4618-7_300680",
+        "title": "Productivity Increase",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_1d7e7358415e0e33e306ac70",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1007/978-3-540-69000-9_101626",
+        "title": "Solar Keratosis",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_88af4dd7d4a9d5c47fa95e62",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1007/978-3-031-25984-5_300989",
+        "title": "Fund",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b0b3af047540a56dabeb50e0",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1016/b978-1-4933-0407-3.50002-5",
+        "title": "Interpetis Præfatiuncula ad Lectorem",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0e1569b3b84aafbb05162543",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1007/978-3-540-69000-9_101623",
+        "title": "Snellen Ratio",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d9b6ec0a09145a227c0151ae",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.5040/9781472599599.ch-005",
+        "title": "Bridges, 1650–1760",
+        "query": "\"Μήλος 1650 πειρατεία\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_636c5d6cef46e511fcb2332b",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.5040/9781350920552",
+        "title": "Milos Forman",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_56879ebd722bb1104af6f21b",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.5040/9781350923683",
+        "title": "Milos Forman",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_232d8d1eab41d51dfffe0b70",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/gmo/9781561592630.article.51847",
+        "title": "Milos, André",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b5e357bbb44d020cc9927590",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00180905",
+        "title": "Tenkovic, Milos",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_066b759c8a65cdba695fd376",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00067029",
+        "title": "France, Milos",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_4ceb60e4a7227eff13519517",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00187191",
+        "title": "Urbasek, Milos",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_7985d5d23187d725de609f83",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00095690",
+        "title": "Jonic, Milos",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_b8fe315f7788f89c5ccb0a78",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00099917",
+        "title": "Kodjoman, Milos",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_ddd93439a3f80d3f8fb73d4b",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00010328",
+        "title": "Bajic, Milos",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_976f1da35888835b42b7ef6b",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00095034",
+        "title": "Jiranek, Milos",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_e2d5726cfd4ce2b84cacb483",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00171445",
+        "title": "Sobajic, Milos",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_becd75b86911443dcf814405",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00202857",
+        "title": "Cvach, Milos",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0778e5fb2564a52a13411359",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00160666",
+        "title": "Santho, Milos or Nikolaus",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fb89e684b8b80d5f0f4432f9",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/benz/9780199773787.article.b00014339",
+        "title": "Bazovsky, Milos or Mikulas Alexander",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_0f91b1b2e34977c6d14f776c",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2514/6.1997-2479",
+        "title": "Gas permeability of rigid fibrous refractory insulations",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_84a4a4ccc8915a40ece74931",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1093/oso/9780190096786.003.0013",
+        "title": "Being milos",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_9b9adfe9a24c11ba0231e38c",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2514/6.1997-141",
+        "title": "Comprehensive model for multicomponent ablation thermochemistry",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_df18f490a2072f6bc620609e",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1163/1570-6664_iyb_sim_person_57246",
+        "title": "Bukejlovic, Milos",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_52648a379cc69eda323db0db",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.29302/oeconomica.2014.16.2.20",
+        "title": "\"A Survey Regarding The Quality Of Financialstatements \"",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_84e59c55973a4f33c4da4bd9",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.12681/eadd/44654",
+        "title": "Modelling of Milos geothermal field in Greece",
+        "query": "\"milos 1650 peirateia\"",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_486aecd6c759420e790edd37",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9780691194318-006",
+        "title": "1600–1650",
+        "query": "\"milos 1650 peirateia\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_d002df8a4d377d59b9820515",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2307/j.ctvdf0jr3.8",
+        "title": "1600–1650",
+        "query": "\"milos 1650 peirateia\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_2497f098dc3ca623f870f8c0",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.2307/j.ctvdf0jr3.9",
+        "title": "1650–1700",
+        "query": "\"milos 1650 peirateia\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_8e6f74f2b2f8b6d88b6a9626",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9780691194318-007",
+        "title": "1650–1700",
+        "query": "\"milos 1650 peirateia\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_830de9f98312e8c4bafb1a6e",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.1515/9781787440081-006",
+        "title": "2. Naval Seamen, 1650–1700",
+        "query": "\"milos 1650 peirateia\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      },
+      {
+        "id": "lead_fa29c936546d6363874bc445",
+        "run_id": "41441324980",
+        "agent_id": "pirate_biography",
+        "connector_id": "repo:Academia.edu Public Research",
+        "source_url_or_identifier": "https://doi.org/10.5194/gchron-2020-30",
+        "title": "Eruptive history and 40Ar/39Ar geochronology of the Milos volcanic\nfield, Greece",
+        "query": "\"milos 1650 peirateia\" history",
+        "stage": "DISCOVERY_ONLY",
+        "historical_attestation": false,
+        "citation_verified": false,
+        "requires": [
+          "ACQUIRE_SOURCE",
+          "EXTRACT_SOURCE_TEXT",
+          "REPLAY_QUOTE",
+          "HUMAN_REVIEW"
+        ]
+      }
+    ],
+    "connector_errors": [
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 119}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 34436, \"response_sha256\": \"0c378f870cc02b0e009507477a42058bec34e9cc58811444d0c9"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22milos+1650+peirateia%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 66}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22milos+1650+peirateia%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22milos+1650+peirateia%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 30435, \"response_sha256\": \"c5a470b36df0b511c9290b115f27311b7b141ef9a7acf82d49c02f04c81298a6\", \"elapsed_ms\": 672}, {\"url\": \"https://api.openalex.org/works?search=%22milos+1650+peirateia%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 80}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 4875, \"response_sha256\": \"1efab4cc98bf5d2070992de7390f6173668b8ad2ae773f4737360de8eaae"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22peirateia%2C+milos%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 65}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22peirateia%2C+milos%22&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 198}, {\"url\": \"https://api.openalex.org/works?search=%22peirateia%2C+milos%22&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.openalex.org/works?search=%22peirateia%2C+milos%22&per_page=20\", \"content_type\": \"application/json\", \"response_bytes\": 1055, \"response_sha256\": \"b120249cdcd52095fbed77166ad039569e59"
+      },
+      {
+        "connector_id": "repo:Academia.edu Public Research",
+        "status": "REMOTE_ACCESS_BLOCKED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Academia.edu Public Research\", \"status\": \"REMOTE_ACCESS_BLOCKED\", \"http_attempts\": [{\"url\": \"https://www.academia.edu/search?q=%22milos+1650+peirateia%22+history\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 403, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_403\", \"elapsed_ms\": 60}, {\"url\": \"https://api.crossref.org/works?query.bibliographic=%22milos+1650+peirateia%22+history&rows=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://api.crossref.org/works?query.bibliographic=%22milos+1650+peirateia%22+history&rows=20\", \"content_type\": \"application/json\", \"response_bytes\": 28224, \"response_sha256\": \"7b1c97859946d5d39a028f64f78ee2fd3d896bbd8dbb638982df88b8a9bb7a5a\", \"elapsed_ms\": 714}, {\"url\": \"https://api.openalex.org/works?search=%22milos+1650+peirateia%22+history&per_page=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status"
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 591}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 528}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%2C+%CE%9C%CE%AE%CE%BB%CE%BF%CF%82%22\", \"method\": \"GET\", \"request_"
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22peirateia%2C+milos%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 585}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22peirateia%2C+milos%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 530}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22peirateia%2C+milos%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 505}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count"
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 605}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 483}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%9C%CE%AE%CE%BB%CE%BF%CF%82+1650+%CF%80%CE%B5%CE%B9%CF%81%CE%B1%CF%84%CE%B5%CE%AF%CE%B1%22\", \"method\": \"GET\", \"re"
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22+history\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 605}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22+history\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 539}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22+history\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 598}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type"
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 598}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 521}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22milos+1650+peirateia%22\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 546}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?text"
+      }
+    ],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 62,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
