@@ -39,6 +39,11 @@ on:
         description: "Evaluation only: requires 1-3 selected_agents, caps acquisition/synthesis time, reports INCOMPLETE validation as a warning. Off = normal production research"
         type: boolean
         default: false
+      initial_semantic_shards:
+        description: "Initial reading: parallel GitHub runners for extraction/review; tiny corpora use one"
+        type: choice
+        options: ['1', '2', '4']
+        default: '4'
       semantic_shards:
         description: "Continuation rounds only: read excerpts on 1-4 parallel free runners. 1 = one job, as before"
         type: choice
@@ -63,6 +68,7 @@ env:
   PCT_AUTO_CONTINUE: ${{ inputs.auto_continue == false && 'false' || 'true' }}
   PCT_EVAL_FAST_MODE: ${{ inputs.eval_fast_mode == true && 'true' || 'false' }}
   PCT_SEMANTIC_SHARDS: ${{ inputs.semantic_shards || '1' }}
+  PCT_INITIAL_SEMANTIC_SHARDS: ${{ inputs.initial_semantic_shards || '4' }}
   PCT_LLM_PROVIDER: ${{ vars.PCT_LLM_PROVIDER || 'local_llama_cpp' }}
   PCT_LLM_MODEL: ${{ vars.PCT_LLM_MODEL || 'Qwen/Qwen3-8B-GGUF' }}
   PCT_LLM_BASE_URL: ${{ vars.PCT_LLM_BASE_URL }}
@@ -528,9 +534,157 @@ jobs:
           python3 tools/research_stage.py --stage publication -- python3 tools/publish_research_outputs.py
 
 
-  jarvis-state-board:
+  semantic-prepare:
     needs: [prepare, publish-lanes]
-    if: always() && needs.prepare.result == 'success' && github.ref == 'refs/heads/main'
+    if: always() && needs.prepare.result == 'success' && needs.publish-lanes.result == 'success' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      shards: ${{ steps.plan.outputs.shards }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+      sha: ${{ steps.snapshot.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/evidence/runs/
+            /evidence/runs/${{ github.run_id }}/
+            !/evidence/specialist_runs/
+            /evidence/specialist_runs/${{ github.run_id }}/
+            !/backups/
+      # Only the small embedding model is needed to freeze the same ranked
+      # reading order. Do not load/download the multi-GB inference model here.
+      - uses: actions/cache/restore@v4
+        if: env.PCT_INITIAL_SEMANTIC_SHARDS != '1' && env.PCT_EVAL_FAST_MODE != 'true' && env.PCT_LLM_PROVIDER != 'disabled'
+        continue-on-error: true
+        with:
+          path: ~/.cache/nabou-models/multilingual-e5-small
+          key: nabou-embed-multilingual-e5-small-onnx-int8-761b726d-v1
+      - name: Prepare only the existing small ranking model
+        if: env.PCT_INITIAL_SEMANTIC_SHARDS != '1' && env.PCT_EVAL_FAST_MODE != 'true' && env.PCT_LLM_PROVIDER != 'disabled'
+        continue-on-error: true
+        run: |
+          python3 -m pip install --quiet 'onnxruntime>=1.18,<2' 'tokenizers>=0.19,<1'
+          python3 tools/local_embeddings.py --download "$HOME/.cache/nabou-models/multilingual-e5-small"
+          echo "PCT_EMBED_MODEL_DIR=$HOME/.cache/nabou-models/multilingual-e5-small" >> "$GITHUB_ENV"
+      - id: plan
+        name: Freeze one source-bound reading order without model inference
+        run: python3 tools/first_pass_semantics.py prepare --run-id "$GITHUB_RUN_ID" --count "$PCT_INITIAL_SEMANTIC_SHARDS"
+      - id: snapshot
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: initial-semantic-plan-${{ github.run_id }}
+          path: evidence/runs/${{ github.run_id }}/first_pass/
+          if-no-files-found: error
+          retention-days: 90
+
+  semantic-read:
+    needs: [prepare, semantic-prepare]
+    if: needs.semantic-prepare.result == 'success' && needs.semantic-prepare.outputs.shards != '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        shard: ${{ fromJSON(needs.semantic-prepare.outputs.matrix) }}
+    env:
+      PCT_SEMANTIC_PARTIAL_ANSWER: '1'
+      PCT_SEMANTIC_BATCHES: '3'
+      PCT_SEMANTIC_CALLS_PER_PASS: '48'
+      PCT_SEMANTIC_BUDGET_SECONDS: '900'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.semantic-prepare.outputs.sha }}
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/evidence/runs/
+            /evidence/runs/${{ github.run_id }}/
+            !/evidence/specialist_runs/
+            /evidence/specialist_runs/${{ github.run_id }}/
+            !/backups/
+      - uses: actions/download-artifact@v4
+        with:
+          name: initial-semantic-plan-${{ github.run_id }}
+          path: evidence/runs/${{ github.run_id }}/first_pass
+      - uses: ./.github/actions/research-model
+      - name: Read this initial shard and review its claims (no final synthesis)
+        run: python3 tools/first_pass_semantics.py read --run-id "$GITHUB_RUN_ID" --index "${{ matrix.shard }}" --count "${{ needs.semantic-prepare.outputs.shards }}"
+      - name: Preserve completed work even if this reader failed
+        if: always()
+        run: python3 tools/first_pass_semantics.py pack --run-id "$GITHUB_RUN_ID" --index "${{ matrix.shard }}" --count "${{ needs.semantic-prepare.outputs.shards }}" --output initial-shard-transport
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: initial-semantic-out-${{ github.run_id }}-${{ matrix.shard }}
+          path: initial-shard-transport/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+
+  semantic-collect:
+    needs: [semantic-prepare, semantic-read]
+    if: always() && needs.semantic-prepare.result == 'success' && needs.semantic-prepare.outputs.shards != '1'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      sha: ${{ steps.publish.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.semantic-prepare.outputs.sha }}
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/evidence/runs/
+            /evidence/runs/${{ github.run_id }}/
+            !/evidence/specialist_runs/
+            /evidence/specialist_runs/${{ github.run_id }}/
+            !/backups/
+      - uses: actions/download-artifact@v4
+        with:
+          name: initial-semantic-plan-${{ github.run_id }}
+          path: evidence/runs/${{ github.run_id }}/first_pass
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          pattern: initial-semantic-out-${{ github.run_id }}-*
+          path: initial-shard-transports
+      - name: Verify and combine available checkpoints without inference
+        run: python3 tools/first_pass_semantics.py unpack --run-id "$GITHUB_RUN_ID" --count "${{ needs.semantic-prepare.outputs.shards }}" --incoming initial-shard-transports
+      - id: publish
+        name: Durably publish every completed shard before final synthesis
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for path in "evidence/runs/$GITHUB_RUN_ID/first_pass/" "evidence/runs/$GITHUB_RUN_ID/research_continuation/"; do
+            if [ -e "$path" ]; then git add "$path"; fi
+          done
+          if ! git diff --cached --quiet; then
+            git commit -m "Preserve initial parallel semantic work $GITHUB_RUN_ID"
+            python3 tools/publish_research_outputs.py
+          fi
+          echo "sha=$(git rev-parse refs/remotes/origin/main)" >> "$GITHUB_OUTPUT"
+
+  jarvis-state-board:
+    needs: [prepare, publish-lanes, semantic-prepare, semantic-collect]
+    if: always() && needs.prepare.result == 'success' && github.ref == 'refs/heads/main' && (needs.semantic-prepare.outputs.shards == '1' || needs.semantic-collect.result == 'success')
     concurrency:
       group: pct-command-center-research-${{ github.run_id }}
       cancel-in-progress: false
@@ -550,7 +704,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ needs.semantic-prepare.outputs.sha }}
           fetch-depth: 2
           filter: blob:none
           sparse-checkout-cone-mode: false
@@ -561,8 +715,16 @@ jobs:
             !/evidence/specialist_runs/
             /evidence/specialist_runs/${{ github.run_id }}/
             !/backups/
-      - name: Refresh durable evidence
-        run: git pull --rebase origin main
+      - name: Restore the published corpus while keeping the pinned engine code
+        env:
+          SOURCE_SHA: ${{ needs.semantic-collect.outputs.sha || needs.semantic-prepare.outputs.sha }}
+        run: |
+          git fetch --depth=2 origin "$SOURCE_SHA"
+          git restore --source=FETCH_HEAD -- "evidence/runs/$GITHUB_RUN_ID"
+      - uses: actions/download-artifact@v4
+        with:
+          name: initial-semantic-plan-${{ github.run_id }}
+          path: evidence/runs/${{ github.run_id }}/first_pass
       - uses: ./.github/actions/research-model
       - name: Build JARVIS situation board
         env:
@@ -571,6 +733,9 @@ jobs:
           python3 tools/orchestrator/jarvis_state_board.py \
             --run-id "$PCT_RUN_ID" \
             --output "evidence/runs/$PCT_RUN_ID/JARVIS_STATE_BOARD.json"
+      - name: Bound the parallel merge review budget
+        if: needs.semantic-prepare.outputs.shards != '1'
+        run: echo "PCT_SEMANTIC_BUDGET_SECONDS=900" >> "$GITHUB_ENV"
       - name: Apply eval fast-mode synthesis budget
         if: env.PCT_EVAL_FAST_MODE == 'true'
         run: |
@@ -580,6 +745,9 @@ jobs:
         timeout-minutes: 50
         env:
           PCT_RUN_ID: ${{ github.run_id }}
+          PCT_SEMANTIC_READING_PLAN: ${{ needs.semantic-prepare.outputs.shards != '1' && format('evidence/runs/{0}/first_pass/reading_plan.json', github.run_id) || '' }}
+          PCT_SEMANTIC_MERGE: ${{ needs.semantic-prepare.outputs.shards != '1' && '1' || '0' }}
+          PCT_INITIAL_SEMANTIC_MERGE: ${{ needs.semantic-prepare.outputs.shards != '1' && '1' || '0' }}
         run: python3 tools/semantic_research_answer.py --run-id "$PCT_RUN_ID"
       - name: Record actual validation even after failed or interrupted synthesis
         if: always()
@@ -608,6 +776,7 @@ jobs:
           name: research-semantic-answer-${{ github.run_id }}
           path: |
             evidence/runs/${{ github.run_id }}/research_answer/
+            evidence/runs/${{ github.run_id }}/first_pass/
             evidence/runs/${{ github.run_id }}/research_continuation/
           retention-days: 90
       - name: Commit situation board
@@ -637,7 +806,7 @@ jobs:
           fi
           git config user.name "jarvis-orchestrator[bot]"
           git config user.email "jarvis-orchestrator@users.noreply.github.com"
-          for output in "evidence/runs/$PCT_RUN_ID/JARVIS_STATE_BOARD.json" "evidence/runs/$PCT_RUN_ID/research_answer/" "evidence/runs/$PCT_RUN_ID/research_continuation/" command-center/live/; do
+          for output in "evidence/runs/$PCT_RUN_ID/JARVIS_STATE_BOARD.json" "evidence/runs/$PCT_RUN_ID/research_answer/" "evidence/runs/$PCT_RUN_ID/research_continuation/" "evidence/runs/$PCT_RUN_ID/first_pass/" command-center/live/; do
             if [ -e "$output" ]; then git add "$output"; fi
           done
           git diff --cached --quiet && exit 0
@@ -667,4 +836,5 @@ jobs:
           PCT_RUN_ID: ${{ github.run_id }}
           GH_TOKEN: ${{ github.token }}
         run: PYTHONPATH=tools python3 tools/auto_chain.py dispatch --run-id "$PCT_RUN_ID" --shards "${{ steps.chain.outputs.shards }}"
+
 
