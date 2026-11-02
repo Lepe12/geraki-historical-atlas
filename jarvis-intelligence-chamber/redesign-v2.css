@@ -1,0 +1,275 @@
+/* NABOU//X — redesign v2 (φάση 1)
+   Φορτώνεται ΤΕΛΕΥΤΑΙΟ: ντύνει την υπάρχουσα εφαρμογή με το νέο σύστημα σχεδίασης χωρίς να αλλάζει τη λειτουργία.
+   Επιστροφή στην παλιά εμφάνιση: classic.html. */
+:root {
+  --v2-bg: #14100B; --v2-panel: #241B12; --v2-panel2: #1B140D; --v2-text: #F1E6CC; --v2-dim: #B9A98A;
+  --v2-gold: #D9B56E; --v2-parch: #F4EAD2; --v2-ink: #2B2118; --v2-seal: #8A1F17; --v2-ok: #7FB8B0; --v2-warn: #E07A5F;
+  --v2-line: rgba(217, 181, 110, .26); --v2-line2: rgba(217, 181, 110, .5);
+  --v2-head: "EB Garamond", "NX Garamond", Georgia, serif; --v2-body: "Source Serif 4", "EB Garamond", Georgia, serif;
+  --v2-ui: "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif; --v2-logo: "Cinzel", "NX Cinzel", Georgia, serif;
+  --v2-rail: 80px; --v2-aside: 344px; --v2-tab: 62px;
+  --fell: var(--v2-body); --gar: var(--v2-head); --fellsc: var(--v2-head); --cin: var(--v2-ui);
+  --dim: #B9A98A; --dim2: #A39373; --txt: #F1E6CC; --brass2: #D9B56E;
+}
+html, body { background: var(--v2-bg) !important; }
+body.nx-v2 { font-family: var(--v2-body); color: var(--v2-text); font-size: 16px; }
+body.nx-v2 :focus-visible { outline: 2px solid var(--v2-gold) !important; outline-offset: 2px !important; }
+body.nx-v2 h1, body.nx-v2 h2, body.nx-v2 h3 { font-family: var(--v2-head); }
+
+/* ---------- σκελετός ---------- */
+body.nx-v2 #viewport { background: var(--v2-bg); }
+body.nx-v2 #stage { position: absolute; inset: 0; width: auto; height: auto; transform: none !important; overflow: hidden;
+  display: grid; grid-template-columns: var(--v2-rail) minmax(0, 1fr) var(--v2-aside); grid-template-rows: minmax(0, 1fr);
+  background: radial-gradient(ellipse 70% 50% at 45% 0%, rgba(217, 181, 110, .07), transparent 70%), var(--v2-bg); }
+body.nx-v2 #stage::after { display: none; }
+body.nx-v2.v2-aside-off #stage { grid-template-columns: var(--v2-rail) minmax(0, 1fr) 0px; }
+body.nx-v2.v2-aside-off .v2-aside { display: none; }
+.v2-legacy { display: none !important; }
+body.nx-v2 .v2-main { grid-column: 2; min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 12px; padding: 0 20px 16px; overflow: hidden; }
+body.nx-v2 .v2-aside { grid-column: 3; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding: 16px 18px 24px 4px; scrollbar-width: thin; scrollbar-color: var(--v2-line2) transparent; }
+body.nx-v2 .v2-aside > * { flex: none; }
+
+/* ---------- ράγα πλοήγησης ---------- */
+#v2rail { grid-column: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 0 14px; background: var(--v2-panel2); border-right: 1px solid var(--v2-line); z-index: 40; }
+.v2-logo { width: 48px; height: 48px; padding: 0; margin-bottom: 8px; border: 0; background: none; border-radius: 50%; cursor: pointer; }
+.v2-logo img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 8px rgba(217, 181, 110, .35)); }
+.v2-spacer { flex: 1; }
+.v2-nav { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; width: 64px; min-height: 60px; padding: 6px 2px; border: 0; border-radius: 10px;
+  background: none; color: var(--v2-dim); font: 500 13px/1.1 var(--v2-ui); cursor: pointer; transition: background .15s, color .15s; }
+.v2-nav .i { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.v2-nav:hover { color: var(--v2-text); background: rgba(217, 181, 110, .08); }
+.v2-nav.active, .v2-nav[aria-expanded="true"] { color: var(--v2-gold); background: rgba(217, 181, 110, .13); }
+#v2rail .v2-nav.active::before { content: ""; position: absolute; left: -4px; top: 14px; bottom: 14px; width: 3px; border-radius: 0 3px 3px 0; background: var(--v2-gold); }
+#v2tabbar { display: none; }
+.v2-menu { position: fixed; z-index: 90; left: 82px; bottom: 14px; min-width: 262px; padding: 6px; background: var(--v2-panel); border: 1px solid var(--v2-line2); border-radius: 12px; box-shadow: 0 18px 50px rgba(0, 0, 0, .65); }
+.v2-menu[hidden] { display: none; }
+.v2-menu > * { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 44px; padding: 8px 12px; border: 0; border-radius: 8px; background: none; color: var(--v2-text); font: 500 15px var(--v2-ui); text-align: left; text-decoration: none; cursor: pointer; box-sizing: border-box; }
+.v2-menu > *:hover, .v2-menu > *:focus-visible { background: rgba(217, 181, 110, .12); }
+.v2-menu .i { width: 20px; height: 20px; flex: none; fill: none; stroke: var(--v2-gold); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- πάνω μπάρα ---------- */
+body.nx-v2 #topbar { position: relative !important; left: auto !important; top: auto !important; width: auto !important; height: 64px !important; flex: none; display: flex; align-items: center; gap: 16px; padding: 0; background: none !important; border: 0; border-bottom: 1px solid var(--v2-line); box-shadow: none !important; z-index: 30; }
+body.nx-v2.nx-mock #topbar .nxs-identity { position: static !important; width: auto !important; height: auto !important; display: flex !important; flex: none; }
+body.nx-v2 #logo { position: static; display: flex; align-items: center; gap: 12px; padding: 4px 0; height: auto; min-height: 44px; }
+body.nx-v2 #logo .mark { position: static; width: 38px; height: 38px; flex: none; }
+body.nx-v2 #logo .lt { position: static; font: 700 22px/1 var(--v2-logo); letter-spacing: 4px; color: var(--v2-parch); text-shadow: none; }
+body.nx-v2 #logo .ls { position: static; font: 400 15px/1 var(--v2-head); letter-spacing: .5px; color: var(--v2-dim); padding-left: 12px; border-left: 1px solid var(--v2-line2); }
+body.nx-v2 #topnav, body.nx-v2 #topOrn { display: none !important; }
+body.nx-v2.nx-mock #topbar .nxs-status { position: static !important; width: auto !important; height: auto !important; margin-left: auto; padding: 0 !important; border: 0 !important; display: flex; align-items: center; }
+body.nx-v2 #topbar .nxs-status > div { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.15; }
+body.nx-v2.nx-mock #topbar .nxs-status small { font: 500 13px var(--v2-ui) !important; letter-spacing: .06em; color: var(--v2-dim) !important; max-width: none !important; }
+body.nx-v2 #clkDate { font: 400 14px var(--v2-ui); color: var(--v2-dim); display: none; }
+body.nx-v2.nx-mock #clock { font: 600 18px var(--v2-ui) !important; letter-spacing: .04em; color: var(--v2-text) !important; font-variant-numeric: tabular-nums; }
+body.nx-v2 #compass { position: static !important; width: 44px; height: 44px; flex: none; border: 1px solid var(--v2-line); border-radius: 50%; background: none; padding: 5px; }
+body.nx-v2 #compass svg { width: 100%; height: 100%; }
+.v2-aside-toggle { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 1px solid var(--v2-line); border-radius: 22px; background: none; color: var(--v2-text); font: 500 14px var(--v2-ui); cursor: pointer; }
+.v2-aside-toggle:hover { border-color: var(--v2-gold); color: var(--v2-gold); }
+.v2-aside-toggle .i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+
+/* ---------- ερώτημα έρευνας ---------- */
+body.nx-v2.nx-mock #operatorCommand { position: relative !important; left: auto !important; top: auto !important; right: auto !important; bottom: auto !important; width: auto !important; height: auto !important; max-width: none !important; flex: none;
+  display: grid !important; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "label state" "box btn" "filters filters"; gap: 8px 14px; align-items: center; padding: 14px 18px 14px !important;
+  background: var(--v2-panel) !important; border: 1px solid var(--v2-line) !important; border-radius: 14px; box-shadow: 0 10px 30px rgba(0, 0, 0, .35) !important; z-index: 24 !important; }
+body.nx-v2 #qRule { display: none; }
+body.nx-v2 #qLabel { position: static; grid-area: label; font: 600 13px var(--v2-ui); letter-spacing: .1em; color: var(--v2-gold); white-space: normal; }
+body.nx-v2.nx-mock #commandState { position: static; grid-area: state; max-width: 46vw; font: italic 500 15px var(--v2-head) !important; color: var(--v2-ok) !important; }
+body.nx-v2.nx-mock #operatorCommand.is-error #commandState { color: var(--v2-warn) !important; }
+body.nx-v2 #qBox { position: relative; grid-area: box; left: auto; top: auto; width: auto; min-height: 52px; background: var(--v2-parch); border-radius: 10px; box-shadow: inset 0 0 0 1px var(--v2-gold) !important; }
+body.nx-v2 #qBox:focus-within { box-shadow: 0 0 0 2px var(--v2-gold), 0 0 22px rgba(217, 181, 110, .25) !important; }
+body.nx-v2 #qBox .quill { color: #7a5a2c; left: 14px; top: 14px; }
+body.nx-v2.nx-mock #operatorQuery { min-height: 52px !important; padding: 14px 16px 10px 48px !important; font: 400 18px/1.35 var(--v2-body) !important; color: var(--v2-ink) !important; background: transparent !important; border-radius: 10px !important; }
+body.nx-v2.nx-mock #operatorQuery::placeholder { color: rgba(43, 33, 24, .62); font-style: italic; }
+body.nx-v2.nx-mock #executeQuery { position: relative !important; grid-area: btn; left: auto !important; top: auto !important; width: 56px !important; height: 56px !important; display: grid; place-items: center; border-radius: 50% !important;
+  background: radial-gradient(circle at 38% 30%, #b3382b, var(--v2-seal) 60%, #5e130d) !important; box-shadow: 0 4px 14px rgba(138, 31, 23, .5), inset 0 0 0 2px rgba(244, 234, 210, .25) !important; }
+body.nx-v2 #executeQuery::before, body.nx-v2 #executeQuery::after { display: none; }
+body.nx-v2 #executeQuery svg { position: static; width: 24px; height: 24px; }
+body.nx-v2 #executeQuery:hover { transform: none; filter: brightness(1.15); }
+body.nx-v2 #filters { position: static; grid-area: filters; width: auto; height: auto; display: flex; flex-wrap: wrap; gap: 8px; }
+body.nx-v2 #filters .dd { height: 38px; min-height: 38px; padding: 0 34px 0 14px; border: 1px solid var(--v2-line2) !important; border-radius: 19px !important; background: rgba(241, 230, 204, .05) !important; box-shadow: none !important; color: var(--v2-text) !important; font: 500 14px var(--v2-ui) !important; }
+body.nx-v2 #filters .dd:hover, body.nx-v2 #filters .dd.open { border-color: var(--v2-gold) !important; color: var(--v2-gold) !important; }
+body.nx-v2 #filters .dd.changed { border-color: var(--v2-gold) !important; background: rgba(217, 181, 110, .14) !important; }
+body.nx-v2 #filters .dd .chev { top: 14px; right: 14px; border-color: var(--v2-gold); }
+body.nx-v2 #filters .dd.open .chev { top: 17px; }
+body.nx-v2 #filters #advBtn { flex: none; padding-right: 14px; }
+body.nx-v2 #advBtn svg { stroke: var(--v2-gold); }
+
+/* ---------- προβολές (σε segmented control — χωρίς επικαλύψεις) ---------- */
+body.nx-v2 #histList { position: relative !important; left: auto !important; top: auto !important; width: auto !important; height: auto !important; flex: none; display: flex; align-self: flex-start; gap: 4px; padding: 4px; border: 1px solid var(--v2-line); border-radius: 12px; background: var(--v2-panel2); box-shadow: none; }
+body.nx-v2 #histList::before, body.nx-v2 #histDash { display: none !important; }
+body.nx-v2 #histList .hist { position: static !important; left: auto !important; top: auto !important; margin: 0 !important; min-height: 40px; padding: 0 16px; border: 0; border-radius: 9px; background: none; color: var(--v2-dim); font: 600 13.5px var(--v2-ui); letter-spacing: .06em; white-space: nowrap; z-index: auto; }
+body.nx-v2 #histList .hist:hover { color: var(--v2-text); }
+body.nx-v2 #histList .hist.on { background: rgba(217, 181, 110, .18); color: var(--v2-gold); box-shadow: inset 0 0 0 1px var(--v2-line2); }
+
+/* ---------- χάρτης ---------- */
+body.nx-v2 #chartFrame { position: relative !important; left: auto !important; top: auto !important; width: auto !important; height: auto !important; flex: 1 1 0; min-height: 280px; background: var(--v2-panel2); border: 1px solid var(--v2-line2); border-radius: 14px; box-shadow: 0 14px 40px rgba(0, 0, 0, .45) !important; overflow: hidden; }
+body.nx-v2 #chartFrame .bandH, body.nx-v2 #chartFrame .bandV, body.nx-v2 #chartFrame .rope { display: none; }
+body.nx-v2 #chartView { left: 0; top: 0; right: 0; bottom: 0; background: #1b140d; box-shadow: none; border-radius: 14px; }
+body.nx-v2.nx-mock #chartView .nxs-3d-tools { right: 12px !important; top: 12px !important; gap: 8px; }
+body.nx-v2.nx-mock #chartView .nxs-3d-tools button { width: 44px !important; height: 44px !important; border-radius: 50% !important; background: rgba(20, 16, 11, .86) !important; border: 1px solid var(--v2-line2) !important; color: var(--v2-gold) !important; }
+body.nx-v2.nx-mock #chartView .nxs-3d-tools button:hover { border-color: var(--v2-gold) !important; }
+body.nx-v2.nx-mock #chartView .nxs-telemetry { right: 12px !important; bottom: 10px !important; background: rgba(20, 16, 11, .86) !important; border: 1px solid var(--v2-line) !important; border-radius: 8px !important; font: 500 13px var(--v2-ui) !important; color: var(--v2-dim) !important; padding: 4px 12px !important; }
+body.nx-v2.nx-mock #chartView .nxs-telemetry b { color: var(--v2-text) !important; }
+/* σφραγίδες: μεγαλύτερη περιοχή αφής ≥ 44px χωρίς να αλλάξει το οπτικό μέγεθος */
+body.nx-v2 #chartView .node-seal { width: 20px !important; height: 20px !important; margin: -10px 0 0 -10px !important; }
+body.nx-v2 #chartView .node-seal::after { content: ""; position: absolute; inset: -12px; border-radius: 50%; }
+/* κάρτες συντομεύσεων */
+body.nx-v2 #cards { position: relative !important; left: auto !important; top: auto !important; width: auto !important; height: auto !important; flex: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+body.nx-v2 #cards .card { height: 72px; min-height: 44px; border-radius: 12px; box-shadow: 0 0 0 1px var(--v2-line) !important; }
+body.nx-v2 #cards .card::before { box-shadow: inset 0 0 0 1px var(--v2-line); border-radius: 12px; }
+body.nx-v2 #cards .card .pic { border-radius: 12px; }
+body.nx-v2 #cards .card:hover { box-shadow: 0 0 0 1px var(--v2-gold) !important; }
+body.nx-v2 #cards .card.active { box-shadow: 0 0 0 2px var(--v2-gold) !important; }
+body.nx-v2 #cards .card .lbl { font: 700 13px var(--v2-ui); letter-spacing: .1em; left: 14px; bottom: 9px; }
+body.nx-v2 #cards .card .lbl::before { background: var(--v2-gold); }
+body.nx-v2 #cards .card .cnt { font: italic 500 15px var(--v2-head); }
+
+/* ---------- δεξιά στήλη ---------- */
+body.nx-v2 .v2-aside #hero { position: relative; left: auto; top: auto; width: 100%; height: 138px; border-radius: 14px; box-shadow: 0 0 0 1px var(--v2-line) !important; }
+body.nx-v2 #hero::before { border-radius: 14px; }
+body.nx-v2 #hero .ht { left: 16px; top: auto; bottom: 36px; font: 700 22px var(--v2-logo); letter-spacing: 4px; }
+body.nx-v2 #hero .hs { left: 17px; right: 12px; top: auto; bottom: 12px; white-space: normal; font: 600 13px/1.25 var(--v2-ui); letter-spacing: .06em; }
+body.nx-v2 #hero .hq { font: italic 500 15px var(--v2-head); }
+body.nx-v2 .v2-aside .box { position: relative !important; left: auto !important; top: auto !important; width: 100% !important; height: auto !important; padding: 16px 16px 14px; box-sizing: border-box; background: var(--v2-panel); border: 1px solid var(--v2-line); border-radius: 14px; box-shadow: none; }
+body.nx-v2 .v2-aside .box::before { display: none; }
+body.nx-v2 #stage .v2-aside .box > h3 { position: static; margin: 0 0 12px; font: 600 13px var(--v2-ui); letter-spacing: .1em; color: var(--v2-gold); }
+body.nx-v2 #stage .v2-aside .box > h3::after { display: none; }
+body.nx-v2 #statRows { position: static; width: auto; height: auto; }
+body.nx-v2 .srow { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 10px; width: auto; height: auto; min-height: 36px; border-bottom: 1px solid var(--v2-line); }
+body.nx-v2 .srow > * { position: static; }
+body.nx-v2 .srow .k { font: 500 13px var(--v2-ui); letter-spacing: .04em; color: var(--v2-dim); }
+body.nx-v2 .srow .n { font: 600 17px var(--v2-ui); color: var(--v2-text); }
+body.nx-v2 .srow .m { width: auto; height: auto; gap: 3px; }
+body.nx-v2 .srow .m i { width: 8px; height: 8px; background: rgba(217, 181, 110, .2); box-shadow: none; }
+body.nx-v2 .srow .m i.lit { background: var(--v2-gold); box-shadow: 0 0 6px rgba(217, 181, 110, .5); }
+body.nx-v2.nx-mock #activityBox .nxs-activity-open { position: static !important; display: inline-flex !important; height: 38px !important; min-height: 38px; margin: -4px 0 8px; padding: 0 14px !important; border: 1px solid var(--v2-line2) !important; border-radius: 19px !important; background: none !important; color: var(--v2-gold) !important; font: 500 13.5px var(--v2-ui) !important; }
+body.nx-v2.nx-mock #activityBox .nxs-activity-open svg { stroke: currentColor; }
+body.nx-v2 #activityLive { position: static; width: auto; height: auto; max-height: 260px; overflow: auto; }
+body.nx-v2 #activityLive .row { width: auto; height: auto; display: grid; grid-template-columns: 14px 54px minmax(0, 1fr); grid-template-areas: "d t ti" "d t su"; column-gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--v2-line); }
+body.nx-v2 #activityLive .row > * { position: static; }
+body.nx-v2 #activityLive .row::after { display: none; }
+body.nx-v2 #activityLive .dot { grid-area: d; margin-top: 6px; width: 10px; height: 10px; background: var(--v2-gold); }
+body.nx-v2 #activityLive .dot.ok { background: var(--v2-ok); } body.nx-v2 #activityLive .dot.warn { background: var(--v2-warn); }
+body.nx-v2 #activityLive .t { grid-area: t; font: 500 13px var(--v2-ui); color: var(--v2-dim); }
+body.nx-v2 #activityLive .ti { grid-area: ti; max-width: none; font: 500 15px var(--v2-body); color: var(--v2-text); }
+body.nx-v2 #activityLive .su { grid-area: su; max-width: none; font: italic 13px var(--v2-body); color: var(--v2-dim); }
+body.nx-v2 #activityLive .empty { color: var(--v2-dim); padding: 18px 0; }
+body.nx-v2 #nodesBox .hdots { display: none; }
+body.nx-v2 #nodes { position: relative; left: auto; top: auto; width: 100%; height: auto; display: block; text-align: left; }
+body.nx-v2 #nodes > * { position: static; }
+body.nx-v2 #miniChart { display: block; width: 100%; height: 120px; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--v2-line); }
+body.nx-v2 #miniChart svg { width: 100%; height: 120px; }
+body.nx-v2 #nodes .nl1 { display: block; margin-top: 10px; font: 600 13px var(--v2-ui); letter-spacing: .08em; color: var(--v2-text); }
+body.nx-v2 #nodes .nl2 { display: block; margin-top: 2px; font: italic 500 15px var(--v2-head); color: var(--v2-dim); }
+body.nx-v2 #nodes .nbar { display: none; }
+
+/* ---------- πάνελ: συρτάρι δεξιά (desktop) ---------- */
+body.nx-v2.nx-mock #stage .nxs-workspace, body.nx-v2.nx-mock #stage .results-drawer, body.nx-v2.nx-mock #stage .learning-panel, body.nx-v2.nx-mock #stage .activity-strip, body.nx-v2.nx-mock #stage .detail-panel {
+  position: fixed !important; left: auto !important; right: 0 !important; top: 0 !important; bottom: 0 !important; width: min(780px, calc(100vw - var(--v2-rail))) !important; height: auto !important; max-height: none !important; z-index: 70 !important;
+  border-left: 1px solid var(--v2-line2) !important; box-shadow: -24px 0 60px rgba(0, 0, 0, .6) !important; }
+body.nx-v2.nx-mock #stage .detail-panel { width: min(400px, calc(100vw - var(--v2-rail))) !important; z-index: 72 !important; }
+
+/* ---------- popovers / μενού ---------- */
+body.nx-v2 #ddMenu, body.nx-v2 .nx-pop { position: fixed; z-index: 85 !important; }
+body.nx-v2 #ddMenu .opt { font: 400 16px var(--v2-body); min-height: 38px; }
+body.nx-v2 .nx-pop h2 { font: 700 18px var(--v2-head); letter-spacing: .08em; }
+body.nx-v2 .nx-pop p, body.nx-v2 .nx-pop label { font-size: 15px; }
+body.nx-v2 .nx-pop .close { width: 40px; height: 40px; top: 8px; right: 8px; }
+
+/* ---------- βοηθός (ολόγραμμα) ---------- */
+body.nx-v2 #nabouAssistantLauncher { width: 48px !important; height: 48px !important; right: 20px !important; bottom: 20px !important; border-radius: 50% !important; border: 1px solid var(--v2-gold) !important; background: var(--v2-panel) !important; box-shadow: 0 6px 24px rgba(0, 0, 0, .55), 0 0 18px rgba(217, 181, 110, .25) !important; z-index: 9001 !important; }
+body.nx-v2 .nxa { bottom: 80px; border-radius: 14px; border-color: var(--v2-line2); }
+body.nx-v2 .nxa-head small, body.nx-v2 .nxa-status { font-size: 13px; }
+
+/* ---------- κείμενο ≥ 13px (έλεγχος με computed styles) ---------- */
+body.nx-v2 .nxs-status small, body.nx-v2 .nxs-telemetry, body.nx-v2 .nxs-telemetry span, body.nx-v2 .nxs-telemetry b,
+body.nx-v2 #chartView .node-label, body.nx-v2 .nxs-workspace small, body.nx-v2 .detail-panel small { font-size: max(13px, 1em); }
+
+/* ---------- σελίδα καλωσορίσματος ---------- */
+#v2welcome { display: none; }
+html.v2-welcome-on #v2welcome { display: flex; }
+#v2welcome { position: fixed; inset: 0; z-index: 10000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; box-sizing: border-box; overflow: hidden;
+  background: radial-gradient(ellipse 60% 55% at 50% 38%, #2a1f12 0%, #17110a 55%, #0d0a07 100%); color: var(--v2-text); opacity: 1; transition: opacity .4s ease; }
+#v2welcome.leaving { opacity: 0; pointer-events: none; }
+#v2wCanvas { position: relative; width: min(760px, 92vw); height: min(54vh, 520px); flex: none; background: #000; border-radius: 50%; -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent 100%); mask-image: radial-gradient(closest-side, #000 55%, transparent 100%); animation: v2breath 6s ease-in-out infinite; }
+.v2w-fallback { display: none; width: min(380px, 70vw); height: min(380px, 40vh); color: var(--v2-gold); filter: drop-shadow(0 0 16px rgba(217, 181, 110, .55)); }
+#v2welcome.no-webgl #v2wCanvas { display: none; }
+#v2welcome.no-webgl .v2w-fallback { display: block; animation: v2breath 6s ease-in-out infinite; }
+@keyframes v2breath { 0%, 100% { transform: scale(1); opacity: .94; } 50% { transform: scale(1.035); opacity: 1; } }
+.v2w-copy { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: -4vh; max-width: 640px; }
+.v2w-kicker { margin: 0; font: 600 13px var(--v2-ui); letter-spacing: .18em; text-transform: uppercase; color: var(--v2-gold); }
+#v2welcome h1 { margin: 0; font: 500 clamp(30px, 5vw, 52px)/1.12 var(--v2-head); color: var(--v2-parch); }
+.v2w-brand { font-family: var(--v2-logo); font-weight: 700; letter-spacing: .08em; color: var(--v2-gold); white-space: nowrap; }
+#v2wLine { margin: 0; font: 400 clamp(16px, 2vw, 19px)/1.5 var(--v2-body); color: var(--v2-dim); }
+#v2welcome .v2w-enter { margin-top: 10px; min-height: 52px; min-width: 190px; padding: 0 36px; border: 1px solid var(--v2-gold); border-radius: 26px; background: radial-gradient(circle at 40% 25%, #b3382b, var(--v2-seal) 62%, #5e130d); color: var(--v2-parch); font: 600 17px var(--v2-ui); letter-spacing: .08em; cursor: pointer; box-shadow: 0 8px 28px rgba(138, 31, 23, .5); }
+#v2welcome .v2w-enter:hover { filter: brightness(1.15); }
+.v2w-hint { margin: 2px 0 0; font: 400 14px var(--v2-ui); color: var(--v2-dim); }
+.v2w-hint kbd { padding: 2px 9px; border: 1px solid var(--v2-line2); border-radius: 6px; font: 600 13px var(--v2-ui); color: var(--v2-gold); background: rgba(217, 181, 110, .08); }
+@media (hover: none) { .v2w-hint { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  #v2welcome { transition-duration: .01s; } #v2wCanvas, #v2welcome.no-webgl .v2w-fallback { animation: none; }
+}
+
+/* ================= ΚΙΝΗΤΟ (≤ 800px) ================= */
+@media (max-width: 800px) {
+  body.nx-v2 #stage { display: flex; flex-direction: column; gap: 12px; position: absolute; inset: 0; overflow-x: hidden; overflow-y: auto; padding: 68px 12px calc(var(--v2-tab) + 22px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling: touch; }
+  body.nx-v2 .v2-main, body.nx-v2 .v2-aside { display: contents !important; }
+  #v2rail { display: none; }
+  body.nx-v2 #topbar { position: fixed !important; left: 0 !important; right: 0 !important; top: 0 !important; height: 56px !important; padding: 0 12px; background: rgba(20, 16, 11, .96) !important; z-index: 60; }
+  body.nx-v2 #logo .ls, body.nx-v2 #compass, body.nx-v2 .v2-aside-toggle { display: none !important; }
+  body.nx-v2 #logo .lt { font-size: 19px; letter-spacing: 3px; }
+  body.nx-v2.nx-mock #clock { font-size: 15px !important; }
+  body.nx-v2.nx-mock #operatorCommand { position: relative !important; left: auto !important; right: auto !important; bottom: auto !important; top: auto !important; order: 0; width: auto !important; padding: 12px !important; grid-template-columns: minmax(0, 1fr) 52px; z-index: 5 !important; }
+  body.nx-v2.nx-mock #commandState { max-width: 60vw; font-size: 14px !important; }
+  body.nx-v2.nx-mock #operatorQuery { font-size: 17px !important; }
+  body.nx-v2.nx-mock #executeQuery { width: 52px !important; height: 52px !important; }
+  body.nx-v2 #filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -2px; padding-bottom: 2px; }
+  body.nx-v2 #filters::-webkit-scrollbar { display: none; }
+  body.nx-v2 #filters .dd { flex: 0 0 auto; }
+  body.nx-v2 #histList { order: 1; align-self: stretch; overflow-x: auto; scrollbar-width: none; }
+  body.nx-v2 #histList .hist { flex: 1 0 auto; padding: 0 12px; }
+  body.nx-v2 #chartFrame { order: 2; flex: none; width: 100% !important; height: min(58vh, 460px) !important; min-height: 320px; }
+  body.nx-v2 #cards { order: 3; grid-template-columns: 1fr 1fr; }
+  body.nx-v2 #hero { order: 4; } body.nx-v2 #status { order: 5; } body.nx-v2 #activityBox { order: 6; } body.nx-v2 #nodesBox { order: 7; }
+  body.nx-v2 .v2-aside #hero, body.nx-v2 .v2-aside .box { width: 100% !important; }
+  #v2tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 65; display: flex; justify-content: space-around; align-items: stretch; height: calc(var(--v2-tab) + env(safe-area-inset-bottom)); padding: 4px 4px env(safe-area-inset-bottom); background: rgba(27, 20, 13, .98); border-top: 1px solid var(--v2-line2); box-shadow: 0 -10px 30px rgba(0, 0, 0, .5); }
+  #v2tabbar .v2-nav { flex: 1 1 0; width: auto; min-width: 0; min-height: 52px; }
+  #v2tabbar .v2-nav.active::before { content: ""; position: absolute; top: 0; left: 24%; right: 24%; height: 3px; border-radius: 0 0 3px 3px; background: var(--v2-gold); }
+  .v2-menu { left: auto; right: 10px; bottom: calc(var(--v2-tab) + 12px + env(safe-area-inset-bottom)); }
+  body.nx-v2.nx-mock #stage .nxs-workspace, body.nx-v2.nx-mock #stage .results-drawer, body.nx-v2.nx-mock #stage .learning-panel, body.nx-v2.nx-mock #stage .activity-strip, body.nx-v2.nx-mock #stage .detail-panel {
+    left: 0 !important; right: 0 !important; top: 64px !important; bottom: calc(var(--v2-tab) + env(safe-area-inset-bottom)) !important; width: auto !important; border-left: 0 !important; border-top: 1px solid var(--v2-line2) !important; border-radius: 16px 16px 0 0 !important; z-index: 62 !important; }
+  body.nx-v2 #nabouAssistantLauncher { right: 12px !important; bottom: calc(var(--v2-tab) + 14px + env(safe-area-inset-bottom)) !important; }
+  body.nx-v2 .nxa { bottom: calc(var(--v2-tab) + 70px); right: 12px; }
+}
+/* στενό desktop: η δεξιά στήλη κλειστή από προεπιλογή (το κουμπί «Πίνακας» τη ανοίγει ως επικάλυψη) */
+@media (min-width: 801px) and (max-width: 1180px) {
+  body.nx-v2 #stage { grid-template-columns: var(--v2-rail) minmax(0, 1fr) 0px; }
+  body.nx-v2 .v2-aside { display: none; }
+  body.nx-v2.v2-aside-open .v2-aside { display: flex; position: fixed; right: 0; top: 0; bottom: 0; width: 344px; z-index: 55; padding: 76px 16px 24px; background: var(--v2-bg); border-left: 1px solid var(--v2-line2); box-shadow: -20px 0 50px rgba(0, 0, 0, .55); }
+}
+
+/* ---------- διορθώσεις 1 ---------- */
+body.nx-v2 #compass svg { position: static !important; left: auto !important; top: auto !important; width: 100% !important; height: 100% !important; }
+body.nx-v2 #compass { display: grid !important; place-items: center; }
+body.nx-v2 #v2rail .v2-nav, body.nx-v2 #v2tabbar .v2-nav { background: none; border: 0 !important; box-shadow: none !important; border-radius: 10px; letter-spacing: 0; text-transform: none; }
+body.nx-v2 #v2rail .v2-nav:hover, body.nx-v2 #v2tabbar .v2-nav:hover { background: rgba(217, 181, 110, .08); }
+body.nx-v2 #v2rail .v2-nav.active, body.nx-v2 #v2tabbar .v2-nav.active, body.nx-v2 .v2-nav[aria-expanded="true"] { background: rgba(217, 181, 110, .13); color: var(--v2-gold); }
+body.nx-v2 .v2-logo { background: none !important; border: 0 !important; box-shadow: none !important; }
+body.nx-v2.nx-mock #chartView .nxs-3d-tools button svg { stroke: currentColor !important; fill: none !important; }
+body.nx-v2.nx-mock #chartView .nxs-3d-tools button svg * { stroke: currentColor; }
+
+/* ---------- διορθώσεις 2 (κινητό) ---------- */
+body.nx-v2 .v2-nav .i { width: 24px !important; height: 24px !important; flex: none; }
+body.nx-v2 .v2-nav span { font: 500 13px/1.1 var(--v2-ui) !important; position: static !important; width: auto !important; height: auto !important; clip: auto !important; white-space: nowrap; }
+@media (max-width: 800px) {
+  body.nx-v2.nx-mock #topbar .nxs-status small { display: none !important; }
+  body.nx-v2 #topbar #compass { display: none !important; }
+  body.nx-v2 #histList .hist { padding: 0 6px; letter-spacing: 0; font-size: 13px; }
+  body.nx-v2.nx-mock #operatorQuery { min-height: 66px !important; font-size: 16px !important; }
+  body.nx-v2 #qBox { min-height: 66px; }
+  #v2tabbar .v2-nav { padding: 6px 0; gap: 3px; }
+}
+
+/* ---------- ελάχιστο 13px (αποτέλεσμα ελέγχου computed styles) ---------- */
+body.nx-v2 #queryHelp, body.nx-v2 .nl-count, body.nx-v2 .map3d-stop-name, body.nx-v2 .map3d-tag, body.nx-v2 #zoomLevel, body.nx-v2 #chartView .nxs-telemetry * { font-size: 13px !important; }
+body.nx-v2 .map3d-tag { min-width: 24px; padding: 1px 4px; line-height: 1.2; border-radius: 6px; background: rgba(20, 16, 11, .92); color: var(--v2-gold); right: -4px; bottom: -4px; }
+@media (max-width: 800px) { body.nx-v2 .nx-pop { top: 68px !important; bottom: auto !important; max-height: calc(100vh - 150px); overflow: auto; } }
