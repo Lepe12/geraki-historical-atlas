@@ -59,6 +59,7 @@ for (const group of ["archive", "analysis"]) {
     row.className = "nxs-agent nx-agent";
     row.dataset.agent = id;
     row.dataset.activity = "idle";
+    row.dataset.state = "waiting";
     row.innerHTML =
       '<span class="nxs-agent-signal"></span><span class="nxs-agent-name"></span><small class="nxs-agent-state">Σε αναμονή</small>';
     row.querySelector(".nxs-agent-name").textContent = name;
@@ -231,12 +232,28 @@ connectResearchFeed({
   },
   onSnapshot: (snapshot) => {
     const agents = snapshot?.agents || [];
+    const ACT = ["RUNNING", "PREPARING", "STARTING", "QUEUED", "ACTIVE", "LIVE"];
+    const BADST = ["FAILED", "ERROR", "BLOCKED", "UNAVAILABLE", "BLOCKED_CONFIGURATION", "CANCELLED", "CANCELED"];
+    const tally = { done: 0, act: 0, bad: 0, wait: 0, out: 0 };
     document.querySelectorAll(".nxs-agent").forEach((row) => {
-      const agent = agents.find((a) => a.id === row.dataset.agent || a.agent_id === row.dataset.agent);
+      // η 17η γραμμή είναι «Πειρατικές βάσεις» ή «Βιογραφία πειρατή», ανάλογα με την έρευνα
+      const alias = row.dataset.agent === "pirate_base" && !agents.some((a) => a.id === "pirate_base") ? "pirate_biography" : row.dataset.agent;
+      const agent = agents.find((a) => a.id === alias || a.agent_id === alias);
+      if (row.dataset.agent === "pirate_base") row.querySelector(".nxs-agent-name").textContent = alias === "pirate_biography" && agent ? "Βιογραφία πειρατή" : "Πειρατικές βάσεις";
       const status = String(agent?.status || agent?.phase || "STANDBY").toUpperCase();
       const active = !!agent?.status && !isTerminal(agent.status);
       row.dataset.activity = active ? "active" : "idle";
+      // κατάσταση για τα χρωματιστά σήματα: completed / running / waiting / blocked / idle
+      let st = "idle", label;
+      if (!agent) { st = agents.length ? "idle" : "waiting"; label = agents.length ? "Εκτός έρευνας" : "Σε αναμονή"; agents.length ? tally.out++ : tally.wait++; }
+      else if (ACT.includes(status)) { st = "running"; tally.act++; }
+      else if (BADST.includes(status)) { st = "blocked"; tally.bad++; }
+      else if (["COMPLETED", "DONE", "COMPLETE", "PARTIAL"].includes(status)) { st = "completed"; tally.done++; }
+      else if (["IDLE"].includes(status)) { st = "idle"; tally.out++; }
+      else { st = "waiting"; tally.wait++; }
+      row.dataset.state = st;
       row.querySelector(".nxs-agent-state").textContent =
+        label ||
         {
           STANDBY: "Σε αναμονή",
           IDLE: "Ανενεργός",
@@ -246,12 +263,20 @@ connectResearchFeed({
           FAILED: "Αποτυχία",
         }[status] || (globalThis.NABOU_GR ? globalThis.NABOU_GR.status(status) : status);
     });
+    const sum = document.getElementById("nxsAgentSummary");
+    if (sum)
+      sum.textContent = agents.length
+        ? agents.length + " ερευνητές στην τρέχουσα έρευνα: " + tally.done + " ολοκληρώθηκαν" + (tally.act ? ", " + tally.act + " σε εξέλιξη" : "") + (tally.bad ? ", " + tally.bad + " με εμπόδιο" : "") + (tally.out ? " · " + tally.out + " δεν συμμετείχαν" : "")
+        : "Δεν έχει φορτωθεί έρευνα — οι ερευνητές είναι σε αναμονή.";
   },
   onReset: () => {
     document.querySelectorAll(".nxs-agent").forEach((row) => {
       row.dataset.activity = "idle";
+      row.dataset.state = "waiting";
       row.querySelector(".nxs-agent-state").textContent = "Σε αναμονή";
     });
+    const sum = document.getElementById("nxsAgentSummary");
+    if (sum) sum.textContent = "Δεν έχει φορτωθεί έρευνα — οι ερευνητές είναι σε αναμονή.";
   },
 });
 

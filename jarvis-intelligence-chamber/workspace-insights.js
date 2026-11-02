@@ -1,6 +1,6 @@
 import { connectResearchFeed } from "./live-bridge.js";
 import { overview, historyEntry, mergeHistory, statusLabel } from "./research-overview.js";
-import { dossierMarkup } from "./research-dossier.js";
+import { dossierMarkup } from "./research-dossier.js?v=v2-phase2-1";
 const $ = (id) => document.getElementById(id);
 const summary = $("researchOverview"),
   list = $("historyList"),

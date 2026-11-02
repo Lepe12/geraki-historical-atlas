@@ -239,8 +239,35 @@ function recordEvidence(record) {
     "</div>"
   );
 }
+function renderActivityV2(src) {
+  const GR = globalThis.NABOU_GR;
+  const fmtT = (e) => {
+    const d = new Date(e.created_utc || e.timestamp || e.at || 0);
+    return Number.isNaN(d.valueOf()) || !d.valueOf() ? "" : d.toLocaleTimeString("el-GR", { hour: "2-digit", minute: "2-digit", hour12: false });
+  };
+  activity.innerHTML = src.length
+    ? "<ol class=\"tl\">" +
+      src
+        .map((e) => {
+          const v = GR?.event ? GR.event(e) : { who: e.agent_id || "", text: e.detail || "", state: "info", raw: e.detail || "" };
+          const t = fmtT(e);
+          const tech = [v.raw, e.agent_id ? "agent_id: " + e.agent_id : "", v.code ? "κωδικός: " + v.code : ""].filter(Boolean);
+          return (
+            '<li class="tl-item" data-state="' + v.state + '"><span class="tl-dot" aria-hidden="true"></span>' +
+            '<div class="tl-body"><div class="tl-top"><b class="tl-who">' + esc(v.who) + "</b>" +
+            (t ? '<time class="tl-time">' + esc(t) + "</time>" : "") + "</div>" +
+            '<p class="tl-text">' + esc(v.text) + "</p>" +
+            (tech.length ? '<details class="tl-tech"><summary>Τεχνικές λεπτομέρειες</summary><code>' + tech.map(esc).join("<br>") + "</code></details>" : "") +
+            "</div></li>"
+          );
+        })
+        .join("") +
+      "</ol>"
+    : '<div class="tl-empty">Δεν έχει καταγραφεί δραστηριότητα για αυτή την έρευνα.</div>';
+}
 function renderActivity() {
   const src = events.slice(-30).reverse();
+  if (document.body.classList.contains("nx-v2")) return renderActivityV2(src);
   activity.innerHTML = src.length
     ? src
         .map(
@@ -402,6 +429,17 @@ function renderResults() {
   document
     .querySelectorAll("[data-result-filter]")
     .forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.resultFilter === resultFilter)));
+  {
+    const counts = {
+      all: related.length + claims.length + supporting.length + unmatched.length + coverage.length + blockers.length,
+      claims: claims.length,
+      contradictions: contradictions.length,
+      blockers: blockers.length,
+    };
+    document.querySelectorAll("[data-result-filter]").forEach((b) => {
+      b.dataset.count = snapshot ? String(counts[b.dataset.resultFilter] ?? "") : "";
+    });
+  }
   meta.textContent =
     related.length +
     " πιθανές σχετικές αναφορές · " +
