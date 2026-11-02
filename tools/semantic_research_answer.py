@@ -1070,20 +1070,27 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
     queue=Continuation(Path(provenance_root or run_root)/'research_continuation',
                        question,Path(__file__).read_bytes(),routing_summary())
     ranking_report=None
-    if request and all_records and os.getenv('PCT_EXCERPT_RANKING','1')!='0':
-        # Deterministic relevance order (target + aliases + gazetteer old names,
-        # date window, purpose, source quality); near-duplicates read last.
-        # Reading order only: every excerpt stays in the queue and coverage.
-        from excerpt_ranking import rank
-        all_records,ranking_report=rank(all_records,request.get('target',''),[*(request.get('aliases',[]) or []),*(request.get('search_name_variants',[]) or [])],
-                                        request.get('date_range','') or '',request.get('purpose','') or '')
-        if question_kind=='topic':
-            # Broad topics keep their region/period/event tiers as the primary
-            # key; lexical relevance only orders passages inside a tier.
-            from research_priority import describe
-            late=set(ranking_report['near_duplicate_ids'])
-            all_records.sort(key=lambda r:(r['evidence_id'] in late,describe(r,True)['tier']))
-            ranking_report['topic_tiers_primary']=True
+    if os.getenv('PCT_SEMANTIC_READING_PLAN'):
+        from first_pass_semantics import apply_plan
+        all_records,ranking_report=apply_plan(os.environ['PCT_SEMANTIC_READING_PLAN'],all_records,queue,request)
+    else:
+        if request and all_records and os.getenv('PCT_EXCERPT_RANKING','1')!='0':
+            # Deterministic relevance order (target + aliases + gazetteer old names,
+            # date window, purpose, source quality); near-duplicates read last.
+            # Reading order only: every excerpt stays in the queue and coverage.
+            from excerpt_ranking import rank
+            all_records,ranking_report=rank(all_records,request.get('target',''),[*(request.get('aliases',[]) or []),*(request.get('search_name_variants',[]) or [])],
+                                            request.get('date_range','') or '',request.get('purpose','') or '')
+            if question_kind=='topic':
+                # Broad topics keep their region/period/event tiers as the primary
+                # key; lexical relevance only orders passages inside a tier.
+                from research_priority import describe
+                late=set(ranking_report['near_duplicate_ids'])
+                all_records.sort(key=lambda r:(r['evidence_id'] in late,describe(r,True)['tier']))
+                ranking_report['topic_tiers_primary']=True
+    if os.getenv('PCT_SEMANTIC_WRITE_READING_PLAN'):
+        from first_pass_semantics import freeze
+        freeze(os.environ['PCT_SEMANTIC_WRITE_READING_PLAN'],all_records,queue,ranking_report,request)
     collected_count=len(all_records);prefilter_report=None;filtered_items=[]
     from excerpt_prefilter import settings as prefilter_settings
     prefilter_config=prefilter_settings()
@@ -1222,6 +1229,7 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
          'configuration':conf,'model_used':False,'claims':[],'answer_sections':[],
          'coverage':{'collected_unique_passages':collected_count,'prefilter':prefilter_report,'screening':screening_report,
                      'original_unique_passages':original_passage_count,'unique_passages':len(all_records),'selected_passages':len(selected),
+                     'reading_batches':len(all_groups),'pending_reading_batches':sum(not queue.completed(g) for g in all_groups),
                      'repeated_occurrences':sum(len(r['occurrences'])-1 for r in all_records),'deferred':deferred,'excluded':excluded},
          'evidence':selected,'calls':[],'rejected':[],
          'selection_priority':selection_report(all_records,selected,question_kind=='topic'),
@@ -1658,6 +1666,11 @@ def main():
         if question:break
     out=execute(root,question or 'Historical research')
     out['research_run_id']=args.run_id
+    if os.getenv('PCT_INITIAL_SEMANTIC_MERGE')=='1':
+        summary=read(root/'first_pass/merge.json')
+        out['semantic_shards']=summary
+        if summary.get('missing_shards') or summary.get('transport_missing'):
+            out.setdefault('limitations',[]).append('INITIAL_SEMANTIC_SHARD_OUTPUT_MISSING')
     dest=root/'research_answer';dest.mkdir(exist_ok=True)
     from place_resolver import annotate as annotate_places
     annotate_places(out)

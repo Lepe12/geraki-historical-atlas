@@ -1,0 +1,36 @@
+name: Initial parallel reading checks
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/first_pass_semantics.py'
+      - 'tools/test_first_pass_semantics.py'
+      - 'tools/semantic_research_answer.py'
+      - 'tools/research_checkpoint_compatibility.json'
+      - '.github/workflows/pct-parallel-multi-agent.yml'
+      - '.github/workflows/initial-semantic-parallel-check.yml'
+  pull_request:
+    paths:
+      - 'tools/first_pass_semantics.py'
+      - 'tools/test_first_pass_semantics.py'
+      - 'tools/semantic_research_answer.py'
+      - 'tools/research_checkpoint_compatibility.json'
+      - '.github/workflows/pct-parallel-multi-agent.yml'
+      - '.github/workflows/initial-semantic-parallel-check.yml'
+permissions:
+  contents: read
+jobs:
+  source-bound-parallel-reading:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            tools
+            data
+            .github
+      - name: Verify isolated readers, source binding, transport and merge
+        env:
+          PYTHONPATH: tools:tools/llm
+        run: python3 -m unittest tools.test_first_pass_semantics tools.test_semantic_shards tools.test_research_shard_replay tools.test_incremental_reading tools.test_research_continuation tools.test_semantic_research_answer -v
