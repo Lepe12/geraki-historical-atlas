@@ -9,6 +9,8 @@ runs:
       run: |
         python3 - <<'PY'
         import os,pathlib,sys
+        sys.path.insert(0,"tools")
+        from research_cpu_cache import cache_tag
         models={'Qwen/Qwen2.5-3B-Instruct-GGUF':('qwen2.5-3b','nabou-qwen2.5-3b-q4km-7dabda4d-v2'),
                 'Qwen/Qwen2.5-7B-Instruct-GGUF':('qwen2.5-7b','nabou-official-qwen2.5-7b-q4km-bb5d59e0-v2'),
                 'Qwen/Qwen3-8B-GGUF':('qwen3-8b','nabou-official-qwen3-8b-q4km-7c41481f-v1')}
@@ -19,6 +21,7 @@ runs:
             out.write('NABOU_MODEL_CACHE_DIR='+str(pathlib.Path.home()/'.cache/nabou-models'/folder)+'\n')
             out.write('NABOU_MODEL_CACHE_KEY='+key+'\n')
             out.write('NABOU_PYTHON_TAG='+str(sys.version_info.major)+'.'+str(sys.version_info.minor)+'\n')
+            out.write('NABOU_CPU_CACHE_TAG='+cache_tag()+'\n')
         PY
     - uses: actions/cache/restore@v4
       if: env.PCT_LLM_PROVIDER == 'local_llama_cpp'
@@ -30,13 +33,14 @@ runs:
       if: env.PCT_LLM_PROVIDER == 'local_llama_cpp'
       with:
         path: ~/.cache/pip
-        key: research-pip-${{ runner.os }}-${{ runner.arch }}-py${{ env.NABOU_PYTHON_TAG }}-${{ hashFiles('.github/actions/research-model/action.yml') }}
+        key: research-pip-cpu-v2-${{ env.NABOU_CPU_CACHE_TAG }}-${{ runner.os }}-${{ runner.arch }}-py${{ env.NABOU_PYTHON_TAG }}-${{ hashFiles('.github/actions/research-model/action.yml') }}
     - name: Install CPU inference dependencies
       if: env.PCT_LLM_PROVIDER == 'local_llama_cpp'
       shell: bash
       env:
         CMAKE_BUILD_PARALLEL_LEVEL: '2'
-      run: python3 -m pip install --quiet 'llama-cpp-python==0.3.16' --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu 'huggingface-hub==0.36.0'
+        CMAKE_ARGS: '-DGGML_NATIVE=ON'
+      run: python3 -m pip install --quiet --no-binary=llama-cpp-python 'llama-cpp-python==0.3.16' --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu 'huggingface-hub==0.36.0'
     - name: Verify every model shard against the official immutable revision
       if: env.PCT_LLM_PROVIDER == 'local_llama_cpp'
       shell: bash
@@ -70,4 +74,5 @@ runs:
       with:
         path: ~/.cache/nabou-models/multilingual-e5-small
         key: nabou-embed-multilingual-e5-small-onnx-int8-761b726d-v1
+
 

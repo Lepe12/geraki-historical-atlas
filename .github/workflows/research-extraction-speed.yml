@@ -7,31 +7,63 @@ on:
       - 'tools/test_incremental_reading.py'
       - 'tools/benchmark_extraction_speed.py'
       - 'tools/test_benchmark_extraction_speed.py'
+      - 'tools/research_cpu_cache.py'
+      - 'tools/test_research_cpu_cache.py'
+      - '.github/actions/research-model/action.yml'
       - 'data/research_benchmarks/extraction_speed.json'
       - '.github/workflows/research-extraction-speed.yml'
   push:
     branches: [main]
     paths:
       - '.github/workflows/research-extraction-speed.yml'
+      - 'inference_speed_requests/*.json'
   workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: 'Optional existing diagnostic run: review its preserved extraction outputs only'
+        type: string
+        default: ''
 permissions:
   contents: read
 jobs:
   regression:
+    outputs:
+      source_run: ${{ steps.request.outputs.source_run }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 2
           sparse-checkout: |
             tools
             data
             .github
+            inference_speed_requests
+      - id: request
+        name: Resolve an explicit comparison-only recovery request
+        env:
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+        run: |
+          python3 - <<'PYREQUEST'
+          import json,os,re,subprocess
+          from pathlib import Path
+          source=os.environ.get('SOURCE_RUN_ID','').strip()
+          request='inference_speed_requests/review-existing-extraction.json'
+          if os.environ['GITHUB_EVENT_NAME']=='push':
+              changed=subprocess.check_output(['git','diff-tree','--no-commit-id','--name-only','-r','HEAD'],text=True).splitlines()
+              if request in changed:
+                  value=json.loads(Path(request).read_text())
+                  assert value['schema']=='research-extraction-review-resume-v1'
+                  assert value['action']=='review_existing_extraction_only'
+                  source=value['source_run_id']
+          if source and not re.fullmatch(r'[0-9]+',source):raise ValueError('INVALID_SOURCE_RUN_ID')
+          with open(os.environ['GITHUB_OUTPUT'],'a') as out:out.write('source_run='+source+'\n')
+          PYREQUEST
       - name: Verify incremental source reuse and unchanged extraction prompts
         env:
           PYTHONPATH: tools:tools/llm
         run: |
-          python3 -m unittest tools.test_incremental_reading tools.test_benchmark_extraction_speed tools.test_research_continuation tools.test_research_shard_replay tools.test_semantic_shards tools.test_semantic_research_answer -q
+          python3 -m unittest tools.test_incremental_reading tools.test_benchmark_extraction_speed tools.test_research_cpu_cache tools.test_research_continuation tools.test_research_shard_replay tools.test_semantic_shards tools.test_semantic_research_answer -q
           python3 - <<'PY'
           import hashlib
           from benchmark_extraction_speed import load_fixture
@@ -44,7 +76,7 @@ jobs:
           PY
   extract:
     needs: regression
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && needs.regression.outputs.source_run == ''
     runs-on: ubuntu-latest
     timeout-minutes: 35
     strategy:
@@ -81,8 +113,8 @@ jobs:
           if-no-files-found: error
           retention-days: 90
   compare:
-    needs: extract
-    if: always() && github.event_name != 'pull_request' && needs.extract.result != 'skipped'
+    needs: [regression, extract]
+    if: always() && github.event_name != 'pull_request' && needs.regression.result == 'success' && (needs.extract.result != 'skipped' || needs.regression.outputs.source_run != '')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -100,11 +132,17 @@ jobs:
             tools
             data
             .github/actions/research-model
-            evidence/configuration
+            evidence/configuration/${{ needs.regression.outputs.source_run || github.run_id }}
       - uses: actions/download-artifact@v4
+        if: needs.regression.outputs.source_run == ''
         with:
           pattern: extraction-*-${{ github.run_id }}
           path: extraction-results
+      - name: Reuse durably preserved extraction reports without new extraction
+        if: needs.regression.outputs.source_run != ''
+        env:
+          SOURCE_RUN_ID: ${{ needs.regression.outputs.source_run }}
+        run: cp -R "evidence/configuration/$SOURCE_RUN_ID/extraction-speed/extraction-results" extraction-results
       - uses: ./.github/actions/research-model
       - name: Larger-model review and measured comparison (no automatic promotion)
         env:
