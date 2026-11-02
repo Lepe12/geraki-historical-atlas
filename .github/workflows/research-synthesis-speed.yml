@@ -24,10 +24,6 @@ jobs:
   measure:
     runs-on: ubuntu-latest
     timeout-minutes: 35
-    strategy:
-      fail-fast: false
-      matrix:
-        profile: [model, reviewed_claims]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -45,17 +41,26 @@ jobs:
           import json
           from pathlib import Path
           value=json.loads(Path('synthesis_speed_requests/sonnini-reviewed-draft.json').read_text())
-          assert value=={'schema':'synthesis-speed-request-v1','parent_run':'41437163921','new_discovery':False,'historical_verified':False}
+          assert value=={'schema':'synthesis-speed-request-v1','parent_run':'41437163921','new_discovery':False,'historical_verified':False,'comparison_environment':'same_runner'}
           PY
           python3 -m unittest tools.test_reviewed_claim_draft -v
       - uses: ./.github/actions/research-model
-      - name: Measure actual synthesis and final review with the same retained claims
-        run: python3 tools/benchmark_reviewed_synthesis.py run --profile "${{ matrix.profile }}" --output result
+      - name: Measure model rewrite and final review on this runner
+        run: python3 tools/benchmark_reviewed_synthesis.py run --profile model --output result-model
+      - name: Measure reviewed-claim draft and final review on the SAME runner
+        if: '!cancelled()'
+        run: python3 tools/benchmark_reviewed_synthesis.py run --profile reviewed_claims --output result-reviewed_claims
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: synthesis-speed-${{ matrix.profile }}-${{ github.run_id }}
-          path: result/
+          name: synthesis-speed-model-${{ github.run_id }}
+          path: result-model/
+          retention-days: 90
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: synthesis-speed-reviewed_claims-${{ github.run_id }}
+          path: result-reviewed_claims/
           retention-days: 90
   report:
     needs: measure

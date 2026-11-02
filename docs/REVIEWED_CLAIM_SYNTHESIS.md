@@ -19,7 +19,8 @@ unverified and human review remains pending. This path produces a concise list
 of reviewed findings, rather than a newly written narrative or claim of complete
 research coverage.
 
-The synthesis-speed workflow compares both modes using the exact retained public
+The synthesis-speed workflow compares both modes sequentially on the SAME runner,
+in separate Python processes, using the exact retained public
 Sonnini work from run 41437163921. It removes only cached synthesis/final-review
 responses, replays extraction and claim review through current validators, and
 requires real new final reviews. Timings exclude setup and earlier reading,
@@ -27,4 +28,6 @@ which are not the stages being changed. A separate real-model negative control
 adds an unsupported dated pirate-base assertion to a cited paragraph and must
 be rejected. Different CPU tags, missing reviews, changed claim/provenance
 bindings or failed controls invalidate the speed claim. All outputs are durably
-published with the existing Git output publisher and readback receipt.
+published with the existing Git output publisher and readback receipt. The first
+run (41445526261) was invalidated because independently allocated runners had
+different CPU tags; its observed times must not be used as a speed comparison.
