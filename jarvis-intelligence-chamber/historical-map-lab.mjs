@@ -88,14 +88,14 @@ function render(){
   if(!w||!h)return;
   ctx.clearRect(0,0,w,h);
   const bg=ctx.createLinearGradient(0,0,w,h);
-  bg.addColorStop(0,"#0b2535");bg.addColorStop(1,"#05111e");
+  bg.addColorStop(0,"#2D2216");bg.addColorStop(1,"#1B140D");
   ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
-  ctx.lineWidth=1;ctx.strokeStyle="rgba(79,152,171,.15)";
+  ctx.lineWidth=1;ctx.strokeStyle="rgba(217,181,110,.12)";
   for(let lon=-15;lon<=45;lon+=5)strokeGeo([[lon,24],[lon,48]]);
   for(let lat=25;lat<=45;lat+=5)strokeGeo([[-18,lat],[48,lat]]);
-  ctx.lineWidth=1;ctx.strokeStyle="rgba(108,197,200,.56)";
+  ctx.lineWidth=1;ctx.strokeStyle="rgba(217,181,110,.55)";
   for(const coastLine of coast)strokeGeo(coastLine);
-  if(!mapAvailable){ctx.font="12px monospace";ctx.fillStyle="#7cabb7";ctx.fillText(loadError||"Φόρτωση ακτογραμμών…",30,40);}
+  if(!mapAvailable){ctx.font="14px \"Noto Sans\", sans-serif";ctx.fillStyle="#C4B493";ctx.fillText(loadError||"Φόρτωση ακτογραμμών…",30,40);}
   visible=collection?visibleFeatures(collection,year,{includeUndated:$("undated").checked,filter:$("searchLabels").value}):[];
   for(const feature of visible){
     const isSelected=selected?.id===feature.id;
@@ -106,12 +106,12 @@ function render(){
     if(x<0||x>w||y<0||y>h)continue;
     ctx.beginPath();ctx.arc(x,y,isSelected?6:3.6,0,Math.PI*2);
     ctx.fillStyle=isSelected?"#fff1b5":"#f2c77a";ctx.fill();
-    ctx.font="11px ui-monospace, monospace";ctx.fillStyle=isSelected?"#fff1b5":"#cfe4e9";
+    ctx.font="13px \"Noto Sans\", sans-serif";ctx.fillStyle=isSelected?"#fff1b5":"#F1E6CC";
     ctx.fillText(feature.properties.label.slice(0,32),x+8,y-7);
   }
   $("mapCount").textContent=visible.length+" γεωαναφερμένες επιγραφές";
   if(!collection){
-    ctx.fillStyle="#a8c7d1";ctx.font="14px system-ui";
+    ctx.fillStyle="#C4B493";ctx.font="14px \"Noto Sans\", sans-serif";
     ctx.textAlign="center";
     ctx.fillText("Εισαγάγετε GeoJSON με πραγματική προέλευση για να εμφανιστούν επιγραφές.",w/2,h*.88);
     ctx.textAlign="start";
