@@ -1,0 +1,24 @@
+name: NABOU Coding Agent — isolated tests
+
+on:
+  pull_request:
+    paths:
+      - 'tools/nabou_coding_agent.py'
+      - 'tools/test_nabou_coding_agent.py'
+      - '.github/workflows/nabou-coding-agent.yml'
+      - '.github/workflows/nabou-coding-agent-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile Python agent
+        run: python3 -m py_compile tools/nabou_coding_agent.py tools/test_nabou_coding_agent.py
+      - name: Run bounded-agent unit tests
+        run: PYTHONPATH=tools python3 -m unittest -v tools/test_nabou_coding_agent.py
