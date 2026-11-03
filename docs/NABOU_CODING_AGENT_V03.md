@@ -47,6 +47,6 @@
 
 Πηγή/προδιαγραφές μοντέλου: https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF
 
-**Επαλήθευση:** Οι δοκιμές συντακτικού και ασφάλειας v0.1–v0.3 εκτελέστηκαν στο GitHub. Η επιτυχία των πραγματικών model tasks και της αυτόματης δημιουργίας PR θα ανακοινωθεί μόνο με ανεξάρτητη επιβεβαίωση των αντίστοιχων Actions logs.
+**Επαλήθευση 03/11/2026:** 32 offline tests PASS, το Qwen2.5-Coder 7B Q4_K_M προετοιμάστηκε επιτυχώς με SHA-256 verification. Στις [τρεις πραγματικές δοκιμές](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/41702543182), **2/3 εργασίες πέρασαν**: η #1 forced-colors απορρίφθηκε επειδή δεν τηρήθηκε η απαιτούμενη συνθήκη, η #2 prefers-contrast πέρασε με ένα edit ανά αρχείο, και η #3 prefers-reduced-transparency πέρασε με μία επιτρεπτή διόρθωση μοντέλου. Οι πλήρεις αναφορές και τα patches διατηρούνται στο artifact `nabou-coder7b-three-real-trials-41702543182`. Το [draft PR #156](https://github.com/Lepe12/geraki-historical-atlas/pull/156) περιέχει την ελεγμένη πρόταση #2 και δημιουργήθηκε μέσω της σύνδεσης GitHub, επειδή η αυτόματη δημιουργία PR από το workflow δεν είχε ακόμη ολοκληρωθεί κατά τον έλεγχο. **Δεν ισχυριζόμαστε αυτοματοποιημένο end-to-end PR έως ότου επαληθευτεί.**
 
 **Απαραβίαστα:** δεν τροποποιούνται 3D, canvas, camera, renderer, backend, WordPress, MariaDB, API, auth, ιστορικά στοιχεία ή production deployment. Όλα τα PR είναι draft, χωρίς αυτόματο merge.
