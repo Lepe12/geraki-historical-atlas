@@ -1,0 +1,82 @@
+name: NABOU Coding Agent — review-first
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: "Describe ONE code fix in English or Greek (8-2000 chars)"
+        required: true
+        type: string
+      target_file:
+        description: "One approved frontend file, e.g. jarvis-intelligence-chamber/nabou-shell.css"
+        required: true
+        default: "jarvis-intelligence-chamber/nabou-shell.css"
+        type: string
+      apply_changes:
+        description: "false: preview only; true: create a draft PR (never deploy)"
+        default: false
+        required: true
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+  models: read
+
+concurrency:
+  group: nabou-coding-agent-${{ github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  code-agent:
+    if: github.repository == 'Lepe12/geraki-historical-atlas' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      AGENT_TASK: ${{ inputs.task }}
+      AGENT_FILE: ${{ inputs.target_file }}
+      AGENT_APPLY: ${{ inputs.apply_changes }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Unit tests (offline, before AI call)
+        run: PYTHONPATH=tools python3 -m unittest -v tools/test_nabou_coding_agent.py
+      - name: Request bounded code change from GitHub Models
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(--repo . --file "$AGENT_FILE" --task "$AGENT_TASK" --report agent_result.json)
+          if [[ "$AGENT_APPLY" == "true" ]]; then args+=(--apply); fi
+          python3 tools/nabou_coding_agent.py "${args[@]}"
+      - name: Unit tests (after AI call)
+        if: inputs.apply_changes
+        run: PYTHONPATH=tools python3 -m unittest -v tools/test_nabou_coding_agent.py
+      - name: Save review report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nabou-agent-report-${{ github.run_id }}
+          path: agent_result.json
+          if-no-files-found: warn
+      - name: Open draft Pull Request (only if explicitly opted in)
+        if: inputs.apply_changes
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git diff --exit-code -- . ':!jarvis-intelligence-chamber'
+          git diff --quiet -- "$AGENT_FILE" && { echo 'No reviewed code change'; exit 1; }
+          git config user.name "nabou-coding-agent[bot]"
+          git config user.email "nabou-coding-agent[bot]@users.noreply.github.com"
+          branch="agent/nabou-review-${GITHUB_RUN_ID}"
+          git switch -c "$branch"
+          git add -- "$AGENT_FILE"
+          git commit -m "chore(agent): propose bounded NABOU fix"
+          git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" push origin "HEAD:refs/heads/$branch"
+          gh pr create --draft --base main --head "$branch" \
+            --title "NABOU Agent: reviewed code proposal #${GITHUB_RUN_ID}" \
+            --body "Automatically generated single-file change. **Do not merge until inspected.** Run: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}. Requested task: ${AGENT_TASK}. The workflow did not deploy or modify protected research/3D modules."
