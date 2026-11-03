@@ -39,10 +39,18 @@ def synthesis(claim_ids):
     sections['minItems']=1
     return obj({'answer_sections':sections,'unknowns':SHORT_STRINGS,'limitations':SHORT_STRINGS})
 
-def final_review(count):
+def final_review(count, scope_facets=(), scope_binding=None):
     indexes={'type':'integer','enum':list(range(count))}
     decisions=array(obj({'section_index':indexes,'source_support_reason':{'type':'string','maxLength':600},
                          'unsupported_answer_spans':array({'type':'string','maxLength':160},3),
                          'decision':{'type':'string','enum':['SUPPORTED','UNSUPPORTED','UNCERTAIN']}}),count)
     decisions['minItems']=count
-    return obj({'section_decisions':decisions})
+    properties={'section_decisions':decisions}
+    if scope_facets:
+        coverage=array(obj({'facet':{'type':'string','enum':list(scope_facets)},
+                            'reason':{'type':'string','maxLength':600},
+                            'decision':{'type':'string','enum':['ADDRESSED','NOT_ADDRESSED','UNCERTAIN']}}),len(scope_facets))
+        coverage['minItems']=len(scope_facets)
+        properties['question_scope_review']=obj({'binding':{'type':'string','enum':[scope_binding]},'decisions':coverage})
+    return obj(properties)
+

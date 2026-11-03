@@ -148,6 +148,8 @@ def rank(records, target='', aliases=(), date_range='', purpose='', gazetteer=_G
         return total
 
     scored = []
+    from question_scope import profile as scope_profile, hits as scope_hits
+    required_facets = set(scope_profile({'purpose': purpose})['facets'])
     for index, (row, doc) in enumerate(zip(records, docs)):
         title = (row.get('occurrences') or [{}])[0].get('title') or ''
         title_terms = {_stem(t) for t in tokens(title)}
@@ -170,6 +172,10 @@ def rank(records, target='', aliases=(), date_range='', purpose='', gazetteer=_G
             elif mentioned:
                 date = -0.5
         quality, reasons = _quality(row)
+        matched_facets = required_facets & set(scope_hits(row.get('text')))
+        if matched_facets:
+            quality += 5.0 * len(matched_facets)
+            reasons = reasons + ['REQUEST_FACET:' + f for f in sorted(matched_facets)]
         if homonym:
             # Read last among its peers, never dropped: same name, other place.
             quality += HOMONYM_PENALTY
@@ -242,3 +248,4 @@ def rank(records, target='', aliases=(), date_range='', purpose='', gazetteer=_G
                           **({'near_duplicate_of': s['duplicate_of']} if 'duplicate_of' in s else {})}
                          for i, s in enumerate(ordered[:SCORE_LOG_LIMIT])]}
     return [s['row'] for s in ordered], report
+

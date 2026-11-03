@@ -18,6 +18,14 @@ on:
       - 'tools/fixtures/kapsis_saulger_336_340.json'
       - 'tools/research_relevance.py'
       - 'tools/research_validation_report.py'
+      - 'tools/question_scope.py'
+      - 'tools/test_question_scope.py'
+      - 'tools/excerpt_ranking.py'
+      - 'tools/lane_repository_plan.py'
+      - 'tools/fulltext_discovery.py'
+      - 'tools/publish_research_outputs.py'
+      - 'tools/test_publication_batch.py'
+      - 'tools/fixtures/kimolos_question_scope_41630296108.json'
       - 'tools/probe_evidence_production.py'
       - 'tools/historical_attestations.py'
       - 'tools/storage/historical_evidence*'
@@ -67,6 +75,8 @@ jobs:
           PYTHONPATH=.:tools python3 -m unittest -v tools.test_historical_attestations tools.test_research_evidence_bridge tools.storage.test_historical_evidence_store tools.test_historical_context
       - name: Existing Node command-center tests
         run: node server/command-center-live/self-test.js
+      - name: Real wrong-scope answer replay and batched Git publication readback
+        run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=.:tools:tools/llm python3 -m unittest -v tools.test_question_scope tools.test_publication_batch tools.test_publish_research_outputs tools.test_research_engine_validation tools.test_fulltext_discovery tools.test_first_pass_semantics tools.test_excerpt_ranking_continuation
       - name: Install public PDF and OCR tools
         run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-eng tesseract-ocr-ell
       - name: PDF Learning HTTP integration tests
@@ -137,4 +147,5 @@ jobs:
           path: |
             /tmp/evidence-database-test.json
             /tmp/evidence-schema-request-test.json
+
 

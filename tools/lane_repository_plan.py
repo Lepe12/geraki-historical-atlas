@@ -36,6 +36,8 @@ if ident['focus']['kind']=='topic':
     queries=expand_queries(lane,ctx['target'],ctx['aliases'],ctx['date_range'])
 semantic_queries=[r['query'] for r in (req.get('semantic_query_expansion') or {}).get('accepted_queries',[]) if r.get('lane')==lane]
 queries=list(dict.fromkeys(queries[:2]+semantic_queries+queries[2:]))
+from question_scope import queries as scope_queries
+queries=scope_queries(req,lane)+queries
 queries=list(dict.fromkeys(queries))
 plan={"lane":lane,"request_file":rf.name,"target":ctx["target"],"aliases":ctx["aliases"],"date_range":ctx["date_range"],"languages":langs[lane],"target_identity":ident,"specialist_plan":specialists,"expanded_queries":queries,"semantic_query_expansion":req.get('semantic_query_expansion'),"repositories":[],"rule":"Search repository/catalogue with auditable multilingual event vocabulary and user-supplied historical name variants; catalogue records are leads only."}
 for name,base in cfg[lane]:
@@ -44,4 +46,5 @@ for name,base in cfg[lane]:
 out=pathlib.Path("repository_plans");out.mkdir(exist_ok=True)
 (out/f"{lane}.json").write_text(json.dumps(plan,ensure_ascii=False,indent=2),encoding="utf-8")
 print("LANE",lane,"request",rf.name,"repositories",len(plan["repositories"]),"languages",",".join(plan["languages"]))
+
 

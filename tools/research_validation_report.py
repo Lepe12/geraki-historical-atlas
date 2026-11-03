@@ -170,6 +170,18 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
     required={'evidence_extractor','adversarial_reviewer'}
     if not synthesis_stage['valid']:required.add('synthesis')
     blockers=[]
+    # Never trust a stored green coverage label: replay against today's request,
+    # actual cited claims and their quotations. This is a negative gate only.
+    from question_scope import assess as assess_question_scope
+    question_coverage=assess_question_scope(request,answer)
+    if question_coverage['status']=='INCOMPLETE':blockers.append('QUESTION_REQUIREMENTS_NOT_COVERED')
+    if question_coverage['facets']:
+        from question_scope import replay_review
+        replay=replay_review(root,analysis_root,request,answer)
+        question_coverage['semantic_review_receipt']=replay
+        if replay['status']!='REPLAYED':blockers.append('QUESTION_SCOPE_REVIEW_NOT_REPLAYED')
+        elif any(r['decision']!='ADDRESSED' for r in replay['review']['decisions']):
+            blockers.append('QUESTION_SCOPE_REVIEW_NOT_ADDRESSED')
     if not continuation_valid:blockers.append('CONTINUATION_RECEIPTS_INVALID')
     coverage=answer.get('coverage') or {}
     if coverage.get('claims_awaiting_review'):blockers.append('CLAIM_REVIEWS_PENDING')
@@ -246,7 +258,7 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
                   'verified':0,'rejected_model_items':sum(r.get('reason')!='UNSUPPORTED_DATE_ATTRIBUTE_REMOVED' for r in answer.get('rejected',[])),
                   'rejected_model_attributes':sum(r.get('reason')=='UNSUPPORTED_DATE_ATTRIBUTE_REMOVED' for r in answer.get('rejected',[])),
                   'deferred_passages':len(answer.get('coverage',{}).get('deferred',[]))},
-        'synthesis_stage_validation':synthesis_stage,
+        'synthesis_stage_validation':synthesis_stage,'question_coverage':question_coverage,
         'required_model_roles':sorted(required),'completed_model_roles':sorted(completed),
         'semantic_calls':answer.get('calls',[]),'reused_semantic_calls':reused,
         'reused_extraction_receipts_validated':valid_reuse,'model_configuration':answer.get('model_configuration'),
@@ -270,4 +282,5 @@ if __name__=='__main__':
     (root/'research_answer/validation_report.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
     print('RESEARCH_E2E_VALIDATION',result['status'],json.dumps(result['counts']))
     if a.require_complete and result['status']=='INCOMPLETE':raise SystemExit(1)
+
 

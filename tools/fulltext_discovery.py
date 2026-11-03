@@ -94,7 +94,7 @@ def ia_queries(focus, limit=8):
     if focus['kind']=='topic':
         from research_topics import topic_queries
         return list(dict.fromkeys(topic_queries(focus)+topic_queries(focus,'french')))[:limit]
-    queries=[]
+    queries=list(focus.get('request_scope_queries') or [])
     if focus['kind']=='person':
         # Supplied spellings stay ahead of mechanical hypotheses so a short
         # result limit still searches the name the user actually wrote.
@@ -417,6 +417,8 @@ def run(root,request,ctx,lane='travellers',ia_enabled=True):
     path=root/'lane_discovery'/f'{lane}.json'
     discovery=json.loads(path.read_text()) if path.exists() else {'results':[],'attempts':[]}
     focus=decompose(ctx['target'],ctx.get('aliases',[]),ctx.get('purpose',''))
+    from question_scope import queries as scope_queries
+    focus['request_scope_queries']=scope_queries(request)
     terms=search_terms(focus);places=context_terms(focus);records=[];attempts=[]
     started=time.monotonic()
     def checkpoint():
@@ -464,3 +466,4 @@ if __name__=='__main__':
     _,req,ctx=load_request()
     lane=os.getenv('PCT_RESEARCH_LANE','travellers')
     run(Path('.'),req,ctx,lane,ia_enabled=lane=='travellers')
+

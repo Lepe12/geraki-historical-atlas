@@ -996,6 +996,14 @@ class SemanticBudgetReached(Exception):
 def execute(*args,**kwargs):
     try:answer=_execute(*args,**kwargs)
     except SemanticBudgetReached as error:answer=error.answer
+    # Recompute question coverage on every result, including cached/partial ones.
+    root=Path(args[0] if args else kwargs['run_root'])
+    request={}
+    for path in sorted(root.glob('*/run_manifest/manifest.json')):
+        request=read(path).get('normalized_request') or {}
+        if request:break
+    from question_scope import apply_to_answer
+    apply_to_answer(request,answer)
     from research_priority import claim_assessment
     answer['claim_evidence_assessment']=claim_assessment(answer)
     answer['research_funnel']=research_funnel(answer)
@@ -1438,7 +1446,10 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
     # Full context is reviewed once per claim, so valid extraction from several
     # sources cannot exceed the local context window by repeating every context
     # in one combined prompt. Unreviewed claims never enter synthesis.
-    for claim in claims:
+    from question_scope import profile as scope_profile, claim_facets
+    requested_facets=set(scope_profile(request)['facets'])
+    review_order=sorted(claims,key=lambda c:not bool(requested_facets & set(claim_facets(c)))) if requested_facets else claims
+    for claim in review_order:
         row=evidence_by_id[claim['evidence_id']]
         review_claim={**model_claim(claim),'claim_index':0,'source_context':row['text'],
                       'consulted_source':model_evidence(row)['consulted_source']}
@@ -1472,6 +1483,10 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
     fidelity_held=[c['claim_id'] for c in claims if c['claim_id'] in supported and (c.get('fidelity_status') in FIDELITY_FLAGGED or (c.get('place_fidelity') or {}).get('status')=='PLACE_NOT_IN_QUOTE')]
     relevance_held=[c['claim_id'] for c in claims if c['claim_id'] in supported and c['claim_id'] not in fidelity_held and c.get('relevance_status')==RELEVANCE_OFF]
     all_synthesis_claims=[c for c in claims if c['claim_id'] in supported and c['claim_id'] not in fidelity_held and c['claim_id'] not in relevance_held]
+    if requested_facets:
+        scope_held=[c for c in all_synthesis_claims if not requested_facets & set(claim_facets(c))]
+        out['question_scope_held_claim_ids']=[c['claim_id'] for c in scope_held]
+        all_synthesis_claims=[c for c in all_synthesis_claims if c not in scope_held]
     all_synthesis_claims.sort(key=lambda c:(c['claim_id'] not in fresh_supported,c['claim_id']))
     synthesis_claims=[];summary_size=0
     for claim in all_synthesis_claims:
@@ -1519,11 +1534,20 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
         sections=answer.get('answer_sections') if isinstance(answer,dict) else None
         if not valid_synthesis(answer,supported):
             out['status']='SYNTHESIS_REJECTED_INVALID_CITATIONS';return out
-        raw_final_review=invoke('adversarial_reviewer',RULES+'\nQUESTION: '+question+'\nCheck each FINAL ANSWER paragraph against ONLY the quotations supporting its cited claims. Return section_decisions with EXACTLY ONE entry for EVERY zero-based section_index. For each entry, first explain the source_support_reason from the supplied quotations, then give unsupported_answer_spans (exact literal words copied from the answer, empty for a faithful paragraph), and finally decision SUPPORTED, UNSUPPORTED or UNCERTAIN. An UNSUPPORTED decision must identify at least one actual unsupported span. Do not invent a mismatch or copy placeholder reasons. Do not require a named prison, precise year or geographic identification if the paragraph does not assert one. Support means a faithful, explicitly attributed paraphrase, not historical verification. An UNVERIFIED source can be faithfully cited: that label alone is NOT an unsupported assertion. Missing original inspection and human review are limitations, not quotation mismatches. A clearly marked source conjecture is allowed as a HYPOTHESIS. Flag invented facts, scope dates asserted as event dates, namesake conflations, wrong source attribution and certainty stronger than the quotation. Do not require prior historical verification. Do not use outside knowledge.\nFINAL_ANSWER_JSON:\n'+json.dumps({'sections':sections,'claims':[model_claim(c) for c in synthesis_claims]},ensure_ascii=False),schemas.final_review(len(sections)))
+        from question_scope import review_binding
+        binding=review_binding(request,sections,claims)
+        scope_context={'binding':binding,'required_facets':sorted(requested_facets),
+                       'instruction':'Assess EVERY requested facet separately. ADDRESSED requires cited evidence answering that facet, for the requested subject and period. General history and merely repeating topic words are NOT_ADDRESSED. Use UNCERTAIN when applicability is unresolved. Explain the actual source support or gap; do not infer an event date from a publication date.'}
+        final_payload={'sections':sections,'claims':[model_claim(c) for c in synthesis_claims]}
+        if requested_facets:final_payload['question_scope']=scope_context
+        final_schema=schemas.final_review(len(sections),sorted(requested_facets),binding)
+        raw_final_review=invoke('adversarial_reviewer',RULES+'\nQUESTION: '+question+'\nCheck each FINAL ANSWER paragraph against ONLY the quotations supporting its cited claims. Return section_decisions with EXACTLY ONE entry for EVERY zero-based section_index. For each entry, first explain the source_support_reason from the supplied quotations, then give unsupported_answer_spans (exact literal words copied from the answer, empty for a faithful paragraph), and finally decision SUPPORTED, UNSUPPORTED or UNCERTAIN. An UNSUPPORTED decision must identify at least one actual unsupported span. Do not invent a mismatch or copy placeholder reasons. Do not require a named prison, precise year or geographic identification if the paragraph does not assert one. Support means a faithful, explicitly attributed paraphrase, not historical verification. An UNVERIFIED source can be faithfully cited: that label alone is NOT an unsupported assertion. Missing original inspection and human review are limitations, not quotation mismatches. A clearly marked source conjecture is allowed as a HYPOTHESIS. Flag invented facts, scope dates asserted as event dates, namesake conflations, wrong source attribution and certainty stronger than the quotation. Do not require prior historical verification. Do not use outside knowledge.\nFINAL_ANSWER_JSON:\n'+json.dumps(final_payload,ensure_ascii=False),final_schema)
+        out['question_scope_review']=(raw_final_review or {}).get('question_scope_review') if isinstance(raw_final_review,dict) else None
         final_review=normalize_final_review(raw_final_review,sections)
         if final_review is None and out['calls'][-1]['status']=='COMPLETED':
-            repair=invoke('adversarial_reviewer',RULES+'\nThe previous final review had an invalid or incomplete decision structure. Reassess each paragraph using the supplied quotations. Explain source_support_reason BEFORE deciding. Return section_decisions for every zero-based section_index, each with source_support_reason, unsupported_answer_spans copied literally from the answer (empty for supported), and decision SUPPORTED/UNSUPPORTED/UNCERTAIN. Do not require historical verification to cite a source faithfully. Do not invent new assertions or geographic identities.\nFINAL_ANSWER_JSON:\n'+json.dumps({'sections':sections,'claims':[model_claim(c) for c in synthesis_claims]},ensure_ascii=False),schemas.final_review(len(sections)))
+            repair=invoke('adversarial_reviewer',RULES+'\nThe previous final review had an invalid or incomplete decision structure. Reassess each paragraph using the supplied quotations. Explain source_support_reason BEFORE deciding. Return section_decisions for every zero-based section_index, each with source_support_reason, unsupported_answer_spans copied literally from the answer (empty for supported), and decision SUPPORTED/UNSUPPORTED/UNCERTAIN. Do not require historical verification to cite a source faithfully. Do not invent new assertions or geographic identities.\nFINAL_ANSWER_JSON:\n'+json.dumps(final_payload,ensure_ascii=False),final_schema)
             out.setdefault('final_review_protocol_repairs',[]).append({'initial_response':raw_final_review,'repaired_response':repair})
+            out['question_scope_review']=(repair or {}).get('question_scope_review') if isinstance(repair,dict) else None
             final_review=normalize_final_review(repair,sections)
         indexes=final_review.get('supported_section_indexes') if isinstance(final_review,dict) else None
         flags=final_review.get('flagged_sections',[]) if isinstance(final_review,dict) else None
@@ -1609,6 +1633,20 @@ def render_funnel(funnel,continuation=None):
 
 def render(out):
     lines=['# Απάντηση έρευνας','',out['question'],'','Κατάσταση: **'+out['status']+'**','']
+    scope=out.get('question_coverage') or {}
+    if scope.get('requirements'):
+        lines.extend(['## Κάλυψη του ερωτήματος','',
+                      'Ο έλεγχος λεξιλογίου δεν αποδεικνύει πλήρη απάντηση ή ιστορική επαλήθευση.',''])
+        for row in scope['requirements']:
+            label=('Δεν βρέθηκε αποδεκτή παραπομπή για το ζητούμενο.' if row['status']=='NO_CITED_SUPPORT' else
+                   'Υπάρχει σχετικό απόσπασμα, αλλά δεν τεκμηριώθηκε η ζητούμενη πρωτογενής πηγή.' if row['status']=='PRIMARY_SUPPORT_NOT_ESTABLISHED' else
+                   'Υπάρχει σχετική παραπομπή· απαιτείται ανθρώπινος έλεγχος.')
+            lines.append('- '+row['label_el']+': '+label)
+        lines.extend(['','Τα κενά αφορούν την εκτελεσμένη έρευνα· δεν αποδεικνύουν ότι δεν υπάρχουν πηγές.',''])
+    if out.get('question_scope_context_sections'):
+        lines.extend(['## Γενικό πλαίσιο — δεν απαντά στα ζητούμενα',''])
+        lines.extend('- '+s['text']+' ['+', '.join(s.get('claim_ids') or [])+']' for s in out['question_scope_context_sections'])
+        lines.append('')
     if out.get('research_funnel'):lines.extend(render_funnel(out['research_funnel'],out.get('continuation_rounds')))
     assessments=out.get('claim_evidence_assessment',{}).get('claims',[])
     if assessments:
@@ -1638,7 +1676,8 @@ def render(out):
                 if src.get('reported_archival_reference'):lines.append('  Αρχειακή παραπομπή όπως τη δίνει η μελέτη (το πρωτότυπο δεν εξετάστηκε): '+src['reported_archival_reference']['display'])
             lines.append('')
     else:
-        lines.extend(['Δεν παρήχθη σημασιολογική απάντηση από μοντέλο. Τα αποκτημένα αποσπάσματα παραμένουν διαθέσιμα.',''])
+        lines.extend([('Δεν τεκμηριώθηκε απάντηση στα συγκεκριμένα ζητούμενα. Τα αποκτημένα αποσπάσματα και οι ισχυρισμοί διατηρούνται.' if out['status']=='QUESTION_COVERAGE_INCOMPLETE' else
+                       'Δεν παρήχθη σημασιολογική απάντηση από μοντέλο. Τα αποκτημένα αποσπάσματα παραμένουν διαθέσιμα.'),''])
         if out['configuration']['missing']:lines.extend(['Λείπουν ρυθμίσεις: '+', '.join(out['configuration']['missing'])+'.',''])
     if out.get('documentary_timeline'):
         lines.extend(['## Χρονολογικές ενδείξεις στα αποσπάσματα','', 'Οι ενδείξεις δεν αποτελούν επαληθευμένο χρονολόγιο γεγονότων.',''])
@@ -1698,6 +1737,7 @@ def main():
     print('SEMANTIC_ANSWER',out['status'],'model_used',out['model_used'],'claims',len(out['claims']))
 
 if __name__=='__main__':main()
+
 
 
 

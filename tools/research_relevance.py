@@ -31,7 +31,7 @@ def identity(req, ctx):
     aliases = list(dict.fromkeys([*ctx.get('aliases', []), *[v for v in extra if v != ctx['target']]]))
     focus=decompose(ctx['target'],aliases,ctx.get('purpose',''),kind,regions)
     return {'target': ctx['target'], 'aliases': aliases, 'type': focus['kind'], 'focus':focus,
-            'region_terms': regions, 'date_range': ctx.get('date_range', ''),
+            'region_terms': regions, 'date_range': ctx.get('date_range', ''), 'purpose': ctx.get('purpose', ''),
             'rule': 'User-supplied geographic context is a search constraint, not source evidence.'}
 
 
@@ -348,10 +348,12 @@ def discovery_queries(ident, recovery=False):
         for genre in ('island' if ident.get('type') == 'place' else 'history','voyage','corsair'):
             queries += [f'"{n}" {genre}' for n in names if n]
         queries += [f'"{n}"' for n in names if n]
-    return list(dict.fromkeys(queries))
+    from question_scope import queries as scope_queries
+    return list(dict.fromkeys(scope_queries(ident) + queries))
 
 
 def request_digest(req, ctx):
     payload={**ctx,'target_context':req.get('target_context',{})}
     return hashlib.sha256(json.dumps(payload,ensure_ascii=False,sort_keys=True).encode()).hexdigest()
+
 
