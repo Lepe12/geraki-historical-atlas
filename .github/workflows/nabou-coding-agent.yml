@@ -21,7 +21,6 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  models: read
 
 concurrency:
   group: nabou-coding-agent-${{ github.run_id }}
@@ -31,8 +30,10 @@ jobs:
   code-agent:
     if: github.repository == 'Lepe12/geraki-historical-atlas' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 35
     env:
+      PCT_LLM_PROVIDER: local_llama_cpp
+      PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen2.5-3B-Instruct-GGUF
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       AGENT_TASK: ${{ inputs.task }}
       AGENT_FILE: ${{ inputs.target_file }}
@@ -46,9 +47,12 @@ jobs:
           sparse-checkout: |
             tools
             jarvis-intelligence-chamber
+            .github/actions
       - name: Unit tests (offline, before AI call)
         run: PYTHONPATH=tools python3 -m unittest -v tools/test_nabou_coding_agent.py
-      - name: Request bounded code change from GitHub Models
+      - name: Prepare pinned, verified Qwen model for local inference
+        uses: ./.github/actions/research-model
+      - name: Request bounded code change from local Qwen
         shell: bash
         run: |
           set -euo pipefail
