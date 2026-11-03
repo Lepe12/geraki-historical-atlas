@@ -62,13 +62,23 @@ class DraftStageValidation(unittest.TestCase):
             path.write_text(path.read_text()+' changed')
             self.assertFalse(validate(root,root,answer)['valid'])
 
-    def test_cached_final_review_is_checked_without_any_new_model_call(self):
+    def test_cached_final_review_receipt_is_checked_without_model_inference(self):
+        from research_continuation import digest as cache_digest
         with tempfile.TemporaryDirectory() as tmp:
             root,answer=self.material(tmp)
-            with patch.dict(os.environ,ENV):
-                cached=engine.execute(root,'Historical research',caller=Caller(forbid=engine.ROLES),config=CONFIG)
-            self.assertTrue(all(c.get('replayed') for c in cached['calls']))
-            proof=validate(root,root,cached)
+            last=answer['calls'][-1]
+            matches=[]
+            for path in (root/'research_continuation').glob('*/responses/*.json'):
+                value=json.loads(path.read_text())
+                if engine.digest(value['result'])==last['response_sha256']:matches.append((path,value))
+            self.assertEqual(len(matches),1)
+            path,value=matches[0]
+            cached=copy.deepcopy(answer)
+            cached['calls'][-1]={'role':'adversarial_reviewer','status':'COMPLETED','replayed':True,
+                'response_cache_path':str(path.relative_to(root)),
+                'response_cache_sha256':cache_digest(value['result'])}
+            with patch.object(engine,'call',side_effect=AssertionError('validation must not infer')):
+                proof=validate(root,root,cached)
             self.assertTrue(proof['valid'],proof)
             self.assertTrue(proof['final_review_replayed'])
 
