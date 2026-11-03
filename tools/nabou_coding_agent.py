@@ -195,9 +195,14 @@ def infer_model(task: str, source: str, path: str, endpoint: str, model: str, to
 def check_syntax(path: Path) -> dict:
     if path.suffix not in (".js", ".cjs", ".mjs"):
         return {"command": "no built-in parser for CSS/HTML", "ok": None}
-    p = subprocess.run(["node", "--check", str(path)], capture_output=True, text=True, timeout=25, check=False)
-    return {"command": "node --check " + str(path), "ok": p.returncode == 0,
-            "stderr": p.stderr[-700:]}
+    # Explicitly parse ESM (or CommonJS) from stdin. Filename-based node
+    # --check previously passed malformed modules on some Node 22 runners.
+    mode = "commonjs" if path.suffix == ".cjs" else "module"
+    cmd = ["node", "--check", "--input-type=" + mode]
+    p = subprocess.run(cmd, input=path.read_text(encoding="utf-8"),
+                       capture_output=True, text=True, timeout=25, check=False)
+    return {"command": "node --check --input-type=" + mode,
+            "ok": p.returncode == 0, "stderr": p.stderr[-700:]}
 
 
 def main(argv=None) -> int:
