@@ -149,7 +149,9 @@ def rank(records, target='', aliases=(), date_range='', purpose='', gazetteer=_G
 
     scored = []
     from question_scope import profile as scope_profile, hits as scope_hits
-    required_facets = set(scope_profile({'purpose': purpose})['facets'])
+    # Piracy already has multilingual BM25/theme boosts above. Applying a
+    # second boost changes which OCR duplicate becomes the retained leader.
+    required_facets = set(scope_profile({'purpose': purpose})['facets']) - {'piracy'}
     for index, (row, doc) in enumerate(zip(records, docs)):
         title = (row.get('occurrences') or [{}])[0].get('title') or ''
         title_terms = {_stem(t) for t in tokens(title)}
