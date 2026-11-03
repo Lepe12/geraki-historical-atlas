@@ -92,13 +92,24 @@ class MultiFileCodingTaskTests(unittest.TestCase):
     def test_file_list_and_scope_are_strict(self):
         for bad in (
             "jarvis-intelligence-chamber/nabou-shell.js",
-            self.names + ",jarvis-intelligence-chamber/index.html",
             "jarvis-intelligence-chamber/nabou-shell.js,jarvis-intelligence-chamber/nabou-shell.js",
             self.names + ",jarvis-intelligence-chamber/command-deck.css,jarvis-intelligence-chamber/nabou-shell.css",
         ):
             with self.subTest(bad=bad), self.assertRaises(AgentError):
                 selected_files(bad)
         self.assertEqual(len(selected_files(self.names)), 2)
+
+    def test_protected_file_rejected_before_inference(self):
+        from nabou_coding_task import prepare_changes
+        protected = [
+            "jarvis-intelligence-chamber/nabou-shell.js",
+            "jarvis-intelligence-chamber/index.html",
+        ]
+        with patch("nabou_coding_task.infer_model", side_effect=AssertionError("called")) as spy:
+            with self.assertRaises(AgentError):
+                prepare_changes(self.root, protected, "Change only the reviewed code",
+                                model="mock", endpoint="", token="")
+            spy.assert_not_called()
 
     def test_proposal_cannot_escape_explicit_targets(self):
         proposal = self.proposal_file()
