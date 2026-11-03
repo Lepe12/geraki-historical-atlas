@@ -94,6 +94,12 @@ jobs:
           git commit -m "chore(agent): review bounded Coder7B patch"
           auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
           git -c "http.extraheader=AUTHORIZATION: basic $auth" push origin "HEAD:refs/heads/$branch"
-          gh pr create --draft --base main --head "$branch" \
+          echo "Proposed review branch: $branch" >> "$GITHUB_STEP_SUMMARY"
+          if ! timeout 65s gh pr create --draft --base main --head "$branch" \
             --title "NABOU Coder7B: review patch #${GITHUB_RUN_ID}" \
-            --body "Code-specialized local model proposed a bounded change. Review source diff and associated GitHub Actions run before merge. **Never auto-deploy.** Run: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            --body "Code-specialized local model proposed a bounded change. Review source diff and associated GitHub Actions run before merge. **Never auto-deploy.** Run: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"; then
+            echo "Draft PR creation was blocked. Review and open the prepared comparison:" >> "$GITHUB_STEP_SUMMARY"
+            echo "https://github.com/${GITHUB_REPOSITORY}/compare/main...${branch}?expand=1" >> "$GITHUB_STEP_SUMMARY"
+            echo "For unattended PR creation, enable Settings > Actions > General > Allow GitHub Actions to create and approve pull requests." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
