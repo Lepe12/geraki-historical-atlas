@@ -62,13 +62,15 @@ void main(){
   vec3 piv = vec3(0.02, -0.2, 0.0);
   mat3 R = rotY(uYaw * aHead) * rotX(uPitch * aHead);
   vec3 b = piv + R * (position - piv);
-  /* speech: the moustache stays put; the lips/jaw under its lower edge (cloud y ≈ 0.155) drop, so a dark gap opens between moustache
-     and beard that reads clearly. Displacement fades out towards the ruff (y ≈ -0.14) and towards the ear side (x ≈ 0). */
-  float jx = smoothstep(-0.48, -0.36, b.x) * smoothstep(0.03, -0.10, b.x);
-  float below = smoothstep(0.17, 0.125, b.y);                       /* 0 on the moustache, 1 just under it */
-  float reach = smoothstep(-0.15, 0.04, b.y);                       /* jaw only, the ruff does not move */
+  /* speech: the jaw swings open. Everything under the moustache line (cloud y ≈ 0.148) — lower lip, chin, beard — drops, hinged at the ear
+     side (x ≈ 0.04) so the front moves most, and fades to zero towards the ruff so the collar never tears. The upper lip lifts a little. */
+  float yo = b.y;                                                      /* height before the jaw moves */
+  float jx = smoothstep(-0.50, -0.38, b.x) * clamp((0.04 - b.x) / 0.30, 0., 1.);
+  float below = smoothstep(0.160, 0.136, yo);                          /* 0 on the moustache, 1 right under it */
+  float reach = smoothstep(-0.20, 0.05, yo);                          /* 1 near the mouth, 0 at the collar */
   float jaw = jx * below * reach * aHead;
-  b.y -= uMouth * 0.1 * jaw; b.x += uMouth * 0.014 * jaw;
+  float lift = jx * smoothstep(0.23, 0.15, yo) * (1. - below) * aHead;
+  b.y += uMouth * (0.012 * lift - 0.20 * jaw); b.x += uMouth * 0.02 * jaw;
   float d = aSeed * 0.45;
   float k = smoothstep(d, d + 0.55, uMorph);
   vec3 p = mix(aOrb, b, k);
@@ -87,15 +89,16 @@ void main(){
   float scan = smoothstep(0.08, 0., abs(fract(position.y * 0.35 - uTime * 0.08) - 0.5) - 0.42) * 0.35;
   float orb = 0.55 + 0.25 * sin(aSeed * 50. + uTime * 1.7);
   float fig = pow(aBright, 0.8) * (1. + scan + uPulse * 0.08 * (0.4 + aHead));
-  /* mouth while speaking: the stretched band between moustache and beard dims (a dark opening), its lower edge gets a bright lip line
-     and a soft light sits in the opening; all of it follows the jaw and fades out when uMouth returns to 0 */
-  float mx = smoothstep(-0.46, -0.36, b.x) * smoothstep(-0.05, -0.17, b.x) * aHead * uMouth;   /* the lips only, not the whole beard */
+  /* mouth while speaking: the opening is the empty, dark band between the moustache and the dropped beard. Its two lips are lit: the
+     underside of the moustache and the first beard hairs that moved with the jaw; points stretched across the gap are dimmed. */
+  float mw = jx * aHead * uMouth;
   float gapB = below * (1. - below) * 4.;
-  fig *= 1. - 0.6 * gapB * mx;
-  float lipY = 0.125 - uMouth * 0.1;
-  fig += 0.7 * mx * smoothstep(0.022, 0., abs(b.y - lipY)) + 0.3 * mx * smoothstep(0.02, 0., abs(b.y - 0.15));
-  vec2 mq = b.xy - vec2(-0.25, 0.14 - uMouth * 0.044);
-  fig += 0.5 * mx * exp(-dot(mq * vec2(1., 2.2), mq * vec2(1., 2.2)) / 0.012);
+  fig *= 1. - 0.85 * gapB * mw;
+  fig *= 1. - 0.45 * uMouth * jaw;                                                          /* the dropped beard is a little dimmer than at rest */
+  fig *= 1. - 0.7 * mw * reach * (1. - reach) * 4. * below;                                /* hairs piling up against the ruff stay soft */
+  float upper = smoothstep(0.100, 0.150, yo) * (1. - smoothstep(0.150, 0.180, yo));       /* moustache underside */
+  float lower = smoothstep(0.060, 0.125, yo) * below;                                        /* hairs that form the lower lip */
+  fig *= 1. + mw * (0.9 * upper + 0.45 * lower);
   /* depth: nearer points (face towards the viewer) are a little larger and brighter */
   float depth = clamp(p.z * 1.3 + 0.5, 0., 1.);
   float dA = 0.72 + 0.45 * depth;
@@ -245,7 +248,7 @@ export async function createHologram(canvas, opts = {}) {
     st.kickV = Math.max(0, st.kickV - dt * 5);
     const env = st.speaking ? 0.55 + 0.45 * Math.abs(Math.sin(t * 7.3) * Math.sin(t * 3.1 + 1)) : 0;
     /* reduced motion: a gentle, steady half-open mouth while the voice plays (no syllable flapping, no pulse) */
-    const wantMouth = st.speaking ? (calm ? 0.3 : Math.min(1, 0.1 + 0.62 * Math.abs(Math.sin(t * 9.4) * Math.sin(t * 4.1 + 0.6)) + 0.5 * st.kickV)) : 0;
+    const wantMouth = st.speaking ? (calm ? 0.4 : Math.min(1, 0.1 + 0.85 * Math.abs(Math.sin(t * 9.4) * Math.sin(t * 4.1 + 0.6)) + 0.5 * st.kickV)) : 0;
     st.mouth += (wantMouth - st.mouth) * Math.min(1, dt * (calm ? 5 : 14));
     const speakNod = st.speaking && !calm ? Math.sin(t * 2.3) * 0.03 + st.kickV * 0.035 : 0;
     st.yaw += (st.tYaw - st.yaw) * Math.min(1, dtm * 2.5);

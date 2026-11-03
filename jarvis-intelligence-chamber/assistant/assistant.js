@@ -202,7 +202,7 @@ function build() {
   q(".nxa-form").onsubmit = (e) => { e.preventDefault(); const v = q(".nxa-text").value; q(".nxa-text").value = ""; handle(v); };
   root.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
   setStatus(SR ? "Πάτα «Πάτα και μίλα» και πες μια εντολή, ή άνοιξε το «Να ακούει πάντα» και ξεκίνα με «Ναμπού»." : "Αυτό το πρόγραμμα περιήγησης δεν έχει αναγνώριση ομιλίας· γράψε την εντολή στο πεδίο.");
-  holoP = import("./assistant-scene.js?v=v2-phase3-2").then((m) => m.createHologram(ui.canvas)).then((h) => { holo = h; h.show(); morphLabel(true); return h; }) /* το ολόγραμμα φαίνεται από την αρχή */
+  holoP = import("./assistant-scene.js?v=v2-mouth-1").then((m) => m.createHologram(ui.canvas)).then((h) => { holo = h; h.show(); morphLabel(true); return h; }) /* το ολόγραμμα φαίνεται από την αρχή */
     .catch((err) => { root.classList.add("no-webgl"); setStatus("Το ολόγραμμα δεν φορτώθηκε (WebGL): " + err.message); });
 }
 
