@@ -69,6 +69,37 @@ class ExactPatchTests(unittest.TestCase):
             ]}), "old")
 
 
+class IntegratedMultiFileAnchors(unittest.TestCase):
+    def test_two_generated_anchor_insertions_apply_atomically(self):
+        from unittest.mock import patch as monkeypatch
+        from nabou_coding_task import apply_atomically, prepare_changes
+        targets = [
+            "jarvis-intelligence-chamber/navigation-rail.css",
+            "jarvis-intelligence-chamber/photon-windows.css",
+        ]
+        with tempfile.TemporaryDirectory() as temp:
+            repo = Path(temp)
+            for index, target in enumerate(targets):
+                file = repo / target
+                file.parent.mkdir(parents=True, exist_ok=True)
+                file.write_text(".rule%d{color:cyan}\n" % index)
+            def inference(task, source, target, *args):
+                anchor = source.strip()
+                return json.dumps({"edits": [{
+                    "op": "insert_after", "anchor": anchor,
+                    "text": "\n@media(forced-colors:active){.focus{outline:2px solid Highlight}}\n",
+                }]})
+            with monkeypatch("nabou_coding_task.infer_model", side_effect=inference) as model:
+                changes = prepare_changes(
+                    repo, targets, "Add high contrast keyboard focus",
+                    model="test-model", endpoint="", token="")
+            self.assertEqual(model.call_count, 2)
+            self.assertEqual(len(changes), 2)
+            self.assertEqual(len(apply_atomically(changes)), 2)
+            for path in targets:
+                self.assertIn("forced-colors", (repo / path).read_text())
+
+
 class CoderModelTests(unittest.TestCase):
     def test_verified_model_with_pinned_revision(self):
         payload = b"tiny fixture (not a real GGUF)"
