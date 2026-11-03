@@ -19,10 +19,10 @@ EXPECTED_SHA256 = "509287f78cb4d4cf6b3843734733b914b2c158e43e22a7f4bf5e963800894
 
 
 def prepare(destination: Path, *, api=None, downloader=None) -> dict:
-    from huggingface_hub import HfApi, hf_hub_download
-
-    api = api or HfApi()
-    downloader = downloader or hf_hub_download
+    if api is None or downloader is None:
+        from huggingface_hub import HfApi, hf_hub_download
+        api = api if api is not None else HfApi()
+        downloader = downloader if downloader is not None else hf_hub_download
     info = api.model_info(REPO, revision=REVISION, files_metadata=True)
     sha = info.sha
     if not isinstance(sha, str) or len(sha) != 40 or not all(c in "0123456789abcdef" for c in sha):
