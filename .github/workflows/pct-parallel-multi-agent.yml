@@ -129,9 +129,14 @@ jobs:
       - name: Compile Python research code
         run: python3 -m compileall -q tools
       - name: Run core scientific benchmark
+        env:
+          # Offline fixtures exercise the model-written repair path explicitly.
+          # Production local inference defaults must not change those fixtures.
+          PCT_LLM_PROVIDER: disabled
+          PCT_SYNTHESIS_MODE: model
         run: |
           PYTHONPATH=tools:tools/orchestrator python3 -m unittest tools/orchestrator/test_research_query.py tools/test_research_focus.py tools/test_fulltext_discovery.py tools/test_cited_work_acquisition.py tools/test_research_pipeline_repairs.py tools/test_section_extraction.py tools/test_research_evidence_package.py -q
-          PYTHONPATH=tools:tools/llm python3 -m unittest tools/test_semantic_research_answer.py -q
+          PYTHONPATH=tools:tools/llm python3 -m unittest tools/test_semantic_research_answer.py tools/test_reviewed_claim_draft.py -q
           python3 tools/scientific_benchmark.py
           python3 tools/adversarial_scientific_benchmark.py
       - name: Build and validate eleven lane payloads
