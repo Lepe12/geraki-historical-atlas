@@ -1,0 +1,46 @@
+name: N7 Top.Host FTPS connection probe (read only)
+on:
+  push:
+    branches: [experiment/n7-tophost-ftps-connectivity]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  connection:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ secrets.PCT_FTPS_TLS_SERVER_NAME }}
+    steps:
+      - name: Verify existing FTPS path without writing
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os, ssl, ftplib, socket, json
+          keys=('PCT_FTPS_HOST','PCT_FTPS_USER','PCT_FTPS_PASSWORD','PCT_FTPS_TLS_SERVER_NAME')
+          if any(not os.getenv(k) for k in keys):
+              raise SystemExit('BLOCKED: FTPS secret binding missing')
+          host=os.environ['PCT_FTPS_HOST']
+          tlsname=os.environ['PCT_FTPS_TLS_SERVER_NAME']
+          ftp=ftplib.FTP_TLS(timeout=20,context=ssl.create_default_context())
+          try:
+              a={x[4][0] for x in socket.getaddrinfo(host,21,type=socket.SOCK_STREAM)}
+              b={x[4][0] for x in socket.getaddrinfo(tlsname,21,type=socket.SOCK_STREAM)}
+              if not a.intersection(b): raise RuntimeError('TLS name does not resolve to configured host')
+              ftp.connect(host,21)
+              ftp.host=tlsname
+              ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD'])
+              ftp.prot_p()
+              # No uploads, directory creation, rename, delete, or writes.
+              ftp.pwd()
+              print('N7_FTPS_CONNECTION_PASS')
+          except Exception as exc:
+              print('N7_FTPS_CONNECTION_FAILED:'+type(exc).__name__)
+              raise SystemExit(1)
+          finally:
+              try: ftp.quit()
+              except Exception: pass
+          PY
