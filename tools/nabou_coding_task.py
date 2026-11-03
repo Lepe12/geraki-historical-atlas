@@ -80,6 +80,51 @@ def prepare_changes(
     return changes
 
 
+def check_css_structure(path: Path) -> dict:
+    """Conservative CSS delimiter/comment check (NOT a complete CSS parser)."""
+    src = path.read_text(encoding="utf-8")
+    depth = 0
+    quote = None
+    in_comment = False
+    i = 0
+    while i < len(src):
+        c = src[i]
+        nxt = src[i + 1] if i + 1 < len(src) else ""
+        if in_comment:
+            if c == "*" and nxt == "/":
+                in_comment = False
+                i += 2
+                continue
+        elif quote:
+            if c == "\\":
+                i += 2
+                continue
+            if c == quote:
+                quote = None
+        elif c == "/" and nxt == "*":
+            in_comment = True
+            i += 2
+            continue
+        elif c in ("'", '"'):
+            quote = c
+        elif c == "{":
+            depth += 1
+        elif c == "}":
+            depth -= 1
+            if depth < 0:
+                return {"command": "CSS delimiter check", "ok": False, "stderr": "unmatched }"}
+        i += 1
+    ok = depth == 0 and not quote and not in_comment
+    return {"command": "CSS delimiter check (not full parser)", "ok": ok,
+            "stderr": "" if ok else "unclosed CSS block, string or comment"}
+
+
+def check_file(path: Path) -> dict:
+    if path.suffix == ".css":
+        return check_css_structure(path)
+    return check_syntax(path)
+
+
 def apply_atomically(changes: list[dict]) -> list[dict]:
     """Every permitted file is restored if ANY syntax/IO validation fails."""
     originals = [(change["path"], change["original"]) for change in changes]
@@ -90,7 +135,7 @@ def apply_atomically(changes: list[dict]) -> list[dict]:
             change["path"].write_text(change["candidate"], encoding="utf-8")
         checks: list[dict] = []
         for change in changes:
-            check = check_syntax(change["path"])
+            check = check_file(change["path"])
             checks.append({"target": change["target"], **check})
             if check["ok"] is False:
                 raise AgentError("Syntax check failed for " + change["target"])
