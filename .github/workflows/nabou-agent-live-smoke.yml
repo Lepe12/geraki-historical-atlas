@@ -10,14 +10,15 @@ on:
 
 permissions:
   contents: write
-  models: read
 
 jobs:
   real-model-smoke:
     if: github.repository == 'Lepe12/geraki-historical-atlas'
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 35
     env:
+      PCT_LLM_PROVIDER: local_llama_cpp
+      PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen2.5-3B-Instruct-GGUF
       GITHUB_TOKEN: ${{ github.token }}
       TARGET: jarvis-intelligence-chamber/workspace-insights.js
       TASK: >-
@@ -34,9 +35,12 @@ jobs:
           sparse-checkout: |
             tools
             jarvis-intelligence-chamber
+            .github/actions
       - name: Verify bounded agent tests
         run: PYTHONPATH=tools python3 -m unittest -v tools/test_nabou_coding_agent.py
-      - name: Ask a REAL GitHub Models model and apply only bounded proposal
+      - name: Prepare Qwen local inference with official hash-checked model
+        uses: ./.github/actions/research-model
+      - name: Ask a REAL local Qwen model and apply only bounded proposal
         shell: bash
         run: |
           set -euo pipefail
