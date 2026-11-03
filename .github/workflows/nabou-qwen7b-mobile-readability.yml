@@ -1,0 +1,78 @@
+name: NABOU Coder7B mobile readability improvement
+on:
+  push:
+    branches:
+      - feat/nabou-qwen7b-mobile-readability-20261103
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  qwen7b-mobile-readability:
+    if: github.repository == 'Lepe12/geraki-historical-atlas' && github.ref == 'refs/heads/feat/nabou-qwen7b-mobile-readability-20261103'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      AGENT_TASK: "Improve real mobile readability without changing the layout or 3D: In navigation-rail.css change ONLY the mobile @media(max-width:900px) .nabou-rail-caption font-size from 7px to 11px. In photon-windows.css change ONLY the mobile @media(max-width:900px) .photon-tabs button font-size from 8px to 11px. Preserve all other CSS rules and desktop appearance; return strict minimal exact-anchor replacements for each file."
+      AGENT_FILES: "jarvis-intelligence-chamber/navigation-rail.css,jarvis-intelligence-chamber/photon-windows.css"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            .github/actions/nabou-coder-model
+            jarvis-intelligence-chamber
+      - name: Preflight agent tests
+        run: PYTHONPATH=tools python3 -m unittest -q tools.test_nabou_coding_agent tools.test_nabou_coding_task tools.test_nabou_patch_engine
+      - name: Prepare verified Qwen Coder 7B
+        uses: ./.github/actions/nabou-coder-model
+      - name: Qwen7B produces and applies safe code patch
+        run: |
+          set -euo pipefail
+          python3 tools/nabou_coding_task.py --repo . --files "$AGENT_FILES" --task "$AGENT_TASK" --report agent_task_result.json --patch agent_task_preview.patch --apply
+      - name: Verify mobile readability change and guard protected CSS
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, subprocess, re
+          from pathlib import Path
+          files = os.environ["AGENT_FILES"].split(",")
+          changed = subprocess.check_output(["git","diff","--name-only"],text=True).splitlines()
+          assert set(changed)==set(files),f"Wrong changed paths: {changed}"
+          before={p:subprocess.check_output(["git","show",f"HEAD:{p}"],text=True) for p in files}
+          after={p:Path(p).read_text() for p in files}
+          expected={
+            files[0]: (".nabou-rail-caption{font-size:7px}",".nabou-rail-caption{font-size:11px}"),
+            files[1]: (".photon-tabs button{font-size:8px;padding:7px}",".photon-tabs button{font-size:11px;padding:7px}")
+          }
+          for p,(old,new) in expected.items():
+            assert before[p].count(old)==1,f"Missing original rule {p}"
+            assert after[p]==before[p].replace(old,new,1),f"Unexpected other CSS edits in {p}"
+          print("PASS: Mobile rail labels 7px -> 11px, dock tabs 8px -> 11px; no other edits")
+          PY
+          git diff --check
+          PYTHONPATH=tools python3 -m unittest -q tools.test_nabou_coding_agent tools.test_nabou_coding_task tools.test_nabou_patch_engine
+      - name: Publish audited model report and patch
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nabou-mobile-readability-${{ github.run_id }}
+          path: |
+            agent_task_result.json
+            agent_task_preview.patch
+          if-no-files-found: warn
+      - name: Open review-only draft PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          branch="agent/nabou-mobile-readable-${GITHUB_RUN_ID}"
+          git config user.name "nabou-coding-agent[bot]"
+          git config user.email "nabou-coding-agent[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add -- jarvis-intelligence-chamber/navigation-rail.css jarvis-intelligence-chamber/photon-windows.css
+          git commit -m "fix(ui): increase mobile NABOU navigation text legibility"
+          auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c "http.extraheader=AUTHORIZATION: basic $auth" push origin "HEAD:refs/heads/$branch"
+          gh pr create --draft --base main --head "$branch" --title "NABOU Qwen7B: improve mobile navigation readability #${GITHUB_RUN_ID}" --body "Real Qwen2.5-Coder 7B task: increase small mobile-only CSS font sizes to 11px in two approved files. Exact expected diff verified in Actions; run https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}. Review visually on mobile before merge. NO automatic merge or deploy."
