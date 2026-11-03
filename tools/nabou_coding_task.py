@@ -69,9 +69,6 @@ def prepare_changes(
             raw = infer_model(coordinated_task, original, target, endpoint, model, token)
         proposal = parse_proposal(raw)
         candidate = build_candidate(original, proposal)
-        if any(candidate == item["original"] for item in changes):
-            # Not normally useful for distinct files; does not block valid same-content.
-            pass
         changes.append({
             "target": target, "path": path, "original": original,
             "candidate": candidate, "summary": str(proposal.get("summary", ""))[:200],
@@ -89,8 +86,8 @@ def apply_atomically(changes: list[dict]) -> list[dict]:
     written: list[Path] = []
     try:
         for change in changes:
-            change["path"].write_text(change["candidate"], encoding="utf-8")
             written.append(change["path"])
+            change["path"].write_text(change["candidate"], encoding="utf-8")
         checks: list[dict] = []
         for change in changes:
             check = check_syntax(change["path"])
