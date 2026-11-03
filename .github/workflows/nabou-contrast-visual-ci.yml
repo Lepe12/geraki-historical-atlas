@@ -1,0 +1,42 @@
+name: NABOU accessibility patch — real Chromium focus test
+on:
+  push:
+    branches:
+      - review/nabou-coder7b-successful-trial-20261103
+    paths:
+      - 'jarvis-intelligence-chamber/contrast-focus.test.cjs'
+      - '.github/workflows/nabou-contrast-visual-ci.yml'
+  pull_request:
+    paths:
+      - 'jarvis-intelligence-chamber/navigation-rail.css'
+      - 'jarvis-intelligence-chamber/photon-windows.css'
+      - 'jarvis-intelligence-chamber/contrast-focus.test.cjs'
+      - '.github/workflows/nabou-contrast-visual-ci.yml'
+permissions:
+  contents: read
+jobs:
+  chromium-focus:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            jarvis-intelligence-chamber
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save --no-audit playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Verify high contrast keyboard focus and export screenshots
+        run: node jarvis-intelligence-chamber/contrast-focus.test.cjs
+      - name: Save actual Chromium screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nabou-accessibility-chromium-screenshots-${{ github.run_id }}
+          path: jarvis-intelligence-chamber/screenshots/contrast-ci/*.png
+          if-no-files-found: warn
