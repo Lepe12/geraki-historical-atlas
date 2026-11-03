@@ -63,6 +63,33 @@ class BatchPublicationTests(unittest.TestCase):
                 publisher.publish()
             self.assertEqual(self.run_git('--git-dir='+str(remote),'rev-parse','main'),before)
 
+    def test_actual_filtered_clone_publishes_without_downloading_unchanged_blobs(self):
+        with self.repository() as (worker,remote):
+            for i in range(100):(worker/('unrelated-'+str(i)+'.txt')).write_text(('unchanged '+str(i)+'\n')*100)
+            self.run_git('add','.');self.run_git('commit','-m','unrelated base');self.run_git('push','origin','main')
+            self.run_git('--git-dir='+str(remote),'config','uploadpack.allowFilter','true')
+            partial=worker.parent/'partial'
+            self.run_git('clone','--filter=blob:none','--no-checkout','--branch','main',remote.as_uri(),str(partial))
+            self.run_git('config','user.name','partial-test',cwd=partial);self.run_git('config','user.email','partial@example.invalid',cwd=partial)
+            def missing():
+                return sum(line.startswith('?') for line in self.run_git('rev-list','--objects','--missing=print','HEAD',cwd=partial).splitlines())
+            initial=missing();self.assertEqual(initial,101)
+            self.run_git('read-tree','HEAD',cwd=partial)
+            dest=partial/'evidence/runs/123';dest.mkdir(parents=True);(dest/'report.txt').write_text('new output\n')
+            self.run_git('add','evidence/runs/123/report.txt',cwd=partial)
+            # Create the fixture output commit without hydrating the base.
+            tree=self.run_git('write-tree','--missing-ok',cwd=partial)
+            commit=self.run_git('commit-tree',tree,'-p','HEAD','-m','fixture output',cwd=partial)
+            self.run_git('update-ref','HEAD',commit,cwd=partial)
+            self.assertEqual(missing(),initial)
+            os.chdir(partial)
+            try:receipt=publisher.publish()
+            finally:os.chdir(worker)
+            self.assertEqual(missing(),initial,'Publication downloaded unrelated promised blobs')
+            self.assertEqual(self.run_git('rev-parse',receipt['commit']+'^{tree}',cwd=partial),tree)
+            self.assertEqual(self.run_git('--git-dir='+str(remote),'show',receipt['commit']+':evidence/runs/123/report.txt'),'new output')
+            self.assertTrue(self.run_git('--git-dir='+str(remote),'show',receipt['commit']+':unrelated-99.txt').startswith('unchanged 99'))
+
     def test_symlink_is_rejected_before_push(self):
         with self.repository() as (worker,remote):
             dest=worker/'evidence';dest.mkdir();(dest/'link').symlink_to('../README.md')
