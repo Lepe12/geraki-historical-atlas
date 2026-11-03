@@ -53,6 +53,7 @@ jobs:
           sparse-checkout: |
             /*
             !/evidence/
+            /evidence/citation_checks/**/SOURCE_IDENTITY_CORRECTION.json
             !/backups/
       - uses: actions/setup-python@v5
         with:
@@ -109,6 +110,7 @@ jobs:
           sparse-checkout: |
             /*
             !/evidence/
+            /evidence/citation_checks/**/SOURCE_IDENTITY_CORRECTION.json
             !/backups/
       - run: python3 -m pip install 'PyMySQL==1.1.2'
       - run: python3 tools/storage/validate_mariadb_evidence.py --receipt /tmp/evidence-database-test.json
