@@ -1,0 +1,46 @@
+name: NABOU Coding Agent v0.2 — multi-file offline CI
+
+on:
+  pull_request:
+    paths:
+      - 'tools/nabou_coding_task.py'
+      - 'tools/test_nabou_coding_task.py'
+      - 'tools/nabou_coding_agent.py'
+      - '.github/workflows/nabou-coding-multifile-ci.yml'
+  push:
+    branches:
+      - 'feat/nabou-coding-agent-multifile-20261103'
+    paths:
+      - 'tools/nabou_coding_task.py'
+      - 'tools/test_nabou_coding_task.py'
+      - 'tools/nabou_coding_agent.py'
+      - '.github/workflows/nabou-coding-multifile-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  multi-file-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/nabou_coding_agent.py
+            tools/nabou_coding_task.py
+            tools/test_nabou_coding_agent.py
+            tools/test_nabou_coding_task.py
+          sparse-checkout-cone-mode: false
+      - name: Compile Python sources
+        run: |
+          python3 -m py_compile \
+            tools/nabou_coding_agent.py \
+            tools/nabou_coding_task.py \
+            tools/test_nabou_coding_agent.py \
+            tools/test_nabou_coding_task.py
+      - name: Test single-file compatibility and multi-file transactional editing
+        run: |
+          PYTHONPATH=tools python3 -m unittest -v \
+            tools.test_nabou_coding_agent tools.test_nabou_coding_task

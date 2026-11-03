@@ -1,0 +1,111 @@
+name: NABOU Coding Agent — coordinated multi-file task
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: "One development task (Greek or English, 8–2000 characters)"
+        type: string
+        required: true
+      target_files:
+        description: "Two or three approved frontend files, comma-separated"
+        type: string
+        required: true
+        default: "jarvis-intelligence-chamber/navigation-rail.css,jarvis-intelligence-chamber/nabou-shell.css"
+      apply_changes:
+        description: "FALSE = preview only; TRUE = review branch + draft PR (never deploy)"
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  coordinated-agent:
+    if: github.repository == 'Lepe12/geraki-historical-atlas' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      PCT_LLM_PROVIDER: local_llama_cpp
+      PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen2.5-3B-Instruct-GGUF
+      AGENT_TASK: ${{ inputs.task }}
+      AGENT_FILES: ${{ inputs.target_files }}
+      AGENT_APPLY: ${{ inputs.apply_changes }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            jarvis-intelligence-chamber
+            .github/actions
+
+      - name: Verify offline safety before model is loaded
+        run: |
+          python3 -m py_compile tools/nabou_coding_agent.py tools/nabou_coding_task.py
+          PYTHONPATH=tools python3 -m unittest -v \
+            tools.test_nabou_coding_agent tools.test_nabou_coding_task
+
+      - name: Prepare pinned official Qwen model
+        uses: ./.github/actions/research-model
+
+      - name: Plan and validate all edits, then optionally apply as one transaction
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(--repo . --files "$AGENT_FILES" --task "$AGENT_TASK" --report agent_task_result.json)
+          if [[ "$AGENT_APPLY" == "true" ]]; then args+=(--apply); fi
+          python3 tools/nabou_coding_task.py "${args[@]}"
+
+      - name: Verify no unexpected file was changed
+        if: inputs.apply_changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os,subprocess
+          expected=set(x.strip() for x in os.environ["AGENT_FILES"].split(","))
+          changed=set(x for x in subprocess.check_output(
+              ["git","diff","--name-only","-z"]).decode().split("\0") if x)
+          if changed != expected:
+              raise SystemExit("UNEXPECTED_CHANGED_FILES: "+repr(sorted(changed ^ expected)))
+          print("Allowed changed files verified:",", ".join(sorted(changed)))
+          PY
+          git diff --check
+          PYTHONPATH=tools python3 -m unittest -v \
+            tools.test_nabou_coding_agent tools.test_nabou_coding_task
+
+      - name: Save complete audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nabou-multifile-report-${{ github.run_id }}
+          path: |
+            agent_task_result.json
+            agent_task_preview.patch
+          if-no-files-found: warn
+
+      - name: Commit approved-scope changes and open DRAFT pull request
+        if: inputs.apply_changes
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          IFS=',' read -r -a targets <<< "$AGENT_FILES"
+          branch="agent/nabou-multifile-${GITHUB_RUN_ID}"
+          git config user.name "nabou-coding-agent[bot]"
+          git config user.email "nabou-coding-agent[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add -- "${targets[@]}"
+          git commit -m "chore(agent): review requested multi-file change"
+          basic="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c "http.extraheader=AUTHORIZATION: basic $basic" push origin "HEAD:refs/heads/$branch"
+          echo "Review branch: $branch" >> "$GITHUB_STEP_SUMMARY"
+          gh pr create --draft --base main --head "$branch" \
+            --title "NABOU Agent: coordinated multi-file proposal #${GITHUB_RUN_ID}" \
+            --body "Automated Qwen proposal across explicitly approved files. **Requires manual review and runtime/browser checks before merge.** Run: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}. No production deployment or merge. Task: ${AGENT_TASK}"
