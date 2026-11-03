@@ -134,5 +134,42 @@ class MultiFileCodingTaskTests(unittest.TestCase):
         self.assertEqual(self.one.read_text(), self.one_source)
 
 
+    def test_css_valid_and_invalid_structure(self):
+        from nabou_coding_task import check_css_structure
+        css = self.frontend / "navigation-rail.css"
+        css.write_text('.menu { color: white; }\n')
+        self.assertTrue(check_css_structure(css)["ok"])
+        css.write_text('.menu { color: white;\n')
+        self.assertFalse(check_css_structure(css)["ok"])
+        css.write_text('.menu { content: "}"; }\n')
+        self.assertTrue(check_css_structure(css)["ok"])
+        css.write_text('.menu { /* never closed')
+        self.assertFalse(check_css_structure(css)["ok"])
+
+    def test_css_transaction_rolls_back_second_invalid_file(self):
+        first = self.frontend / "navigation-rail.css"
+        second = self.frontend / "nabou-shell.css"
+        first.write_text(".rail { color: red; }\n")
+        second.write_text(".shell { color: blue; }\n")
+        file = self.root / "css.json"
+        targets = ("jarvis-intelligence-chamber/navigation-rail.css,"
+                   "jarvis-intelligence-chamber/nabou-shell.css")
+        proposals = {
+            "jarvis-intelligence-chamber/navigation-rail.css":
+                {"edits": [{"old": "red", "new": "cyan"}]},
+            "jarvis-intelligence-chamber/nabou-shell.css":
+                {"edits": [{"old": "blue; }", "new": "blue; /* missing close"}]},
+        }
+        file.write_text(json.dumps(proposals))
+        code = main(["--repo", str(self.root), "--files", targets,
+                     "--task", "Improve both stylesheet focus colors",
+                     "--apply", "--proposals-file", str(file),
+                     "--report", str(self.report)])
+        self.assertEqual(code, 1)
+        self.assertEqual(first.read_text(), ".rail { color: red; }\n")
+        self.assertEqual(second.read_text(), ".shell { color: blue; }\n")
+
+
+
 if __name__ == "__main__":
     unittest.main()
