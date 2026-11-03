@@ -1,0 +1,50 @@
+# NABOU Coding Agent v0.2 — συντονισμένες εργασίες σε πολλά αρχεία
+
+**Αυτό είναι δικό μας λογισμικό.** Δεν περιέχει κώδικα Copilot. Χρησιμοποιεί το τοπικό μοντέλο Qwen που διαθέτει ήδη το NABOU και δεν απαιτεί συνδρομή Copilot ή API key.
+
+## Τι υλοποιήθηκε
+
+- Μία ανάπτυξη μπορεί να περιλαμβάνει **2 ή 3 εγκεκριμένα frontend αρχεία**.
+- Το μοντέλο καλείται για κάθε αρχείο, με **κοινή περιγραφή εργασίας** και γνώση της ονομασίας των άλλων στόχων. Το μοντέλο δεν μπορεί να επιλέξει επιπλέον αρχεία.
+- **Όλες** οι αλλαγές υπολογίζονται, ελέγχονται και προετοιμάζονται **πριν γραφτεί το πρώτο αρχείο**.
+- Στο mode **preview** δεν τροποποιείται κανένα αρχείο.
+- Στο mode **apply**, το σύνολο των αλλαγών εφαρμόζεται σε ένα βήμα· σε σφάλμα ελέγχου γίνεται **rollback όλων των αρχείων**.
+- JavaScript: έλεγχος σύνταξης **ως ESM από stdin**, ώστε να μη διαφεύγουν λανθασμένα modules σε ορισμένες εκδόσεις Node 22. CSS: βασικός δομικός έλεγχος blocks, εισαγωγικών και σχολίων (**όχι πλήρης CSS parser**).
+- Αναφορά JSON με SHA-256 πριν/μετά, ελέγχους ανά αρχείο και σφάλματα.
+- Ξεχωριστό χειροκίνητο GitHub Actions workflow \`.github/workflows/nabou-coding-multifile.yml\` δημιουργεί **draft PR** μόνο με ρητή επιλογή εφαρμογής και εφόσον υπάρχουν οι απαιτούμενες άδειες GitHub.
+
+## Περιορισμοί / όρια ασφάλειας
+
+Τα αποδεκτά ονόματα αρχείων καθορίζονται από το \`ALLOWED_BASENAMES\` στο \`tools/nabou_coding_agent.py\`. Το σύστημα απορρίπτει 3D renderer/camera/canvas/overlays, ασφαλισμένα αρχεία backend και API, ερευνητικές πηγές, WordPress, στοιχεία MariaDB, secrets, protected workflows και διαδρομές εκτός scope.
+
+Η σύνταξη JavaScript **δεν εγγυάται** ότι δεν θα υπάρξει runtime σφάλμα ή παλινδρόμηση λειτουργικότητας. Τυχόν browser/functional tests απαιτούνται επιπλέον πριν από merge. Το Qwen μπορεί να αρνηθεί αλλαγή ή να παράγει ανεπαρκές patch· τότε η διαδικασία αποτυγχάνει χωρίς να τροποποιήσει τον αρχικό κώδικα.
+
+Η πρώτη έκδοση v0.2 δεν κάνει αυτοματοποιημένο σχεδιασμό άγνωστης μεγάλης εργασίας ή περιήγηση στο web· οι στόχοι επιλέγονται ρητά. Είναι ένα **ελεγχόμενο πολυαρχειακό coding workflow**, όχι πλήρης αντικατάσταση του Copilot.
+
+## Εκτέλεση μετά από έγκριση και merge
+
+1. Άνοιξε το [workflow πολλών αρχείων](https://github.com/Lepe12/geraki-historical-atlas/actions/workflows/nabou-coding-multifile.yml).
+2. Καθόρισε **μία** εργασία στο \`task\` και 2–3 εγκεκριμένα paths στο \`target_files\`, χωρισμένα με κόμματα.
+3. Αρχικά \`apply_changes=false\`, ώστε να παραχθεί μόνο έκθεση.
+4. Μόνο αφού ελεγχθεί το αποτέλεσμα, \`apply_changes=true\`, ώστε να δημιουργηθεί review branch και draft PR. Δεν γίνεται ποτέ merge/deploy αυτόματα.
+
+### Τοπικό παράδειγμα (χωρίς εγγραφή)
+
+\`\`\`sh
+python3 tools/nabou_coding_task.py \
+  --repo . \
+  --files "jarvis-intelligence-chamber/navigation-rail.css,jarvis-intelligence-chamber/photon-windows.css" \
+  --task "Improve keyboard-focus accessibility in these two CSS files" \
+  --report agent_task_result.json
+\`\`\`
+
+Για παραγωγή του patch χρειάζεται προετοιμασμένη διαδρομή \`PCT_LOCAL_MODEL_PATH\` προς το επίσημα επαληθευμένο GGUF Qwen, όπως ορίζει η υπάρχουσα \`.github/actions/research-model\`.
+
+## Ανεξάρτητοι έλεγχοι
+
+\`\`\`sh
+PYTHONPATH=tools python3 -m unittest -v \
+  tools.test_nabou_coding_agent tools.test_nabou_coding_task
+\`\`\`
+
+Το CI χρησιμοποιεί sparse checkout και ελέγχει εκ των προτέρων και εκ των υστέρων την ακεραιότητα του τροποποιούμενου συνόλου. Ζωντανή δοκιμή δύο CSS αρχείων: \`.github/workflows/nabou-multifile-live-trial.yml\` (μόνο στο feature branch). Τα αποτελέσματα της πραγματικής μοντελοπαραγωγής πρέπει να επαληθεύονται χωριστά από τα offline unit tests.
