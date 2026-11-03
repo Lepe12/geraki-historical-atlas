@@ -1,0 +1,76 @@
+name: NABOU Coder7B — three REAL isolated coding trials
+
+on:
+  push:
+    branches: ['feat/nabou-agent-coder7b-v03-20261103']
+    paths: ['.github/workflows/nabou-coder7b-three-trials.yml']
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  model-trials:
+    if: github.repository == 'Lepe12/geraki-historical-atlas'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            .github/actions/nabou-coder-model
+            jarvis-intelligence-chamber
+      - name: Verify every offline safety test before model inference
+        run: |
+          PYTHONPATH=tools python3 -m unittest -q \
+            tools.test_nabou_coding_agent tools.test_nabou_coding_task tools.test_nabou_patch_engine
+      - name: Download and verify official Coder7B GGUF from Hugging Face
+        uses: ./.github/actions/nabou-coder-model
+      - name: Run THREE independent, real two-file Qwen-Coder tasks
+        run: |
+          set -euo pipefail
+          python3 tools/nabou_coder_trial_suite.py \
+            --repo . --report-dir coder_trial_reports \
+            --model Qwen/Qwen2.5-Coder-7B-Instruct-GGUF
+      - name: Verify exactly two permitted CSS files changed
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import subprocess
+          expected={'jarvis-intelligence-chamber/navigation-rail.css',
+                    'jarvis-intelligence-chamber/photon-windows.css'}
+          changed=set(subprocess.check_output(['git','diff','--name-only']).decode().splitlines())
+          if changed!=expected: raise SystemExit('UNEXPECTED_CHANGED_SCOPE '+repr(changed))
+          print('Two approved CSS files changed, protected code untouched')
+          PY
+          git diff --check
+          PYTHONPATH=tools python3 -m unittest -q \
+            tools.test_nabou_coding_agent tools.test_nabou_coding_task tools.test_nabou_patch_engine
+      - name: Publish trial audit and exact patches as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nabou-coder7b-three-real-trials-${{ github.run_id }}
+          path: coder_trial_reports/
+          if-no-files-found: warn
+      - name: Open review branch and DRAFT PR for the first valid AI change
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="agent/nabou-coder7b-trial-${GITHUB_RUN_ID}"
+          git config user.name "nabou-coding-agent[bot]"
+          git config user.email "nabou-coding-agent[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add -- jarvis-intelligence-chamber/navigation-rail.css \
+            jarvis-intelligence-chamber/photon-windows.css
+          git commit -m "a11y(agent): Coder7B proposed checked two-file improvement"
+          basic="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c "http.extraheader=AUTHORIZATION: basic $basic" push origin "HEAD:refs/heads/$branch"
+          gh pr create --draft --base feat/nabou-agent-coder7b-v03-20261103 --head "$branch" \
+            --title "Coder7B trial: first tested two-file CSS proposal" \
+            --body "First successful proposal from three **real**, independent Qwen-Coder 7B trials on an isolated branch; per-task outcomes in artifact. Automated CSS check is not proof of browser correctness. Review before merge. No deployment. Run: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
