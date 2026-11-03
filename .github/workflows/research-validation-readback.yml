@@ -1,0 +1,90 @@
+name: Revalidate stored reviewed-claim synthesis
+on:
+  pull_request:
+    paths:
+      - 'tools/reviewed_draft_validation.py'
+      - 'tools/test_reviewed_draft_validation.py'
+      - 'tools/research_validation_report.py'
+      - '.github/workflows/research-validation-readback.yml'
+      - 'validation_recheck_requests/**'
+  push:
+    branches: [main]
+    paths: ['validation_recheck_requests/*.json']
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  PYTHONPATH: tools:tools/llm
+  PCT_LLM_PROVIDER: disabled
+  PCT_EXCERPT_RANKING: '0'
+jobs:
+  revalidate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/evidence/
+            /evidence/runs/41630296108/
+            /evidence/citation_checks/**/SOURCE_IDENTITY_CORRECTION.json
+            !/backups/
+      - name: Test verbatim draft validation, rejection and cached final reviews
+        run: python3 -m unittest tools.test_reviewed_draft_validation tools.test_reviewed_claim_draft -v
+      - name: Revalidate the exact stored answer and source receipts without inference
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,os,subprocess
+          from pathlib import Path
+          from unittest.mock import patch
+          from research_validation_report import build
+          request=json.loads(Path('validation_recheck_requests/reviewed-synthesis-20261103.json').read_text())
+          assert request=={'schema':'stored-research-validation-recheck-v1','parent_run':'41630296108','expected_answer_blob_sha':'829610e8b3180bb11ca20bf3ee7d3aab9b9d04fa','new_model_inference':False,'historical_verified':False}
+          root=Path('evidence/runs')/request['parent_run']
+          answer=root/'research_answer/answer.json'
+          expected=subprocess.check_output(['git','rev-parse','HEAD:'+str(answer)],text=True).strip()
+          assert expected==request['expected_answer_blob_sha'],'STORED_ANSWER_CHANGED'
+          before=hashlib.sha256(answer.read_bytes()).hexdigest()
+          report_path=root/'research_answer/validation_report.json'
+          previous=json.loads(report_path.read_text())
+          previous_sha=hashlib.sha256(report_path.read_bytes()).hexdigest()
+          with patch('semantic_research_answer.call',side_effect=AssertionError('VALIDATION_MUST_NOT_INFER')):
+              result=build(root)
+          report_path.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+          assert hashlib.sha256(answer.read_bytes()).hexdigest()==before
+          destination=Path('evidence/configuration')/os.environ['GITHUB_RUN_ID']/'stored-validation-recheck'
+          destination.mkdir(parents=True,exist_ok=True)
+          receipt={'schema':'stored-research-validation-recheck-v1','parent_run':request['parent_run'],
+              'recheck_run_id':os.environ['GITHUB_RUN_ID'],'validator_revision':os.environ['GITHUB_SHA'],
+              'answer_sha256':before,'answer_unchanged':True,'new_model_calls':0,
+              'previous_validation_sha256':previous_sha,'previous_status':previous['status'],
+              'previous_blockers':previous['blockers'],'status':result['status'],'blockers':result['blockers'],
+              'synthesis_stage_validation':result['synthesis_stage_validation'],
+              'historical_verified':False,'question_specific_coverage_not_claimed':True}
+          (destination/'receipt.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps(receipt,ensure_ascii=False))
+          if result['status']!='PROVISIONAL_RESEARCH_PIPELINE_PASSED':raise SystemExit(1)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stored-validation-recheck-${{ github.run_id }}
+          path: |
+            evidence/configuration/${{ github.run_id }}/stored-validation-recheck/
+            evidence/runs/41630296108/research_answer/validation_report.json
+          retention-days: 90
+      - name: Publish validation correction and verify readback
+        if: success() && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add evidence/runs/41630296108/research_answer/validation_report.json "evidence/configuration/$GITHUB_RUN_ID/stored-validation-recheck/"
+          if ! git diff --cached --quiet; then
+            git commit -m "Revalidate stored reviewed-claim synthesis without new inference $GITHUB_RUN_ID"
+            python3 tools/publish_research_outputs.py
+          fi
