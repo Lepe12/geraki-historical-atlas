@@ -14,6 +14,20 @@
   if (!panel || !toggle || !close || !input || !analyze || !status || !source || !list || !summary || !save)
     return;
 
+  const L = window.NABOU_LEARNING;
+  if (!L) return;
+  const T = {
+    readingLocal: "Ανάγνωση του PDF στον υπολογιστή σας",
+    reading: (n, N) => "Ανάγνωση σελίδας " + n + " / " + N,
+    building: "Προετοιμασία προτάσεων για έλεγχο",
+    noText: "Χωρίς επίπεδο κειμένου — απαιτείται OCR",
+    pdfRequired: "Απαιτείται αρχείο PDF",
+    uploading: "Αποστολή της εγκεκριμένης πηγής",
+    saving: "Αποθήκευση εγκεκριμένων στοιχείων",
+    backendDown: "Η υπηρεσία αποθήκευσης δεν είναι διαθέσιμη",
+    textFound: "Βρέθηκε κείμενο — η εξαγωγή χρειάζεται έλεγχο",
+    ready: "Έτοιμο",
+  };
   const endpoint = "https://pct-live.piratecartography.com/pct-api/live";
   let saving = false;
   let current = { source_id: "", file: null, pages: [], items: [] };
@@ -40,6 +54,17 @@
   reader.innerHTML =
     '<label>Σελίδα PDF <input type="number" min="1" value="1" aria-label="Αριθμός σελίδας PDF" style="width:80px"></label><small class="coverage"></small><pre style="white-space:pre-wrap;max-height:240px;overflow:auto;user-select:text"></pre>';
   list.before(reader);
+  /* Έγκριση όλου του PDF + αναίρεση: ένα βήμα για όλα τα στοιχεία όλων των σελίδων, χωρίς αποθήκευση. */
+  const bulk = document.createElement("section");
+  bulk.className = "learning-bulk";
+  bulk.hidden = true;
+  bulk.innerHTML =
+    '<div class="learning-bulk-row"><button type="button" class="learning-approve-all" data-bulk="approve"></button><button type="button" class="learning-undo" data-bulk="undo" hidden>Αναίρεση</button></div><small class="learning-bulk-note" role="status" aria-live="polite"></small>';
+  list.before(bulk);
+  const approveBtn = bulk.querySelector('[data-bulk="approve"]'),
+    undoBtn = bulk.querySelector('[data-bulk="undo"]'),
+    bulkNote = bulk.querySelector(".learning-bulk-note");
+  let undoSnapshot = null;
   const pageInput = reader.querySelector("input"),
     pageText = reader.querySelector("pre"),
     coverage = reader.querySelector(".coverage");
@@ -86,8 +111,15 @@
     const accepted = current.items.filter((x) => x.status === "accepted").length;
     const rejected = current.items.filter((x) => x.status === "rejected").length;
     const pending = current.items.length - accepted - rejected;
+    const savedCount = current.items.filter((x) => x.saved).length;
+    const openCount = current.items.filter((x) => !x.saved && x.status !== "accepted").length;
+    bulk.hidden = !current.items.length;
+    approveBtn.textContent = "Έγκριση όλου του PDF (" + openCount + ")";
+    approveBtn.disabled = saving || openCount === 0;
+    undoBtn.hidden = !undoSnapshot;
+    undoBtn.disabled = saving;
     summary.textContent = current.items.length
-      ? accepted + " εγκεκριμένα · " + rejected + " απορριφθέντα · " + pending + " προς έλεγχο"
+      ? current.items.length + " στοιχεία · " + accepted + " εγκεκριμένα · " + rejected + " απορριφθέντα · " + pending + " προς έλεγχο" + (savedCount ? " · " + savedCount + " αποθηκευμένα" : "")
       : "Δεν υπάρχουν ακόμη στοιχεία προς έλεγχο.";
     list.innerHTML = current.items.length
       ? current.items
@@ -106,8 +138,10 @@
                     ? "ΑΠΟΣΠΑΣΜΑ — ΑΝΕΠΙΒΕΒΑΙΩΤΟ"
                     : ({ claim: "ΙΣΧΥΡΙΣΜΟΣ", person: "ΠΡΟΣΩΠΟ", place: "ΤΟΠΟΣ", date: "ΧΡΟΝΟΛΟΓΙΑ", year: "ΧΡΟΝΟΛΟΓΙΑ", event: "ΓΕΓΟΝΟΣ", ship: "ΠΛΟΙΟ", source: "ΠΗΓΗ", entity: "ΟΝΟΜΑ", hidden: "ΚΡΥΦΟ" }[x.type] || x.type.toUpperCase()),
               ) +
-              "</span><small>ΣΕΛΙΔΑ " +
-              esc(x.page || "—") +
+              "</span><small>" +
+              (x.pages && x.pages.length > 1
+                ? "ΣΕΛΙΔΕΣ " + esc(x.pages.slice(0, 8).join(", ") + (x.pages.length > 8 ? " … (" + x.pages.length + " σελίδες)" : ""))
+                : "ΣΕΛΙΔΑ " + esc(x.page || "—")) +
               " · " +
               (x.confidence == null ? "ΧΩΡΙΣ ΕΚΤΙΜΗΣΗ ΒΕΒΑΙΟΤΗΤΑΣ" : Math.round(x.confidence * 100) + "%") +
               '</small></div><div class="learning-item-text" contenteditable="' +
@@ -156,81 +190,15 @@
     for (let n = 1; n <= pdf.numPages; n++) {
       const page = await pdf.getPage(n),
         tc = await page.getTextContent();
-      const text = tc.items
-        .map((x) => (x.str || "") + (x.hasEOL ? "\n" : " "))
-        .join("")
-        .replace(/[ \t]+/g, " ")
-        .trim();
-      pages.push({ page: n, text });
+      const lines = L.linesFromItems(tc.items),
+        text = lines.map((l) => l.text).join("\n");
+      pages.push({ page: n, text, lines });
       page.cleanup();
       await new Promise((resolve) => setTimeout(resolve, 0));
-      if (n % 5 === 0 || n === pdf.numPages) setState("READING " + n + " / " + pdf.numPages, "working");
+      if (n % 5 === 0 || n === pdf.numPages) setState(T.reading(n, pdf.numPages), "working");
     }
     await pdf.destroy();
     return pages;
-  }
-
-  function proposals(pages) {
-    const items = [],
-      seen = new Set(),
-      add = (type, text, page, confidence) => {
-        text = String(text || "")
-          .replace(/\s+/g, " ")
-          .trim();
-        if (text.length < 3) return;
-        const k = type + "|" + page + "|" + text.toLowerCase();
-        if (seen.has(k)) return;
-        seen.add(k);
-        items.push({
-          id: "k-" + items.length,
-          type: type === "excerpt" ? "claim" : type,
-          extraction_kind: type,
-          text,
-          page,
-          pdf_page: page,
-          printed_page: null,
-          confidence,
-          extraction_method: "text_layer_heuristic",
-          verification_status: "UNREVIEWED",
-          status: "pending",
-          editing: false,
-        });
-      };
-    const stop = new Set(
-      "την τον της του των το τα τις τους στη στην στο στον και εις από απο για με ο η οι εν ένας μια ένα αυτό αυτή σελίδες περιεχόμενα κεφάλαιο βιβλιογραφία the this that from with there their they for and but not chapter page figure table introduction conclusion references bibliography".split(
-        " ",
-      ),
-    );
-    const normalized = (t) => t.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
-    for (const pg of pages) {
-      const text = String(pg.text || "")
-        .replace(/\s+/g, " ")
-        .trim();
-      if (!text) continue;
-      for (const m of text.matchAll(/(?<!\d)(1\d{3}|20\d{2})(?!\d)/g)) add("date", m[1], pg.page, null);
-      // Conservative name candidates; capitals alone do not establish identity.
-      for (const m of text.matchAll(/[\p{Lu}][\p{Ll}’'-]{2,}(?:\s+[\p{Lu}][\p{Ll}’'-]{2,}){1,3}/gu)) {
-        const v = m[0].trim();
-        if (v.length > 90 || v.split(/\s+/).some((w) => stop.has(normalized(w)))) continue;
-        add("entity", v, pg.page, null);
-      }
-      // Preserve every passage for review, including contents and OCR noise.
-      // Do not label a sentence a verified historical claim.
-      const passages = text.match(/[^.!?]+(?:[.!?]+|$)/g) || [text];
-      for (const passage of passages) {
-        const words = passage.trim().split(/\s+/);
-        let chunk = "";
-        for (const word of words) {
-          if (chunk.length + word.length > 800) {
-            add("excerpt", chunk, pg.page, null);
-            chunk = "";
-          }
-          chunk += (chunk ? " " : "") + word;
-        }
-        if (chunk.length >= 35) add("excerpt", chunk, pg.page, null);
-      }
-    }
-    return items;
   }
 
   toggle.addEventListener("click", () => {
@@ -241,17 +209,19 @@
   input.addEventListener("change", () => {
     const file = input.files?.[0];
     open();
+    undoSnapshot = null;
+    bulkNote.textContent = "";
     current = { source_id: "", file: file || null, pages: [], items: [] };
     render();
     analyze.disabled = !file;
     if (!file) {
       source.textContent = "Δεν έχει επιλεγεί αρχείο.";
-      setState("READY");
+      setState(T.ready);
       return;
     }
     source.textContent = file.name + " · " + (file.size / 1048576).toFixed(1) + " MB";
     if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
-      setState("PDF REQUIRED", "error");
+      setState(T.pdfRequired, "error");
       analyze.disabled = true;
       return;
     }
@@ -270,27 +240,32 @@
     input.disabled = true;
     save.disabled = true;
     current.items = [];
+    undoSnapshot = null;
+    bulkNote.textContent = "";
     reviewPage = 0;
     render();
     try {
-      setState("READING PDF LOCALLY", "working");
+      setState(T.readingLocal, "working");
       current.pages = await extractPages(file);
       const textChars = current.pages.reduce((n, p) => n + String(p.text || "").trim().length, 0);
       if (textChars < 40) {
         current.items = [];
-        setState("NO TEXT LAYER — OCR REQUIRED", "error");
+        setState(T.noText, "error");
         summary.textContent =
           "Το PDF φαίνεται σαρωμένο ή μόνο εικόνα. Απαιτείται OCR πριν από την εξαγωγή στοιχείων.";
         list.innerHTML =
           '<div class="learning-empty">Δεν βρέθηκε αναγνώσιμο κείμενο στο PDF. Απαιτείται OCR πριν εξαχθούν προτάσεις.</div>';
         return;
       }
-      setState("BUILDING REVIEW", "working");
-      current.items = proposals(current.pages);
+      setState(T.building, "working");
+      const built = L.buildProposals(current.pages);
+      current.items = built.items;
+      undoSnapshot = null;
+      bulkNote.textContent = "";
       setState(
         current.items.length
           ? "Ελέγξτε τα στοιχεία πριν την αποθήκευση"
-          : "TEXT FOUND — EXTRACTION NEEDS REVIEW",
+          : T.textFound,
         current.items.length ? "ready" : "error",
       );
       render();
@@ -310,6 +285,28 @@
       const item = current.items[Number(card.dataset.i)];
       if (item) item.text = e.target.textContent.trim();
     }
+  });
+  bulk.addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-bulk]");
+    if (!b || saving) return;
+    const todo = current.items.filter((x) => !x.saved);
+    if (b.dataset.bulk === "approve") {
+      list.querySelectorAll(".learning-item").forEach((card) => {
+        const it = current.items[Number(card.dataset.i)];
+        if (it?.editing) it.text = card.querySelector(".learning-item-text")?.textContent?.trim() || it.text;
+      });
+      undoSnapshot = new Map(todo.map((x) => [x.id, { status: x.status, editing: x.editing }]));
+      const changed = todo.filter((x) => x.status !== "accepted");
+      todo.forEach((x) => { x.status = "accepted"; x.editing = false; });
+      const places = new Set(changed.flatMap((x) => x.pages || [x.page])).size;
+      bulkNote.textContent = "Εγκρίθηκαν " + changed.length + " στοιχεία σε " + places + " σελίδες. Δεν έχει αποθηκευτεί τίποτα ακόμη — πατήστε «Αποθήκευση εγκεκριμένων».";
+    } else if (b.dataset.bulk === "undo" && undoSnapshot) {
+      let n = 0;
+      todo.forEach((x) => { const was = undoSnapshot.get(x.id); if (was && x.status !== was.status) n++; if (was) { x.status = was.status; x.editing = false; } });
+      undoSnapshot = null;
+      bulkNote.textContent = "Η έγκριση αναιρέθηκε (" + n + " στοιχεία επανήλθαν).";
+    }
+    render();
   });
   list.addEventListener("click", (e) => {
     const b = e.target.closest("button[data-act]"),
@@ -350,34 +347,48 @@
         item.editing = false;
       }
     });
-    const accepted = current.items.filter((x) => x.status === "accepted" && !x.saved);
-    if (!accepted.length || !current.file) return;
+    const fresh = current.items.filter((x) => x.status === "accepted" && !x.saved);
+    if (!fresh.length || !current.file) return;
+    /* Ο διακομιστής αντικαθιστά την προηγούμενη έγκριση της ίδιας πηγής, γι' αυτό στέλνονται ΟΛΑ τα εγκεκριμένα, και τα ήδη αποθηκευμένα. */
+    const payload = L.toPayload(current.items.filter((x) => x.status === "accepted"));
+    if (payload.length > 5000) {
+      setState("Πάρα πολλά εγκεκριμένα αποσπάσματα (" + payload.length + " > 5000) — απορρίψτε μερικά", "error");
+      return;
+    }
+    const edited = current.items.filter((x) => x.status === "accepted" && (x.occurrences || []).some((o) => o.excerpt !== x.text)).length;
     saving = true;
     input.disabled = true;
     analyze.disabled = true;
     list.inert = true;
     save.disabled = true;
-    setState("UPLOADING APPROVED SOURCE", "working");
+    setState(T.uploading, "working");
     try {
       if (!current.source_id) {
         const uploaded = await uploadPdf(current.file);
         current.source_id = uploaded.source_id;
       }
-      setState("SAVING APPROVED MEMORY", "working");
+      setState(T.saving, "working");
       const r = await fetch(endpoint + "/knowledge/review", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ source_id: current.source_id, pages: current.pages, items: accepted }),
+        body: JSON.stringify({ source_id: current.source_id, pages: current.pages.map((p) => ({ page: p.page, text: p.text })), items: payload }),
       });
       const data = await r.json().catch(() => ({}));
       if (!r.ok) throw Object.assign(new Error(data.error || "save_http_" + r.status), { status: r.status });
-      accepted.forEach((x) => (x.saved = true));
-      setState("Αποθηκεύτηκαν " + data.accepted_items + " στοιχεία", "learned");
+      fresh.forEach((x) => (x.saved = true));
+      undoSnapshot = null;
+      const kept = Number(data.accepted_items) || 0, lost = payload.length - kept;
+      if (lost > 0) {
+        setState("Αποθηκεύτηκαν " + kept + " από " + payload.length + " αποσπάσματα — " + lost + " δεν βρέθηκαν αυτούσια στη σελίδα που διάβασε ο διακομιστής και δεν αποθηκεύτηκαν", "error");
+      } else setState("Αποθηκεύτηκαν " + kept + " αποσπάσματα από " + fresh.length + " νέα στοιχεία", "learned");
+      bulkNote.textContent = edited
+        ? "Οι διορθώσεις σας αποθηκεύτηκαν ως κείμενο του στοιχείου· η αναζήτηση της έρευνας γίνεται στο αρχικό απόσπασμα του PDF."
+        : "";
       source.textContent = (source.textContent || "Πηγή") + " · Αποθηκεύτηκε";
     } catch (e) {
       setState(
         e.message === "Failed to fetch"
-          ? "KNOWLEDGE BACKEND UNAVAILABLE"
+          ? T.backendDown
           : "Αποτυχία αποθήκευσης — τα στοιχεία παραμένουν για νέα προσπάθεια",
         "error",
       );
