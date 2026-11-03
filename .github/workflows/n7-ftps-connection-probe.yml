@@ -10,12 +10,13 @@ permissions:
 jobs:
   connection:
     runs-on: ubuntu-latest
+    environment: nabou-production
     timeout-minutes: 3
     env:
       PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
       PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
       PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
-      PCT_FTPS_TLS_SERVER_NAME: ${{ secrets.PCT_FTPS_TLS_SERVER_NAME }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME || 'linux3087.grserver.gr' }}
     steps:
       - name: Verify existing FTPS path without writing
         shell: bash
