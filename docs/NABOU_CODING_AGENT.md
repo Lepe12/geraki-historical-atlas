@@ -34,7 +34,7 @@ python3 tools/nabou_coding_agent.py --repo . --file jarvis-intelligence-chamber/
 
 - Πρόκειται για **πρώτη λειτουργική έκδοση ενός αρχείου ανά αποστολή**, όχι για πλήρη ισοδύναμο του Copilot Coding Agent.
 - Η ταχύτητα του site δεν έχει μετρηθεί και **δεν** υπάρχει ακόμη πραγματική επίδοση βελτιστοποίησης.
-- Τοπικά unit tests ελέγχουν path safety, ακριβή patch, preview-only και rollback JavaScript. Δεν έχουν ακόμη πραγματοποιηθεί πραγματική κλήση GitHub Models και end-to-end GitHub Action/PR.
+- Τοπικά unit tests ελέγχουν path safety, ακριβή patch, preview-only και rollback JavaScript. Η πρώτη ζωντανή κλήση έδειξε ότι το GitHub Models έχει αποσυρθεί· η διαδρομή Qwen και η αυτόματη δημιουργία PR χρειάζονται τελική επιβεβαίωση.
 - Το ανοικτό Qwen δεν απαιτεί API συνδρομή αλλά η εκτέλεση σε GitHub Actions υπόκειται στα όρια χρόνου/πόρων Actions. Δεν χρησιμοποιούνται secrets μέσα στον browser.
 - Οι αλλαγές σε CSS δεν έχουν ακόμη syntax validator· η έγκριση του PR πρέπει να περιλαμβάνει έλεγχο browser. Η επιτυχία JS syntax δεν αποδεικνύει σωστή συμπεριφορά.
 - Το `GITHUB_TOKEN` ίσως χρειάζεται άδεια «Allow GitHub Actions to create and approve pull requests» στις ρυθμίσεις του repository.
