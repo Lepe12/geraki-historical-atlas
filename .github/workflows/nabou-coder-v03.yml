@@ -1,0 +1,99 @@
+name: NABOU Coding Agent v0.3 — Coder7B multi-file review
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: "One specific coding change, 8–2000 characters"
+        required: true
+        type: string
+      target_files:
+        description: "Two or three allowed CSS/JS paths, comma-separated"
+        required: true
+        type: string
+        default: "jarvis-intelligence-chamber/navigation-rail.css,jarvis-intelligence-chamber/photon-windows.css"
+      apply_changes:
+        description: "False = preview and diff only; true = create review branch and draft PR"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  code-agent:
+    if: github.repository == 'Lepe12/geraki-historical-atlas' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      AGENT_TASK: ${{ inputs.task }}
+      AGENT_FILES: ${{ inputs.target_files }}
+      AGENT_APPLY: ${{ inputs.apply_changes }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            .github/actions/nabou-coder-model
+            jarvis-intelligence-chamber
+      - name: Preflight offline agent tests
+        run: |
+          PYTHONPATH=tools python3 -m unittest -q \
+            tools.test_nabou_coding_agent tools.test_nabou_coding_task tools.test_nabou_patch_engine
+      - name: Prepare code-specialized, checksum-verified Qwen2.5 Coder 7B
+        uses: ./.github/actions/nabou-coder-model
+      - name: Generate and evaluate bounded two/three-file patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(--repo . --files "$AGENT_FILES" --task "$AGENT_TASK" \
+            --report agent_task_result.json --patch agent_task_preview.patch)
+          if [[ "$AGENT_APPLY" == "true" ]]; then args+=(--apply); fi
+          python3 tools/nabou_coding_task.py "${args[@]}"
+      - name: Verify diff boundary and regression tests
+        if: inputs.apply_changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os,subprocess
+          requested={p.strip() for p in os.environ["AGENT_FILES"].split(",")}
+          changed=set(p for p in subprocess.check_output(["git","diff","--name-only"]).decode().splitlines())
+          if requested != changed: raise SystemExit(f"UNEXPECTED_DIFF_SCOPE {changed ^ requested}")
+          print("Validated changed paths:",sorted(changed))
+          PY
+          git diff --check
+          PYTHONPATH=tools python3 -m unittest -q \
+            tools.test_nabou_coding_agent tools.test_nabou_coding_task tools.test_nabou_patch_engine
+      - name: Save auditable report and patch
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nabou-coder7b-review-${{ github.run_id }}
+          path: |
+            agent_task_result.json
+            agent_task_preview.patch
+          if-no-files-found: warn
+      - name: Create draft pull request with no merge or deployment
+        if: inputs.apply_changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="agent/nabou-coder7b-${GITHUB_RUN_ID}"
+          git config user.name "nabou-coding-agent[bot]"
+          git config user.email "nabou-coding-agent[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          IFS=',' read -r -a paths <<< "$AGENT_FILES"
+          git add -- "${paths[@]}"
+          git commit -m "chore(agent): review bounded Coder7B patch"
+          auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c "http.extraheader=AUTHORIZATION: basic $auth" push origin "HEAD:refs/heads/$branch"
+          gh pr create --draft --base main --head "$branch" \
+            --title "NABOU Coder7B: review patch #${GITHUB_RUN_ID}" \
+            --body "Code-specialized local model proposed a bounded change. Review source diff and associated GitHub Actions run before merge. **Never auto-deploy.** Run: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
