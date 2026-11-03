@@ -18,6 +18,12 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/nabou_coding_agent.py
+            tools/test_nabou_coding_agent.py
+          sparse-checkout-cone-mode: false
       - name: Compile Python agent
         run: python3 -m py_compile tools/nabou_coding_agent.py tools/test_nabou_coding_agent.py
       - name: Run bounded-agent unit tests
