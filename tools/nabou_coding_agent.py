@@ -132,7 +132,16 @@ def infer_model(task: str, source: str, path: str, endpoint: str, model: str, to
     request = urllib.request.Request(endpoint, data=json.dumps(payload).encode(), headers=headers, method="POST")
     try:
         with urllib.request.urlopen(request, timeout=75) as response:
-            result = json.load(response)
+            raw_body = response.read()
+            response_type = response.headers.get("Content-Type", "unknown")
+            response_status = getattr(response, "status", "unknown")
+        if not raw_body.strip():
+            raise AgentError(f"Model returned empty HTTP response (status {response_status}, type {response_type})")
+        try:
+            result = json.loads(raw_body)
+        except json.JSONDecodeError as exc:
+            preview = raw_body[:120].decode("utf-8", errors="replace").replace("\\n", " ")
+            raise AgentError(f"Model returned non-JSON HTTP response (status {response_status}, type {response_type}, prefix {preview!r})") from exc
     except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as exc:
         raise AgentError(f"Model request failed: {type(exc).__name__} {getattr(exc, 'code', '')}") from exc
     try:
