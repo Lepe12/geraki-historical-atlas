@@ -165,7 +165,10 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
             if covered!=needed:raise ValueError('RESUME_CLAIMS_NOT_COVERED_BY_EXTRACTOR_RECEIPTS')
             valid_reuse=True;completed.add('evidence_extractor')
         except (ValueError,OSError,KeyError,IndexError,TypeError):valid_reuse=False
-    required={'evidence_extractor','adversarial_reviewer','synthesis'}
+    from reviewed_draft_validation import validate as validate_reviewed_draft
+    synthesis_stage=validate_reviewed_draft(root,analysis_root,answer,continuation_valid)
+    required={'evidence_extractor','adversarial_reviewer'}
+    if not synthesis_stage['valid']:required.add('synthesis')
     blockers=[]
     if not continuation_valid:blockers.append('CONTINUATION_RECEIPTS_INVALID')
     coverage=answer.get('coverage') or {}
@@ -243,6 +246,8 @@ def build(root,validation_root=Path('evidence/engine_validation'),analysis_root=
                   'verified':0,'rejected_model_items':sum(r.get('reason')!='UNSUPPORTED_DATE_ATTRIBUTE_REMOVED' for r in answer.get('rejected',[])),
                   'rejected_model_attributes':sum(r.get('reason')=='UNSUPPORTED_DATE_ATTRIBUTE_REMOVED' for r in answer.get('rejected',[])),
                   'deferred_passages':len(answer.get('coverage',{}).get('deferred',[]))},
+        'synthesis_stage_validation':synthesis_stage,
+        'required_model_roles':sorted(required),'completed_model_roles':sorted(completed),
         'semantic_calls':answer.get('calls',[]),'reused_semantic_calls':reused,
         'reused_extraction_receipts_validated':valid_reuse,'model_configuration':answer.get('model_configuration'),
         'query_expansion':queries,'research_connector_attempts':attempts,
