@@ -8,7 +8,7 @@ const fs=require("fs");
 const path=require("path");
 const {URL}=require("url");
 const {execFile}=require("node:child_process");
-const {fromReviewedKnowledge}=require("./historical-evidence");
+const {fromReviewedKnowledge,compileQuery,scoreExcerpt,compareScores}=require("./historical-evidence");
 const {replayPdf}=require("./pdf-evidence");
 
 const PORT=Number(process.env.PORT||process.env.PCT_COMMAND_CENTER_PORT||8787);
@@ -305,22 +305,21 @@ const server=http.createServer(async(req,res)=>{
       const body=JSON.parse(await readBody(req));
       const query=String(body?.query||"").trim().toLowerCase();
       if(query.length<3||query.length>200)return json(res,400,{error:"invalid_query"});
-      const hits=[];
+      const compiled=compileQuery(query),candidates=[];let order=0;
       for(const meta of readKnowledgeIndex().filter(x=>x.state==="LEARNED").slice(0,500)){
         try{
           const rec=JSON.parse(fs.readFileSync(knowledgeRecordPath(meta.source_id),"utf8"));
-          const attestations=rec.historical_evidence?.attestations||[];
-          for(const att of attestations){
-            if(!String(att.exact_excerpt||"").toLowerCase().includes(query))continue;
-            hits.push({source_id:meta.source_id,source_name:meta.original_name,
-              attestation_id:att.id,page:att.page,locator:att.locator,
-              exact_excerpt:att.exact_excerpt,stage:"INGESTED_UNREVIEWED",
-              original_pdf_replayed:att.original_pdf_replayed===true,source_sha256:att.source_sha256||null,historically_verified:false});
-            if(hits.length>=12)break;
+          for(const att of rec.historical_evidence?.attestations||[]){
+            const score=scoreExcerpt(compiled,att.exact_excerpt);
+            if(score)candidates.push({meta,att,score,order:order++});
           }
         }catch(_){}
-        if(hits.length>=12)break;
       }
+      candidates.sort((x,y)=>compareScores(x.score,y.score)||x.order-y.order);
+      const hits=candidates.slice(0,12).map(({meta,att})=>({source_id:meta.source_id,source_name:meta.original_name,
+        attestation_id:att.id,page:att.page,locator:att.locator,
+        exact_excerpt:att.exact_excerpt,stage:"INGESTED_UNREVIEWED",
+        original_pdf_replayed:att.original_pdf_replayed===true,source_sha256:att.source_sha256||null,historically_verified:false}));
       return json(res,200,{schema:"nabou-agent-learning-evidence-v1",query,hits,
         count:hits.length,verified_count:0,acquisition_basis:"PER_HIT_SOURCE_BASIS"});
     }

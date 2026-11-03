@@ -62,6 +62,10 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-eng tesseract-ocr-ell
       - name: PDF Learning HTTP integration tests
         run: node server/command-center-live/learning-integration-test.js
+      - name: Agent-search matcher and endpoint tests (local key, no network)
+        run: |
+          node server/command-center-live/agent-search-test.js
+          node server/command-center-live/agent-search-integration-test.js
       - name: Actual acquired PDF reading order and constrained response protocols
         run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=.:tools:tools/llm python3 -m unittest -v tools.test_acquired_analysis tools.test_source_acquisition_routes tools.test_research_response_schema tools.test_semantic_research_answer tools.test_claim_fidelity_guard tools.test_relevance_filter tools.test_research_continuation tools.test_surname_section_anchor tools.test_adjacent_sentence_identity
       - name: Source-bound shard replay and continuation regressions
