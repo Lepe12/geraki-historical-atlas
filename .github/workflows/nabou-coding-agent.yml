@@ -42,6 +42,10 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            jarvis-intelligence-chamber
       - name: Unit tests (offline, before AI call)
         run: PYTHONPATH=tools python3 -m unittest -v tools/test_nabou_coding_agent.py
       - name: Request bounded code change from GitHub Models
