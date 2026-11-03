@@ -1,0 +1,360 @@
+{
+  "schema": "pct-specialist-agent-result-v4",
+  "agent_id": "pirate_base",
+  "label": "Pirate Base / Anchorage Agent",
+  "assignment_id": "pirate_base:wave2",
+  "assignment_wave": 2,
+  "requested_outputs": [
+    "base_classification",
+    "use_frequency",
+    "logistics",
+    "actors",
+    "date_ranges",
+    "evidence_gaps"
+  ],
+  "runtime_permit": {
+    "schema": "pct-jarvis-runtime-permit-v1",
+    "status": "PERMITTED",
+    "permit_id": "dc8832ee02bca22401c71b6e61a180d3cd73db141bb4672ca36cb4c864a89fbb",
+    "policy_version": 1,
+    "routing_authority": "JARVIS_PLANNER",
+    "agent_id": "pirate_base",
+    "assignment_id": "pirate_base:wave2",
+    "assignment_wave": 2,
+    "route_ids": [
+      "repo:Gallica/BnF",
+      "repo:PARES / Archivo General de Simancas"
+    ],
+    "queries": [
+      "Kimolos pirate base corsair base anchorage harbour refuge",
+      "Kimolos pirates corsairs provisioning repairs captives ransom",
+      "Kimolos historical harbour anchorage fort cave island piracy",
+      "Kimolos 1700-1801 pirates corsairs",
+      "\"Κίμωλος\" 1700-1801"
+    ],
+    "operation": "search",
+    "search_budget": 10,
+    "arbitrary_code_allowed": false,
+    "shell_allowed": false,
+    "subprocess_allowed": false,
+    "direct_secret_values_allowed": false
+  },
+  "routing": {
+    "authority": "JARVIS_PLANNER",
+    "strategy": "result_aware_fallback_v1",
+    "routes": [
+      {
+        "route_id": "repo:Gallica/BnF",
+        "route_type": "repository_dispatch",
+        "repository": "Gallica/BnF",
+        "connector_id": null,
+        "score": 88,
+        "reason": [
+          "agent_profile",
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:PARES / Archivo General de Simancas",
+        "route_type": "repository_dispatch",
+        "repository": "PARES / Archivo General de Simancas",
+        "connector_id": null,
+        "score": 84,
+        "reason": [
+          "agent_profile"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "fallback_sources_not_executed": [
+      {
+        "route_id": "repo:OpenArchives.gr / EKT",
+        "route_type": "repository_dispatch",
+        "repository": "OpenArchives.gr / EKT",
+        "connector_id": null,
+        "score": 81,
+        "reason": [
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      },
+      {
+        "route_id": "repo:Academia.edu Public Research",
+        "route_type": "repository_dispatch",
+        "repository": "Academia.edu Public Research",
+        "connector_id": null,
+        "score": 75,
+        "reason": [
+          "context:greek_aegean"
+        ],
+        "context_profiles": [
+          "greek_aegean"
+        ],
+        "evidence_effect": "NONE_DISCOVERY_PRIORITY_ONLY"
+      }
+    ],
+    "queries_per_route": 5,
+    "total_search_budget": 10,
+    "worker_self_routing": false,
+    "rule": "Worker executes only JARVIS-assigned sources; routing has no evidence effect."
+  },
+  "search_runs": [
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "\"Κίμωλος\" 1700-1801",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82++1700-1801%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82++1700-1801%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 620, \"response_sha256\": \"1cf3592cfa4bda84403f1c634b52a8b677daefca1bade915aa16ac307e1f4800\", \"elapsed_ms\": 758}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22+%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82++1700-1801%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Kimolos 1700-1801 pirates corsairs",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Kimolos+1700-1801+pirates+corsairs%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Kimolos+1700-1801+pirates+corsairs%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 628, \"response_sha256\": \"efcee281cdd2467919f5681802fb0913faf4bde7b7d55f3bae3f93b0be9d4df7\", \"elapsed_ms\": 882}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Kimolos+1700-1801+pirates+corsairs%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Kimolos pirate base corsair base anchorage harbour refuge",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Kimolos+pirate+base+corsair+base+anchorage+harbour+refuge%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Kimolos+pirate+base+corsair+base+anchorage+harbour+refuge%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 651, \"response_sha256\": \"2e739c2533ee56d6424ec77b9c60364e8fb7a27a39b7357065f57d4631f44b90\", \"elapsed_ms\": 976}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Kimolos+pirate+base+corsair+base+anchorage+harbour+refuge%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Kimolos historical harbour anchorage fort cave island piracy",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Kimolos+historical+harbour+anchorage+fort+cave+island+piracy%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Kimolos+historical+harbour+anchorage+fort+cave+island+piracy%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 654, \"response_sha256\": \"d78d697f0e2ed7efda0dac3a2de8147f9012512ba88375f3d1a0263597c38ebc\", \"elapsed_ms\": 989}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Kimolos+historical+harbour+anchorage+fort+cave+island+piracy%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:Gallica/BnF",
+      "repository": "Gallica/BnF",
+      "operation": "search",
+      "status": "EXECUTED",
+      "query": "Kimolos pirates corsairs provisioning repairs captives ransom",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"Gallica/BnF\", \"status\": \"EXECUTED\", \"http_attempts\": [{\"url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Kimolos+pirates+corsairs+provisioning+repairs+captives+ransom%22&recordSchema=dublincore&maximumRecords=20\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 200, \"tls_verification\": true, \"final_url\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Kimolos+pirates+corsairs+provisioning+repairs+captives+ransom%22&recordSchema=dublincore&maximumRecords=20\", \"content_type\": \"text/xml;charset=UTF-8\", \"response_bytes\": 655, \"response_sha256\": \"f3bf42dc08e10376f8d8deaf0b44b00f77146892faf31990090532b0152cd4e0\", \"elapsed_ms\": 1163}], \"detail\": \"https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=bib.anywhere+all+%22Kimolos+pirates+corsairs+provisioning+repairs+captives+ransom%22&recordSchema=dublincore&maximumRecords=20\", \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "Kimolos historical harbour anchorage fort cave island piracy",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+historical+harbour+anchorage+fort+cave+island+piracy\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 588}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+historical+harbour+anchorage+fort+cave+island+piracy\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 615}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+historical+harbour+anchorage+fort+cave+island+piracy\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 598}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+historical+harbour+anchorage+fort+cave+island+piracy\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 588}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+historical+harbour+anchorage+fort+cave+island+piracy\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 615}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+historical+harbour+anchorage+fort+cave+island+piracy\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 598}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "Kimolos pirates corsairs provisioning repairs captives ransom",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+pirates+corsairs+provisioning+repairs+captives+ransom\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 596}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+pirates+corsairs+provisioning+repairs+captives+ransom\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 549}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+pirates+corsairs+provisioning+repairs+captives+ransom\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 589}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+pirates+corsairs+provisioning+repairs+captives+ransom\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 596}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+pirates+corsairs+provisioning+repairs+captives+ransom\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 549}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+pirates+corsairs+provisioning+repairs+captives+ransom\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 589}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "Kimolos pirate base corsair base anchorage harbour refuge",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+pirate+base+corsair+base+anchorage+harbour+refuge\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 690}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+pirate+base+corsair+base+anchorage+harbour+refuge\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 595}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+pirate+base+corsair+base+anchorage+harbour+refuge\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 595}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+pirate+base+corsair+base+anchorage+harbour+refuge\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 690}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+pirate+base+corsair+base+anchorage+harbour+refuge\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 595}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+pirate+base+corsair+base+anchorage+harbour+refuge\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 595}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "\"Κίμωλος\" 1700-1801",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+1700-1801\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 615}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+1700-1801\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 614}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+1700-1801\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 561}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+1700-1801\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 615}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+1700-1801\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 614}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+1700-1801\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 561}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    },
+    {
+      "connector_id": "repo:PARES / Archivo General de Simancas",
+      "repository": "PARES / Archivo General de Simancas",
+      "operation": "search",
+      "status": "REMOTE_RATE_LIMITED",
+      "query": "Kimolos 1700-1801 pirates corsairs",
+      "records": [],
+      "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+1700-1801+pirates+corsairs\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 599}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+1700-1801+pirates+corsairs\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 563}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+1700-1801+pirates+corsairs\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 600}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+1700-1801+pirates+corsairs\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 580}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}",
+      "blockers": [
+        {
+          "code": "REMOTE_RATE_LIMITED",
+          "detail": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+1700-1801+pirates+corsairs\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 599}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+1700-1801+pirates+corsairs\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 563}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+1700-1801+pirates+corsairs\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 600}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+1700-1801+pirates+corsairs\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 580}], \"detail\": {\"error_code\": \"HTTP_429\", \"error_type\": \"HTTPError\"}, \"result_count\": 0, \"coverage\": \"BOUNDED_DISCOVERY_ONLY\", \"verified\": false}"
+        }
+      ],
+      "warnings": [],
+      "next_best_route": null,
+      "evidence_level": "DISCOVERY_ONLY",
+      "routing_mode": "repository_dispatch",
+      "specialist_agent": "pirate_base",
+      "assignment_id": "pirate_base:wave2",
+      "assignment_wave": 2
+    }
+  ],
+  "historical_evidence": {
+    "schema": "nabou-discovery-evidence-queue-v1",
+    "run_id": "41630296108",
+    "agent_id": "pirate_base",
+    "source_leads": [],
+    "connector_errors": [
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+historical+harbour+anchorage+fort+cave+island+piracy\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 588}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+historical+harbour+anchorage+fort+cave+island+piracy\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 615}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+historical+harbour+anchorage+fort+cave+island+piracy\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HT"
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+pirates+corsairs+provisioning+repairs+captives+ransom\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 596}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+pirates+corsairs+provisioning+repairs+captives+ransom\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 549}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+pirates+corsairs+provisioning+repairs+captives+ransom\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": "
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+pirate+base+corsair+base+anchorage+harbour+refuge\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 690}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+pirate+base+corsair+base+anchorage+harbour+refuge\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 595}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+pirate+base+corsair+base+anchorage+harbour+refuge\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", "
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+1700-1801\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 615}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+1700-1801\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 614}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=%22%CE%9A%CE%AF%CE%BC%CF%89%CE%BB%CE%BF%CF%82%22+1700-1801\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429"
+      },
+      {
+        "connector_id": "repo:PARES / Archivo General de Simancas",
+        "status": "REMOTE_RATE_LIMITED",
+        "diagnostic": "{\"schema\": \"nabou-connector-access-v1\", \"repository\": \"PARES / Archivo General de Simancas\", \"status\": \"REMOTE_RATE_LIMITED\", \"http_attempts\": [{\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+1700-1801+pirates+corsairs\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 599}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+1700-1801+pirates+corsairs\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 563}, {\"url\": \"https://pares.cultura.gob.es/ParesBusquedas20/catalogo/find?texto=Kimolos+1700-1801+pirates+corsairs\", \"method\": \"GET\", \"request_performed\": true, \"http_status\": 429, \"tls_verification\": true, \"retry_after\": null, \"error_code\": \"HTTP_429\", \"elapsed_ms\": 600}, {\"url\": \"https://pares.cultura.gob.es/ParesBusque"
+      }
+    ],
+    "historical_attestations": [],
+    "verified_count": 0,
+    "learned_pdf_evidence": {
+      "status": "EXECUTED",
+      "hits": [],
+      "verified_count": 0,
+      "source": "PRODUCTION_LEARNING_EVIDENCE",
+      "original_pdf_replayed": false
+    },
+    "historical_map_catalogue": {
+      "schema": "nabou-map-catalogue-bridge-v1",
+      "status": "NOT_RELEVANT_TO_OPERATOR_QUERY",
+      "leads": [],
+      "historically_verified": 0,
+      "archival_search_executed": false
+    }
+  },
+  "result_count": 0,
+  "verified_promotion_allowed": false,
+  "rule": "Specialist discovery output is CANDIDATE/UNRESOLVED until scientific gates pass."
+}
