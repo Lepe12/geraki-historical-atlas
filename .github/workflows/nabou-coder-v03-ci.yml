@@ -1,0 +1,53 @@
+name: NABOU Coding Agent v0.3 — Coder7B and patch tests
+
+on:
+  push:
+    branches:
+      - feat/nabou-agent-coder7b-v03-20261103
+    paths:
+      - 'tools/nabou_coding_agent.py'
+      - 'tools/nabou_coding_task.py'
+      - 'tools/nabou_patch_engine.py'
+      - 'tools/test_nabou_patch_engine.py'
+      - 'tools/prepare_nabou_coder_model.py'
+      - '.github/workflows/nabou-coder-v03-ci.yml'
+  pull_request:
+    paths:
+      - 'tools/nabou_coding_agent.py'
+      - 'tools/nabou_coding_task.py'
+      - 'tools/nabou_patch_engine.py'
+      - 'tools/test_nabou_patch_engine.py'
+      - 'tools/prepare_nabou_coder_model.py'
+      - '.github/workflows/nabou-coder-v03-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/nabou_coding_agent.py
+            tools/nabou_coding_task.py
+            tools/nabou_patch_engine.py
+            tools/prepare_nabou_coder_model.py
+            tools/test_nabou_coding_agent.py
+            tools/test_nabou_coding_task.py
+            tools/test_nabou_patch_engine.py
+          sparse-checkout-cone-mode: false
+      - name: Compile Python modules
+        run: |
+          python3 -m py_compile tools/nabou_coding_agent.py \
+            tools/nabou_coding_task.py tools/nabou_patch_engine.py \
+            tools/prepare_nabou_coder_model.py
+      - name: Verify v0.1 and v0.2 regression plus v0.3 patches and pinning
+        run: |
+          PYTHONPATH=tools python3 -m unittest -v \
+            tools.test_nabou_coding_agent \
+            tools.test_nabou_coding_task \
+            tools.test_nabou_patch_engine
