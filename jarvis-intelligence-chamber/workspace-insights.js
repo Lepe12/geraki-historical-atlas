@@ -28,7 +28,7 @@ function dateLabel(value) {
   const date = new Date(value);
   return Number.isNaN(date.valueOf())
     ? "Ημερομηνία μη διαθέσιμη"
-    : new Intl.DateTimeFormat("el-GR", { dateStyle: "medium", timeStyle: "short" }).format(date);
+    : sharedFormatter.format(date);
 }
 // Αναζήτηση χωρίς τόνους/πεζά-κεφαλαία: NFD + αφαίρεση διακριτικών, ς → σ.
 const fold = (v) =>
