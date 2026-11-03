@@ -84,7 +84,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nabou-multifile-report-${{ github.run_id }}
-          path: agent_task_result.json
+          path: |
+            agent_task_result.json
+            agent_task_preview.patch
           if-no-files-found: warn
 
       - name: Commit approved-scope changes and open DRAFT pull request
