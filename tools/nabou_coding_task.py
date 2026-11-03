@@ -68,12 +68,33 @@ def prepare_changes(
                 + "Return precise JSON old/new edits matching this file verbatim."
             )
             raw = infer_model(coordinated_task, original, target, endpoint, model, token)
-        proposal = parse_proposal(raw)
-        candidate = build_candidate(original, proposal)
+        attempts = 1
+        try:
+            proposal = parse_proposal(raw)
+            candidate = build_candidate(original, proposal)
+        except AgentError as first_error:
+            if proposals is not None:
+                raise AgentError(f"{target}: {first_error}") from first_error
+            # One bounded second attempt. Never fuzzily match or weaken validation.
+            attempts = 2
+            repair_task = (
+                coordinated_task
+                + "\\nPrevious attempt was rejected: " + str(first_error)
+                + ". Every old string MUST be copied verbatim from the source, "
+                + "including whitespace and line breaks, and occur EXACTLY once. "
+                + "For an appended CSS rule, replace a unique existing final rule "
+                + "with the same rule PLUS your appended rule. Output valid JSON only."
+            )
+            raw = infer_model(repair_task, original, target, endpoint, model, token)
+            try:
+                proposal = parse_proposal(raw)
+                candidate = build_candidate(original, proposal)
+            except AgentError as second_error:
+                raise AgentError(f"{target}: retry failed: {second_error}") from second_error
         changes.append({
             "target": target, "path": path, "original": original,
             "candidate": candidate, "summary": str(proposal.get("summary", ""))[:200],
-            "edit_count": len(proposal["edits"]),
+            "edit_count": len(proposal["edits"]), "model_attempts": attempts,
         })
 
     if sum(abs(len(c["candidate"]) - len(c["original"])) for c in changes) > MAX_TOTAL_DELTA:
@@ -215,6 +236,7 @@ def main(argv=None) -> int:
         report["files"] = [
             {
                 "target": c["target"], "edit_count": c["edit_count"],
+                "model_attempts": c["model_attempts"],
                 "summary": c["summary"],
                 "before_sha256": _sha(c["original"]),
                 "after_sha256": _sha(c["candidate"]),
