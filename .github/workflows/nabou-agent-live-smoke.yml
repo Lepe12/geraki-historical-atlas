@@ -22,11 +22,14 @@ jobs:
       GITHUB_TOKEN: ${{ github.token }}
       TARGET: jarvis-intelligence-chamber/workspace-insights.js
       TASK: >-
-        In workspace-insights.js optimize renderDossier to avoid rewriting a
-        content element's innerHTML when its newly generated markup is exactly
-        identical to the existing markup. Preserve all open-details states,
-        element structure, Greek labels and visible behavior. Only make a
-        focused safe change. Do not touch any other file.
+        In workspace-insights.js, the dateLabel function constructs
+        new Intl.DateTimeFormat("el-GR", { dateStyle: "medium", timeStyle: "short" })
+        every time it formats a history row. Implement a minimal optimization:
+        create ONE shared formatter outside dateLabel and reuse it in dateLabel,
+        keeping the output exactly identical. Return 1-3 precise old/new edits
+        for these two lines. This is a safe tiny change to a hot path.
+        Preserve all other behavior, text and file content.
+
     steps:
       - uses: actions/checkout@v4
         with:
