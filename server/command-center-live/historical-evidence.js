@@ -55,4 +55,76 @@ function fromReviewedKnowledge(record) {
     verified_count: 0, source_original_verified: false};
 }
 
-module.exports = {fromReviewedKnowledge};
+// ---- Agent-search: accent/case/final-sigma folding, stop-words, light stemming, ranking ----
+// Search-only helpers. They never change what is stored or returned; they only decide which
+// already-attested excerpts match a query and in which order.
+function foldText(value) {
+  return String(value || "").normalize("NFD").replace(/\p{M}+/gu, "").toLowerCase().replace(/ς/g, "σ");
+}
+const STOPWORDS = new Set(foldText(
+  "ο η το οι τα των του της τον την τους τις στο στη στην στον στα στους στις και ή να σε με για από απο ως που ότι οτι αν ένα ενα μια ένας ενας είναι ειναι ήταν ηταν δεν έχει εχει κατά κατα προς μετά μετα παρά παρα επί επι υπό υπο ανά ανα διά δια αλλά αλλα ούτε ουτε αυτός αυτος αυτή αυτη αυτό αυτο " +
+  "the a an of in on at to and or for by with from is was were be been as that this these those it its are not but into than then there their"
+).split(/\s+/).filter(Boolean));
+const MIN_STEM = 4;
+// Longest suffix first. Greek forms are given folded (no accents, final sigma as σ).
+const SUFFIXES = ["εια", "εσ", "ων", "ου", "οσ", "ησ", "ασ", "α", "η", "ο", "ι", "ing", "ed", "es", "s"]
+  .map(x => foldText(x)).sort((a, b) => b.length - a.length);
+function stemToken(token) {
+  let stem = token;
+  for (const suffix of SUFFIXES) {
+    if (token.length - suffix.length >= MIN_STEM && token.endsWith(suffix)) { stem = token.slice(0, -suffix.length); break; }
+  }
+  // English: "pirate" and "pirates"/"pirating" must meet; drop a trailing Latin "e" when the stem stays long enough.
+  if (/[a-z]/.test(stem) && stem.endsWith("e") && stem.length - 1 >= MIN_STEM) stem = stem.slice(0, -1);
+  return stem;
+}
+function tokenizeFolded(value) {
+  return foldText(value).split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+}
+function compileQuery(query) {
+  const tokens = tokenizeFolded(query);
+  const content = tokens.filter(t => !STOPWORDS.has(t));
+  const used = content.length ? content : tokens;   // stop-word-only query: keep old phrase behaviour
+  return {phrase: tokens.join(" "), tokens: used, stems: [...new Set(used.map(stemToken))]};
+}
+// Returns null when the excerpt does not match, else {phrase, matched, span} (phrase first, more
+// matched stems first, tighter span first). All stems must match, except one may be missing for
+// queries of 3+ meaningful tokens (these rank below full matches).
+function scoreExcerpt(compiled, excerpt) {
+  const tokens = tokenizeFolded(excerpt);
+  if (!tokens.length || !compiled.stems.length) return null;
+  const phrase = compiled.phrase && (" " + tokens.join(" ") + " ").includes(" " + compiled.phrase + " ") ? 1 : 0;
+  const positions = new Map(compiled.stems.map(s => [s, []]));
+  tokens.forEach((token, index) => {
+    const stem = stemToken(token);
+    if (positions.has(stem)) positions.get(stem).push(index);
+  });
+  const found = [...positions.entries()].filter(([, at]) => at.length);
+  const need = compiled.stems.length >= 3 ? compiled.stems.length - 1 : compiled.stems.length;
+  if (found.length < need && !phrase) return null;
+  // Smallest token window containing every matched stem.
+  const points = found.flatMap(([stem, at]) => at.map(i => [i, stem])).sort((a, b) => a[0] - b[0]);
+  const have = new Map();
+  let left = 0, best = Infinity;
+  for (let right = 0; right < points.length; right++) {
+    have.set(points[right][1], (have.get(points[right][1]) || 0) + 1);
+    while (have.size === found.length) {
+      best = Math.min(best, points[right][0] - points[left][0] + 1);
+      const key = points[left][1];
+      have.set(key, have.get(key) - 1);
+      if (!have.get(key)) have.delete(key);
+      left++;
+    }
+  }
+  return {phrase, matched: found.length, span: Number.isFinite(best) ? best : 0};
+}
+function compareScores(a, b) {
+  return (b.phrase - a.phrase) || (b.matched - a.matched) || (a.span - b.span);
+}
+function rankAttestations(query, attestations) {
+  const compiled = compileQuery(query);
+  return (attestations || []).map((att, index) => ({att, index, score: scoreExcerpt(compiled, att && att.exact_excerpt)}))
+    .filter(x => x.score).sort((a, b) => compareScores(a.score, b.score) || a.index - b.index);
+}
+
+module.exports = {fromReviewedKnowledge, foldText, stemToken, compileQuery, scoreExcerpt, compareScores, rankAttestations};
