@@ -50,3 +50,17 @@
 **Επαλήθευση 03/11/2026:** 32 offline tests PASS, το Qwen2.5-Coder 7B Q4_K_M προετοιμάστηκε επιτυχώς με SHA-256 verification. Στις [τρεις πραγματικές δοκιμές](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/41702543182), **2/3 εργασίες πέρασαν**: η #1 forced-colors απορρίφθηκε επειδή δεν τηρήθηκε η απαιτούμενη συνθήκη, η #2 prefers-contrast πέρασε με ένα edit ανά αρχείο, και η #3 prefers-reduced-transparency πέρασε με μία επιτρεπτή διόρθωση μοντέλου. Οι πλήρεις αναφορές και τα patches διατηρούνται στο artifact `nabou-coder7b-three-real-trials-41702543182`. Το [draft PR #156](https://github.com/Lepe12/geraki-historical-atlas/pull/156) περιέχει την ελεγμένη πρόταση #2 και δημιουργήθηκε μέσω της σύνδεσης GitHub, επειδή η αυτόματη δημιουργία PR από το workflow δεν είχε ακόμη ολοκληρωθεί κατά τον έλεγχο. **Δεν ισχυριζόμαστε αυτοματοποιημένο end-to-end PR έως ότου επαληθευτεί.**
 
 **Απαραβίαστα:** δεν τροποποιούνται 3D, canvas, camera, renderer, backend, WordPress, MariaDB, API, auth, ιστορικά στοιχεία ή production deployment. Όλα τα PR είναι draft, χωρίς αυτόματο merge.
+
+
+## Επαληθευμένος περιορισμός αυτόματου PR
+
+Στις 03/11/2026 ο ανεξάρτητος [έλεγχος GitHub Actions](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/41706685130) απέδειξε ότι το `GITHUB_TOKEN` **δημιουργεί και ανεβάζει επιτυχώς review branch**, αλλά το REST API αρνείται το επόμενο βήμα με HTTP 403: `GitHub Actions is not permitted to create or approve pull requests.`
+
+Αυτό είναι **ρύθμιση του αποθετηρίου**, όχι σφάλμα του Qwen ή του προγραμματιστικού μηχανισμού. Για πλήρως αυτόματη δημιουργία draft PR ο διαχειριστής του repository χρειάζεται να ενεργοποιήσει **Settings → Actions → General → Workflow permissions → Allow GitHub Actions to create and approve pull requests**. Μετά την αλλαγή, απαιτείται νέα end-to-end δοκιμή του workflow `nabou-coder-v03.yml`. Η πρόσβαση GitHub App του ChatGPT δεν μπορεί να μεταβάλει αυτή τη διαχειριστική ρύθμιση.
+
+Μέχρι τότε ο agent αποθηκεύει τα patches και ανεβάζει τον review branch, ενώ το workflow παραθέτει στο GitHub Step Summary σύνδεσμο σύγκρισης προς δημιουργία PR. **Δεν θεωρείται πλήρως αυτόνομη παράδοση PR πριν από επιτυχημένη νέα δοκιμή.**
+
+## Ζωντανή δοκιμή του εξειδικευμένου μοντέλου
+
+Το πραγματικό [GitHub Actions run #41702543182](https://github.com/Lepe12/geraki-historical-atlas/actions/runs/41702543182) κατέγραψε **δύο επιτυχημένες και μία απορριφθείσα** πολυαρχειακές εργασίες. Η επιτυχία αφορά τα ελεγμένα CSS patches και τη δοκιμαστική εκτέλεσή τους, όχι πλήρη αυτονομία του agent ή πραγματική επιτάχυνση συνολικού ιστοτόπου. Οι αλλαγές παρουσιάστηκαν για έλεγχο στο [PR #156](https://github.com/Lepe12/geraki-historical-atlas/pull/156).
+
