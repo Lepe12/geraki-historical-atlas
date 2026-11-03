@@ -1,0 +1,46 @@
+name: NABOU existing Plesk host read-only SSH connectivity check
+on:
+  push:
+    branches: [test/nabou-server-readonly-connect-20261103]
+permissions:
+  contents: read
+jobs:
+  readonly-connectivity:
+    if: github.repository == 'Lepe12/geraki-historical-atlas'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      PCT_PLESK_SSH_HOST: ${{ secrets.PCT_PLESK_SSH_HOST || vars.PCT_PLESK_SSH_HOST }}
+      PCT_PLESK_SSH_USER: ${{ secrets.PCT_PLESK_SSH_USER || vars.PCT_PLESK_SSH_USER }}
+      PCT_PLESK_SSH_PRIVATE_KEY: ${{ secrets.PCT_PLESK_SSH_PRIVATE_KEY }}
+      PCT_PLESK_SSH_KNOWN_HOSTS: ${{ secrets.PCT_PLESK_SSH_KNOWN_HOSTS || vars.PCT_PLESK_SSH_KNOWN_HOSTS }}
+      PCT_PLESK_SSH_PORT: ${{ vars.PCT_PLESK_SSH_PORT }}
+    steps:
+      - name: Secure read-only SSH authentication and command; no remote writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          for variable in PCT_PLESK_SSH_HOST PCT_PLESK_SSH_USER PCT_PLESK_SSH_PRIVATE_KEY PCT_PLESK_SSH_KNOWN_HOSTS; do
+            if [[ -z "${!variable:-}" ]]; then
+              echo "::error::Missing required SSH binding: $variable"
+              exit 1
+            fi
+          done
+          port="${PCT_PLESK_SSH_PORT:-22}"
+          if ! [[ "$port" =~ ^[0-9]+$ ]] || ((port < 1 || port > 65535)); then
+            echo "::error::Invalid SSH port"
+            exit 1
+          fi
+          umask 077
+          tempdir="$(mktemp -d)"
+          trap 'rm -rf "$tempdir"' EXIT
+          printf '%s\n' "$PCT_PLESK_SSH_PRIVATE_KEY" > "$tempdir/id_key"
+          printf '%s\n' "$PCT_PLESK_SSH_KNOWN_HOSTS" > "$tempdir/known_hosts"
+          echo "NABOU read-only SSH diagnostic beginning; values and keys are not logged."
+          if ssh -F /dev/null -i "$tempdir/id_key" -p "$port" -o BatchMode=yes -o ConnectTimeout=15 -o ConnectionAttempts=1 -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$tempdir/known_hosts" -o IdentitiesOnly=yes -o LogLevel=ERROR -- "$PCT_PLESK_SSH_USER@$PCT_PLESK_SSH_HOST" "printf 'NABOU_SERVER_CONNECTION_OK\\n'"; then
+            echo "NABOU_READONLY_SSH_CONNECT_PASS" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::error::SSH connectivity/authentication test failed (no remote changes made)"
+            echo "NABOU_READONLY_SSH_CONNECT_FAIL" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
