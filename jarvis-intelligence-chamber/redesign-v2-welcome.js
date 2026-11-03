@@ -48,7 +48,7 @@ else if (root) {
   // Ζωντάνια ολογράμματος όσο μιλάει. Με reduced-motion: μόνο στατική αύξηση φωτεινότητας, χωρίς παλμό.
   function applySpeaking() {
     if (!holo) return;
-    try { if (!reduce) holo.speaking(speakingNow); } catch {}
+    try { holo.speaking(speakingNow); } catch {}   /* reduced motion too: the scene has its own calm steady mode */
     if (reduce) holo.tune(speakingNow ? { uGain: 0.23, uSize: 0.042 } : { uGain: 0.21, uSize: 0.04 });
   }
 
@@ -63,10 +63,10 @@ else if (root) {
     performance.mark?.("v2w:holo-start");
     // η αλυσίδα scene.js → three.module → three.core και τα σημεία (.bin) κατεβαίνουν ΠΑΡΑΛΛΗΛΑ αντί για σειριακά
     const hint = (rel, href, attrs) => { const l = document.createElement("link"); l.rel = rel; l.href = new URL(href, import.meta.url).href; Object.assign(l, attrs); document.head.appendChild(l); };
-    hint("modulepreload", "./assistant/assistant-scene.js?v=v2-phase3-2", { fetchPriority: "high" });
+    hint("modulepreload", "./assistant/assistant-scene.js?v=v2-mouth-1", { fetchPriority: "high" });
     hint("modulepreload", "./vendor/three/three.core.min.js", { fetchPriority: "high" });
     hint("preload", "./assets/assistant/cartographer-points.bin", { as: "fetch", crossOrigin: "anonymous", fetchPriority: "high" });
-    import("./assistant/assistant-scene.js?v=v2-phase3-2")
+    import("./assistant/assistant-scene.js?v=v2-mouth-1")
       .then((m) => m.createHologram(canvas, { stage: true }))
       .then((h) => {
         if (done) { h.dispose(); return; }
