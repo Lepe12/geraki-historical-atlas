@@ -7,6 +7,7 @@ strict frontend path allowlist. No arbitrary commands, merge, or deployment.
 from __future__ import annotations
 
 import argparse
+import difflib
 import hashlib
 import json
 import os
@@ -136,6 +137,19 @@ def check_file(path: Path) -> dict:
     return check_syntax(path)
 
 
+def make_patch(changes: list[dict]) -> str:
+    """Produce a reviewable diff without modifying tracked source files."""
+    output = []
+    for change in changes:
+        target = change["target"]
+        output.extend(difflib.unified_diff(
+            change["original"].splitlines(keepends=True),
+            change["candidate"].splitlines(keepends=True),
+            fromfile="a/" + target, tofile="b/" + target,
+        ))
+    return "".join(output)
+
+
 def apply_atomically(changes: list[dict]) -> list[dict]:
     """Every permitted file is restored if ANY syntax/IO validation fails."""
     originals = [(change["path"], change["original"]) for change in changes]
@@ -175,6 +189,7 @@ def main(argv=None) -> int:
     parser.add_argument("--proposals-file", type=Path, help="Offline test fixture; never passed by production workflow")
     parser.add_argument("--apply", action="store_true", help="Write only after all proposals validate")
     parser.add_argument("--report", type=Path, default=Path("agent_task_result.json"))
+    parser.add_argument("--patch", type=Path, default=Path("agent_task_preview.patch"))
     args = parser.parse_args(argv)
 
     report: dict = {
@@ -206,6 +221,9 @@ def main(argv=None) -> int:
             }
             for c in changes
         ]
+        args.patch.parent.mkdir(parents=True, exist_ok=True)
+        args.patch.write_text(make_patch(changes), encoding="utf-8")
+        report["review_patch"] = str(args.patch)
         if args.apply:
             report["checks"] = apply_atomically(changes)
             report["status"] = "applied"
