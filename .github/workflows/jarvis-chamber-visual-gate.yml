@@ -20,6 +20,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 1
+          filter: blob:none
           # This job does not read research evidence; skip the multi-GB
           # evidence/ tree (see repo_size plan, option A).
           sparse-checkout-cone-mode: false
@@ -37,7 +39,14 @@ jobs:
           grep -q 'src="./chamber.js' jarvis-intelligence-chamber/index.html
           grep -q 'src="./gpu-field.js' jarvis-intelligence-chamber/index.html
           ! grep -q 'src="./world3d.js"' jarvis-intelligence-chamber/index.html
+      - name: Install required PDF text replay tool
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+          command -v pdftotext
       - name: Verify source content search and research state
+        env:
+          NABOU_REQUIRE_PDF_ATTESTATION: '1'
         run: node --test jarvis-intelligence-chamber/source-search.test.cjs jarvis-intelligence-chamber/learning-review.test.cjs jarvis-intelligence-chamber/live-bridge.test.cjs jarvis-intelligence-chamber/research-export.test.cjs jarvis-intelligence-chamber/assistant/assistant-intents.test.mjs
       - name: Install browser
         run: |
