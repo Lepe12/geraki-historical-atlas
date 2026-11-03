@@ -1,0 +1,88 @@
+name: NABOU Coding Agent — live trial (feature branch only)
+
+on:
+  push:
+    branches:
+      - feat/nabou-own-coding-agent-20261103
+    paths:
+      - '.github/workflows/nabou-agent-live-smoke.yml'
+      - 'tools/nabou_coding_agent.py'
+
+permissions:
+  contents: write
+
+jobs:
+  real-model-smoke:
+    if: github.repository == 'Lepe12/geraki-historical-atlas'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      PCT_LLM_PROVIDER: local_llama_cpp
+      PCT_LOCAL_MODEL_REPOSITORY: Qwen/Qwen2.5-3B-Instruct-GGUF
+      GITHUB_TOKEN: ${{ github.token }}
+      TARGET: jarvis-intelligence-chamber/workspace-insights.js
+      TASK: >-
+        In workspace-insights.js, the dateLabel function constructs
+        new Intl.DateTimeFormat("el-GR", { dateStyle: "medium", timeStyle: "short" })
+        every time it formats a history row. Implement a minimal optimization:
+        create ONE shared formatter outside dateLabel and reuse it in dateLabel,
+        keeping the output exactly identical. Return 1-3 precise old/new edits
+        for these two lines. This is a safe tiny change to a hot path.
+        Preserve all other behavior, text and file content.
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            jarvis-intelligence-chamber
+            .github/actions
+      - name: Verify bounded agent tests
+        run: PYTHONPATH=tools python3 -m unittest -v tools/test_nabou_coding_agent.py
+      - name: Prepare Qwen local inference with official hash-checked model
+        uses: ./.github/actions/research-model
+      - name: Ask a REAL local Qwen model and apply only bounded proposal
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/nabou_coding_agent.py \
+            --repo . \
+            --file "$TARGET" \
+            --task "$TASK" \
+            --apply \
+            --report agent_result.json
+      - name: Validate syntax and isolated changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check "$TARGET"
+          PYTHONPATH=tools python3 -m unittest -v tools/test_nabou_coding_agent.py
+          test "$(git diff --name-only | wc -l)" -eq 1
+          test "$(git diff --name-only)" = "$TARGET"
+          git diff --check
+          git diff --stat
+      - name: Save model test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nabou-real-model-trial-${{ github.run_id }}
+          path: agent_result.json
+          if-no-files-found: warn
+      - name: Commit proposal to NEW review branch (no production changes)
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          new_branch="agent/nabou-real-model-trial-${GITHUB_RUN_ID}"
+          git config user.name "nabou-coding-agent[bot]"
+          git config user.email "nabou-coding-agent[bot]@users.noreply.github.com"
+          git switch -c "$new_branch"
+          git add -- "$TARGET"
+          git commit -m "perf: propose minimal research dossier DOM update optimization"
+          basic="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c "http.extraheader=AUTHORIZATION: basic $basic" push origin "HEAD:refs/heads/$new_branch"
+          echo "REVIEW_BRANCH=$new_branch" >> "$GITHUB_STEP_SUMMARY"
+          echo "No merge or deploy performed." >> "$GITHUB_STEP_SUMMARY"
