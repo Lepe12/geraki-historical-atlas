@@ -1,0 +1,61 @@
+name: NABOU agent — automatic PR handoff verification
+on:
+  push:
+    branches: ['feat/nabou-agent-coder7b-v03-20261103']
+    paths:
+      - '.github/workflows/nabou-pr-handoff-smoke.yml'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  handoff:
+    if: github.repository == 'Lepe12/geraki-historical-atlas'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            .github/workflows/nabou-pr-handoff-smoke.yml
+      - name: Create isolated harmless test change
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="agent/nabou-handoff-smoke-${GITHUB_RUN_ID}"
+          git config user.name "nabou-coding-agent[bot]"
+          git config user.email "nabou-coding-agent[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          mkdir -p docs
+          printf '%s\n' "# NABOU agent handoff verification" "" "Run: ${GITHUB_RUN_ID}" "No site code or production changes." > "docs/nabou-agent-handoff-${GITHUB_RUN_ID}.md"
+          git add -- "docs/nabou-agent-handoff-${GITHUB_RUN_ID}.md"
+          git commit -m "test(agent): verify automatic draft PR creation"
+          echo "REVIEW_BRANCH=$branch" >> "$GITHUB_ENV"
+      - name: Push isolated test branch via GitHub token
+        shell: bash
+        timeout-minutes: 2
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GIT_TERMINAL_PROMPT: '0'
+        run: |
+          set -euo pipefail
+          auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          timeout 65s git -c "http.extraheader=AUTHORIZATION: basic $auth" push origin "HEAD:refs/heads/$REVIEW_BRANCH"
+      - name: Create DRAFT PR via GitHub REST API
+        shell: bash
+        timeout-minutes: 2
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          timeout 65s gh api "repos/$GITHUB_REPOSITORY/pulls" \
+            --method POST \
+            -f title="NABOU agent PR handoff verification #$GITHUB_RUN_ID" \
+            -f head="$REVIEW_BRANCH" \
+            -f base="feat/nabou-agent-coder7b-v03-20261103" \
+            -f body="Harmless workflow-only verification. No production files changed. Review before closing." \
+            -F draft=true --jq '{number,html_url,draft}'
