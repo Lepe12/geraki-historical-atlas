@@ -15,6 +15,8 @@ def expand(request,caller=None):
     schema=query_expansion(lanes)
     prompt='''Return JSON matching the supplied response schema. The queries object has one registered lane as each key and its concrete catalogue search query as the value. Generate a real query for every lane. Never return field descriptions or placeholder text. Queries are retrieval hypotheses, never historical facts or results. For a personal name or place, exact searches of supplied name variants are useful. For a thematic question use short native-language subject and geographic terms plus travel-book/catalogue vocabulary. Do not invent identities or undocumented archive records. Keep each query under 100 characters. QUESTION_JSON: '''+json.dumps({k:request.get(k) for k in ('target','purpose','date_range')},ensure_ascii=False)
     prompt+='\nSUPPLIED_NAME_OR_PLACE_VARIANTS_NOT_IDENTITY_PROOF: '+json.dumps(request.get('aliases',[]),ensure_ascii=False)
+    from question_scope import profile as scope_profile, queries as scope_queries
+    prompt+='\nREQUEST_FACETS_AND_RETRIEVAL_HINTS_NOT_EVIDENCE: '+json.dumps({'scope':scope_profile(request),'queries':{lane:scope_queries(request,lane) for lane in sorted(lanes)}},ensure_ascii=False)
     prompt+='\nUse the catalogue language of each lane: greek=Greek; travellers/british=English; venetian/italian_states=Italian; french/north_african=French; spanish_simancas=Spanish; ottoman=Turkish; dutch=Dutch; german=German. Do not merely copy Greek prose into foreign-language lanes. Preserve genuine supplied personal names as retrieval variants, without asserting identity.'
     if focus.get('kind')=='topic':
         from research_topics import topic_queries,VOCAB
@@ -66,3 +68,4 @@ if __name__=='__main__':
     destination.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
     print(json.dumps({'status':result['output_status'],'accepted':len(result['accepted_queries']),'rejected':len(result['rejected_queries'])}))
     if result['output_status']!='MODEL_QUERIES_AVAILABLE' or result['validation_status']!='PASS':raise SystemExit(1)
+

@@ -5,6 +5,8 @@ on:
       - 'tools/reviewed_draft_validation.py'
       - 'tools/test_reviewed_draft_validation.py'
       - 'tools/research_validation_report.py'
+      - 'tools/question_scope.py'
+      - 'tools/research_response_schema.py'
       - '.github/workflows/research-validation-readback.yml'
       - 'validation_recheck_requests/**'
   push:
@@ -66,10 +68,19 @@ jobs:
               'previous_validation_sha256':previous_sha,'previous_status':previous['status'],
               'previous_blockers':previous['blockers'],'status':result['status'],'blockers':result['blockers'],
               'synthesis_stage_validation':result['synthesis_stage_validation'],
+              'question_coverage':result['question_coverage'],
+              'expected_validation_status':'INCOMPLETE',
               'historical_verified':False,'question_specific_coverage_not_claimed':True}
           (destination/'receipt.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
           print(json.dumps(receipt,ensure_ascii=False))
-          if result['status']!='PROVISIONAL_RESEARCH_PIPELINE_PASSED':raise SystemExit(1)
+          # This old answer is faithful general history, not an answer about
+          # anchorage/water. Passing CI means detecting that precise gap while
+          # retaining every source-byte and synthesis-receipt check.
+          assert result['status']=='INCOMPLETE','WRONG_SCOPE_ANSWER_MUST_NOT_PASS'
+          assert set(result['blockers'])=={'QUESTION_REQUIREMENTS_NOT_COVERED','QUESTION_SCOPE_REVIEW_NOT_REPLAYED'},result['blockers']
+          assert result['synthesis_stage_validation']['valid'] is True
+          assert result['durable_citation_replays'] and all(r['status']=='PASS' for r in result['durable_citation_replays'])
+          assert result['question_coverage']['missing_requirements']==['anchorage','freshwater']
           PY
       - uses: actions/upload-artifact@v4
         if: always()
@@ -89,3 +100,4 @@ jobs:
             git commit -m "Revalidate stored reviewed-claim synthesis without new inference $GITHUB_RUN_ID"
             python3 tools/publish_research_outputs.py
           fi
+

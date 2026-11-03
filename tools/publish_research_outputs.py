@@ -51,14 +51,16 @@ def publish(attempts=5):
     if not from_environment()['production_writes_allowed']:
         raise ValueError('EXPERIMENT_PRODUCTION_WRITE_FORBIDDEN')
     # Call after creating the output commit. No branch history is replayed.
-    rows=git('diff-tree','--no-commit-id','--name-status','-r','--no-renames','HEAD').decode().splitlines()
+    # Raw NUL-delimited metadata supplies every blob identity in one call.
+    # Do not spawn ls-tree (or lazy-fetch a blob) for every evidence file.
+    rows=git('diff-tree','--no-commit-id','--raw','-z','-r','--no-renames','HEAD').decode().split('\0')
     changes=[]
-    for row in rows:
-        status,path=row.split('\t',1)
+    for index in range(0,len(rows)-1,2):
+        metadata,path=rows[index:index+2]
+        old_mode,mode,old_oid,oid,status=metadata.split()
         if status not in ('A','M') or not path.startswith(ALLOWED) or '..' in PurePosixPath(path).parts:
             raise ValueError('NON_OUTPUT_CHANGE_FORBIDDEN:'+path)
-        mode,kind,oid=git('ls-tree','HEAD','--',path).decode().split('\t')[0].split()
-        if mode!='100644' or kind!='blob':raise ValueError('REGULAR_OUTPUT_FILES_ONLY')
+        if mode!='100644':raise ValueError('REGULAR_OUTPUT_FILES_ONLY')
         changes.append((path,mode,oid))
     if not changes:raise ValueError('NO_OUTPUT_COMMIT')
     for attempt in range(attempts):
@@ -72,7 +74,9 @@ def publish(attempts=5):
                 resolved=shared_output(path,oid,parent)
                 if resolved is None:continue
                 applied.append((path,mode,resolved))
-                git('update-index','--add','--cacheinfo',mode,resolved,path,env=env)
+            if applied:
+                entries=''.join(mode+' '+oid+'\t'+path+'\0' for path,mode,oid in applied).encode()
+                git('update-index','-z','--index-info',env=env,input=entries)
             tree=git('write-tree',env=env).decode().strip()
         if tree==git('rev-parse',parent+'^{tree}').decode().strip():
             commit=parent
@@ -83,8 +87,15 @@ def publish(attempts=5):
         # Read back the published object identity for every file.
         git('fetch','--quiet','origin','main')
         head=git('rev-parse','refs/remotes/origin/main').decode().strip()
+        # Read tree metadata once; the equality check still covers EVERY file.
+        published={}
+        for entry in git('ls-tree','-r','-z','--full-tree',head).decode().split('\0'):
+            if entry:
+                metadata,path=entry.split('\t',1)
+                published[path]=metadata.split()[2]
         for path,mode,oid in applied:
-            actual=git('rev-parse',head+':'+path).decode().strip()
+            actual=published.get(path)
+            if actual is None:raise ValueError('PUBLICATION_READBACK_MISSING:'+path)
             if actual!=oid:
                 if re.fullmatch(r'evidence/runs/[0-9]+/research_continuation/latest\.json|command-center/live/runs/[0-9]+\.json',path) or path=='command-center/live/latest.json':
                     a=json.loads(git('cat-file','blob',actual));b=json.loads(git('cat-file','blob',oid))
@@ -102,3 +113,4 @@ def publish(attempts=5):
     raise RuntimeError('PUBLICATION_REJECTED_AFTER_RETRIES')
 
 if __name__=='__main__':publish()
+
