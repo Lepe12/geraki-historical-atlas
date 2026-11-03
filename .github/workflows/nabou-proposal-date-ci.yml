@@ -1,0 +1,35 @@
+name: NABOU AI date-format optimization — functional test
+on:
+  push:
+    branches:
+      - 'agent/nabou-real-model-trial-*'
+    paths:
+      - '.github/workflows/nabou-proposal-date-ci.yml'
+      - 'jarvis-intelligence-chamber/workspace-insights.js'
+      - 'jarvis-intelligence-chamber/workspace-insights-date.test.cjs'
+  pull_request:
+    branches:
+      - 'feat/nabou-own-coding-agent-20261103'
+    paths:
+      - 'jarvis-intelligence-chamber/workspace-insights.js'
+      - 'jarvis-intelligence-chamber/workspace-insights-date.test.cjs'
+permissions:
+  contents: read
+jobs:
+  check-date-format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            jarvis-intelligence-chamber/workspace-insights.js
+            jarvis-intelligence-chamber/workspace-insights-date.test.cjs
+          sparse-checkout-cone-mode: false
+      - name: JavaScript parser
+        run: |
+          node --check jarvis-intelligence-chamber/workspace-insights.js
+          node --check jarvis-intelligence-chamber/workspace-insights-date.test.cjs
+      - name: Functional comparison and single formatter lifetime
+        run: node --test jarvis-intelligence-chamber/workspace-insights-date.test.cjs
