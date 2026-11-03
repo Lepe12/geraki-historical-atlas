@@ -63,6 +63,11 @@ def publish(attempts=5):
         if mode!='100644':raise ValueError('REGULAR_OUTPUT_FILES_ONLY')
         changes.append((path,mode,oid))
     if not changes:raise ValueError('NO_OUTPUT_COMMIT')
+    # Only incoming output blobs need to be materialized in this partial clone.
+    # Unchanged main-tree blobs already exist on the destination server.
+    wanted=''.join(oid+'\n' for _,_,oid in changes).encode()
+    checked=git('cat-file','--batch-check=%(objectname) %(objecttype)',input=wanted).decode().splitlines()
+    if checked!=[oid+' blob' for _,_,oid in changes]:raise ValueError('OUTPUT_BLOB_NOT_AVAILABLE')
     for attempt in range(attempts):
         git('fetch','--quiet','origin','main')
         parent=git('rev-parse','refs/remotes/origin/main').decode().strip()
@@ -77,7 +82,9 @@ def publish(attempts=5):
             if applied:
                 entries=''.join(mode+' '+oid+'\t'+path+'\0' for path,mode,oid in applied).encode()
                 git('update-index','-z','--index-info',env=env,input=entries)
-            tree=git('write-tree',env=env).decode().strip()
+            # Default write-tree hydrates every promised blob, undoing the
+            # workflow's sparse/blob:none checkout just to publish a report.
+            tree=git('write-tree','--missing-ok',env=env).decode().strip()
         if tree==git('rev-parse',parent+'^{tree}').decode().strip():
             commit=parent
         else:

@@ -50,6 +50,19 @@ index update and one tree readback, plus the existing commit/fetch/push operatio
 This is a reduction in Git operations, NOT a measured full-research speedup.
 No claim is made that the earlier 16:03 publication time has disappeared.
 
+### Preserve blob-filtered checkouts during publication
+
+A subsequent real partial-clone reproduction found another cost: default
+`git write-tree` downloads every unchanged promised blob. With 100 missing blobs,
+the default fetched all 100; `write-tree --missing-ok` produced the identical
+tree while leaving all 100 missing locally. These blobs already exist in the
+fetched main tree on the destination server. The publisher now checks every
+incoming output blob in one `cat-file --batch-check`, uses `--missing-ok` for
+unchanged base objects, then pushes and checks every published output identity.
+An actual filtered-clone integration test verifies successful remote readback
+while all 101 unrelated base blobs remain undownloaded. This does not skip
+incoming evidence objects or the server readback gate.
+
 ## Verification
 
 `tools/fixtures/kimolos_question_scope_41630296108.json` is a provenance-labelled
