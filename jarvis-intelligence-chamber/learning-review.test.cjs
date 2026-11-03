@@ -26,7 +26,7 @@ assert.ok(payload.every((x) => x.exact_excerpt && x.page && x.status === "accept
 
 let pop = null;
 try { pop = execFileSync("pdftotext", ["-enc", "UTF-8", pdf, "-"], { maxBuffer: 1 << 26 }).toString().split("\f").slice(0, pages.length).map((t, i) => ({ page: i + 1, text: t })); }
-catch (e) { console.log("SKIP attestation part: pdftotext is not available"); }
+catch (e) { if (process.env.NABOU_REQUIRE_PDF_ATTESTATION === "1") throw e; console.log("SKIP attestation part: pdftotext is not available"); }
 if (pop) {
   const attest = (its) => {
     const r = fromReviewedKnowledge({ source_id: "src-test", pages: pop, pdf_replay: { original_pdf_replayed: true, pages: pop, source_sha256: "x" }, items: its });
