@@ -189,7 +189,7 @@ def main(argv=None) -> int:
     parser.add_argument("--proposals-file", type=Path, help="Offline test fixture; never passed by production workflow")
     parser.add_argument("--apply", action="store_true", help="Write only after all proposals validate")
     parser.add_argument("--report", type=Path, default=Path("agent_task_result.json"))
-    parser.add_argument("--patch", type=Path, default=Path("agent_task_preview.patch"))
+    parser.add_argument("--patch", type=Path, default=None)
     args = parser.parse_args(argv)
 
     report: dict = {
@@ -221,9 +221,10 @@ def main(argv=None) -> int:
             }
             for c in changes
         ]
-        args.patch.parent.mkdir(parents=True, exist_ok=True)
-        args.patch.write_text(make_patch(changes), encoding="utf-8")
-        report["review_patch"] = str(args.patch)
+        patch_path = args.patch or args.report.with_name("agent_task_preview.patch")
+        patch_path.parent.mkdir(parents=True, exist_ok=True)
+        patch_path.write_text(make_patch(changes), encoding="utf-8")
+        report["review_patch"] = str(patch_path)
         if args.apply:
             report["checks"] = apply_atomically(changes)
             report["status"] = "applied"
