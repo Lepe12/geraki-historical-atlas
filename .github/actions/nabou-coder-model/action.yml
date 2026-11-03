@@ -1,0 +1,32 @@
+name: Verify pinned NABOU coding model
+description: Download Qwen2.5-Coder-7B Q4_K_M and verify fixed official SHA-256 without changing research inference.
+runs:
+  using: composite
+  steps:
+    - name: Select isolated coder model cache
+      shell: bash
+      run: |
+        echo "NABOU_CODER_DIR=$HOME/.cache/nabou-models/qwen-coder-7b" >> "$GITHUB_ENV"
+    - uses: actions/cache/restore@v4
+      id: coder-cache
+      with:
+        path: ~/.cache/nabou-models/qwen-coder-7b
+        key: nabou-coder7b-q4km-13fb94b-509287f7-v1
+    - name: Install CPU inference tools
+      shell: bash
+      env:
+        CMAKE_BUILD_PARALLEL_LEVEL: '2'
+        CMAKE_ARGS: '-DGGML_NATIVE=ON'
+      run: |
+        python3 -m pip install --quiet --no-binary=llama-cpp-python \
+          'llama-cpp-python==0.3.16' \
+          --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu \
+          'huggingface-hub==0.36.0'
+    - name: Download and SHA-256 verify official merged GGUF
+      shell: bash
+      run: python3 tools/prepare_nabou_coder_model.py --destination "$NABOU_CODER_DIR"
+    - uses: actions/cache/save@v4
+      if: steps.coder-cache.outputs.cache-hit != 'true'
+      with:
+        path: ~/.cache/nabou-models/qwen-coder-7b
+        key: nabou-coder7b-q4km-13fb94b-509287f7-v1
