@@ -58,6 +58,10 @@ class MultiFileCodingTaskTests(unittest.TestCase):
         self.assertEqual(self.two.read_text(), self.two_source)
         r = json.loads(self.report.read_text())
         self.assertEqual(r["status"], "preview_only")
+        patch = self.report.with_name("agent_task_preview.patch")
+        self.assertTrue(patch.exists())
+        self.assertIn("a/jarvis-intelligence-chamber/nabou-shell.js", patch.read_text())
+        self.assertIn("b/jarvis-intelligence-chamber/command-deck.js", patch.read_text())
         self.assertEqual(len(r["files"]), 2)
         self.assertNotEqual(r["files"][0]["before_sha256"], r["files"][0]["after_sha256"])
 
