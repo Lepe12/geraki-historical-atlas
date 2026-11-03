@@ -17,8 +17,9 @@ import sys
 
 from nabou_coding_agent import (
     AgentError, DEFAULT_ENDPOINT, DEFAULT_MODEL,
-    build_candidate, check_syntax, infer_model, parse_proposal, validate_target,
+    check_syntax, infer_model, validate_target,
 )
+from nabou_patch_engine import parse_and_apply
 
 MAX_FILES = 3
 MAX_TOTAL_DELTA = 7500
@@ -65,13 +66,13 @@ def prepare_changes(
                 + ". You are editing ONLY " + target
                 + ". Make the smallest correct change in this file; "
                 + "any peer-file modifications will be reviewed separately. "
-                + "Return precise JSON old/new edits matching this file verbatim."
+                + "Use a single short exact replacement or unique insert_after anchor. "
+                + "Never copy the entire file as an edit. Return valid structured JSON."
             )
             raw = infer_model(coordinated_task, original, target, endpoint, model, token)
         attempts = 1
         try:
-            proposal = parse_proposal(raw)
-            candidate = build_candidate(original, proposal)
+            proposal, candidate = parse_and_apply(raw, original)
         except AgentError as first_error:
             if proposals is not None:
                 raise AgentError(f"{target}: {first_error}") from first_error
@@ -80,15 +81,13 @@ def prepare_changes(
             repair_task = (
                 coordinated_task
                 + "\\nPrevious attempt was rejected: " + str(first_error)
-                + ". Every old string MUST be copied verbatim from the source, "
-                + "including whitespace and line breaks, and occur EXACTLY once. "
-                + "For an appended CSS rule, replace a unique existing final rule "
-                + "with the same rule PLUS your appended rule. Output valid JSON only."
+                + ". Use the exact existing old/anchor substring copied verbatim; "
+                + "prefer insert_after with a UNIQUE short anchor. "
+                + "Do NOT rewrite the entire file. JSON only."
             )
             raw = infer_model(repair_task, original, target, endpoint, model, token)
             try:
-                proposal = parse_proposal(raw)
-                candidate = build_candidate(original, proposal)
+                proposal, candidate = parse_and_apply(raw, original)
             except AgentError as second_error:
                 raise AgentError(f"{target}: retry failed: {second_error}") from second_error
         changes.append({
