@@ -1,5 +1,9 @@
 /* NABOU//X — σελίδα καλωσορίσματος με το ολόγραμμα του βοηθού (assistant/assistant-scene.js).
-   Εμφανίζεται μία φορά ανά συνεδρία· δεν εμφανίζεται σε άμεσους συνδέσμους (?run=…, ?skip, #…). Enter ή «Είσοδος» → fade ~400ms. */
+   Εμφανίζεται μία φορά ανά συνεδρία· δεν εμφανίζεται σε άμεσους συνδέσμους (?run=…, ?skip, #…). Enter ή «Είσοδος» → fade ~400ms.
+   Φόρτωση: ο τίτλος, η υπογραμμή και το «Είσοδος» είναι απλό HTML/CSS και λειτουργούν αμέσως (το script φορτώνει από το <head>).
+   Το τρισδιάστατο ολόγραμμα (three.js + σημεία, ~1.5MB) φορτώνεται ΜΕΤΑ το πρώτο paint, σε idle· στο μεταξύ φαίνεται ένα ελαφρύ SVG,
+   που δίνει τη θέση στο canvas με fade όταν το πρώτο καρέ είναι έτοιμο. Χωρίς WebGL (ή με «εξοικονόμηση δεδομένων») μένει το SVG. */
+performance.mark?.("v2w:script");
 const html = document.documentElement, root = document.getElementById("v2welcome");
 if (root && !html.classList.contains("v2-welcome-on")) root.remove();
 else if (root) {
@@ -49,8 +53,19 @@ else if (root) {
   }
 
   const hasGL = () => { try { const c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); } catch { return false; } };
-  if (!hasGL()) root.classList.add("no-webgl");
-  else {
+  // Σε εξοικονόμηση δεδομένων / πολύ αργό δίκτυο δεν κατεβάζουμε καν το 3D (~1.5MB)· μένει το SVG
+  const conn = navigator.connection, lean = !!conn && (conn.saveData === true || /(^|-)2g$/.test(conn.effectiveType || ""));
+  const afterFirstPaint = (fn) => requestAnimationFrame(() => setTimeout(() => ("requestIdleCallback" in window ? requestIdleCallback(fn, { timeout: 1500 }) : setTimeout(fn, 120)), 0));
+
+  function startHologram() {
+    if (done) return;
+    if (lean || !hasGL()) { root.classList.add("no-webgl"); return; }
+    performance.mark?.("v2w:holo-start");
+    // η αλυσίδα scene.js → three.module → three.core και τα σημεία (.bin) κατεβαίνουν ΠΑΡΑΛΛΗΛΑ αντί για σειριακά
+    const hint = (rel, href, attrs) => { const l = document.createElement("link"); l.rel = rel; l.href = new URL(href, import.meta.url).href; Object.assign(l, attrs); document.head.appendChild(l); };
+    hint("modulepreload", "./assistant/assistant-scene.js?v=v2-phase3-2", { fetchPriority: "high" });
+    hint("modulepreload", "./vendor/three/three.core.min.js", { fetchPriority: "high" });
+    hint("preload", "./assets/assistant/cartographer-points.bin", { as: "fetch", crossOrigin: "anonymous", fetchPriority: "high" });
     import("./assistant/assistant-scene.js?v=v2-phase3-2")
       .then((m) => m.createHologram(canvas, { stage: true }))
       .then((h) => {
@@ -60,6 +75,8 @@ else if (root) {
         if (reduce) h.jump(1); else h.show(1.8);
         h.tune({ uGain: 0.21, uSize: 0.04 });
         applySpeaking();
+        // το canvas εμφανίζεται (fade) αφού ζωγραφιστεί το πρώτο καρέ· το SVG υποχωρεί
+        requestAnimationFrame(() => requestAnimationFrame(() => { root.classList.add("holo-on"); performance.mark?.("v2w:holo-on"); }));
         if (reduce) { h.freeze(2.2); return; }
         const t0 = performance.now();
         const loop = (now) => { // απαλή «αναπνοή»: φωτεινότητα και μέγεθος σημείων· πιο έντονος παλμός όσο μιλάει
@@ -74,6 +91,7 @@ else if (root) {
       })
       .catch(() => root.classList.add("no-webgl"));
   }
+  afterFirstPaint(startHologram);
 
   /* ---------- Φωνητικός χαιρετισμός στο πρώτο άγγιγμα / πλήκτρο ----------
      Οι browsers μπλοκάρουν την ομιλία πριν από user activation, γι' αυτό περιμένουμε την πρώτη κίνηση του χρήστη.
@@ -81,7 +99,7 @@ else if (root) {
   const GREETING_FULL = "Καλώς ήρθες στο Ναμπού. Είμαι ο ψηφιακός σου χαρτογράφος. Πάτησε Είσοδο για να ξεκινήσουμε την έρευνα."; // «Ναμπού» = προφορά του NABOU//X
   const GREETING_SHORT = "Καλώς ήρθες.";
   const MUTE_KEY = "nx-v2-welcome-mute";
-  const synth = window.speechSynthesis, hint = document.getElementById("v2wGreetHint");
+  const synth = window.speechSynthesis;
   const store = { get() { try { return localStorage.getItem(MUTE_KEY) === "1"; } catch { return false; } }, set(v) { try { localStorage.setItem(MUTE_KEY, v ? "1" : "0"); } catch {} } };
   let muted = store.get(), spoken = false, utter = null, voice = null;
 
@@ -96,18 +114,14 @@ else if (root) {
   const supported = () => !!synth && typeof SpeechSynthesisUtterance !== "undefined" && (greekVoices().length > 0 || ((synth.getVoices && synth.getVoices()) || []).length === 0);
 
   function syncUI() {
-    const ok = supported();
     if (muteBtn) {
-      muteBtn.hidden = !ok;
+      muteBtn.hidden = !supported();
       muteBtn.setAttribute("aria-pressed", muted ? "true" : "false");
       muteBtn.setAttribute("aria-label", muted ? "Ενεργοποίηση φωνής του χαρτογράφου" : "Σίγαση φωνής του χαρτογράφου");
       muteBtn.title = muteBtn.getAttribute("aria-label");
       muteBtn.textContent = muted ? "🔇" : "🔊";
     }
-    if (hint) hint.hidden = !ok || muted || spoken || hintGone;
   }
-  let hintGone = false;
-  function hideHint() { hintGone = true; if (hint) { hint.classList.add("gone"); setTimeout(() => { hint.hidden = true; }, 500); } }
 
   function stopSpeech() {
     if (utter) { try { synth.cancel(); } catch {} utter = null; }
@@ -140,7 +154,7 @@ else if (root) {
       muted = !muted; store.set(muted);
       if (muted) stopSpeech();
       syncUI();
-      if (!muted && !spoken) { hideHint(); speak(GREETING_FULL); }
+      if (!muted && !spoken) speak(GREETING_FULL);
     });
     // Πρώτη κίνηση: pointerdown / touchstart / keydown (+ pointerup/touchend/click ως εφεδρεία για touch)
     const onGesture = (e) => {
@@ -149,12 +163,11 @@ else if (root) {
       if (e.type === "keydown" && (e.key === "Escape" || e.key === "Shift" || e.key === "Control" || e.key === "Alt" || e.key === "Meta" || e.key === "CapsLock")) return;
       const onEnterBtn = !!(e.target && e.target.closest && e.target.closest("#v2wEnter"));
       const entering = e.type === "keydown" ? e.key === "Enter" : onEnterBtn; // Enter ή κλικ στο «Είσοδος» → σύντομος χαιρετισμός
-      hideHint();
       speak(entering ? GREETING_SHORT : GREETING_FULL);
     };
     for (const t of ["pointerdown", "touchstart", "keydown", "pointerup", "touchend", "click"]) document.addEventListener(t, onGesture, { capture: true, passive: true });
     // Αν ο χρήστης ανοίξει τον βοηθό, σταματά ο χαιρετισμός ώστε να μην επικαλύπτονται
     document.addEventListener("click", (e) => { if (e.target.closest?.("#nabouAssistantLauncher, .nxa")) { stopSpeech(); spoken = true; } }, true);
     window.addEventListener("pagehide", stopSpeech);
-  } else { if (muteBtn) muteBtn.hidden = true; if (hint) hint.hidden = true; }
+  } else if (muteBtn) muteBtn.hidden = true;
 }

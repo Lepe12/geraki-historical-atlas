@@ -202,10 +202,14 @@ html.v2-welcome-on #v2welcome { display: flex; }
 #v2welcome { position: fixed; inset: 0; z-index: 10000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; box-sizing: border-box; overflow: hidden;
   background: radial-gradient(ellipse 50% 46% at 50% 31%, rgba(30, 111, 168, .42) 0%, rgba(16, 52, 80, .24) 45%, rgba(0, 0, 0, 0) 78%), radial-gradient(ellipse 60% 55% at 50% 38%, #1d1a17 0%, #14100c 55%, #0d0a07 100%); color: var(--v2-text); opacity: 1; transition: opacity .36s ease; }
 #v2welcome.leaving { opacity: 0; pointer-events: none; }
-#v2wCanvas { position: relative; width: min(820px, 96vw); height: min(54vh, 560px); margin-bottom: 8px; flex: none; background: #000; border-radius: 0; mix-blend-mode: screen; -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 88%, transparent); -webkit-mask-composite: source-in; mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 88%, transparent); mask-composite: intersect; }
-.v2w-fallback { display: none; width: min(380px, 70vw); height: min(380px, 40vh); color: #7FD4FF; filter: drop-shadow(0 0 16px rgba(80, 180, 255, .55)); }
+.v2w-stage { position: relative; display: grid; place-items: center; width: min(820px, 96vw); height: min(54vh, 560px); margin-bottom: 8px; flex: none; }
+/* το 3D φορτώνει μετά το πρώτο paint: μέχρι τότε φαίνεται το SVG· το canvas εμφανίζεται με fade όταν είναι έτοιμο το πρώτο καρέ */
+#v2wCanvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity .7s ease; background: #000; border-radius: 0; mix-blend-mode: screen; -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 88%, transparent); -webkit-mask-composite: source-in; mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 88%, transparent); mask-composite: intersect; }
+#v2welcome.holo-on #v2wCanvas { opacity: 1; }
+.v2w-fallback { display: block; width: min(380px, 70vw); height: min(380px, 40vh); color: #7FD4FF; filter: drop-shadow(0 0 16px rgba(80, 180, 255, .55)); opacity: .8; animation: v2breath 6s ease-in-out infinite; transition: opacity .7s ease, visibility 0s .7s; }
+#v2welcome.holo-on .v2w-fallback { opacity: 0; visibility: hidden; animation: none; }
 #v2welcome.no-webgl #v2wCanvas { display: none; }
-#v2welcome.no-webgl .v2w-fallback { display: block; animation: v2breath 6s ease-in-out infinite; }
+#v2welcome.no-webgl .v2w-fallback { opacity: 1; }
 @keyframes v2breath { 0%, 100% { transform: scale(1); opacity: .94; } 50% { transform: scale(1.035); opacity: 1; } }
 .v2w-copy { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 0; max-width: 640px; }
 #v2welcome h1 { margin: 0; font: 600 clamp(46px, 9vw, 80px)/1 var(--v2-head); letter-spacing: .1em; text-indent: .1em; color: var(--v2-gold); text-shadow: 0 0 28px rgba(80, 180, 255, .22); }
@@ -216,11 +220,10 @@ html.v2-welcome-on #v2welcome { display: flex; }
 #v2welcome .v2w-enter { margin-top: 22px; min-height: 52px; min-width: 190px; padding: 0 36px; border: 1px solid var(--v2-gold); border-radius: 26px; background: radial-gradient(circle at 40% 25%, #b3382b, var(--v2-seal) 62%, #5e130d); color: var(--v2-parch); font: 600 17px var(--v2-ui); letter-spacing: .08em; cursor: pointer; box-shadow: 0 8px 28px rgba(138, 31, 23, .5); }
 #v2welcome .v2w-enter:hover { filter: brightness(1.15); }
 @media (prefers-reduced-motion: reduce) {
-  #v2welcome { transition-duration: .01s; } #v2wCanvas, #v2welcome.no-webgl .v2w-fallback { animation: none; }
+  #v2welcome { transition-duration: .01s; } #v2wCanvas, .v2w-fallback { animation: none; transition-duration: .2s; }
 }
 
-/* ---------- φωνητικός χαιρετισμός: ένδειξη + κουμπί σίγασης ---------- */
-@keyframes v2greet { 0%, 100% { opacity: .75; } 50% { opacity: 1; } }
+/* ---------- φωνητικός χαιρετισμός: κουμπί σίγασης ---------- */
 .v2w-mute { position: absolute; top: max(14px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); z-index: 2; width: 48px; height: 48px; min-width: 44px; min-height: 44px; padding: 0; border: 1px solid var(--v2-line2); border-radius: 50%; background: rgba(36, 27, 18, .85); color: var(--v2-parch); font-size: 20px; line-height: 1; cursor: pointer; }
 .v2w-mute:hover { border-color: var(--v2-gold); }
 .v2w-mute:focus-visible, #v2welcome .v2w-enter:focus-visible { outline: 2px solid var(--v2-gold); outline-offset: 3px; }
