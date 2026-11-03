@@ -1,0 +1,29 @@
+name: N7 secure gateway tests
+on:
+  pull_request:
+    paths:
+      - "server/command-center-live/n7-gateway.js"
+      - "server/command-center-live/n7-gateway.test.js"
+      - "server/command-center-live/app.js"
+      - ".github/workflows/n7-gateway-tests.yml"
+  workflow_dispatch:
+jobs:
+  n7-gateway:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: server/command-center-live
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Syntax checks
+        run: |
+          node --check server/command-center-live/n7-gateway.js
+          node --check server/command-center-live/app.js
+      - name: Unit tests
+        run: node --test server/command-center-live/n7-gateway.test.js
