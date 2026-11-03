@@ -1,0 +1,31 @@
+name: Test autonomous draft Pull Request
+on:
+  push:
+    branches: [test/nabou-agent-pr-permission-20261103]
+    paths: ['.github/workflows/nabou-auto-pr-check.yml']
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            docs
+            .github/workflows
+      - name: Create harmless documentation-only change
+        run: |
+          mkdir -p docs
+          echo 'Automatic draft PR permission verification only; no production changes.' > docs/nabou-agent-pr-check.txt
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: 'test: verify autonomous agent PR'
+          branch: agent/verify-github-action-pr
+          base: test/nabou-agent-pr-permission-20261103
+          title: 'NABOU Agent: autonomous draft PR permission test'
+          body: 'Safe one-file documentation-only permission verification. Do not merge.'
+          draft: true
+          add-paths: docs/nabou-agent-pr-check.txt
