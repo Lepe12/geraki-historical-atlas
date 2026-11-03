@@ -1,0 +1,80 @@
+name: NABOU Coding Agent — live trial (feature branch only)
+
+on:
+  push:
+    branches:
+      - feat/nabou-own-coding-agent-20261103
+    paths:
+      - '.github/workflows/nabou-agent-live-smoke.yml'
+
+permissions:
+  contents: write
+  models: read
+
+jobs:
+  real-model-smoke:
+    if: github.repository == 'Lepe12/geraki-historical-atlas'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      TARGET: jarvis-intelligence-chamber/workspace-insights.js
+      TASK: >-
+        In workspace-insights.js optimize renderDossier to avoid rewriting a
+        content element's innerHTML when its newly generated markup is exactly
+        identical to the existing markup. Preserve all open-details states,
+        element structure, Greek labels and visible behavior. Only make a
+        focused safe change. Do not touch any other file.
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            jarvis-intelligence-chamber
+      - name: Verify bounded agent tests
+        run: PYTHONPATH=tools python3 -m unittest -v tools/test_nabou_coding_agent.py
+      - name: Ask a REAL GitHub Models model and apply only bounded proposal
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/nabou_coding_agent.py \
+            --repo . \
+            --file "$TARGET" \
+            --task "$TASK" \
+            --apply \
+            --report agent_result.json
+      - name: Validate syntax and isolated changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check "$TARGET"
+          PYTHONPATH=tools python3 -m unittest -v tools/test_nabou_coding_agent.py
+          test "$(git diff --name-only | wc -l)" -eq 1
+          test "$(git diff --name-only)" = "$TARGET"
+          git diff --check
+          git diff --stat
+      - name: Save model test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nabou-real-model-trial-${{ github.run_id }}
+          path: agent_result.json
+          if-no-files-found: warn
+      - name: Commit proposal to NEW review branch (no production changes)
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          new_branch="agent/nabou-real-model-trial-${GITHUB_RUN_ID}"
+          git config user.name "nabou-coding-agent[bot]"
+          git config user.email "nabou-coding-agent[bot]@users.noreply.github.com"
+          git switch -c "$new_branch"
+          git add -- "$TARGET"
+          git commit -m "perf: propose minimal research dossier DOM update optimization"
+          basic="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c "http.extraheader=AUTHORIZATION: basic $basic" push origin "HEAD:refs/heads/$new_branch"
+          echo "REVIEW_BRANCH=$new_branch" >> "$GITHUB_STEP_SUMMARY"
+          echo "No merge or deploy performed." >> "$GITHUB_STEP_SUMMARY"
