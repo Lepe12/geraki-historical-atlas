@@ -122,6 +122,17 @@ def check_css_structure(path: Path) -> dict:
 def check_file(path: Path) -> dict:
     if path.suffix == ".css":
         return check_css_structure(path)
+    if path.suffix in (".js", ".mjs", ".cjs"):
+        # On some Node 22 runners, node --check path.js returns 0 for broken
+        # ES modules; parse from stdin with an explicit module mode instead.
+        mode = "commonjs" if path.suffix == ".cjs" else "module"
+        cmd = ["node", "--check", "--input-type=" + mode]
+        result = subprocess.run(
+            cmd, input=path.read_text(encoding="utf-8"),
+            text=True, capture_output=True, timeout=25, check=False,
+        )
+        return {"command": "node --check --input-type=" + mode + " < " + str(path),
+                "ok": result.returncode == 0, "stderr": result.stderr[-700:]}
     return check_syntax(path)
 
 
