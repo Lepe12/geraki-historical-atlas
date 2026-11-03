@@ -67,7 +67,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nabou-multifile-ai-live-${{ github.run_id }}
-          path: agent_task_result.json
+          path: |
+            agent_task_result.json
+            agent_task_preview.patch
           if-no-files-found: warn
       - name: Create isolated review branch (never merge or deploy)
         env:
