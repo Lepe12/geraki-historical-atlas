@@ -12,6 +12,7 @@ const escape = (s) =>
     (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c],
   );
 const storageKey = "nabou-research-history-v1";
+const sharedFormatter = new Intl.DateTimeFormat("el-GR", { dateStyle: "medium", timeStyle: "short" });
 let catalog = [],
   recent = [],
   current = "",
