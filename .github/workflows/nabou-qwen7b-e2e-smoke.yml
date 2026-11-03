@@ -1,0 +1,68 @@
+name: NABOU Qwen7B isolated end-to-end smoke test
+on:
+  push:
+    branches:
+      - test/nabou-qwen7b-e2e-20261103
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  coder7b-e2e:
+    if: github.repository == 'Lepe12/geraki-historical-atlas' && github.ref == 'refs/heads/test/nabou-qwen7b-e2e-20261103'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      AGENT_TASK: "In navigation-rail.css and photon-windows.css, add a narrowly scoped forced-colors accessibility rule at the end of each file: make keyboard focus-visible indicators on .nabou-rail-item and .nx-workspace .nx-dock button use an outline colored CanvasText within @media (forced-colors: active). Preserve every existing rule and do not change 3D or layout."
+      AGENT_FILES: "jarvis-intelligence-chamber/navigation-rail.css,jarvis-intelligence-chamber/photon-windows.css"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            tools
+            .github/actions/nabou-coder-model
+            jarvis-intelligence-chamber
+      - name: Preflight tests
+        run: PYTHONPATH=tools python3 -m unittest -q tools.test_nabou_coding_agent tools.test_nabou_coding_task tools.test_nabou_patch_engine
+      - name: Prepare verified Qwen Coder 7B
+        uses: ./.github/actions/nabou-coder-model
+      - name: Real model inference and bounded patch
+        run: |
+          set -euo pipefail
+          python3 tools/nabou_coding_task.py --repo . --files "$AGENT_FILES" --task "$AGENT_TASK" --report agent_task_result.json --patch agent_task_preview.patch --apply
+      - name: Verify changes and tests
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, subprocess
+          expected=set(os.environ["AGENT_FILES"].split(","))
+          actual=set(subprocess.check_output(["git","diff","--name-only"],text=True).splitlines())
+          if actual != expected: raise SystemExit(f"Unexpected paths: {actual ^ expected}")
+          print("Expected changed paths verified")
+          PY
+          git diff --check
+          PYTHONPATH=tools python3 -m unittest -q tools.test_nabou_coding_agent tools.test_nabou_coding_task tools.test_nabou_patch_engine
+      - name: Save model report and diff
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nabou-qwen7b-e2e-${{ github.run_id }}
+          path: |
+            agent_task_result.json
+            agent_task_preview.patch
+          if-no-files-found: warn
+      - name: Commit and open own draft PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          branch="agent/qwen7b-e2e-${GITHUB_RUN_ID}"
+          git config user.name "nabou-coding-agent[bot]"
+          git config user.email "nabou-coding-agent[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add -- jarvis-intelligence-chamber/navigation-rail.css jarvis-intelligence-chamber/photon-windows.css
+          git commit -m "test(agent): Qwen7B bounded accessibility change"
+          auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c "http.extraheader=AUTHORIZATION: basic $auth" push origin "HEAD:refs/heads/$branch"
+          gh pr create --draft --base main --head "$branch" --title "NABOU Qwen7B: autonomous end-to-end smoke #${GITHUB_RUN_ID}" --body "Real Qwen2.5 Coder 7B two-file test. Review code and CI before merge. No deployment. Run: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
