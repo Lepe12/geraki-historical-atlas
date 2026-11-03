@@ -142,6 +142,41 @@ class MultiFileCodingTaskTests(unittest.TestCase):
         self.assertEqual(self.one.read_text(), self.one_source)
         self.assertEqual(self.two.read_text(), self.two_source)
 
+    def test_bad_model_patch_gets_exactly_one_bounded_retry(self):
+        attempts = []
+        def model(task, source, target, *args):
+            attempts.append(target)
+            if target.endswith("nabou-shell.js"):
+                return json.dumps({"edits": [{"old": "old-one", "new": "new-one"}]})
+            if attempts.count(target) == 1:
+                return json.dumps({"edits": [{"old": "not-found", "new": "oops"}]})
+            self.assertIn("Previous attempt was rejected", task)
+            return json.dumps({"edits": [{"old": "old-two", "new": "new-two"}]})
+
+        with patch("nabou_coding_task.infer_model", side_effect=model):
+            changes = prepare_changes(
+                self.root, selected_files(self.names), "Update two exact module strings",
+                model="mock", endpoint="", token="")
+        self.assertEqual(len(attempts), 3)
+        self.assertEqual([x["model_attempts"] for x in changes], [1, 2])
+        self.assertEqual(self.one.read_text(), self.one_source)
+        self.assertEqual(self.two.read_text(), self.two_source)
+
+    def test_two_bad_model_patches_abort_without_file_writes(self):
+        def model(task, source, target, *args):
+            if target.endswith("nabou-shell.js"):
+                return json.dumps({"edits": [{"old": "old-one", "new": "new-one"}]})
+            return json.dumps({"edits": [{"old": "not-found", "new": "oops"}]})
+
+        with patch("nabou_coding_task.infer_model", side_effect=model) as spy:
+            with self.assertRaises(AgentError):
+                prepare_changes(
+                    self.root, selected_files(self.names), "Try two code changes",
+                    model="mock", endpoint="", token="")
+        self.assertEqual(spy.call_count, 3)
+        self.assertEqual(self.one.read_text(), self.one_source)
+        self.assertEqual(self.two.read_text(), self.two_source)
+
     def test_symlink_is_rejected(self):
         self.two.unlink()
         self.two.symlink_to(self.one)
