@@ -2,12 +2,12 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const {createN7Relay}=require('./n7-queue-bridge');
-function sandbox(){
+function sandbox({dispatch=async()=>false,dispatchConfigured=()=>false}={}){
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'n7-queue-test-'));
  let conversations=[{id:'a1b2c3d4-1111-4222-a333-c55555555555',title:'Νέα συνομιλία',updated:'',messages:[]}];
  const bridge=createN7Relay({dataDir:dir,authenticated:r=>r.cookie==='owner',originOK:r=>r.origin!=='bad',
     readBody:async r=>r.body,loadConversations:()=>JSON.parse(JSON.stringify(conversations)),
-    saveConversations:x=>{conversations=x;},modelConfigured:()=>false,
+    saveConversations:x=>{conversations=x;},modelConfigured:()=>false,dispatch,dispatchConfigured,
     verifyToken:async token=>{if(token!=='private-jwt')throw Error('bad');return {run_id:'12345'};}});
  function req(method,url,{cookie,origin,body,authorization}={}){return {method,url,cookie,origin,body,headers:{authorization:authorization||''}};}
  async function call(request){const res={status:0,value:null,writeHead(c){this.status=c;},end(b){this.value=b?JSON.parse(b):null;}};
@@ -42,5 +42,35 @@ test('Qwen queue rejects bad inputs and provides transparent asynchronous status
   assert.equal((await s.call(s.req('POST','/api/conversations/a1b2c3d4-1111-4222-a333-c55555555555/chat',{cookie:'owner',body:{message:''}}))).code,400);
   const state=await s.call(s.req('GET','/api/status'));
   assert.equal(state.code,200);assert.equal(state.value.queueModelAvailable,true);assert.equal(state.value.modelConfigured,false);
+ }finally{fs.rmSync(s.dir,{recursive:true,force:true});}
+});
+
+test('dispatch starts immediately after authenticated job is durably queued',async()=>{
+ let count=0;
+ const s=sandbox({dispatch:async()=>{
+    count++;const p=path.join(s.dir,'n7-private-queue.json');
+    const jobs=JSON.parse(fs.readFileSync(p,'utf8'));
+    assert.equal(jobs.length,1);assert.equal(jobs[0].status,'queued');
+    assert.equal(jobs[0].prompt,'Qwen ξεκίνα');
+    return true;
+  },dispatchConfigured:()=>true});
+ try{
+  const state=await s.call(s.req('GET','/api/status'));
+  assert.equal(state.value.queueDispatchConfigured,true);
+  const endpoint='/api/conversations/a1b2c3d4-1111-4222-a333-c55555555555/chat';
+  assert.equal((await s.call(s.req('POST',endpoint,{body:{message:'deny'}}))).code,401);
+  assert.equal(count,0);
+  const result=await s.call(s.req('POST',endpoint,{cookie:'owner',body:{message:'Qwen ξεκίνα'}}));
+  assert.equal(result.code,202);assert.equal(result.value.dispatch,'immediate');assert.equal(count,1);
+ }finally{fs.rmSync(s.dir,{recursive:true,force:true});}
+});
+test('dispatch failure leaves accepted job for scheduled worker',async()=>{
+ const s=sandbox({dispatch:async()=>{throw Error('network_unavailable');}});
+ try{
+  const endpoint='/api/conversations/a1b2c3d4-1111-4222-a333-c55555555555/chat';
+  const res=await s.call(s.req('POST',endpoint,{cookie:'owner',body:{message:'Keep this job'}}));
+  assert.equal(res.code,202);assert.equal(res.value.dispatch,'scheduled_fallback');
+  const state=await s.call(s.req('GET','/api/n7/job/'+res.value.job_id,{cookie:'owner'}));
+  assert.equal(state.value.status,'queued');
  }finally{fs.rmSync(s.dir,{recursive:true,force:true});}
 });
