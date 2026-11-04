@@ -1,0 +1,79 @@
+name: N7 immediate Qwen dispatch safe deployment
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/n7-immediate-dispatch-deploy.yml'
+      - 'tools/n7/n7-queue-bridge.js'
+      - 'tools/n7/n7-queue-bridge.test.js'
+      - 'tools/n7/deploy_immediate_dispatch.py'
+  push:
+    branches: [main]
+    paths:
+      - 'ops_ftps_requests/n7-immediate-dispatch.json'
+permissions:
+  contents: read
+concurrency:
+  group: n7-immediate-plesk-upgrade
+  cancel-in-progress: false
+jobs:
+  validate:
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify private Qwen session safety and dispatch fallback
+        run: |
+          node --check tools/n7/n7-queue-bridge.js
+          node --test tools/n7/n7-queue-bridge.test.js
+          python3 -m py_compile tools/n7/deploy_immediate_dispatch.py
+      - name: Check exact live file compatibility with no writes
+        run: python3 tools/n7/deploy_immediate_dispatch.py
+  deploy:
+    if: github.event_name == 'push'
+    needs: validate
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check bot-only deployment request
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('ops_ftps_requests/n7-immediate-dispatch.json').read_text())
+          assert p['confirmation']=='N7-IMMEDIATE-PRIVATE-QWEN'
+          assert p['destination']=='/bot.piratecartography.com/n7-app'
+          assert p['secrets_in_public_repository']==False
+          PY
+      - name: Deploy immediate trigger with backups, restart, HTTPS smoke test and rollback
+        run: python3 tools/n7/deploy_immediate_dispatch.py
