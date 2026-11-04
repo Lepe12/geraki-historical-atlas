@@ -30,7 +30,7 @@ function createN7Gateway({json,operatorAuthorized,readBody,statusFor,githubWorkf
     // Enforce a same-origin operator flow or a server-side client with no Origin.
     // An arbitrary browser origin is not sufficient even with a bearer token.
     const origin=String(req.headers.origin||"");
-    if(origin && origin!=="https://lepe12.github.io" && origin!=="https://pct-live.piratecartography.com"){json(res,403,{error:"origin_not_allowed"});return true;}
+    if(origin && origin!=="https://lepe12.github.io" && origin!=="https://pct-live.piratecartography.com" && origin!=="https://bot.piratecartography.com"){json(res,403,{error:"origin_not_allowed"});return true;}
     const now=Date.now();
     if(now-lastAccepted<10000){json(res,429,{error:"n7_rate_limited"});return true;}
     let body;
