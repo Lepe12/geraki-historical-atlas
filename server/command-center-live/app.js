@@ -64,13 +64,14 @@ function safeEqual(a,b){
   const x=Buffer.from(String(a||"")),y=Buffer.from(String(b||""));
   return x.length===y.length&&x.length>0&&crypto.timingSafeEqual(x,y);
 }
-function githubWorkflowDispatch(inputs){
+function githubDispatchWorkflow(workflow,inputs){
+  if(![CONTROLLED_WORKFLOW,"nabou-coder-v03.yml"].includes(workflow))return Promise.reject(new Error("workflow_not_allowed"));
   return new Promise((resolve,reject)=>{
     if(!GITHUB_DISPATCH_TOKEN)return reject(new Error("github_dispatch_not_configured"));
     const body=JSON.stringify({ref:"main",inputs});
     const req=https.request({
       hostname:"api.github.com",
-      path:"/repos/"+REPO+"/actions/workflows/"+CONTROLLED_WORKFLOW+"/dispatches",
+      path:"/repos/"+REPO+"/actions/workflows/"+workflow+"/dispatches",
       method:"POST",
       headers:{
         "user-agent":"piratecartography-command-center-live/1",
@@ -88,6 +89,8 @@ function githubWorkflowDispatch(inputs){
     req.on("error",reject);req.end(body);
   });
 }
+function githubWorkflowDispatch(inputs){return githubDispatchWorkflow(CONTROLLED_WORKFLOW,inputs);}
+function githubCodingDispatch(inputs){return githubDispatchWorkflow("nabou-coder-v03.yml",inputs);}
 async function refreshBaseline(force=false){
   if(!force && Date.now()-baselineFetchedAt<15000 && baseline)return baseline;
   if(baselineRefresh)return baselineRefresh;
@@ -242,7 +245,7 @@ async function statusFor(run){
 async function publishSnapshots(){
   for(const [run,clients] of sockets){if(!clients.size)continue;try{const state=await statusFor(run),frame=frameText(JSON.stringify({schema:"pct-command-center-bootstrap-v1",...state}));for(const socket of clients)if(!socket.destroyed)socket.write(frame);}catch(_){}}
 }
-const handleN7=createN7Gateway({json,operatorAuthorized,readBody,statusFor,githubWorkflowDispatch});
+const handleN7=createN7Gateway({json,operatorAuthorized,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch});
 const server=http.createServer(async(req,res)=>{
   try{
     const u=new URL(req.url,"http://localhost");const p=normalizePath(u.pathname);
