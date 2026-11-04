@@ -14,7 +14,7 @@ function setKind(kind){if(!label[kind])return;if(kind==='done'&&state.kind!=='do
 function mount(parent,small){if(!parent||parent.querySelector('.n7-live-presence'))return;
  const box=document.createElement('div');box.className='n7-live-presence'+(small?' n7-live-small':'');box.style.cssText=small?'width:52px;height:52px;flex:0 0 52px;':'width:min(210px,60vw);height:auto;aspect-ratio:1;margin:0 auto 8px;';
  box.style.visibility='hidden';box.setAttribute('role','img');box.setAttribute('aria-label','N7');
- const canvas=document.createElement('canvas');canvas.width=650;canvas.height=650;canvas.style.cssText='width:100%;height:100%;display:block;';
+ const canvas=document.createElement('canvas');canvas.width=650;canvas.height=650;canvas.style.cssText='width:100%;height:100%;display:block;mask-image:radial-gradient(ellipse 50% 51% at 50% 49%,black 60%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse 50% 51% at 50% 49%,black 60%,transparent 100%);';
  box.append(canvas);parent.prepend(box);state.mounted.add(box);
  function draw(now){if(!box.isConnected){state.mounted.delete(box);return;}
  const ctx=canvas.getContext('2d');if(state.image&&state.eyes&&ctx){
@@ -33,9 +33,9 @@ function mount(parent,small){if(!parent||parent.querySelector('.n7-live-presence
 }
 function ensureMounted(){
  const header=document.querySelector('#application header');
- if(header)mount(header,true);
+ if(header)header.querySelectorAll('.n7-live-presence').forEach(x=>x.remove());
  const welcome=document.querySelector('#messages .welcome');
- if(welcome)mount(welcome,false);
+ if(welcome){const legacy=welcome.querySelector('.logo');if(legacy)legacy.style.display='none';mount(welcome,false);}
 }
 let polling=false;
 async function syncTasks(){if(polling)return;polling=true;
