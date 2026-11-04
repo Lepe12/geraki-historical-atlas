@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>NABOU N7 — Real Qwen7B Preview Test</title>
+<title>NABOU N7 — Coding Agent</title>
 <style>
 :root{color-scheme:dark;font-family:system-ui,sans-serif}
 body{margin:0;background:#081522;color:#e1f8ff;min-height:100vh;display:grid;place-items:center}
 main{margin:20px;padding:28px;max-width:540px;background:#0c2433;border:1px solid #317887;border-radius:14px;box-shadow:0 15px 50px #0009}
 h1{font-size:1.5rem;margin-top:0}p{line-height:1.6;color:#bdd4dd}
-label{display:block;margin:18px 0 7px}input{width:100%;box-sizing:border-box;padding:12px;background:#081b28;color:#f4ffff;border:1px solid #518b9f;border-radius:7px;font:inherit}
-button{background:#58cddb;color:#04212c;border:0;border-radius:7px;padding:12px 17px;font:700 1rem system-ui;cursor:pointer;margin-top:16px}
+label{display:block;margin:18px 0 7px}textarea{width:100%;box-sizing:border-box;min-height:115px;resize:vertical;padding:12px;background:#081b28;color:#f4ffff;border:1px solid #518b9f;border-radius:7px;font:inherit}fieldset{border:1px solid #317887;border-radius:8px;margin-top:15px}fieldset label{margin:9px 0;display:flex;align-items:center;gap:9px}input[type=checkbox],input[type=radio]{width:auto;flex-shrink:0}input{width:100%;box-sizing:border-box;padding:12px;background:#081b28;color:#f4ffff;border:1px solid #518b9f;border-radius:7px;font:inherit}
+#confirmWrap[hidden]{display:none}button{background:#58cddb;color:#04212c;border:0;border-radius:7px;padding:12px 17px;font:700 1rem system-ui;cursor:pointer;margin-top:16px}
 button:disabled{opacity:.55;cursor:progress}
 a{color:#8becfb}#status{font-weight:600;white-space:pre-wrap}
 small{display:block;color:#a6c6d2;margin-top:16px;line-height:1.5}
@@ -20,10 +20,22 @@ small{display:block;color:#a6c6d2;margin-top:16px;line-height:1.5}
 <body>
 <main>
 <h1>N7 → GitHub → Qwen 7B</h1>
-<p>Δοκιμή πραγματικής εντολής στον live Top.Host. Η εργασία περιορίζεται σε δύο αρχεία CSS, σε λειτουργία προεπισκόπησης, χωρίς εφαρμογή αλλαγών.</p>
+<p>Δώσε δική σου εντολή στο Qwen 7B. Επιτρέπονται μόνο τα τρία παρακάτω αρχεία CSS. Το Draft PR δεν συγχωνεύεται ούτε εγκαθίσταται αυτόματα.</p>
 <label for="token">PCT_OPERATOR_TOKEN (από Plesk → Περιβάλλον)</label>
 <input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="Επικόλληση token">
-<button id="run" type="button">Εκτέλεση δοκιμής</button>
+<label for="task">Εντολή προς N7 (8–2000 χαρακτήρες)</label>
+<textarea id="task" maxlength="2000" spellcheck="true">Βελτίωσε την εμφάνιση των panels σε κινητά και μικρές οθόνες, με μικρές αλλαγές CSS. Διατήρησε την αισθητική Photon και μην επηρεάσεις λειτουργίες.</textarea>
+<fieldset><legend>Επιτρεπόμενα αρχεία (επίλεξε 2–3)</legend>
+<label><input type="checkbox" name="file" value="jarvis-intelligence-chamber/navigation-rail.css" checked> navigation-rail.css</label>
+<label><input type="checkbox" name="file" value="jarvis-intelligence-chamber/photon-windows.css" checked> photon-windows.css</label>
+<label><input type="checkbox" name="file" value="jarvis-intelligence-chamber/nabou-shell.css"> nabou-shell.css</label>
+</fieldset>
+<fieldset><legend>Τρόπος εκτέλεσης</legend>
+<label><input type="radio" name="mode" value="preview" checked> Μόνο προεπισκόπηση και patch</label>
+<label><input type="radio" name="mode" value="draft"> Δημιουργία αλλαγών σε ξεχωριστό branch και Draft PR (χωρίς merge/deploy)</label>
+</fieldset>
+<label id="confirmWrap" hidden><input id="confirm" type="checkbox"> Επιβεβαιώνω τη δημιουργία Draft PR χωρίς αυτόματο merge ή deployment.</label>
+<button id="run" type="button">Αποστολή εντολής στο N7</button>
 <p id="status" role="status" aria-live="polite">Έτοιμο.</p>
 <p><a id="runs" href="https://github.com/Lepe12/geraki-historical-atlas/actions/workflows/nabou-coder-v03.yml" target="_blank" rel="noopener noreferrer" hidden>Εκτελέσεις Qwen 7B στο GitHub</a></p>
 <small>Το token χρησιμοποιείται μόνο για το συγκεκριμένο αίτημα. Δεν αποθηκεύεται στο πρόγραμμα περιήγησης και δεν εμφανίζεται στα αποτελέσματα.</small>
@@ -34,26 +46,37 @@ const run=document.getElementById("run");
 const field=document.getElementById("token");
 const status=document.getElementById("status");
 const runs=document.getElementById("runs");
+const taskField=document.getElementById("task");
+const confirmWrap=document.getElementById("confirmWrap");
+const confirm=document.getElementById("confirm");
+document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener("change",()=>{
+  confirmWrap.hidden=document.querySelector('input[name="mode"]:checked').value!=="draft";
+  confirm.checked=false;
+}));
 run.addEventListener("click",async()=>{
   const token=field.value.trim();
   field.value="";
   runs.hidden=true;
   if(!token){status.textContent="Χρειάζεται το token του Plesk.";return;}
+  const task=taskField.value.trim();
+  const target_files=[...document.querySelectorAll('input[name="file"]:checked')].map(el=>el.value);
+  const apply_changes=document.querySelector('input[name="mode"]:checked').value==="draft";
+  if(task.length<8||task.length>2000){status.textContent="Η εντολή πρέπει να περιέχει 8–2000 χαρακτήρες.";return;}
+  if(target_files.length<2||target_files.length>3){status.textContent="Επίλεξε 2 ή 3 αρχεία CSS.";return;}
+  if(apply_changes&&!confirm.checked){status.textContent="Επιβεβαίωσε τη δημιουργία Draft PR.";return;}
   run.disabled=true;status.textContent="Αποστολή στο N7...";
   try{
     const response=await fetch("/pct-api/live/n7/code",{
       method:"POST",
       headers:{"Authorization":"Bearer "+token,"Content-Type":"application/json"},
       body:JSON.stringify({
-        task:"Review mobile readability of NABOU navigation rail and photon windows; preview only, do not modify production.",
-        target_files:["jarvis-intelligence-chamber/navigation-rail.css","jarvis-intelligence-chamber/photon-windows.css"],
-        apply_changes:false
+        task,target_files,apply_changes,confirm_draft_pr:apply_changes&&confirm.checked
       }),
       signal:AbortSignal.timeout(25000)
     });
     const result=await response.json().catch(()=>({}));
     if(response.status===202&&result.status==="ACCEPTED"){
-      status.textContent="HTTP 202: Το N7 δέχτηκε την εντολή. Έλεγξε την εκτέλεση του Qwen 7B στο GitHub.";
+      status.textContent="HTTP 202: Το N7 δέχτηκε την εντολή ("+(result.mode==="draft_pr"?"Draft PR":"preview")+"). Παρακολούθησε την εκτέλεση στο GitHub.";
       runs.hidden=false;
     }else{
       status.textContent="HTTP "+response.status+": "+String(result.error||"Η εντολή δεν έγινε δεκτή.").slice(0,140);
