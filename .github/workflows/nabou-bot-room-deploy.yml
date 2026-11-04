@@ -22,6 +22,12 @@ jobs:
       PCT_FTPS_TLS_SERVER_NAME: linux3087.grserver.gr
     steps:
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            server/command-center-live/public
+            tools/gateway
+            ops_ftps_requests
       - name: Validate explicit bot-only deployment authorization
         run: |
           python3 - <<'PY'
