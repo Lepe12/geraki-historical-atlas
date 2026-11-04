@@ -23,7 +23,7 @@ def execute(env=None, runner=subprocess.run):
     if not all(report['bindings_present'].values()):
         report['status']='BLOCKED_FTPS_BINDINGS_NOT_BOUND';return report
     root=Path(__file__).resolve().parents[2]
-    names=('historical-evidence.js','pdf-evidence.py','pdf-evidence.js','n7-gateway.js','app.js')
+    names=('historical-evidence.js','pdf-evidence.py','pdf-evidence.js','n7-gateway.js','public/n7-test.html','app.js')
     report['local_payload_sha256']={name:hashlib.sha256((root/'server/command-center-live'/name).read_bytes()).hexdigest() for name in names}
     storage=env.get('PCT_FTPS_PAYLOAD')=='evidence_storage'
     if storage:

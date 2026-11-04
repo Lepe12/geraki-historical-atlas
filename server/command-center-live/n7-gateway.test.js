@@ -75,3 +75,15 @@ test("N7 coding requires operator and rejects protected paths or auto-apply",asy
   assert.equal((await rig(true,{...ok,target_files:["server/command-center-live/app.js",
     "jarvis-intelligence-chamber/photon-windows.css"]}).call("POST","/n7/code")).status,400);
 });
+
+test("same-origin Plesk operator coding preview is permitted",async()=>{
+  process.env.PCT_GITHUB_DISPATCH_TOKEN="test-placeholder";
+  const x=rig(true,{task:"Review mobile readability in preview mode",target_files:[
+    "jarvis-intelligence-chamber/navigation-rail.css",
+    "jarvis-intelligence-chamber/photon-windows.css"
+  ],apply_changes:false});
+  const r=await x.call("POST","/n7/code",{origin:"https://pct-live.piratecartography.com"});
+  assert.equal(r.status,202);
+  assert.equal(x.codingDispatches.length,1);
+  assert.equal(x.codingDispatches[0].apply_changes,"false");
+});
