@@ -389,6 +389,17 @@ const server=http.createServer(async(req,res)=>{
       lastDispatchAt=Date.now();
       return json(res,202,{status:"ACCEPTED",request_id:requestId,workflow:CONTROLLED_WORKFLOW});
     }
+    if(req.method==="GET"&&p==="/n7/private-status"){
+      const file=path.join(KNOWLEDGE_DIR,"n7-private-status.json");
+      let last=null;
+      try{
+        if(fs.existsSync(file)){
+          const st=fs.lstatSync(file);
+          if(st.isFile()&&!st.isSymbolicLink()&&st.size<4096)last=JSON.parse(fs.readFileSync(file,"utf8"));
+        }
+      }catch(_){last=null;}
+      return json(res,200,{schema:"n7-private-worker-status-v1",last,standalone_node_deployed:false});
+    }
     if(req.method==="POST"&&p==="/n7/private-event"){
       const auth=String(req.headers.authorization||"");
       if(!auth.startsWith("Bearer "))return json(res,401,{error:"missing_oidc"});
@@ -407,7 +418,11 @@ const server=http.createServer(async(req,res)=>{
         historical_verification:false,source:"VERIFIED_PRIVATE_REPO_OIDC"
       };
       if(body.phase==="failed")event.status="FAILED";
-      addEvent(event);
+      // Private N7 worker state must NOT overwrite the NABOU live/latest research snapshot.
+      const status={schema:"n7-private-worker-status-v1",run_id:event.run_id,
+        phase:event.phase,status:event.status,updated_at:event.created_utc,
+        source:"VERIFIED_PRIVATE_GITHUB_ACTIONS",model:"Qwen2.5-3B",standalone_node_deployed:false};
+      atomicJson(path.join(KNOWLEDGE_DIR,"n7-private-status.json"),status);
       return json(res,202,{status:"ACCEPTED",run_id:event.run_id,event_id:event.event_id});
     }
     if(req.method==="POST"&&p==="/events"){
