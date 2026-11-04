@@ -1,0 +1,70 @@
+name: N7 safe public static permissions repair
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/n7-public-static-permissions.yml']
+permissions:
+  contents: read
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 6
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: linux3087.grserver.gr
+    steps:
+      - name: Change permissions on precisely three public N7 assets
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os,ssl,socket,ftplib,posixpath,json,urllib.request,urllib.error
+          host=os.environ['PCT_FTPS_HOST'];tls=os.environ['PCT_FTPS_TLS_SERVER_NAME']
+          port=int(os.environ.get('PCT_FTPS_PORT','21'))
+          a={x[4][0] for x in socket.getaddrinfo(host,port,type=socket.SOCK_STREAM)}
+          b={x[4][0] for x in socket.getaddrinfo(tls,port,type=socket.SOCK_STREAM)}
+          if not a.intersection(b):raise SystemExit('N7_TLS_NAME_MISMATCH')
+          ftp=ftplib.FTP_TLS(timeout=25,context=ssl.create_default_context())
+          ftp.connect(host,port);ftp.host=tls
+          ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD']);ftp.prot_p()
+          allowed=('index.html','app.js','style.css')
+          directory='/bot.piratecartography.com/n7-app/public'
+          try:
+            ftp.cwd(directory)
+            if ftp.pwd().rstrip('/')!=directory:raise SystemExit('N7_UNEXPECTED_CWD')
+            names={posixpath.basename(x.rstrip('/')) for x in ftp.nlst()}
+            if not all(f in names for f in allowed):raise SystemExit('N7_MISSING_PUBLIC_ASSET')
+            rows=[];ftp.retrlines('LIST',rows.append)
+            listing={x.split(None,8)[-1]:x.split(None,1)[0] for x in rows if len(x.split(None,8))>=9}
+            for f in allowed:
+              if f not in listing or not listing[f].startswith('-'):
+                raise SystemExit('N7_ASSET_IS_NOT_REGULAR_FILE_'+f)
+            for f in allowed:
+              if listing[f]=='-rw-r--r--':
+                print('N7_ASSET_ALREADY_PUBLIC_READ '+f)
+                continue
+              ftp.sendcmd('SITE CHMOD 644 '+f)
+              print('N7_ASSET_CHMOD_REQUESTED '+f)
+            after=[];ftp.retrlines('LIST',after.append)
+            updated={x.split(None,8)[-1]:x.split(None,1)[0] for x in after if len(x.split(None,8))>=9}
+            print('N7_PUBLIC_PERMISSIONS '+json.dumps({f:updated.get(f) for f in allowed},sort_keys=True))
+            if not all(updated.get(f)=='-rw-r--r--' for f in allowed):
+              raise SystemExit('N7_PUBLIC_ASSET_PERMISSIONS_NOT_FIXED')
+          finally:
+            ftp.quit()
+          base='https://bot.piratecartography.com'
+          for endpoint in ('/','/index.html','/app.js','/style.css','/health'):
+            url=base+endpoint
+            try:
+              with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'n7-static-permission-verify/1','Cache-Control':'no-cache'}),timeout=12,context=ssl.create_default_context()) as r:
+                r.read(100000)
+                print('N7_STATIC_VERIFY '+json.dumps({'endpoint':endpoint,'code':r.status,'content_type':r.headers.get('content-type')}))
+                if r.status!=200:raise SystemExit('N7_UNEXPECTED_HTTP_'+str(r.status))
+            except urllib.error.HTTPError as e:
+              print('N7_STATIC_VERIFY '+json.dumps({'endpoint':endpoint,'code':e.code}))
+              raise
+          print('N7_PUBLIC_STATIC_REPAIR_PASS')
+          PY
