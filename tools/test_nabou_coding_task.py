@@ -162,6 +162,32 @@ class MultiFileCodingTaskTests(unittest.TestCase):
         self.assertEqual(self.one.read_text(), self.one_source)
         self.assertEqual(self.two.read_text(), self.two_source)
 
+    def test_hallucinated_css_anchor_recovers_with_bounded_append(self):
+        first = self.frontend / "navigation-rail.css"
+        second = self.frontend / "photon-windows.css"
+        first.write_text(".rail{color:#fff}\n", encoding="utf-8")
+        second.write_text(".window{color:#eee}\n", encoding="utf-8")
+        targets = ["jarvis-intelligence-chamber/navigation-rail.css",
+                   "jarvis-intelligence-chamber/photon-windows.css"]
+        attempts = []
+        def model(task, source, target, *args):
+            attempts.append(target)
+            if target.endswith("navigation-rail.css"):
+                return json.dumps({"edits": [{"op": "append_css", "text": ".rail:focus-visible{outline:2px solid cyan}"}]})
+            if attempts.count(target) == 1:
+                return json.dumps({"edits": [{"op": "insert_after", "anchor": ".invented{rule:no}", "text": ".window:focus-visible{outline:2px solid cyan}"}]})
+            self.assertIn("append_css", task)
+            self.assertIn("Previous attempt was rejected", task)
+            return json.dumps({"edits": [{"op": "append_css", "text": ".window:focus-visible{outline:2px solid cyan}"}]})
+        with patch("nabou_coding_task.infer_model", side_effect=model):
+            changes = prepare_changes(self.root, targets, "Improve mobile focus visibility",
+                                      model="mock", endpoint="", token="")
+        self.assertEqual(len(changes), 2)
+        self.assertEqual([c["model_attempts"] for c in changes], [1, 2])
+        self.assertEqual(first.read_text(), ".rail{color:#fff}\n")
+        self.assertEqual(second.read_text(), ".window{color:#eee}\n")
+        self.assertIn(".window:focus-visible", changes[1]["candidate"])
+
     def test_two_bad_model_patches_abort_without_file_writes(self):
         def model(task, source, target, *args):
             if target.endswith("nabou-shell.js"):
