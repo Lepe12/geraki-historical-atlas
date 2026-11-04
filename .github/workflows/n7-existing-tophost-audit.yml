@@ -54,7 +54,7 @@ jobs:
                   parts=[]
                   ftp.retrbinary('RETR index.html',parts.append)
                   raw=b''.join(parts)
-                  row.update(index_bytes=len(raw),n7_agent_room=b'// AGENT ROOM' in raw,
+                  row.update(index_bytes=len(raw),n7_agent_room=b'// AGENT ROOM' in raw,private_n7_status_ui=b'id="privateState"' in raw,
                              index_sha256=hashlib.sha256(raw).hexdigest())
                 if directory.endswith('command-center-live'):
                   for target,key in (('app.js','app_matches_current_main'),('n7-gateway.js','gateway_matches_current_main'),('n7-oauth.js','oauth_matches_current_main')):
@@ -90,6 +90,20 @@ jobs:
           probe('https://bot.piratecartography.com/')
           probe('https://bot.piratecartography.com/health')
           probe('https://pct-live.piratecartography.com/pct-api/live/n7/status')
+          # Check the new private worker metadata endpoint without authentication or mutation.
+          private='https://pct-live.piratecartography.com/pct-api/live/n7/private-status'
+          try:
+            with urllib.request.urlopen(private,timeout=12,context=ssl.create_default_context()) as resp:
+              payload=json.loads(resp.read(4096))
+              last=payload.get('last') if isinstance(payload,dict) else None
+              print('N7_PRIVATE_LIVE '+json.dumps({
+                'http_status':resp.status,'schema':payload.get('schema'),
+                'worker_observed':bool(last),
+                'phase':last.get('phase') if isinstance(last,dict) else None,
+                'status':last.get('status') if isinstance(last,dict) else None
+              }))
+          except Exception as e:
+            print('N7_PRIVATE_LIVE '+json.dumps({'error_type':type(e).__name__}))
           token=os.environ.get('PCT_GITHUB_DISPATCH_TOKEN','')
           if not token:
             print('CROSS_REPO_PRIVATE_READ_TOKEN=NOT_CONFIGURED')
