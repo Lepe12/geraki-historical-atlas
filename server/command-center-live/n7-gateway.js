@@ -3,10 +3,10 @@ const crypto=require("node:crypto");
 
 // Routes are explicitly scoped to the existing live service. No shell,
 // database writer, privileged host action, or arbitrary workflow selection.
-function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch}) {
+function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch,githubPrivateDispatch}) {
   let lastAccepted=0;
   return async function handleN7(req,res,p) {
-    if (p!=="/n7/status" && p!=="/n7/dispatch" && p!=="/n7/code") return false;
+    if (p!=="/n7/status" && p!=="/n7/dispatch" && p!=="/n7/code" && p!=="/n7/brain/task") return false;
     if (p==="/n7/status") {
       if(req.method!=="GET") {json(res,405,{error:"method_not_allowed"});return true;}
       const state=await statusFor("latest");
@@ -37,6 +37,21 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
     let body;
     try {body=JSON.parse(await readBody(req));}
     catch(_){json(res,400,{error:"invalid_json"});return true;}
+    if(p==="/n7/brain/task"){
+      const task=body?.task,skill=body?.skill||"greek-prose-editor";
+      if(typeof task!=="string"||task.trim().length<12||task.length>2000||
+        [...task].some(ch=>ch.charCodeAt(0)<32&&![9,10,13].includes(ch.charCodeAt(0)))||
+        !["greek-prose-editor","historical-source-audit"].includes(skill)){
+        json(res,400,{error:"invalid_n7_private_task"});return true;
+      }
+      if(typeof githubPrivateDispatch!=="function")return json(res,503,{error:"private_dispatch_unavailable"}),true;
+      lastAccepted=now;
+      try{await githubPrivateDispatch({task:task.trim(),skill});}
+      catch(_){json(res,502,{error:"private_n7_dispatch_failed"});return true;}
+      json(res,202,{status:"ACCEPTED",agent:"N7",worker:"private-Qwen2.5-3B",
+        workflow:"n7-private-model.yml",mode:"private_skill_task",private_result:true});
+      return true;
+    }
     if(p==="/n7/code") {
       const task=String(body?.task||"").trim();
       const allowed=new Set([

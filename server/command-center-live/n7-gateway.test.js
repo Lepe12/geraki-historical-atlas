@@ -3,20 +3,21 @@ const assert=require("node:assert/strict");
 const test=require("node:test");
 const {createN7Gateway}=require("./n7-gateway");
 function rig(authorized=true, body={target:"Research Naxos piracy 1670"}) {
-  const replies=[],dispatches=[],codingDispatches=[];
+  const replies=[],dispatches=[],codingDispatches=[],privateDispatches=[];
   const handle=createN7Gateway({
     json:(res,status,payload)=>replies.push({status,payload}),
     operatorAuthorized:()=>authorized,
     readBody:async()=>JSON.stringify(body),
     statusFor:async()=>({run_id:"123",transport:"WEBSOCKET_LIVE",snapshot:{mission:{status:"RUNNING"},generated_utc:"2026-11-03T00:00:00Z"}}),
     githubWorkflowDispatch:async inputs=>dispatches.push(inputs),
-    githubCodingDispatch:async inputs=>codingDispatches.push(inputs)
+    githubCodingDispatch:async inputs=>codingDispatches.push(inputs),
+    githubPrivateDispatch:async inputs=>privateDispatches.push(inputs)
   });
   const call=async(method,path,headers={})=>{
     const ok=await handle({method,headers},{},path);
     return {ok,...replies.at(-1),dispatches};
   };
-  return {call,dispatches,codingDispatches,replies};
+  return {call,dispatches,codingDispatches,privateDispatches,replies};
 }
 test("unknown routes are left untouched",async()=>{
   const x=rig();assert.equal((await x.call("GET","/health")).ok,false);assert.equal(x.replies.length,0);
@@ -153,5 +154,51 @@ test("GitHub signed session authorizes code tasks only from dedicated bot with C
   assert.equal(await call("https://evil.example",true),401);
   assert.equal(await call("https://bot.piratecartography.com",false),401);
   assert.equal(await call("https://bot.piratecartography.com",true),202);
+  assert.equal(calls.length,1);
+});
+
+
+test("authorized private N7 task dispatches only the selected reviewed skill",async()=>{
+  process.env.PCT_GITHUB_DISPATCH_TOKEN="test-placeholder";
+  const task="Επιμελήσου το απόσπασμα με σεβασμό στο αρχικό ύφος.\nΣυνέχισε με την επόμενη παράγραφο.";
+  const x=rig(true,{task,skill:"greek-prose-editor"});
+  const result=await x.call("POST","/n7/brain/task");
+  assert.equal(result.status,202);
+  assert.equal(result.payload.worker,"private-Qwen2.5-3B");
+  assert.deepEqual(x.privateDispatches,[{task,skill:"greek-prose-editor"}]);
+  assert.equal(x.codingDispatches.length,0);
+  assert.equal(x.dispatches.length,0);
+});
+test("private skill dispatch rejects unknown skills, unauthenticated and cross-site requests",async()=>{
+  process.env.PCT_GITHUB_DISPATCH_TOKEN="test-placeholder";
+  const task="Έλεγξε τις πηγές για την ιστορία του 16ου αιώνα.";
+  const denied=rig(false,{task,skill:"historical-source-audit"});
+  assert.equal((await denied.call("POST","/n7/brain/task")).status,401);
+  const invalid=rig(true,{task,skill:"execute-shell"});
+  assert.equal((await invalid.call("POST","/n7/brain/task")).status,400);
+  assert.equal(invalid.privateDispatches.length,0);
+  const cross=rig(true,{task,skill:"greek-prose-editor"});
+  assert.equal((await cross.call("POST","/n7/brain/task",{origin:"https://evil.example"})).status,403);
+  assert.equal(cross.privateDispatches.length,0);
+});
+test("private N7 dispatch only accepts signed owner bot origin and CSRF header",async()=>{
+  process.env.PCT_GITHUB_DISPATCH_TOKEN="test-placeholder";
+  const calls=[],replies=[];
+  const task="Διόρθωσε τη στίξη στο σύντομο ελληνικό απόσπασμα.";
+  const handle=createN7Gateway({
+    json:(res,status,payload)=>replies.push({status,payload}),
+    operatorAuthorized:()=>false,
+    sessionAuthorized:()=>true,
+    readBody:async()=>JSON.stringify({task,skill:"greek-prose-editor"}),
+    statusFor:async()=>({run_id:"latest"}),
+    githubPrivateDispatch:async input=>calls.push(input)
+  });
+  async function request(origin,csrf){
+    await handle({method:"POST",headers:{origin,...(csrf?{"x-nabou-agent-room":"1"}:{})}},{}, "/n7/brain/task");
+    return replies.at(-1).status;
+  }
+  assert.equal(await request("https://evil.example",true),401);
+  assert.equal(await request("https://bot.piratecartography.com",false),401);
+  assert.equal(await request("https://bot.piratecartography.com",true),202);
   assert.equal(calls.length,1);
 });
