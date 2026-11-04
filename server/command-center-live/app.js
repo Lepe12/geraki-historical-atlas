@@ -23,6 +23,7 @@ const RUN_EVENTS_LIMIT=1000;
 const OPERATOR_TOKEN=String(process.env.PCT_OPERATOR_TOKEN||"");
 const GITHUB_DISPATCH_TOKEN=String(process.env.PCT_GITHUB_DISPATCH_TOKEN||"");
 const CONTROLLED_WORKFLOW="jarvis-controlled-dispatch.yml";
+const ALLOWED_BROWSER_ORIGINS=new Set(["https://lepe12.github.io","https://pct-live.piratecartography.com","https://bot.piratecartography.com"]);
 const SESSION_COOKIE="naboux_session";
 const SESSION_MAX_AGE=30*24*60*60;
 const KNOWLEDGE_DIR=process.env.PCT_KNOWLEDGE_DIR||path.join(typeof __dirname==="string"?__dirname:".","knowledge-data");
@@ -42,7 +43,7 @@ let jwksCache={at:0,keys:[]};
 
 function json(res,status,obj,extra={}){
   const body=JSON.stringify(obj);
-  res.writeHead(status,{"content-type":"application/json; charset=utf-8","cache-control":"no-store","access-control-allow-origin":"https://lepe12.github.io","access-control-allow-credentials":"true","x-content-type-options":"nosniff",...extra});
+  res.writeHead(status,{"content-type":"application/json; charset=utf-8","cache-control":"no-store","access-control-allow-origin":res.nabouCorsOrigin||"https://lepe12.github.io","access-control-allow-credentials":"true","x-content-type-options":"nosniff",...extra});
   res.end(body);
 }
 function normalizePath(pathname){
@@ -249,7 +250,8 @@ const handleN7=createN7Gateway({json,operatorAuthorized,readBody,statusFor,githu
 const server=http.createServer(async(req,res)=>{
   try{
     const u=new URL(req.url,"http://localhost");const p=normalizePath(u.pathname);
-    if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":"https://lepe12.github.io","access-control-allow-credentials":"true","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type,x-file-name"});return res.end();}
+    res.nabouCorsOrigin=ALLOWED_BROWSER_ORIGINS.has(String(req.headers.origin||""))?String(req.headers.origin):"https://lepe12.github.io";
+    if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":res.nabouCorsOrigin||"https://lepe12.github.io","access-control-allow-credentials":"true","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type,x-file-name"});return res.end();}
     if(await handleN7(req,res,p))return;
     if(req.method==="GET"&&p==="/health"){const b=await refreshBaseline();return json(res,200,{status:"PASS",service:"piratecartography-command-center-live",websocket:true,dispatch_configured:Boolean(GITHUB_DISPATCH_TOKEN),knowledge_memory:true,session_auth:true,revision:"no-session-dispatch-v1",baseline_run_id:b?.run_id||null});}
     if(req.method==="GET"&&p==="/session"){return json(res,200,{authenticated:sessionAuthorized(req)});}

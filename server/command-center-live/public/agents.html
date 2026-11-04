@@ -113,7 +113,7 @@ footer{color:#6d94a5;font-size:.77rem;margin-top:24px}
 Οι ενδείξεις ελέγχονται από πραγματικά endpoints.</div>
       <div class="links">
         <a id="runLink" href="https://github.com/Lepe12/geraki-historical-atlas/actions/workflows/nabou-coder-v03.yml" target="_blank" rel="noopener noreferrer">Εκτελέσεις Coding Agent</a>
-        <a href="/n7-test.html">Παλιός έλεγχος N7</a>
+        <a href="https://pct-live.piratecartography.com/n7-test.html">Παλιά κονσόλα N7</a>
       </div>
       <hr class="sep">
       <div class="mini">CONTROLLED SCOPE</div>
@@ -126,12 +126,13 @@ footer{color:#6d94a5;font-size:.77rem;margin-top:24px}
 "use strict";
 const $=id=>document.getElementById(id);
 const workflow="https://github.com/Lepe12/geraki-historical-atlas/actions/workflows/nabou-coder-v03.yml";
+const API_BASE=location.hostname==="bot.piratecartography.com"?"https://pct-live.piratecartography.com":"";
 function indicator(dotId,textId,text,kind){
   $(dotId).className="dot"+(kind?" "+kind:"");$(textId).textContent=text;
 }
 async function refresh(){
   try{
-    const r=await fetch("/pct-api/live/n7/status",{cache:"no-store",signal:AbortSignal.timeout(12000)});
+    const r=await fetch(API_BASE+"/pct-api/live/n7/status",{cache:"no-store",signal:AbortSignal.timeout(12000)});
     if(!r.ok)throw Error("HTTP "+r.status);
     const j=await r.json();
     indicator("n7Dot","n7State",j.connected?"Συνδεδεμένο · "+j.state:"Gateway διαθέσιμο · χωρίς live snapshot",j.connected?"ok":"");
@@ -165,7 +166,7 @@ $("submit").addEventListener("click",async()=>{
   if(draft&&!$("confirmation").checked){$("console").textContent="Χρειάζεται η επιβεβαίωση Draft PR.";return;}
   $("submit").disabled=true;$("console").textContent="N7: αποστολή εντολής στον Coding Agent…";
   try{
-    const r=await fetch("/pct-api/live/n7/code",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({task,target_files:files,apply_changes:draft,confirm_draft_pr:draft&&$("confirmation").checked}),signal:AbortSignal.timeout(25000)});
+    const r=await fetch(API_BASE+"/pct-api/live/n7/code",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({task,target_files:files,apply_changes:draft,confirm_draft_pr:draft&&$("confirmation").checked}),signal:AbortSignal.timeout(25000)});
     const data=await r.json().catch(()=>({}));
     if(r.status===202&&data.status==="ACCEPTED"){
       $("console").textContent="N7: η εντολή έγινε δεκτή (HTTP 202).\nCODER 7B: ανάθεση στο GitHub.\nΛειτουργία: "+(draft?"Draft PR":"προεπισκόπηση")+".\nΗ ολοκλήρωση δεν έχει ακόμη επιβεβαιωθεί. Πάτησε ανανέωση.";

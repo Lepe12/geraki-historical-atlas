@@ -114,3 +114,18 @@ test("unconfirmed draft request and unsupported mode are rejected",async()=>{
   const wrongType=rig(true,{...ok,apply_changes:"true",confirm_draft_pr:true});
   assert.equal((await wrongType.call("POST","/n7/code")).status,400);
 });
+
+test("dedicated bot subdomain may dispatch only an authenticated bounded coding task",async()=>{
+  process.env.PCT_GITHUB_DISPATCH_TOKEN="test-placeholder";
+  const request={task:"Improve NABOU mobile panel spacing",target_files:[
+    "jarvis-intelligence-chamber/navigation-rail.css",
+    "jarvis-intelligence-chamber/photon-windows.css"
+  ],apply_changes:false};
+  const x=rig(true,request);
+  const accepted=await x.call("POST","/n7/code",{origin:"https://bot.piratecartography.com"});
+  assert.equal(accepted.status,202);
+  assert.equal(x.codingDispatches.length,1);
+  assert.equal(x.codingDispatches[0].apply_changes,"false");
+  const blocked=rig(false,request);
+  assert.equal((await blocked.call("POST","/n7/code",{origin:"https://bot.piratecartography.com"})).status,401);
+});
