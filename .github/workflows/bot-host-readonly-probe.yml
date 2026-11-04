@@ -1,0 +1,63 @@
+name: NABOU bot subdomain read-only FTPS probe
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/bot-host-readonly-probe.yml'
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 5
+    env:
+      PCT_FTPS_HOST: \${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: \${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: \${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: \${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: linux3087.grserver.gr
+    steps:
+      - name: Read-only check candidate bot subdomain document roots
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os,ftplib,ssl,socket,posixpath,json
+          host=os.environ["PCT_FTPS_HOST"]
+          port=int(os.environ.get("PCT_FTPS_PORT","21"))
+          tls=os.environ["PCT_FTPS_TLS_SERVER_NAME"]
+          src={r[4][0] for r in socket.getaddrinfo(host,port,type=socket.SOCK_STREAM)}
+          dst={r[4][0] for r in socket.getaddrinfo(tls,port,type=socket.SOCK_STREAM)}
+          if not (src & dst):raise SystemExit("TLS_NAME_NOT_BOUND_TO_CONFIGURED_HOST")
+          ftp=ftplib.FTP_TLS(timeout=20,context=ssl.create_default_context())
+          ftp.connect(host,port);ftp.host=tls
+          ftp.login(os.environ["PCT_FTPS_USER"],os.environ["PCT_FTPS_PASSWORD"]);ftp.prot_p()
+          candidates=[
+            "/bot.piratecartography.com/httpdocs",
+            "/bot.piratecartography.com",
+            "/subdomains/bot/httpdocs",
+            "/httpdocs",
+            "/public_html/bot",
+            "/piratecartography-gateway/bot.piratecartography.com/httpdocs",
+            "/var/www/vhosts/piratecartography.com/subdomains/bot/httpdocs",
+            "/var/www/vhosts/bot.piratecartography.com/httpdocs"
+          ]
+          result=[]
+          for loc in candidates:
+            row={"path":loc,"accessible":False}
+            try:
+              ftp.cwd(loc)
+              names={posixpath.basename(n.rstrip("/")) for n in ftp.nlst()}
+              row.update(accessible=True,entries=sorted(n for n in names if n in ("index.html","index.php","httpdocs","error_docs","cgi-bin",".well-known","web.config")))
+              if "index.html" in names:
+                chunks=[]
+                try:
+                  ftp.retrbinary("RETR index.html",lambda b:chunks.append(b) if sum(map(len,chunks))<24000 else None)
+                  data=b"".join(chunks)[:24000].lower()
+                  row["index_type"]="PLESK_DEFAULT" if b"plesk" in data else "OTHER"
+                except ftplib.all_errors:row["index_type"]="READ_UNAVAILABLE"
+            except ftplib.all_errors as e:row["error_type"]=type(e).__name__
+            result.append(row)
+          ftp.quit()
+          print(json.dumps({"schema":"nabou-bot-root-probe-v1","read_only":True,"host":"bot.piratecartography.com","candidates":result},indent=2))
+          PY
