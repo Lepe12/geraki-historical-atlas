@@ -64,7 +64,7 @@ test("N7 routes bounded coding tasks to Qwen 7B in preview-only mode",async()=>{
   assert.equal(x.codingDispatches[0].apply_changes,"false");
   assert.equal(x.dispatches.length,0);
 });
-test("N7 coding requires operator and rejects protected paths or auto-apply",async()=>{
+test("N7 coding requires operator and rejects protected paths or unconfirmed apply",async()=>{
   process.env.PCT_GITHUB_DISPATCH_TOKEN="test-placeholder";
   const ok={task:"Improve keyboard focus visibility",target_files:[
     "jarvis-intelligence-chamber/navigation-rail.css",
@@ -86,4 +86,31 @@ test("same-origin Plesk operator coding preview is permitted",async()=>{
   assert.equal(r.status,202);
   assert.equal(x.codingDispatches.length,1);
   assert.equal(x.codingDispatches[0].apply_changes,"false");
+});
+
+test("authorized explicit draft PR request dispatches bounded apply",async()=>{
+  process.env.PCT_GITHUB_DISPATCH_TOKEN="test-placeholder";
+  const payload={task:"Improve Photon panel mobile readability without touching 3D",target_files:[
+    "jarvis-intelligence-chamber/navigation-rail.css",
+    "jarvis-intelligence-chamber/photon-windows.css"
+  ],apply_changes:true,confirm_draft_pr:true};
+  const x=rig(true,payload);
+  const response=await x.call("POST","/n7/code",{origin:"https://pct-live.piratecartography.com"});
+  assert.equal(response.status,202);
+  assert.equal(response.payload.mode,"draft_pr");
+  assert.equal(x.codingDispatches.length,1);
+  assert.equal(x.codingDispatches[0].apply_changes,"true");
+  assert.equal(x.codingDispatches[0].task,payload.task);
+});
+test("unconfirmed draft request and unsupported mode are rejected",async()=>{
+  process.env.PCT_GITHUB_DISPATCH_TOKEN="test-placeholder";
+  const ok={task:"Improve mobile panel readability",target_files:[
+    "jarvis-intelligence-chamber/navigation-rail.css",
+    "jarvis-intelligence-chamber/photon-windows.css"
+  ]};
+  const noConfirm=rig(true,{...ok,apply_changes:true,confirm_draft_pr:false});
+  assert.equal((await noConfirm.call("POST","/n7/code")).status,400);
+  assert.equal(noConfirm.codingDispatches.length,0);
+  const wrongType=rig(true,{...ok,apply_changes:"true",confirm_draft_pr:true});
+  assert.equal((await wrongType.call("POST","/n7/code")).status,400);
 });
