@@ -3,10 +3,10 @@ const crypto=require("node:crypto");
 
 // Routes are explicitly scoped to the existing live service. No shell,
 // database writer, privileged host action, or arbitrary workflow selection.
-function createN7Gateway({json,operatorAuthorized,readBody,statusFor,githubWorkflowDispatch}) {
+function createN7Gateway({json,operatorAuthorized,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch}) {
   let lastAccepted=0;
   return async function handleN7(req,res,p) {
-    if (p!=="/n7/status" && p!=="/n7/dispatch") return false;
+    if (p!=="/n7/status" && p!=="/n7/dispatch" && p!=="/n7/code") return false;
     if (p==="/n7/status") {
       if(req.method!=="GET") {json(res,405,{error:"method_not_allowed"});return true;}
       const state=await statusFor("latest");
@@ -36,6 +36,33 @@ function createN7Gateway({json,operatorAuthorized,readBody,statusFor,githubWorkf
     let body;
     try {body=JSON.parse(await readBody(req));}
     catch(_){json(res,400,{error:"invalid_json"});return true;}
+    if(p==="/n7/code") {
+      const task=String(body?.task||"").trim();
+      const allowed=new Set([
+        "jarvis-intelligence-chamber/navigation-rail.css",
+        "jarvis-intelligence-chamber/photon-windows.css",
+        "jarvis-intelligence-chamber/nabou-shell.css"
+      ]);
+      const files=body?.target_files;
+      if(task.length<8||task.length>2000||/[\\x00-\\x1F]/.test(task)||
+        !Array.isArray(files)||files.length<2||files.length>3||
+        new Set(files).size!==files.length||!files.every(f=>allowed.has(f))||
+        body?.apply_changes===true){
+        json(res,400,{error:"invalid_coding_request"});return true;
+      }
+      lastAccepted=now;
+      try{
+        await githubCodingDispatch({
+          task,target_files:files.join(","),apply_changes:"false"
+        });
+      }catch(err){
+        json(res,502,{error:"coding_dispatch_failed",reason:String(err.message||"unknown").slice(0,120)});
+        return true;
+      }
+      json(res,202,{status:"ACCEPTED",agent:"N7",worker:"Qwen2.5-Coder-7B",
+        workflow:"nabou-coder-v03.yml",mode:"preview_only"});
+      return true;
+    }
     const target=String(body?.target||"").trim();
     if(target.length<3||target.length>500||/[\x00-\x1F]/.test(target)){
       json(res,400,{error:"invalid_target"});return true;
