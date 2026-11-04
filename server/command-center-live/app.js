@@ -11,6 +11,7 @@ const {execFile}=require("node:child_process");
 const {fromReviewedKnowledge,compileQuery,scoreExcerpt,compareScores}=require("./historical-evidence");
 const {replayPdf}=require("./pdf-evidence");
 const {createN7Gateway}=require("./n7-gateway");
+const {createN7OAuth}=require("./n7-oauth");
 
 const PORT=Number(process.env.PORT||process.env.PCT_COMMAND_CENTER_PORT||8787);
 const PREFIX=(process.env.PCT_COMMAND_CENTER_PREFIX||"/pct-api/live").replace(/\/$/,"");
@@ -246,12 +247,14 @@ async function statusFor(run){
 async function publishSnapshots(){
   for(const [run,clients] of sockets){if(!clients.size)continue;try{const state=await statusFor(run),frame=frameText(JSON.stringify({schema:"pct-command-center-bootstrap-v1",...state}));for(const socket of clients)if(!socket.destroyed)socket.write(frame);}catch(_){}}
 }
-const handleN7=createN7Gateway({json,operatorAuthorized,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch});
+const oauth=createN7OAuth({json});
+const handleN7=createN7Gateway({json,operatorAuthorized,sessionAuthorized:oauth.sessionAuthorized,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch});
 const server=http.createServer(async(req,res)=>{
   try{
     const u=new URL(req.url,"http://localhost");const p=normalizePath(u.pathname);
     res.nabouCorsOrigin=ALLOWED_BROWSER_ORIGINS.has(String(req.headers.origin||""))?String(req.headers.origin):"https://lepe12.github.io";
-    if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":res.nabouCorsOrigin||"https://lepe12.github.io","access-control-allow-credentials":"true","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type,x-file-name"});return res.end();}
+    if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":res.nabouCorsOrigin||"https://lepe12.github.io","access-control-allow-credentials":"true","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"authorization,content-type,x-file-name,x-nabou-agent-room"});return res.end();}
+    if(await oauth.handle(req,res,p))return;
     if(await handleN7(req,res,p))return;
     if(req.method==="GET"&&p==="/health"){const b=await refreshBaseline();return json(res,200,{status:"PASS",service:"piratecartography-command-center-live",websocket:true,dispatch_configured:Boolean(GITHUB_DISPATCH_TOKEN),knowledge_memory:true,session_auth:true,revision:"no-session-dispatch-v1",baseline_run_id:b?.run_id||null});}
     if(req.method==="GET"&&p==="/session"){return json(res,200,{authenticated:sessionAuthorized(req)});}
