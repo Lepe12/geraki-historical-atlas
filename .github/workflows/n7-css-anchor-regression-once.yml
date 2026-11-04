@@ -1,0 +1,27 @@
+name: N7 one-time Qwen7B CSS anchor regression smoke
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/n7-css-anchor-regression-once.yml'
+permissions:
+  actions: write
+  contents: read
+jobs:
+  dispatch-reviewed-preview:
+    if: github.repository == 'Lepe12/geraki-historical-atlas'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Dispatch Qwen 7B preview through protected workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api --method POST repos/${GITHUB_REPOSITORY}/actions/workflows/nabou-coder-v03.yml/dispatches \
+            -f ref=main \
+            -f 'inputs[task]=Review mobile readability of NABOU navigation rail and photon windows; preview only, do not modify production.' \
+            -f 'inputs[target_files]=jarvis-intelligence-chamber/navigation-rail.css,jarvis-intelligence-chamber/photon-windows.css' \
+            -f 'inputs[apply_changes]=false'
+          echo "N7 Qwen7B regression dispatch requested in preview-only mode." >> "$GITHUB_STEP_SUMMARY"
