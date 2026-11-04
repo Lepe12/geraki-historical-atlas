@@ -1,0 +1,70 @@
+name: N7 public frontend 403 read-only audit
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/n7-frontend-static-audit.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: linux3087.grserver.gr
+    steps:
+      - name: Inspect Plesk bot public document root without changes
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import ftplib,ssl,socket,os,posixpath,json,urllib.request,urllib.error
+          host=os.environ['PCT_FTPS_HOST'];tls=os.environ['PCT_FTPS_TLS_SERVER_NAME']
+          port=int(os.environ.get('PCT_FTPS_PORT','21'))
+          a={x[4][0] for x in socket.getaddrinfo(host,port,type=socket.SOCK_STREAM)}
+          b={x[4][0] for x in socket.getaddrinfo(tls,port,type=socket.SOCK_STREAM)}
+          if not a.intersection(b):raise SystemExit('TLS_NAME_MISMATCH')
+          ftp=ftplib.FTP_TLS(timeout=22,context=ssl.create_default_context())
+          ftp.connect(host,port);ftp.host=tls
+          ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD']);ftp.prot_p()
+          allowed={'index.html','app.js','style.css','public','n7-app','server.js','package.json','.htaccess','index.php','tmp','restart.txt'}
+          for d in ['/bot.piratecartography.com','/bot.piratecartography.com/n7-app','/bot.piratecartography.com/n7-app/public']:
+            try:
+              ftp.cwd(d)
+              raw=ftp.nlst()
+              names={posixpath.basename(n.rstrip('/')) for n in raw}
+              info={'dir':d,'accessible':True,'recognized':sorted(names&allowed)}
+              for f in ['index.html','app.js','style.css','.htaccess']:
+                if f in names:
+                  chunks=[]
+                  try:
+                    ftp.retrbinary('RETR '+f, chunks.append)
+                    data=b''.join(chunks)
+                    info[f]={'readable':True,'bytes':len(data)}
+                    if f=='.htaccess':
+                      info[f]['has_passenger']=b'Passenger' in data
+                      info[f]['has_deny']=b'Deny' in data or b'Require all denied' in data
+                  except ftplib.all_errors as e:info[f]={'readable':False,'error':type(e).__name__}
+              try:
+                rows=[]
+                ftp.retrlines('LIST',rows.append)
+                info['permissions']={str(x.split(None,8)[-1]):str(x.split(None,1)[0]) for x in rows if x.split(None,8)[-1] in allowed and len(x.split(None,8))>=9}
+              except ftplib.all_errors:pass
+              print('N7_STATIC_FTPS '+json.dumps(info,sort_keys=True))
+            except ftplib.all_errors as e:
+              print('N7_STATIC_FTPS '+json.dumps({'dir':d,'accessible':False,'error':type(e).__name__}))
+          ftp.quit()
+          for endpoint in ('/','/index.html','/app.js','/style.css','/health','/api/status'):
+            url='https://bot.piratecartography.com'+endpoint
+            try:
+              with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'n7-frontend-audit/1'}),timeout=12,context=ssl.create_default_context()) as r:
+                data=r.read(24000)
+                print('N7_STATIC_HTTPS '+json.dumps({'endpoint':endpoint,'code':r.status,'content_type':r.headers.get('content-type'),'body_length':len(data)}))
+            except urllib.error.HTTPError as e:
+              print('N7_STATIC_HTTPS '+json.dumps({'endpoint':endpoint,'code':e.code,'server':e.headers.get('server'),'content_type':e.headers.get('content-type')}))
+            except Exception as e:print('N7_STATIC_HTTPS '+json.dumps({'endpoint':endpoint,'error':type(e).__name__}))
+          PY
