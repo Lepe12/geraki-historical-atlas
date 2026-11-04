@@ -112,6 +112,12 @@ async function jwks(){
   jwksCache={at:Date.now(),keys:Array.isArray(d.keys)?d.keys:[]};
   return jwksCache.keys;
 }
+function isTrustedPrivateWorker(claims){
+  return Boolean(claims&&claims.repository==="Lepe12/independent-ai-bot"&&
+    claims.ref==="refs/heads/main"&&
+    claims.workflow_ref==="Lepe12/independent-ai-bot/.github/workflows/n7-private-model.yml@refs/heads/main"&&
+    /^[0-9]{1,20}$/.test(String(claims.run_id||"")));
+}
 async function verifyGithubOidc(token,{privateN7=false}={}){
   const parts=String(token||"").split(".");
   if(parts.length!==3)throw new Error("invalid_token");
@@ -125,7 +131,7 @@ async function verifyGithubOidc(token,{privateN7=false}={}){
   const correctRepo=privateN7?"Lepe12/independent-ai-bot":REPO;
   if(payload.repository!==correctRepo)throw new Error("wrong_repository");
   if(payload.ref!=="refs/heads/main")throw new Error("wrong_ref");
-  if(privateN7&&payload.workflow_ref!=="Lepe12/independent-ai-bot/.github/workflows/n7-private-model.yml@refs/heads/main")throw new Error("wrong_private_workflow");
+  if(privateN7&&!isTrustedPrivateWorker(payload))throw new Error("wrong_private_workflow");
   const key=(await jwks()).find(k=>k.kid===header.kid);
   if(!key)throw new Error("unknown_kid");
   const pub=crypto.createPublicKey({key,format:"jwk"});
@@ -456,5 +462,5 @@ if(require.main===module || typeof PhusionPassenger !== "undefined"){
     loopback.listen(PORT,"127.0.0.1");
   }
 }
-module.exports={normalizePath,frameText,statusFor,verifyGithubOidc,safeEqual,newerRun,eventSnapshot,server};
+module.exports={normalizePath,frameText,statusFor,verifyGithubOidc,isTrustedPrivateWorker,safeEqual,newerRun,eventSnapshot,server};
 
