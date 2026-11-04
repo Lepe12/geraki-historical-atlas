@@ -33,6 +33,7 @@ const KNOWLEDGE_INDEX=path.join(KNOWLEDGE_DIR,"index.json");
 const MAX_PDF_BYTES=25*1024*1024;
 fs.mkdirSync(KNOWLEDGE_UPLOAD_DIR,{recursive:true});
 let lastDispatchAt=0;
+let lastPrivateProbeAt=0;
 let latestLiveRun="";
 
 let baseline=null;
@@ -402,6 +403,22 @@ const server=http.createServer(async(req,res)=>{
         }
       }catch(_){last=null;}
       return json(res,200,{schema:"n7-private-worker-status-v1",last,standalone_node_deployed:false});
+    }
+    if(req.method==="POST"&&p==="/n7/brain/probe"){
+      const authorization=String(req.headers.authorization||"");
+      if(req.headers.origin||!authorization.startsWith("Bearer "))
+        return json(res,401,{error:"trusted_github_oidc_required"});
+      const claims=await verifyGithubOidc(authorization.slice(7));
+      if(claims.workflow_ref!=="Lepe12/geraki-historical-atlas/.github/workflows/n7-private-dispatch-probe.yml@refs/heads/main")
+        return json(res,403,{error:"untrusted_probe_workflow"});
+      if(Date.now()-lastPrivateProbeAt<600000)
+        return json(res,429,{error:"probe_rate_limited"});
+      if(!GITHUB_DISPATCH_TOKEN)return json(res,503,{error:"github_dispatch_not_configured"});
+      lastPrivateProbeAt=Date.now();
+      try{
+        await githubPrivateDispatch({task:"Call load_skill with greek-prose-editor and describe one safe editing check.",skill:"greek-prose-editor"});
+      }catch(_){return json(res,502,{error:"private_repo_dispatch_permission_or_api_failure"});}
+      return json(res,202,{status:"PRIVATE_WORKFLOW_DISPATCH_ACCEPTED",worker:"n7-private-model.yml"});
     }
     if(req.method==="POST"&&p==="/n7/private-event"){
       const auth=String(req.headers.authorization||"");
