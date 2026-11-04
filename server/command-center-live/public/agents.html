@@ -74,6 +74,7 @@ footer{color:#6d94a5;font-size:.77rem;margin-top:24px}
         <div><h2 class="name">N7</h2><div class="role">GATEWAY / OPERATOR</div><div class="mini">Top.Host · NABOU</div></div>
       </div>
       <div class="state"><span class="dot" id="n7Dot"></span><span id="n7State">Έλεγχος σύνδεσης…</span></div>
+      <div class="state"><span class="dot" id="privateDot"></span><span id="privateState">N7 Skills: έλεγχος ιδιωτικού Qwen worker…</span></div>
       <p class="notes">Μεταφέρει τις εντολές στο GitHub. Η ένδειξη σύνδεσης δεν σημαίνει ότι εκτελεί κώδικα το ίδιο.</p>
     </article>
     <article class="panel">
@@ -114,6 +115,7 @@ footer{color:#6d94a5;font-size:.77rem;margin-top:24px}
       <div class="links">
         <a id="runLink" href="https://github.com/Lepe12/geraki-historical-atlas/actions/workflows/nabou-coder-v03.yml" target="_blank" rel="noopener noreferrer">Εκτελέσεις Coding Agent</a>
         <a href="https://pct-live.piratecartography.com/n7-test.html">Παλιά κονσόλα N7</a>
+        <a href="https://github.com/Lepe12/independent-ai-bot/actions/workflows/n7-private-model.yml" target="_blank" rel="noopener noreferrer">N7 Skills — ιδιωτικές εκτελέσεις</a>
       </div>
       <hr class="sep">
       <div class="mini">CONTROLLED SCOPE</div>
@@ -149,6 +151,17 @@ async function refresh(){
     const j=await r.json();
     indicator("n7Dot","n7State",j.connected?"Συνδεδεμένο · "+j.state:"Gateway διαθέσιμο · χωρίς live snapshot",j.connected?"ok":"");
   }catch(e){indicator("n7Dot","n7State","Δεν είναι διαθέσιμη η ζωντανή κατάσταση N7","error");}
+  try{
+    const r=await fetch(API_BASE+"/pct-api/live/n7/private-status",{cache:"no-store",signal:AbortSignal.timeout(12000)});
+    if(!r.ok)throw Error("private_worker_http_"+r.status);
+    const state=await r.json(),last=state.last;
+    if(!last){
+      indicator("privateDot","privateState","N7 Skills: καμία επαληθευμένη εκτέλεση ακόμη","");
+    }else{
+      const label="N7 Skills / Qwen 3B: "+last.phase+" · "+last.status;
+      indicator("privateDot","privateState",label,last.status==="PASS"?"ok":last.status==="FAILED"?"error":"busy");
+    }
+  }catch(e){indicator("privateDot","privateState","N7 Skills: η ανεξάρτητη εκτέλεση δεν έχει επιβεβαιωθεί","error");}
   try{
     const url="https://api.github.com/repos/Lepe12/geraki-historical-atlas/actions/workflows/nabou-coder-v03.yml/runs?per_page=1";
     const r=await fetch(url,{headers:{"Accept":"application/vnd.github+json"},cache:"no-store",signal:AbortSignal.timeout(12000)});
