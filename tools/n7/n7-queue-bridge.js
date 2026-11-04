@@ -55,8 +55,44 @@ function sanitize(jobs){
   if(!Array.isArray(jobs))throw Error('invalid_queue');
   return jobs.filter(j=>j&&typeof j==='object'&&typeof j.id==='string');
 }
+
+// Trigger only the hard-coded private Qwen queue workflow, never user-provided paths.
+// The request body contains no prompt, conversation ID or other private content.
+const DISPATCH_TOKEN=String(process.env.N7_GITHUB_DISPATCH_TOKEN||'').trim();
+function dispatchQwenWorkflow(){
+  if(!DISPATCH_TOKEN)return Promise.resolve(false);
+  return new Promise(resolve=>{
+    const payload=JSON.stringify({ref:'main'});
+    const req=https.request({
+      hostname:'api.github.com',
+      path:'/repos/Lepe12/independent-ai-bot/actions/workflows/n7-private-queue.yml/dispatches',
+      method:'POST',timeout:12000,
+      headers:{
+        'Authorization':'Bearer '+DISPATCH_TOKEN,
+        'Accept':'application/vnd.github+json',
+        'X-GitHub-Api-Version':'2022-11-28',
+        'User-Agent':'N7-owner-queue-dispatch/1',
+        'Content-Type':'application/json',
+        'Content-Length':Buffer.byteLength(payload)
+      }
+    },res=>{
+      res.resume();
+      res.on('end',()=>{
+        if(res.statusCode!==204)console.error('N7 dispatch failed HTTP '+res.statusCode);
+        resolve(res.statusCode===204);
+      });
+    });
+    req.on('timeout',()=>req.destroy(new Error('dispatch_timeout')));
+    req.on('error',err=>{
+      console.error('N7 dispatch transport '+String(err.code||'request_failed'));
+      resolve(false);
+    });
+    req.end(payload);
+  });
+}
+
 function createN7Relay({dataDir,authenticated,originOK,readBody,loadConversations,saveConversations,modelConfigured,
-  verifyToken=verifyOidc}){
+  verifyToken=verifyOidc, dispatch=dispatchQwenWorkflow, dispatchConfigured=()=>Boolean(DISPATCH_TOKEN)}){
   if(!path.isAbsolute(dataDir))throw Error('N7_DATA_DIR_MUST_BE_ABSOLUTE');
   const storage=path.join(dataDir,'n7-private-queue.json');
   const lock=storage+'.lock';
@@ -96,7 +132,8 @@ function createN7Relay({dataDir,authenticated,originOK,readBody,loadConversation
     const url=new URL(req.url,'http://localhost'),p=url.pathname;
     if(p==='/api/status'&&req.method==='GET'){
       reply(res,200,{authenticated:!!authenticated(req),modelConfigured:!!modelConfigured(),
-        queueModelAvailable:true,queueModel:'Qwen2.5-3B GitHub Actions (delayed)'});
+        queueModelAvailable:true,queueDispatchConfigured:Boolean(dispatchConfigured()),
+        queueModel:dispatchConfigured()?'Qwen2.5-3B GitHub Actions (immediate trigger)':'Qwen2.5-3B GitHub Actions (scheduled fallback)'});
       return true;
     }
     const chat=p.match(/^\/api\/conversations\/([a-f0-9-]+)\/chat$/);
@@ -120,6 +157,14 @@ function createN7Relay({dataDir,authenticated,originOK,readBody,loadConversation
         saveConversations(all);
         return {status:202,job_id:job.id,pending:true};
       });
+      if(result.status===202){
+        // Job is safely persisted before attempting dispatch. If GitHub is
+        // unavailable or credentials are absent, the existing schedule remains.
+        let triggered=false;
+        try{triggered=Boolean(await dispatch());}
+        catch(e){console.error('N7 immediate trigger unavailable '+String(e.code||'dispatch_failed'));}
+        result.dispatch=triggered?'immediate':'scheduled_fallback';
+      }
       reply(res,result.status,result.status!==202?{error:result.error}:result);
       return true;
     }
