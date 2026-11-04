@@ -47,20 +47,21 @@ function createN7Gateway({json,operatorAuthorized,readBody,statusFor,githubWorkf
       if(task.length<8||task.length>2000||[...task].some(ch=>ch.charCodeAt(0)<32)||
         !Array.isArray(files)||files.length<2||files.length>3||
         new Set(files).size!==files.length||!files.every(f=>allowed.has(f))||
-        body?.apply_changes===true){
+        (body?.apply_changes!==true && body?.apply_changes!==false && body?.apply_changes!==undefined) ||
+        (body?.apply_changes===true && body?.confirm_draft_pr!==true)){
         json(res,400,{error:"invalid_coding_request"});return true;
       }
       lastAccepted=now;
       try{
         await githubCodingDispatch({
-          task,target_files:files.join(","),apply_changes:"false"
+          task,target_files:files.join(","),apply_changes:body.apply_changes===true?"true":"false"
         });
       }catch(err){
         json(res,502,{error:"coding_dispatch_failed",reason:String(err.message||"unknown").slice(0,120)});
         return true;
       }
       json(res,202,{status:"ACCEPTED",agent:"N7",worker:"Qwen2.5-Coder-7B",
-        workflow:"nabou-coder-v03.yml",mode:"preview_only"});
+        workflow:"nabou-coder-v03.yml",mode:body.apply_changes===true?"draft_pr":"preview_only"});
       return true;
     }
     const target=String(body?.target||"").trim();
