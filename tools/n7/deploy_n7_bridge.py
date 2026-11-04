@@ -2,7 +2,7 @@
 """Guarded N7 FTPS patch. Private server.js/app.js are read from hosting,
 patched only in ephemeral CI memory, never committed to this public repository.
 """
-import ftplib,ssl,socket,io,os,re,uuid,hashlib,subprocess,tempfile,json
+import ftplib,ssl,socket,io,os,re,uuid,hashlib,subprocess,tempfile,json,time,urllib.request,urllib.error
 from pathlib import Path
 TLS='linux3087.grserver.gr'
 ROOT='/bot.piratecartography.com/n7-app'
@@ -135,6 +135,22 @@ def main():
         b=stage(ftp,'server.js',server,'600');done.append(('BACKUP','server.js',b,ROOT))
         ftp.cwd(ROOT+'/tmp')
         ftp.storbinary('STOR restart.txt',io.BytesIO(b'n7-qwen-queue-update\n'))
+        # Verify actual production HTTP before accepting installation.
+        # On failure, restore all originals and restart Passenger after rollback.
+        live_ok=False
+        for attempt in range(12):
+            try:
+                url='https://bot.piratecartography.com/api/status'
+                request=urllib.request.Request(url,headers={'User-Agent':'n7-queue-live-verification','Cache-Control':'no-cache'})
+                with urllib.request.urlopen(request,timeout=8,context=ssl.create_default_context()) as res:
+                    snapshot=json.loads(res.read(10000))
+                    live_ok=(res.status==200 and snapshot.get('queueModelAvailable') is True)
+                    if live_ok:break
+            except (urllib.error.URLError,TimeoutError,ValueError):
+                pass
+            time.sleep(2)
+        if not live_ok:raise RuntimeError('N7_LIVE_QUEUE_VERIFICATION_FAILED_ROLLBACK')
+        print('N7_LIVE_QUEUE_ENDPOINT_PASS')
         print('N7_FTPS_BRIDGE_INSTALLED '+json.dumps({'server_updated':True,'frontend_updated':True,
           'backups_kept':True,'passenger_restart_requested':True,'other_domains_untouched':True}))
     except BaseException:
@@ -146,6 +162,11 @@ def main():
                     else:
                         ftp.delete(name);ftp.rename(backup,name)
                 except ftplib.all_errors:print('N7_ROLLBACK_MANUAL_INSPECTION_NEEDED '+name)
+            try:
+                ftp.cwd(ROOT+'/tmp')
+                ftp.storbinary('STOR restart.txt',io.BytesIO(b'n7-qwen-queue-rollback\n'))
+                print('N7_PASSENGER_ROLLBACK_RESTART_REQUESTED')
+            except ftplib.all_errors:print('N7_ROLLBACK_RESTART_MANUAL_INSPECTION_NEEDED')
         raise
     finally:ftp.quit()
 if __name__=='__main__':main()
