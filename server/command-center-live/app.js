@@ -112,7 +112,7 @@ async function jwks(){
   jwksCache={at:Date.now(),keys:Array.isArray(d.keys)?d.keys:[]};
   return jwksCache.keys;
 }
-async function verifyGithubOidc(token){
+async function verifyGithubOidc(token,{privateN7=false}={}){
   const parts=String(token||"").split(".");
   if(parts.length!==3)throw new Error("invalid_token");
   const header=JSON.parse(b64url(parts[0]).toString("utf8"));
@@ -122,8 +122,10 @@ async function verifyGithubOidc(token){
   const aud=payload.aud;
   if(payload.iss!==OIDC_ISSUER||!(aud===OIDC_AUD||(Array.isArray(aud)&&aud.includes(OIDC_AUD))))throw new Error("invalid_issuer_or_audience");
   if(Number(payload.exp||0)<now-30||Number(payload.nbf||0)>now+30)throw new Error("expired_or_not_yet_valid");
-  if(payload.repository!==REPO)throw new Error("wrong_repository");
+  const correctRepo=privateN7?"Lepe12/independent-ai-bot":REPO;
+  if(payload.repository!==correctRepo)throw new Error("wrong_repository");
   if(payload.ref!=="refs/heads/main")throw new Error("wrong_ref");
+  if(privateN7&&payload.workflow_ref!=="Lepe12/independent-ai-bot/.github/workflows/n7-private-model.yml@refs/heads/main")throw new Error("wrong_private_workflow");
   const key=(await jwks()).find(k=>k.kid===header.kid);
   if(!key)throw new Error("unknown_kid");
   const pub=crypto.createPublicKey({key,format:"jwk"});
@@ -380,6 +382,27 @@ const server=http.createServer(async(req,res)=>{
       });
       lastDispatchAt=Date.now();
       return json(res,202,{status:"ACCEPTED",request_id:requestId,workflow:CONTROLLED_WORKFLOW});
+    }
+    if(req.method==="POST"&&p==="/n7/private-event"){
+      const auth=String(req.headers.authorization||"");
+      if(!auth.startsWith("Bearer "))return json(res,401,{error:"missing_oidc"});
+      const verified=await verifyGithubOidc(auth.slice(7),{privateN7:true});
+      let body;
+      try{body=JSON.parse(await readBody(req,1500));}
+      catch(_){return json(res,400,{error:"invalid_private_event"});}
+      if(!["started","skill_loaded","file_written","completed","failed"].includes(body.phase)||
+          typeof body.success!=="boolean"||!/^[0-9]{1,20}$/.test(String(verified.run_id||"")))return json(res,400,{error:"invalid_private_event"});
+      const event={
+        project:"piratecartography",schema:"pct-jarvis-event-v1",
+        run_id:"n7-private-"+verified.run_id,event_id:"n7-"+verified.run_id+"-"+Date.now(),
+        agent_id:"n7-brain",event_type:"n7_private_inference",
+        status:body.success?"PASS":"RUNNING",phase:body.phase,
+        created_utc:new Date().toISOString(),
+        historical_verification:false,source:"VERIFIED_PRIVATE_REPO_OIDC"
+      };
+      if(body.phase==="failed")event.status="FAILED";
+      addEvent(event);
+      return json(res,202,{status:"ACCEPTED",run_id:event.run_id,event_id:event.event_id});
     }
     if(req.method==="POST"&&p==="/events"){
       const auth=String(req.headers.authorization||"");if(!auth.startsWith("Bearer "))return json(res,401,{error:"missing_oidc"});
