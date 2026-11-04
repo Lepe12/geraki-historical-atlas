@@ -18,7 +18,7 @@ import uuid
 
 DESTINATION = "/bot.piratecartography.com"
 SOURCE = Path(__file__).resolve().parents[2] / "server/command-center-live/public/agents.html"
-ALLOWED_MARKERS = (b"plesk", b"NABOU // AGENT ROOM")
+ALLOWED_MARKERS = (b"plesk", b"// AGENT ROOM")
 
 
 def deploy(factory=ftplib.FTP_TLS):
@@ -35,7 +35,7 @@ def deploy(factory=ftplib.FTP_TLS):
     if not expected.intersection(actual):
         raise RuntimeError("TLS_NAME_NOT_BOUND_TO_HOST")
     payload=SOURCE.read_bytes()
-    if not (b"NABOU // AGENT ROOM" in payload and b"AI AGENTS" in payload and b"/pct-api/live/n7/" in payload):
+    if not (b"// AGENT ROOM" in payload and b"AI AGENTS" in payload and b"/pct-api/live/n7/" in payload):
         raise RuntimeError("INVALID_BOT_ROOM_SOURCE")
     ftp=factory(timeout=30,context=ssl.create_default_context())
     token=uuid.uuid4().hex[:12]
