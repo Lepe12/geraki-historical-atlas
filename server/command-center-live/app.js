@@ -66,14 +66,16 @@ function safeEqual(a,b){
   const x=Buffer.from(String(a||"")),y=Buffer.from(String(b||""));
   return x.length===y.length&&x.length>0&&crypto.timingSafeEqual(x,y);
 }
-function githubDispatchWorkflow(workflow,inputs){
-  if(![CONTROLLED_WORKFLOW,"nabou-coder-v03.yml"].includes(workflow))return Promise.reject(new Error("workflow_not_allowed"));
+function githubDispatchWorkflow(workflow,inputs,repo=REPO){
+  const privateN7=repo==="Lepe12/independent-ai-bot"&&workflow==="n7-private-model.yml";
+  if(!privateN7&&(repo!==REPO||![CONTROLLED_WORKFLOW,"nabou-coder-v03.yml"].includes(workflow)))
+    return Promise.reject(new Error("workflow_not_allowed"));
   return new Promise((resolve,reject)=>{
     if(!GITHUB_DISPATCH_TOKEN)return reject(new Error("github_dispatch_not_configured"));
     const body=JSON.stringify({ref:"main",inputs});
     const req=https.request({
       hostname:"api.github.com",
-      path:"/repos/"+REPO+"/actions/workflows/"+workflow+"/dispatches",
+      path:"/repos/"+repo+"/actions/workflows/"+workflow+"/dispatches",
       method:"POST",
       headers:{
         "user-agent":"piratecartography-command-center-live/1",
@@ -93,6 +95,7 @@ function githubDispatchWorkflow(workflow,inputs){
 }
 function githubWorkflowDispatch(inputs){return githubDispatchWorkflow(CONTROLLED_WORKFLOW,inputs);}
 function githubCodingDispatch(inputs){return githubDispatchWorkflow("nabou-coder-v03.yml",inputs);}
+function githubPrivateDispatch(inputs){return githubDispatchWorkflow("n7-private-model.yml",inputs,"Lepe12/independent-ai-bot");}
 async function refreshBaseline(force=false){
   if(!force && Date.now()-baselineFetchedAt<15000 && baseline)return baseline;
   if(baselineRefresh)return baselineRefresh;
@@ -256,7 +259,7 @@ async function publishSnapshots(){
   for(const [run,clients] of sockets){if(!clients.size)continue;try{const state=await statusFor(run),frame=frameText(JSON.stringify({schema:"pct-command-center-bootstrap-v1",...state}));for(const socket of clients)if(!socket.destroyed)socket.write(frame);}catch(_){}}
 }
 const oauth=createN7OAuth({json});
-const handleN7=createN7Gateway({json,operatorAuthorized,sessionAuthorized:oauth.sessionAuthorized,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch});
+const handleN7=createN7Gateway({json,operatorAuthorized,sessionAuthorized:oauth.sessionAuthorized,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch,githubPrivateDispatch});
 const server=http.createServer(async(req,res)=>{
   try{
     const u=new URL(req.url,"http://localhost");const p=normalizePath(u.pathname);
