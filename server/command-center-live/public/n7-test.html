@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>NABOU N7 — Real Qwen7B Preview Test</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,sans-serif}
+body{margin:0;background:#081522;color:#e1f8ff;min-height:100vh;display:grid;place-items:center}
+main{margin:20px;padding:28px;max-width:540px;background:#0c2433;border:1px solid #317887;border-radius:14px;box-shadow:0 15px 50px #0009}
+h1{font-size:1.5rem;margin-top:0}p{line-height:1.6;color:#bdd4dd}
+label{display:block;margin:18px 0 7px}input{width:100%;box-sizing:border-box;padding:12px;background:#081b28;color:#f4ffff;border:1px solid #518b9f;border-radius:7px;font:inherit}
+button{background:#58cddb;color:#04212c;border:0;border-radius:7px;padding:12px 17px;font:700 1rem system-ui;cursor:pointer;margin-top:16px}
+button:disabled{opacity:.55;cursor:progress}
+a{color:#8becfb}#status{font-weight:600;white-space:pre-wrap}
+small{display:block;color:#a6c6d2;margin-top:16px;line-height:1.5}
+</style>
+</head>
+<body>
+<main>
+<h1>N7 → GitHub → Qwen 7B</h1>
+<p>Δοκιμή πραγματικής εντολής στον live Top.Host. Η εργασία περιορίζεται σε δύο αρχεία CSS, σε λειτουργία προεπισκόπησης, χωρίς εφαρμογή αλλαγών.</p>
+<label for="token">PCT_OPERATOR_TOKEN (από Plesk → Περιβάλλον)</label>
+<input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="Επικόλληση token">
+<button id="run" type="button">Εκτέλεση δοκιμής</button>
+<p id="status" role="status" aria-live="polite">Έτοιμο.</p>
+<p><a id="runs" href="https://github.com/Lepe12/geraki-historical-atlas/actions/workflows/nabou-coder-v03.yml" target="_blank" rel="noopener noreferrer" hidden>Εκτελέσεις Qwen 7B στο GitHub</a></p>
+<small>Το token χρησιμοποιείται μόνο για το συγκεκριμένο αίτημα. Δεν αποθηκεύεται στο πρόγραμμα περιήγησης και δεν εμφανίζεται στα αποτελέσματα.</small>
+</main>
+<script>
+"use strict";
+const run=document.getElementById("run");
+const field=document.getElementById("token");
+const status=document.getElementById("status");
+const runs=document.getElementById("runs");
+run.addEventListener("click",async()=>{
+  const token=field.value.trim();
+  field.value="";
+  runs.hidden=true;
+  if(!token){status.textContent="Χρειάζεται το token του Plesk.";return;}
+  run.disabled=true;status.textContent="Αποστολή στο N7...";
+  try{
+    const response=await fetch("/pct-api/live/n7/code",{
+      method:"POST",
+      headers:{"Authorization":"Bearer "+token,"Content-Type":"application/json"},
+      body:JSON.stringify({
+        task:"Review mobile readability of NABOU navigation rail and photon windows; preview only, do not modify production.",
+        target_files:["jarvis-intelligence-chamber/navigation-rail.css","jarvis-intelligence-chamber/photon-windows.css"],
+        apply_changes:false
+      }),
+      signal:AbortSignal.timeout(25000)
+    });
+    const result=await response.json().catch(()=>({}));
+    if(response.status===202&&result.status==="ACCEPTED"){
+      status.textContent="HTTP 202: Το N7 δέχτηκε την εντολή. Έλεγξε την εκτέλεση του Qwen 7B στο GitHub.";
+      runs.hidden=false;
+    }else{
+      status.textContent="HTTP "+response.status+": "+String(result.error||"Η εντολή δεν έγινε δεκτή.").slice(0,140);
+    }
+  }catch(error){
+    status.textContent="Σφάλμα επικοινωνίας: "+(error.name==="TimeoutError"?"χρονικό όριο":"αποτυχία σύνδεσης");
+  }finally{run.disabled=false;}
+});
+</script>
+</body>
+</html>
