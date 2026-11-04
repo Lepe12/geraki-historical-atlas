@@ -150,7 +150,7 @@ test("GitHub signed session authorizes code tasks only from dedicated bot with C
     await handle({method:"POST",headers:{origin,...(csrf?{"x-nabou-agent-room":"1"}:{})}},{}, "/n7/code");
     return replies.at(-1).status;
   }
-  assert.equal(await call("https://evil.example",true),403);
+  assert.equal(await call("https://evil.example",true),401);
   assert.equal(await call("https://bot.piratecartography.com",false),401);
   assert.equal(await call("https://bot.piratecartography.com",true),202);
   assert.equal(calls.length,1);
