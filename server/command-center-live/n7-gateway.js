@@ -40,7 +40,8 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
     if(p==="/n7/brain/task"){
       const task=body?.task,skill=body?.skill||"greek-prose-editor";
       if(typeof task!=="string"||task.trim().length<12||task.length>2000||
-        /[\x00-\x1F]/.test(task)||!["greek-prose-editor","historical-source-audit"].includes(skill)){
+        [...task].some(ch=>ch.charCodeAt(0)<32&&![9,10,13].includes(ch.charCodeAt(0)))||
+        !["greek-prose-editor","historical-source-audit"].includes(skill)){
         json(res,400,{error:"invalid_n7_private_task"});return true;
       }
       if(typeof githubPrivateDispatch!=="function")return json(res,503,{error:"private_dispatch_unavailable"}),true;
