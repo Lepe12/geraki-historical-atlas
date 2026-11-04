@@ -129,3 +129,29 @@ test("dedicated bot subdomain may dispatch only an authenticated bounded coding 
   const blocked=rig(false,request);
   assert.equal((await blocked.call("POST","/n7/code",{origin:"https://bot.piratecartography.com"})).status,401);
 });
+
+test("GitHub signed session authorizes code tasks only from dedicated bot with CSRF header",async()=>{
+  process.env.PCT_GITHUB_DISPATCH_TOKEN="test-placeholder";
+  const body={task:"Improve mobile CSS accessibility",target_files:[
+    "jarvis-intelligence-chamber/navigation-rail.css",
+    "jarvis-intelligence-chamber/photon-windows.css"
+  ],apply_changes:false};
+  const replies=[],calls=[];
+  const handle=createN7Gateway({
+    json:(res,status,payload)=>replies.push({status,payload}),
+    operatorAuthorized:()=>false,
+    sessionAuthorized:()=>true,
+    readBody:async()=>JSON.stringify(body),
+    statusFor:async()=>({snapshot:null,run_id:"latest",transport:"no"}),
+    githubCodingDispatch:async inputs=>calls.push(inputs),
+    githubWorkflowDispatch:async()=>{}
+  });
+  async function call(origin,csrf){
+    await handle({method:"POST",headers:{origin,...(csrf?{"x-nabou-agent-room":"1"}:{})}},{}, "/n7/code");
+    return replies.at(-1).status;
+  }
+  assert.equal(await call("https://evil.example",true),401);
+  assert.equal(await call("https://bot.piratecartography.com",false),401);
+  assert.equal(await call("https://bot.piratecartography.com",true),202);
+  assert.equal(calls.length,1);
+});

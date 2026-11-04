@@ -35,7 +35,7 @@ p{line-height:1.6;color:#a9c5d2}
 .sep{border:0;border-top:1px solid #26495d;margin:22px 0}
 .workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,.7fr);gap:20px;margin-top:20px}
 label{display:block;color:#b1d4e0;font-size:.9rem;margin:15px 0 6px}
-textarea,input[type=password]{background:#071723;border:1px solid #3a7184;color:#ebfbff;border-radius:8px;padding:12px;width:100%;outline:none}
+textarea{background:#071723;border:1px solid #3a7184;color:#ebfbff;border-radius:8px;padding:12px;width:100%;outline:none}
 textarea:focus,input:focus{border-color:#64e4fc;box-shadow:0 0 0 2px #64e4fc21}
 textarea{min-height:130px;resize:vertical}
 fieldset{border:1px solid #31586b;border-radius:10px;margin:15px 0;padding:12px 15px}
@@ -102,8 +102,8 @@ footer{color:#6d94a5;font-size:.77rem;margin-top:24px}
         <label class="choice"><input name="mode" type="radio" value="draft"> Δημιουργία Draft PR (χωρίς merge ή deployment)</label>
       </fieldset>
       <label class="choice" id="confirmationWrap" hidden><input type="checkbox" id="confirmation"> Επιβεβαιώνω τη δημιουργία Draft PR, χωρίς συγχώνευση.</label>
-      <label for="token">PCT_OPERATOR_TOKEN (Plesk)</label>
-      <input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="Το μυστικό token δεν αποθηκεύεται">
+      <div class="state"><span class="dot" id="loginDot"></span><span id="loginState">Έλεγχος σύνδεσης λογαριασμού…</span></div>
+      <div class="actions"><button id="login" type="button" class="ghost" hidden>Σύνδεση με GitHub</button><button id="logout" type="button" class="ghost" hidden>Αποσύνδεση</button></div>
       <div class="actions"><button class="primary" id="submit" type="button">Αποστολή στο N7</button><button id="refresh" type="button" class="ghost">Ανανέωση κατάστασης</button></div>
       <p class="notes">Για λόγους ασφαλείας, οι εντολές περιορίζονται προς το παρόν σε τρία αρχεία CSS. Δεν εκτελούνται εντολές shell ούτε αυτόματες δημοσιεύσεις.</p>
     </article>
@@ -127,8 +127,20 @@ footer{color:#6d94a5;font-size:.77rem;margin-top:24px}
 const $=id=>document.getElementById(id);
 const workflow="https://github.com/Lepe12/geraki-historical-atlas/actions/workflows/nabou-coder-v03.yml";
 const API_BASE=location.hostname==="bot.piratecartography.com"?"https://pct-live.piratecartography.com":"";
+let authenticated=false;
 function indicator(dotId,textId,text,kind){
   $(dotId).className="dot"+(kind?" "+kind:"");$(textId).textContent=text;
+}
+async function checkLogin(){
+  try{
+    const r=await fetch(API_BASE+"/pct-api/live/n7/auth/session",{credentials:"include",cache:"no-store",signal:AbortSignal.timeout(12000)});
+    if(!r.ok)throw Error("auth_http_"+r.status);
+    const j=await r.json();authenticated=j.authenticated===true;
+    indicator("loginDot","loginState",authenticated?"Συνδεδεμένος λογαριασμός GitHub":j.login_available?"Απαιτείται σύνδεση με GitHub":"Η σύνδεση GitHub δεν έχει ρυθμιστεί στον server",authenticated?"ok":"");
+    $("login").hidden=authenticated||!j.login_available;
+    $("logout").hidden=!authenticated;
+    $("submit").disabled=!authenticated;
+  }catch(e){authenticated=false;$("submit").disabled=true;indicator("loginDot","loginState","Δεν ήταν δυνατός ο έλεγχος ταυτότητας","error");}
 }
 async function refresh(){
   try{
@@ -154,19 +166,22 @@ document.querySelectorAll('input[name="mode"]').forEach(r=>r.addEventListener("c
   $("confirmationWrap").hidden=document.querySelector('input[name="mode"]:checked').value!=="draft";
   $("confirmation").checked=false;
 }));
-$("refresh").addEventListener("click",refresh);
+$("refresh").addEventListener("click",()=>{refresh();checkLogin();});
+$("login").addEventListener("click",()=>location.assign(API_BASE+"/pct-api/live/n7/auth/start"));
+$("logout").addEventListener("click",async()=>{
+  try{await fetch(API_BASE+"/pct-api/live/n7/auth/logout",{method:"POST",credentials:"include",headers:{"X-NABOU-Agent-Room":"1"}});}finally{authenticated=false;checkLogin();}
+});
 $("submit").addEventListener("click",async()=>{
-  const token=$("token").value.trim();$("token").value="";
   const task=$("task").value.trim();
   const files=[...document.querySelectorAll('input[name="files"]:checked')].map(x=>x.value);
   const draft=document.querySelector('input[name="mode"]:checked').value==="draft";
-  if(!token){$("console").textContent="Χρειάζεται το PCT_OPERATOR_TOKEN.";return;}
+  if(!authenticated){$("console").textContent="Απαιτείται σύνδεση με GitHub.";return;}
   if(task.length<8||task.length>2000){$("console").textContent="Η εντολή πρέπει να περιέχει 8 έως 2000 χαρακτήρες.";return;}
   if(files.length<2||files.length>3){$("console").textContent="Επίλεξε 2 ή 3 αρχεία.";return;}
   if(draft&&!$("confirmation").checked){$("console").textContent="Χρειάζεται η επιβεβαίωση Draft PR.";return;}
   $("submit").disabled=true;$("console").textContent="N7: αποστολή εντολής στον Coding Agent…";
   try{
-    const r=await fetch(API_BASE+"/pct-api/live/n7/code",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({task,target_files:files,apply_changes:draft,confirm_draft_pr:draft&&$("confirmation").checked}),signal:AbortSignal.timeout(25000)});
+    const r=await fetch(API_BASE+"/pct-api/live/n7/code",{method:"POST",credentials:"include",headers:{"Content-Type":"application/json","X-NABOU-Agent-Room":"1"},body:JSON.stringify({task,target_files:files,apply_changes:draft,confirm_draft_pr:draft&&$("confirmation").checked}),signal:AbortSignal.timeout(25000)});
     const data=await r.json().catch(()=>({}));
     if(r.status===202&&data.status==="ACCEPTED"){
       $("console").textContent="N7: η εντολή έγινε δεκτή (HTTP 202).\nCODER 7B: ανάθεση στο GitHub.\nΛειτουργία: "+(draft?"Draft PR":"προεπισκόπηση")+".\nΗ ολοκλήρωση δεν έχει ακόμη επιβεβαιωθεί. Πάτησε ανανέωση.";
@@ -176,6 +191,7 @@ $("submit").addEventListener("click",async()=>{
   finally{$("submit").disabled=false;refresh();}
 });
 refresh();
+checkLogin();
 </script>
 </body>
 </html>

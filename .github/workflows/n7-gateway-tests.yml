@@ -4,6 +4,8 @@ on:
     paths:
       - "server/command-center-live/n7-gateway.js"
       - "server/command-center-live/n7-gateway.test.js"
+      - "server/command-center-live/n7-oauth.js"
+      - "server/command-center-live/n7-oauth.test.js"
       - "server/command-center-live/app.js"
       - ".github/workflows/n7-gateway-tests.yml"
   workflow_dispatch:
@@ -24,6 +26,7 @@ jobs:
       - name: Syntax checks
         run: |
           node --check server/command-center-live/n7-gateway.js
+          node --check server/command-center-live/n7-oauth.js
           node --check server/command-center-live/app.js
       - name: Unit tests
-        run: node --test server/command-center-live/n7-gateway.test.js
+        run: node --test server/command-center-live/n7-gateway.test.js server/command-center-live/n7-oauth.test.js

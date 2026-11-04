@@ -3,7 +3,7 @@ const crypto=require("node:crypto");
 
 // Routes are explicitly scoped to the existing live service. No shell,
 // database writer, privileged host action, or arbitrary workflow selection.
-function createN7Gateway({json,operatorAuthorized,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch}) {
+function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch}) {
   let lastAccepted=0;
   return async function handleN7(req,res,p) {
     if (p!=="/n7/status" && p!=="/n7/dispatch" && p!=="/n7/code") return false;
@@ -25,7 +25,8 @@ function createN7Gateway({json,operatorAuthorized,readBody,statusFor,githubWorkf
       return true;
     }
     if(req.method!=="POST"){json(res,405,{error:"method_not_allowed"});return true;}
-    if(!operatorAuthorized(req)){json(res,401,{error:"operator_authorization_required"});return true;}
+    const sessionOk=req.headers.origin==="https://bot.piratecartography.com" && req.headers["x-nabou-agent-room"]==="1" && sessionAuthorized(req);
+    if(!operatorAuthorized(req)&&!sessionOk){json(res,401,{error:"operator_authorization_required"});return true;}
     if(!String(process.env.PCT_GITHUB_DISPATCH_TOKEN||"")){json(res,503,{error:"dispatch_not_configured"});return true;}
     // Enforce a same-origin operator flow or a server-side client with no Origin.
     // An arbitrary browser origin is not sufficient even with a bearer token.
