@@ -1,0 +1,70 @@
+name: N7 Plesk Node readiness audit (no writes)
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/n7-plesk-node-readiness.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 6
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: linux3087.grserver.gr
+    steps:
+      - name: Inspect only the existing bot FTP root and exposed HTTPS routes
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import ftplib,io,json,os,re,socket,ssl,urllib.request,urllib.error,posixpath,hashlib
+          host=os.environ['PCT_FTPS_HOST']
+          tls=os.environ['PCT_FTPS_TLS_SERVER_NAME']
+          port=int(os.environ.get('PCT_FTPS_PORT','21'))
+          if not ({i[4][0] for i in socket.getaddrinfo(host,port,type=socket.SOCK_STREAM)} &
+                  {i[4][0] for i in socket.getaddrinfo(tls,port,type=socket.SOCK_STREAM)}):
+            raise SystemExit('TLS_NAME_NOT_BOUND_TO_CONFIGURED_HOST')
+          ftp=ftplib.FTP_TLS(timeout=22,context=ssl.create_default_context())
+          ftp.connect(host,port);ftp.host=tls
+          ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD']);ftp.prot_p()
+          print('N7_FTPS_CONNECTED=true')
+          for directory in ['/bot.piratecartography.com','/bot.piratecartography.com/httpdocs','/bot.piratecartography.com/n7-app','/bot.piratecartography.com/tmp']:
+            try:
+              ftp.cwd(directory)
+              names={posixpath.basename(x.rstrip('/')) for x in ftp.nlst()}
+              recognized=['index.html','index.js','server.js','app.js','package.json','.htaccess','public','data','tmp','n7-app','node_modules','restart.txt','passenger.js']
+              detail={'directory':directory,'accessible':True,'recognized':sorted(names.intersection(recognized))}
+              if 'index.html' in names:
+                chunks=[];ftp.retrbinary('RETR index.html',chunks.append)
+                data=b''.join(chunks)
+                detail['existing_agent_room']=b'// AGENT ROOM' in data
+                detail['html_sha256']=hashlib.sha256(data).hexdigest()
+              for name in ('.htaccess','package.json','server.js','app.js'):
+                if name not in names:continue
+                chunks=[];ftp.retrbinary('RETR '+name,chunks.append)
+                data=b''.join(chunks)[:200000]
+                detail[name.replace('.','_')+'_present']=True
+                detail[name.replace('.','_')+'_sha256']=hashlib.sha256(data).hexdigest()
+                if name=='.htaccess':
+                  detail['passenger_directive_present']=bool(re.search(rb'Passenger(?:Enabled|AppRoot|StartupFile|Nodejs)',data,re.I))
+                  detail['passenger_directive_names']=sorted(set(x.decode('ascii') for x in re.findall(rb'Passenger(?:Enabled|AppRoot|StartupFile|Nodejs)',data,re.I)))
+              print('N7_FTPS_ROOT '+json.dumps(detail,sort_keys=True))
+            except ftplib.all_errors as e:
+              print('N7_FTPS_ROOT '+json.dumps({'directory':directory,'accessible':False,'error_type':type(e).__name__}))
+          ftp.quit()
+          for url in ('https://bot.piratecartography.com/','https://bot.piratecartography.com/health'):
+            try:
+              with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'n7-readonly-node-readiness'}),timeout=15,context=ssl.create_default_context()) as r:
+                data=r.read(100000)
+                print('N7_HTTPS '+json.dumps({'url':url,'code':r.status,'agent_room':b'AGENT ROOM' in data,'n7_node_health':b'"modelConfigured"' in data}))
+            except urllib.error.HTTPError as e:
+              print('N7_HTTPS '+json.dumps({'url':url,'code':e.code}))
+            except Exception as e:
+              print('N7_HTTPS '+json.dumps({'url':url,'error_type':type(e).__name__}))
+          print('N7_READONLY_AUDIT_COMPLETED=true')
+          PY
