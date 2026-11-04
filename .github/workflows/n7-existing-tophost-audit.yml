@@ -21,6 +21,10 @@ jobs:
       PCT_GITHUB_DISPATCH_TOKEN: ${{ secrets.PCT_GITHUB_DISPATCH_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            server/command-center-live/n7-gateway.js
       - name: FTPS directory readback and TLS web probes - no writes
         shell: bash
         run: |
