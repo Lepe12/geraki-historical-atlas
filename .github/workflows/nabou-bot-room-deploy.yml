@@ -1,0 +1,52 @@
+name: NABOU dedicated bot room deployment
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ops_ftps_requests/bot-agent-room.json'
+permissions:
+  contents: read
+concurrency:
+  group: nabou-bot-production-ftps
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 8
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: linux3087.grserver.gr
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate explicit bot-only deployment authorization
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('ops_ftps_requests/bot-agent-room.json').read_text())
+          assert p.get('schema')=='nabou-bot-room-deployment-request-v1'
+          assert p.get('confirmation')=='DEPLOY-BOT-ROOM'
+          assert p.get('destination')=='/bot.piratecartography.com'
+          assert p.get('payload')=='server/command-center-live/public/agents.html'
+          PY
+          python3 -m py_compile tools/gateway/deploy_bot_room.py
+      - name: Atomically upload verified agent room to bot domain
+        run: python3 tools/gateway/deploy_bot_room.py
+      - name: Check bot URL through verified HTTPS without bypass
+        continue-on-error: true
+        run: |
+          python3 - <<'PY'
+          import ssl,urllib.request,urllib.error
+          try:
+            with urllib.request.urlopen('https://bot.piratecartography.com/',timeout=15,context=ssl.create_default_context()) as response:
+              body=response.read(150000)
+              if b'AGENT ROOM' not in body:raise RuntimeError('UNEXPECTED_SITE_BODY')
+              print('BOT_ROOM_HTTPS_CERT_VERIFIED_AND_HTML_PRESENT')
+          except Exception as e:
+            print('HTTPS_NOT_YET_VERIFIED:',type(e).__name__)
+            raise
+          PY
