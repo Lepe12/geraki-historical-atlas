@@ -67,12 +67,13 @@ def prepare_changes(
                 + ". Make the smallest correct change in this file; "
                 + "any peer-file modifications will be reviewed separately. "
                 + "Use a single short exact replacement or unique insert_after anchor. "
+                + ("For new CSS rules, use append_css with text containing a small complete rule; no anchor needed. " if target.endswith(".css") else "")
                 + "Never copy the entire file as an edit. Return valid structured JSON."
             )
             raw = infer_model(coordinated_task, original, target, endpoint, model, token)
         attempts = 1
         try:
-            proposal, candidate = parse_and_apply(raw, original)
+            proposal, candidate = parse_and_apply(raw, original, allow_css_append=target.endswith(".css"))
         except AgentError as first_error:
             if proposals is not None:
                 raise AgentError(f"{target}: {first_error}") from first_error
@@ -80,14 +81,15 @@ def prepare_changes(
             attempts = 2
             repair_task = (
                 coordinated_task
-                + "\\nPrevious attempt was rejected: " + str(first_error)
+                + "\nPrevious attempt was rejected: " + str(first_error)
                 + ". Use the exact existing old/anchor substring copied verbatim; "
                 + "prefer insert_after with a UNIQUE short anchor. "
+                + ("If the target is CSS and the anchor failed, use append_css with a complete small CSS rule in text. " if target.endswith(".css") else "")
                 + "Do NOT rewrite the entire file. JSON only."
             )
             raw = infer_model(repair_task, original, target, endpoint, model, token)
             try:
-                proposal, candidate = parse_and_apply(raw, original)
+                proposal, candidate = parse_and_apply(raw, original, allow_css_append=target.endswith(".css"))
             except AgentError as second_error:
                 raise AgentError(f"{target}: retry failed: {second_error}") from second_error
         changes.append({

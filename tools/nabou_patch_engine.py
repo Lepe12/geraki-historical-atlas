@@ -14,7 +14,34 @@ MAX_EDITS = 5
 MAX_CHANGE_BYTES = 4000
 
 
-def parse_and_apply(raw: str, original: str) -> tuple[dict, str]:
+def _safe_css_append(text: str) -> bool:
+    """Only allow bounded, self-contained CSS; no external resources."""
+    if not text.strip() or len(text) > 1200:
+        return False
+    if re.search(r"@import|@charset|@namespace|url\s*\(|expression\s*\(|behavior\s*:|-moz-binding", text, re.I):
+        return False
+    if "/*" in text or "*/" in text or "<" in text or ">" in text:
+        return False
+    if text.count("{") != text.count("}") or text.count("{") < 1:
+        return False
+    depth = 0
+    quote = None
+    for ch in text:
+        if quote:
+            if ch == quote:
+                quote = None
+        elif ch in ("'", '"'):
+            quote = ch
+        elif ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth < 0:
+                return False
+    return depth == 0 and quote is None and text.rstrip().endswith("}")
+
+
+def parse_and_apply(raw: str, original: str, *, allow_css_append: bool = False) -> tuple[dict, str]:
     raw = raw.strip()
     if raw.startswith(chr(96) * 3):
         raw = re.sub(r"^" + chr(96) * 3 + r"(?:json)?\s*", "", raw)
@@ -51,6 +78,13 @@ def parse_and_apply(raw: str, original: str) -> tuple[dict, str]:
                 raise AgentError("EXACT_INSERT_ANCHOR_NOT_UNIQUE_" + str(index))
             point = output.index(anchor) + (len(anchor) if op == "insert_after" else 0)
             output = output[:point] + text + output[point:]
+        elif op == "append_css":
+            text = item.get("text")
+            if not allow_css_append or not isinstance(text, str) or not _safe_css_append(text):
+                raise AgentError("INVALID_CSS_APPEND_" + str(index))
+            if text.strip() in output:
+                raise AgentError("DUPLICATE_CSS_APPEND_" + str(index))
+            output = output.rstrip("\n") + "\n" + text.strip() + "\n"
         else:
             raise AgentError("UNSUPPORTED_PATCH_OPERATION_" + str(index))
 

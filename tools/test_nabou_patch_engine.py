@@ -45,6 +45,30 @@ class ExactPatchTests(unittest.TestCase):
             parse_and_apply(json.dumps({"edits": [{"op": "insert_after",
                 "anchor": ".does-not-exist{}", "text": ".y{}"}]}), ".x{}")
 
+    def test_css_append_succeeds_without_an_anchor(self):
+        original = ".rail{color:#fff}\n"
+        proposal = {"edits": [{"op": "append_css",
+                               "text": "@media(max-width:600px){.rail{min-width:44px}}"}]}
+        _, result = parse_and_apply(json.dumps(proposal), original, allow_css_append=True)
+        self.assertTrue(result.startswith(original))
+        self.assertIn("min-width:44px", result)
+
+    def test_css_append_never_allowed_for_js(self):
+        proposal = {"edits": [{"op": "append_css", "text": ".x{color:red}"}]}
+        with self.assertRaisesRegex(AgentError, "INVALID_CSS_APPEND"):
+            parse_and_apply(json.dumps(proposal), "const x = 1;", allow_css_append=False)
+
+    def test_css_append_rejects_external_resources_and_duplicates(self):
+        for payload in ("@import 'https://evil.example/style.css';",
+                        ".x{background:url(https://evil.example/x)}",
+                        ".x{color:red", "<script>alert(1)</script>"):
+            with self.subTest(payload=payload), self.assertRaises(AgentError):
+                parse_and_apply(json.dumps({"edits": [{"op": "append_css", "text": payload}]}),
+                                ".rail{color:#fff}", allow_css_append=True)
+        duplicate = {"edits": [{"op": "append_css", "text": ".rail{color:#fff}"}]}
+        with self.assertRaisesRegex(AgentError, "DUPLICATE_CSS_APPEND"):
+            parse_and_apply(json.dumps(duplicate), ".rail{color:#fff}", allow_css_append=True)
+
     def test_large_ai_rewrite_refused(self):
         with self.assertRaises(AgentError):
             parse_and_apply(json.dumps({"edits": [{"op": "insert_after",
