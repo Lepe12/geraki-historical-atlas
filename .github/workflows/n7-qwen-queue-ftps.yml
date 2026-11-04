@@ -1,0 +1,100 @@
+name: N7 private Qwen queue bridge safe FTPS deployment
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/n7-qwen-queue-ftps.yml'
+      - 'tools/n7/n7-queue-bridge.js'
+      - 'tools/n7/n7-queue-bridge.test.js'
+      - 'tools/n7/deploy_n7_bridge.py'
+  push:
+    branches: [main]
+    paths:
+      - 'ops_ftps_requests/n7-qwen-queue.json'
+permissions:
+  contents: read
+concurrency:
+  group: n7-private-qwen-queue-plesk
+  cancel-in-progress: false
+jobs:
+  validate:
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run private-queue authorization and delivery regression tests
+        run: |
+          node --check tools/n7/n7-queue-bridge.js
+          node --test tools/n7/n7-queue-bridge.test.js
+          python3 -m py_compile tools/n7/deploy_n7_bridge.py
+      - name: Dry-run patch on actual owner-hosted N7 files without modifications
+        run: python3 tools/n7/deploy_n7_bridge.py
+  deploy:
+    if: github.event_name == 'push'
+    needs: validate
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Require explicitly scoped bot-only deployment request
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('ops_ftps_requests/n7-qwen-queue.json').read_text())
+          assert p['confirmation']=='DEPLOY-N7-PRIVATE-QUEUE'
+          assert p['destination']=='/bot.piratecartography.com/n7-app'
+          assert p['secret_values_in_repo']==False
+          PY
+      - name: Patch, hash-verify and restart only N7 with automatic rollback
+        run: python3 tools/n7/deploy_n7_bridge.py
+      - name: Verify live app routes and deny unauthenticated worker
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import ssl,urllib.request,urllib.error,json
+          base='https://bot.piratecartography.com'
+          ctx=ssl.create_default_context()
+          for route in ('/','/health','/api/status','/app.js'):
+            with urllib.request.urlopen(base+route,timeout=15,context=ctx) as r:
+              body=r.read(40000)
+              if r.status!=200:raise RuntimeError('N7_ROUTE_UNHEALTHY_'+route)
+              if route=='/api/status':
+                j=json.loads(body)
+                if j.get('queueModelAvailable') is not True:raise RuntimeError('N7_QUEUED_MODEL_NOT_EXPOSED')
+              print('N7_ROUTE_PASS '+route+' HTTP_200')
+          req=urllib.request.Request(base+'/api/n7/worker/claim',data=b'{}',method='POST',headers={'Content-Type':'application/json'})
+          try:urllib.request.urlopen(req,timeout=12,context=ctx);raise RuntimeError('N7_WORKER_UNGUARDED')
+          except urllib.error.HTTPError as e:
+            if e.code!=401:raise
+          print('N7_WORKER_AUTH_NEGATIVE_PASS')
+          PY
