@@ -19,3 +19,25 @@ The only change to `app.js` is a require and a dispatch to the small `n7-gateway
 
 ## Limitations
 This is a controlled JARVIS workflow dispatch bridge, **not** a general shell, editor, autonomous coding agent or server administrator. No arbitrary command execution, filesystem writes, direct MariaDB access or unattended production deployment is permitted through N7.
+
+## N7 → Qwen 7B GitHub bridge (review-only)
+Once this PR is merged and the existing Node service is deployed/restarted,
+an authorized `POST /pct-api/live/n7/code` accepts a JSON object with:
+- `task`: 8–2000 characters (concrete frontend coding request);
+- `target_files`: an array of 2–3 distinct items selected only from
+  `jarvis-intelligence-chamber/navigation-rail.css`,
+  `jarvis-intelligence-chamber/photon-windows.css`,
+  `jarvis-intelligence-chamber/nabou-shell.css`.
+
+The server sends a **fixed** GitHub Actions dispatch to
+`nabou-coder-v03.yml` on `main`, always with `apply_changes=false`.
+This runs the existing Qwen2.5 Coder 7B code workflow and saves a preview
+artifact. It **does not** write, merge, or deploy AI-proposed changes.
+Operator authorization, configured GitHub token, browser Origin controls and
+rate limits match existing N7 dispatch. The server token must have permission
+to trigger Actions. The response HTTP 202 proves acceptance by GitHub only,
+not completion of the model inference; inspect the GitHub Actions run.
+
+Smoke checks: `node --check server/command-center-live/app.js` and
+`node --test server/command-center-live/n7-gateway.test.js`.
+Production integration still requires reviewed merge and live host deployment.
