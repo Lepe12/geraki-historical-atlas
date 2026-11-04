@@ -44,7 +44,7 @@ function createN7Gateway({json,operatorAuthorized,readBody,statusFor,githubWorkf
         "jarvis-intelligence-chamber/nabou-shell.css"
       ]);
       const files=body?.target_files;
-      if(task.length<8||task.length>2000||/[\\x00-\\x1F]/.test(task)||
+      if(task.length<8||task.length>2000||[...task].some(ch=>ch.charCodeAt(0)<32)||
         !Array.isArray(files)||files.length<2||files.length>3||
         new Set(files).size!==files.length||!files.every(f=>allowed.has(f))||
         body?.apply_changes===true){
