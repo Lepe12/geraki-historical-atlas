@@ -48,7 +48,7 @@ jobs:
               try:
                 ftp.cwd(directory)
                 names={posixpath.basename(x.rstrip('/')) for x in ftp.nlst()}
-                allow={'index.html','server.js','app.js','n7-gateway.js','package.json','.htaccess','tmp','node_modules','public','agents.html','web.config','passenger.js','passenger_wsgi.py'}
+                allow={'index.html','server.js','app.js','n7-gateway.js','n7-oauth.js','package.json','.htaccess','tmp','node_modules','public','agents.html','web.config','passenger.js','passenger_wsgi.py'}
                 row={'directory':directory,'accessible':True,'recognized_entries':sorted(names&allow)}
                 if directory=='/bot.piratecartography.com' and 'index.html' in names:
                   parts=[]
@@ -56,11 +56,14 @@ jobs:
                   raw=b''.join(parts)
                   row.update(index_bytes=len(raw),n7_agent_room=b'// AGENT ROOM' in raw,
                              index_sha256=hashlib.sha256(raw).hexdigest())
-                if directory.endswith('command-center-live') and 'n7-gateway.js' in names:
-                  parts=[]; ftp.retrbinary('RETR n7-gateway.js',parts.append)
-                  installed=hashlib.sha256(b''.join(parts)).hexdigest()
-                  source=Path('server/command-center-live/n7-gateway.js').read_bytes()
-                  row.update(gateway_exists=True,gateway_matches_current_main=(installed==hashlib.sha256(source).hexdigest()))
+                if directory.endswith('command-center-live'):
+                  for target,key in (('app.js','app_matches_current_main'),('n7-gateway.js','gateway_matches_current_main'),('n7-oauth.js','oauth_matches_current_main')):
+                    if target in names:
+                      parts=[]; ftp.retrbinary('RETR '+target,parts.append)
+                      deployed=hashlib.sha256(b''.join(parts)).hexdigest()
+                      source=Path('server/command-center-live',target).read_bytes()
+                      row[key]=deployed==hashlib.sha256(source).hexdigest()
+                    else:row[key]=False
                 print('FTPS_READONLY '+json.dumps(row,sort_keys=True))
               except ftplib.all_errors as e:
                 print('FTPS_READONLY '+json.dumps({'directory':directory,'accessible':False,'error_type':type(e).__name__}))
