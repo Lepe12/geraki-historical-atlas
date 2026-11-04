@@ -136,6 +136,7 @@ footer{color:#6d94a5;font-size:.77rem;margin-top:24px}
     </select>
     <div class="actions">
       <button type="button" class="primary" id="n7PrivateSubmit">Ανάθεση στον ιδιωτικό N7</button>
+      <button type="button" class="ghost" id="n7IssueFallback">Ιδιωτική ανάθεση μέσω GitHub (χωρίς token)</button>
     </div>
     <div class="console" id="n7PrivateConsole" role="status" aria-live="polite">Καμία νέα εργασία N7 Skills.</div>
     <p class="notes">Απαιτείται σύνδεση GitHub. Τα αποτελέσματα δεν προβάλλονται δημόσια στην Agent Room. Η λειτουργία δεν τροποποιεί τον τρισδιάστατο NABOU.</p>
@@ -197,6 +198,34 @@ document.querySelectorAll('input[name="mode"]').forEach(r=>r.addEventListener("c
   $("confirmationWrap").hidden=document.querySelector('input[name="mode"]:checked').value!=="draft";
   $("confirmation").checked=false;
 }));
+$("n7IssueFallback").addEventListener("click",async()=>{
+  const task=$("n7PrivateTask").value.trim(),skill=$("n7PrivateSkill").value;
+  if(task.length<12||task.length>2000){
+    $("n7PrivateConsole").textContent="Η εργασία πρέπει να έχει 12–2000 χαρακτήρες.";
+    return;
+  }
+  if(!["greek-prose-editor","historical-source-audit"].includes(skill)){
+    $("n7PrivateConsole").textContent="Μη έγκυρο skill.";
+    return;
+  }
+  // No task content is placed in a URL, sent to this public server or stored in browser storage.
+  // The owner pastes it directly into a private GitHub Issue Form after GitHub sign-in.
+  try{
+    await navigator.clipboard.writeText(task);
+  }catch(_){
+    const pad=document.createElement("textarea");
+    pad.value=task;pad.style.cssText="position:fixed;left:-10000px;top:0";
+    document.body.appendChild(pad);pad.select();
+    const copied=document.execCommand("copy");
+    pad.remove();
+    if(!copied){
+      $("n7PrivateConsole").textContent="Δεν ήταν δυνατή η αντιγραφή. Άνοιξε την ιδιωτική φόρμα του GitHub και επικόλλησε χειροκίνητα την εργασία.";
+      return;
+    }
+  }
+  window.open("https://github.com/Lepe12/independent-ai-bot/issues/new?template=n7-task.yml","_blank","noopener,noreferrer");
+  $("n7PrivateConsole").textContent="Η εργασία αντιγράφηκε χωρίς να σταλεί στον δημόσιο server. Στην ιδιωτική φόρμα GitHub επέλεξε "+skill+", επικόλλησε το κείμενο στο πεδίο Task και πάτησε Submit new issue. Ο ιδιωτικός N7 θα ξεκινήσει χωρίς API token.";
+});
 $("n7PrivateSubmit").addEventListener("click",async()=>{
   const task=$("n7PrivateTask").value.trim(),skill=$("n7PrivateSkill").value;
   if(!authenticated){$("n7PrivateConsole").textContent="Απαιτείται πρώτα σύνδεση GitHub.";return;}
