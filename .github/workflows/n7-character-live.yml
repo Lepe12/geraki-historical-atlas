@@ -1,0 +1,48 @@
+name: N7 approved character live FTPS deployment
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ops_ftps_requests/n7-character.json'
+permissions:
+  contents: read
+concurrency:
+  group: n7-approved-character-frontend
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 8
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify scoped deployment authorization and syntax
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          request=json.loads(Path('ops_ftps_requests/n7-character.json').read_text())
+          assert request['schema']=='n7-approved-character-v1'
+          assert request['confirmation']=='DEPLOY-N7-CHARACTER'
+          assert request['destination']=='/bot.piratecartography.com/n7-app/public/app.js'
+          assert request['backend_changed'] is False
+          assert request['nabou_changed'] is False
+          PY
+          node --check tools/n7/n7-approved-character.js
+          python3 -m py_compile tools/n7/deploy_n7_character.py
+      - name: Install approved character only on existing N7 frontend, verify HTTP and retain backup
+        run: python3 tools/n7/deploy_n7_character.py
