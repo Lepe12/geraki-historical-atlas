@@ -42,8 +42,16 @@ def main():
         if len(existing)>300_000 or len(existing)<1_000 or b'/api/conversations/' not in existing or b'/api/tasks' not in existing:
             raise RuntimeError('UNRECOGNIZED_N7_FRONTEND_ABORT')
         if MARKER in existing:
+            start=existing.rfind(b'/* N7_APPROVED_CHARACTER_V1:')
+            if start<0:raise RuntimeError('UNKNOWN_EXISTING_N7_CHARACTER_LAYOUT')
+            # Keep the entire original private app and replace only the
+            # previously appended N7 character payload.
+            original=existing[:start].rstrip()
+        else:
+            original=existing.rstrip()
+        combined=original+b'\n\n'+patch+b'\n'
+        if combined==existing:
             print('N7_CHARACTER_ALREADY_DEPLOYED '+sha(existing));return
-        combined=existing.rstrip()+b'\n\n'+patch+b'\n'
         syntax(combined)
         token=uuid.uuid4().hex[:12]
         stage='.n7-avatar-stage-'+token+'.js'
