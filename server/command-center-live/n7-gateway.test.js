@@ -160,7 +160,7 @@ test("GitHub signed session authorizes code tasks only from dedicated bot with C
 
 test("authorized private N7 task dispatches only the selected reviewed skill",async()=>{
   process.env.PCT_GITHUB_DISPATCH_TOKEN="test-placeholder";
-  const task="Επιμελήσου το απόσπασμα με σεβασμό στο αρχικό ύφος.";
+  const task="Επιμελήσου το απόσπασμα με σεβασμό στο αρχικό ύφος.\nΣυνέχισε με την επόμενη παράγραφο.";
   const x=rig(true,{task,skill:"greek-prose-editor"});
   const result=await x.call("POST","/n7/brain/task");
   assert.equal(result.status,202);
