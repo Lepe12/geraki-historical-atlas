@@ -1,0 +1,37 @@
+name: N7 private repository dispatch permission probe
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/n7-private-dispatch-probe.yml'
+  workflow_dispatch:
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  probe-private-n7:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Verify narrow private N7 workflow dispatch with signed GitHub OIDC
+        shell: bash
+        run: |
+          node <<'NODE'
+          async function run(){
+            const src=process.env.ACTIONS_ID_TOKEN_REQUEST_URL;
+            const auth=process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN;
+            if(!src||!auth)throw Error('GH_OIDC_NOT_AVAILABLE');
+            const u=new URL(src);u.searchParams.set('audience','piratecartography-command-center');
+            const tokenResponse=await fetch(u,{headers:{authorization:'Bearer '+auth},signal:AbortSignal.timeout(15000)});
+            if(!tokenResponse.ok)throw Error('OIDC_HTTP_'+tokenResponse.status);
+            const token=(await tokenResponse.json()).value;
+            if(typeof token!=='string'||!token)throw Error('OIDC_EMPTY');
+            const result=await fetch('https://pct-live.piratecartography.com/pct-api/live/n7/brain/probe',{
+              method:'POST',headers:{authorization:'Bearer '+token},
+              signal:AbortSignal.timeout(20000)});
+            const body=await result.json().catch(()=>({}));
+            console.log('N7_PRIVATE_DISPATCH_PROBE_HTTP='+result.status+' RESULT='+String(body.status||body.error||'unknown'));
+            if(result.status!==202||body.status!=='PRIVATE_WORKFLOW_DISPATCH_ACCEPTED')process.exitCode=1;
+          }
+          run().catch(e=>{console.error('N7_PRIVATE_DISPATCH_PROBE_FAILED '+String(e.message||e).slice(0,90));process.exitCode=1;});
+          NODE
