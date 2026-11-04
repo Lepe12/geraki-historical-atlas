@@ -10,7 +10,7 @@
 :root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color-scheme:dark;color:#e5f5fb;background:#07121c}
 *{box-sizing:border-box}
 body{margin:0;background:radial-gradient(circle at 50% 0,#113143 0,#07121c 43%,#040910 100%);min-height:100vh}
-button,input,textarea{font:inherit}
+button,input,textarea,select{font:inherit}
 a{color:#8aeafe}
 button{cursor:pointer;border-radius:8px;border:1px solid #3a8395;color:#c9f8ff;background:#143647;padding:10px 15px}
 button:hover{border-color:#8ceaff;background:#1b5264}button:disabled{opacity:.5;cursor:wait}
@@ -38,6 +38,7 @@ label{display:block;color:#b1d4e0;font-size:.9rem;margin:15px 0 6px}
 textarea{background:#071723;border:1px solid #3a7184;color:#ebfbff;border-radius:8px;padding:12px;width:100%;outline:none}
 textarea:focus,input:focus{border-color:#64e4fc;box-shadow:0 0 0 2px #64e4fc21}
 textarea{min-height:130px;resize:vertical}
+select{background:#071723;border:1px solid #3a7184;color:#ebfbff;border-radius:8px;padding:10px;max-width:100%}
 fieldset{border:1px solid #31586b;border-radius:10px;margin:15px 0;padding:12px 15px}
 legend{color:#8fdaf0;padding:0 6px;font-size:.86rem}
 .choice{display:flex;gap:10px;align-items:flex-start;font-size:.86rem;margin:9px 0;cursor:pointer}
@@ -122,6 +123,23 @@ footer{color:#6d94a5;font-size:.77rem;margin-top:24px}
       <p class="notes">N7 = σύνδεση και ανάθεση. Coding Agent = επεξεργασία CSS και δημιουργία patch ή Draft PR. Ο τρισδιάστατος κόσμος του NABOU παραμένει ανεπηρέαστος.</p>
     </aside>
   </section>
+  <section class="panel" aria-label="Ιδιωτικές εργασίες N7 Skills" style="margin-top:22px">
+    <div class="mini">PRIVATE N7 SKILLS · LOCAL QWEN ON DEMAND</div>
+    <h2>Ανάθεση στο N7 Skills</h2>
+    <p>Δώσε μια εργασία επιμέλειας ελληνικού κειμένου ή ιστορικής έρευνας. Το ιδιωτικό Qwen εκτελείται στο GitHub Actions και επιστρέφει κατάσταση εδώ. Η απάντηση φυλάσσεται ως ιδιωτικό artifact του workflow.</p>
+    <label for="n7PrivateTask">Εργασία N7</label>
+    <textarea id="n7PrivateTask" maxlength="2000" placeholder="Γράψε την εργασία επιμέλειας ή τον ιστορικό έλεγχο που θέλεις…"></textarea>
+    <label for="n7PrivateSkill">Εγκεκριμένο skill</label>
+    <select id="n7PrivateSkill">
+      <option value="greek-prose-editor">Επιμέλεια ελληνικής πεζογραφίας</option>
+      <option value="historical-source-audit">Ιστορικός έλεγχος πηγών</option>
+    </select>
+    <div class="actions">
+      <button type="button" class="primary" id="n7PrivateSubmit">Ανάθεση στον ιδιωτικό N7</button>
+    </div>
+    <div class="console" id="n7PrivateConsole" role="status" aria-live="polite">Καμία νέα εργασία N7 Skills.</div>
+    <p class="notes">Απαιτείται σύνδεση GitHub. Τα αποτελέσματα δεν προβάλλονται δημόσια στην Agent Room. Η λειτουργία δεν τροποποιεί τον τρισδιάστατο NABOU.</p>
+  </section>
   <footer>PROJECT NABOU · TWO AGENTS · VERIFIED STATUS, NOT SIMULATED AI</footer>
 </main>
 <script>
@@ -179,6 +197,25 @@ document.querySelectorAll('input[name="mode"]').forEach(r=>r.addEventListener("c
   $("confirmationWrap").hidden=document.querySelector('input[name="mode"]:checked').value!=="draft";
   $("confirmation").checked=false;
 }));
+$("n7PrivateSubmit").addEventListener("click",async()=>{
+  const task=$("n7PrivateTask").value.trim(),skill=$("n7PrivateSkill").value;
+  if(!authenticated){$("n7PrivateConsole").textContent="Απαιτείται πρώτα σύνδεση GitHub.";return;}
+  if(task.length<12||task.length>2000){$("n7PrivateConsole").textContent="Η εργασία πρέπει να έχει 12–2000 χαρακτήρες.";return;}
+  const button=$("n7PrivateSubmit");button.disabled=true;
+  $("n7PrivateConsole").textContent="Αποστολή στο ιδιωτικό workflow N7…";
+  try{
+    const r=await fetch(API_BASE+"/pct-api/live/n7/brain/task",{
+      method:"POST",credentials:"include",
+      headers:{"Content-Type":"application/json","X-NABOU-Agent-Room":"1"},
+      body:JSON.stringify({task,skill}),signal:AbortSignal.timeout(25000)
+    });
+    const data=await r.json().catch(()=>({}));
+    if(r.status!==202||data.status!=="ACCEPTED")throw Error(data.error||"HTTP "+r.status);
+    $("n7PrivateConsole").textContent="N7 Skills: η εργασία ανατέθηκε στο ιδιωτικό GitHub Actions (HTTP 202).\nΕργαλείο: "+skill+".\nΗ κατάσταση ενημερώνεται από υπογεγραμμένα σήματα.\nΑποτέλεσμα: ιδιωτικό GitHub Actions artifact, όταν ολοκληρωθεί.";
+    refresh();
+  }catch(e){$("n7PrivateConsole").textContent="Η εργασία δεν ανατέθηκε: "+e.message;}
+  finally{button.disabled=false;}
+});
 $("refresh").addEventListener("click",()=>{refresh();checkLogin();});
 $("login").addEventListener("click",()=>location.assign(API_BASE+"/pct-api/live/n7/auth/start"));
 $("logout").addEventListener("click",async()=>{
