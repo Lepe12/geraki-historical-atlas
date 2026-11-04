@@ -55,6 +55,12 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            server/command-center-live
+            tools
+            ops_ftps_requests
       - name: Validate explicit existing-host deployment request
         id: request
         if: github.event_name == 'push'
