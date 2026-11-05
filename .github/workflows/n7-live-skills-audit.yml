@@ -24,7 +24,7 @@ jobs:
         shell: bash
         run: |
           python3 - <<'PY'
-          import ftplib, ssl, socket, json, os, collections
+          import ftplib, ssl, socket, json, os, collections, re
           root='/bot.piratecartography.com/n7-app'
           tls='linux3087.grserver.gr'
           host=os.environ['PCT_FTPS_HOST']
@@ -67,14 +67,24 @@ jobs:
             for name in ('greek-prose-editor','historical-source-audit'):
               raw=read(root+'/skills/'+name+'/SKILL.md')
               print('N7_LIVE_SKILL_'+name+'='+('PRESENT' if raw and ('name: '+name).encode() in raw else 'MISSING'))
+            livecode=code.decode('utf8') if code else ''
+            normalized=re.sub(r'\\s+','',livecode)
             print('N7_LIVE_PATH_WIRING='+json.dumps({
-              'chat_uses_agent':bool(code and b'runAgent(history' in code),
-              'agent_task_uses_agent':bool(code and b"kind==='agent'" in code and b'runAgent(prompt' in code),
+              'server_imports_agent':"require('./agent')" in normalized,
+              'server_calls_runAgent':bool(re.search(r'\\brunAgent\\s*\\(',livecode)),
+              'server_declares_agent_queue_kind':bool(re.search(r"kind\\s*===\\s*['\"]agent['\"]",livecode)),
+              'server_has_tasks_route':'/api/tasks' in livecode,
+              'chat_uses_agent':bool(re.search(r'runAgent\\s*\\(\\s*history',livecode)),
               'skill_load_tool':bool(agent and b"name==='load_skill'" in agent),
               'feedback_endpoint':bool(code and b'/api/skills/feedback' in code),
               'feedback_persistence':bool(learning and b'feedback.json' in learning),
               'lesson_appendix':bool(agent and b'Observed owner-reviewed feedback' in agent),
-              'suggest_inactive_revision':bool(agent and b'suggest_skill_improvement' in agent)
+              'suggest_inactive_revision':bool(agent and b'suggest_skill_improvement' in agent),
+              'default_data_dir_declared':"path.join(__dirname,'data')" in normalized
+            },sort_keys=True))
+            print('N7_LIVE_DATA_PATH_MARKERS='+json.dumps({
+              'conversations_file_exists':read(root+'/data/conversations.json') is not None,
+              'legacy_queue_file_exists':read(root+'/data/n7-private-queue.json') is not None
             },sort_keys=True))
             feedback_path=root+'/data/agent-workspace/.n7-internal/skill-learning/feedback.json'
             feedback=read(feedback_path,700000)
