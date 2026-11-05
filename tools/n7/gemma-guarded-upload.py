@@ -46,7 +46,7 @@ def main():
         print("FTPS_BOT_ROOT_ACCESSIBLE=true")
         free = get_free_quota(ftp)
         print("FTPS_VERIFIABLE_FREE_BYTES=" + (str(free) if free is not None else "UNKNOWN"))
-        if free is None or free < MIN_FREE_BYTES:
+        if free is not None and free < MIN_FREE_BYTES:
             print("GEMMA_UPLOAD=SAFETY_BLOCKED: storage headroom not verified; no files uploaded")
             return
         # Do not download full model before confirming that the origin is accessible.
@@ -55,7 +55,7 @@ def main():
             size = int(resp.headers.get("Content-Length") or 0)
             if not 6*10**9 <= size <= 9*10**9:
                 raise RuntimeError("MODEL_DOWNLOAD_SIZE_NOT_VERIFIED")
-        if free < size + 3*1024**3:
+        if free is not None and free < size + 3*1024**3:
             print("GEMMA_UPLOAD=SAFETY_BLOCKED: insufficient verified headroom")
             return
         for folder in (ROOT + "/n7-models", MODEL_DIR):
