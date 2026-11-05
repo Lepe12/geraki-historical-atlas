@@ -1,0 +1,94 @@
+name: N7 rich chat streaming, attachments, and evidence deploy
+
+on:
+  pull_request:
+    paths:
+      - tools/n7/stream-attachments.js
+      - tools/n7/stream-upload-ui.js
+      - tools/n7/public-web-search.js
+      - tools/n7/test_stream_attachments.cjs
+      - tools/n7/test_source_evidence.cjs
+      - tools/n7/deploy_rich_chat.py
+      - .github/workflows/n7-rich-chat.yml
+      - ops_ftps_requests/n7-rich-chat.json
+  push:
+    branches: [main]
+    paths:
+      - ops_ftps_requests/n7-rich-chat.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n7-rich-chat-deploy
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax and integration regression tests
+        run: |
+          node --check tools/n7/stream-attachments.js
+          node --check tools/n7/stream-upload-ui.js
+          node --check tools/n7/public-web-search.js
+          node --test tools/n7/test_stream_attachments.cjs tools/n7/test_source_evidence.cjs
+          python3 -m py_compile tools/n7/deploy_rich_chat.py
+      - name: Read real live N7 and ensure compatibility without writing
+        run: python3 tools/n7/deploy_rich_chat.py
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: validate
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Confirm explicit owner scope before real deployment
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          expected={
+            'confirmation':'N7-GENUINE-STREAM-ATTACHMENTS-SOURCE-READING',
+            'target':'/bot.piratecartography.com/n7-app',
+            'preserve_groq_memory_clock_and_conversations':True,
+            'private_attachment_storage':True,
+            'rollback':True
+          }
+          assert json.loads(Path('ops_ftps_requests/n7-rich-chat.json').read_text())==expected
+          print('N7_RICH_OWNER_AUTH_VALID=true')
+          PY
+      - name: Activate streaming, upload, publisher reading with full rollback protections
+        run: python3 tools/n7/deploy_rich_chat.py
