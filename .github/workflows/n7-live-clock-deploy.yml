@@ -1,0 +1,89 @@
+name: N7 live Athens clock and no-unverified-news deploy
+
+on:
+  pull_request:
+    paths:
+      - tools/n7/live-clock-guard.js
+      - tools/n7/test_live_clock_guard.cjs
+      - tools/n7/deploy_live_clock_guard.py
+      - .github/workflows/n7-live-clock-deploy.yml
+      - ops_ftps_requests/n7-live-clock.json
+  push:
+    branches: [main]
+    paths:
+      - ops_ftps_requests/n7-live-clock.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n7-live-clock-deploy
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Unit-test date, timezone, DST, prompt injection and no false recency claims
+        run: |
+          node --check tools/n7/live-clock-guard.js
+          node --test tools/n7/test_live_clock_guard.cjs
+          python3 -m py_compile tools/n7/deploy_live_clock_guard.py
+      - name: FTPS read-only dry-run compatibility with real N7 server
+        run: python3 tools/n7/deploy_live_clock_guard.py
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: validate
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify owner's specific guarded clock-fix request
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          expected={
+            'confirmation':'N7-CURRENT-DATE-AND-NEWS-CAUTION',
+            'target':'/bot.piratecartography.com/n7-app/server.js',
+            'preserve_groq_and_owner_memory':True,
+            'backend_only':True,
+            'backup_and_rollback':True
+          }
+          assert json.loads(Path('ops_ftps_requests/n7-live-clock.json').read_text())==expected
+          print('N7_CLOCK_OWNER_DEPLOY_REQUEST_VALID=true')
+          PY
+      - name: FTPS backup, install live time, verify health and rollback on failure
+        run: python3 tools/n7/deploy_live_clock_guard.py
