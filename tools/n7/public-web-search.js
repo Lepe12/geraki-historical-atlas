@@ -161,16 +161,16 @@ const ARTICLE_HOSTS=new Set([
 ]);
 function extractVisibleArticle(html){
  const text=String(html||'');
- const main=text.match(/<article\\b[^>]*>([\\s\\S]*?)<\\/article>/i)?.[1]||
-    text.match(/<main\\b[^>]*>([\\s\\S]*?)<\\/main>/i)?.[1]||text;
- const clean=main.replace(/<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi,' ')
-   .replace(/<style\\b[^>]*>[\\s\\S]*?<\\/style>/gi,' ')
-   .replace(/<(?:nav|footer|header|aside|form|svg)\\b[^>]*>[\\s\\S]*?<\\/(?:nav|footer|header|aside|form|svg)>/gi,' ')
-   .replace(/<(?:p|h[1-6]|blockquote|li|div)\\b[^>]*>/gi,'\\n')
+ const main=text.match(/<article\b[^>]*>([\s\S]*?)<\/article>/i)?.[1]||
+    text.match(/<main\b[^>]*>([\s\S]*?)<\/main>/i)?.[1]||text;
+ const clean=main.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,' ')
+   .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,' ')
+   .replace(/<(?:nav|footer|header|aside|form|svg)\b[^>]*>[\s\S]*?<\/(?:nav|footer|header|aside|form|svg)>/gi,' ')
+   .replace(/<(?:p|h[1-6]|blockquote|li|div)\b[^>]*>/gi,'\n')
    .replace(/<[^>]+>/g,' ').replace(/&nbsp;/gi,' ').replace(/&amp;/gi,'&')
-   .replace(/&#(\\d+);/g,(_,n)=>String.fromCodePoint(Math.min(+n,0x10ffff)))
-   .replace(/[ \\t]{2,}/g,' ').replace(/\\n[ \\t]+/g,'\\n')
-   .replace(/\\n{3,}/g,'\\n\\n').trim();
+   .replace(/&#(\d+);/g,(_,n)=>String.fromCodePoint(Math.min(+n,0x10ffff)))
+   .replace(/[ \t]{2,}/g,' ').replace(/\n[ \t]+/g,'\n')
+   .replace(/\n{3,}/g,'\n\n').trim();
  return clean.length>400?clean.slice(0,10000):'';
 }
 async function publisherArticle(url,{transport=fetch,timeout=7000}={}){
