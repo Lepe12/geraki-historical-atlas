@@ -29,7 +29,7 @@ def check(b):
         f.write(b);f.flush()
         p=subprocess.run(['node','--check',f.name],capture_output=True,timeout=20)
         if p.returncode:
-            print('N7_SYNTAX_ERROR='+p.stderr.decode('utf8',errors='replace').splitlines()[-1][:150])
+            print('N7_SYNTAX_DIAGNOSTIC='+repr(p.stderr.decode('utf8',errors='replace').splitlines()[:7])[:1300])
             print('N7_SYNTAX_LINE='+str([line for line in p.stderr.decode('utf8',errors='replace').splitlines() if ': ' in line or '.js:' in line][-1:])[:250])
             raise RuntimeError('N7_INVALID_JS_ABORT')
 def server_patch(original):
