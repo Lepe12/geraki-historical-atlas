@@ -1,0 +1,43 @@
+name: N7 private workflow-dispatch capability (read only)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/n7-immediate-capability.yml'
+permissions:
+  contents: read
+jobs:
+  audit:
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    env:
+      PCT_GITHUB_DISPATCH_TOKEN: ${{ secrets.PCT_GITHUB_DISPATCH_TOKEN }}
+    steps:
+      - name: Check existing dispatch credentials against the private repo (GET only)
+        run: |
+          python3 - <<'PY'
+          import json,os,urllib.request,urllib.error
+          t=os.environ.get('PCT_GITHUB_DISPATCH_TOKEN','')
+          if not t:
+            print('N7_PRIVATE_WORKFLOW_TOKEN=ABSENT')
+            raise SystemExit(0)
+          headers={'Authorization':'Bearer '+t,'Accept':'application/vnd.github+json',
+            'User-Agent':'n7-readonly-dispatch-capability'}
+          urls=[
+            ('private_repo','https://api.github.com/repos/Lepe12/independent-ai-bot'),
+            ('private_workflow','https://api.github.com/repos/Lepe12/independent-ai-bot/actions/workflows/n7-private-queue.yml')
+          ]
+          for key,url in urls:
+            try:
+              with urllib.request.urlopen(urllib.request.Request(url,headers=headers),timeout=12) as resp:
+                raw=resp.read(4000)
+                obj=json.loads(raw)
+                print('N7_DISPATCH_CAPABILITY '+json.dumps({
+                  'target':key,'http_status':resp.status,
+                  'workflow_state':obj.get('state') if key=='private_workflow' else None
+                }))
+            except urllib.error.HTTPError as e:
+              print('N7_DISPATCH_CAPABILITY '+json.dumps({'target':key,'http_status':e.code}))
+            except Exception as e:
+              print('N7_DISPATCH_CAPABILITY '+json.dumps({'target':key,'error':type(e).__name__}))
+          PY
