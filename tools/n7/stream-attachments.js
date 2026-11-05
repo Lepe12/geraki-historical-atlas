@@ -175,6 +175,8 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
   let evidence=null,messages;
   try{
    evidence=await publicSearch.researchMessages(history);
+   if(typeof publicSearch.enrichPublisherArticles==='function')
+     evidence=await publicSearch.enrichPublisherArticles(evidence);
    messages=buildPrompt(history,id,DATA_DIR,promptMessages);
    const context=publicSearch.contextForResearch(evidence);
    if(context&&messages[0]?.role==='system')messages[0].content+='\n\n'+context;
@@ -219,17 +221,19 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
     const note='\n\n[Η απάντηση διακόπηκε στο όριο μήκους· γράψε «συνέχισε».]';
     final+=note;emit('delta',{text:note});
    }
-   item.messages=[...history,{role:'assistant',content:final}].slice(-100);
-   item.updated=new Date().toISOString();
-   if(item.title==='Νέα συνομιλία')item.title=content.slice(0,70);
-   save(all);
-   emit('done',{conversation:{id:item.id,title:item.title}});
+   const fresh=load(),current=fresh.find(c=>c.id===id);
+   if(!current)throw Error('Η συνομιλία διαγράφηκε πριν ολοκληρωθεί η απάντηση');
+   current.messages=[...history,{role:'assistant',content:final}].slice(-100);
+   current.updated=new Date().toISOString();
+   if(current.title==='Νέα συνομιλία')current.title=content.slice(0,70);
+   save(fresh);
+   emit('done',{conversation:{id:current.id,title:current.title}});
   }catch(e){
    if(final){
     // Do not lose a response after it started streaming.
-    item.messages=[...history,{role:'assistant',content:final+'\n\n[Μη ολοκληρωμένη απάντηση]'}].slice(-100);
-    item.updated=new Date().toISOString();
-    try{save(all);}catch{}
+    const fresh=load(),current=fresh.find(c=>c.id===id);
+    if(current){current.messages=[...history,{role:'assistant',content:final+'\n\n[Μη ολοκληρωμένη απάντηση]'}].slice(-100);
+      current.updated=new Date().toISOString();try{save(fresh);}catch{}}
    }
    emit('error',{error:'Η απάντηση διακόπηκε: '+String(e.message||e).slice(0,150)});
   }finally{if(started&&!res.writableEnded)res.end();}
