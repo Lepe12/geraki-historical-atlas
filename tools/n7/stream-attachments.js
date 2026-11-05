@@ -133,6 +133,16 @@ function buildPrompt(history,conversationId,dir,promptMessages){
     parts[0].text+='\n\n[Συνημμένο '+attachment.name+' — κείμενο]\n'+attachment.text.slice(0,MAX_TEXT)+'\n[/Συνημμένο]';
    }
   }
+  const visualCount=parts.filter(p=>p.type==='image_url').length;
+  if(visualCount){
+   const assertion=visualCount===1?
+     'Επισυνάπτεται ΑΚΡΙΒΩΣ ΜΙΑ ενιαία εικόνα στο παρόν μήνυμα, όχι τέσσερις φωτογραφίες ή καρέ.':
+     'Επισυνάπτονται ακριβώς '+visualCount+' εικόνες στο παρόν μήνυμα.';
+   parts[0].text=assertion+'\\n'+
+     'Περιέγραψε μόνο ό,τι είναι ορατό στο πραγματικό οπτικό περιεχόμενο. '+
+     'Μην επινοείς πλάνα, τεταρτημόρια, cropped views, δεύτερες λήψεις, αντικείμενα ή λεπτομέρειες. '+
+     'Μην προσποιείσαι ότι εξέτασες την εικόνα αν δεν μπορείς να την αναλύσεις.\\n\\n'+parts[0].text;
+  }
   return {role:'user',content:parts};
  });
  return promptMessages(trimmed);
@@ -185,6 +195,23 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
    if(typeof publicSearch.enrichPublisherArticles==='function')
      evidence=await publicSearch.enrichPublisherArticles(evidence);
    messages=buildPrompt(history,id,DATA_DIR,promptMessages);
+   const n7ImageCount=attachments.filter(a=>a.type.startsWith('image/')).length;
+   if(n7ImageCount){
+     const recent=messages.findLast(m=>m.role==='user');
+     const sent=Array.isArray(recent?.content)?
+       recent.content.filter(x=>x.type==='image_url').length:0;
+     if(sent!==n7ImageCount)throw Error('Αποτυχία οπτικής μεταφοράς: λείπει συνημμένη εικόνα');
+     if(messages[0]?.role==='system'){
+       messages[0].content+='\\n\\nN7 VISION GROUNDING — IMPORTANT: the current user supplied '+
+         n7ImageCount+' actual image'+(n7ImageCount===1?'':'s')+
+         '. Count the image attachments, not visual objects or scene regions. '+
+         'If ONE single image was provided, describe ONE composition as a whole. '+
+         'Do not infer four camera shots, quadrants or crops unless the image visibly is a collage. '+
+         'For visual details, separate observed features from historical interpretation. '+
+         'If anything is unclear, say so rather than fabricate. Never claim to read small text unless legible.';
+     }
+     console.log('N7_VISION_GROUNDING attachments='+n7ImageCount+' forwarded='+sent);
+   }
    const context=publicSearch.contextForResearch(evidence);
    if(context&&messages[0]?.role==='system')messages[0].content+='\n\n'+context;
   }catch(e){return writeError(res,502,'Πρόβλημα προετοιμασίας: '+e.message);}
