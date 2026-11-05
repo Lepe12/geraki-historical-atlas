@@ -32,14 +32,13 @@ def check(b):
 def server_patch(original):
     src=original.decode('utf8')
     if MARKER in src:return original
-    if src.count('async function answer(messages)')!=1 or src.count("const learning=createLearningMemory(")!=1:
-        print('N7_MEMORY_MARKERS answer='+str(src.count('async function answer(messages)'))+' learning='+str(src.count('const learning=createLearningMemory(')))
+    if src.count('async function answer(messages)')!=1 or src.count('const DATA_DIR')!=1:
         raise RuntimeError('N7_WRONG_LIVE_SERVER_ABORT')
     if "if(!session(req))return json(res,401,{error:'Authentication required'});" not in src:
         raise RuntimeError('N7_MISSING_AUTH_CHECK_ABORT')
     if 'N7_FAST_GROQ_BOOTSTRAP_v1' not in src or 'N7_COMPLETE_OUTPUT_V1' not in src:
         raise RuntimeError('N7_LIVE_GROQ_OR_COMPLETION_GUARD_MISSING')
-    line='const learning=createLearningMemory('
+    line='const DATA_DIR'
     pos=src.index('\n',src.index(line))
     src=src[:pos+1]+(
       "const {createOwnerChatMemory}=require('./owner-chat-memory');\n"
