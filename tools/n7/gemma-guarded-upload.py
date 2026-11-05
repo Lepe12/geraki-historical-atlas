@@ -33,7 +33,7 @@ def get_free_quota(ftp):
         except ftplib.all_errors:
             continue
         # Accept only explicit FREE/AVAILABLE labels with units (not used/total).
-        m = re.search(r"(?:free|available)\\s*(?:space|bytes)?\\s*[:=]\\s*([0-9]+)\\s*(GiB|GB|MiB|MB|bytes)", response, re.I)
+        m = re.search(r"(?:free|available)\s*(?:space|bytes)?\s*[:=]\s*([0-9]+)\s*(GiB|GB|MiB|MB|bytes)", response, re.I)
         if m:
             n = int(m.group(1))
             units = {"gib":1024**3,"gb":10**9,"mib":1024**2,"mb":10**6,"bytes":1}
