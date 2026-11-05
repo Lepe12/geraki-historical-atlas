@@ -62,8 +62,9 @@ promptMessages=function(history){
 };
 """
     src=src.replace(anchor,wrapper+anchor,1)
-    marker=src.index('/api/skills/feedback')
-    insertion=src.rfind('\n',0,marker)+1
+    route_header='    // Skills feedback'
+    if src.count(route_header)!=1:raise RuntimeError('N7_SKILLS_ROUTE_HEADER_NOT_UNIQUE')
+    insertion=src.index(route_header)
     routes="""
     // Owner-reviewed writing knowledge: authenticated only, never silently derived from chats.
     if(req.method==='GET'&&p==='/api/n7/approved-lessons'){
@@ -88,7 +89,6 @@ promptMessages=function(history){
     }
 """
     src=src[:insertion]+routes+'\n'+src[insertion:]
-    print('N7_ROUTE_INSERT_CONTEXT='+repr(src[insertion-240:insertion+130].splitlines()[:15])[:1400])
     if src.count(MARKER)!=1:raise RuntimeError('N7_MEMORY_PATCH_ASSERTION')
     return src.encode('utf8')
 def app_patch(original):
