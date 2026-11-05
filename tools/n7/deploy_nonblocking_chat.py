@@ -60,6 +60,7 @@ def patch(original):
     if MARK in s:
         return original
     if s.count(ANCHOR)!=1 or s.count(OLD_START)!=1 or s.count(OLD_END)!=1:
+        print('N7_UI_MARKER_COUNTS anchor='+str(s.count(ANCHOR))+' start='+str(s.count(OLD_START))+' end='+str(s.count(OLD_END))+' newline_crlf='+str(s.count('\\r\\n')))
         raise RuntimeError('N7_UNEXPECTED_FRONTEND_STRUCTURE_ABORT')
     start=s.index(OLD_START)
     end=s.index(OLD_END,start)
