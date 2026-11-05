@@ -1,0 +1,111 @@
+name: N7 Historical Full-text, Bibliography and Chronology Audit
+
+on:
+  pull_request:
+    paths:
+      - tools/n7/public-web-search.js
+      - tools/n7/historical-source-audit.js
+      - tools/n7/test_historical_source_audit.cjs
+      - tools/n7/deploy_source_audit.py
+      - .github/workflows/n7-source-audit.yml
+      - ops_ftps_requests/n7-source-audit.json
+  push:
+    branches: [main]
+    paths:
+      - ops_ftps_requests/n7-source-audit.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n7-historical-source-audit-deploy
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run historical source, bibliography, chronology and prior functionality tests
+        run: |
+          node --check tools/n7/public-web-search.js
+          node --check tools/n7/historical-source-audit.js
+          node --test tools/n7/test_historical_source_audit.cjs tools/n7/test_source_evidence.cjs tools/n7/test_historical_topic_isolation.cjs tools/n7/test_public_web_search.cjs
+          python3 -m py_compile tools/n7/deploy_source_audit.py
+      - name: Independently test retrieval of actual public Petros Lantzas article
+        run: |
+          node - <<'JS'
+          (async()=>{
+            const {enrichPublisherArticles}=require('./tools/n7/public-web-search');
+            const target='https://www.piratecartography.com/archives/114';
+            const data={searched:true,kind:'historical',
+              query:'Pietro Lanza Corfu corsair Parga 1573 Spanish Naples 1608 history',
+              items:[{title:'Πέτρος Λάντζας – Ο Πειρατής Κατάσκοπος',url:target,source:'Pirate Cartography'}]};
+            await enrichPublisherArticles(data);
+            const item=data.items[0],audit=data.historicalAudit;
+            console.log('N7_REAL_HISTORICAL_ARTICLE_READ='+Boolean(item.articleRead));
+            console.log('N7_REAL_HISTORICAL_ARTICLE_CHARACTERS='+(item.articleText?.length||0));
+            console.log('N7_REAL_HISTORICAL_BIBLIOGRAPHY_COUNT='+(audit?.bibliography?.length||0));
+            console.log('N7_REAL_HISTORICAL_CHRONOLOGY_WARNING_COUNT='+(audit?.warnings?.length||0));
+            console.log('N7_REAL_HISTORICAL_INDEPENDENT_REIGN_CHECKED='+Boolean(audit?.independentReignChecked));
+            if(!item.articleRead||!audit||audit.bibliography.length<2)
+              throw Error('N7_ACTUAL_HISTORICAL_ARTICLE_OR_BIBLIOGRAPHY_UNAVAILABLE');
+          })().catch(e=>{console.error(e.message);process.exitCode=1});
+          JS
+      - name: Confirm safe changes match existing Top.Host code (read-only)
+        run: python3 tools/n7/deploy_source_audit.py
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: validate
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate requested deployment scope
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          expected={
+            'authorization':'N7-READ-HISTORICAL-FULLTEXT-AND-CROSSCHECK',
+            'target':'/bot.piratecartography.com/n7-app',
+            'preserve_model_ui_owner_memory_and_conversations':True,
+            'read_only_external_research':True,
+            'rollback_on_failure':True
+          }
+          assert json.loads(Path('ops_ftps_requests/n7-source-audit.json').read_text()) == expected
+          print('N7_SOURCE_AUDIT_OWNER_SCOPE_VALID=true')
+          PY
+      - name: Install research helpers, verify production health, rollback if needed
+        run: python3 tools/n7/deploy_source_audit.py

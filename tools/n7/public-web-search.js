@@ -2,6 +2,7 @@
 // N7_PUBLIC_SEARCH_V1: private server-side read-only retrieval, no API key.
 // Bounded public search feeds and Wikimedia reference material; not a full browser.
 const DEFAULT_UA='N7PublicResearch/1.0 (https://piratecartography.com)';
+const n7HistoricalAudit=require('./historical-source-audit'); // N7_HISTORICAL_DEEP_READING_V1
 const NEWS_HOST='news.google.com';
 const BING_HOST='www.bing.com';
 const WIKI_HOST='en.wikipedia.org';
@@ -176,7 +177,7 @@ const ARTICLE_HOSTS=new Set([
  'www.bbc.com','www.bbc.co.uk','www.npr.org','www.cbsnews.com',
  'www.nytimes.com','www.theguardian.com','www.aljazeera.com',
  'www.euronews.com','www.ekathimerini.com','www.kathimerini.gr',
- 'www.britannica.com','www.history.com','www.piratecartography.com','piratecartography.com','corfu-museum.gr','www.corfu-museum.gr'
+ 'www.britannica.com','www.history.com','islamansiklopedisi.org.tr','www.piratecartography.com','piratecartography.com','corfu-museum.gr','www.corfu-museum.gr'
 ]);
 function extractVisibleArticle(html){
  const text=String(html||'');
@@ -190,7 +191,7 @@ function extractVisibleArticle(html){
    .replace(/&#(\d+);/g,(_,n)=>String.fromCodePoint(Math.min(+n,0x10ffff)))
    .replace(/[ \t]{2,}/g,' ').replace(/\n[ \t]+/g,'\n')
    .replace(/\n{3,}/g,'\n\n').trim();
- return clean.length>400?clean.slice(0,10000):'';
+ return clean.length>400?clean.slice(0,26000):'';
 }
 async function publisherArticle(url,{transport=fetch,timeout=7000}={}){
  const u=new URL(url);
@@ -203,8 +204,9 @@ async function publisherArticle(url,{transport=fetch,timeout=7000}={}){
   if(!response.ok)throw Error('Article HTTP '+response.status);
   const type=response.headers?.get?.('content-type')||'';
   if(type&&!type.includes('text/html'))throw Error('Not HTML');
+  const maxBytes=(u.hostname==='www.piratecartography.com'||u.hostname==='piratecartography.com')?1400000:450000;
   const declared=Number(response.headers?.get?.('content-length')||0);
-  if(declared>450000)throw Error('Article too large');
+  if(declared>maxBytes)throw Error('Article too large');
   const reader=response.body?.getReader?.();
   if(!reader)throw Error('No streaming article body');
   const chunks=[];let count=0;
@@ -213,7 +215,7 @@ async function publisherArticle(url,{transport=fetch,timeout=7000}={}){
     const next=await reader.read();
     if(next.done)break;
     count+=next.value.byteLength;
-    if(count>450000)throw Error('Article exceeded limit');
+    if(count>maxBytes)throw Error('Article exceeded limit');
     chunks.push(next.value);
    }
   }finally{try{await reader.cancel()}catch(_){}}
@@ -227,12 +229,33 @@ async function enrichPublisherArticles(research,{transport=fetch}={}){
  const chosen=research.items.filter(x=>{
   try{return ARTICLE_HOSTS.has(new URL(x.url).hostname)}catch{return false}
  }).slice(0,3);
- await Promise.all(chosen.map(async x=>{
+ const jobs=chosen.map(async x=>{
   try{
    const content=await publisherArticle(x.url,{transport});
    if(content){x.articleText=content;x.articleRead=true;}
-  }catch{}
- }));
+   else x.articleRead=false;
+  }catch{ x.articleRead=false; }
+ });
+ // Independently consult an academic encyclopedia for the sultan's dates,
+ // never infer that the source was read merely from a memorized chronology.
+ let reignChecked=false;
+ if(research.kind==='historical'&&/Pietro Lanza|Corfu corsair/iu.test(research.query||'')){
+  jobs.push((async()=>{
+   try{
+    const url='https://islamansiklopedisi.org.tr/murad-iii';
+    const text=await publisherArticle(url,{transport,timeout:7000});
+    if(/1574[\s\S]{0,15}1595/u.test(text)&&/MURAD III|III\. Murad|Murad III/iu.test(text)){
+     reignChecked=true;
+     if(research.items.length<9&&!research.items.some(x=>x.url===url))
+      research.items.push({title:'MURAD III — TDV İslâm Ansiklopedisi',
+        url,source:'TDV İslâm Ansiklopedisi (scholarly reference)',
+        published:'',provider:'Independent historical chronology',articleText:text.slice(0,3500),articleRead:true});
+    }
+   }catch{}
+  })());
+ }
+ await Promise.all(jobs);
+ n7HistoricalAudit.attachHistoricalAudit(research,{independentReignChecked:reignChecked});
  return research;
 }
 function cleanHistoryForTopic(history){
@@ -275,14 +298,15 @@ function contextForResearch(research){
     'Use these sources with precise source URLs and dates. Verify the date and do not overstate what headlines prove.',
     'If results conflict, say so. Do not invent vote counts, dates, full-text quotations or conclusions absent from the source metadata.',
     'Cite [S1] etc in the answer where relevant, and distinguish reported claims from your own analysis.',
-    list
+    list,
+    n7HistoricalAudit.historicalAuditContext(research)
   ].join('\n');
 }
 function sourceFooter(research){
   if(!research?.searched||!research.items.length)return '';
   const items=research.items.slice(0,9);
-  return '\n\nΠηγές διαδικτυακής αναζήτησης (τίτλοι/ημερομηνίες, όχι πλήρη άρθρα):\n'+
+  return '\n\nΠηγές έρευνας (αναγνωσμένα αποσπάσματα επισημαίνονται· άλλες είναι μεταδεδομένα):\n'+
     items.map((x,i)=>'[S'+(i+1)+'] '+x.title+' — '+x.source+
-      (x.published?' ('+x.published+')':'')+'\n'+x.url).join('\n');
+      (x.published?' ('+x.published+')':'')+(x.articleRead?' [αναγνώστηκε περιεχόμενο]':' [μόνο μεταδεδομένα]')+'\n'+x.url).join('\n');
 }
 module.exports={classify,parseRss,wikiParse,boundedFetch,researchMessages,contextForResearch,sourceFooter,safeLink,extractVisibleArticle,publisherArticle,enrichPublisherArticles,cleanHistoryForTopic};
