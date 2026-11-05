@@ -34,8 +34,8 @@ def server_patch(original):
     if MARKER in src:return original
     if src.count('async function answer(messages)')!=1 or src.count('const DATA_DIR')!=1:
         raise RuntimeError('N7_WRONG_LIVE_SERVER_ABORT')
-    if "if(!session(req))return json(res,401,{error:'Authentication required'});" not in src:
-        raise RuntimeError('N7_MISSING_AUTH_CHECK_ABORT')
+    if src.count('/api/skills/feedback')<1:
+        raise RuntimeError('N7_EXISTING_SKILLS_ROUTES_MISSING')
     if 'N7_FAST_GROQ_BOOTSTRAP_v1' not in src or 'N7_COMPLETE_OUTPUT_V1' not in src:
         raise RuntimeError('N7_LIVE_GROQ_OR_COMPLETION_GUARD_MISSING')
     line='const DATA_DIR'
@@ -58,25 +58,32 @@ promptMessages=function(history){
 };
 """
     src=src.replace(anchor,wrapper+anchor,1)
-    guard="if(!session(req))return json(res,401,{error:'Authentication required'});"
+    marker=src.index('/api/skills/feedback')
+    insertion=src.rfind('\n',0,marker)+1
     routes="""
     // Owner-reviewed writing knowledge: authenticated only, never silently derived from chats.
     if(req.method==='GET'&&p==='/api/n7/approved-lessons'){
+      if(!session(req))return json(res,401,{error:'Authentication required'});
+      if(!originOK(req))return json(res,403,{error:'Invalid origin'});
       try{return json(res,200,{lessons:ownerChatMemory.list()});}
       catch(e){return json(res,500,{error:'Writing memory unavailable'});}
     }
     if(req.method==='POST'&&p==='/api/n7/approved-lessons'){
+      if(!session(req))return json(res,401,{error:'Authentication required'});
+      if(!originOK(req))return json(res,403,{error:'Invalid origin'});
       try{const b=await body(req);return json(res,201,{lesson:ownerChatMemory.add(b.rule)});}
       catch(e){return json(res,400,{error:String(e.message||'Invalid owner rule')});}
     }
     const forgetMatch=p.match(/^\\/api\\/n7\\/approved-lessons\\/([0-9a-f-]{36})$/);
     if(req.method==='DELETE'&&forgetMatch){
+      if(!session(req))return json(res,401,{error:'Authentication required'});
+      if(!originOK(req))return json(res,403,{error:'Invalid origin'});
       try{return ownerChatMemory.remove(forgetMatch[1])?json(res,200,{deleted:true}):
         json(res,404,{error:'Rule not found'});}
       catch(e){return json(res,500,{error:'Writing memory unavailable'});}
     }
 """
-    src=src.replace(guard,guard+'\n'+routes,1)
+    src=src[:insertion]+routes+'\n'+src[insertion:]
     if src.count(MARKER)!=1:raise RuntimeError('N7_MEMORY_PATCH_ASSERTION')
     return src.encode('utf8')
 def app_patch(original):
