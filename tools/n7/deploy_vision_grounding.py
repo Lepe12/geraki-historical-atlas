@@ -52,6 +52,12 @@ def main():
    old=read(ftp,folder,name);fresh=(HERE/source).read_bytes()
    if marker.encode() not in old:
     print('N7_VISION_LIVE_MARKERS file='+name+' rich='+str(b'N7_GROQ_TRUE_STREAM_AND_UPLOADS_V1' in old)+' inline='+str(b'N7_CHAT_CORRECTION_CONFIRM_V1' in old)+' picker='+str(b'n7-file-picker' in old)+' stream='+str(b'/stream' in old)+' length='+str(len(old)))
+    if name=='app.js':
+     import re
+     text=old.decode('utf8',errors='replace')
+     paths=sorted(set(re.findall(r'/api/[a-zA-Z0-9_/:{}.-]{2,95}',text)))[:35]
+     print('N7_VISION_LIVE_API_PATHS='+repr(paths))
+     print('N7_VISION_LIVE_CAPABILITIES='+repr({k:(k in text) for k in ('FormData','FileReader','attachments','image_url','/api/conversations','/stream','/api/chat','data:image','base64','fetch(')}))
     raise RuntimeError('N7_VISION_MARKER_MISSING_'+name)
    if name=='app.js':
     begin=old.find(b'// N7_GROQ_TRUE_STREAM_AND_UPLOADS_V1')
