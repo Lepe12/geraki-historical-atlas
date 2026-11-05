@@ -27,7 +27,7 @@ test('search triggered on 2026 election follow-up using conversational context',
  assert.match(s.query,/2026 US midterm election results/);
 });
 test('explicit online research triggers web results; explicit do-not-search wins',()=>{
- assert.equal(classify([{role:'user',content:'Ψάξε το αρχείο του Πέτρου Λάντζα'}],when).kind,'general');
+ assert.equal(classify([{role:'user',content:'Ψάξε το αρχείο του Πέτρου Λάντζα'}],when).kind,'historical');
  assert.equal(classify([{role:'user',content:'Μην ψάξεις στο διαδίκτυο, γράψε μου ένα ποίημα.'}],when),null);
  assert.equal(classify([{role:'user',content:'Γράψε μου ένα ποίημα'}],when),null);
 });
