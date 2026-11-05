@@ -1,0 +1,25 @@
+name: N7 Research Pilot Tests
+
+on:
+  push:
+    branches:
+      - n7/source-library-pilot-20261105
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: n7-research-pilot
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile and run isolated research tool tests
+        run: |
+          python -m compileall -q n7-research-pilot
+          python -m unittest discover -s n7-research-pilot -p 'test_*.py' -v
