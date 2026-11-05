@@ -21,7 +21,7 @@ ROOT = '/bot.piratecartography.com/n7-app'
 TLS = 'linux3087.grserver.gr'
 PUBLIC = 'https://bot.piratecartography.com'
 BEGIN = 'async function answer(messages) {'
-END = 'function serve(res,pathname) {'
+END = 'function serve'
 MARKER = 'N7_COMPLETE_OUTPUT_V1'
 SOURCE = Path(__file__).with_name('answer_complete_function.js')
 
