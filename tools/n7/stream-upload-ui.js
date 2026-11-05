@@ -65,9 +65,9 @@
    if(all.length>4)throw Error('Μέχρι 4 συνημμένα ανά μήνυμα.');
    if(all.filter(x=>x.type.startsWith('image/')).length>3)
       throw Error('Μέχρι 3 εικόνες ανά μήνυμα.');
-   if(all.some(x=>x.size>3*1024*1024)||all.reduce((n,x)=>n+x.size,0)>6*1024*1024)
-      throw Error('Έως 3 MB ανά αρχείο και 6 MB συνολικά.');
-   const extensions=/\.(png|jpg|jpeg|webp|txt|md|csv|json|docx|pdf)$/i;
+   if(all.some(x=>x.size>5*1024*1024)||all.reduce((n,x)=>n+x.size,0)>6*1024*1024)
+      throw Error('Έως 5 MB ανά αρχείο και 6 MB συνολικά.');
+   const extensions=/\.(png|jpg|jpeg|webp|txt|md|csv|json|docx)$/i;
    if(all.some(x=>!extensions.test(x.name)))throw Error('Μη υποστηριζόμενος τύπος αρχείου.');
    pending=all;showFiles();notice.textContent='';
   }catch(e){notice.textContent='Συνημμένα: '+e.message;}
@@ -110,7 +110,7 @@
   e.preventDefault();
   if(sending||busy)return;
   const content=input.value.trim()||
-    (pending.length?'Περιέγραψε και ανέλυσε τα συνημμένα αρχεία.':'');
+    (pending.length===1&&pending[0].type.startsWith('image/')?'Περιέγραψε προσεκτικά αυτή τη μία εικόνα. Μην επινοήσεις άλλα πλάνα ή εικόνες.':pending.length?'Περιέγραψε και ανέλυσε τα '+pending.length+' συνημμένα αρχεία.':'');
   if(!content)return;
   sending=true;busy=true;send.disabled=true;add.disabled=true;
   input.disabled=true;
