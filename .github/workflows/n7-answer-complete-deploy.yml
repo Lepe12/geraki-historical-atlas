@@ -1,0 +1,87 @@
+name: N7 complete reply guarded production deploy
+
+on:
+  pull_request:
+    paths:
+      - tools/n7/answer_complete_function.js
+      - tools/n7/test_answer_complete.cjs
+      - tools/n7/deploy_answer_complete.py
+      - .github/workflows/n7-answer-complete-deploy.yml
+      - ops_ftps_requests/n7-answer-complete.json
+  push:
+    branches: [main]
+    paths:
+      - ops_ftps_requests/n7-answer-complete.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n7-reply-completion-deploy
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test continuation and timeout/fallback behavior
+        run: |
+          node --check tools/n7/answer_complete_function.js
+          node --test tools/n7/test_answer_complete.cjs
+          python3 -m py_compile tools/n7/deploy_answer_complete.py
+      - name: Validate exact live Top.Host server patch without writing
+        run: python3 tools/n7/deploy_answer_complete.py
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: validate
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact owner request scoped to N7 server.js only
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          v=json.loads(Path('ops_ftps_requests/n7-answer-complete.json').read_text())
+          assert v == {
+            'confirmation':'N7-COMPLETE-REPLIES-PRODUCTION',
+            'target':'/bot.piratecartography.com/n7-app/server.js',
+            'backup_and_rollback':True,
+            'preserve_model_and_queues':True
+          }
+          PY
+      - name: Backup, patch, restart and verify; rollback if failure
+        run: python3 tools/n7/deploy_answer_complete.py
