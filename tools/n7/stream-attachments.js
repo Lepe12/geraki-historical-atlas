@@ -112,16 +112,23 @@ function loadStored(dir,conversationId,meta){
  }catch{return null;}
 }
 function buildPrompt(history,conversationId,dir,promptMessages){
- const trimmed=history.slice(-24).map(m=>{
+ const recent=history.slice(-24);
+ const visibleImageIds=new Set();
+ for(const message of [...recent].reverse()){
+  for(const meta of [...(message.attachments||[])].reverse()){
+   if(meta.type?.startsWith('image/')&&visibleImageIds.size<3)visibleImageIds.add(meta.id);
+  }
+ }
+ const trimmed=recent.map(m=>{
   if(m.role!=='user'||!Array.isArray(m.attachments)||!m.attachments.length)return {role:m.role,content:m.content};
-  const parts=[{type:'text',text:m.content}];let hasImage=false;
+  const parts=[{type:'text',text:m.content}];
   for(const meta of m.attachments.slice(0,4)){
    const attachment=loadStored(dir,conversationId,meta);
    if(!attachment)continue;
    if(attachment.type.startsWith('image/')){
-    if(hasImage)continue; // only one image per historical turn; control token cost
+    if(!visibleImageIds.has(meta.id))continue; // Groq Qwen supports up to three images per request
     parts.push({type:'image_url',image_url:{url:'data:'+attachment.type+';base64,'+attachment.buffer.toString('base64')}});
-    hasImage=true;
+
    }else if(attachment.text){
     parts[0].text+='\n\n[Συνημμένο '+attachment.name+' — κείμενο]\n'+attachment.text.slice(0,MAX_TEXT)+'\n[/Συνημμένο]';
    }
