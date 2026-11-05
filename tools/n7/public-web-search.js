@@ -58,7 +58,7 @@ function classify(messages,at=new Date()){
   if(!last)return null;
   if(/(?:μην|χωρίς|όχι)\s+(?:ψάξεις|αναζητήσεις|μπεις\s+στο\s+(?:ίντερνετ|διαδίκτυο)|χρησιμοποιήσεις\s+(?:internet|web))/iu.test(last))return null;
   const prior=compact(users.at(-2)?.content,280);
-  const isContinuation=last.length<95 && /^(?:και\s+(?:τι|αυτό|για|πώς|ποιος|ποια)|τι\s+έγινε\s+με\s+αυτό|συνέχισε|τι\s+εννοείς|δηλαδή|από\s+πού|ποιες\s+πηγές|δώσε\s+μου\s+πηγές|more\s+on\s+that|and\s+what)\b/iu.test(last);
+  const isContinuation=last.length<95 && /^(?:και\s+(?:τι|αυτό|για|πώς|ποιος|ποια)|τι\s+έγινε\s+με\s+αυτό|συνέχισε|τι\s+εννοείς|δηλαδή|από\s+πού|ποιες\s+πηγές|δώσε\s+μου\s+πηγές|εννοώ\s+τις|εννοώ\s+τα|εννοώ\s+αυτ|more\s+on\s+that|and\s+what)/iu.test(last);
   const context=isContinuation?compact(prior+' '+last,550):last;
   const explicit=/(?:ψάξε|αναζήτησε|βρες\s+(?:στο\s+)?(?:διαδίκτυο|πηγές|online)|έλεγξε\s+(?:στο\s+)?(?:ίντερνετ|διαδίκτυο)|search\s+(?:the\s+)?web|look\s+up|πηγές\s+στο\s+διαδίκτυο)/iu.test(last);
   const current=/(?:χθεσιν|χθες|σήμερα|προχθές|φέτος|πρόσφατ|τελευταί|τρέχον|τωριν|αυτή\s+την\s+εβδομάδα|εξελίξε|είδησ|νέα\s+για|εκλογ|πρόεδρ|κυβέρνησ|αποτελέσματ|latest|recent|breaking|yesterday|today|now|current|election|midterm|president|news|result)/iu.test(context);
