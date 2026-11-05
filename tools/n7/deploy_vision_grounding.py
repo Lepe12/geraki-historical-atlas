@@ -58,6 +58,9 @@ def main():
      paths=sorted(set(re.findall(r'/api/[a-zA-Z0-9_/:{}.-]{2,95}',text)))[:35]
      print('N7_VISION_LIVE_API_PATHS='+repr(paths))
      print('N7_VISION_LIVE_CAPABILITIES='+repr({k:(k in text) for k in ('FormData','FileReader','attachments','image_url','/api/conversations','/stream','/api/chat','data:image','base64','fetch(')}))
+     for needle in ("el('chat').onsubmit",'chat.onsubmit','/chat',"type='file'",'type="file"','file-input','File', 'base64'):
+      ix=text.find(needle)
+      if ix>=0:print('N7_VISION_LIVE_CONTEXT_'+str(len(needle))+'_'+str(ix)+'='+repr(text[max(0,ix-160):ix+430])[:650])
     raise RuntimeError('N7_VISION_MARKER_MISSING_'+name)
    if name=='app.js':
     begin=old.find(b'// N7_GROQ_TRUE_STREAM_AND_UPLOADS_V1')
