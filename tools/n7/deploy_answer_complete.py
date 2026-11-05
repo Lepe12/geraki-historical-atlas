@@ -43,12 +43,13 @@ def patch(original):
     start = text.index(BEGIN)
     end = text.index(END, start)
     original_answer = text[start:end]
-    for idx, expected in enumerate((
-        "const resp=await fetch(", "temperature:0.3",
-        "const content=result?.choices?.[0]?.message?.content",
-    )):
-        if expected not in original_answer:
-            raise RuntimeError('N7_UNRECOGNIZED_OLD_ANSWER_ABORT_marker_'+str(idx))
+    # The deployed JS is formatted differently from the standalone repository.
+    # Require exact function boundaries and a recognizable OpenAI chat transport,
+    # but not brittle whitespace/variable-name matches.
+    required = ('API_KEY', 'MODEL', 'BASE', 'fetch(', 'choices', 'content')
+    for item in required:
+        if item not in original_answer:
+            raise RuntimeError('N7_UNRECOGNIZED_ANSWER_SEMANTICS_'+item.replace('(',''))
     for expected in ('N7_FAST_GROQ_BOOTSTRAP_v1','n7-queue-bridge'):
         if expected not in text:
             raise RuntimeError('N7_EXPECTED_PRODUCTION_INTEGRATION_MISSING')
