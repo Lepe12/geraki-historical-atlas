@@ -61,11 +61,11 @@ def main():
      marker_start=old.rfind(b'// ',0,begin)
      if marker_start<0 or old.find(marker.encode(),begin+len(marker))>=0:
       raise RuntimeError('N7_VISION_UI_BOUNDARY_AMBIGUOUS')
-     new=old[:marker_start]+fresh+b'\\n'
+     new=old[:marker_start]+fresh+b'\n'
     else:
      if b"el('chat').onsubmit" not in old or b'/api/conversations/' not in old:
       raise RuntimeError('N7_VISION_UNRECOGNIZED_NEW_LIVE_UI')
-     new=old+b'\\n'+fresh+b'\\n'
+     new=old+b'\n'+fresh+b'\n'
      print('N7_VISION_UPDATED_UI_ADDON=APPENDED_WITHOUT_REPLACING_EXISTING')
    else:
     if marker.encode() not in old or old.count(marker.encode())!=1:
