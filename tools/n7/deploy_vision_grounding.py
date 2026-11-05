@@ -50,7 +50,9 @@ def main():
   originals={};updated={}
   for folder,name,source,marker in paths:
    old=read(ftp,folder,name);fresh=(HERE/source).read_bytes()
-   if marker.encode() not in old:raise RuntimeError('N7_VISION_MARKER_MISSING_'+name)
+   if marker.encode() not in old:
+    print('N7_VISION_LIVE_MARKERS file='+name+' rich='+str(b'N7_GROQ_TRUE_STREAM_AND_UPLOADS_V1' in old)+' inline='+str(b'N7_CHAT_CORRECTION_CONFIRM_V1' in old)+' picker='+str(b'n7-file-picker' in old)+' stream='+str(b'/stream' in old)+' length='+str(len(old)))
+    raise RuntimeError('N7_VISION_MARKER_MISSING_'+name)
    if name=='app.js':
     begin=old.find(b'// N7_GROQ_TRUE_STREAM_AND_UPLOADS_V1')
     if begin<0 or old.find(b'// N7_GROQ_TRUE_STREAM_AND_UPLOADS_V1',begin+3)>=0:
