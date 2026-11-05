@@ -1,0 +1,103 @@
+name: N7 public web research — guarded production activation
+
+on:
+  pull_request:
+    paths:
+      - tools/n7/public-web-search.js
+      - tools/n7/test_public_web_search.cjs
+      - tools/n7/deploy_public_web_search.py
+      - .github/workflows/n7-public-web-search.yml
+      - ops_ftps_requests/n7-public-web-search.json
+  push:
+    branches: [main]
+    paths:
+      - ops_ftps_requests/n7-public-web-search.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n7-public-web-search-activation
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Unit tests for public search, citations, privacy and network failures
+        run: |
+          node --check tools/n7/public-web-search.js
+          node --test tools/n7/test_public_web_search.cjs
+          python3 -m py_compile tools/n7/deploy_public_web_search.py
+      - name: Check public source connectivity, no API keys
+        run: |
+          node - <<'JS'
+          (async()=>{
+            const {researchMessages}=require('./tools/n7/public-web-search');
+            const result=await researchMessages([{role:'user',content:'Ψάξε τις πρόσφατες αμερικανικές ενδιάμεσες εκλογές'}]);
+            console.log('N7_PUBLIC_WEB_CONNECTIVITY searched='+result.searched+
+              ' providers='+result.availableProviders+
+              ' sources='+result.items.length+
+              ' failedProviders='+result.failedProviders);
+            if(!result.searched||!result.items.length)
+              throw Error('N7_PUBLIC_WEB_NO_REAL_SOURCE_AVAILABLE');
+          })().catch(e=>{console.error(e.message);process.exitCode=1});
+          JS
+      - name: Exact live Top.Host source compatibility check (read-only)
+        run: python3 tools/n7/deploy_public_web_search.py
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: validate
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify owner authorization and protected production target
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          expected={
+            'confirmation':'N7-PUBLIC-WEB-SEARCH-NO-PAID-KEY',
+            'target':'/bot.piratecartography.com/n7-app/server.js',
+            'preserve_groq_clock_memory_and_ui':True,
+            'read_only_external_search':True,
+            'backup_and_rollback':True
+          }
+          assert json.loads(Path('ops_ftps_requests/n7-public-web-search.json').read_text())==expected
+          print('N7_WEB_OWNER_AUTHORIZATION_VALID=true')
+          PY
+      - name: Stage and deploy exact server helper with backups and HTTPS verification
+        run: python3 tools/n7/deploy_public_web_search.py
