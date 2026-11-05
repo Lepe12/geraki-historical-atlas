@@ -43,12 +43,12 @@ def patch(original):
     start = text.index(BEGIN)
     end = text.index(END, start)
     original_answer = text[start:end]
-    for expected in (
+    for idx, expected in enumerate((
         "const resp=await fetch(", "temperature:0.3",
         "const content=result?.choices?.[0]?.message?.content",
-    ):
+    )):
         if expected not in original_answer:
-            raise RuntimeError('N7_UNRECOGNIZED_OLD_ANSWER_ABORT')
+            raise RuntimeError('N7_UNRECOGNIZED_OLD_ANSWER_ABORT_marker_'+str(idx))
     for expected in ('N7_FAST_GROQ_BOOTSTRAP_v1','n7-queue-bridge'):
         if expected not in text:
             raise RuntimeError('N7_EXPECTED_PRODUCTION_INTEGRATION_MISSING')
