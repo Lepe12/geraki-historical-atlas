@@ -41,10 +41,10 @@ def server_patch(original):
         raise RuntimeError('N7_EXISTING_SKILLS_ROUTES_MISSING')
     if 'N7_FAST_GROQ_BOOTSTRAP_v1' not in src or 'N7_COMPLETE_OUTPUT_V1' not in src:
         raise RuntimeError('N7_LIVE_GROQ_OR_COMPLETION_GUARD_MISSING')
-    definition=re.search(r'\\bconst\\s+DATA_DIR\\s*=.*?;',src,re.S)
+    definition=re.search(r'\bconst\s+DATA_DIR\s*=.*?;',src,re.S)
     if not definition:raise RuntimeError('N7_DATA_ROOT_DECLARATION_MISSING')
     pos=definition.end()
-    src=src[:pos]+'\\n'+(
+    src=src[:pos]+'\n'+(
       "const {createOwnerChatMemory}=require('./owner-chat-memory');\n"
       "const ownerChatMemory=createOwnerChatMemory(DATA_DIR,path.join(__dirname,'skills'));\n"
     )+src[pos+1:]
