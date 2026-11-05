@@ -38,6 +38,7 @@ def patch(original):
     if MARKER in text:
         return original
     if text.count(BEGIN) != 1 or text.count(END) != 1:
+        print('N7_ANSWER_LAYOUT_MARKERS begin='+str(text.count(BEGIN))+' end='+str(text.count(END))+' function_answer='+str(text.count('function answer'))+' function_serve='+str(text.count('function serve')))
         raise RuntimeError('N7_UNEXPECTED_ANSWER_LAYOUT_ABORT')
     start = text.index(BEGIN)
     end = text.index(END, start)
