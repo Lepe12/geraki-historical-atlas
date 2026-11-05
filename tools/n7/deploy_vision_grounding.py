@@ -15,7 +15,9 @@ def check(data):
  with tempfile.NamedTemporaryFile(suffix='.js') as tmp:
   tmp.write(data);tmp.flush()
   result=subprocess.run(['node','--check',tmp.name],capture_output=True,timeout=20)
-  if result.returncode:raise RuntimeError('N7_VISION_INVALID_JS')
+  if result.returncode:
+   print('N7_VISION_JS_DIAGNOSTIC='+repr(result.stderr.decode('utf8',errors='replace').splitlines()[:6])[:650])
+   raise RuntimeError('N7_VISION_INVALID_JS')
 def connect():
  host=os.environ['PCT_FTPS_HOST'];port=int(os.getenv('PCT_FTPS_PORT','21'))
  resolve=lambda h:{r[4][0] for r in socket.getaddrinfo(h,port,type=socket.SOCK_STREAM)}
@@ -71,6 +73,10 @@ def main():
     new=fresh
    if b'N7_OWNER_MEMORY_UI_V1' in old and b'N7_OWNER_MEMORY_UI_V1' not in new:
     raise RuntimeError('N7_VISION_OWNER_MEMORY_LOSS')
+   if name=='app.js':
+    print('N7_VISION_BASE_JS_CHECK_START')
+    check(old)
+   print('N7_VISION_PATCHED_JS_CHECK='+name)
    check(new)
    originals[(folder,name)]=old;updated[(folder,name)]=new
   print('N7_VISION_PREFLIGHT_OK dry_run='+str(dry)+' new_files=0 changes='+str(sum(originals[k]!=updated[k] for k in originals)))
