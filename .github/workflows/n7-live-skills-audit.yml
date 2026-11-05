@@ -1,0 +1,133 @@
+name: N7 live skills and learning read-only audit
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/n7-live-skills-audit.yml
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - name: Verify installed skill code and aggregate learning statistics without revealing user data
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import ftplib, ssl, socket, json, os, collections
+          root='/bot.piratecartography.com/n7-app'
+          tls='linux3087.grserver.gr'
+          host=os.environ['PCT_FTPS_HOST']
+          port=int(os.environ.get('PCT_FTPS_PORT','21'))
+          ips=lambda x: {v[4][0] for v in socket.getaddrinfo(x,port,type=socket.SOCK_STREAM)}
+          if not ips(host).intersection(ips(tls)):
+            raise SystemExit('N7_AUDIT_FTPS_IDENTITY_ERROR')
+          ftp=ftplib.FTP_TLS(timeout=30,context=ssl.create_default_context())
+          ftp.connect(host,port)
+          ftp.host=tls
+          ftp.login(os.environ['PCT_FTPS_USER'],os.environ['PCT_FTPS_PASSWORD'])
+          ftp.prot_p()
+          def read(filename,limit=2000000):
+            parent,name=filename.rsplit('/',1)
+            try:
+              ftp.cwd(parent)
+              chunks=[]
+              ftp.retrbinary('RETR '+name,chunks.append)
+              raw=b''.join(chunks)
+              if len(raw)>limit: raise RuntimeError('N7_AUDIT_FILE_TOO_LARGE')
+              return raw
+            except ftplib.error_perm as e:
+              if str(e).startswith('550 '): return None
+              raise
+          try:
+            code=read(root+'/server.js')
+            agent=read(root+'/agent.js')
+            registry=read(root+'/skills/registry.js')
+            learning=read(root+'/skills/learning.js')
+            improvements=read(root+'/skills/improvements.js')
+            app=read(root+'/public/app.js')
+            print('N7_LIVE_MODULES='+json.dumps({
+              'server':code is not None,
+              'agent':agent is not None,
+              'registry':registry is not None,
+              'learning':learning is not None,
+              'improvements':improvements is not None,
+              'feedback_ui':bool(app and b'/api/skills/feedback' in app)
+            },sort_keys=True))
+            for name in ('greek-prose-editor','historical-source-audit'):
+              raw=read(root+'/skills/'+name+'/SKILL.md')
+              print('N7_LIVE_SKILL_'+name+'='+('PRESENT' if raw and ('name: '+name).encode() in raw else 'MISSING'))
+            livecode=code.decode('utf8') if code else ''
+            normalized=''.join(livecode.split())
+            print('N7_LIVE_PATH_WIRING='+json.dumps({
+              'server_imports_agent':"require('./agent')" in normalized,
+              'server_calls_runAgent':'runAgent(' in normalized,
+              'server_declares_agent_queue_kind':("kind==='agent'" in normalized or 'kind==="agent"' in normalized),
+              'server_has_tasks_route':'/api/tasks' in livecode,
+              'chat_uses_agent':'runAgent(history' in normalized,
+              'skill_load_tool':bool(agent and b"name==='load_skill'" in agent),
+              'feedback_endpoint':bool(code and b'/api/skills/feedback' in code),
+              'feedback_persistence':bool(learning and b'feedback.json' in learning),
+              'lesson_appendix':bool(agent and b'Observed owner-reviewed feedback' in agent),
+              'suggest_inactive_revision':bool(agent and b'suggest_skill_improvement' in agent),
+              'default_data_dir_declared':"path.join(__dirname,'data')" in normalized
+            },sort_keys=True))
+            print('N7_LIVE_DATA_PATH_MARKERS='+json.dumps({
+              'conversations_file_exists':read(root+'/data/conversations.json') is not None,
+              'legacy_queue_file_exists':read(root+'/data/n7-private-queue.json') is not None
+            },sort_keys=True))
+            feedback_path=root+'/data/agent-workspace/.n7-internal/skill-learning/feedback.json'
+            feedback=read(feedback_path,700000)
+            if feedback is None:
+              print('N7_LIVE_FEEDBACK_STORE=NOT_CREATED')
+            else:
+              rows=json.loads(feedback)
+              if not isinstance(rows,list): raise RuntimeError('Unexpected feedback format')
+              print('N7_LIVE_FEEDBACK_STORE=EXISTS')
+              print('N7_LIVE_FEEDBACK_COUNT='+str(len(rows)))
+              print('N7_LIVE_FEEDBACK_SKILL_COUNTS='+json.dumps(dict(collections.Counter(
+                  str(x.get('skill','unknown')) for x in rows if isinstance(x,dict)
+              )),sort_keys=True))
+            taskraw=read(root+'/data/tasks.json',2000000)
+            if taskraw is None:
+              print('N7_LIVE_TASK_STORE=NOT_CREATED')
+            else:
+              tasks=json.loads(taskraw)
+              if not isinstance(tasks,list): raise RuntimeError('Unexpected task format')
+              agent_tasks=[x for x in tasks if isinstance(x,dict) and x.get('kind')=='agent']
+              completed=[x for x in agent_tasks if x.get('status')=='completed']
+              used=0
+              for item in completed:
+                try: result=json.loads(item.get('result',''))
+                except (ValueError,TypeError): continue
+                if isinstance(result,dict) and any(
+                  isinstance(step,dict) and step.get('name')=='load_skill' and step.get('ok') is True
+                  for step in result.get('steps',[]) if isinstance(result.get('steps',[]),list)
+                ): used+=1
+              print('N7_LIVE_TASK_COUNTS='+json.dumps({
+                'all':len(tasks), 'agent':len(agent_tasks), 'agent_completed':len(completed),
+                'completed_with_skill_load':used
+              },sort_keys=True))
+            try:
+              ftp.cwd(root+'/data/agent-workspace/.n7-internal/skill-proposals')
+              names=ftp.nlst()
+              count=sum(1 for item in names if item.endswith('.json'))
+              print('N7_LIVE_INACTIVE_PROPOSALS='+str(count))
+            except ftplib.error_perm as e:
+              if str(e).startswith('550 '): print('N7_LIVE_INACTIVE_PROPOSALS=NO_DIRECTORY')
+              else: raise
+            print('N7_AUDIT_PRIVATE_CONTENT_OUTPUT=false')
+          finally:
+            try: ftp.quit()
+            except ftplib.all_errors: pass
+          PY
