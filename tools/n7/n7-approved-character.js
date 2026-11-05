@@ -28,7 +28,7 @@ function setKind(kind){
  if(!label[kind])return;
  if(kind==='done'&&state.kind!=='done'){state.winkAt=performance.now();if(state.motion?.readyState>=2&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches)state.motion.currentTime=4.7;}
  state.kind=kind;ensureMounted();
- for(const x of state.mounted){x.setAttribute('aria-label','N7: '+label[kind]);x.title='N7 · '+label[kind];}
+ for(const x of state.mounted){x.setAttribute('aria-label','N7: '+label[kind]);x.removeAttribute('title');}
 }
 
 function mount(parent,small){if(!parent||parent.querySelector('.n7-live-presence'))return;
@@ -58,7 +58,7 @@ function ensureMounted(){
  for(const bubble of messages.querySelectorAll('.bubble.assistant')){
   if(bubble.querySelector(':scope > .n7-answer-identity'))continue;
   const identity=document.createElement('div');identity.className='n7-answer-identity';
-  const name=document.createElement('span');name.textContent='N7';identity.append(name);bubble.prepend(identity);mount(identity,true);
+  bubble.prepend(identity);mount(identity,true);
  }
  let row=messages.querySelector(':scope > .n7-conversation-status');
  const working=['listen','think','work'].includes(state.kind);
