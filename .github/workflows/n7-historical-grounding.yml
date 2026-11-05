@@ -1,0 +1,89 @@
+name: N7 historical grounding and citation isolation — deploy
+
+on:
+  pull_request:
+    paths:
+      - tools/n7/public-web-search.js
+      - tools/n7/stream-attachments.js
+      - tools/n7/test_historical_topic_isolation.cjs
+      - tools/n7/deploy_historical_grounding.py
+      - .github/workflows/n7-historical-grounding.yml
+      - ops_ftps_requests/n7-historical-grounding.json
+  push:
+    branches: [main]
+    paths:
+      - ops_ftps_requests/n7-historical-grounding.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n7-historical-grounding
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test current-subject isolation and original N7 features
+        run: |
+          node --check tools/n7/public-web-search.js
+          node --check tools/n7/stream-attachments.js
+          node --test tools/n7/test_historical_topic_isolation.cjs tools/n7/test_source_evidence.cjs tools/n7/test_public_web_search.cjs tools/n7/test_stream_attachments.cjs
+          python3 -m py_compile tools/n7/deploy_historical_grounding.py
+      - name: Read-only live production compatibility check
+        run: python3 tools/n7/deploy_historical_grounding.py
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: validate
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify explicit task scope
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          assert json.loads(Path('ops_ftps_requests/n7-historical-grounding.json').read_text())=={
+            'authorization':'N7-HISTORICAL-RESEARCH-FACTS-FIX',
+            'target':'/bot.piratecartography.com/n7-app',
+            'do_not_change_model_ui_or_history':True,
+            'preserve_verified_prior_features':True,
+            'rollback_on_failure':True
+          }
+          PY
+      - name: Deploy safe source and subject isolation, verify model health and private endpoints
+        run: python3 tools/n7/deploy_historical_grounding.py
