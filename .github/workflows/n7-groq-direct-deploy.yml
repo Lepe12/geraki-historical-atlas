@@ -1,0 +1,86 @@
+name: N7 Groq direct chat guarded FTPS activation
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/n7-groq-direct-deploy.yml
+      - tools/n7/deploy_groq_direct_chat.py
+      - ops_ftps_requests/n7-groq-activation.json
+  push:
+    branches: [main]
+    paths:
+      - ops_ftps_requests/n7-groq-activation.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n7-groq-direct-chat-activation
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_GROQ_API_KEY: ${{ secrets.GROQ_API_KEY || secrets.N7_GROQ_API_KEY }}
+      N7_DRY_RUN: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check and Groq/FTPS read-only live compatibility check
+        run: |
+          python3 -m py_compile tools/n7/deploy_groq_direct_chat.py
+          python3 tools/n7/deploy_groq_direct_chat.py
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: validate
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_GROQ_API_KEY: ${{ secrets.GROQ_API_KEY || secrets.N7_GROQ_API_KEY }}
+      N7_DRY_RUN: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify strictly scoped owner deployment request
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('ops_ftps_requests/n7-groq-activation.json').read_text())
+          assert d == {
+            'confirmation':'N7-GROQ-FAST-CHAT-PRIVATE-FTPS',
+            'target':'/bot.piratecartography.com/n7-app',
+            'model':'qwen/qwen3.8-27b',
+            'api_key_in_repo':False,
+            'rollback_required':True
+          }
+          print('N7_GROQ_OWNER_DEPLOY_REQUEST_VALID=true')
+          PY
+      - name: Deploy private provider config, restart, verify and rollback if needed
+        run: python3 tools/n7/deploy_groq_direct_chat.py
