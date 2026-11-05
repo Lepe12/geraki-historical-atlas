@@ -194,7 +194,7 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
    evidence=await publicSearch.researchMessages(history);
    if(typeof publicSearch.enrichPublisherArticles==='function')
      evidence=await publicSearch.enrichPublisherArticles(evidence);
-   messages=buildPrompt(history,id,DATA_DIR,promptMessages);
+   messages=buildPrompt(publicSearch.cleanHistoryForTopic(history),id,DATA_DIR,promptMessages);
    const n7ImageCount=attachments.filter(a=>a.type.startsWith('image/')).length;
    if(n7ImageCount){
      const recent=messages.findLast(m=>m.role==='user');
