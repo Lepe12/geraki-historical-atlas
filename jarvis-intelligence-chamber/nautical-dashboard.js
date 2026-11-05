@@ -322,11 +322,18 @@ function renderStatus() {
   const nRepos = Number(s?.metrics?.repositories_attempted) || repos.size;
   const records = s ? (s.discoveries?.length || 0) + (s.claims?.length || 0) : NaN;
   const conflicts = s ? (Array.isArray(s.contradictions?.records) ? s.contradictions.records.length : 0) : NaN;
+  const narrative = s?.research_answer?.greek_narrative;
+  const narrativeReady = narrative && ["NARRATIVE_PENDING_HUMAN_REVIEW", "NO_USABLE_EVIDENCE"].includes(narrative.status);
+  const storyBit = narrativeReady
+    ? (narrative.paragraphs || []).map((x) => x.text_el).filter(Boolean)[0] || narrative.title_el || "Αφήγηση διαθέσιμη"
+    : "";
   const rows = [
     ["ΕΡΕΥΝΗΤΕΣ", s ? (act ? act + " / " : "") + done + " / " + agents.length : "—", agents.length ? (7 * (done + act)) / agents.length : 0,
       s ? `${done} ολοκληρωμένοι, ${act} ενεργοί, ${agents.length} ερευνητές συνολικά` : "Δεν υπάρχει φορτωμένη έρευνα"],
     ["ΠΗΓΕΣ", s && nRepos ? fmt(nRepos) : "—", nRepos ? (7 * reposHit.size) / nRepos : 0, provisional ? "Τα συγκεντρωτικά δεδομένα δεν έχουν δημοσιευτεί ακόμη" : s ? `${nRepos} αποθετήρια ερωτήθηκαν · ${reposHit.size} με αποτελέσματα` : ""],
-    ["ΕΓΓΡΑΦΕΣ", provisional ? "—" : fmt(records), provisional ? 0 : logMeter(records), provisional ? "Τα τελικά ευρήματα δεν έχουν δημοσιευτεί ακόμη" : s ? `${s.discoveries?.length || 0} καταγεγραμμένες πηγές · ${s.claims?.length || 0} ισχυρισμοί` : ""],
+    narrativeReady
+      ? ["ΑΦΗΓΗΣΗ", "ναι", 5, storyBit]
+      : ["ΕΓΓΡΑΦΕΣ", provisional ? "—" : fmt(records), provisional ? 0 : logMeter(records), provisional ? "Τα τελικά ευρήματα δεν έχουν δημοσιευτεί ακόμη" : s ? `${s.discoveries?.length || 0} καταγεγραμμένες πηγές · ${s.claims?.length || 0} ισχυρισμοί` : ""],
     ["ΑΝΤΙΦΑΣΕΙΣ", provisional ? "—" : fmt(conflicts), provisional ? 0 : Math.min(7, conflicts || 0), provisional ? "Οι αντιφάσεις και τα εμπόδια δεν έχουν συγκεντρωθεί ακόμη" : s ? `${conflicts} καταγεγραμμένες αντιφάσεις · ${s.blockers?.length || 0} εμπόδια πρόσβασης` : ""],
   ];
   $("statRows").innerHTML = rows.map(([k, n, lit, title]) => `<div class="srow" title="${esc(title)}"><span class="k">${k}</span><span class="n">${esc(n)}</span>${meter(lit)}</div>`).join("");
@@ -377,9 +384,20 @@ function activityItems() {
     const repos = new Set((s.discoveries || []).map((d) => d.repository).filter(Boolean)).size;
     const claims = s.claims?.length || 0, contra = Array.isArray(s.contradictions?.records) ? s.contradictions.records.length : 0;
     const at = s.generated_utc || latest(all);
-    if (contra) items.push({ at, title: contra + (contra === 1 ? " αντίφαση" : " αντιφάσεις"), sub: "καταγράφηκαν στα τεκμήρια", cls: "" });
-    if (claims) items.push({ at, title: claims + (claims === 1 ? " ισχυρισμός" : " ισχυρισμοί"), sub: "για έλεγχο στο πρωτότυπο", cls: "warn" });
-    if (s.discoveries?.length) items.push({ at, title: fmt(related) + " σχετικές αναφορές", sub: "από " + fmt(s.discoveries.length) + " εγγραφές σε " + repos + " πηγές", cls: "warn" });
+    const narrative = s.research_answer?.greek_narrative;
+    const narrativeReady = narrative && ["NARRATIVE_PENDING_HUMAN_REVIEW", "NO_USABLE_EVIDENCE"].includes(narrative.status);
+    if (narrativeReady) {
+      items.push({
+        at,
+        title: narrative.status === "NO_USABLE_EVIDENCE" ? "Δεν τεκμηριώθηκε αφήγηση" : "Αφήγηση έτοιμη για έλεγχο",
+        sub: narrative.title_el || "βλ. φάκελο έρευνας",
+        cls: narrative.status === "NO_USABLE_EVIDENCE" ? "" : "ok",
+      });
+    } else {
+      if (contra) items.push({ at, title: contra + (contra === 1 ? " αντίφαση" : " αντιφάσεις"), sub: "καταγράφηκαν στα τεκμήρια", cls: "" });
+      if (claims) items.push({ at, title: claims + (claims === 1 ? " ισχυρισμός" : " ισχυρισμοί"), sub: "για έλεγχο στο πρωτότυπο", cls: "warn" });
+      if (s.discoveries?.length) items.push({ at, title: fmt(related) + " σχετικές αναφορές", sub: "από " + fmt(s.discoveries.length) + " εγγραφές σε " + repos + " πηγές", cls: "warn" });
+    }
     const m = s.mission || {};
     if (m.status) items.push({ at, title: "Έρευνα #" + (s.run_id || "—") + ": " + GR.status(m.status), sub: m.answer_status ? GR.status(m.answer_status) : m.target || "", cls: laneClass(m.status) === "COMPLETED" ? "ok" : "" });
   }
@@ -440,10 +458,20 @@ function renderCards() {
   const lanes = window.NABOU_LANES || [];
   const related = (s?.discoveries || []).filter((d) => ["TARGET_MATCH", "POSSIBLE_TARGET"].includes(d.topical_match?.category)).length + (s?.claims?.length || 0);
   const repos = new Set((s?.discoveries || []).map((d) => d.repository).filter(Boolean));
-  $("cardPlaces").textContent = lanes.filter((l) => l.kind === "archive").length + " αρχεία";
-  $("cardEvents").textContent = s ? fmt(s.events?.length || 0) + " συμβάντα" : "—";
-  $("cardPeople").textContent = s ? fmt(related) + " αναφορές" : "—";
+  const narrative = s?.research_answer?.greek_narrative;
+  const narrativeReady = narrative && ["NARRATIVE_PENDING_HUMAN_REVIEW", "NO_USABLE_EVIDENCE"].includes(narrative.status);
+  const mapPlaces = narrative?.map_places?.length || 0;
+  $("cardPlaces").textContent = narrativeReady && mapPlaces
+    ? mapPlaces + " τόποι αφήγησης"
+    : lanes.filter((l) => l.kind === "archive").length + " αρχεία";
+  $("cardEvents").textContent = narrativeReady
+    ? ((narrative.events || []).length + " γεγονότα αφήγησης")
+    : s ? fmt(s.events?.length || 0) + " συμβάντα" : "—";
+  $("cardPeople").textContent = narrativeReady
+    ? (narrative.status === "NO_USABLE_EVIDENCE" ? "χωρίς αφήγηση" : "αφήγηση")
+    : s ? fmt(related) + " αναφορές" : "—";
   $("cardSources").textContent = s ? fmt(repos.size) + " πηγές" : "—";
+  if (window.NABOU_FACT_PINS) window.NABOU_FACT_PINS.fromSnapshot(s);
 }
 function renderMission() {
   const m = snapshot?.mission || {};

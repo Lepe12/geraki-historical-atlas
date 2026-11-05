@@ -95,10 +95,33 @@ function conflictEvidence(record) {
       .join("")
   );
 }
+function greekNarrative(data) {
+  const n = data?.greek_narrative;
+  if (!n || !["NARRATIVE_PENDING_HUMAN_REVIEW", "NO_USABLE_EVIDENCE"].includes(n.status)) return "";
+  const body = (n.paragraphs || [])
+    .map((row) => "<p>" + esc(row.text_el || "") + "</p>")
+    .join("");
+  const gaps =
+    Array.isArray(n.not_found) && n.not_found.length
+      ? "<details open><summary>Τι δεν βρέθηκε</summary>" +
+        n.not_found.map((x) => "<p>" + esc(x.note_el || "") + "</p>").join("") +
+        "<small>«Δεν βρέθηκε στις εξετασθείσες πηγές» δεν σημαίνει «δεν συνέβη».</small></details>"
+      : "";
+  return (
+    '<section class="result-item research-narrative"><b>ΑΦΗΓΗΣΗ · ΠΡΟΣ ΕΛΕΓΧΟ</b><small>' +
+    esc(n.title_el || "") +
+    "</small>" +
+    body +
+    gaps +
+    "</section>"
+  );
+}
 function semanticAnswer(data) {
   if (!["pct-semantic-answer-v1", "pct-semantic-answer-v2", "pct-semantic-answer-v3"].includes(data?.schema)) return "";
+  const greek = greekNarrative(data);
   if (!["MODEL_ANSWER_PENDING_HUMAN_REVIEW", "SOURCE_DOSSIER_AVAILABLE"].includes(data.status))
     return (
+      greek ||
       '<section class="result-item"><b>ΑΠΑΝΤΗΣΗ ΕΡΕΥΝΑΣ</b><p>' +
       esc(
         data.status === "BLOCKED_CONFIGURATION"
@@ -164,7 +187,7 @@ function semanticAnswer(data) {
         "</details>",
     )
     .join("");
-  return (
+  const english =
     '<section class="result-item"><b>ΑΠΑΝΤΗΣΗ ΜΕ ΠΑΡΑΠΟΜΠΕΣ · ΠΡΟΣ ΕΛΕΓΧΟ</b><small>' +
     esc(
       data.answer_mode === "EXACT_SOURCE_EXTRACTS"
@@ -180,8 +203,16 @@ function semanticAnswer(data) {
         data.unknowns.map((x) => "<p>" + esc(x) + "</p>").join("") +
         "</details>"
       : "") +
-    "</section>"
-  );
+    "</section>";
+  if (greek) {
+    return (
+      greek +
+      '<details class="result-item"><summary>Λεπτομέρειες πηγών (αγγλική σύνθεση)</summary>' +
+      english +
+      "</details>"
+    );
+  }
+  return english;
 }
 function recordEvidence(record) {
   const printed = record.printed_page ?? record.text_locator?.printed_page;
@@ -440,17 +471,21 @@ function renderResults() {
       b.dataset.count = snapshot ? String(counts[b.dataset.resultFilter] ?? "") : "";
     });
   }
-  meta.textContent =
-    related.length +
-    " πιθανές σχετικές αναφορές · " +
-    supporting.length +
-    " γενικού πλαισίου · " +
-    unmatched.length +
-    " αταύτιστα · " +
-    claims.length +
-    " ιστορικοί ισχυρισμοί · " +
-    blockers.length +
-    " εμπόδια";
+  const narrativeReady = ["NARRATIVE_PENDING_HUMAN_REVIEW", "NO_USABLE_EVIDENCE"].includes(
+    snapshot?.research_answer?.greek_narrative?.status,
+  );
+  meta.textContent = narrativeReady
+    ? "Αφήγηση και χάρτης · οι αριθμοί στις Λεπτομέρειες"
+    : related.length +
+      " πιθανές σχετικές αναφορές · " +
+      supporting.length +
+      " γενικού πλαισίου · " +
+      unmatched.length +
+      " αταύτιστα · " +
+      claims.length +
+      " ιστορικοί ισχυρισμοί · " +
+      blockers.length +
+      " εμπόδια";
   const groups =
     resultFilter === "contradictions"
       ? [[contradictions, "CONTRADICTION"]]
@@ -640,21 +675,29 @@ function renderResults() {
       (snapshot.evidence_url ? sourceLink({ url: snapshot.evidence_url }) : "") +
       "</details>"
     : "";
-  list.innerHTML =
-    context +
-    (resultFilter === "all" && !q && !resultPage ? semanticAnswer(snapshot?.research_answer) : "") +
-    (items.join("") ||
-      '<div class="result-empty">' +
-        (resultFilter === "contradictions"
-          ? "Δεν έχουν καταγραφεί αντιφάσεις. Τα προβλήματα πρόσβασης εμφανίζονται στα Εμπόδια."
-          : requestedId && !snapshot
-            ? "Το αίτημα παραλήφθηκε. Αναμένουμε τα αποτελέσματα της νέας έρευνας."
-            : "Δεν υπάρχουν καταγεγραμμένα στοιχεία για αυτό το φίλτρο. Δοκιμάστε άλλο φίλτρο ή ανοίξτε μια άλλη έρευνα.") +
-        "</div>");
+  const narrativeFirst =
+    resultFilter === "all" && !q && !resultPage ? semanticAnswer(snapshot?.research_answer) : "";
+  const rawBlock =
+    items.join("") ||
+    '<div class="result-empty">' +
+      (resultFilter === "contradictions"
+        ? "Δεν έχουν καταγραφεί αντιφάσεις. Τα προβλήματα πρόσβασης εμφανίζονται στα Εμπόδια."
+        : requestedId && !snapshot
+          ? "Το αίτημα παραλήφθηκε. Αναμένουμε τα αποτελέσματα της νέας έρευνας."
+          : "Δεν υπάρχουν καταγεγραμμένα στοιχεία για αυτό το φίλτρο. Δοκιμάστε άλλο φίλτρο ή ανοίξτε μια άλλη έρευνα.") +
+      "</div>";
+  const wrappedRaw =
+    narrativeFirst && resultFilter === "all" && !q && !resultPage
+      ? '<details class="result-raw"><summary>Λεπτομέρειες · πρώτες ύλες και μετρήσεις</summary>' +
+        rawBlock +
+        "</details>"
+      : rawBlock;
+  list.innerHTML = context + narrativeFirst + wrappedRaw;
   if (q && !total)
     list.innerHTML =
       context + '<div class="result-empty">Δεν υπάρχουν ευρήματα που να ταιριάζουν στην αναζήτηση.</div>';
   $("resultsList").scrollTop = 0;
+  if (window.NABOU_FACT_PINS) window.NABOU_FACT_PINS.fromSnapshot(snapshot);
 }
 function updateDetail() {
   const id = $("detailPanel")?.dataset?.agentId || map[$("detailTitle")?.textContent?.trim()],

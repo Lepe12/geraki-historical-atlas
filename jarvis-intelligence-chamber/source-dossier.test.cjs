@@ -28,3 +28,41 @@ test('schema compatibility never exposes unreviewed or uncited answer sections',
  assert.doesNotMatch(uncited,/Missing evidence/);
  assert.equal(render({schema:'unknown-schema',status:'MODEL_ANSWER_PENDING_HUMAN_REVIEW'}),'');
 });
+
+test('greek narrative is the default answer surface with raw English under details', () => {
+  const html = render({
+    schema: 'pct-semantic-answer-v3',
+    status: 'MODEL_ANSWER_PENDING_HUMAN_REVIEW',
+    claims: [{
+      claim_id: 'c-1', kind: 'source_statement', statement: 'Held Melos.',
+      quote: 'Held Melos.',
+      source_occurrences: [{ title: 'Book', url: 'https://example.org/book', locator: { printed_page: 42 } }],
+    }],
+    answer_sections: [{ text: 'Held Melos.', claim_ids: ['c-1'] }],
+    greek_narrative: {
+      status: 'NARRATIVE_PENDING_HUMAN_REVIEW',
+      title_el: 'Ιωάννης Καψής',
+      paragraphs: [{ text_el: 'Το 1677 περίπου κράτησε τη Μήλο *(Book, σελ. 42)*', claim_ids: ['c-1'] }],
+      not_found: [{ note_el: 'Δεν βρέθηκε ακριβής ημερομηνία σύλληψης στις εξετασθείσες πηγές.', reason: 'NOT_FOUND_IN_CONSULTED_SOURCES' }],
+    },
+  });
+  assert.match(html, /ΑΦΗΓΗΣΗ/);
+  assert.match(html, /κράτησε τη Μήλο/);
+  assert.match(html, /Τι δεν βρέθηκε/);
+  assert.match(html, /Λεπτομέρειες πηγών/);
+  assert.match(html, /Held Melos/);
+});
+test('honest empty greek narrative renders without inventing a biography', () => {
+  const html = render({
+    schema: 'pct-semantic-answer-v3',
+    status: 'INSUFFICIENT_ACQUIRED_EVIDENCE',
+    greek_narrative: {
+      status: 'NO_USABLE_EVIDENCE',
+      title_el: 'Άγνωστος',
+      paragraphs: [{ text_el: 'Δεν προέκυψε τεκμηριωμένη βιογραφία. Αυτό δεν σημαίνει ότι δεν υπήρξε.', claim_ids: [] }],
+      not_found: [],
+    },
+  });
+  assert.match(html, /ΑΦΗΓΗΣΗ|δεν σημαίνει/);
+  assert.doesNotMatch(html, /βασιλιάς της Μήλου/);
+});

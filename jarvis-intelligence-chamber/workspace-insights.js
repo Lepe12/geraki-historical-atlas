@@ -164,6 +164,19 @@ connectResearchFeed({
     link.href = "?run=" + encodeURIComponent(snapshot.run_id);
     link.hidden = false;
     document.title = "NABOU//X · " + data.title;
+    const narrative = data.narrative || snapshot.research_answer?.greek_narrative;
+    const story =
+      narrative && Array.isArray(narrative.paragraphs)
+        ? narrative.paragraphs
+            .map((row) => "<p class=\"narrative-paragraph\">" + escape(row.text_el || "") + "</p>")
+            .join("")
+        : "";
+    const notFound =
+      narrative && Array.isArray(narrative.not_found) && narrative.not_found.length
+        ? '<section class="narrative-not-found"><h3>Τι δεν βρέθηκε</h3><ul>' +
+          narrative.not_found.map((row) => "<li>" + escape(row.note_el || "") + "</li>").join("") +
+          "</ul><small>«Δεν βρέθηκε στις εξετασθείσες πηγές» δεν σημαίνει «δεν συνέβη».</small></section>"
+        : "";
     summary.innerHTML =
       '<div class="overview-heading"><h2>' +
       escape(data.title) +
@@ -173,9 +186,14 @@ connectResearchFeed({
       escape(snapshot.mission?.purpose || snapshot.mission?.target || (snapshot.mission?.status === "RUNNING" ? "Το ερώτημα δεν είναι ακόμη διαθέσιμο στα δεδομένα της έρευνας." : "Δεν καταγράφηκε αρχικό ερώτημα.")) +
       "</dd></div><div><dt>Περίοδος</dt><dd>" +
       escape(snapshot.mission?.date_range || (snapshot.mission?.status === "RUNNING" ? "Η περίοδος δεν είναι ακόμη διαθέσιμη." : "Δεν ορίστηκε περίοδος")) +
-      "</dd></div></dl><p>" +
-      escape(data.message) +
-      '</p><dl class="overview-counts">' +
+      "</dd></div></dl>" +
+      (story
+        ? '<section class="research-narrative" aria-label="Αφήγηση έρευνας"><h3>Αφήγηση</h3>' +
+          story +
+          notFound +
+          "</section>"
+        : "<p>" + escape(data.message) + "</p>") +
+      '<details class="overview-details"><summary>Λεπτομέρειες</summary><dl class="overview-counts">' +
       [
         [data.related, "Σχετικές αναφορές"],
         [data.claims, "Ιστορικοί ισχυρισμοί"],
@@ -184,9 +202,13 @@ connectResearchFeed({
       ]
         .map(([n, label]) => "<div><dt>" + label + "</dt><dd>" + n + "</dd></div>")
         .join("") +
-      '</dl><p class="overview-next"><strong>Επόμενο βήμα:</strong> ' +
+      "</dl><p>" +
+      escape(data.message) +
+      "</p></details>" +
+      '<p class="overview-next"><strong>Επόμενο βήμα:</strong> ' +
       escape(data.next) +
       "</p>";
+    if (window.NABOU_FACT_PINS) window.NABOU_FACT_PINS.fromSnapshot(snapshot);
   },
   onState: (mode) => {
     if (mode === "OFFLINE" && !current)

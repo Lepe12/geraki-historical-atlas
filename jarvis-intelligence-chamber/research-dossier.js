@@ -132,15 +132,21 @@ export function dossierMarkup(snapshot) {
   const contradictions = Array.isArray(snapshot.contradictions?.records)
     ? snapshot.contradictions.records
     : [];
+  const narrative = snapshot.research_answer?.greek_narrative;
+  const narrativeReady = narrative && ["NARRATIVE_PENDING_HUMAN_REVIEW", "NO_USABLE_EVIDENCE"].includes(narrative.status);
   const leads =
     (snapshot.discoveries || []).filter((d) =>
       ["TARGET_MATCH", "POSSIBLE_TARGET"].includes(d.topical_match?.category),
     ).length + (snapshot.claims || []).length;
   const pending =
     "<p>" +
-    (leads
-      ? "Οι αναφορές και οι ισχυρισμοί χρειάζονται έλεγχο του πρωτοτύπου, της σελίδας και της ανεξαρτησίας των πηγών."
-      : provisional ? "Τα τελικά στοιχεία δεν έχουν ακόμη δημοσιευτεί." : "Δεν έχουν καταγραφεί σχετικές αναφορές ή ισχυρισμοί προς έλεγχο.") +
+    (narrativeReady
+      ? narrative.status === "NO_USABLE_EVIDENCE"
+        ? "Δεν προέκυψε τεκμηριωμένη αφήγηση από τις εξετασθείσες πηγές. Αυτό δεν αποδεικνύει ιστορική απουσία."
+        : "Η αφήγηση είναι διαθέσιμη στο ερώτημα και στα ευρήματα. Οι αριθμοί και οι πρώτες ύλες μένουν στις Λεπτομέρειες."
+      : leads
+        ? "Οι αναφορές και οι ισχυρισμοί χρειάζονται έλεγχο του πρωτοτύπου, της σελίδας και της ανεξαρτησίας των πηγών."
+        : provisional ? "Τα τελικά στοιχεία δεν έχουν ακόμη δημοσιευτεί." : "Δεν έχουν καταγραφεί σχετικές αναφορές ή ισχυρισμοί προς έλεγχο.") +
     "</p>" +
     (contradictions.length
       ? "<p>" +

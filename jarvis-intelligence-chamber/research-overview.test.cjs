@@ -6,3 +6,26 @@ test('history rejects unsafe IDs, orders numeric IDs without precision loss and 
 test('blocked analysis and insufficient evidence are clear terminal outcomes',async()=>{const {overview}=await modulePromise;const blocked=overview({mission:{status:'BLOCKED_CONFIGURATION'},agents:[{status:'RUNNING'}]});assert.equal(blocked.status,'Η ανάλυση χρειάζεται ρύθμιση');assert.doesNotMatch(blocked.message,/βρίσκεται σε εξέλιξη/);assert.equal(overview({mission:{status:'INSUFFICIENT_EVIDENCE'}}).status,'Ανεπαρκή τεκμήρια');});
 test('live-only events do not pretend unpublished evidence counts are zero',async()=>{const {overview}=await modulePromise;const live=overview({run_id:'1',mission:{status:'RUNNING'},agents:[{status:'RUNNING'}],claims:[],blockers:[],contradictions:{records:[]}});assert.equal(live.blockers,'—');assert.equal(live.related,'—');const complete=overview({run_id:'1',mission:{status:'COMPLETED'},discoveries:[],claims:[],blockers:[]});assert.equal(complete.blockers,0);});
 
+test('greek narrative leads the overview and keeps counts for details', async () => {
+  const { overview } = await modulePromise;
+  const r = overview({
+    run_id: '1',
+    mission: { status: 'COMPLETED', target: 'Ιωάννης Καψής' },
+    discoveries: [{ topical_match: { category: 'TARGET_MATCH' } }],
+    claims: [{ verified: false }],
+    blockers: [],
+    contradictions: { records: [] },
+    research_answer: {
+      greek_narrative: {
+        status: 'NARRATIVE_PENDING_HUMAN_REVIEW',
+        title_el: 'Ιωάννης Καψής',
+        paragraphs: [{ text_el: 'Το 1677 περίπου κράτησε τη Μήλο *(πηγή)*' }],
+      },
+    },
+  });
+  assert.equal(r.title, 'Ιωάννης Καψής');
+  assert.match(r.message, /Μήλο/);
+  assert.match(r.next, /Λεπτομέρειες/);
+  assert.equal(r.related, 1);
+  assert.equal(r.claims, 1);
+});
