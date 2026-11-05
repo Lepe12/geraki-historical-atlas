@@ -5,6 +5,7 @@ import hashlib
 import io
 import json
 import os
+import re
 import socket
 import ssl
 import subprocess
@@ -59,11 +60,13 @@ def patch(original):
     s=original.decode('utf-8')
     if MARK in s:
         return original
-    if s.count(ANCHOR)!=1 or s.count(OLD_START)!=1 or s.count(OLD_END)!=1:
-        print('N7_UI_MARKER_COUNTS anchor='+str(s.count(ANCHOR))+' start='+str(s.count(OLD_START))+' end='+str(s.count(OLD_END))+' newline_crlf='+str(s.count('\\r\\n')))
+    if s.count(ANCHOR)!=1 or s.count(OLD_START)!=1:
         raise RuntimeError('N7_UNEXPECTED_FRONTEND_STRUCTURE_ABORT')
     start=s.index(OLD_START)
-    end=s.index(OLD_END,start)
+    end_marker=re.search(r'}\s*else\s*{\s*render\s*\(\s*reply\.conversation\.messages\s*\)\s*;', s[start:])
+    if not end_marker:
+        raise RuntimeError('N7_MISSING_QUEUED_ELSE_RENDER')
+    end=start+end_marker.start()
     original_block=s[start:end]
     # preserve existing user-facing enqueue notice exactly
     notice_lines=[line for line in original_block.splitlines() if "el('notice').textContent=reply.dispatch" in line]
