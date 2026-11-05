@@ -5,7 +5,7 @@
 function toText(x){return String(x||'').replace(/\s+/g,' ').trim();}
 function extractBibliography(article){
  const text=String(article||'');
- const match=/\b(?:Πηγές|Βιβλιογραφία|References|Bibliography)\s*:/iu.exec(text);
+ const match=/(?:^|\n|\s)(?:Πηγές|Βιβλιογραφία|References|Bibliography)\s*:/iu.exec(text);
  if(!match)return [];
  const tail=text.slice(match.index+match[0].length,match.index+match[0].length+7500);
  const chunks=tail.split(/\n\s*(?:[•*\-–]\s*|\d+[.)]\s*)|\n(?=[Α-ΩΆΈΉΊΌΎΏ][^\n]{15,})/u)
