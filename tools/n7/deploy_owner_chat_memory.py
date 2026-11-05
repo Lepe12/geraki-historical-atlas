@@ -33,6 +33,7 @@ def server_patch(original):
     src=original.decode('utf8')
     if MARKER in src:return original
     if src.count('async function answer(messages)')!=1 or src.count("const learning=createLearningMemory(")!=1:
+        print('N7_MEMORY_MARKERS answer='+str(src.count('async function answer(messages)'))+' learning='+str(src.count('const learning=createLearningMemory(')))
         raise RuntimeError('N7_WRONG_LIVE_SERVER_ABORT')
     if "if(!session(req))return json(res,401,{error:'Authentication required'});" not in src:
         raise RuntimeError('N7_MISSING_AUTH_CHECK_ABORT')
