@@ -1,0 +1,29 @@
+name: N7 Gemma 4 12B isolated guarded model upload
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/n7-gemma-guarded-upload.yml'
+      - 'tools/n7/gemma-guarded-upload.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: n7-gemma-isolated-model-upload
+  cancel-in-progress: false
+jobs:
+  transfer:
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 110
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check isolated upload script syntax
+        run: python3 -m py_compile tools/n7/gemma-guarded-upload.py
+      - name: Verify quota and transfer Gemma only if storage headroom proven
+        run: python3 tools/n7/gemma-guarded-upload.py
