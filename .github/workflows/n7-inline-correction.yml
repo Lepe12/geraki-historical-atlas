@@ -1,0 +1,88 @@
+name: N7 inline correction approval guarded deployment
+
+on:
+  pull_request:
+    paths:
+      - tools/n7/chat-correction-confirm.js
+      - tools/n7/test_chat_correction_confirm.cjs
+      - tools/n7/deploy_inline_correction.py
+      - .github/workflows/n7-inline-correction.yml
+      - ops_ftps_requests/n7-inline-correction.json
+  push:
+    branches: [main]
+    paths:
+      - ops_ftps_requests/n7-inline-correction.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n7-inline-correction-deploy
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test explicit consent, decline, suggestion detection and API submission
+        run: |
+          node --check tools/n7/chat-correction-confirm.js
+          node --test tools/n7/test_chat_correction_confirm.cjs
+          python3 -m py_compile tools/n7/deploy_inline_correction.py
+      - name: Check exact live N7 frontend, no writes
+        run: python3 tools/n7/deploy_inline_correction.py
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: validate
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact owner deployment authorization
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          assert json.loads(Path('ops_ftps_requests/n7-inline-correction.json').read_text()) == {
+            'confirmation':'N7-INLINE-CORRECTION-OWNER-APPROVAL',
+            'target':'/bot.piratecartography.com/n7-app/public/app.js',
+            'preserve_backend_and_groq':True,
+            'no_automatic_learning':True,
+            'backup_and_rollback':True
+          }
+          print('N7_INLINE_CORRECTION_OWNER_REQUEST_VALID=true')
+          PY
+      - name: Deploy UI-only explicit approval, read-back verify and rollback on failure
+        run: python3 tools/n7/deploy_inline_correction.py
