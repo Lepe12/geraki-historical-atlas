@@ -150,6 +150,72 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
   return {searched:true,query:request.query,kind:request.kind,items,
     availableProviders:successful,failedProviders:results.length-successful};
 }
+// N7_FULL_SOURCE_READING_V1: content excerpts only from a bounded trusted publisher allowlist.
+const ARTICLE_HOSTS=new Set([
+ 'www.reuters.com','reuters.com','apnews.com','www.apnews.com',
+ 'www.pbs.org','www.dw.com','www.thehindu.com',
+ 'www.bbc.com','www.bbc.co.uk','www.npr.org','www.cbsnews.com',
+ 'www.nytimes.com','www.theguardian.com','www.aljazeera.com',
+ 'www.euronews.com','www.ekathimerini.com','www.kathimerini.gr',
+ 'www.britannica.com','www.history.com'
+]);
+function extractVisibleArticle(html){
+ const text=String(html||'');
+ const main=text.match(/<article\\b[^>]*>([\\s\\S]*?)<\\/article>/i)?.[1]||
+    text.match(/<main\\b[^>]*>([\\s\\S]*?)<\\/main>/i)?.[1]||text;
+ const clean=main.replace(/<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi,' ')
+   .replace(/<style\\b[^>]*>[\\s\\S]*?<\\/style>/gi,' ')
+   .replace(/<(?:nav|footer|header|aside|form|svg)\\b[^>]*>[\\s\\S]*?<\\/(?:nav|footer|header|aside|form|svg)>/gi,' ')
+   .replace(/<(?:p|h[1-6]|blockquote|li|div)\\b[^>]*>/gi,'\\n')
+   .replace(/<[^>]+>/g,' ').replace(/&nbsp;/gi,' ').replace(/&amp;/gi,'&')
+   .replace(/&#(\\d+);/g,(_,n)=>String.fromCodePoint(Math.min(+n,0x10ffff)))
+   .replace(/[ \\t]{2,}/g,' ').replace(/\\n[ \\t]+/g,'\\n')
+   .replace(/\\n{3,}/g,'\\n\\n').trim();
+ return clean.length>400?clean.slice(0,10000):'';
+}
+async function publisherArticle(url,{transport=fetch,timeout=7000}={}){
+ const u=new URL(url);
+ if(u.protocol!=='https:'||!ARTICLE_HOSTS.has(u.hostname)||u.username||u.password)
+   throw Error('Not in trusted publisher list');
+ const ctl=new AbortController(),stop=setTimeout(()=>ctl.abort(),timeout);
+ try{
+  const response=await transport(u.href,{method:'GET',redirect:'error',signal:ctl.signal,
+    headers:{'Accept':'text/html','User-Agent':DEFAULT_UA}});
+  if(!response.ok)throw Error('Article HTTP '+response.status);
+  const type=response.headers?.get?.('content-type')||'';
+  if(type&&!type.includes('text/html'))throw Error('Not HTML');
+  const declared=Number(response.headers?.get?.('content-length')||0);
+  if(declared>450000)throw Error('Article too large');
+  const reader=response.body?.getReader?.();
+  if(!reader)throw Error('No streaming article body');
+  const chunks=[];let count=0;
+  try{
+   while(true){
+    const next=await reader.read();
+    if(next.done)break;
+    count+=next.value.byteLength;
+    if(count>450000)throw Error('Article exceeded limit');
+    chunks.push(next.value);
+   }
+  }finally{try{await reader.cancel()}catch(_){}}
+  const buffer=new Uint8Array(count);let offset=0;
+  for(const chunk of chunks){buffer.set(chunk,offset);offset+=chunk.byteLength;}
+  return extractVisibleArticle(new TextDecoder().decode(buffer));
+ }finally{clearTimeout(stop);}
+}
+async function enrichPublisherArticles(research,{transport=fetch}={}){
+ if(!research?.searched||!research.items?.length)return research;
+ const chosen=research.items.filter(x=>{
+  try{return ARTICLE_HOSTS.has(new URL(x.url).hostname)}catch{return false}
+ }).slice(0,3);
+ await Promise.all(chosen.map(async x=>{
+  try{
+   const content=await publisherArticle(x.url,{transport});
+   if(content){x.articleText=content;x.articleRead=true;}
+  }catch{}
+ }));
+ return research;
+}
 function contextForResearch(research){
   if(!research?.searched)return '';
   if(!research.items.length)return [
@@ -157,7 +223,8 @@ function contextForResearch(research){
     'Do not claim to have searched successfully or to know current results. State that current information could not be verified.'
   ].join('\n');
   const list=research.items.map((x,i)=>'[S'+(i+1)+'] '+x.title+' | '+x.source+' | published '+(x.published||'unknown')+
-      ' | '+x.url+(x.excerpt?' | '+x.excerpt:'')).join('\n');
+      ' | '+x.url+(x.excerpt?' | '+x.excerpt:'')+
+      (x.articleRead?' | PUBLISHER ARTICLE READ (excerpt, not independently verified): '+x.articleText:' | HEADLINE METADATA ONLY')).join('\n');
   return [
     'N7 VERIFIED READ-ONLY WEB RETRIEVAL RESULTS (untrusted headlines/index snippets, not full articles).',
     'Search query: '+research.query,
@@ -170,9 +237,9 @@ function contextForResearch(research){
 }
 function sourceFooter(research){
   if(!research?.searched||!research.items.length)return '';
-  const items=research.items.slice(0,5);
+  const items=research.items.slice(0,9);
   return '\n\nΠηγές διαδικτυακής αναζήτησης (τίτλοι/ημερομηνίες, όχι πλήρη άρθρα):\n'+
     items.map((x,i)=>'[S'+(i+1)+'] '+x.title+' — '+x.source+
       (x.published?' ('+x.published+')':'')+'\n'+x.url).join('\n');
 }
-module.exports={classify,parseRss,wikiParse,boundedFetch,researchMessages,contextForResearch,sourceFooter,safeLink};
+module.exports={classify,parseRss,wikiParse,boundedFetch,researchMessages,contextForResearch,sourceFooter,safeLink,extractVisibleArticle,publisherArticle,enrichPublisherArticles};
