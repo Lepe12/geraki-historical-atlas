@@ -49,5 +49,9 @@ test('new chat route streams and preserves only private attachment metadata',asy
  assert.equal(db[0].messages[0].attachments[0].name,'photo.png');
  assert.equal(payload.stream,true);
  assert.match(payload.messages.find(x=>x.role==='user').content[1].image_url.url,/^data:image\/png;base64,/);
+ assert.match(payload.messages[0].content,/current user supplied 1 actual image/);
+ assert.match(payload.messages[0].content,/Do not infer four camera shots/);
+ assert.match(payload.messages.find(x=>x.role==='user').content[0].text,/ΑΚΡΙΒΩΣ ΜΙΑ ενιαία εικόνα/);
+ assert.equal(payload.messages.find(x=>x.role==='user').content.filter(x=>x.type==='image_url').length,1);
  }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
