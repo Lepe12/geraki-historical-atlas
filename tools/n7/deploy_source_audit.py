@@ -11,7 +11,7 @@ BASE='https://bot.piratecartography.com'
 TLS='linux3087.grserver.gr'
 HERE=Path(__file__).resolve().parent
 RESEARCH='n7-public-web-search.js'
-AUDIT='n7-historical-source-audit.js'
+AUDIT='historical-source-audit.js'
 def sha(b):return hashlib.sha256(b).hexdigest()
 def read(f,name):
  chunks=[];f.retrbinary('RETR '+name,chunks.append)
