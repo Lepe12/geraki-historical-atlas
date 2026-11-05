@@ -65,8 +65,8 @@
    if(all.length>4)throw Error('Μέχρι 4 συνημμένα ανά μήνυμα.');
    if(all.filter(x=>x.type.startsWith('image/')).length>3)
       throw Error('Μέχρι 3 εικόνες ανά μήνυμα.');
-   if(all.some(x=>x.size>3*1024*1024)||all.reduce((n,x)=>n+x.size,0)>6*1024*1024)
-      throw Error('Έως 3 MB ανά αρχείο και 6 MB συνολικά.');
+   if(all.some(x=>x.size>5*1024*1024)||all.reduce((n,x)=>n+x.size,0)>6*1024*1024)
+      throw Error('Έως 5 MB ανά αρχείο και 6 MB συνολικά.');
    const extensions=/\.(png|jpg|jpeg|webp|txt|md|csv|json|docx)$/i;
    if(all.some(x=>!extensions.test(x.name)))throw Error('Μη υποστηριζόμενος τύπος αρχείου.');
    pending=all;showFiles();notice.textContent='';
