@@ -1,0 +1,91 @@
+name: N7 approved writing memory — production deployment
+
+on:
+  pull_request:
+    paths:
+      - tools/n7/owner-chat-memory.js
+      - tools/n7/owner-chat-ui.js
+      - tools/n7/test_owner_chat_memory.cjs
+      - tools/n7/deploy_owner_chat_memory.py
+      - .github/workflows/n7-owner-memory-deploy.yml
+      - ops_ftps_requests/n7-owner-memory.json
+  push:
+    branches: [main]
+    paths:
+      - ops_ftps_requests/n7-owner-memory.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n7-approved-memory-deploy
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run approved-memory and filesystem regression tests
+        run: |
+          node --check tools/n7/owner-chat-memory.js
+          node --check tools/n7/owner-chat-ui.js
+          node --test tools/n7/test_owner_chat_memory.cjs
+          python3 -m py_compile tools/n7/deploy_owner_chat_memory.py
+      - name: Verify live server patch compatibility without writing
+        run: python3 tools/n7/deploy_owner_chat_memory.py
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: validate
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      N7_DRY_RUN: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check explicit owner request and scope
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          expected={
+            'authorization':'N7-OWNER-APPROVED-CHAT-LEARNING',
+            'target':'/bot.piratecartography.com/n7-app',
+            'owner_approval_required':True,
+            'preserve_conversations':True,
+            'rollback':True
+          }
+          value=json.loads(Path('ops_ftps_requests/n7-owner-memory.json').read_text())
+          assert value==expected
+          PY
+      - name: Install memory and skill integration, verify authenticated privacy, rollback if needed
+        run: python3 tools/n7/deploy_owner_chat_memory.py
