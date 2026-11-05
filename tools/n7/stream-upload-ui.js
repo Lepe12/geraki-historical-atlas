@@ -5,9 +5,34 @@
    input=document.getElementById('message');
  if(!chat||!send||!input)return;
  let pending=[],sending=false;
+ // Convert cited HTTPS source URLs into clickable links without using innerHTML.
+ const originalRender=render;
+ render=function(messages){
+  originalRender(messages);
+  const wrap=document.getElementById('messages');
+  for(const node of wrap.querySelectorAll('.bubble.assistant')){
+   const source=node.textContent||'';
+   if(!source.includes('https://'))continue;
+   node.replaceChildren();
+   const regex=/https:\/\/[^\\s<>\"']+/g;
+   let match,last=0;
+   while((match=regex.exec(source))){
+    node.append(document.createTextNode(source.slice(last,match.index)));
+    const link=document.createElement('a');
+    const url=match[0].replace(/[),.;]+$/,'');
+    link.href=url;link.target='_blank';link.rel='noopener noreferrer';
+    link.style.cssText='color:#70d7fb;text-decoration:underline;overflow-wrap:anywhere;';
+    link.textContent=url;
+    node.append(link);
+    if(url.length<match[0].length)node.append(document.createTextNode(match[0].slice(url.length)));
+    last=regex.lastIndex;
+   }
+   node.append(document.createTextNode(source.slice(last)));
+  }
+ };
  const picker=document.createElement('input');
  picker.type='file';picker.multiple=true;picker.id='n7-file-picker';
- picker.accept='.png,.jpg,.jpeg,.webp,.txt,.md,.csv,.json,.docx,.pdf';
+ picker.accept='.png,.jpg,.jpeg,.webp,.txt,.md,.csv,.json,.docx';
  picker.hidden=true;
  const add=document.createElement('button');
  add.type='button';add.textContent='＋';add.title='Επισύναψη εικόνας ή αρχείου';
