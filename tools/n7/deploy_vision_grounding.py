@@ -48,27 +48,26 @@ def main():
    (PUB,'app.js','stream-upload-ui.js','N7_GROQ_TRUE_STREAM_AND_UPLOADS_V1')]
  try:
   originals={};updated={}
+  live_server=read(ftp,ROOT,'server.js')
+  if b'N7_STREAM_ATTACHMENTS_ROUTE_V1' not in live_server:
+   raise RuntimeError('N7_VISION_MULTIMODAL_ENDPOINT_NOT_LIVE')
   for folder,name,source,marker in paths:
    old=read(ftp,folder,name);fresh=(HERE/source).read_bytes()
-   if marker.encode() not in old:
-    print('N7_VISION_LIVE_MARKERS file='+name+' rich='+str(b'N7_GROQ_TRUE_STREAM_AND_UPLOADS_V1' in old)+' inline='+str(b'N7_CHAT_CORRECTION_CONFIRM_V1' in old)+' picker='+str(b'n7-file-picker' in old)+' stream='+str(b'/stream' in old)+' length='+str(len(old)))
-    if name=='app.js':
-     import re
-     text=old.decode('utf8',errors='replace')
-     paths=sorted(set(re.findall(r'/api/[a-zA-Z0-9_/:{}.-]{2,95}',text)))[:35]
-     print('N7_VISION_LIVE_API_PATHS='+repr(paths))
-     print('N7_VISION_LIVE_CAPABILITIES='+repr({k:(k in text) for k in ('FormData','FileReader','attachments','image_url','/api/conversations','/stream','/api/chat','data:image','base64','fetch(')}))
-     for needle in ("el('chat').onsubmit",'chat.onsubmit','/chat',"type='file'",'type="file"','file-input','File', 'base64'):
-      ix=text.find(needle)
-      if ix>=0:print('N7_VISION_LIVE_CONTEXT_'+str(len(needle))+'_'+str(ix)+'='+repr(text[max(0,ix-160):ix+430])[:650])
-    raise RuntimeError('N7_VISION_MARKER_MISSING_'+name)
    if name=='app.js':
-    begin=old.find(b'// N7_GROQ_TRUE_STREAM_AND_UPLOADS_V1')
-    if begin<0 or old.find(b'// N7_GROQ_TRUE_STREAM_AND_UPLOADS_V1',begin+3)>=0:
-     raise RuntimeError('N7_VISION_UI_BOUNDARY_NOT_UNIQUE')
-    new=old[:begin]+fresh+b'\n'
+    if marker.encode() in old:
+     begin=old.find(marker.encode())
+     marker_start=old.rfind(b'// ',0,begin)
+     if marker_start<0 or old.find(marker.encode(),begin+len(marker))>=0:
+      raise RuntimeError('N7_VISION_UI_BOUNDARY_AMBIGUOUS')
+     new=old[:marker_start]+fresh+b'\\n'
+    else:
+     if b"el('chat').onsubmit" not in old or b'/api/conversations/' not in old:
+      raise RuntimeError('N7_VISION_UNRECOGNIZED_NEW_LIVE_UI')
+     new=old+b'\\n'+fresh+b'\\n'
+     print('N7_VISION_UPDATED_UI_ADDON=APPENDED_WITHOUT_REPLACING_EXISTING')
    else:
-    if old.count(b"N7_STREAM_ATTACHMENTS_V1")!=1:raise RuntimeError('N7_VISION_HELPER_UNEXPECTED')
+    if marker.encode() not in old or old.count(marker.encode())!=1:
+     raise RuntimeError('N7_VISION_HELPER_NOT_INSTALLED')
     new=fresh
    if b'N7_OWNER_MEMORY_UI_V1' in old and b'N7_OWNER_MEMORY_UI_V1' not in new:
     raise RuntimeError('N7_VISION_OWNER_MEMORY_LOSS')
