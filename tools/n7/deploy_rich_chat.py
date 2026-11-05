@@ -49,7 +49,9 @@ const n7StreamChat=require('./n7-stream-attachments').makeHandler({
 """
  s=s.replace(anchor,init+anchor,1)
  route_anchor='    const chat=p.match('
- if s.count(route_anchor)!=1:raise RuntimeError('N7_MISSING_CHAT_ROUTE_ANCHOR')
+ if s.count(route_anchor)!=1:
+  print('N7_CHAT_ROUTE_CANDIDATES='+repr([line.strip()[:180] for line in s.splitlines() if 'chat' in line.lower() and ('match(' in line or 'const ' in line or '/api/conversations' in line)][:10]))
+  raise RuntimeError('N7_MISSING_CHAT_ROUTE_ANCHOR')
  routes="""    const n7StreamMatch=p.match(/^\\/api\\/conversations\\/([a-f0-9-]+)\\/stream$/);
     if(req.method==='POST'&&n7StreamMatch)
       return await n7StreamChat(req,res,n7StreamMatch[1]);
