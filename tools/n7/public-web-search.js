@@ -2,7 +2,7 @@
 // N7_PUBLIC_SEARCH_V1: private server-side read-only retrieval, no API key.
 // Bounded public search feeds and Wikimedia reference material; not a full browser.
 const DEFAULT_UA='N7PublicResearch/1.0 (https://piratecartography.com)';
-const n7HistoricalAudit=require('./n7-historical-source-audit'); // N7_HISTORICAL_DEEP_READING_V1
+const n7HistoricalAudit=require('./historical-source-audit'); // N7_HISTORICAL_DEEP_READING_V1
 const NEWS_HOST='news.google.com';
 const BING_HOST='www.bing.com';
 const WIKI_HOST='en.wikipedia.org';
