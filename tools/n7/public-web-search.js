@@ -243,7 +243,8 @@ function cleanHistoryForTopic(history){
   const recent=history.slice(-24).map(x=>{
     if(!x||typeof x.content!=='string')return x;
     if(x.role==='assistant'){
-      const clipped=x.content.split(/\\n\\nΠηγές διαδικτυακής αναζήτησης\\s*\\(/u)[0];
+      const cut=x.content.indexOf('\n\nΠηγές διαδικτυακής αναζήτησης');
+      const clipped=cut<0?x.content:x.content.slice(0,cut);
       return {...x,content:clipped};
     }
     return x;
