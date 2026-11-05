@@ -24,7 +24,7 @@ jobs:
         shell: bash
         run: |
           python3 - <<'PY'
-          import ftplib, ssl, socket, json, os, collections, re
+          import ftplib, ssl, socket, json, os, collections
           root='/bot.piratecartography.com/n7-app'
           tls='linux3087.grserver.gr'
           host=os.environ['PCT_FTPS_HOST']
@@ -68,13 +68,13 @@ jobs:
               raw=read(root+'/skills/'+name+'/SKILL.md')
               print('N7_LIVE_SKILL_'+name+'='+('PRESENT' if raw and ('name: '+name).encode() in raw else 'MISSING'))
             livecode=code.decode('utf8') if code else ''
-            normalized=re.sub(r'\\s+','',livecode)
+            normalized=''.join(livecode.split())
             print('N7_LIVE_PATH_WIRING='+json.dumps({
               'server_imports_agent':"require('./agent')" in normalized,
-              'server_calls_runAgent':bool(re.search(r'\\brunAgent\\s*\\(',livecode)),
-              'server_declares_agent_queue_kind':bool(re.search(r"kind\\s*===\\s*['\"]agent['\"]",livecode)),
+              'server_calls_runAgent':'runAgent(' in normalized,
+              'server_declares_agent_queue_kind':("kind==='agent'" in normalized or 'kind==="agent"' in normalized),
               'server_has_tasks_route':'/api/tasks' in livecode,
-              'chat_uses_agent':bool(re.search(r'runAgent\\s*\\(\\s*history',livecode)),
+              'chat_uses_agent':'runAgent(history' in normalized,
               'skill_load_tool':bool(agent and b"name==='load_skill'" in agent),
               'feedback_endpoint':bool(code and b'/api/skills/feedback' in code),
               'feedback_persistence':bool(learning and b'feedback.json' in learning),
