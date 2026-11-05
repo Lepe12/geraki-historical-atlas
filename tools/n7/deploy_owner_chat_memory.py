@@ -28,7 +28,10 @@ def check(b):
     with tempfile.NamedTemporaryFile(suffix='.js',mode='wb') as f:
         f.write(b);f.flush()
         p=subprocess.run(['node','--check',f.name],capture_output=True,timeout=20)
-        if p.returncode:raise RuntimeError('N7_INVALID_JS_ABORT')
+        if p.returncode:
+            print('N7_SYNTAX_ERROR='+p.stderr.decode('utf8',errors='replace').splitlines()[-1][:150])
+            print('N7_SYNTAX_LINE='+str([line for line in p.stderr.decode('utf8',errors='replace').splitlines() if ': ' in line or '.js:' in line][-1:])[:250])
+            raise RuntimeError('N7_INVALID_JS_ABORT')
 def server_patch(original):
     src=original.decode('utf8')
     if MARKER in src:return original
@@ -138,7 +141,9 @@ def deploy():
         if ftp.pwd().rstrip('/')!=PUBLIC:raise RuntimeError('N7_PUBLIC_ROOT_MISMATCH')
         old_app=read(ftp,'app.js')
         new_server=server_patch(old_server);new_app=app_patch(old_app)
-        for b in (helper,new_server,new_app):check(b)
+        for label,b in (('helper',helper),('server',new_server),('app',new_app)):
+            print('N7_CHECKING_SCRIPT='+label)
+            check(b)
         print('N7_OWNER_MEMORY_PREFLIGHT_OK dry_run='+str(dry)
               +' new_helper=' + str(old_helper is None)
               +' server_change='+str(new_server!=old_server)
