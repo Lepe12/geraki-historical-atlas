@@ -1,7 +1,7 @@
 'use strict';
 // N7_STREAM_ATTACHMENTS_V1 - genuine Groq SSE token streaming, private bounded attachments.
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),zlib=require('node:zlib');
-const MAX_BODY=9*1024*1024,MAX_FILE=3*1024*1024,MAX_TOTAL=6*1024*1024;
+const MAX_BODY=9*1024*1024,MAX_FILE=5*1024*1024,MAX_TOTAL=6*1024*1024;
 const FILES=4,MAX_TEXT=26000;
 const TYPES={
  '.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp',
