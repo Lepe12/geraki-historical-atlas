@@ -63,7 +63,7 @@ test("metadata save is disabled before selecting book; selecting book switches t
  booksTab.click();
  const details=dlg.querySelector("article details");details.open=true;
  [...details.querySelectorAll("button")].find(x=>x.textContent==="Στοιχεία").click();
- assert.equal(save.disabled,true); // This is refreshed below; never permit implicit save before an explicit selection event.
+ assert.equal(save.disabled,false); // Explicit selection enables metadata editing.
  assert.equal(dlg.querySelectorAll(".n7-library-panel:not([hidden])").length,1);
  assert.equal(metadataTab.getAttribute("aria-current"),"page");
  dom.window.close();
