@@ -83,15 +83,18 @@ def signed(key,kind,obj):
             result=json.loads(response.read(500000))
             return response.status,result
     except urllib.error.HTTPError as error:
-        # Never print downloaded book text or signed request values.
-        raise RuntimeError("SIGNED_"+kind.upper().replace("-","_")+"_HTTP_"+str(error.code)) from None
+        # Only report allowlisted protocol error codes; never log book text or secrets.
+        try:code=json.loads(error.read(300)).get("error","unknown")
+        except (ValueError,UnicodeError):code="unparseable"
+        if not isinstance(code,str) or not re.fullmatch(r"[a-z0-9_]{1,64}",code):code="unexpected"
+        raise RuntimeError("SIGNED_"+kind.upper().replace("-","_")+"_HTTP_"+str(error.code)+"_"+code) from None
 def main():
     key=ftp_key()
     imported=0
     for book in BOOKS:
         pages=pages_from_html(download(book["url"]))
         digest=hashlib.sha256(("gutenberg:"+book["id"]).encode()).hexdigest()
-        print(json.dumps({"book":book["id"],"verified_html_page_markers":len(pages),
+        print(json.dumps({"book":book["id"],"short_pages":sum(len(p["text"])<40 for p in pages),"verified_html_page_markers":len(pages),
                           "first_printed_page":pages[0]["printed_page"],"last_printed_page":pages[-1]["printed_page"]}))
         for offset in range(0,len(pages),12):
             batch={"gutenberg_id":book["id"],"source_id":digest,
