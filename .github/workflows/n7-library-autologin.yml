@@ -1,0 +1,75 @@
+name: N7 Library single-login deployment
+on:
+  pull_request:
+    paths:
+      - 'tools/library/n7-bot-autologin-ui.js'
+      - 'tools/library/n7-bot-library-route.snippet'
+      - 'tools/library/deploy_n7_autologin_ftps.py'
+      - 'server/command-center-live/n7-gateway*'
+      - 'server/command-center-live/n7-library-bridge.js'
+  push:
+    branches: [main]
+    paths:
+      - 'ops_ftps_requests/n7-library-autologin.json'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            server/command-center-live
+            tools/library
+            ops_ftps_requests
+      - name: Validate scoped N7 library bridge
+        run: |
+          set -e
+          node --check server/command-center-live/n7-gateway.js
+          node --check server/command-center-live/n7-library-bridge.js
+          node --check tools/library/n7-bot-autologin-ui.js
+          node --test server/command-center-live/n7-gateway.test.js
+          python3 -m py_compile tools/library/deploy_n7_autologin_ftps.py
+  install:
+    needs: validate
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 10
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            server/command-center-live
+            tools/library
+            ops_ftps_requests
+      - name: Verify exact authorized installation scope
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          payload=json.loads(Path('ops_ftps_requests/n7-library-autologin.json').read_text())
+          assert payload.get('schema')=='n7-library-autologin-deployment-v1'
+          assert payload.get('confirmation')=='INSTALL-N7-LIBRARY-AUTOLOGIN'
+          assert payload.get('scope')=='existing-bot-and-gateway-only'
+          PY
+      - name: Deploy N7 bot-side authenticated library proxy
+        run: python3 tools/library/deploy_n7_autologin_ftps.py
+      - name: Check bot and library production health
+        run: |
+          python3 - <<'PY'
+          import urllib.request
+          for url in ('https://bot.piratecartography.com/health','https://pct-live.piratecartography.com/pct-api/live/health','https://bot.piratecartography.com/historical-library.js'):
+              with urllib.request.urlopen(url,timeout=15) as r:
+                  assert r.status==200,(url,r.status)
+                  print('PASS',url.rsplit('/',1)[-1])
+          PY
