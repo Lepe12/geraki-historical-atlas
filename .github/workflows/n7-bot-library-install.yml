@@ -1,0 +1,36 @@
+name: N7 bot historical library install
+on:
+  push:
+    branches: [main]
+    paths:
+      - ops_ftps_requests/n7-bot-library-install.json
+permissions:
+  contents: read
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 12
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: atlas
+      - uses: actions/checkout@v4
+        with:
+          repository: Lepe12/independent-ai-bot
+          ref: main
+          path: n7-bot-source
+      - name: Verify sources
+        run: |
+          node --check n7-bot-source/server.js
+          node --check n7-bot-source/public/historical-library.js
+          test -f n7-bot-source/public/index.html
+          python3 -m py_compile atlas/tools/library/deploy_n7_bot_frontend.py
+      - name: Deploy only N7 bot library files with FTPS
+        run: python3 atlas/tools/library/deploy_n7_bot_frontend.py
