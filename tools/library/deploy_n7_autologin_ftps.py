@@ -48,7 +48,9 @@ try:
     if b"Independent AI Bot" not in html:raise RuntimeError("WRONG_CHAT")
     anchor=b"    if(!session(req))return json(res,401,{error:'Authentication required'});"
     if b"if(p==='/api/library/search')" not in server:
-        if server.count(anchor)!=1:raise RuntimeError("BOT_SESSION_ANCHOR_CHANGED")
+        if server.count(anchor)!=1:
+            print(json.dumps({"bot_session_lines":[line.decode("utf-8","replace")[:250] for line in server.splitlines() if b"session(req)" in line][:8]}))
+            raise RuntimeError("BOT_SESSION_ANCHOR_CHANGED")
         server=server.replace(anchor,anchor+b"\n"+route)
     elif b"x-n7-library-signature" not in server and b"X-N7-Library-Signature" not in server:
         raise RuntimeError("UNVERIFIED_BOT_LIBRARY_ROUTE")
