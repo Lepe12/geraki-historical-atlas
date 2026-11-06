@@ -1,0 +1,76 @@
+name: N7 library close and clean UI
+on:
+  pull_request:
+    paths:
+      - tools/library/n7-source-library-ui-v2.js
+      - tools/library/test_n7_source_library_ui_v2.cjs
+      - tools/library/deploy_n7_source_library_ui_v2.py
+      - .github/workflows/n7-library-modal-v2.yml
+  push:
+    branches: [main]
+    paths:
+      - ops_ftps_requests/n7-library-modal-v2.json
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/library
+            tools/n7
+            ops_ftps_requests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate syntax and accessible dialog navigation in real DOM
+        run: |
+          set -e
+          npm install --prefix "$RUNNER_TEMP/n7-jsdom" --ignore-scripts --no-audit --no-fund jsdom@26.1.0
+          export NODE_PATH="$RUNNER_TEMP/n7-jsdom/node_modules"
+          node --check tools/library/n7-source-library-ui-v2.js
+          node --test tools/library/test_n7_source_library_ui_v2.cjs
+          python3 -m py_compile tools/library/deploy_n7_source_library_ui_v2.py
+  deploy:
+    needs: validate
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 7
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/library
+            tools/n7
+            ops_ftps_requests
+      - name: Confirm constrained UI-only change
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          q=json.loads(Path('ops_ftps_requests/n7-library-modal-v2.json').read_text())
+          assert q['authorization']=='FIX-N7-LIBRARY-MODAL'
+          assert q['scope']=='ui-only-no-data'
+          PY
+      - name: Deploy only modal UI and cache-busted script tag, with backup and rollback
+        run: python3 tools/library/deploy_n7_source_library_ui_v2.py
+      - name: Verify the N7 bot remains healthy and historic records are untouched
+        run: |
+          python3 - <<'PY'
+          import urllib.request
+          with urllib.request.urlopen('https://bot.piratecartography.com/health',timeout=30) as r:
+              assert r.status==200
+          print("N7_LIBRARY_MODAL_HEALTH_PASS")
+          PY
