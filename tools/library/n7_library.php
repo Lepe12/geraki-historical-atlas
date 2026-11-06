@@ -78,6 +78,14 @@ function n7import(PDO $db,array $source): array {
         return ['status'=>'IMPORTED','source_id'=>$source['source_id'],'page_count'=>count($source['pages']),'note'=>'No historical claim verified'];
     } catch (Throwable $e) { if ($db->inTransaction()) $db->rollBack(); throw $e; }
 }
+function n7isReferenceIndexPage(string $text): bool {
+    // A back-of-book alphabetical index consists of dense comma/semicolon + page-number references.
+    // Keep ordinary narrative pages with isolated historical dates and numbers.
+    $refs=preg_match_all('/[,;]\\s*[0-9]{1,3}\\b/u',$text);
+    $punct=preg_match_all('/[;,:]/u',$text);
+    $chars=max(1,mb_strlen($text,'UTF-8'));
+    return $refs>=8 && $punct>=12 && ($refs*1000/$chars)>=4.0;
+}
 function n7search(PDO $db,string $term): array {
     $term=trim($term);
     if(mb_strlen($term)<2||mb_strlen($term)>150)n7fail('INVALID_SEARCH');
@@ -89,6 +97,7 @@ function n7search(PDO $db,string $term): array {
         $full=$row['ocr_text'];
         if($label!==''&&!ctype_digit($label))continue;
         if(preg_match('/^(contents|list of illustrations|illustrations|index)\\b/i',trim($full)))continue;
+        if(n7isReferenceIndexPage($full))continue;
         preg_match_all('/(?<![\\p{L}\\p{N}])'.preg_quote($term,'/').'(?![\\p{L}\\p{N}])/iu',$full,$hits,PREG_OFFSET_CAPTURE);
         $count=count($hits[0]);
         if(!$count)continue;
@@ -120,6 +129,9 @@ try {
         $bad=$sample;$bad['pages'][]=$bad['pages'][0];
         try { n7parse(json_encode($bad,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)); n7fail('DUPLICATE_UNDETECTED'); }
         catch (RuntimeException $e) { if ($e->getMessage()!=='DUPLICATE_SCAN_INDEX') throw $e; }
+        $index='Barbarossa, 17, 22, 108; raids, 24, 35, 43; Tunis, 59, 71; Doria, 103, 127; Dragut, 261, 279.';
+        $narrative='Barbarossa commanded ships in the year 1538, and Andrea Doria opposed him. He moved towards the coast with the fleet and prepared for battle.';
+        if(!n7isReferenceIndexPage($index)||n7isReferenceIndexPage($narrative))n7fail('INDEX_CLASSIFIER_FAILED');
         n7out(['status'=>'PASS','scope'=>'parser only; no live DB tested']); exit(0);
     }
     if (!in_array($action,['install','import','search','page'],true)) n7fail('USAGE: install | import FILE | search TERM | page SOURCE_ID SCAN_INDEX | self-test');
