@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import posixpath
 import socket
+import subprocess
 import ssl
 import sys
 import time
@@ -33,7 +34,11 @@ manifest=dict(schema='n7-library-additive-install-request-v1',
               database='piratecartography', confirmation='INSTALL-N7-LIBRARY-SCHEMA',
               source_revision=REV, code_sha256=source_hashes)
 payload['.n7-library-install-request.json']=(json.dumps(manifest,indent=2)+'\n').encode()
-expected_old=hashlib.sha256((ROOT/'tools/storage/pct_research_store.php').read_bytes()).hexdigest()
+try:
+    previous=subprocess.check_output(['git','show','HEAD^:tools/storage/pct_research_store.php'],cwd=ROOT,timeout=20)
+except (subprocess.CalledProcessError,subprocess.TimeoutExpired,FileNotFoundError) as exc:
+    raise SystemExit('BLOCKED_CANNOT_VERIFY_PREVIOUS_STORAGE_REVISION') from exc
+expected_old=hashlib.sha256(previous).hexdigest()
 # Every uploaded byte is pinned, but the currently deployed storage script must not be overwritten
 # if the server has untracked changes. The old importer is compared to the declared main version.
 ftp=ftplib.FTP_TLS(timeout=30,context=ssl.create_default_context())
@@ -65,6 +70,8 @@ try:
     ftp.cwd(BASE)
     # Avoid replacing host-local changes by comparing to repository version before this PR.
     current=read('pct_research_store.php')
+    if hashlib.sha256(current).hexdigest()!=expected_old:
+        raise RuntimeError('HOST_STORAGE_SCRIPT_DIFFERS_FROM_PREVIOUS_RELEASE')
     if b'n7LibrarySchemaRequest' in current:
         raise RuntimeError('LIBRARY_SCHEMA_HOOK_ALREADY_PRESENT')
     for name in FILES:
@@ -111,7 +118,7 @@ try:
             if receipt.get('source_revision')==REV and receipt.get('status')=='PASS' and receipt.get('roundtrip')=='PASS_ROLLED_BACK':
                 print(json.dumps({'status':'DB_SCHEMA_INSTALLED_AND_ROUNDTRIP_PASS','receipt':receipt}))
                 sys.exit(0)
-            if receipt.get('status')=='BLOCKED':
+            if receipt.get('status')=='BLOCKED' and receipt.get('source_revision')==REV:
                 print(json.dumps({'status':'SCHEMA_REQUEST_BLOCKED','receipt':receipt}))
                 sys.exit(1)
         except (ftplib.error_perm,json.JSONDecodeError):
