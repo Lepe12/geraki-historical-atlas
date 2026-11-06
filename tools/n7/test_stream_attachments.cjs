@@ -57,3 +57,46 @@ test('new chat route streams and preserves only private attachment metadata',asy
  assert.equal(payload.messages.find(x=>x.role==='user').content.filter(x=>x.type==='image_url').length,1);
  }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
+
+
+test('Groq SSE CRLF frames are decoded as true incremental text',async()=>{
+ const response=new Response('data: {"choices":[{"delta":{"content":"Γεια"},"finish_reason":null}]}\r\n\r\n'+
+ 'data: {"choices":[{"delta":{"content":" σου"},"finish_reason":"stop"}]}\r\n\r\n'+
+ 'data: [DONE]\r\n\r\n');
+ const chunks=[];const result=await readGroqStream(response,t=>chunks.push(t));
+ assert.equal(result.text,'Γεια σου');assert.deepEqual(chunks,['Γεια',' σου']);
+});
+test('a hung research provider times out and model answers without waiting forever',async()=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'n7-stall-test-'));
+ try{
+  const id='11111111-1111-4111-8111-111111111111';
+  const db=[{id,title:'Νέα συνομιλία',messages:[],updated:''}];
+  const {Readable}=require('node:stream');
+  const req=Readable.from([Buffer.from(JSON.stringify({message:'Τι ξέρεις για τον Λάντζα;'}))]);
+  let output='';let ended=false;let modelBody;
+  const res={destroyed:false,writableEnded:false,writeHead(){},write(x){output+=x;},end(){ended=true;this.writableEnded=true;}};
+  const never=new Promise(()=>{});
+  const handler=makeHandler({
+   API_KEY:'mock',MODEL:'qwen/qwen3.8-27b',BASE:'https://api.groq.com/openai/v1',
+   DATA_DIR:dir,promptMessages:h=>[{role:'system',content:'Be accurate.'},...h],
+   load:()=>db,save:()=>{},researchDeadlineMs:15,articleDeadlineMs:15,
+   publicSearch:{
+    researchMessages:()=>never,
+    enrichPublisherArticles:()=>never,
+    cleanHistoryForTopic:x=>x,
+    contextForResearch:e=>e.reason==='research_timeout'?'No sources verified':'',
+    sourceFooter:()=>''
+   },
+   fetcher:async(_url,opts)=>{
+    modelBody=JSON.parse(opts.body);
+    return new Response('data: {"choices":[{"delta":{"content":"Δεν βρέθηκαν πηγές."},"finish_reason":"stop"}]}\n\n');
+   }
+  });
+  await handler(req,res,id);
+  assert.equal(ended,true);
+  assert.ok(output.includes('"stage":"research_timeout"'),output);
+  assert.ok(output.includes('"type":"done"'),output);
+  assert.equal(modelBody.max_completion_tokens,1800);
+  assert.equal(db[0].messages[1].content,'Δεν βρέθηκαν πηγές.');
+ }finally{fs.rmSync(dir,{recursive:true,force:true});}
+});
