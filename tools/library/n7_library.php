@@ -38,7 +38,7 @@ function n7parse(string $json): array {
         $i=$page['scan_index']; if (isset($seen[$i])) n7fail('DUPLICATE_SCAN_INDEX'); $seen[$i]=true;
         if (!isset($page['text'])||!is_string($page['text'])||!mb_check_encoding($page['text'],'UTF-8')) n7fail('INVALID_PAGE_TEXT');
         $status=$page['ocr_status']??'UNREVIEWED';
-        if (!in_array($status,['UNREVIEWED','MANUALLY_TRANSCRIBED','OCR_REVIEWED'],true)) n7fail('INVALID_OCR_STATUS');
+        if (!in_array($status,['UNREVIEWED','MANUALLY_TRANSCRIBED','OCR_REVIEWED','OCR_PENDING'],true)) n7fail('INVALID_OCR_STATUS');
         $printed=$page['printed_page']??null;
         if ($printed!==null && (!is_string($printed)||mb_strlen($printed)>64)) n7fail('INVALID_PRINTED_PAGE');
         $pages[]=['scan_index'=>$i,'printed_page'=>$printed,'text'=>$page['text'],'ocr_status'=>$status];
@@ -130,6 +130,8 @@ try {
         try { n7parse(json_encode($bad,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)); n7fail('DUPLICATE_UNDETECTED'); }
         catch (RuntimeException $e) { if ($e->getMessage()!=='DUPLICATE_SCAN_INDEX') throw $e; }
         $index='Barbarossa, 17, 22, 108; raids, 24, 35, 43; Tunis, 59, 71; Doria, 103, 127; Dragut, 261, 279.';
+        $pending=$sample;$pending['pages'][0]['ocr_status']='OCR_PENDING';$pending['pages'][0]['text']='';
+        if(n7parse(json_encode($pending,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR))['pages'][0]['ocr_status']!=='OCR_PENDING')n7fail('OCR_PENDING_UNDETECTED');
         $narrative='Barbarossa commanded ships in the year 1538, and Andrea Doria opposed him. He moved towards the coast with the fleet and prepared for battle.';
         if(!n7isReferenceIndexPage($index)||n7isReferenceIndexPage($narrative))n7fail('INDEX_CLASSIFIER_FAILED');
         n7out(['status'=>'PASS','scope'=>'parser only; no live DB tested']); exit(0);
