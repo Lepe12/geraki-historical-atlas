@@ -111,7 +111,7 @@ function n7search(PDO $db,string $term): array {
         if($start+440<mb_strlen($full,'UTF-8'))$excerpt=preg_replace('/\\s+\\S*$/u','',$excerpt);
         $row['excerpt']=($start>0?'…':'').trim($excerpt).($start+440<mb_strlen($full,'UTF-8')?'…':'');
         $row['relevance_score']=$count*10;
-        $row['source_type']='SECONDARY_HISTORIOGRAPHY';
+        $row['source_type']=str_contains(strtolower((string)($row['rights_note']??'')),'historical secondary source')?'SECONDARY_HISTORIOGRAPHY':'UNCLASSIFIED_REQUIRES_REVIEW';
         $row['evidence_state']='UNVERIFIED_SOURCE_TEXT';
         unset($row['ocr_text']);
         $ranked[]=$row;
@@ -153,7 +153,7 @@ try {
     else {
         $id=(string)($argv[2]??'');$scan=filter_var($argv[3]??null,FILTER_VALIDATE_INT,['options'=>['min_range'=>1]]);
         if (!preg_match('/^[a-f0-9]{64}$/D',$id)||$scan===false) n7fail('INVALID_PAGE_REFERENCE');
-        $page=n7query($db,'SELECT s.title,s.author,s.bibliographic_reference,s.source_uri,
+        $page=n7query($db,'SELECT s.title,s.author,s.publication_year,s.bibliographic_reference,s.source_uri,s.rights_note,
             p.source_id,p.scan_index,p.printed_page,p.ocr_text,p.text_sha256,p.ocr_status
             FROM pc_library_pages p JOIN pc_library_sources s ON s.source_id=p.source_id
             WHERE p.source_id=? AND p.scan_index=?',[$id,$scan])->fetch();
