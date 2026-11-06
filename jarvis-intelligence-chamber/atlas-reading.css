@@ -1,0 +1,97 @@
+/* Approved reading edition. The existing scene, research feed and approval handlers are retained. */
+body.atlas-ui.atlas-reading.nx-v2.nx-mock[data-atlas-page="research"] .atlas-research-panel{
+ position:fixed!important;left:50%!important;right:auto!important;top:86px!important;bottom:92px!important;
+ transform:translateX(-50%)!important;width:min(1020px,calc(100vw - 120px))!important;
+ padding:25px 28px!important;border:0!important;border-radius:0!important;
+ background:transparent url('./assets/reader/antique-paper.svg') center/100% 100% no-repeat!important;
+ box-shadow:none!important;backdrop-filter:none!important;filter:drop-shadow(0 20px 34px #0009);
+ color:#423e32!important;
+ --p-bg:transparent;--p-bg2:#d8c5a3;--p-card:transparent;--p-text:#423e32;--p-dim:#786c53;--p-gold:#78633f;--p-line:#9c7f5033;
+}
+body.atlas-ui.atlas-reading .atlas-panel-head{background:none!important;border:0!important;padding:22px 65px 10px 60px!important;min-height:56px!important;position:relative}
+body.atlas-ui.atlas-reading .atlas-panel-head:before{content:'N7  ·  ΙΣΤΟΡΙΚΟΣ ΑΤΛΑΣ';font:11px 'GFS Didot',Georgia,serif;letter-spacing:.2em;color:#786345}
+body.atlas-ui.atlas-reading .atlas-crumb,body.atlas-ui.atlas-reading .atlas-panel-title-row>div{display:none!important}
+body.atlas-ui.atlas-reading #atlasCloseResearch{position:absolute;right:42px;top:14px;width:36px;height:36px;background:none!important;border:0!important;color:#69563e!important;font:28px 'GFS Didot',Georgia,serif!important}
+body.atlas-ui.atlas-reading #atlasPanelSlot{min-height:0!important;overflow:hidden!important}
+body.atlas-ui.atlas-reading.nx-v2.nx-mock[data-atlas-page="research"] #atlasPanelSlot #resultsDrawer{
+ padding:0!important;background:none!important;color:#423e32!important;overflow:hidden!important;
+ --p-bg:transparent;--p-bg2:#d8c5a3;--p-card:transparent;--p-text:#423e32;--p-dim:#786c53;--p-gold:#78633f;--p-line:#9c7f5033;
+}
+body.atlas-ui.atlas-reading #resultsDrawer.hidden{display:none!important}
+body.atlas-ui.atlas-reading #resultsDrawer>.results-head{display:none!important}
+body.atlas-ui.atlas-reading #resultsDrawer .v2-scroll{background:none!important;padding:5px clamp(40px,6vw,88px) 65px!important;overflow-y:auto!important;flex:1;min-height:0;scrollbar-color:#99816377 transparent!important;scrollbar-width:thin}
+body.atlas-ui.atlas-reading #resultsDrawer .results-summary,
+body.atlas-ui.atlas-reading #resultsDrawer .dossier-navigation,
+body.atlas-ui.atlas-reading #resultsDrawer .dossier-columns,
+body.atlas-ui.atlas-reading #resultsDrawer #researchHistory,
+body.atlas-ui.atlas-reading #resultsDrawer #researchFindings,
+body.atlas-ui.atlas-reading #resultsDrawer #researchUpdates,
+body.atlas-ui.atlas-reading #resultsDrawer #resultsList,
+body.atlas-ui.atlas-reading #resultsDrawer #resultsPagination,
+body.atlas-ui.atlas-reading #resultsDrawer .research-path,
+body.atlas-ui.atlas-reading #resultsDrawer .overview-details,
+body.atlas-ui.atlas-reading #resultsDrawer .overview-counts,
+body.atlas-ui.atlas-reading #resultsDrawer .dossier-question,
+body.atlas-ui.atlas-reading #resultsDrawer .overview-next,
+body.atlas-ui.atlas-reading #resultsDrawer .overview-heading>span{display:none!important}
+body.atlas-ui.atlas-reading #resultsDrawer #researchOverview,
+body.atlas-ui.atlas-reading #resultsDrawer .research-narrative,
+body.atlas-ui.atlas-reading #resultsDrawer .narrative-article,
+body.atlas-ui.atlas-reading #resultsDrawer .narrative-fact{
+ margin:0!important;padding:0!important;background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:#423e32!important;
+}
+body.atlas-ui.atlas-reading #resultsDrawer .overview-heading{display:block!important;margin:18px 0 24px!important;padding:0!important;border:0!important}
+body.atlas-ui.atlas-reading #resultsDrawer h2,body.atlas-ui.atlas-reading #resultsDrawer h3{
+ font-family:'GFS Didot',Georgia,serif!important;font-style:normal!important;font-weight:400!important;color:#393b2e!important;text-transform:none!important;letter-spacing:-.02em!important;
+}
+body.atlas-ui.atlas-reading #resultsDrawer .overview-heading h2{font-size:clamp(32px,3.5vw,46px)!important;line-height:1.18!important;margin:0!important}
+body.atlas-ui.atlas-reading #resultsDrawer h3{font-size:27px!important;line-height:1.35!important;margin:28px 0 16px!important}
+body.atlas-ui.atlas-reading #resultsDrawer .research-narrative p,
+body.atlas-ui.atlas-reading #resultsDrawer .research-narrative p *{
+ font-family:'Noto Serif',Georgia,'Times New Roman',serif!important;font-size:18px!important;font-style:normal!important;font-weight:400!important;line-height:1.95!important;letter-spacing:0!important;font-variant:normal!important;text-shadow:none!important;color:#423e32!important;
+}
+body.atlas-ui.atlas-reading #resultsDrawer .research-narrative p{margin:0 0 24px!important}
+body.atlas-ui.atlas-reading #resultsDrawer .narrative-fact:first-letter{float:none!important;font:inherit!important;padding:0!important}
+body.atlas-ui.atlas-reading #resultsDrawer .narrative-sources{margin-top:32px!important;border-top:1px solid #9c7f5044!important;padding-top:18px!important;scroll-margin-top:16px}
+body.atlas-ui.atlas-reading #resultsDrawer .narrative-sources,
+body.atlas-ui.atlas-reading #resultsDrawer .narrative-sources *,
+body.atlas-ui.atlas-reading #resultsDrawer .narrative-fact figcaption{font-family:'Noto Serif',Georgia,serif!important;font-size:14px!important;line-height:1.75!important;color:#6a5a3e!important}
+body.atlas-ui.atlas-reading #resultsDrawer a{color:#6c532f!important;text-decoration-color:#9c7f5066!important}
+body.atlas-ui.atlas-reading #resultsDrawer .reader-illustration{margin:0 -20px 28px!important;padding:0!important;border:0!important;background:none!important;box-shadow:none!important}
+body.atlas-ui.atlas-reading #resultsDrawer .reader-illustration img{display:block;width:100%;height:245px;object-fit:cover;mix-blend-mode:multiply;opacity:.95;mask-image:linear-gradient(to right,transparent,#000 4%,#000 96%,transparent),linear-gradient(to bottom,transparent,#000 7%,#000 88%,transparent);mask-composite:intersect}
+body.atlas-ui.atlas-reading #resultsDrawer .reader-illustration figcaption{font:400 11px/1.6 'Noto Serif',Georgia,serif!important;color:#84765b!important;text-align:center;padding:7px 25px 0!important}
+body.atlas-ui.atlas-reading .atlas-research-filters{display:none!important}
+body.atlas-ui.atlas-reading.nx-v2.nx-mock[data-atlas-page="research"] .atlas-askbar{position:fixed!important;left:50%!important;right:auto!important;bottom:19px!important;width:min(750px,calc(100vw - 80px))!important;transform:translateX(-50%)!important;height:48px!important;background:#102625ee!important;border-color:#bea47766!important;border-radius:2px!important}
+body.atlas-ui.atlas-reading #chartView .nxs-telemetry{display:none!important}
+body.atlas-ui.atlas-reading #nxsAgentsPage:not(.hidden),
+body.atlas-ui.atlas-reading #learningPanel:not(.hidden),
+body.atlas-ui.atlas-reading #activityStrip:not(.hidden),
+body.atlas-ui.atlas-reading #detailPanel:not(.hidden){left:50%!important;right:auto!important;top:96px!important;bottom:92px!important;width:min(1120px,calc(100vw - 90px))!important;max-width:none!important;transform:translateX(-50%)!important;background:#142b2bf5!important;border-color:#bea47766!important;border-radius:3px!important}
+body.atlas-ui.atlas-reading #nxsAgentGroups{display:grid!important;grid-template-columns:1.2fr 1fr;gap:30px;align-items:start}
+body.atlas-ui.atlas-reading .learning-source{max-width:780px;margin-left:auto!important;margin-right:auto!important}
+body.atlas-ui.atlas-reading #nxsAgentsPage .nxs-workspace-scroll{padding:0 30px 30px!important}
+body.atlas-ui.atlas-reading .atlas-topnav{font-family:'GFS Didot',Georgia,serif!important;font-size:18px!important}
+body.atlas-ui.atlas-reading:focus-visible,body.atlas-ui.atlas-reading #resultsDrawer :focus-visible{outline:2px solid #78633f!important;outline-offset:4px}
+@media(max-width:760px){
+ body.atlas-ui.atlas-reading.nx-v2.nx-mock[data-atlas-page="research"] .atlas-research-panel{left:0!important;right:0!important;transform:none!important;width:100%!important;top:65px!important;bottom:80px!important;padding:15px 16px!important}
+ body.atlas-ui.atlas-reading .atlas-panel-head{padding:18px 55px 8px 28px!important}
+ body.atlas-ui.atlas-reading #atlasCloseResearch{right:26px!important;top:8px!important}
+ body.atlas-ui.atlas-reading #resultsDrawer .v2-scroll{padding:4px 28px 40px!important}
+ body.atlas-ui.atlas-reading #resultsDrawer .research-narrative p{font-size:16px!important;line-height:1.9!important}
+ body.atlas-ui.atlas-reading #resultsDrawer .reader-illustration{margin-left:-12px!important;margin-right:-12px!important}
+ body.atlas-ui.atlas-reading #resultsDrawer .reader-illustration img{height:190px!important}
+ body.atlas-ui.atlas-reading.nx-v2.nx-mock[data-atlas-page="research"] .atlas-askbar{left:12px!important;right:12px!important;bottom:14px!important;transform:none!important;width:auto!important}
+ body.atlas-ui.atlas-reading #nxsAgentsPage:not(.hidden),body.atlas-ui.atlas-reading #learningPanel:not(.hidden),body.atlas-ui.atlas-reading #activityStrip:not(.hidden),body.atlas-ui.atlas-reading #detailPanel:not(.hidden){left:10px!important;right:10px!important;width:auto!important;transform:none!important;top:70px!important;bottom:80px!important}
+ body.atlas-ui.atlas-reading #nxsAgentGroups{grid-template-columns:1fr}
+ body.atlas-ui.atlas-reading .atlas-topnav{gap:12px;font-size:14px!important}
+}
+/* Continue the approved midnight-teal chart palette behind the manuscript. */
+body.atlas-ui.atlas-reading #chartView{position:absolute!important;inset:0!important;width:auto!important;height:auto!important;background:#122b2d!important;border-radius:0!important}
+body.atlas-ui.atlas-reading #chartFrame{border-radius:0!important;overflow:hidden!important}
+body.atlas-ui.atlas-reading .chart .seabase{fill:#264445!important;filter:none!important}
+body.atlas-ui.atlas-reading .chart .seawash{fill:#122b2d!important;fill-opacity:.12!important}
+body.atlas-ui.atlas-reading .chart .landbase{filter:grayscale(.6) brightness(.82) saturate(.65)!important}
+body.atlas-ui.atlas-reading .chart .coastwash{stroke:#bda879!important;stroke-opacity:.4!important}
+body.atlas-ui.atlas-reading .chart .rh{stroke:#b8a879!important;stroke-opacity:.38!important}
+body.atlas-ui.atlas-reading .chart .sea{fill:#d4c59e!important;opacity:.8}
+body.atlas-ui.atlas-reading #atlasResearch{background:radial-gradient(ellipse at center,#081e1e55,#071919aa)!important}
