@@ -125,6 +125,10 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
       if(!String(req.headers["content-type"]||"").toLowerCase().startsWith("application/pdf")){
         json(res,415,{error:"pdf_required"});return true;
       }
+      const claimed=String(req.headers["x-n7-library-digest"]||"");
+      if(!/^[a-f0-9]{64}$/.test(claimed)||!libraryBridgeVerifier(req,claimed)){
+        json(res,401,{error:"signed_upload_required"});return true;
+      }
       const max=200*1024*1024,folder=fs.mkdtempSync(path.join(os.tmpdir(),"n7-private-pdf-"));
       const staged=path.join(folder,"incoming.pdf");
       const digestHash=crypto.createHash("sha256");
@@ -143,7 +147,7 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
         validPDF=total>=5&&header.toString("ascii")==="%PDF-";
         if(!validPDF){json(res,415,{error:"invalid_pdf_magic"});return true;}
         const digest=digestHash.digest("hex");
-        if(!libraryBridgeVerifier(req,digest)){json(res,401,{error:"signed_upload_required"});return true;}
+        if(digest!==claimed){json(res,400,{error:"pdf_digest_mismatch"});return true;}
         const outcome=await libraryUploadRunner(req,staged);
         const committed=outcome?.status==="DATABASE_COMMITTED";
         json(res,committed?201:503,{
