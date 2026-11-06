@@ -41,25 +41,35 @@ export function overview(snapshot) {
   ].includes(String(snapshot?.mission?.status).toUpperCase());
   const title = snapshot?.mission?.target || snapshot?.mission?.purpose || "Έρευνα " + snapshot?.run_id;
   const hasEvidence = related + claims > 0;
+  const narrative = snapshot?.research_answer?.greek_narrative;
+  const narrativeReady = narrative && ["NARRATIVE_PENDING_HUMAN_REVIEW", "NO_USABLE_EVIDENCE"].includes(narrative.status);
+  const narrativeLead = narrativeReady
+    ? (narrative.paragraphs || []).map((p) => p.text_el).filter(Boolean).slice(0, 2).join(" ")
+    : "";
   return {
-    title,
+    title: (narrativeReady && narrative.title_el) || title,
     related: provisional ? '—' : related,
     claims: provisional ? '—' : claims,
     blockers: provisional ? '—' : blockers,
     contradictions: provisional ? '—' : contradictions,
+    narrative,
     message:
       !terminal && active
         ? "Η έρευνα βρίσκεται σε εξέλιξη. Τα αποτελέσματα ενημερώνονται καθώς καταγράφονται."
-        : hasEvidence
-          ? "Υπάρχουν καταγεγραμμένες αναφορές για έλεγχο. Δεν αποτελούν από μόνες τους επιβεβαιωμένο ιστορικό συμπέρασμα."
-          : terminal
-            ? "Δεν έχουν καταγραφεί σχετικές αναφορές ή ιστορικοί ισχυρισμοί. Αυτό δεν αποδεικνύει ότι δεν υπάρχουν ιστορικές πηγές."
-            : "Δεν έχουν καταγραφεί ακόμη αποτελέσματα για αυτή την έρευνα.",
-    next: hasEvidence
-      ? "Ανοίξτε τις πηγές παρακάτω και ελέγξτε το αρχικό κείμενο και τη σελίδα."
-      : blockers
-        ? "Δείτε τα εμπόδια πρόσβασης πριν αποφασίσετε τα επόμενα βήματα."
-        : "Δείτε την πορεία της έρευνας ή διευκρινίστε το ερώτημα.",
+        : narrativeLead
+          ? narrativeLead
+          : hasEvidence
+            ? "Υπάρχουν καταγεγραμμένες αναφορές για έλεγχο. Δεν αποτελούν από μόνες τους επιβεβαιωμένο ιστορικό συμπέρασμα."
+            : terminal
+              ? "Δεν έχουν καταγραφεί σχετικές αναφορές ή ιστορικοί ισχυρισμοί. Αυτό δεν αποδεικνύει ότι δεν υπάρχουν ιστορικές πηγές."
+              : "Δεν έχουν καταγραφεί ακόμη αποτελέσματα για αυτή την έρευνα.",
+    next: narrativeReady
+      ? "Διαβάστε την αφήγηση και τον χάρτη· τα πλήθη και οι λόγοι απόρριψης είναι στην Πορεία έρευνας."
+      : hasEvidence
+        ? "Ανοίξτε τις πηγές παρακάτω και ελέγξτε το αρχικό κείμενο και τη σελίδα."
+        : blockers
+          ? "Δείτε τα εμπόδια πρόσβασης πριν αποφασίσετε τα επόμενα βήματα."
+          : "Δείτε την πορεία της έρευνας ή διευκρινίστε το ερώτημα.",
     status: statusLabel(snapshot?.mission?.status),
   };
 }

@@ -1601,6 +1601,13 @@ def _execute(run_root, question, caller=call, config=None, output_root=None, pro
             out['status']='RELEVANCE_HELD';out['answer_sections']=[];return out
     out.update(status='MODEL_ANSWER_PENDING_HUMAN_REVIEW',answer_sections=sections,
                unknowns=answer.get('unknowns',[]),model_limitations=answer.get('limitations',[]))
+    try:
+        from greek_narrative import attach as attach_greek_narrative
+        attach_greek_narrative(out, caller=call)
+    except Exception as exc:
+        out['greek_narrative']={'schema':'pct-greek-narrative-v1','status':'ATTACH_FAILED','error':type(exc).__name__,
+                                'verified':False,'paragraphs':[],'events':[],'not_found':[],'map_places':[]}
+        out['greek_translation_status']='ATTACH_FAILED'
     return out
 
 def render_funnel(funnel,continuation=None):
@@ -1633,6 +1640,13 @@ def render_funnel(funnel,continuation=None):
 
 def render(out):
     lines=['# Απάντηση έρευνας','',out['question'],'','Κατάσταση: **'+out['status']+'**','']
+    narrative=out.get('greek_narrative') if isinstance(out.get('greek_narrative'),dict) else None
+    if narrative:
+        try:
+            from greek_narrative import render_markdown
+            lines.extend([render_markdown(narrative).rstrip(),''])
+        except Exception:
+            pass
     scope=out.get('question_coverage') or {}
     if scope.get('requirements'):
         lines.extend(['## Κάλυψη του ερωτήματος','',
@@ -1727,6 +1741,14 @@ def main():
         # Round 0 of the continuation ledger: this run's own semantic pass.
         from continuation_rounds import record
         out['continuation_rounds']=record(root,out,0,'research_answer')
+    if 'greek_narrative' not in out:
+        try:
+            from greek_narrative import attach as attach_greek_narrative
+            attach_greek_narrative(out, caller=call)
+        except Exception as exc:
+            out['greek_narrative']={'schema':'pct-greek-narrative-v1','status':'ATTACH_FAILED','error':type(exc).__name__,
+                                    'verified':False,'paragraphs':[],'events':[],'not_found':[],'map_places':[]}
+            out['greek_translation_status']='ATTACH_FAILED'
     (dest/'answer.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (dest/'answer.md').write_text(render(out),encoding='utf-8')
     from persistent_evidence_bundle import write as write_bundle

@@ -1,7 +1,11 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs');
 const dataUrl=source=>'data:text/javascript;base64,'+Buffer.from(source).toString('base64');
 const overviewUrl=dataUrl(fs.readFileSync(__dirname+'/research-overview.js','utf8'));
-const modulePromise=import(dataUrl(fs.readFileSync(__dirname+'/research-dossier.js','utf8').replace("'./research-overview.js'",JSON.stringify(overviewUrl))));
+const viewUrl=dataUrl(fs.readFileSync(__dirname+'/research-narrative-view.js','utf8'));
+const dossierSource=fs.readFileSync(__dirname+'/research-dossier.js','utf8')
+  .replace("'./research-overview.js'",JSON.stringify(overviewUrl))
+  .replace("'./research-narrative-view.js'",JSON.stringify(viewUrl));
+const modulePromise=import(dataUrl(dossierSource));
 test('dossier separates completed, blocked and active work without inventing progress',async()=>{const {progressInfo,dossierMarkup}=await modulePromise;const snapshot={agents:[{id:'greek',status:'COMPLETED',percent:100},{id:'venetian',status:'BLOCKED',percent:null},{id:'french',status:'RUNNING',percent:140}]};const result=progressInfo(snapshot);assert.equal(result.completed,1);assert.equal(result.blocked,1);assert.equal(result.active,1);const html=dossierMarkup(snapshot).progress;assert.match(html,/1 \/ 3/);assert.ok(!html.includes('140%'));assert.ok(!html.includes('Πρόοδος εργασίας: 0%'));assert.match(html,/Δεν αναφέρεται ποσοστό/);});
 test('all blockers and events remain accessible; output is escaped and timestamps are not invented',async()=>{const {dossierMarkup}=await modulePromise;const result=dossierMarkup({blockers:Array.from({length:6},(_,i)=>({repository:'Πηγή '+i,detail:'<script>unsafe</script>'})),events:Array.from({length:8},(_,i)=>({detail:'Ενημέρωση '+i}))});for(let i=0;i<6;i++)assert.ok(result.pending.includes('Πηγή '+i));for(let i=0;i<8;i++)assert.ok(result.updates.includes('Ενημέρωση '+i));assert.ok(!result.pending.includes('<script>'));assert.match(result.pending,/&lt;script&gt;/);assert.match(result.updates,/Χρόνος μη διαθέσιμος/);assert.ok(result.updates.indexOf('Ενημέρωση 7')<result.updates.indexOf('Ενημέρωση 0'));});
 test('reset clears run-specific content instead of carrying an old task forward',async()=>{const {dossierMarkup}=await modulePromise;const empty=dossierMarkup(null);assert.match(empty.progress,/θα εμφανιστεί/);assert.match(empty.pending,/Δεν υπάρχει επιλεγμένη/);assert.ok(!empty.updates.includes('COMPLETED'));});
@@ -9,3 +13,30 @@ test('reset clears run-specific content instead of carrying an old task forward'
 test('provider payment and rate limits show as incomplete searches',async()=>{const {dossierMarkup}=await modulePromise;const html=dossierMarkup({blockers:[{repository:'Web search',description:'Exa: απαιτείται έλεγχος χρέωσης ή διαθέσιμου ορίου λογαριασμού · SerpAPI: περιορισμός αιτημάτων· η αναζήτηση δεν ολοκληρώθηκε'}]}).pending;assert.match(html,/χρέωσης/);assert.match(html,/δεν ολοκληρώθηκε/);});
 test('a live-only snapshot reports evidence and blockers as pending, not absent',async()=>{const {dossierMarkup}=await modulePromise;const html=dossierMarkup({mission:{status:'RUNNING'},agents:[],claims:[],blockers:[],events:[{detail:'source access blocked'}]}).pending;assert.match(html,/δεν είναι ακόμη διαθέσιμα/);assert.doesNotMatch(html,/Δεν έχουν καταγραφεί εμπόδια/);const final=dossierMarkup({mission:{status:'COMPLETED'},discoveries:[],claims:[],blockers:[]}).pending;assert.match(final,/Δεν έχουν καταγραφεί εμπόδια/);});
 
+
+test('dossier embeds the greek narrative instead of a pointer', async () => {
+  const { dossierMarkup } = await modulePromise;
+  const html = dossierMarkup({
+    mission: { status: 'COMPLETED', target: 'Δείγμα προσώπου' },
+    discoveries: [{ topical_match: { category: 'TARGET_MATCH' } }],
+    claims: [{ verified: false }],
+    blockers: [{ repository: 'Πηγή Α', description: 'έλεγχος' }],
+    contradictions: { records: [] },
+    research_answer: {
+      greek_narrative: {
+        status: 'NARRATIVE_PENDING_HUMAN_REVIEW',
+        title_el: 'Δείγμα προσώπου',
+        paragraphs: [{ text_el: 'Το 1600 περίπου εμφανίζεται σε νησί *(ΠΑΡΑΔΕΙΓΜΑ, σελ. 1)*', claim_ids: ['c1'] }],
+        sources: [{ label_el: 'ΠΑΡΑΔΕΙΓΜΑ, τόπος 1600, σ. 1' }],
+        research_path: { found: 5, passed: 1, cut: 4, summary_el: 'Βρέθηκαν 5 τεκμήρια· Πέρασαν 1· Κόπηκαν 4.' },
+        not_found: [{ note_el: 'Δεν βρέθηκε ημερομηνία θανάτου στις εξετασθείσες πηγές.' }],
+      },
+    },
+  }).pending;
+  assert.match(html, /Δείγμα προσώπου/);
+  assert.match(html, /εμφανίζεται σε νησί/);
+  assert.match(html, /ΠΑΡΑΔΕΙΓΜΑ, σελ\. 1/);
+  assert.doesNotMatch(html, /Η αφήγηση είναι διαθέσιμη στο ερώτημα/);
+  assert.match(html, /Πορεία έρευνας/);
+  assert.match(html, /Εμπόδια πρόσβασης/);
+});

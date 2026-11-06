@@ -1,4 +1,5 @@
 import { statusLabel } from './research-overview.js';
+import { isNarrativeReady, renderStoryHtml, renderCountsDetails } from './research-narrative-view.js';
 const escape = (value) =>
   String(value ?? "").replace(
     /[&<>"']/g,
@@ -132,16 +133,22 @@ export function dossierMarkup(snapshot) {
   const contradictions = Array.isArray(snapshot.contradictions?.records)
     ? snapshot.contradictions.records
     : [];
+  const narrative = snapshot.research_answer?.greek_narrative;
+  const narrativeReady = isNarrativeReady(narrative);
   const leads =
     (snapshot.discoveries || []).filter((d) =>
       ["TARGET_MATCH", "POSSIBLE_TARGET"].includes(d.topical_match?.category),
     ).length + (snapshot.claims || []).length;
-  const pending =
-    "<p>" +
-    (leads
-      ? "Οι αναφορές και οι ισχυρισμοί χρειάζονται έλεγχο του πρωτοτύπου, της σελίδας και της ανεξαρτησίας των πηγών."
-      : provisional ? "Τα τελικά στοιχεία δεν έχουν ακόμη δημοσιευτεί." : "Δεν έχουν καταγραφεί σχετικές αναφορές ή ισχυρισμοί προς έλεγχο.") +
-    "</p>" +
+  const storyLead = narrativeReady
+    ? renderStoryHtml(narrative, { mode: "default", heading: true })
+    : "<p>" +
+      (leads
+        ? "Οι αναφορές και οι ισχυρισμοί χρειάζονται έλεγχο του πρωτοτύπου, της σελίδας και της ανεξαρτησίας των πηγών."
+        : provisional
+          ? "Τα τελικά στοιχεία δεν έχουν ακόμη δημοσιευτεί."
+          : "Δεν έχουν καταγραφεί σχετικές αναφορές ή ισχυρισμοί προς έλεγχο.") +
+      "</p>";
+  const pendingExtras =
     (contradictions.length
       ? "<p>" +
         contradictions.length +
@@ -153,7 +160,22 @@ export function dossierMarkup(snapshot) {
         ')</h3><ul class="dossier-list">' +
         expandable(blockers, 3, "Περισσότερα εμπόδια") +
         "</ul>"
-      : provisional ? "<p>Τα εμπόδια δεν είναι ακόμη διαθέσιμα στον τελικό φάκελο. Δείτε τις ενημερώσεις για όσα αναφέρονται κατά την εκτέλεση.</p>" : "<p>Δεν έχουν καταγραφεί εμπόδια πρόσβασης. Αυτό δεν επιβεβαιώνει ότι εξετάστηκαν όλες οι πηγές.</p>");
+      : provisional
+        ? "<p>Τα εμπόδια δεν είναι ακόμη διαθέσιμα στον τελικό φάκελο. Δείτε τις ενημερώσεις για όσα αναφέρονται κατά την εκτέλεση.</p>"
+        : "<p>Δεν έχουν καταγραφεί εμπόδια πρόσβασης. Αυτό δεν επιβεβαιώνει ότι εξετάστηκαν όλες οι πηγές.</p>");
+  const pending =
+    storyLead +
+    (narrativeReady
+      ? renderCountsDetails(
+          [
+            [leads, "Σχετικές αναφορές / ισχυρισμοί"],
+            [contradictions.length, "Καταγεγραμμένες αντιφάσεις"],
+            [blockers.length, "Εμπόδια πρόσβασης"],
+          ],
+          pendingExtras,
+          narrative,
+        )
+      : pendingExtras);
   const events = Array.isArray(snapshot.events) ? snapshot.events : [];
   const updates = [...events]
     .reverse()
