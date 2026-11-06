@@ -75,6 +75,8 @@ jobs:
         run: python3 tools/library/deploy_n7_large_pdf_ftps.py
       - name: Verify existing 646 book pages, ranked search and full-page retrieval
         run: python3 tools/library/probe_n7_library_quality.py
+      - name: Confirm actual 27 MB signed PDF transport without database writes
+        run: python3 tools/library/probe_n7_large_pdf_transport.py
       - name: Verify auth boundaries and HTTP health
         run: |
           python3 - <<'PY'
