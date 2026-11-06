@@ -11,7 +11,7 @@ async function navTo(page,view){
   }
   if(view==='universe'){
     await page.locator('#atlasHome:not([hidden]) .atlas-topnav [data-atlas-nav="map"], #atlasResearch:not([hidden]) .atlas-topnav [data-atlas-nav="map"]').first().click();
-    await page.waitForFunction(()=>document.body.dataset.atlasPage==='home');
+    await page.waitForFunction(()=>document.body.dataset.readerView==='map');
     return;
   }
   await openResearch();
@@ -32,7 +32,7 @@ async function navTo(page,view){
  current={...current,mission:{...current.mission,status:'COMPLETED'},agents:[{id:'greek',status:'COMPLETED'}],discoveries:[{title:'Πηγή για τη Μήλο',lane:'greek',topical_match:{category:'TARGET_MATCH'},url:'https://example.org/source',repository:'Δοκιμαστικό αρχείο',printed_page:42,context_excerpt:'Απόσπασμα από την πηγή για τη Μήλο.'}]};emit(current);await page.waitForFunction(()=>document.querySelector('#researchOverview').textContent.includes('Υπάρχουν καταγεγραμμένες'));assert.match(await page.locator('#resultsList').textContent(),/Πηγή για τη Μήλο/);assert.ok(!(await page.locator('#resultsList').textContent()).includes('Παλιός ισχυρισμός'));assert.match(await page.locator('#researchProgress').textContent(),/1 \/ 1/);assert.equal(await page.locator('#researchProgress').isVisible(),false);await page.locator('#atlasResearch [data-atlas-nav="sources"]').click();await page.waitForFunction(()=>document.querySelector('#readerSources').textContent.includes('Πηγή για τη Μήλο'));assert.match(await page.locator('#readerSources').innerText(),/Έντυπη σελίδα 42/);assert.match(await page.locator('#readerSources').innerText(),/Απόσπασμα από την πηγή/);await navTo(page,'findings');
  await page.locator('#readerHistoryOpen').click();await page.locator('#historySearch').fill('Λάντζα');await page.locator('[data-history-run="100"]').waitFor({state:'visible'});assert.equal(await page.locator('[data-history-run]').count(),1);await page.locator('[data-history-run="100"]').click();await page.waitForFunction(()=>document.querySelector('#researchOverview').textContent.includes('Βρες πηγές για τον Λάντζα'));assert.equal(new URL(page.url()).searchParams.get('run'),'100');assert.match(await page.locator('#resultsList').textContent(),/Παλιός ισχυρισμός/);
  await page.reload();await page.waitForFunction(()=>document.body.dataset.currentResearchRun==='100');await navTo(page,'findings');await page.locator('#readerHistoryOpen').click();assert.equal(await page.locator('[data-history-run="200"]').count(),1);
- if(width===390){await page.keyboard.press('Escape');assert.equal(await page.locator('#readerSources').isVisible(),false);await navTo(page,'universe');assert.equal(await page.locator('#atlasHome').isVisible(),true);assert.equal(await page.locator('#resultsDrawer').isVisible(),false);await navTo(page,'findings');}
+ if(width===390){await page.keyboard.press('Escape');assert.equal(await page.locator('#readerSources').isVisible(),false);await navTo(page,'universe');assert.equal(await page.locator('#chartFrame').isVisible(),true);assert.equal(await page.locator('#resultsDrawer').isVisible(),false);await navTo(page,'findings');}
  if(process.env.NABOU_SCREENSHOT_DIR){fs.mkdirSync(process.env.NABOU_SCREENSHOT_DIR,{recursive:true});await page.screenshot({path:path.join(process.env.NABOU_SCREENSHOT_DIR,width+'-research-flow.png'),animations:'disabled'});}
  if(width===1440){
   let unavailable=true;

@@ -88,12 +88,12 @@ body.atlas-ui.atlas-reading:focus-visible,body.atlas-ui.atlas-reading #resultsDr
 /* Continue the approved midnight-teal chart palette behind the manuscript. */
 body.atlas-ui.atlas-reading #chartView{position:absolute!important;inset:0!important;width:auto!important;height:auto!important;background:#122b2d!important;border-radius:0!important}
 body.atlas-ui.atlas-reading #chartFrame{border-radius:0!important;overflow:hidden!important}
-body.atlas-ui.atlas-reading .chart .seabase{fill:#264445!important;filter:none!important}
-body.atlas-ui.atlas-reading .chart .seawash{fill:#122b2d!important;fill-opacity:.12!important}
-body.atlas-ui.atlas-reading .chart .landbase{filter:grayscale(.6) brightness(.82) saturate(.65)!important}
-body.atlas-ui.atlas-reading .chart .coastwash{stroke:#bda879!important;stroke-opacity:.4!important}
-body.atlas-ui.atlas-reading .chart .rh{stroke:#b8a879!important;stroke-opacity:.38!important}
-body.atlas-ui.atlas-reading .chart .sea{fill:#d4c59e!important;opacity:.8}
+body.atlas-ui.atlas-reading:not([data-reader-view="map"]) .chart .seabase{fill:#264445!important;filter:none!important}
+body.atlas-ui.atlas-reading:not([data-reader-view="map"]) .chart .seawash{fill:#122b2d!important;fill-opacity:.12!important}
+body.atlas-ui.atlas-reading:not([data-reader-view="map"]) .chart .landbase{filter:grayscale(.6) brightness(.82) saturate(.65)!important}
+body.atlas-ui.atlas-reading:not([data-reader-view="map"]) .chart .coastwash{stroke:#bda879!important;stroke-opacity:.4!important}
+body.atlas-ui.atlas-reading:not([data-reader-view="map"]) .chart .rh{stroke:#b8a879!important;stroke-opacity:.38!important}
+body.atlas-ui.atlas-reading:not([data-reader-view="map"]) .chart .sea{fill:#d4c59e!important;opacity:.8}
 body.atlas-ui.atlas-reading #atlasResearch{background:radial-gradient(ellipse at center,#081e1e55,#071919aa)!important}
 
 /* One active workspace; hidden modules must never intercept map/home clicks. */
@@ -146,3 +146,37 @@ body.atlas-reading[data-reader-view="history"] #resultsDrawer #researchHistory{d
 body.atlas-reading[data-reader-view="history"] #researchHistory summary{font:26px/1.4 'GFS Didot',Georgia,serif;cursor:pointer}
 body.atlas-reading[data-reader-view="history"] #researchHistory input{width:100%;box-sizing:border-box;background:#fff5;color:#423e32;padding:12px;border:1px solid #9c7f5066}
 body.atlas-reading[data-reader-view="history"] #researchHistory button{background:#efe1bf;color:#423e32;border-color:#9c7f5066;cursor:pointer}
+
+/* Welcome artwork and working chart are separate surfaces. Keep the original chart engine. */
+body.atlas-reading[data-reader-view="map"] #atlasResearch{background:transparent!important}
+body.atlas-reading[data-reader-view="map"] .atlas-research-panel{display:none!important;pointer-events:none!important}
+body.atlas-reading[data-reader-view="map"] #atlasMapVeil{display:none!important}
+body.atlas-reading[data-reader-view="map"] #chartFrame{position:fixed!important;left:18px!important;right:18px!important;top:88px!important;bottom:86px!important;inset:88px 18px 86px!important;width:calc(100vw - 36px)!important;height:calc(100vh - 174px)!important;visibility:visible!important;pointer-events:auto!important;border:1px solid #b89b5c66!important}
+body.atlas-reading[data-reader-view="map"] #chartView{background:#d1bd89!important}
+body.atlas-reading[data-reader-view="map"] .nxs-3d-tools{visibility:visible!important;pointer-events:auto!important;right:16px!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important;z-index:9!important}
+body.atlas-reading[data-reader-view="map"] #nodeLabels,body.atlas-reading[data-reader-view="map"] #nodeSeals{visibility:visible!important}
+body.atlas-reading #atlasHome .atlas-topnav button,
+body.atlas-reading #atlasHome .atlas-topnav button:hover,
+body.atlas-reading #atlasHome .atlas-topnav button:focus,
+body.atlas-reading #atlasHome .atlas-topnav button:active{background:none!important;background-image:none!important;border:0!important;box-shadow:none!important;filter:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;color:transparent!important}
+body.atlas-reading #atlasResearch .atlas-topnav button,
+body.atlas-reading #atlasResearch .atlas-topnav button:hover,
+body.atlas-reading #atlasResearch .atlas-topnav button:focus,
+body.atlas-reading #atlasResearch .atlas-topnav button:active{background:none!important;background-image:none!important;border:0!important;color:#f4efe4!important;filter:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;text-shadow:0 1px 6px #000}
+body.atlas-reading #atlasHome .atlas-home-hero{left:2.8%!important;top:50.2%!important;bottom:auto!important;width:12.6%!important;height:5.6%!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+body.atlas-reading #atlasHome #atlasExplore,
+body.atlas-reading #atlasHome #atlasExplore:hover,
+body.atlas-reading #atlasHome #atlasExplore:focus,
+body.atlas-reading #atlasHome #atlasExplore:active{color:transparent!important;background:none!important;background-image:none!important;border:0!important;box-shadow:none!important;filter:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;min-height:0!important;min-width:0!important}
+body.atlas-reading #atlasHome .reader-home-zoom{width:3%!important;height:12%!important}
+body.atlas-reading #atlasHome .reader-home-zoom button,
+body.atlas-reading #atlasHome .reader-home-zoom button:hover{background:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;color:transparent!important;min-height:0!important;padding:0!important}
+body.atlas-reading #atlasResearch .atlas-brand{cursor:pointer;outline-offset:5px}
+@media(max-width:760px){
+ body.atlas-reading[data-reader-view="map"] #chartFrame{inset:80px 6px 86px!important;width:calc(100vw - 12px)!important;height:calc(100vh - 166px)!important}
+}
+
+body.atlas-ui.atlas-reading[data-reader-view="map"] #chartView .nxs-3d-tools{top:50%!important;right:16px!important;bottom:auto!important;transform:translateY(-50%)!important;position:absolute!important}
+body.atlas-reading[data-reader-view="map"] #atlasResearch>.atlas-brand{top:15px!important}
+body.atlas-reading[data-reader-view="map"] #atlasResearch .atlas-n7{font-size:40px!important;line-height:1.05!important}
+body.atlas-reading[data-reader-view="map"] #atlasResearch .atlas-sub{margin-top:5px!important;font-size:13px!important}

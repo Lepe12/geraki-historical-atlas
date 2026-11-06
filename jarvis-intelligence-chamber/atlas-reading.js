@@ -7,11 +7,11 @@
  const overview=$('researchOverview'),drawer=$('resultsDrawer');
  if(!overview||!drawer)return;
  const scroll=()=>drawer.querySelector('.v2-scroll')||drawer;
- let mode='research',detailReturn='research',snapshot=null,sourceRows=[],routing=false;
+ let mode='research',detailReturn='map',snapshot=null,sourceRows=[],routing=false;
  const shell=view=>document.querySelector('[data-nxs-view="'+view+'"]')?.click();
  const navState=()=>{
   document.querySelectorAll('[data-atlas-nav]').forEach(button=>{
-   const active=body.dataset.atlasPage==='home'?'map':mode==='history'?'research':mode==='detail'?detailReturn:mode;
+   const active=body.dataset.atlasPage==='home'?'home':mode==='history'?'research':mode==='detail'?detailReturn:mode;
    button.setAttribute('aria-current',button.dataset.atlasNav===active?'page':'false');
   });
  };
@@ -65,12 +65,19 @@
   onReset:()=>{snapshot=null;sourceRows=[];search.value='';renderSources();}
  })).catch(()=>{empty.textContent='Οι πηγές δεν είναι διαθέσιμες αυτή τη στιγμή. Δοκιμάστε ανανέωση.';});
  function show(next,{focus=true}={}){
+  const previous=mode;
   routing=true;
   mode=next;body.dataset.readerView=next;
   sourceSection.hidden=next!=='sources';
-  if(next==='map'){
+  if(next==='home'){
    shell('universe');
    window.NABOU_ATLAS?.setPage('home');
+  }else if(next==='map'){
+   shell('universe');
+   window.NABOU_ATLAS?.setPage('research');
+   drawer.classList.add('hidden');
+   document.body.classList.remove('nx-no-labels','nx-no-seals','nx-no-routes');
+   if(previous!=='map')requestAnimationFrame(()=>{window.dispatchEvent(new Event('resize'));if(!window.NABOU_MAP3D?.enabled)$('resetView')?.click();});
   }else{
    // Close every previous workspace before opening the destination.
    shell('universe');
@@ -92,7 +99,8 @@
    if(next==='sources')search.focus({preventScroll:true});
    else if(next==='history')$('historySearch')?.focus({preventScroll:true});
    else if(next==='research')$('operatorQuery')?.focus({preventScroll:true});
-   else if(next==='map')$('atlasExplore')?.focus({preventScroll:true});
+   else if(next==='home')$('atlasExplore')?.focus({preventScroll:true});
+   else if(next==='map')$('chartStage')?.focus({preventScroll:true});
   });
  }
 
@@ -101,9 +109,11 @@
  historyButton.addEventListener('click',()=>show('history'));
  $('researchHistory')?.addEventListener('click',event=>{if(event.target.closest('[data-history-run]'))setTimeout(()=>show('research',{focus:false}),0);});
 
- if($('focusButton')){$('focusButton').textContent='Επιστροφή στους ερευνητές';$('focusButton').setAttribute('aria-label','Επιστροφή στους ερευνητές');}
+ if($('focusButton')){$('focusButton').textContent='Εστίαση στον χάρτη';$('focusButton').setAttribute('aria-label','Εστίαση στον χάρτη');}
+ document.querySelectorAll('#atlasResearch .atlas-brand').forEach(el=>{el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label','N7 · Αρχική σελίδα');});
  $('atlasCloseResearch')?.setAttribute('aria-label','Επιστροφή στον χάρτη');
  document.addEventListener('click',event=>{
+  if(event.target.closest('#atlasResearch .atlas-brand')){event.preventDefault();event.stopImmediatePropagation();show('home');return;}
   let target=event.target.closest('button');
   // Transparent poster navigation can retarget a touch to its nav container.
   // Resolve that touch to the nearest visible labelled button.
@@ -120,13 +130,19 @@
    event.preventDefault();event.stopImmediatePropagation();show(dest);return;
   }
   if(target.id==='atlasExplore'||target.id==='atlasCloseResearch'){
-   event.preventDefault();event.stopImmediatePropagation();show(target.id==='atlasExplore'?'research':'map');return;
+   event.preventDefault();event.stopImmediatePropagation();show('map');return;
   }
   if(['nxsCloseAgents','closeLearning','nxsCloseActivity'].includes(target.id)){
    event.preventDefault();event.stopImmediatePropagation();show('research');return;
   }
   if(target.id==='focusButton'){
-   event.preventDefault();event.stopImmediatePropagation();show('agents');return;
+   event.preventDefault();event.stopImmediatePropagation();
+   const agent=$('detailPanel')?.dataset.agentId;detailReturn='map';
+   show('map',{focus:false});
+   requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    if(agent)window.dispatchEvent(new CustomEvent('jarvis:focus-agent',{detail:{agent_id:agent}}));
+    $('closeDetail')?.click();
+   }));return;
   }
   if(target.id==='closeDetail'){
    if(routing)return;
@@ -137,32 +153,30 @@
 
  },true);
  document.addEventListener('keydown',event=>{
+  if(event.target.closest('#atlasResearch .atlas-brand')&&['Enter',' '].includes(event.key)){event.preventDefault();show('home');return;}
   if(event.key!=='Escape'||body.dataset.atlasPage==='home')return;
   event.preventDefault();event.stopImmediatePropagation();
   const detail=$('detailPanel');
   if(detail&&!detail.classList.contains('hidden')){const back=detailReturn;$('closeDetail')?.click();show(back);}
-  else show(['agents','tools','sources','history'].includes(mode)?'research':'map');
+  else show(mode==='map'?'home':['agents','tools','sources','history'].includes(mode)?'research':'map');
  },true);
  $('operatorCommand')?.addEventListener('submit',()=>show('research',{focus:false}),true);
  // Mirror shell-initiated inspector and close actions in the top navigation.
  new MutationObserver(()=>{
   const detail=$('detailPanel');
-  if(detail&&!detail.classList.contains('hidden')){body.dataset.readerView='detail';}
+  if(detail&&!detail.classList.contains('hidden')&&mode==='map'){detailReturn='map';}
   navState();
  }).observe(body,{attributes:true,attributeFilter:['data-nxs-view','data-atlas-page']});
- // Decorative map zoom marks are actual controls, not accidental links to research.
+ // The home image is a welcome page. Its controls open the actual map.
  const frame=document.querySelector('#atlasHome .atlas-home-frame');
  if(frame){
   const clone=frame.cloneNode(false);
-  // Remove the old whole-poster click listener without replacing the live child controls.
   while(frame.firstChild)clone.append(frame.firstChild);
   frame.replaceWith(clone);
   const zoom=document.createElement('div');zoom.className='reader-home-zoom';
-  let scale=1;
-  for(const [name,delta] of [['Μεγέθυνση αρχικού χάρτη',.15],['Σμίκρυνση αρχικού χάρτη',-.15]]){
-   const button=document.createElement('button');button.type='button';button.setAttribute('aria-label',name);button.textContent=delta>0?'+':'−';
-   button.addEventListener('click',()=>{scale=Math.min(1.9,Math.max(1,scale+delta));clone.style.setProperty('--reader-home-zoom',String(scale));});
-   zoom.append(button);
+  for(const [name,id]of [['Μεγέθυνση χάρτη','zoomIn'],['Σμίκρυνση χάρτη','zoomOut']]){
+   const button=document.createElement('button');button.type='button';button.setAttribute('aria-label',name);button.textContent=id==='zoomIn'?'+':'−';
+   button.addEventListener('click',()=>{show('map');requestAnimationFrame(()=>requestAnimationFrame(() => $(id)?.click()));});zoom.append(button);
   }
   clone.append(zoom);
  }
@@ -178,5 +192,7 @@
  const updateTitle=()=>{if(document.title.includes('NABOU//X'))document.title=document.title.replace('NABOU//X','N7');};
  if(title)new MutationObserver(updateTitle).observe(title,{childList:true,subtree:true});updateTitle();
  window.N7_READER={show};
+ const initial=new URLSearchParams(location.search).get('view');
+ if(initial==='map')show('map',{focus:false});else if(body.dataset.atlasPage==='home')mode='home';
  navState();
 })();
