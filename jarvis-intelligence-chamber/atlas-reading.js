@@ -145,6 +145,14 @@
   }
   clone.append(zoom);
  }
+
+ const notice=document.createElement('p');notice.id='readerCommandNotice';notice.setAttribute('role','status');notice.hidden=true;$('atlasResearch')?.append(notice);
+ window.addEventListener('jarvis:mission-state',event=>{
+  const form=$('operatorCommand'),text=String(event.detail?.state||'');
+  const pending=form?.classList.contains('is-pending'),error=form?.classList.contains('is-error');
+  notice.hidden=!pending&&!error;
+  notice.textContent=error?'Δεν ξεκίνησε η έρευνα. '+(/503/.test(text)?'Ο διακομιστής είναι προσωρινά μη διαθέσιμος. Δοκιμάστε ξανά.':/401|403/.test(text)?'Η σύνδεση με τον διακομιστή χρειάζεται έλεγχο.':'Δοκιμάστε ξανά σε λίγο.'):pending?(/Αποστολή/.test(text)?'Αποστολή ερωτήματος…':'Το αίτημα παραλήφθηκε. Αναμονή έναρξης έρευνας…'):'';
+ });
  const title=document.querySelector('title');
  const updateTitle=()=>{if(document.title.includes('NABOU//X'))document.title=document.title.replace('NABOU//X','N7');};
  if(title)new MutationObserver(updateTitle).observe(title,{childList:true,subtree:true});updateTitle();
