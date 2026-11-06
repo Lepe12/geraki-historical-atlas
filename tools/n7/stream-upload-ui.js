@@ -104,7 +104,7 @@
      await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
      const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.86));
      canvas.width=canvas.height=0;
-     if(blob)prepared.push(new File([blob],file.name+' — PDF page '+n+'.jpg',{type:'image/jpeg'}));
+     if(blob)prepared.push(new File([blob],file.name.slice(0,60)+' — PDF page '+n+'.jpg',{type:'image/jpeg'}));
      budget--;
     }
    }finally{clearTimeout(timer);if(doc)await doc.destroy();else await task.destroy();}
