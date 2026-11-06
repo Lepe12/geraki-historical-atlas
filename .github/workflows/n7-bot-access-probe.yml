@@ -50,9 +50,26 @@ jobs:
                      "server_js":"server.js" in names,
                      "package_json":"package.json" in names,
                      "public":"public" in names,
-                     "index_html":"index.html" in names})
+                     "index_html":"index.html" in names,
+                     "app_js":"app.js" in names,
+                     "style_css":"style.css" in names,
+                     "presence_js":"n7-presence.js" in names,
+                     "historical_library_js":"historical-library.js" in names})
               except ftplib.all_errors:
                   result.append({"path":p,"accessible":False})
+          bot=next((x for x in result if x["path"]=="/bot.piratecartography.com"),{})
+          if bot.get("accessible") and bot.get("index_html"):
+              ftp.cwd("/bot.piratecartography.com")
+              chunks=[]
+              def collect(blob):
+                  if sum(map(len,chunks))+len(blob)>100000:raise ValueError("HTML_TOO_LARGE")
+                  chunks.append(blob)
+              ftp.retrbinary("RETR index.html",collect)
+              html=b"".join(chunks)
+              print(json.dumps({"bot_html_probe":{"bytes":len(html),
+                  "is_independent_ai_bot":b"Independent AI Bot" in html,
+                  "loads_app_js":b"/app.js" in html,
+                  "loads_historical_library":b"/historical-library.js" in html}}))
           print(json.dumps({"status":"READ_ONLY","results":result}))
           ftp.quit()
           PY
