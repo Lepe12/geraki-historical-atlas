@@ -87,6 +87,13 @@ try:
         if b"reply = await answer(history);" not in old_answer_stage or len(old_answer_stage)>1100:
             raise RuntimeError("LIVE_CHAT_ANSWER_STAGE_CHANGED")
         current=current[:start]+response_stage+current[end:]
+    # Never ask a generative model to fill missing historical source evidence.
+    old_gate=b"      if(researchData){\n        if(API_KEY&&MODEL){"
+    new_gate=b"      if(researchData){\n        if(!researchData.evidence.length){reply=researchData.answer;}\n        else if(API_KEY&&MODEL){"
+    if old_gate in current:
+        if current.count(old_gate)!=1:raise RuntimeError("RESEARCH_MODEL_GATE_AMBIGUOUS")
+        current=current.replace(old_gate,new_gate)
+    elif new_gate not in current:raise RuntimeError("RESEARCH_MODEL_GATE_CHANGED")
     current=add_once(current,
         b"    if(p==='/api/library/search'){",
         (STAGE/"n7-research-upload-route.snippet").read_bytes(),
