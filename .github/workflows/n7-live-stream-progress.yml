@@ -4,6 +4,9 @@ on:
   pull_request:
     paths:
       - tools/n7/stream-attachments.js
+      - tools/n7/public-web-search.js
+      - tools/n7/test_source_evidence.cjs
+      - tools/n7/test_historical_source_audit.cjs
       - tools/n7/stream-upload-ui.js
       - tools/n7/test_stream_attachments.cjs
       - tools/n7/deploy_live_stream_progress.py
@@ -45,8 +48,9 @@ jobs:
       - name: Test SSE status, tokens, attachments, source regressions
         run: |
           node --check tools/n7/stream-attachments.js
+          node --check tools/n7/public-web-search.js
           node --check tools/n7/stream-upload-ui.js
-          node --test tools/n7/test_stream_attachments.cjs
+          node --test tools/n7/test_stream_attachments.cjs tools/n7/test_source_evidence.cjs tools/n7/test_historical_source_audit.cjs
           python3 -m py_compile tools/n7/deploy_live_stream_progress.py
       - name: Verify exact current Top.Host app.js and live stream route without changes
         run: python3 tools/n7/deploy_live_stream_progress.py
