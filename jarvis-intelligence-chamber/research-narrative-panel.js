@@ -59,7 +59,15 @@ function render() {
     return;
   }
   if (!isNarrativeReady(narrative)) {
-    titleEl.textContent = snapshot.mission?.target || meta.titleFallback;
+    let typed = "";
+    try {
+      typed = String(document.body?.dataset?.operatorQuery || "").trim();
+    } catch {}
+    titleEl.textContent =
+      snapshot.mission?.target ||
+      snapshot.mission?.purpose ||
+      typed ||
+      meta.titleFallback;
     body.innerHTML = emptyHtml(
       "Η αφήγηση δεν είναι ακόμη έτοιμη. Μόλις ολοκληρωθεί η σύνθεση, θα εμφανιστεί εδώ μαζί με τον χάρτη.",
     );

@@ -427,11 +427,24 @@ function renderResults() {
     contradictions = snapshot?.contradictions?.records || [],
     discoveries = snapshot?.discoveries || [],
     coverage = snapshot?.coverage || [];
-  runEl.textContent = snapshot?.run_id
-    ? "Έρευνα " + snapshot.run_id
-    : requestedId
-      ? "Αναμονή νέας έρευνας"
-      : "Δεν έχει επιλεγεί έρευνα";
+  // Title = topic/question, never «Έρευνα {runId}» when the typed query or mission topic is known.
+  let typedQuery = "";
+  try {
+    typedQuery = String(document.body?.dataset?.operatorQuery || "").trim();
+  } catch {}
+  const inProgress = ["RUNNING", "PREPARING", "QUEUED", "STARTING", "ACTIVE"].includes(
+    String(snapshot?.mission?.status || "").toUpperCase(),
+  );
+  const topic =
+    String(snapshot?.mission?.target || snapshot?.mission?.purpose || "").trim() ||
+    (inProgress || requestedId ? typedQuery : "");
+  runEl.textContent = topic
+    ? topic
+    : snapshot?.run_id
+      ? "Έρευνα " + snapshot.run_id
+      : requestedId
+        ? typedQuery || "Αναμονή νέας έρευνας"
+        : "Δεν έχει επιλεγεί έρευνα";
   if (!snapshot && missingRun) runEl.textContent = "Δεν βρέθηκε η έρευνα #" + missingRun;
   const related = discoveries.filter((r) =>
     ["TARGET_MATCH", "POSSIBLE_TARGET"].includes(r.topical_match?.category),
@@ -747,6 +760,9 @@ window.addEventListener("jarvis:dispatch-accepted", (e) => {
     window.history.replaceState(null, "", u);
   }
   renderResults();
+  // Surface the typed query in the drawer header immediately (before any snapshot).
+  const q = String(e.detail?.query || document.body?.dataset?.operatorQuery || "").trim();
+  if (q && runEl) runEl.textContent = q;
   renderActivity();
   drawer.classList.remove("hidden");
 });

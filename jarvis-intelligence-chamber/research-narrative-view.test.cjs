@@ -149,3 +149,72 @@ test('people mode labels the article as βιογραφικό', async () => {
   }, { mode: 'people', heading: false });
   assert.match(html, /Βιογραφικό/);
 });
+
+
+test('in-progress title uses typed query, not run id; question visible; Πορεία open', async () => {
+  const { overview } = await overviewPromise;
+  const { renderOverviewStory } = await viewPromise;
+  const typed = 'Κίμωλος πειρατεία 1700';
+  const snapshot = {
+    run_id: '42176932029',
+    mission: { status: 'RUNNING' },
+    agents: [{ status: 'RUNNING' }],
+  };
+  const data = overview(snapshot, { knownQuery: typed });
+  assert.equal(data.title, typed);
+  assert.doesNotMatch(data.title, /Έρευνα/);
+  assert.doesNotMatch(data.title, /42176932029/);
+  const html = renderOverviewStory(snapshot, data, { knownQuery: typed });
+  assert.match(html, new RegExp('<h2>' + typed + '</h2>'));
+  assert.match(html, /Το ερώτημά σας/);
+  assert.match(html, new RegExp(typed));
+  assert.doesNotMatch(html, /δεν είναι ακόμη διαθέσιμο/);
+  assert.match(html, /<details class="overview-details research-path" open>/);
+  assert.doesNotMatch(html, /Αφήγηση έρευνας/);
+});
+
+test('finished research keeps Πορεία closed and still shows the recorded question', async () => {
+  const { overview } = await overviewPromise;
+  const { renderOverviewStory } = await viewPromise;
+  const snapshot = {
+    run_id: '1',
+    mission: { status: 'COMPLETED', target: 'Δείγμα τόπου', purpose: 'Τι γνωρίζουμε για τον τόπο;', date_range: '1600–1700' },
+    discoveries: [{ topical_match: { category: 'TARGET_MATCH' } }],
+    claims: [{}],
+    blockers: [],
+    contradictions: { records: [] },
+    research_answer: {
+      greek_narrative: {
+        status: 'NARRATIVE_PENDING_HUMAN_REVIEW',
+        title_el: 'Δείγμα τόπου',
+        paragraphs: [{ text_el: 'Αναφέρεται σε πηγή *(Α)*' }],
+        sources: [{ label_el: 'Α' }],
+        research_path: { found: 3, passed: 1, cut: 2 },
+        not_found: [{ note_el: 'Δεν βρέθηκε οχυρό.' }],
+      },
+    },
+  };
+  const html = renderOverviewStory(snapshot, overview(snapshot));
+  assert.match(html, /<h2>Δείγμα τόπου<\/h2>/);
+  assert.match(html, /Τι γνωρίζουμε για τον τόπο;/);
+  assert.match(html, /Τι δεν βρέθηκε/);
+  assert.doesNotMatch(html, /<details[^>]*open/);
+  assert.match(html, /<details class="overview-details research-path"><summary>Πορεία έρευνας<\/summary>/);
+});
+
+test('in-progress without known query still warns; with known query never invents years', async () => {
+  const { overview } = await overviewPromise;
+  const { renderOverviewStory } = await viewPromise;
+  const bare = {
+    run_id: '99',
+    mission: { status: 'RUNNING' },
+    agents: [{ status: 'RUNNING' }],
+  };
+  const bareHtml = renderOverviewStory(bare, overview(bare));
+  assert.match(bareHtml, /δεν είναι ακόμη διαθέσιμο/);
+  assert.equal(overview(bare).title, '');
+  const named = 'Πέτρος Λάντζας';
+  const withQuery = overview(bare, { knownQuery: named });
+  assert.equal(withQuery.title, named);
+  assert.doesNotMatch(withQuery.title, /1530|1613|\d{4}/);
+});

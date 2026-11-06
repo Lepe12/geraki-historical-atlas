@@ -113,7 +113,7 @@ export function articleTitle(narrative, fallback = "") {
  * Legacy dashboard numbers (ιστορικοί ισχυρισμοί, αντιφάσεις, εμπόδια πρόσβασης)
  * are deliberately not rendered here; only cut reasons from research_path.groups explain a cut.
  */
-export function renderResearchPath(narrative, extraHtml = "") {
+export function renderResearchPath(narrative, extraHtml = "", { open = false } = {}) {
   const path = narrative?.research_path || null;
   let body = "";
   if (path && (path.found != null || path.passed != null || path.cut != null)) {
@@ -149,7 +149,9 @@ export function renderResearchPath(narrative, extraHtml = "") {
   body += extraHtml || "";
   if (!body) return "";
   return (
-    '<details class="overview-details research-path"><summary>Πορεία έρευνας</summary>' +
+    '<details class="overview-details research-path"' +
+    (open ? " open" : "") +
+    '><summary>Πορεία έρευνας</summary>' +
     body +
     "</details>"
   );
@@ -209,26 +211,34 @@ export function renderStoryHtml(narrative, { mode = "default", heading = true, f
 
 /** @deprecated kept for callers. Legacy `counts` are ignored: the closed
  *  Πορεία έρευνας shows only found / passed / cut (and why) plus «Τι δεν βρέθηκε». */
-export function renderCountsDetails(_counts, extraHtml = "", narrative = null) {
-  return renderResearchPath(narrative, extraHtml);
+export function renderCountsDetails(_counts, extraHtml = "", narrative = null, options = {}) {
+  return renderResearchPath(narrative, extraHtml, options);
 }
 
-/** Compact overview used by the right-hand «Το ερώτημα» panel. */
-export function renderOverviewStory(snapshot, data) {
+function missionInProgress(snapshot) {
+  return ["RUNNING", "PREPARING", "QUEUED", "STARTING", "ACTIVE"].includes(
+    String(snapshot?.mission?.status || "").toUpperCase(),
+  );
+}
+
+/** Compact overview used by the right-hand «Το ερώτημα» / «Η έρευνά μου» panel. */
+export function renderOverviewStory(snapshot, data, { knownQuery = "" } = {}) {
   const narrative = data?.narrative || snapshot?.research_answer?.greek_narrative;
   const story = renderStoryHtml(narrative, { mode: "default", heading: false });
+  const inProgress = missionInProgress(snapshot);
+  // Prefer mission purpose/target; while running, use the query the client already typed.
+  const queryText = String(
+    snapshot?.mission?.purpose || snapshot?.mission?.target || knownQuery || "",
+  ).trim();
   const question = escapeHtml(
-    snapshot?.mission?.purpose ||
-      snapshot?.mission?.target ||
-      (snapshot?.mission?.status === "RUNNING"
+    queryText ||
+      (inProgress
         ? "Το ερώτημα δεν είναι ακόμη διαθέσιμο στα δεδομένα της έρευνας."
         : "Δεν καταγράφηκε αρχικό ερώτημα."),
   );
   const period = escapeHtml(
     snapshot?.mission?.date_range ||
-      (snapshot?.mission?.status === "RUNNING"
-        ? "Η περίοδος δεν είναι ακόμη διαθέσιμη."
-        : "Δεν ορίστηκε περίοδος"),
+      (inProgress ? "Η περίοδος δεν είναι ακόμη διαθέσιμη." : "Δεν ορίστηκε περίοδος"),
   );
   const extras =
     '<dl class="dossier-question"><div><dt>Το ερώτημά σας</dt><dd>' +
@@ -240,13 +250,15 @@ export function renderOverviewStory(snapshot, data) {
     '<p class="overview-next"><strong>Επόμενο βήμα:</strong> ' +
     escapeHtml(data?.next || "") +
     "</p>";
+  // Open Πορεία while the research is still working; close it again when finished.
+  const pathOpen = inProgress && !isNarrativeReady(narrative);
   return (
     '<div class="overview-heading"><h2>' +
-    escapeHtml(data?.title || "") +
+    escapeHtml(data?.title || queryText || "") +
     "</h2><span>" +
     escapeHtml(data?.status || "") +
     "</span></div>" +
     (story || "<p>" + escapeHtml(data?.message || "") + "</p>") +
-    renderResearchPath(narrative, extras)
+    renderResearchPath(narrative, extras, { open: pathOpen })
   );
 }

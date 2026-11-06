@@ -1,5 +1,5 @@
 import { connectResearchFeed } from "./live-bridge.js";
-import { overview, historyEntry, mergeHistory, statusLabel } from "./research-overview.js";
+import { overview, historyEntry, mergeHistory, statusLabel, isMissionInProgress } from "./research-overview.js";
 import { dossierMarkup } from "./research-dossier.js?v=v2-phase2-1";
 import { renderOverviewStory } from "./research-narrative-view.js";
 const $ = (id) => document.getElementById(id);
@@ -13,6 +13,20 @@ const escape = (s) =>
     (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c],
   );
 const storageKey = "nabou-research-history-v1";
+
+/** Typed query the operator just sent — available before the backend publishes mission.purpose. */
+function clientKnownQuery(snapshot) {
+  // Only overlay the typed query while this mission is still in progress and
+  // the snapshot has not yet published purpose/target.
+  if (snapshot && !isMissionInProgress(snapshot)) return "";
+  if (String(snapshot?.mission?.purpose || snapshot?.mission?.target || "").trim()) return "";
+  try {
+    return String(document.body?.dataset?.operatorQuery || "").trim();
+  } catch {
+    return "";
+  }
+}
+
 let catalog = [],
   recent = [],
   current = "",
@@ -148,7 +162,8 @@ connectResearchFeed({
     renderHistory();
   },
   onSnapshot: (snapshot) => {
-    const item = historyEntry(snapshot);
+    const knownQuery = clientKnownQuery(snapshot);
+    const item = historyEntry(snapshot, knownQuery);
     if (item) {
       current = item.run_id;
       recent = mergeHistory(recent, [item]).slice(0, 50);
@@ -159,14 +174,14 @@ connectResearchFeed({
       }
       renderHistory();
     }
-    const data = overview(snapshot);
+    const data = overview(snapshot, { knownQuery });
     renderDossier(snapshot);
     const link = $("researchPermalink");
     link.href = "?run=" + encodeURIComponent(snapshot.run_id);
     link.hidden = false;
-    document.title = "NABOU//X · " + data.title;
-    // Story first; question / period / counts / next stay behind closed Λεπτομέρειες.
-    summary.innerHTML = renderOverviewStory(snapshot, data);
+    document.title = "NABOU//X · " + (data.title || "Έρευνα");
+    // Story first when ready; while in progress, Πορεία stays open with the typed query.
+    summary.innerHTML = renderOverviewStory(snapshot, data, { knownQuery });
     if (window.NABOU_FACT_PINS) window.NABOU_FACT_PINS.fromSnapshot(snapshot);
   },
   onState: (mode) => {
@@ -174,11 +189,24 @@ connectResearchFeed({
       empty("Δεν ήταν δυνατή η φόρτωση αποτελεσμάτων. Δοκιμάστε την πιο πρόσφατη ή μια προηγούμενη έρευνα.");
   },
 });
-window.addEventListener("jarvis:dispatch-accepted", () => {
+window.addEventListener("jarvis:dispatch-accepted", (event) => {
   current = "";
-  empty(
-    "Το αίτημα παραλήφθηκε. Αναμένουμε τη δική σας έρευνα· δεν εμφανίζονται αποτελέσματα άλλου αιτήματος.",
-  );
+  const query = String(
+    event.detail?.query || document.body?.dataset?.operatorQuery || "",
+  ).trim();
+  if (query) {
+    // Show title + question immediately from what Leonidas typed; do not wait for payload.
+    const snap = { mission: { status: "RUNNING", purpose: query, target: query } };
+    const data = overview(snap, { knownQuery: query });
+    $("researchPermalink").hidden = true;
+    document.title = "NABOU//X · " + data.title;
+    summary.innerHTML = renderOverviewStory(snap, data, { knownQuery: query });
+    renderDossier(snap);
+  } else {
+    empty(
+      "Το αίτημα παραλήφθηκε. Αναμένουμε τη δική σας έρευνα· δεν εμφανίζονται αποτελέσματα άλλου αιτήματος.",
+    );
+  }
   renderHistory();
 });
 loadHistory();

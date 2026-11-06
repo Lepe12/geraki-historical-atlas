@@ -13,7 +13,40 @@ export const statusLabel = (status) =>
     PREPARING: "Προετοιμασία",
     IDLE: "Ανενεργή",
   })[String(status || "").toUpperCase()] || "Άγνωστη κατάσταση";
-export function overview(snapshot) {
+
+/** Mission still working (not a terminal outcome). */
+export function isMissionInProgress(snapshot) {
+  return ["RUNNING", "PREPARING", "QUEUED", "STARTING", "ACTIVE"].includes(
+    String(snapshot?.mission?.status || "").toUpperCase(),
+  );
+}
+
+/**
+ * Topic / question text for titles and «Το ερώτημά σας».
+ * Prefer mission fields; while in progress, fall back to the query the operator
+ * just typed (knownQuery) so the panel never waits on the backend payload.
+ */
+export function resolveResearchQuery(snapshot, knownQuery = "") {
+  const fromMission = String(snapshot?.mission?.purpose || snapshot?.mission?.target || "").trim();
+  if (fromMission) return fromMission;
+  return String(knownQuery || "").trim();
+}
+
+/** Panel / document title: topic or typed query — never «Έρευνα {runId}» or «Αφήγηση έρευνας». */
+export function resolveResearchTitle(snapshot, narrative = null, knownQuery = "") {
+  const narrativeTitle = String(narrative?.title_el || "").trim();
+  const generic = new Set(["αφήγηση έρευνας", "αφήγηση", "αφήγηση (ελληνικά)", "research narrative"]);
+  if (
+    narrativeTitle &&
+    !generic.has(narrativeTitle.toLocaleLowerCase("el")) &&
+    !/^έρευνα\s+\d+$/i.test(narrativeTitle)
+  ) {
+    return narrativeTitle;
+  }
+  return resolveResearchQuery(snapshot, knownQuery);
+}
+
+export function overview(snapshot, { knownQuery = "" } = {}) {
   // A live-event-only snapshot has no finalized evidence package yet. Its
   // empty placeholder arrays must not be presented as measured zeroes.
   const provisional = Boolean(snapshot && !Array.isArray(snapshot.discoveries) && String(snapshot.mission?.status || '').toUpperCase() === 'RUNNING');
@@ -39,20 +72,15 @@ export function overview(snapshot) {
     "CANCELLED",
     "CANCELED",
   ].includes(String(snapshot?.mission?.status).toUpperCase());
-  const title = snapshot?.mission?.target || snapshot?.mission?.purpose || "Έρευνα " + snapshot?.run_id;
   const hasEvidence = related + claims > 0;
   const narrative = snapshot?.research_answer?.greek_narrative;
   const narrativeReady = narrative && ["NARRATIVE_PENDING_HUMAN_REVIEW", "NO_USABLE_EVIDENCE"].includes(narrative.status);
   const narrativeLead = narrativeReady
     ? (narrative.paragraphs || []).map((p) => p.text_el).filter(Boolean).slice(0, 2).join(" ")
     : "";
+  const title = resolveResearchTitle(snapshot, narrativeReady ? narrative : null, knownQuery);
   return {
-    title:
-      (narrativeReady &&
-        narrative.title_el &&
-        !["αφήγηση έρευνας", "αφήγηση"].includes(String(narrative.title_el).trim().toLocaleLowerCase("el")) &&
-        narrative.title_el) ||
-      title,
+    title,
     related: provisional ? '—' : related,
     claims: provisional ? '—' : claims,
     blockers: provisional ? '—' : blockers,
@@ -78,12 +106,12 @@ export function overview(snapshot) {
     status: statusLabel(snapshot?.mission?.status),
   };
 }
-export function historyEntry(snapshot) {
+export function historyEntry(snapshot, knownQuery = "") {
   const id = String(snapshot?.run_id || "");
   if (!/^\d+$/.test(id)) return null;
   return {
     run_id: id,
-    target: String(snapshot.mission?.target || snapshot.mission?.purpose || "Έρευνα " + id),
+    target: String(resolveResearchQuery(snapshot, knownQuery) || "Έρευνα " + id),
     date_range: String(snapshot.mission?.date_range || ""),
     generated_utc: String(snapshot.generated_utc || ""),
     status: String(snapshot.mission?.status || "UNKNOWN"),
