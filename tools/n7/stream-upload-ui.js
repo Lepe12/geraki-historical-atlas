@@ -14,7 +14,7 @@
    const source=node.textContent||'';
    if(!source.includes('https://'))continue;
    node.replaceChildren();
-   const regex=/https:\/\/[^\\s<>\"']+/g;
+   const regex=/https:\/\/[^\s<>"'\[\]]+/g;
    let match,last=0;
    while((match=regex.exec(source))){
     node.append(document.createTextNode(source.slice(last,match.index)));
@@ -32,7 +32,7 @@
  };
  const picker=document.createElement('input');
  picker.type='file';picker.multiple=true;picker.id='n7-file-picker';
- picker.accept='.png,.jpg,.jpeg,.webp,.txt,.md,.csv,.json,.docx';
+ picker.accept='.png,.jpg,.jpeg,.webp,.txt,.md,.csv,.json,.docx,.pdf';
  picker.hidden=true;
  const add=document.createElement('button');
  add.type='button';add.textContent='＋';add.title='Επισύναψη εικόνας ή αρχείου';
@@ -67,7 +67,7 @@
       throw Error('Μέχρι 3 εικόνες ανά μήνυμα.');
    if(all.some(x=>x.size>5*1024*1024)||all.reduce((n,x)=>n+x.size,0)>6*1024*1024)
       throw Error('Έως 5 MB ανά αρχείο και 6 MB συνολικά.');
-   const extensions=/\.(png|jpg|jpeg|webp|txt|md|csv|json|docx)$/i;
+   const extensions=/\.(png|jpg|jpeg|webp|txt|md|csv|json|docx|pdf)$/i;
    if(all.some(x=>!extensions.test(x.name)))throw Error('Μη υποστηριζόμενος τύπος αρχείου.');
    pending=all;showFiles();notice.textContent='';
   }catch(e){notice.textContent='Συνημμένα: '+e.message;}
@@ -80,6 +80,37 @@
    output+=String.fromCharCode(...bytes.subarray(i,i+16384));
   }
   return {name:file.name,base64:btoa(output)};
+ }
+ // Render scanned PDF pages locally; use the existing visual model for transcription.
+ // Text extraction stays on the server; no external OCR subscription or file hosting.
+ async function encodeWithPdfPages(files){
+  const prepared=[...files];let budget=3-files.filter(f=>f.type.startsWith('image/')).length;
+  for(const file of files.filter(f=>/\.pdf$/i.test(f.name))){
+   if(budget<=0||prepared.length>=4)break;
+   if(notice)notice.textContent='Ελέγχω τις σελίδες του PDF…';
+   const pdfjs=await import('/n7-pdf/pdf.mjs');
+   pdfjs.GlobalWorkerOptions.workerSrc='/n7-pdf/pdf.worker.mjs';
+   const task=pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer()),isEvalSupported:false});
+   let doc;const timer=setTimeout(()=>task.destroy(),20000);
+   try{
+    doc=await task.promise;
+    // Bound local work; only the first three physical pages are candidates for visual OCR.
+    for(let n=1;n<=Math.min(3,doc.numPages)&&budget>0&&prepared.length<4;n++){
+     const page=await doc.getPage(n),text=await page.getTextContent();
+     if(text.items.some(x=>String(x.str||'').trim()))continue;
+     const base=page.getViewport({scale:1}),scale=Math.min(1.8,1600/base.width,2000/base.height);
+     const viewport=page.getViewport({scale}),canvas=document.createElement('canvas');
+     canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
+     await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+     const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.86));
+     canvas.width=canvas.height=0;
+     if(blob)prepared.push(new File([blob],file.name.slice(0,60)+' — PDF page '+n+'.jpg',{type:'image/jpeg'}));
+     budget--;
+    }
+   }finally{clearTimeout(timer);if(doc)await doc.destroy();else await task.destroy();}
+  }
+  if(prepared.reduce((n,f)=>n+f.size,0)>6*1024*1024)throw Error('Το PDF μαζί με τις εικόνες σελίδων ξεπερνά τα 6 MB. Στείλε μικρότερο αρχείο ή μεμονωμένες σελίδες.');
+  return Promise.all(prepared.map(encode));
  }
  async function readNdjson(response,onEvent){
   if(!response.ok){
@@ -120,7 +151,7 @@
   try{
    if(!active)await create();
    const original=await api('/api/conversations/'+active);
-   const files=await Promise.all(pending.map(encode));
+   const files=await encodeWithPdfPages(pending);
    const visible=content+(pending.length?'\n'+pending.map(x=>'📎 '+x.name).join('\n'):'');
    render([...original.conversation.messages,{role:'user',content:visible},{role:'assistant',content:''}]);
    const pane=document.getElementById('messages');
@@ -185,3 +216,4 @@
  // A file-only message still requires a real user submission via the send button.
  input.required=false;
 })();
+

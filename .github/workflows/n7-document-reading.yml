@@ -1,0 +1,77 @@
+name: N7 public document reading
+on:
+  pull_request:
+    paths:
+      - 'tools/n7/**'
+      - '.github/workflows/n7-document-reading.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/n7-document-reading.yml'
+      - 'tools/n7/document-reader.js'
+      - 'tools/n7/pdf-reader-worker.cjs'
+      - 'tools/n7/deploy_document_reading.py'
+permissions:
+  contents: read
+concurrency:
+  group: n7-live-stream-progress-restore
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/n7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare pinned PDF.js runtime without native executables
+        run: |
+          npm install --prefix "$RUNNER_TEMP/n7-pdf" --ignore-scripts --omit=optional --no-audit --no-fund pdfjs-dist@5.6.205 @napi-rs/canvas@0.1.100
+          mkdir -p tools/n7/vendor
+          cp "$RUNNER_TEMP/n7-pdf/node_modules/pdfjs-dist/legacy/build/pdf.mjs" tools/n7/vendor/
+          cp "$RUNNER_TEMP/n7-pdf/node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs" tools/n7/vendor/
+          cp "$RUNNER_TEMP/n7-pdf/node_modules/pdfjs-dist/LICENSE" tools/n7/vendor/PDFJS-LICENSE
+          cp "$RUNNER_TEMP/n7-pdf/node_modules/@napi-rs/canvas/geometry.js" tools/n7/vendor/geometry.cjs
+          cp "$RUNNER_TEMP/n7-pdf/node_modules/@napi-rs/canvas/LICENSE" tools/n7/vendor/CANVAS-LICENSE
+      - name: Test network isolation, document evidence and existing research
+        run: |
+          node --test tools/n7/test_document_reader.cjs tools/n7/test_europeana_api.cjs tools/n7/test_stream_attachments.cjs tools/n7/test_source_evidence.cjs tools/n7/test_historical_source_audit.cjs tools/n7/test_public_web_search.cjs tools/n7/test_historical_topic_isolation.cjs
+          python3 -m py_compile tools/n7/deploy_document_reading.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: n7-document-runtime
+          path: tools/n7/vendor/
+          retention-days: 7
+  deploy:
+    if: github.event_name == 'push'
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 10
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/n7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: n7-document-runtime
+          path: tools/n7/vendor/
+      - name: Check current production files before changes
+        env:
+          N7_DRY_RUN: '1'
+        run: python3 tools/n7/deploy_document_reading.py
+      - name: Install document reader with checksums and automatic rollback
+        env:
+          N7_DRY_RUN: '0'
+        run: python3 tools/n7/deploy_document_reading.py
