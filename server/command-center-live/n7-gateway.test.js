@@ -293,3 +293,26 @@ test("N7 chat POST search accepts query and returns flat matches while legacy GE
   await handle({method:"GET",url:"/pct-api/live/n7/library/search?q=Lanza",headers:{}},{}, "/n7/library/search");
   assert.equal(out.at(-1).payload.schema,"n7-private-library-read-v1");
 });
+
+
+test("existing N7 login can delegate read-only search with verified server signature",async()=>{
+  const replies=[],calls=[];
+  let authorized=false;
+  const handler=createN7Gateway({
+    json:(_r,status,payload)=>replies.push({status,payload}),
+    operatorAuthorized:()=>false,sessionAuthorized:()=>false,
+    libraryBridgeVerifier:(req,raw)=>authorized && req.headers["x-n7-library-signature"]==="signed" && raw.includes("Λάντζας"),
+    readBody:async()=>JSON.stringify({query:"Λάντζας"}),
+    libraryRunner:async (command,args)=>{calls.push({command,args});return {matches:[{title:"Laskaris",scan_index:7,printed_page:"11",excerpt:"Λάντζας"}]};}
+  });
+  const req={method:"POST",url:"/pct-api/live/n7/library/search",headers:{"x-n7-library-signature":"signed"}};
+  await handler(req,{},"/n7/library/search");
+  assert.equal(replies.at(-1).status,401);
+  authorized=true;
+  await handler(req,{},"/n7/library/search");
+  assert.equal(replies.at(-1).status,200);
+  assert.equal(replies.at(-1).payload.matches[0].printed_page,"11");
+  assert.deepEqual(calls,[{command:"search",args:["Λάντζας"]}]);
+  await handler({...req,headers:{...req.headers,origin:"https://evil.test"}},{},"/n7/library/search");
+  assert.equal(replies.at(-1).status,403);
+});
