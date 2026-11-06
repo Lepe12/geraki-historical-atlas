@@ -77,6 +77,7 @@ try:
     replacement_chat=(STAGE/"n7-research-chat-handler.snippet").read_bytes()
     if b"historicalResearch.research(content" not in current:
         if current.count(original_chat)!=1:
+            print(json.dumps({"live_chat_lines":[x.decode("utf-8","replace")[:200] for x in current.splitlines() if b"const history" in x or b"reply=await answer" in x or b"const chat=" in x][:8]}))
             raise RuntimeError("LIVE_CHAT_HANDLER_CHANGED")
         current=current.replace(original_chat,replacement_chat)
     current=add_once(current,
