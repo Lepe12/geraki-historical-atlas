@@ -28,6 +28,7 @@ assert results.get("schema")=="n7-library-read-v1" and len(matches)>=10
 assert results.get("source_count",0)>=2 and results.get("page_count",0)>=646
 assert all(str(m.get("printed_page","")).isdigit() for m in matches)
 assert all(m.get("source_type")=="SECONDARY_HISTORIOGRAPHY" for m in matches)
+assert not any(m.get("title")=="Sea-Wolves of the Mediterranean" and str(m.get("printed_page")) in {"390","392"} for m in matches),"INDEX_PAGES_STILL_RANKED"
 assert all(m.get("relevance_score",0)>0 for m in matches)
 assert all("excerpt" in m and "source_uri" in m for m in matches)
 assert all(matches[i]["relevance_score"]>=matches[i+1]["relevance_score"] for i in range(len(matches)-1))
