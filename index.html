@@ -53,19 +53,46 @@ linear-gradient(rgba(79,56,31,.025),rgba(31,23,17,.10));mix-blend-mode:multiply}
 .panel-scroll::-webkit-scrollbar{width:6px}.panel-scroll::-webkit-scrollbar-thumb{background:rgba(124,83,43,.4);border-radius:5px}
 .book-btn.active,.year-btn.active{background:rgba(217,119,6,.32);border-color:rgba(245,158,11,.72);color:#fde8ba}
 #sidePanel.closed{transform:translateX(100%)}
+
+/* N7 atlas shell: isolated presentation only; preserve MapLibre/terrain code */
+:root{--n7-gold:#caa56a;--n7-ink:#0e1519}
+header.n7-header{height:64px!important;background:rgba(11,17,21,.97)!important;border-color:rgba(202,165,106,.3)!important}
+.n7-header .n7-brand{font-family:Georgia,serif;color:#edddbd;letter-spacing:.15em;font-size:22px}
+.n7-header .n7-subtitle{color:#caa56a;font:11px Georgia,serif;letter-spacing:.08em}
+.n7-header nav button{padding:9px 4px;cursor:pointer;color:#ded6c9}
+.n7-header nav button:focus-visible,.n7-rail button:focus-visible,.n7-assistant:focus-visible{outline:2px solid #e5bb73;outline-offset:2px}
+.n7-rail{position:absolute;top:16px;left:12px;z-index:850;display:flex;flex-direction:column;gap:5px;background:rgba(10,17,21,.94);border:1px solid rgba(202,165,106,.27);border-radius:7px;padding:6px;box-shadow:0 12px 35px #0008}
+.n7-rail button{width:40px;height:40px;border-radius:4px;color:#d8c8ab;cursor:pointer}
+.n7-rail button:hover,.n7-rail button[aria-expanded=true]{background:#caa56a25;color:#f3dba8}
+.n7-drawer{position:absolute;top:16px;left:66px;width:min(300px,calc(100vw - 90px));z-index:840;background:rgba(10,17,21,.97);border:1px solid #caa56a50;border-radius:7px;padding:19px;color:#e6dfd3;box-shadow:0 16px 38px #0009}
+.n7-drawer[hidden],.n7-timeline[hidden]{display:none!important}
+.n7-drawer h2{font:22px Georgia,serif;color:#efdab2;margin:0 0 15px}
+.n7-drawer label{display:flex;gap:10px;align-items:center;margin:13px 0;font-size:13px}
+.n7-drawer input{accent-color:#caa56a}
+.n7-timeline{position:absolute;z-index:850;bottom:18px;left:50%;transform:translateX(-50%);background:rgba(10,17,21,.97);border:1px solid #caa56a50;border-radius:7px;padding:12px 16px;color:#e4d7bb;max-width:calc(100vw - 140px)}
+.n7-timeline .year-btn{white-space:nowrap}
+.n7-assistant{position:absolute;z-index:900;bottom:20px;right:20px;color:#edd4a8;background:rgba(10,17,21,.96);border:1px solid #caa56a75;border-radius:24px;padding:10px 16px;font:13px Georgia,serif;box-shadow:0 10px 30px #0008}
+#sidePanel{width:min(370px,100vw)!important;background:rgba(13,20,24,.98)!important;color:#e8dbc1!important;border-color:#caa56a45!important;box-shadow:-14px 0 36px #0007!important}
+#sidePanel .border-b{border-color:#caa56a40!important}
+#sidePanel #panelTitle{color:#f0dcbb!important;font-size:30px!important}
+#sidePanel #panelSubtitle,#sidePanel #panelDescription,#sidePanel #panelNote{color:#d7c9b0!important}
+#sidePanel #panelRows>div{background:#1c2529!important;border-color:#caa56a35!important}
+#sidePanel #panelRows *{color:#e5d6bc!important}
+#sidePanel button{color:#ead8bb!important}
+#sidePanel #panelHero{background:#293135!important;color:#dccaa8!important}
+.n7-map-zoom{position:absolute;right:18px;top:18px;z-index:810;display:flex;flex-direction:column;padding:4px;background:rgba(10,17,21,.94);border:1px solid #caa56a50;border-radius:6px}
+.n7-map-zoom button{width:35px;height:35px;color:#ebd4ab}
+.n7-map-zoom button:hover{background:#caa56a25}
+@media(max-width:700px){header.n7-header{padding:0 12px!important}.n7-header .n7-brand{font-size:16px}.n7-header .n7-subtitle{font-size:9px}.n7-header nav{display:none!important}.n7-header .n7-search{width:min(43vw,190px)!important}.n7-timeline{left:72px;right:8px;transform:none;max-width:none;overflow-x:auto}.n7-assistant{bottom:92px;right:10px}#sidePanel{width:min(92vw,370px)!important}}
+
 </style>
 </head>
 <body class="h-screen w-screen flex flex-col">
-<header class="h-16 z-[1200] glass-dark flex items-center justify-between px-5 md:px-7 border-b shrink-0">
-  <div class="flex items-center gap-3">
-    <div class="w-10 h-10 rounded-full border border-amber-500/45 bg-amber-950/50 flex items-center justify-center text-amber-400"><i class="fa-solid fa-compass text-xl"></i></div>
-    <div><div class="font-cinzel text-[17px] font-bold tracking-[.14em] text-amber-100">ΙΣΤΟΡΙΚΟΣ ΑΤΛΑΣ</div><div class="font-cinzel text-[9px] tracking-[.28em] text-amber-500">ΤΗΣ ΜΕΣΟΓΕΙΟΥ</div></div>
-  </div>
-  <nav class="hidden lg:flex items-center gap-5 font-cinzel text-[11px] tracking-wider">
-    <button class="text-amber-300 border-b-2 border-amber-400 py-2">ΧΑΡΤΗΣ</button><button class="text-stone-400">ΠΕΡΙΟΔΟΙ</button><button class="text-stone-400">ΘΕΜΑΤΑ</button><button class="text-stone-400">ΠΡΟΣΩΠΑ</button><button class="text-stone-400">ΠΗΓΕΣ</button>
-  </nav>
-  <div class="relative w-52 sm:w-72 md:w-80">
-    <input id="searchInput" class="w-full bg-stone-900/85 border border-amber-800/45 text-amber-100 text-xs rounded-md py-2 pl-9 pr-8 outline-none" placeholder="Αναζήτηση τόπων, προσώπων..." oninput="searchPlaces(this.value)">
+<header class="n7-header h-16 z-[1200] glass-dark flex items-center justify-between px-5 md:px-7 border-b shrink-0">
+  <div class="flex items-center gap-4"><div><div class="n7-brand">N7 <span style="font-size:13px;color:#a78955">/ HISTORICAL ATLAS</span></div><div class="n7-subtitle">ΙΣΤΟΡΙΚΟΣ ΑΤΛΑΣ ΤΗΣ ΜΕΣΟΓΕΙΟΥ</div></div></div>
+  <nav class="hidden lg:flex items-center gap-7 font-cinzel text-xs"><button class="text-amber-300 border-b border-amber-400" onclick="closePanel();fitMediterranean()">Χάρτης</button><button onclick="toggleAtlasDrawer('search')">Εξερεύνηση</button><button onclick="toggleAtlasDrawer('layers')">Επίπεδα</button><button onclick="toggleAtlasTimeline()">Χρονολόγιο</button></nav>
+  <div class="n7-search relative w-52 sm:w-72 md:w-80">
+    <input id="searchInput" aria-label="Αναζήτηση ιστορικών τόπων" class="w-full bg-stone-900/85 border border-amber-800/45 text-amber-100 text-xs rounded-md py-2 pl-9 pr-8 outline-none" placeholder="Αναζήτηση τόπων..." oninput="searchPlaces(this.value)">
     <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-amber-500/70"></i>
     <div id="searchResults" class="hidden absolute top-full mt-2 left-0 right-0 bg-stone-900/95 border border-amber-700/40 rounded-md shadow-2xl max-h-72 overflow-y-auto z-[1600]"></div>
   </div>
@@ -73,17 +100,21 @@ linear-gradient(rgba(79,56,31,.025),rgba(31,23,17,.10));mix-blend-mode:multiply}
 
 <main class="relative flex-1 min-h-0">
   <div id="realMap"></div><div class="map-wash"></div>
-  <div class="absolute top-5 left-5 z-[800] flex flex-col gap-1 glass-dark p-1.5 rounded-md border">
-    <button onclick="atlasMap.zoomIn()" class="w-8 h-8 text-amber-300 hover:bg-amber-500/15 rounded"><i class="fa-solid fa-plus"></i></button>
-    <button onclick="atlasMap.zoomOut()" class="w-8 h-8 text-amber-300 hover:bg-amber-500/15 rounded"><i class="fa-solid fa-minus"></i></button>
-    <button onclick="fitAll()" class="w-8 h-8 text-amber-300 hover:bg-amber-500/15 rounded"><i class="fa-solid fa-arrows-to-dot"></i></button>
+  <div class="n7-rail" aria-label="Εργαλεία άτλαντα">
+    <button title="Επίπεδα" aria-label="Επίπεδα" aria-expanded="false" onclick="toggleAtlasDrawer('layers')"><i class="fa-solid fa-layer-group"></i></button>
+    <button title="Χρονολόγιο" aria-label="Χρονολόγιο" onclick="toggleAtlasTimeline()"><i class="fa-regular fa-clock"></i></button>
+    <button title="Αναζήτηση" aria-label="Αναζήτηση" onclick="document.getElementById('searchInput').focus()"><i class="fa-solid fa-magnifying-glass"></i></button>
+    <button title="Ολόκληρη η Μεσόγειος" aria-label="Ολόκληρη η Μεσόγειος" onclick="fitMediterranean()"><i class="fa-solid fa-earth-europe"></i></button>
   </div>
-  <div class="absolute bottom-5 left-6 z-[800] hidden sm:block pointer-events-none">
-    <div class="w-24 h-24 rounded-full border border-dashed border-amber-500/45 flex items-center justify-center text-amber-300 relative">
-      <span class="absolute top-1 text-[10px]">N</span><span class="absolute right-1 text-[10px]">E</span><span class="absolute bottom-1 text-[10px]">S</span><span class="absolute left-1 text-[10px]">W</span><i class="fa-regular fa-compass text-5xl opacity-90"></i>
-    </div>
+  <div id="n7Layers" class="n7-drawer" hidden>
+    <div class="flex items-center justify-between"><h2>Επίπεδα χάρτη</h2><button aria-label="Κλείσιμο" onclick="toggleAtlasDrawer('layers')">✕</button></div>
+    <label><input id="n7Places" type="checkbox" checked onchange="toggleAtlasMarkers(this.checked)"> Ιστορικές τοποθεσίες</label>
+    <label><input id="n7Routes" type="checkbox" checked onchange="toggleAtlasRoutes(this.checked)"> Θαλάσσιες διαδρομές</label>
+    <p class="text-xs text-stone-400 mt-5">Οι πληροφορίες προέρχονται από τα ήδη καταχωρισμένα δεδομένα του άτλαντα.</p>
   </div>
-
+  <div id="n7SearchDrawer" class="n7-drawer" hidden><div class="flex items-center justify-between"><h2>Εξερεύνηση</h2><button aria-label="Κλείσιμο" onclick="toggleAtlasDrawer('search')">✕</button></div><p class="text-sm">Αναζήτησε ιστορικούς τόπους στο πεδίο της επάνω μπάρας ή επίλεξε σημείο στον χάρτη.</p><button class="mt-4 border border-amber-600/50 rounded px-4 py-2 text-amber-200" onclick="document.getElementById('searchInput').focus()">Αναζήτηση τόπου</button></div>
+  <div class="n7-map-zoom"><button aria-label="Μεγέθυνση" onclick="atlasMap.zoomIn()"><i class="fa-solid fa-plus"></i></button><button aria-label="Σμίκρυνση" onclick="atlasMap.zoomOut()"><i class="fa-solid fa-minus"></i></button><button aria-label="Επαναφορά χάρτη" onclick="fitMediterranean()"><i class="fa-solid fa-arrows-to-dot"></i></button></div>
+  <a class="n7-assistant" href="https://bot.piratecartography.com" target="_blank" rel="noopener noreferrer" title="Άνοιγμα του N7 σε νέα καρτέλα"><i class="fa-solid fa-diamond mr-2"></i>N7 Βοηθός <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-xs"></i></a>
   <aside id="sidePanel" class="closed absolute z-[1300] right-0 top-0 bottom-0 w-full sm:w-[430px] lg:w-[470px] parchment-panel border-l border-amber-900/40 transition-transform duration-300 flex flex-col">
     <div class="p-5 border-b border-amber-900/25 flex justify-between items-start">
       <div><div id="panelSubtitle" class="font-cinzel text-[10px] tracking-[.16em] text-amber-900/75"></div><h2 id="panelTitle" class="font-didot text-4xl text-stone-900 leading-none mt-1"></h2></div>
@@ -98,7 +129,7 @@ linear-gradient(rgba(79,56,31,.025),rgba(31,23,17,.10));mix-blend-mode:multiply}
   </aside>
 </main>
 
-<footer class="h-20 z-[1200] glass-dark border-t shrink-0 px-5 flex items-center justify-between gap-4">
+<footer id="n7Timeline" class="n7-timeline" hidden><div class="flex items-center justify-between gap-5 mb-2"><span class="text-xs text-amber-200">Χρονολόγιο και βιβλία</span><button aria-label="Κλείσιμο χρονολογίου" onclick="toggleAtlasTimeline()">✕</button></div><div class="flex items-center flex-wrap gap-5">
   <div class="flex items-center gap-2 overflow-x-auto">
     <span class="font-cinzel text-[10px] text-amber-500 mr-1">ΒΙΒΛΙΟ</span>
     <button class="book-btn active px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-book="All">Όλα</button>
@@ -113,7 +144,7 @@ linear-gradient(rgba(79,56,31,.025),rgba(31,23,17,.10));mix-blend-mode:multiply}
     <button class="year-btn px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-year="1577">1577</button>
     <button class="year-btn px-3 py-2 rounded border border-amber-800/40 text-xs text-stone-300" data-year="1578">1578</button>
   </div>
-</footer>
+</div></footer>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script>
 let DATA={places:[],routes:[]};
@@ -271,7 +302,7 @@ function initMap(){
 
     updateMarkerHierarchy();
     render();
-    fitAll();
+    fitMediterranean();
   });
 
   atlasMap.on("click","atlas-routes",e=>{
@@ -583,6 +614,29 @@ function showRoute(r){
     row("fa-scroll","Τεκμηρίωση",r.status||r.type);
   document.getElementById("panelNote").textContent=r.note||"";
   openPanel();
+}
+
+
+/* N7 shell presentation controls: no renderer/terrain/camera implementation changes. */
+function fitMediterranean(){
+ if(!atlasMap)return;
+ atlasMap.fitBounds([[-11.0,29.0],[42.0,47.5]],{padding:30,duration:750,pitch:0,bearing:0});
+}
+function toggleAtlasDrawer(which){
+ const a=document.getElementById("n7Layers"),b=document.getElementById("n7SearchDrawer");
+ const target=which==="layers"?a:b,other=which==="layers"?b:a;
+ const opening=target.hidden;other.hidden=true;target.hidden=!opening;
+ const control=document.querySelector('.n7-rail button[title="Επίπεδα"]');
+ if(control)control.setAttribute("aria-expanded",String(!a.hidden));
+}
+function toggleAtlasTimeline(){const e=document.getElementById("n7Timeline");e.hidden=!e.hidden}
+let n7MarkersVisible=true;
+function toggleAtlasMarkers(on){
+ n7MarkersVisible=on;placeMarkers.forEach(m=>{const e=m.getElement();if(e)e.style.display=on?"":"none"});
+}
+function toggleAtlasRoutes(on){
+ if(!atlasMap||!atlasMap.getLayer("atlas-routes"))return;
+ atlasMap.setLayoutProperty("atlas-routes","visibility",on?"visible":"none");
 }
 
 function fitAll(){
