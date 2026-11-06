@@ -289,7 +289,7 @@ test("N7 chat POST search accepts query and returns flat matches while legacy GE
   assert.equal(out.at(-1).payload.matches[0].printed_page,"15");
   assert.deepEqual(calls[0],{command:"search",args:["Λάντζας"]});
   await handle({method:"POST",url:"/pct-api/live/n7/library/page",headers:{}},{}, "/n7/library/page");
-  assert.equal(out.at(-1).status,405);
+  assert.equal(out.at(-1).status,400);
   await handle({method:"GET",url:"/pct-api/live/n7/library/search?q=Lanza",headers:{}},{}, "/n7/library/search");
   assert.equal(out.at(-1).payload.schema,"n7-private-library-read-v1");
 });
