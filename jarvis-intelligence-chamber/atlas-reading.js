@@ -65,6 +65,7 @@
   onReset:()=>{snapshot=null;sourceRows=[];search.value='';renderSources();}
  })).catch(()=>{empty.textContent='Οι πηγές δεν είναι διαθέσιμες αυτή τη στιγμή. Δοκιμάστε ανανέωση.';});
  function show(next,{focus=true}={}){
+  if(next==='home')next='map';
   const previous=mode;
   routing=true;
   mode=next;body.dataset.readerView=next;
@@ -193,6 +194,6 @@
  if(title)new MutationObserver(updateTitle).observe(title,{childList:true,subtree:true});updateTitle();
  window.N7_READER={show};
  const initial=new URLSearchParams(location.search).get('view');
- if(initial==='map')show('map',{focus:false});else if(body.dataset.atlasPage==='home')mode='home';
+ show(initial==='research'?'research':'map',{focus:false});
  navState();
 })();
