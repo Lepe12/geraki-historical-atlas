@@ -99,15 +99,12 @@ const path = require("node:path");
     assert.equal(await page.locator("#atlasResearch").isVisible(), false);
 
 
-    page.on('console',m=>{if(m.text().startsWith('N7 CLICK'))console.log(m.text());});
-    await page.evaluate(()=>window.addEventListener('click',e=>console.log('N7 CLICK',e.target.outerHTML.slice(0,250)),true));
     const nav = key => page.locator('.atlas-page:not([hidden]) [data-atlas-nav="'+key+'"]');
     const go = async key => { await nav(key).click(); };
-    for(const width of [390,360]){
+    for(const width of [1440,390,360]){
       await page.setViewportSize({width,height:900});
       await go('sources');
-      console.log('SOURCE NAV',width,await page.locator('body').evaluate(el=>({...el.dataset})),await page.locator('#readerSources').getAttribute('hidden'));
-      await page.locator('#readerSources').waitFor({state:'visible',timeout:5000});
+      await page.locator('#readerSources').waitFor({state:'visible'});
       await page.waitForFunction(()=>document.querySelector('#readerSources ol')?.textContent.includes('Δοκιμαστική ιστορική πηγή'));
       assert.equal(await nav('sources').getAttribute('aria-current'),'page');
       await page.locator('#readerSourceSearch').fill('ανύπαρκτο');
@@ -116,6 +113,7 @@ const path = require("node:path");
       assert.equal(await page.locator('#readerSources li').count(),1);
       assert.equal(await page.locator('#readerSources a').getAttribute('href'),'https://example.org/source');
       await page.locator('#readerSourceSearch').fill('');
+      if(process.env.NABOU_SCREENSHOT_DIR){fs.mkdirSync(process.env.NABOU_SCREENSHOT_DIR,{recursive:true});await page.screenshot({path:path.join(process.env.NABOU_SCREENSHOT_DIR,width+'-sources-navigation.png')});}
       await go('agents');
       assert.equal(await nav('agents').getAttribute('aria-current'),'page');
       await page.locator('#nxsAgentsPage').waitFor({state:'visible'});
