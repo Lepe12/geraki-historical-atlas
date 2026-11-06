@@ -105,7 +105,7 @@ function createHandler({dataDir,json,keyPath,fetcher=fetch}){
         method:"POST",redirect:"error",signal:controller.signal,duplex:"half",
         headers:{"Content-Type":"application/pdf","Content-Length":String(item.size),
           "X-File-Name":encodeURIComponent(item.filename),
-          "X-N7-Library-Ts":ts,"X-N7-Library-Signature":signature},
+          "X-N7-Library-Ts":ts,"X-N7-Library-Signature":signature,"X-N7-Library-Digest":digest},
         body:fs.createReadStream(item.file,{highWaterMark:512*1024})
       });
       const payload=await response.json().catch(()=>({}));
