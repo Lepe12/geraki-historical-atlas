@@ -100,7 +100,7 @@ const path = require("node:path");
 
 
     page.on('console',m=>{if(m.text().startsWith('N7 CLICK'))console.log(m.text());});
-    await page.evaluate(()=>document.addEventListener('click',e=>console.log('N7 CLICK',e.target.outerHTML.slice(0,250)),true));
+    await page.evaluate(()=>window.addEventListener('click',e=>console.log('N7 CLICK',e.target.outerHTML.slice(0,250)),true));
     const nav = key => page.locator('.atlas-page:not([hidden]) [data-atlas-nav="'+key+'"]');
     const go = async key => { await nav(key).click(); };
     for(const width of [390,360]){
