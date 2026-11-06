@@ -47,7 +47,7 @@ try:
     html=fetch("public/index.html")
     if b"Independent AI Bot" not in html:raise RuntimeError("WRONG_CHAT")
     if b"if(p==='/api/library/search')" not in server:
-        guard=re.search(rb"(?m)^([ \\t]*)if \\(!session\\(req\\)\\) \\{\\r?\\n(?:[^\\r\\n]*\\r?\\n){1,6}?\\1\\}\\r?\\n",server)
+        guard=re.search(rb"(?m)^([ \t]*)if \(!session\(req\)\) \{\r?\n(?:[^\r\n]*\r?\n){1,6}?\1\}\r?\n",server)
         if not guard:
             raise RuntimeError("BOT_GLOBAL_SESSION_GUARD_CHANGED")
         server=server[:guard.end()]+route+server[guard.end():]
