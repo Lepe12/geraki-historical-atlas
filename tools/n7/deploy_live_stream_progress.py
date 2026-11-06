@@ -7,7 +7,7 @@ PUB=ROOT+'/public'
 BASE='https://bot.piratecartography.com'
 TLS='linux3087.grserver.gr'
 HERE=Path(__file__).resolve().parent
-FILES=[(ROOT,'n7-europeana-api.js','europeana-api.js'),(ROOT,'n7-stream-attachments.js','stream-attachments.js'),(ROOT,'n7-public-web-search.js','public-web-search.js'),(PUB,'app.js','stream-upload-ui.js')]
+FILES=[(ROOT,'europeana-api.js','europeana-api.js'),(ROOT,'n7-stream-attachments.js','stream-attachments.js'),(ROOT,'n7-public-web-search.js','public-web-search.js'),(PUB,'app.js','stream-upload-ui.js')]
 MARKER=b'N7_GROQ_TRUE_STREAM_AND_UPLOADS_V1'
 def sha(b):return hashlib.sha256(b).hexdigest()
 def read(f,folder,name):
@@ -84,7 +84,7 @@ def main():
   for folder,name,local in FILES:
    previous=read_or_missing(f,folder,name)
    data=(HERE/local).read_bytes()
-   if previous is None and name!='n7-europeana-api.js':raise RuntimeError('N7_PROGRESS_MISSING_EXISTING_FILE_'+name)
+   if previous is None and name!='europeana-api.js':raise RuntimeError('N7_PROGRESS_MISSING_EXISTING_FILE_'+name)
    if name=='app.js':
     data=make_ui(previous,data)
     if len(data)<len(previous)-10000:raise RuntimeError('N7_PROGRESS_LIVE_UI_TRUNCATION')
@@ -94,7 +94,7 @@ def main():
    elif name=='n7-public-web-search.js':
     if b'N7_HISTORICAL_DEEP_READING_V1' not in previous or b'N7_SOURCE_PRIORITY_CONTEXT_V2' not in data or b'N7_EUROPEANA_SEARCH_INTEGRATION_V1' not in data:
      raise RuntimeError('N7_PROGRESS_RESEARCH_HELPER_UNEXPECTED')
-   elif name=='n7-europeana-api.js':
+   elif name=='europeana-api.js':
     if b'N7_EUROPEANA_API_V1' not in data:raise RuntimeError('N7_EUROPEANA_MODULE_INVALID')
    check(data)
    if previous!=data:changes.append((folder,name,previous,data))
