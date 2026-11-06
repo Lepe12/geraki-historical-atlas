@@ -102,17 +102,19 @@ try:
         time.sleep(5)
     else:
         print(json.dumps({"status":"HTTP_SMOKE_UNCONFIRMED","files_installed":True}))
-        sys.exit(1)
+        raise RuntimeError("HTTP_SMOKE_FAILED")
 except Exception as err:
     print(json.dumps({"status":"BRIDGE_DEPLOY_FAILED","phase":phase,"error_type":type(err).__name__,
                       "reason":str(err) if isinstance(err,RuntimeError) and re.fullmatch(r"[A-Z_]+",str(err)) else None}))
-    if phase not in ("HTTP_SMOKE",):
+    if active:
         for name in reversed(active):
             try:
                 ftp.delete(name)
                 ftp.rename(remoteBackups[name],name)
             except Exception:
                 print("ROLLBACK_REQUIRES_MANUAL_CHECK",name)
+        try:upload("tmp/restart.txt",b"")
+        except Exception:print("ROLLBACK_RESTART_REQUIRES_MANUAL_CHECK")
     sys.exit(1)
 finally:
     for stage in stages:
