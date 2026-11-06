@@ -7,7 +7,7 @@
  const overview=$('researchOverview'),drawer=$('resultsDrawer');
  if(!overview||!drawer)return;
  const scroll=()=>drawer.querySelector('.v2-scroll')||drawer;
- let mode='research',detailReturn='research',snapshot=null,sourceRows=[];
+ let mode='research',detailReturn='research',snapshot=null,sourceRows=[],routing=false;
  const shell=view=>document.querySelector('[data-nxs-view="'+view+'"]')?.click();
  const navState=()=>{
   document.querySelectorAll('[data-atlas-nav]').forEach(button=>{
@@ -65,6 +65,7 @@
   onReset:()=>{snapshot=null;sourceRows=[];search.value='';renderSources();}
  })).catch(()=>{empty.textContent='Οι πηγές δεν είναι διαθέσιμες αυτή τη στιγμή. Δοκιμάστε ανανέωση.';});
  function show(next,{focus=true}={}){
+  routing=true;
   mode=next;body.dataset.readerView=next;
   sourceSection.hidden=next!=='sources';
   if(next==='map'){
@@ -82,6 +83,7 @@
     scroll().scrollTop=0;
    }
   }
+  routing=false;
   navState();
   requestAnimationFrame(()=>{
    navState();
@@ -106,6 +108,7 @@
    event.preventDefault();event.stopImmediatePropagation();show('research');return;
   }
   if(target.id==='closeDetail'){
+   if(routing)return;
    // Let the inspector clear its own state, then return to its parent workspace.
    const back=detailReturn;setTimeout(()=>show(back,{focus:false}),0);return;
   }
