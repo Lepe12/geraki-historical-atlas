@@ -1,0 +1,39 @@
+    if(p==='/api/library/upload'){
+      if(req.method!=='POST')return json(res,405,{error:'Method not allowed'});
+      if(!String(req.headers['content-type']||'').toLowerCase().startsWith('application/pdf'))
+        return json(res,415,{error:'PDF required'});
+      const filename=String(req.headers['x-file-name']||'Historical source.pdf');
+      if(filename.length>600)return json(res,400,{error:'Invalid PDF filename'});
+      const chunks=[];let size=0;
+      for await(const chunk of req){
+        size+=chunk.length;
+        if(size>25*1024*1024)return json(res,413,{error:'Maximum PDF size is 25 MB'});
+        chunks.push(chunk);
+      }
+      const raw=Buffer.concat(chunks);
+      if(raw.length<5||raw.subarray(0,5).toString('ascii')!=='%PDF-')
+        return json(res,415,{error:'Invalid PDF header'});
+      let key;
+      try{key=fs.readFileSync(path.join(__dirname,'.n7-library-bridge-key'));}
+      catch(_){return json(res,503,{error:'Private historical library is unavailable'});}
+      if(key.length!==32)return json(res,503,{error:'Private historical library is unavailable'});
+      const ts=String(Math.floor(Date.now()/1000));
+      const digest=crypto.createHash('sha256').update(raw).digest('hex');
+      const signature=historicalResearch.signature(key,digest,ts);
+      const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),175000);
+      try{
+        const upstream=await fetch('https://pct-live.piratecartography.com/pct-api/live/n7/library/upload-signed',{
+          method:'POST',redirect:'error',signal:controller.signal,body:raw,
+          headers:{'Content-Type':'application/pdf','X-File-Name':filename,
+            'X-N7-Library-Ts':ts,'X-N7-Library-Signature':signature}
+        });
+        const result=await upstream.json().catch(()=>({}));
+        if(upstream.status===201&&result.status==='DATABASE_COMMITTED')
+          return json(res,201,{status:'IMPORTED',source_id:result.source_id,
+            imported_pages:result.imported_pages,historically_verified:false});
+        return json(res,upstream.status===413?413:503,{
+          error:result.reason||result.error||'PDF could not be fully indexed',
+          imported_pages:Number(result.imported_pages)||0});
+      }catch(_){return json(res,503,{error:'PDF upload or extraction timed out'});}
+      finally{clearTimeout(timeout);}
+    }
