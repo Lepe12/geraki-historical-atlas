@@ -46,12 +46,11 @@ try:
     server=fetch("server.js")
     html=fetch("public/index.html")
     if b"Independent AI Bot" not in html:raise RuntimeError("WRONG_CHAT")
-    anchor=b"    if(!session(req))return json(res,401,{error:'Authentication required'});"
     if b"if(p==='/api/library/search')" not in server:
-        if server.count(anchor)!=1:
-            print(json.dumps({"bot_session_lines":[line.decode("utf-8","replace")[:250] for line in server.splitlines() if b"session(req)" in line][:8]}))
-            raise RuntimeError("BOT_SESSION_ANCHOR_CHANGED")
-        server=server.replace(anchor,anchor+b"\n"+route)
+        guard=re.search(rb"(?m)^([ \\t]*)if \\(!session\\(req\\)\\) \\{\\r?\\n(?:[^\\r\\n]*\\r?\\n){1,6}?\\1\\}\\r?\\n",server)
+        if not guard:
+            raise RuntimeError("BOT_GLOBAL_SESSION_GUARD_CHANGED")
+        server=server[:guard.end()]+route+server[guard.end():]
     elif b"x-n7-library-signature" not in server and b"X-N7-Library-Signature" not in server:
         raise RuntimeError("UNVERIFIED_BOT_LIBRARY_ROUTE")
     with tempfile.TemporaryDirectory() as d:
