@@ -22,32 +22,47 @@ function readPrivateLibrary(command,arg) {
 
 // Dedicated OAuth-protected PDF ingestion; avoids changing the existing app.js upload code.
 async function privateLibraryUpload(req,rawOverride=null){
-  const max=25*1024*1024;
-  const chunks=[];let bytes=0;
-  if(!rawOverride){
-    for await(const part of req){
-      bytes+=part.length;
-      if(bytes>max)throw new Error("PDF_TOO_LARGE");
-      chunks.push(part);
+  const diskFile=typeof rawOverride==="string"?rawOverride:null;
+  const max=diskFile?200*1024*1024:25*1024*1024;
+  const chunks=[];let bytes=0;let raw=null,digest;
+  if(diskFile){
+    const info=fs.statSync(diskFile);
+    if(!info.isFile()||info.size<5||info.size>max)throw new Error("INVALID_PDF_SIZE");
+    const fd=fs.openSync(diskFile,"r"),head=Buffer.alloc(5);
+    try{fs.readSync(fd,head,0,5,0);}finally{fs.closeSync(fd);}
+    if(head.toString("ascii")!=="%PDF-")throw new Error("INVALID_PDF");
+    const hash=crypto.createHash("sha256");
+    for await(const chunk of fs.createReadStream(diskFile,{highWaterMark:512*1024}))hash.update(chunk);
+    digest=hash.digest("hex");
+  }else{
+    if(rawOverride!==null)raw=rawOverride;
+    else{
+      for await(const part of req){
+        bytes+=part.length;
+        if(bytes>max)throw new Error("PDF_TOO_LARGE");
+        chunks.push(part);
+      }
+      raw=Buffer.concat(chunks);
     }
+    if(!Buffer.isBuffer(raw)||raw.length>max||raw.length<5||raw.subarray(0,5).toString("ascii")!=="%PDF-")
+      throw new Error("INVALID_PDF");
+    digest=crypto.createHash("sha256").update(raw).digest("hex");
   }
-  const raw=rawOverride||Buffer.concat(chunks);
-  if(raw.length>max)throw new Error("PDF_TOO_LARGE");
-  if(raw.length<5||raw.subarray(0,5).toString("ascii")!=="%PDF-")
-    throw new Error("INVALID_PDF");
-  const digest=crypto.createHash("sha256").update(raw).digest("hex");
   const dataRoot=process.env.PCT_KNOWLEDGE_DIR||path.join(__dirname,"knowledge-data");
   const originals=path.join(dataRoot,"uploads");
   fs.mkdirSync(originals,{recursive:true,mode:0o700});
   const full=path.join(originals,"n7-library-"+digest+".pdf");
-  try{fs.writeFileSync(full,raw,{flag:"wx",mode:0o600});}
-  catch(error){if(error.code!=="EEXIST")throw error;}
-  if(crypto.createHash("sha256").update(fs.readFileSync(full)).digest("hex")!==digest)
-    throw new Error("SOURCE_CHECKSUM_FAILED");
+  try{
+    if(diskFile)fs.copyFileSync(diskFile,full,fs.constants.COPYFILE_EXCL);
+    else fs.writeFileSync(full,raw,{flag:"wx",mode:0o600});
+  }catch(error){if(error.code!=="EEXIST")throw error;}
+  const copyHash=crypto.createHash("sha256");
+  for await(const part of fs.createReadStream(full,{highWaterMark:512*1024}))copyHash.update(part);
+  if(copyHash.digest("hex")!==digest)throw new Error("SOURCE_CHECKSUM_FAILED");
   const replay=await new Promise((resolve,reject)=>execFile(
     process.env.PCT_PYTHON_BIN||"python3",
     [path.join(__dirname,"pdf-evidence.py"),full],
-    {timeout:150000,maxBuffer:32*1024*1024},(error,stdout)=>{
+    {timeout:300000,maxBuffer:32*1024*1024},(error,stdout)=>{
       let parsed;try{parsed=JSON.parse(stdout);}catch(_){return reject(new Error("PDF_EXTRACTION_FAILED"));}
       if(error||parsed.error)return reject(new Error("PDF_EXTRACTION_LIMIT_OR_FAILURE"));
       resolve(parsed);
@@ -62,12 +77,12 @@ async function privateLibraryUpload(req,rawOverride=null){
   const batches=path.join(dataRoot,"library-batches",digest);
   fs.mkdirSync(batches,{recursive:true,mode:0o700});
   const cli=path.resolve(__dirname,"../../tools/library/n7_library.php");
-  let imported=0;
+  let imported=0,searchable=0,pendingOCR=0;
   for(let i=0;i<replay.pages.length;i+=20){
     const pageGroup=replay.pages.slice(i,i+20);
     const pageRows=pageGroup.map(pg=>({
       scan_index:Number(pg.page),printed_page:pg.printed_page==null?null:String(pg.printed_page),
-      text:String(pg.text||""),ocr_status:"UNREVIEWED"
+      text:String(pg.text||""),ocr_status:pg.method==="OCR_DEFERRED"?"OCR_PENDING":"UNREVIEWED"
     }));
     if(pageRows.some(p=>!Number.isSafeInteger(p.scan_index)||p.scan_index<1))
       throw new Error("PAGE_INDEX_INVALID");
@@ -89,8 +104,11 @@ async function privateLibraryUpload(req,rawOverride=null){
       return {status:"STAGED",source_id:digest,imported_pages:imported,
         reason:"LIBRARY_DB_IMPORT_NOT_CONFIRMED",historically_verified:false};
     imported+=pageRows.length;
+    searchable+=pageRows.filter(pg=>pg.ocr_status!=="OCR_PENDING"&&pg.text.trim().length).length;
+    pendingOCR+=pageRows.filter(pg=>pg.ocr_status==="OCR_PENDING").length;
   }
   return {status:"DATABASE_COMMITTED",source_id:digest,imported_pages:imported,
+    searchable_pages:searchable,ocr_pending_pages:pendingOCR,
     printed_pages_inferred:false,historically_verified:false};
 }
 
@@ -107,32 +125,43 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
       if(!String(req.headers["content-type"]||"").toLowerCase().startsWith("application/pdf")){
         json(res,415,{error:"pdf_required"});return true;
       }
-      const chunks=[];let total=0;const max=25*1024*1024;
+      const max=200*1024*1024,folder=fs.mkdtempSync(path.join(os.tmpdir(),"n7-private-pdf-"));
+      const staged=path.join(folder,"incoming.pdf");
+      const digestHash=crypto.createHash("sha256");
+      let fd=null,total=0,validPDF=true,header=Buffer.alloc(0);
       try{
+        fd=fs.openSync(staged,"wx",0o600);
         for await(const part of req){
           total+=part.length;
-          if(total>max){json(res,413,{error:"pdf_exceeds_limit"});return true;}
-          chunks.push(part);
+          if(total>max)throw new Error("PDF_TOO_LARGE");
+          if(header.length<5)header=Buffer.concat([header,part.subarray(0,5-header.length)]);
+          digestHash.update(part);
+          let written=0;
+          while(written<part.length)written+=fs.writeSync(fd,part,written,part.length-written);
         }
-      }catch(_){json(res,400,{error:"invalid_pdf_body"});return true;}
-      const raw=Buffer.concat(chunks);
-      if(raw.length<5||raw.subarray(0,5).toString("ascii")!=="%PDF-"){
-        json(res,415,{error:"invalid_pdf_magic"});return true;
-      }
-      const digest=crypto.createHash("sha256").update(raw).digest("hex");
-      if(!libraryBridgeVerifier(req,digest)){
-        json(res,401,{error:"signed_upload_required"});return true;
-      }
-      try{
-        const outcome=await libraryUploadRunner(req,raw);
+        fs.closeSync(fd);fd=null;
+        validPDF=total>=5&&header.toString("ascii")==="%PDF-";
+        if(!validPDF){json(res,415,{error:"invalid_pdf_magic"});return true;}
+        const digest=digestHash.digest("hex");
+        if(!libraryBridgeVerifier(req,digest)){json(res,401,{error:"signed_upload_required"});return true;}
+        const outcome=await libraryUploadRunner(req,staged);
         const committed=outcome?.status==="DATABASE_COMMITTED";
         json(res,committed?201:503,{
           schema:"n7-private-pdf-import-v1",
-          status:outcome.status,source_id:outcome.source_id||null,
-          imported_pages:outcome.imported_pages||0,historically_verified:false,
-          ...(committed?{}:{reason:outcome.reason||"import_not_confirmed"})
+          status:outcome?.status||"UNKNOWN",source_id:outcome?.source_id||null,
+          imported_pages:outcome?.imported_pages||0,
+          searchable_pages:outcome?.searchable_pages||0,
+          ocr_pending_pages:outcome?.ocr_pending_pages||0,
+          historically_verified:false,
+          ...(committed?{}:{reason:outcome?.reason||"import_not_confirmed"})
         });
-      }catch(_){json(res,503,{error:"pdf_extraction_or_import_unavailable"});}
+      }catch(error){
+        json(res,error.message==="PDF_TOO_LARGE"?413:503,
+          {error:error.message==="PDF_TOO_LARGE"?"pdf_exceeds_200mb":"pdf_extraction_or_import_unavailable"});
+      }finally{
+        if(fd!==null)try{fs.closeSync(fd);}catch(_){}
+        try{fs.rmSync(folder,{recursive:true,force:true});}catch(_){}
+      }
       return true;
     }
     // Import only two rights-verified, fixed Gutenberg works over the authenticated host bridge.
