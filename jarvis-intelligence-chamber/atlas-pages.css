@@ -1,0 +1,946 @@
+/* NABOU Atlas — home vs research page states (cinematic portolan UI).
+   Explicit mutually exclusive page roots; the live map stays full-bleed. */
+
+:root {
+  --atlas-ink: #f4efe4;
+  --atlas-muted: rgba(244, 239, 228, 0.72);
+  --atlas-gold: #c4a574;
+  --atlas-gold-line: rgba(196, 165, 116, 0.55);
+  --atlas-panel: rgba(8, 28, 30, 0.88);
+  --atlas-panel-edge: rgba(196, 165, 116, 0.28);
+  --atlas-teal: #0a2324;
+  --atlas-pill: #d4c4a8;
+  --atlas-serif: "EB Garamond", "Source Serif 4", Georgia, "Times New Roman", serif;
+  --atlas-sans: "Noto Sans", system-ui, sans-serif;
+}
+
+html, body.atlas-ui {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #0a1618;
+  color: var(--atlas-ink);
+}
+
+body.atlas-ui {
+  font-family: var(--atlas-sans);
+}
+
+/* —— Shared full-bleed map host —— */
+body.atlas-ui #viewport,
+body.atlas-ui #stage {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  display: block !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+body.atlas-ui #stage {
+  --nx-k: 1 !important;
+  --nx-x: 0 !important;
+  --nx-y: 0 !important;
+  --nx-dw: 0 !important;
+}
+
+body.atlas-ui #chartFrame {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  z-index: 1;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+body.atlas-ui #chartView,
+body.atlas-ui #chartStage,
+body.atlas-ui #chartPlane {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+body.atlas-ui #chartFrame .bandH,
+body.atlas-ui #chartFrame .bandV,
+body.atlas-ui #chartFrame .rope,
+body.atlas-ui #chartFrame .grain {
+  opacity: 0.35;
+}
+
+/* Parchment atmosphere over the live map (visual only). */
+body.atlas-ui #atlasMapVeil {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 40%, transparent 40%, rgba(8, 16, 14, 0.38) 100%),
+    linear-gradient(180deg, rgba(12, 22, 20, 0.18), transparent 28%, transparent 72%, rgba(8, 14, 12, 0.28));
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+}
+
+body.atlas-ui[data-atlas-page="home"] #atlasMapVeil {
+  opacity: 1;
+  background:
+    radial-gradient(ellipse at 45% 45%, transparent 35%, rgba(20, 14, 8, 0.45) 100%),
+    linear-gradient(to bottom, rgba(18, 12, 8, 0.22), transparent 30%, transparent 70%, rgba(12, 10, 6, 0.35));
+}
+
+/* Zoom / reset stay with the live map */
+body.atlas-ui .nxs-3d-tools {
+  position: absolute !important;
+  right: 22px !important;
+  top: 50% !important;
+  transform: translateY(-50%);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+body.atlas-ui .nxs-3d-tools button {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(10, 24, 26, 0.78);
+  border: 1px solid var(--atlas-gold-line);
+  color: var(--atlas-gold);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+body.atlas-ui .nxs-3d-tools button svg {
+  width: 20px;
+  height: 20px;
+  margin: 10px auto 0;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+
+body.atlas-ui .nxs-3d-tools #resetView {
+  /* Keep reset for map; home mockup shows +/− only — hide reset on home */
+}
+
+body.atlas-ui[data-atlas-page="home"] .nxs-3d-tools #resetView {
+  display: none;
+}
+
+body.atlas-ui .nxs-telemetry {
+  position: absolute !important;
+  right: 24px !important;
+  bottom: 14px !important;
+  left: auto !important;
+  z-index: 5;
+  display: flex;
+  gap: 14px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: rgba(232, 220, 190, 0.55);
+  font: 500 11px/1.2 var(--atlas-sans);
+  letter-spacing: 0.04em;
+}
+
+body.atlas-ui[data-atlas-page="home"] .nxs-telemetry {
+  display: none;
+}
+
+body.atlas-ui[data-atlas-page="research"] .nxs-telemetry #coordinates {
+  display: none;
+}
+
+/* —— Page roots: only one visible —— */
+.atlas-page {
+  position: fixed;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+}
+
+.atlas-page[hidden] {
+  display: none !important;
+}
+
+.atlas-page > * {
+  pointer-events: auto;
+}
+
+/* Brand + top nav shared */
+.atlas-brand {
+  position: absolute;
+  top: 28px;
+  left: 36px;
+  z-index: 9;
+  color: var(--atlas-ink);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
+}
+
+.atlas-brand .atlas-n7 {
+  display: block;
+  margin: 0;
+  font: 600 42px/0.95 var(--atlas-serif);
+  letter-spacing: 0.04em;
+}
+
+.atlas-brand .atlas-n7::after {
+  content: "";
+  display: block;
+  width: 2.6em;
+  height: 1px;
+  margin-top: 6px;
+  background: rgba(244, 239, 228, 0.55);
+}
+
+.atlas-brand .atlas-sub {
+  display: block;
+  margin-top: 8px;
+  font: italic 500 15px/1.2 var(--atlas-serif);
+  letter-spacing: 0.02em;
+  color: var(--atlas-muted);
+}
+
+.atlas-topnav {
+  position: absolute;
+  top: 36px;
+  right: 40px;
+  z-index: 9;
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  font: 500 16px/1 var(--atlas-serif);
+  color: var(--atlas-ink);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+}
+
+.atlas-topnav button {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 6px 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  opacity: 0.88;
+}
+
+.atlas-topnav button:hover,
+.atlas-topnav button[aria-current="page"] {
+  opacity: 1;
+}
+
+.atlas-topnav button[aria-current="page"] {
+  box-shadow: inset 0 -2px 0 var(--atlas-gold);
+  text-shadow: 0 0 12px rgba(120, 180, 220, 0.35);
+}
+
+/* —— HOME: Leonidas’s uploaded image, not the live chamber map —— */
+#atlasHome.atlas-home-exact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a120c;
+  pointer-events: auto;
+}
+#atlasHome .atlas-home-frame {
+  position: relative;
+  width: min(100vw, calc(100vh * 1672 / 941));
+  height: min(100vh, calc(100vw * 941 / 1672));
+  max-width: 100%;
+  max-height: 100%;
+}
+#atlasHome .atlas-home-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  z-index: 1;
+  pointer-events: none;
+}
+#atlasHome .atlas-brand,
+#atlasHome .atlas-ship,
+#atlasHome .atlas-longitude,
+#atlasHome .atlas-compass-rose {
+  display: none;
+}
+#atlasHome .atlas-topnav {
+  top: 4.6%;
+  right: 5.2%;
+  z-index: 3;
+}
+#atlasHome .atlas-topnav button {
+  color: transparent;
+  text-shadow: none;
+  box-shadow: none;
+  min-width: 4.2em;
+}
+#atlasHome .atlas-topnav button[aria-current="page"] {
+  box-shadow: none;
+}
+#atlasHome .atlas-home-hero {
+  left: 5.4%;
+  top: 41%;
+  transform: none;
+  z-index: 3;
+}
+#atlasHome .atlas-home-hero h1 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+#atlasHome .atlas-explore {
+  min-width: 0;
+  width: 9.6em;
+  height: 2.55em;
+  color: transparent;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+body.atlas-ui[data-atlas-page="home"] #chartFrame,
+body.atlas-ui[data-atlas-page="home"] .nxs-3d-tools,
+body.atlas-ui[data-atlas-page="home"] .nxs-telemetry,
+body.atlas-ui[data-atlas-page="home"] #atlasMapVeil {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* —— HOME —— */
+.atlas-home-hero {
+  position: absolute;
+  left: 48px;
+  top: 42%;
+  transform: translateY(-50%);
+  max-width: min(420px, 42vw);
+  z-index: 9;
+}
+
+.atlas-home-hero h1 {
+  margin: 0 0 22px;
+  font: 500 44px/1.15 var(--atlas-serif);
+  color: var(--atlas-ink);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+}
+
+.atlas-explore {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 148px;
+  height: 44px;
+  padding: 0 22px;
+  border: 1px solid var(--atlas-gold-line);
+  background: rgba(12, 22, 20, 0.35);
+  color: var(--atlas-ink);
+  font: 500 16px/1 var(--atlas-serif);
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  backdrop-filter: blur(2px);
+}
+
+.atlas-explore:hover {
+  border-color: var(--atlas-gold);
+  background: rgba(12, 22, 20, 0.5);
+}
+
+.atlas-ship {
+  position: absolute;
+  left: 38%;
+  top: 58%;
+  width: min(110px, 9vw);
+  height: auto;
+  z-index: 3;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
+  opacity: 0.92;
+}
+
+.atlas-longitude {
+  position: absolute;
+  left: 8%;
+  right: 18%;
+  bottom: 18px;
+  z-index: 9;
+  height: 28px;
+  pointer-events: none;
+  border-top: 1px solid rgba(244, 239, 228, 0.45);
+  display: flex;
+  justify-content: space-between;
+  padding-top: 6px;
+  font: 500 12px/1 var(--atlas-sans);
+  color: rgba(244, 239, 228, 0.7);
+  letter-spacing: 0.04em;
+}
+
+.atlas-compass-rose {
+  position: absolute;
+  right: 36px;
+  bottom: 36px;
+  width: 96px;
+  height: 96px;
+  z-index: 9;
+  pointer-events: none;
+  opacity: 0.9;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+}
+
+/* —— RESEARCH —— */
+.atlas-research-panel {
+  position: absolute;
+  top: 92px;
+  right: 18px;
+  bottom: 100px;
+  width: min(420px, 34vw);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  background: var(--atlas-panel);
+  border: 1px solid var(--atlas-panel-edge);
+  border-radius: 4px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  color: var(--atlas-ink);
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+
+.atlas-research-panel .atlas-panel-head {
+  flex: 0 0 auto;
+  padding: 16px 18px 10px;
+  border-bottom: 1px solid rgba(196, 165, 116, 0.18);
+}
+
+.atlas-crumb {
+  margin: 0 0 8px;
+  font: 500 12px/1.3 var(--atlas-sans);
+  letter-spacing: 0.04em;
+  color: #7dcea0;
+}
+
+.atlas-panel-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.atlas-panel-title-row h1 {
+  margin: 0;
+  font: 600 28px/1.15 var(--atlas-serif);
+}
+
+.atlas-panel-title-row .atlas-panel-sub {
+  display: block;
+  margin-top: 4px;
+  font: 600 11px/1.3 var(--atlas-sans);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--atlas-muted);
+}
+
+.atlas-close {
+  appearance: none;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  background: transparent;
+  color: var(--atlas-muted);
+  font: 400 22px/1 var(--atlas-sans);
+  cursor: pointer;
+}
+
+.atlas-close:hover {
+  color: var(--atlas-ink);
+}
+
+/* resultsDrawer becomes the panel body */
+body.atlas-ui.nx-mock[data-atlas-page="research"] #resultsDrawer,
+body.atlas-ui.nx-v2.nx-mock[data-atlas-page="research"] #resultsDrawer,
+body.atlas-ui.nx-mock[data-atlas-page="research"] #stage .results-drawer {
+  position: static !important;
+  left: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  inset: auto !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: none !important;
+  max-height: none !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  margin: 0 !important;
+  padding: 0 14px 16px !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: auto !important;
+  transform: none !important;
+  z-index: auto !important;
+}
+
+/* Drawer .hidden respected so agents/PDF can take the surface. */
+
+
+body.atlas-ui[data-atlas-page="home"] #resultsDrawer {
+  display: none !important;
+}
+
+body.atlas-ui[data-atlas-page="research"] #resultsDrawer .results-head {
+  display: none; /* replaced by atlas panel head */
+}
+
+body.atlas-ui[data-atlas-page="research"] #resultsDrawer .results-summary {
+  margin: 8px 0 12px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+body.atlas-ui[data-atlas-page="research"] #resultsDrawer .dossier-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 14px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+body.atlas-ui[data-atlas-page="research"] #resultsDrawer .dossier-navigation button {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 7px 12px;
+  background: transparent;
+  color: var(--atlas-muted);
+  font: 500 13px/1 var(--atlas-sans);
+  cursor: pointer;
+}
+
+body.atlas-ui[data-atlas-page="research"] #resultsDrawer .dossier-navigation button[aria-current="true"],
+body.atlas-ui[data-atlas-page="research"] #resultsDrawer .dossier-navigation button.is-active,
+body.atlas-ui[data-atlas-page="research"] #resultsDrawer .dossier-navigation button.is-current,
+body.atlas-ui[data-atlas-page="research"] #resultsDrawer .dossier-navigation button[aria-pressed="true"] {
+  background: var(--atlas-pill);
+  color: #2a2118;
+}
+
+/* Bottom filters + search */
+.atlas-research-filters {
+  position: absolute;
+  left: 18px;
+  bottom: 22px;
+  z-index: 9;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: min(520px, 46vw);
+}
+
+body.atlas-ui[data-atlas-page="research"] #histList,
+body.atlas-ui[data-atlas-page="research"] #cards {
+  position: static !important;
+  inset: auto !important;
+  display: flex !important;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 6px 8px !important;
+  background: rgba(8, 28, 30, 0.82) !important;
+  border: 1px solid var(--atlas-panel-edge) !important;
+  border-radius: 4px;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+body.atlas-ui[data-atlas-page="home"] #histList,
+body.atlas-ui[data-atlas-page="home"] #cards {
+  display: none !important;
+}
+
+body.atlas-ui[data-atlas-page="research"] #histList .hist,
+body.atlas-ui[data-atlas-page="research"] #cards .card {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 6px 10px !important;
+  background: transparent !important;
+  border: 0 !important;
+  color: var(--atlas-ink) !important;
+  font: 600 11px/1.2 var(--atlas-sans) !important;
+  letter-spacing: 0.08em;
+}
+
+body.atlas-ui[data-atlas-page="research"] #cards .card .pic,
+body.atlas-ui[data-atlas-page="research"] #cards .card .cnt,
+body.atlas-ui[data-atlas-page="research"] #histList #histDash {
+  display: none !important;
+}
+
+.atlas-askbar {
+  position: absolute;
+  left: max(540px, 48%);
+  right: 18px;
+  bottom: 22px;
+  z-index: 11;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  min-height: 48px;
+  background: rgba(8, 28, 30, 0.9);
+  border: 1px solid var(--atlas-panel-edge);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+body.atlas-ui[data-atlas-page="home"] .atlas-askbar,
+body.atlas-ui[data-atlas-page="home"] #operatorCommand {
+  display: none !important;
+}
+
+body.atlas-ui.nx-mock[data-atlas-page="research"] #operatorCommand,
+body.atlas-ui.nx-v2.nx-mock[data-atlas-page="research"] #operatorCommand {
+  position: static !important;
+  left: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  inset: auto !important;
+  display: flex !important;
+  flex: 1 1 auto !important;
+  align-items: center !important;
+  gap: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: none !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+  z-index: auto !important;
+  grid-template-columns: none !important;
+}
+
+body.atlas-ui[data-atlas-page="research"] #operatorCommand #qRule,
+body.atlas-ui[data-atlas-page="research"] #operatorCommand #qLabel,
+body.atlas-ui[data-atlas-page="research"] #operatorCommand #queryHelp,
+body.atlas-ui[data-atlas-page="research"] #operatorCommand #filters,
+body.atlas-ui[data-atlas-page="research"] #operatorCommand .quill,
+body.atlas-ui[data-atlas-page="research"] #operatorCommand #commandState {
+  display: none !important;
+}
+
+body.atlas-ui[data-atlas-page="research"] #operatorCommand #qBox {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0 14px;
+  background: transparent;
+  border: 0;
+}
+
+body.atlas-ui[data-atlas-page="research"] #operatorCommand #operatorQuery {
+  width: 100%;
+  min-height: 46px;
+  max-height: 120px;
+  margin: 0;
+  padding: 12px 0;
+  border: 0;
+  background: transparent;
+  color: var(--atlas-ink);
+  font: 500 15px/1.35 var(--atlas-sans);
+  resize: none;
+}
+
+body.atlas-ui[data-atlas-page="research"] #operatorCommand #executeQuery {
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--atlas-pill);
+  color: #2a2118;
+}
+
+body.atlas-ui[data-atlas-page="research"] #operatorCommand #executeQuery svg {
+  width: 22px;
+  height: 22px;
+  margin: 13px auto 0;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+/* —— Hide laboratory chrome as separate layouts (not stacked under atlas) —— */
+body.atlas-ui #v2welcome,
+body.atlas-ui #v2rail,
+body.atlas-ui #v2tabbar,
+body.atlas-ui #v2ToolsMenu,
+body.atlas-ui #v2AsideToggle,
+body.atlas-ui #v2ToolsBtn,
+body.atlas-ui #v2MoreBtn,
+body.atlas-ui .v2-legacy,
+body.atlas-ui #topbar,
+body.atlas-ui #sidenav,
+body.atlas-ui #moon,
+body.atlas-ui #banner,
+body.atlas-ui #workspaceWelcome,
+body.atlas-ui .v2-aside,
+body.atlas-ui #n7-live-test-button,
+body.atlas-ui [id^="n7-live"] {
+  display: none !important;
+}
+
+body.atlas-ui .v2-main {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  overflow: visible !important;
+  grid-area: unset !important;
+}
+
+/* Overlays (agents / pdf / activity / detail) still usable from research nav */
+body.atlas-ui #nxsAgentsPage,
+body.atlas-ui #learningPanel,
+body.atlas-ui #activityStrip,
+body.atlas-ui #detailPanel {
+  z-index: 20;
+}
+
+body.atlas-ui.v2-welcome-on {
+  /* welcome disabled in atlas UI */
+}
+
+body.atlas-ui.v2-welcome-on #v2welcome {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  .atlas-brand {
+    top: 16px;
+    left: 16px;
+  }
+  .atlas-brand .atlas-n7 {
+    font-size: 30px;
+  }
+  .atlas-topnav {
+    top: 18px;
+    right: 14px;
+    gap: 14px;
+    font-size: 14px;
+  }
+  .atlas-home-hero {
+    left: 20px;
+    right: 20px;
+    max-width: none;
+    top: auto;
+    bottom: 110px;
+    transform: none;
+  }
+  .atlas-home-hero h1 {
+    font-size: 32px;
+  }
+  .atlas-research-panel {
+    top: 70px;
+    left: 10px;
+    right: 10px;
+    bottom: 120px;
+    width: auto;
+  }
+  .atlas-research-filters {
+    left: 10px;
+    right: 10px;
+    bottom: 70px;
+    max-width: none;
+  }
+  .atlas-askbar {
+    left: 10px;
+    right: 10px;
+    bottom: 12px;
+  }
+  .atlas-ship,
+  .atlas-longitude,
+  .atlas-compass-rose {
+    display: none;
+  }
+  body.atlas-ui .nxs-3d-tools {
+    right: 12px;
+    top: auto;
+    bottom: 130px;
+    transform: none;
+  }
+}
+
+
+/* Beat legacy artboard absolute placement for atlas research chrome hosts */
+body.atlas-ui.nx-mock[data-atlas-page="research"] .atlas-askbar,
+body.atlas-ui.nx-v2.nx-mock[data-atlas-page="research"] .atlas-askbar {
+  position: absolute !important;
+  left: max(540px, 48%) !important;
+  right: 18px !important;
+  bottom: 18px !important;
+  top: auto !important;
+  width: auto !important;
+  height: 48px !important;
+  z-index: 12 !important;
+  display: flex !important;
+}
+
+body.atlas-ui.nx-mock[data-atlas-page="research"] .atlas-research-panel,
+body.atlas-ui.nx-v2.nx-mock[data-atlas-page="research"] .atlas-research-panel {
+  position: absolute !important;
+  top: 92px !important;
+  right: 18px !important;
+  bottom: 100px !important;
+  left: auto !important;
+  width: min(420px, 34vw) !important;
+  z-index: 10 !important;
+}
+
+body.atlas-ui.nx-mock[data-atlas-page="home"] #operatorCommand,
+body.atlas-ui.nx-mock[data-atlas-page="home"] #resultsDrawer,
+body.atlas-ui.nx-mock[data-atlas-page="home"] #histList,
+body.atlas-ui.nx-mock[data-atlas-page="home"] #cards {
+  display: none !important;
+}
+
+
+#atlasPanelSlot {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+body.atlas-ui.nx-mock[data-atlas-page="research"] #atlasPanelSlot #resultsDrawer {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  overflow: auto !important;
+}
+
+
+/* Secondary workspaces on research page: clear the bottom ask bar */
+body.atlas-ui[data-atlas-page="research"] #nxsAgentsPage:not(.hidden),
+body.atlas-ui[data-atlas-page="research"] #learningPanel:not(.hidden),
+body.atlas-ui[data-atlas-page="research"] #activityStrip:not(.hidden),
+body.atlas-ui[data-atlas-page="research"] #detailPanel:not(.hidden) {
+  position: fixed !important;
+  top: 92px !important;
+  left: 18px !important;
+  right: auto !important;
+  bottom: 100px !important;
+  width: min(520px, 42vw) !important;
+  max-width: calc(100vw - 36px) !important;
+  height: auto !important;
+  z-index: 20 !important;
+  transform: none !important;
+}
+
+body.atlas-ui[data-atlas-page="research"] #learningPanel:not(.hidden),
+body.atlas-ui[data-atlas-page="research"] #nxsAgentsPage:not(.hidden) {
+  /* When agents/PDF open, tuck the research panel aside visually */
+}
+
+body.atlas-ui[data-atlas-page="research"]:has(#nxsAgentsPage:not(.hidden)) .atlas-research-panel,
+body.atlas-ui[data-atlas-page="research"]:has(#learningPanel:not(.hidden)) .atlas-research-panel,
+body.atlas-ui[data-atlas-page="research"]:has(#detailPanel:not(.hidden)) .atlas-research-panel,
+body.atlas-ui[data-atlas-page="research"]:has(#activityStrip:not(.hidden)) .atlas-research-panel {
+  display: none !important;
+}
+
+
+/* Voice assistant launcher must not cover the research ask bar */
+body.atlas-ui #nabouAssistantLauncher {
+  right: 22px !important;
+  bottom: auto !important;
+  top: 100px !important;
+  z-index: 7 !important;
+}
+body.atlas-ui[data-atlas-page="research"] #nabouAssistantLauncher {
+  display: none !important;
+}
+
+
+/* Dossier tabs: not sticky over findings filters inside the atlas panel */
+body.atlas-ui[data-atlas-page="research"] #resultsDrawer .dossier-navigation {
+  position: static !important;
+  top: auto !important;
+  background: transparent !important;
+  border-bottom: 1px solid rgba(196, 165, 116, 0.18) !important;
+}
+
+
+@media (max-width: 900px) {
+  body.atlas-ui.nx-mock[data-atlas-page="research"] .atlas-askbar,
+  body.atlas-ui.nx-v2.nx-mock[data-atlas-page="research"] .atlas-askbar {
+    left: 10px !important;
+    right: 10px !important;
+    bottom: 12px !important;
+    width: auto !important;
+    height: 48px !important;
+  }
+  body.atlas-ui.nx-mock[data-atlas-page="research"] .atlas-research-panel,
+  body.atlas-ui.nx-v2.nx-mock[data-atlas-page="research"] .atlas-research-panel {
+    top: 70px !important;
+    left: 10px !important;
+    right: 10px !important;
+    bottom: 120px !important;
+    width: auto !important;
+  }
+  body.atlas-ui[data-atlas-page="research"] #nxsAgentsPage:not(.hidden),
+  body.atlas-ui[data-atlas-page="research"] #learningPanel:not(.hidden),
+  body.atlas-ui[data-atlas-page="research"] #activityStrip:not(.hidden),
+  body.atlas-ui[data-atlas-page="research"] #detailPanel:not(.hidden) {
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+    max-width: none !important;
+    top: 70px !important;
+    bottom: 120px !important;
+  }
+  body.atlas-ui .nxs-3d-tools {
+    right: 12px !important;
+    top: auto !important;
+    bottom: 130px !important;
+    transform: none !important;
+  }
+}
+
+
+/* redesign-v2 crumb inject — not part of atlas chrome */
+body.atlas-ui .v2-crumb,
+body.atlas-ui .v2-panel-chrome,
+body.atlas-ui .v2-x {
+  display: none !important;
+}
