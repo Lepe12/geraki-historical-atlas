@@ -1,0 +1,59 @@
+name: N7 autonomous public bibliography scout
+on:
+  pull_request:
+    paths:
+      - 'tools/library/n7_source_scout.py'
+      - '.github/workflows/n7-source-scout.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'ops_ftps_requests/n7-source-scout-run.json'
+  schedule:
+    - cron: '15 6 * * 1'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/library
+            ops_ftps_requests
+      - name: Validate source discovery logic and rights guards
+        run: |
+          python3 -m py_compile tools/library/n7_source_scout.py
+          python3 tools/library/n7_source_scout.py --self-test
+  scout:
+    if: github.event_name != 'pull_request'
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/library
+            ops_ftps_requests
+      - name: Verify explicit execution request on manual push
+        if: github.event_name == 'push'
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path("ops_ftps_requests/n7-source-scout-run.json").read_text())
+          assert x['authorization']=="RUN-N7-SOURCE-SCOUT"
+          assert x['scope']=="metadata-only"
+          PY
+      - name: Search public historical literature and classify citation candidates
+        run: python3 tools/library/n7_source_scout.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: n7-public-source-candidates
+          path: research/n7-source-candidates.json
+          retention-days: 30
+          if-no-files-found: error
