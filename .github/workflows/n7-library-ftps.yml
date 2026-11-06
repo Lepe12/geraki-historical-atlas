@@ -1,0 +1,64 @@
+name: N7 private library FTPS staging
+on:
+  push:
+    branches: [main]
+    paths:
+      - ops_ftps_requests/n7-library-deployment.json
+  pull_request:
+    paths:
+      - tools/library/**
+      - .github/workflows/n7-library-ftps.yml
+      - ops_ftps_requests/n7-library-deployment.json
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Validate without credentials, or upload library code to the existing server"
+        required: true
+        type: choice
+        options: [validate, stage]
+        default: validate
+      confirmation:
+        description: "For stage: STAGE-N7-LIBRARY"
+        required: false
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: n7-library-ftps
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax and parser tests
+        run: |
+          set -euo pipefail
+          python3 -m py_compile tools/library/n7_pdf_ingest.py tools/library/deploy_library_ftps.py
+          php -l tools/library/n7_library.php
+          php tools/library/n7_library.php self-test
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('ops_ftps_requests/n7-library-deployment.json')
+          if p.exists():
+              data=json.loads(p.read_text())
+              assert data == {'schema':'n7-library-staging-request-v1','mode':'stage','confirmation':'STAGE-N7-LIBRARY','scope':'tools/library-only'}
+          PY
+  stage:
+    needs: validate
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.mode == 'stage' && inputs.confirmation == 'STAGE-N7-LIBRARY') || github.event_name == 'push' }}
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_APP_ROOT: /piratecartography-gateway/server/command-center-live
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stage library files over existing FTPS connection
+        run: python3 tools/library/deploy_library_ftps.py
