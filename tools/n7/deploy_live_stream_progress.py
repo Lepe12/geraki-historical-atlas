@@ -117,7 +117,7 @@ def main():
    stages.remove((folder,stage));backups.append((folder,name,backup))
    if sha(read(f,folder,name))!=sha(data):raise RuntimeError('N7_PROGRESS_FINAL_HASH_MISMATCH')
   restart(f,'activate')
-  verify(next(v[3] for v in changes if v[1]=='app.js'))
+  verify(read(f,PUB,'app.js'))
   print('N7_PROGRESS_DEPLOY_SUCCESS=true')
  except BaseException:
   if not dry and backups:
