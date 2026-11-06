@@ -34,3 +34,21 @@ test('publisher full text is loaded only from trusted domain',async()=>{
  assert.equal(result.items[0].articleRead,true);
  assert.ok(result.items[0].articleText.length>400);
 });
+
+test('bibliography from actual article is placed before long article excerpts',()=>{
+ const {contextForResearch}=require('./public-web-search');
+ const research={searched:true,kind:'historical',query:'Pietro Lanza Corfu corsair',items:[{
+  title:'Πέτρος Λάντζας',source:'Pirate Cartography',url:'https://www.piratecartography.com/archives/114',
+  articleRead:true,articleText:'Α'.repeat(15000)
+ }],historicalAudit:{
+  articleUrl:'https://www.piratecartography.com/archives/114',
+  readCharacters:15000,bibliography:['Λάσκαρις: Πέτρος Λάντζας','Ιωάννου: Από τη Γαληνοτάτη στον Καθολικότατο'],
+  warnings:[],independentReignChecked:false
+ }};
+ const prompt=contextForResearch(research);
+ assert.ok(prompt.indexOf('Λάσκαρις')<prompt.indexOf('ACTUAL ARTICLE TEXT EXTRACTED'));
+ assert.ok(prompt.indexOf('Ιωάννου')<prompt.indexOf('ACTUAL ARTICLE TEXT EXTRACTED'));
+ assert.ok(prompt.length<9500,'source context exceeded bounded size: '+prompt.length);
+ assert.match(prompt,/MENTIONED, NOT READ/);
+ assert.match(prompt,/actual publisher article text extracted/i);
+});

@@ -264,16 +264,30 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
 
   emit('status',{stage:'model',message:'Οι πηγές ελέγχθηκαν. Το N7 συντάσσει την απάντηση…'});
   try{
+   let continuationFailure='';
+   const answerGuide={
+     role:'system',
+     content:'N7 RESPONSE COMPLETION: Answer the actual request concisely but completely. '+
+       'For a long historical question, start with sources read/not read and the bibliography '+
+       'and chronological inconsistencies, THEN give a compact timeline. '+
+       'Do not produce a year-by-year list longer than 12 key entries. '+
+       'If only the title/snippet is available, never claim to have read the full article.'
+   };
    for(let pass=0;pass<2;pass++){
+    // Follow-up is focused on the missing final sections, not a replay of the
+    // entire long answer or model context (which caused timeouts).
     const ask=pass?[
-      ...messages,{role:'assistant',content:final.slice(-4500)},
-      {role:'user',content:'Συνέχισε ακριβώς από εκεί που σταμάτησες, χωρίς επανάληψη.'}
-    ]:messages;
+      ...messages,answerGuide,
+      {role:'assistant',content:final.slice(-2400)},
+      {role:'user',content:'Συνέχισε ΑΜΕΣΩΣ μετά την τελευταία πρόταση, χωρίς να ξαναγράψεις όσα είπες. '+
+       'Ολοκλήρωσε σε έως 700 λέξεις και συμπερίλαβε οποιαδήποτε ελλείπουσα βιβλιογραφία, '+
+       'χρονολογική διασταύρωση και πηγές.'}
+    ]:[...messages,answerGuide];
     const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),modelDeadlineMs);
-    const request={model:MODEL,messages:ask,temperature:0.3,stream:true,
-      max_completion_tokens:1800};
+    const request={model:MODEL,messages:ask,temperature:0.25,stream:true,
+      max_completion_tokens:2400};
     if(BASE==='https://api.groq.com/openai/v1'&&MODEL==='qwen/qwen3.8-27b'){
-      request.reasoning_effort='none';request.max_completion_tokens=1800;
+      request.reasoning_effort='none';request.max_completion_tokens=2400;
     }
     let completion;
     try{
@@ -282,15 +296,25 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
         body:JSON.stringify(request),signal:controller.signal
       });
       completion=await readGroqStream(response,part=>{final+=part;emit('delta',{text:part})});
+    }catch(err){
+      if(!final)throw err;
+      continuationFailure=err.name==='AbortError'?'το χρονικό όριο':'πρόβλημα σύνδεσης με το μοντέλο';
+      emit('status',{stage:'partial',message:'Η συνέχεια διακόπηκε· διατηρώ την ήδη παραχθείσα απάντηση.'});
+      break;
     }finally{clearTimeout(timeout);}
     if(completion.reason!=='length'){done=true;break;}
     emit('status',{stage:'continuation',message:'Η απάντηση συνεχίζεται…'});
    }
+   if(!done&&continuationFailure) {
+     const note='\\n\\n[Η απάντηση δεν ολοκληρώθηκε λόγω '+continuationFailure+
+       '. Το διαθέσιμο κείμενο αποθηκεύτηκε. Γράψε «συνέχισε» για τα υπόλοιπα.]';
+     final+=note;emit('delta',{text:note});
+   }
    if(!final)throw Error('Το μοντέλο δεν έστειλε κείμενο');
    const footer=publicSearch.sourceFooter(evidence);
    if(footer){final+=footer;emit('delta',{text:footer});}
-   if(!done){
-    const note='\n\n[Η απάντηση διακόπηκε στο όριο μήκους· γράψε «συνέχισε».]';
+   if(!done&&!continuationFailure){
+    const note='\n\n[Η απάντηση έφτασε στο όριο μήκους. Γράψε «συνέχισε» για τα υπόλοιπα.]';
     final+=note;emit('delta',{text:note});
    }
    const fresh=load(),current=fresh.find(c=>c.id===id);
