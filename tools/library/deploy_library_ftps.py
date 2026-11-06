@@ -8,6 +8,8 @@ import os
 from pathlib import Path
 import posixpath
 import ssl
+import socket
+import re
 import sys
 import uuid
 
@@ -17,6 +19,7 @@ HOST = os.environ["PCT_FTPS_HOST"]
 USER = os.environ["PCT_FTPS_USER"]
 PASSWORD = os.environ["PCT_FTPS_PASSWORD"]
 PORT = int(os.environ.get("PCT_FTPS_PORT", "21"))
+TLS_NAME = os.environ.get("PCT_FTPS_TLS_SERVER_NAME", "").strip().rstrip(".")
 APP = os.environ.get("PCT_FTPS_APP_ROOT", "/piratecartography-gateway/server/command-center-live")
 if APP != "/piratecartography-gateway/server/command-center-live":
     raise SystemExit("BLOCKED_UNEXPECTED_APP_ROOT")
@@ -27,7 +30,16 @@ backup, staged, installed, remote_backup = {}, [], [], {}
 runid = uuid.uuid4().hex[:12]
 phase = "CONNECT"
 try:
+    if TLS_NAME:
+        if len(TLS_NAME)>253 or not re.fullmatch(r'[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?', TLS_NAME):
+            raise RuntimeError("INVALID_TLS_SERVER_NAME")
+        configured={addr[4][0] for addr in socket.getaddrinfo(HOST,PORT,type=socket.SOCK_STREAM)}
+        certname={addr[4][0] for addr in socket.getaddrinfo(TLS_NAME,PORT,type=socket.SOCK_STREAM)}
+        if not configured.intersection(certname):
+            raise RuntimeError("TLS_NAME_NOT_MATCHING_HOST")
     ftp.connect(HOST, PORT)
+    if TLS_NAME:
+        ftp.host=TLS_NAME
     phase = "AUTH"
     ftp.login(USER, PASSWORD)
     ftp.prot_p()
