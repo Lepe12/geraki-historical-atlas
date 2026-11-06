@@ -33,10 +33,23 @@ def verify(expected_ui):
   with urllib.request.urlopen(urllib.request.Request(BASE+route,headers={'Cache-Control':'no-cache'}),timeout=18,context=ctx) as r:
    v=json.loads(r.read(18000))
    if r.status!=200 or not v.get('modelConfigured'):raise RuntimeError('N7_PROGRESS_MODEL_UNAVAILABLE')
- with urllib.request.urlopen(urllib.request.Request(BASE+'/app.js',headers={'Cache-Control':'no-cache'}),timeout=18,context=ctx) as r:
-  data=r.read(700000)
-  if sha(data)!=sha(expected_ui) or MARKER not in data or b"event.type==='status'" not in data:
-   raise RuntimeError('N7_PROGRESS_UI_NOT_SERVED')
+ import time
+ verified=False
+ for attempt in range(1,7):
+  query='?n7progress='+secrets.token_hex(7)
+  req=urllib.request.Request(BASE+'/app.js'+query,headers={'Cache-Control':'no-cache','Pragma':'no-cache'})
+  with urllib.request.urlopen(req,timeout=18,context=ctx) as r:
+   data=r.read(900000)
+  hash_match=sha(data)==sha(expected_ui)
+  marker_ok=MARKER in data
+  status_ok=b"event.type==='status'" in data
+  print('N7_PROGRESS_SERVE_CHECK attempt='+str(attempt)+' hashMatch='+str(hash_match)+
+    ' marker='+str(marker_ok)+' status='+str(status_ok)+
+    ' length='+str(len(data))+' expected='+str(len(expected_ui)))
+  if hash_match and marker_ok and status_ok:
+   verified=True;break
+  if attempt<6:time.sleep(2)
+ if not verified:raise RuntimeError('N7_PROGRESS_UI_NOT_SERVED')
  for route,method in (('/api/n7/approved-lessons','GET'),
   ('/api/conversations/11111111-1111-4111-8111-111111111111/stream','POST')):
   try:
