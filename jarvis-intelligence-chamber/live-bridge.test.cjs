@@ -10,11 +10,17 @@ test('new run never inherits old claims or blockers and older events cannot rewi
 test('lane completion waits for mission gate; durable completion is terminal',async()=>{const {applyResearchEvent,missionState}=await modulePromise;const a=applyResearchEvent(null,{schema:'pct-jarvis-event-v1',run_id:'200',event_id:'1',agent_id:'greek',status:'RUNNING'});assert.equal(missionState(a),'RESEARCH ACTIVE');const b=applyResearchEvent(a,{schema:'pct-jarvis-event-v1',run_id:'200',event_id:'2',agent_id:'greek',status:'COMPLETED'});assert.notEqual(missionState(b),'RESEARCH ACTIVE');assert.equal(missionState({...b,mission:{status:'COMPLETED'}}),'COMPLETED');});
 test('invalid scientific snapshot never becomes displayed research',async()=>{const {connectResearchFeed}=await modulePromise;const snaps=[];class FakeWS{close(){}}const stop=connectResearchFeed({fetchImpl:async()=>({ok:true,json:async()=>({...snapshot('1'),safety:{automatic_verified:true}})}),WebSocketImpl:FakeWS,onSnapshot:x=>snaps.push(x)});try{await new Promise(setImmediate);assert.equal(snaps.length,0);}finally{stop();}});
 test('results panel follows run change and does not call blockers contradictions',async()=>{const {missionState}=await modulePromise;const {matchesSource}=await import('data:text/javascript;base64,'+Buffer.from(fs.readFileSync(path.join(__dirname,'source-search.js'),'utf8')).toString('base64'));const vm=require('node:vm'),elements=new Map(),listeners=new Map();let callbacks;function el(id){if(!elements.has(id))elements.set(id,{textContent:'',innerHTML:'',value:'',options:[],addEventListener(){},querySelectorAll(){return []},setAttribute(){},classList:{add(){},remove(){},toggle(){}},insertBefore(){},remove(){elements.delete(id)}});return elements.get(id)}
- const scope={document:{getElementById:el,querySelectorAll:()=>[],body:{dataset:{}},createElement:()=>({})},window:{addEventListener:(n,f)=>listeners.set(n,f),dispatchEvent(){}},CustomEvent:class{},MutationObserver:class{observe(){}},connectResearchFeed:x=>callbacks=x,matchesSource,missionState,selectResearchRun(){},waitForResearchRequest(){},URL,URLSearchParams,globalThis:{},console};
+ const scope={document:{getElementById:el,querySelectorAll:()=>[],body:{dataset:{}},createElement:()=>({})},window:{addEventListener:(n,f)=>listeners.set(n,f),dispatchEvent(){}},CustomEvent:class{},MutationObserver:class{observe(){}},connectResearchFeed:x=>callbacks=x,matchesSource,missionState,selectResearchRun(){},waitForResearchRequest(){},isNarrativeReady:()=>false,renderStoryHtml:()=>'',renderResearchPath:()=>'',exportResearch:()=>({text:'{}',mime:'application/json',extension:'json'}),URL,URLSearchParams,globalThis:{},console};
  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'research-ui.js'),'utf8').replace(/^import[^\n]*\n/gm,''),scope);
  callbacks.onSnapshot({...snapshot('90'),claims:[{title:'PDF page reference',text_locator:{pdf_file:'document.pdf',scan_indexes_0_based:[8]}}]});assert.match(el('resultsList').innerHTML,/PDF 9/);assert.match(el('resultsList').innerHTML,/έντυπη σελίδα μη επιβεβαιωμένη/);
  callbacks.onSnapshot({...snapshot('100'),claims:[{title:'previous claim'}],blockers:[{repository:'access blocker'}]});callbacks.onSnapshot({...snapshot('200'),agents:[{id:'greek',status:'RUNNING'}],mission:{status:'RUNNING'}});
  assert.equal(el('resultsRun').textContent,'Έρευνα 200');assert.ok(!el('resultsList').innerHTML.includes('previous claim'));
+ scope.document.body.dataset.operatorQuery = 'Θέμα από πληκτρολόγηση';
+ callbacks.onSnapshot({...snapshot('200'),agents:[{id:'greek',status:'RUNNING'}],mission:{status:'RUNNING'}});
+ assert.equal(el('resultsRun').textContent,'Θέμα από πληκτρολόγηση');
+ scope.document.body.dataset.operatorQuery = '';
+ callbacks.onSnapshot({...snapshot('200'),agents:[{id:'greek',status:'RUNNING'}],mission:{status:'RUNNING'}});
+ assert.equal(el('resultsRun').textContent,'Έρευνα 200');
  listeners.get('jarvis:results-filter')({detail:{filter:'contradictions'}});assert.match(el('resultsList').innerHTML,/Δεν έχουν καταγραφεί αντιφάσεις/);assert.ok(!el('resultsList').innerHTML.includes('access blocker'));
  callbacks.onSnapshot({...snapshot('201'),contradictions:{records:[{title:'Dates differ',status:'MODEL_FLAGGED_NOT_ADJUDICATED',claims:[{kind:'source_statement',statement:'Source A reports a date',quote:'<unsafe>',source_occurrences:[{title:'Source A',url:'https://example.org/a'}]},{kind:'hypothesis',statement:'A possible explanation',quote:'Source B excerpt',source_occurrences:[{url:'javascript:alert(1)'}]}]}]}});
  assert.match(el('resultsList').innerHTML,/Πιθανή αντίφαση/);assert.match(el('resultsList').innerHTML,/Η πηγή δηλώνει/);assert.match(el('resultsList').innerHTML,/Υπόθεση μοντέλου/);assert.match(el('resultsList').innerHTML,/&lt;unsafe&gt;/);assert.ok(!el('resultsList').innerHTML.includes('href="javascript:'));
@@ -31,10 +37,14 @@ test('results panel follows run change and does not call blockers contradictions
  assert.match(el('resultsMeta').textContent,/1 πιθανές σχετικές αναφορές/);
  assert.match(el('resultsList').innerHTML,/<details[^>]*><summary>Αταύτιστα ευρήματα/);
  assert.ok(el('resultsList').innerHTML.indexOf('Ιωάννης Καψής')<el('resultsList').innerHTML.indexOf('Ιωάννης Παπαδόπουλος'));
- listeners.get('jarvis:dispatch-accepted')({detail:{request_id:'ui-new'}});
+ listeners.get('jarvis:dispatch-accepted')({detail:{request_id:'ui-new',query:'Κίμωλος δοκιμή'}});
+ assert.equal(el('resultsRun').textContent,'Κίμωλος δοκιμή');
  callbacks.onSnapshot({...snapshot('300'),request_id:'unrelated',claims:[{title:'wrong query'}]});
- assert.equal(el('resultsRun').textContent,'Αναμονή νέας έρευνας');assert.ok(!el('resultsList').innerHTML.includes('wrong query'));assert.ok(!el('resultsList').innerHTML.includes('Unresolved lead'));
- callbacks.onSnapshot({...snapshot('301'),request_id:'ui-new',discoveries:[{title:'Own result'}]});
+ assert.equal(el('resultsRun').textContent,'Κίμωλος δοκιμή');assert.ok(!el('resultsList').innerHTML.includes('wrong query'));assert.ok(!el('resultsList').innerHTML.includes('Unresolved lead'));
+ scope.document.body.dataset.operatorQuery = '';
+ listeners.get('jarvis:dispatch-accepted')({detail:{request_id:'ui-new-2'}});
+ assert.equal(el('resultsRun').textContent,'Αναμονή νέας έρευνας');
+ callbacks.onSnapshot({...snapshot('301'),request_id:'ui-new-2',discoveries:[{title:'Own result'}]});
  assert.equal(el('resultsRun').textContent,'Έρευνα 301');assert.match(el('resultsList').innerHTML,/Own result/);
  callbacks.onSnapshot({...snapshot('301'),research_answer:{schema:'pct-semantic-answer-v1',status:'BLOCKED_CONFIGURATION',answer_sections:[],claims:[]}});
  assert.match(el('resultsList').innerHTML,/Δεν έχει συνδεθεί ακόμη μοντέλο/);

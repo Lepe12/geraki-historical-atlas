@@ -29,3 +29,22 @@ test('greek narrative leads the overview and keeps counts for details', async ()
   assert.equal(r.related, 1);
   assert.equal(r.claims, 1);
 });
+
+
+test('in-progress title prefers typed query over run id', async () => {
+  const { overview, resolveResearchQuery, resolveResearchTitle, historyEntry } = await modulePromise;
+  const snap = { run_id: '42176932029', mission: { status: 'RUNNING' }, agents: [{ status: 'RUNNING' }] };
+  assert.equal(resolveResearchQuery(snap, 'Κίμωλος'), 'Κίμωλος');
+  assert.equal(resolveResearchTitle(snap, null, 'Κίμωλος'), 'Κίμωλος');
+  assert.equal(overview(snap, { knownQuery: 'Κίμωλος' }).title, 'Κίμωλος');
+  assert.equal(overview(snap).title, '');
+  assert.equal(historyEntry(snap, 'Κίμωλος').target, 'Κίμωλος');
+  assert.equal(historyEntry(snap).target, 'Έρευνα 42176932029');
+});
+
+test('mission purpose wins over typed query once published', async () => {
+  const { overview, resolveResearchQuery } = await modulePromise;
+  const snap = { run_id: '1', mission: { status: 'RUNNING', purpose: 'Ιωάννης Καψής', target: 'Ιωάννης Καψής' } };
+  assert.equal(resolveResearchQuery(snap, 'άλλο κείμενο'), 'Ιωάννης Καψής');
+  assert.equal(overview(snap, { knownQuery: 'άλλο κείμενο' }).title, 'Ιωάννης Καψής');
+});
