@@ -23,21 +23,9 @@ jobs:
           path: atlas
           filter: blob:none
           sparse-checkout: tools/library
-      - uses: actions/checkout@v4
-        with:
-          repository: Lepe12/independent-ai-bot
-          ref: main
-          path: n7-bot-source
-          filter: blob:none
-          sparse-checkout: |
-            public
-            server.js
-            package.json
       - name: Verify sources
         run: |
-          node --check n7-bot-source/server.js
-          node --check n7-bot-source/public/historical-library.js
-          test -f n7-bot-source/public/index.html
+          node --check atlas/tools/library/n7-bot-browser.js
           python3 -m py_compile atlas/tools/library/deploy_n7_bot_frontend.py
       - name: Deploy only N7 bot library files with FTPS
         run: python3 atlas/tools/library/deploy_n7_bot_frontend.py
