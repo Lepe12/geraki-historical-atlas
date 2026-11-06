@@ -2,6 +2,7 @@
 // N7_PUBLIC_SEARCH_V1: private server-side read-only retrieval, no API key.
 // Bounded public search feeds and Wikimedia reference material; not a full browser.
 const DEFAULT_UA='N7PublicResearch/1.0 (https://piratecartography.com)';
+const n7Europeana=require('./europeana-api'); // N7_EUROPEANA_SEARCH_INTEGRATION_V1
 const n7HistoricalAudit=require('./historical-source-audit'); // N7_HISTORICAL_DEEP_READING_V1
 const NEWS_HOST='news.google.com';
 const BING_HOST='www.bing.com';
@@ -142,10 +143,18 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
     {name:'Wikipedia',url:'https://en.wikipedia.org/w/rest.php/v1/search/page?q='+q+'&limit=4',rss:false}
   ];
   // Historical research uses general search, not short-lived news feeds.
-  const results=await Promise.allSettled(targets.map(async x=>{
-    const raw=await boundedFetch(x.url,{transport});
-    return x.rss?parseRss(raw,x.name,now.getTime(),request.kind==='news'?75:10000):wikiParse(raw);
-  }));
+  // Europeana is metadata-only. Query in parallel with legacy sources so
+  // configured European heritage discovery does not introduce sequential latency.
+  const europeanaJob=request.kind==='historical'
+    ?n7Europeana.searchEuropeana(request.historicalLanza?'Pietro Lanza':request.userText,{transport})
+    :Promise.resolve({configured:false,queried:false,items:[],reason:'not_historical'});
+  const [results,europeana]=await Promise.all([
+    Promise.allSettled(targets.map(async x=>{
+      const raw=await boundedFetch(x.url,{transport});
+      return x.rss?parseRss(raw,x.name,now.getTime(),request.kind==='news'?75:10000):wikiParse(raw);
+    })),
+    europeanaJob
+  ]);
   const merged=[],seen=new Set();let successful=0;
   for(const r of results){
     if(r.status!=='fulfilled')continue;successful++;
@@ -166,9 +175,18 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
         provider:'Curated historical article',excerpt:'Πέτρος Λάντζας, Κέρκυρα, Πάργα 1573, Νάπολη, Ισπανία και δράση το 1608.'});
     }
   }
+  // Deduplicate by stable URL; do not displace the user's own long-form article.
+  // Europeana result pages are bibliographic discovery metadata, not verified text.
+  for(const record of europeana.items||[]){
+    if(merged.some(x=>x.url===record.url))continue;
+    merged.push(record);
+  }
   const items=merged.slice(0,9);
   return {searched:true,query:request.query,kind:request.kind,items,
-    availableProviders:successful,failedProviders:results.length-successful};
+    europeana:{configured:europeana.configured,queried:europeana.queried,
+      found:(europeana.items||[]).length,reason:europeana.reason},
+    availableProviders:successful+(europeana.reason==='ok'?1:0),
+    failedProviders:results.length-successful+(europeana.queried&&europeana.reason!=='ok'?1:0)};
 }
 // N7_FULL_SOURCE_READING_V1: content excerpts only from a bounded trusted publisher allowlist.
 const ARTICLE_HOSTS=new Set([
@@ -290,6 +308,11 @@ function contextForResearch(research){
     'Do not claim to have searched successfully. State the limitation.'
   ].join('\n');
   const audit=n7HistoricalAudit.historicalAuditContext(research);
+  const europeanaNote=research.europeana?.configured
+    ?('Europeana Search API: '+research.europeana.found+
+      ' bibliographic metadata records returned; NEVER claim their content was read. '+
+      (research.europeana.reason==='ok'?'':'Provider status: '+research.europeana.reason))
+    :'Europeana Search API: NOT CONFIGURED (EUROPEANA_API_KEY missing). Never claim that Europeana was queried.';
   const isHistory=research.kind==='historical';
   const items=research.items.slice(0,9).map((x,i)=>{
     const metadata='[S'+(i+1)+'] '+x.title+' | '+x.source+' | '+x.url+
@@ -314,6 +337,7 @@ function contextForResearch(research){
       audit,
       'Unresolved contradictions must be identified and not silently resolved.'
     ]:[]),
+    europeanaNote,
     'Search query: '+research.query,
     'Cite these source identifiers only when they support the corresponding claim:',
     items.join('\n\n')
