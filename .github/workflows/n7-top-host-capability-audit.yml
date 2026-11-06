@@ -1,0 +1,43 @@
+name: N7 Top.Host capability audit (read-only)
+on:
+  push:
+    branches: [main]
+    paths:
+      - tools/n7/audit_top_host_capabilities.py
+      - .github/workflows/n7-top-host-capability-audit.yml
+  pull_request:
+    paths:
+      - tools/n7/audit_top_host_capabilities.py
+      - .github/workflows/n7-top-host-capability-audit.yml
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: nabou-production
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/n7/audit_top_host_capabilities.py
+      - name: Check audit syntax and read-only guarantees
+        run: |
+          python3 -m py_compile tools/n7/audit_top_host_capabilities.py
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('tools/n7/audit_top_host_capabilities.py').read_text()
+          assert 'storbinary' not in p
+          assert 'delete(' not in p and 'rename(' not in p
+          assert 'retrbinary' in p
+          print('N7_AUDIT_READ_ONLY_SCRIPT_VERIFIED=true')
+          PY
+      - name: Inventory Top.Host N7 hosting capabilities
+        if: github.event_name == 'push'
+        run: python3 tools/n7/audit_top_host_capabilities.py
