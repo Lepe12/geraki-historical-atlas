@@ -1,0 +1,64 @@
+name: N7 historical library index-page filter
+on:
+  pull_request:
+    paths:
+      - tools/library/n7_library.php
+      - tools/library/deploy_index_filter_ftps.py
+      - .github/workflows/n7-index-page-filter.yml
+  push:
+    branches: [main]
+    paths:
+      - ops_ftps_requests/n7-index-page-filter.json
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/library
+            ops_ftps_requests
+      - name: Validate classifier without database writes
+        run: |
+          php -l tools/library/n7_library.php
+          php tools/library/n7_library.php self-test
+          python3 -m py_compile tools/library/deploy_index_filter_ftps.py
+  deploy:
+    needs: validate
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 8
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            tools/library
+            ops_ftps_requests
+      - name: Confirm exact classifier-only scope
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          j=json.loads(Path('ops_ftps_requests/n7-index-page-filter.json').read_text())
+          assert j['authorization']=='INSTALL-INDEX-PAGE-FILTER'
+          assert j['scope']=='one-php-search-only'
+          PY
+      - name: Install one PHP file with rollback
+        run: python3 tools/library/deploy_index_filter_ftps.py
+      - name: Confirm index stays intact and index results suppressed
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('tools/library/probe_n7_library_quality.py')
+          assert p.exists()
+          PY
+          python3 tools/library/probe_n7_library_quality.py
