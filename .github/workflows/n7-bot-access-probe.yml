@@ -70,6 +70,20 @@ jobs:
                   "is_independent_ai_bot":b"Independent AI Bot" in html,
                   "loads_app_js":b"/app.js" in html,
                   "loads_historical_library":b"/historical-library.js" in html}}))
+          for dirname in ("/bot.piratecartography.com", "/"):
+              try:
+                  ftp.cwd(dirname)
+                  entries=[s.rstrip("/").split("/")[-1] for s in ftp.nlst()]
+                  dirs=[]
+                  for entry in entries[:100]:
+                      if entry.startswith("."):continue
+                      try:
+                          ftp.cwd(dirname.rstrip("/")+"/"+entry)
+                          dirs.append(entry)
+                          ftp.cwd(dirname)
+                      except ftplib.all_errors:pass
+                  print(json.dumps({"directory":dirname,"subdirectories":dirs[:40]}))
+              except ftplib.all_errors:pass
           print(json.dumps({"status":"READ_ONLY","results":result}))
           ftp.quit()
           PY
