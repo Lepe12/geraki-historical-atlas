@@ -35,7 +35,7 @@ def verify(expected_ui):
    if r.status!=200 or not v.get('modelConfigured'):raise RuntimeError('N7_PROGRESS_MODEL_UNAVAILABLE')
  with urllib.request.urlopen(urllib.request.Request(BASE+'/app.js',headers={'Cache-Control':'no-cache'}),timeout=18,context=ctx) as r:
   data=r.read(700000)
-  if sha(data)!=sha(expected_ui) or MARKER not in data or b"stage==='reading'" not in data:
+  if sha(data)!=sha(expected_ui) or MARKER not in data or b"event.type==='status'" not in data:
    raise RuntimeError('N7_PROGRESS_UI_NOT_SERVED')
  for route,method in (('/api/n7/approved-lessons','GET'),
   ('/api/conversations/11111111-1111-4111-8111-111111111111/stream','POST')):
