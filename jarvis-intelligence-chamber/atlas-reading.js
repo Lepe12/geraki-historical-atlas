@@ -11,7 +11,7 @@
  const shell=view=>document.querySelector('[data-nxs-view="'+view+'"]')?.click();
  const navState=()=>{
   document.querySelectorAll('[data-atlas-nav]').forEach(button=>{
-   const active=body.dataset.atlasPage==='home'?'map':mode==='detail'?detailReturn:mode;
+   const active=body.dataset.atlasPage==='home'?'map':mode==='history'?'research':mode==='detail'?detailReturn:mode;
    button.setAttribute('aria-current',button.dataset.atlasNav===active?'page':'false');
   });
  };
@@ -56,7 +56,7 @@
   };
   for(const row of narrative?.sources||[])add(row.label_el||row.title,row.url||row.source_url,'Βιβλιογραφία ιστορικού άρθρου');
   if(!rows.length&&narrative?.sources_el)add(narrative.sources_el,'','Βιβλιογραφία ιστορικού άρθρου');
-  for(const row of s?.discoveries||[])add(row.title||row.source_title||row.citation,row.url||row.source_url,[row.repository,row.author,'Ερευνητική εγγραφή · η καταγραφή δεν ισοδυναμεί με ιστορική επιβεβαίωση.'].filter(Boolean).join(' · '));
+  for(const row of s?.discoveries||[])add(row.title||row.source_title||row.citation,row.url||row.source_url,[row.repository,row.author,row.printed_page!=null?'Έντυπη σελίδα '+row.printed_page:'',row.context_excerpt||row.excerpt||'','Ερευνητική εγγραφή · η καταγραφή δεν ισοδυναμεί με ιστορική επιβεβαίωση.'].filter(Boolean).join(' · '));
   sourceRows=rows;renderSources();
  }
  search.addEventListener('input',renderSources);renderSources();
@@ -83,16 +83,23 @@
     scroll().scrollTop=0;
    }
   }
+  if(next==='history'){const history=$('researchHistory');if(history)history.open=true;scroll().scrollTop=0;}
   routing=false;
   navState();
   requestAnimationFrame(()=>{
    navState();
    if(!focus)return;
    if(next==='sources')search.focus({preventScroll:true});
+   else if(next==='history')$('historySearch')?.focus({preventScroll:true});
    else if(next==='research')$('operatorQuery')?.focus({preventScroll:true});
    else if(next==='map')$('atlasExplore')?.focus({preventScroll:true});
   });
  }
+
+ const historyButton=document.createElement('button');historyButton.type='button';historyButton.id='readerHistoryOpen';historyButton.textContent='Προηγούμενες έρευνες';
+ document.querySelector('.atlas-panel-head')?.append(historyButton);
+ historyButton.addEventListener('click',()=>show('history'));
+ $('researchHistory')?.addEventListener('click',event=>{if(event.target.closest('[data-history-run]'))setTimeout(()=>show('research',{focus:false}),0);});
  $('atlasCloseResearch')?.setAttribute('aria-label','Επιστροφή στον χάρτη');
  document.addEventListener('click',event=>{
   let target=event.target.closest('button');
@@ -129,7 +136,7 @@
   event.preventDefault();event.stopImmediatePropagation();
   const detail=$('detailPanel');
   if(detail&&!detail.classList.contains('hidden')){const back=detailReturn;$('closeDetail')?.click();show(back);}
-  else show(['agents','tools','sources'].includes(mode)?'research':'map');
+  else show(['agents','tools','sources','history'].includes(mode)?'research':'map');
  },true);
  $('operatorCommand')?.addEventListener('submit',()=>show('research',{focus:false}),true);
  // Mirror shell-initiated inspector and close actions in the top navigation.
