@@ -5,7 +5,7 @@ const NAVMAP={universe:'map',findings:'research',agents:'agents'};
 // Atlas UI: top text nav replaces the lab rail. PDF/tools opens via Εργαλεία.
 async function navTo(page,view){
   async function openResearch(){
-    if(await page.locator('#atlasHome:not([hidden])').count()){
+    if(await page.locator('#atlasHome').isVisible()){
       await page.locator('#atlasExplore').click();
       await page.waitForFunction(()=>document.body.dataset.atlasPage==='research');
     }
@@ -37,8 +37,8 @@ async function navTo(page,view){
   await page.waitForFunction(()=>/^[0-9]+ FPS$/.test(document.querySelector('#fps')?.textContent||''));
   assert.ok(await page.locator('#universe').evaluate(canvas=>canvas.width>100&&canvas.height>100),'The original renderer must own a real canvas');
   assert.equal(await page.locator('#nodeLabels .node-label').count(),17,'All original research nodes must be rendered');
-  assert.equal(await page.locator('body').getAttribute('data-atlas-page'),'home');
-  assert.equal(await page.locator('#atlasHome .atlas-topnav [data-atlas-nav]').count(),3,'Home nav: Χάρτης · Έρευνα · Πηγές');
+  assert.equal(await page.locator('body').getAttribute('data-atlas-landing'),'true');
+  assert.equal(await page.locator('#atlasResearch .atlas-topnav [data-atlas-nav]').count(),5,'Shared home and workspace navigation');
   assert.equal(await page.locator('#v2rail').isVisible(),false,'Lab rail must not show under atlas home');
   assert.equal(await page.locator('#topbar').isVisible(),false,'Lab topbar/clock must not show under atlas home');
   async function layout(panel){
@@ -53,13 +53,17 @@ async function navTo(page,view){
   await page.locator('#atlasExplore').click();
   await page.waitForFunction(()=>document.body.dataset.atlasPage==='research');
   const initialHeight=await page.locator('#operatorQuery').evaluate(e=>e.offsetHeight);
+  const queryStyle=await page.locator('#operatorQuery').evaluate(e=>({color:getComputedStyle(e).color,fill:getComputedStyle(e).webkitTextFillColor}));
+  assert.equal(queryStyle.color,'rgb(255, 243, 214)','Typed query stays legible on dark teal');
+  assert.equal(queryStyle.fill,queryStyle.color);
+  assert.equal(await page.locator('#executeQuery').evaluate(e=>getComputedStyle(e,'::after').content),'none','Legacy red seal is removed');
   await page.locator('#operatorQuery').fill('Πρόσωπο και ιστορική περίοδος\nΠηγές για τη δράση του\nΣχετικά αρχεία και μαρτυρίες\nΑκριβείς σελίδες και ημερομηνίες\nΠεριορισμοί της έρευνας');
   await page.waitForTimeout(150);
   assert.ok(await page.locator('#operatorQuery').evaluate(e=>e.offsetHeight)>=initialHeight,'Query field remains usable');
   await navTo(page,'findings');await layout('.atlas-research-panel');
   await navTo(page,'universe');
   await page.locator('#atlasResearch .atlas-brand').click();
-  await page.waitForFunction(()=>document.body.dataset.atlasPage==='home');
+  await page.waitForFunction(()=>document.body.dataset.atlasLanding==='true');
   await page.locator('#atlasExplore').click();
   await page.waitForFunction(()=>document.body.dataset.atlasPage==='research');
   await navTo(page,'findings');
