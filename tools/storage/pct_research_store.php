@@ -8,6 +8,7 @@ const PCT_GIT = PCT_VHOST . '/git/geraki-historical-atlas.git';
 const PCT_TEXT_LIMIT = 16777216;
 require_once __DIR__.'/historical_evidence.php';
 require_once __DIR__.'/evidence_schema_request.php';
+require_once __DIR__.'/n7_library_schema_request.php';
 
 function emit(array $value): void {
     echo json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR), PHP_EOL;
@@ -195,6 +196,7 @@ try {
         // Consume only the explicitly deployed, hash-bound request. Normal sync
         // never changes schemas. The existing lock serializes backup and DDL.
         $migration=heApplyRequestedSchema($db,__DIR__.'/.evidence-schema-install-request.json',PCT_PRIVATE);
+        $libraryMigration=n7LibrarySchemaRequest($db,__DIR__.'/.n7-library-install-request.json',PCT_PRIVATE);
         $forceRuns=$migration['requested_runs']??[];
         if (!in_array('--no-fetch',$argv,true)) git(['fetch','--quiet','origin']);
         $commit=trim(git(['rev-parse','main'])); if (!preg_match('/^[a-f0-9]{40}$/D',$commit)) throw new RuntimeException('INVALID_COMMIT');
@@ -210,6 +212,7 @@ try {
         $summary=['status'=>$blocked===0?'PASS':'PARTIAL_BLOCKED','source_commit'=>$commit,'imported_runs'=>$imported,'unchanged_runs'=>$unchanged,'blocked_runs'=>$blocked];
         $summary['evidence_schema_installed']=heInstalled($db);
         $summary['evidence_migration_status']=$migration['status'];
+        $summary['n7_library_schema_status']=$libraryMigration['status'];
         $summary['recent_runs']=$db->query('SELECT run_id,source_commit,document_count,imported_at FROM pc_research_runs ORDER BY imported_at DESC,run_id DESC LIMIT 10')->fetchAll();
         $summary['evidence_counts_by_recent_run']=[];
         if ($summary['evidence_schema_installed'])foreach ($summary['recent_runs'] as $recent) {

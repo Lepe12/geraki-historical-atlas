@@ -1,0 +1,48 @@
+name: N7 library migration validation
+on:
+  push:
+    branches: [main]
+    paths: ['tools/storage/n7_library_schema_request.php']
+  pull_request:
+    paths:
+      - 'tools/storage/n7_library_schema_request.php'
+      - 'tools/storage/pct_research_store.php'
+      - '.github/workflows/n7-library-schema.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/library
+            tools/storage
+      - run: |
+          php -l tools/storage/n7_library_schema_request.php
+          php -l tools/storage/pct_research_store.php
+          python3 -m py_compile tools/library/deploy_library_schema_ftps.py
+  install:
+    needs: validate
+    if: github.event_name == 'push'
+    environment: nabou-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+      PCT_FTPS_APP_ROOT: /piratecartography-gateway/server/command-center-live
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout: |
+            tools/library
+            tools/storage
+      - run: python3 tools/library/deploy_library_schema_ftps.py
