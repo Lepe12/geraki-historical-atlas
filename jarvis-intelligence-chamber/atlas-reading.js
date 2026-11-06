@@ -100,6 +100,8 @@
  document.querySelector('.atlas-panel-head')?.append(historyButton);
  historyButton.addEventListener('click',()=>show('history'));
  $('researchHistory')?.addEventListener('click',event=>{if(event.target.closest('[data-history-run]'))setTimeout(()=>show('research',{focus:false}),0);});
+
+ if($('focusButton')){$('focusButton').textContent='Επιστροφή στους ερευνητές';$('focusButton').setAttribute('aria-label','Επιστροφή στους ερευνητές');}
  $('atlasCloseResearch')?.setAttribute('aria-label','Επιστροφή στον χάρτη');
  document.addEventListener('click',event=>{
   let target=event.target.closest('button');
@@ -122,6 +124,9 @@
   }
   if(['nxsCloseAgents','closeLearning','nxsCloseActivity'].includes(target.id)){
    event.preventDefault();event.stopImmediatePropagation();show('research');return;
+  }
+  if(target.id==='focusButton'){
+   event.preventDefault();event.stopImmediatePropagation();show('agents');return;
   }
   if(target.id==='closeDetail'){
    if(routing)return;
