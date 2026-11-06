@@ -119,7 +119,12 @@ try {
     $db=n7db();
     if ($action==='install') {n7install($db); n7out(['status'=>'INSTALLED','database'=>N7_DB]);}
     elseif ($action==='import') n7out(n7import($db,$source));
-    elseif ($action==='search') n7out(['matches'=>n7search($db,(string)($argv[2]??''))]);
+    elseif ($action==='search') {
+        $count=(int)$db->query('SELECT COUNT(*) FROM pc_library_sources')->fetchColumn();
+        $pageCount=(int)$db->query('SELECT COUNT(*) FROM pc_library_pages')->fetchColumn();
+        n7out(['matches'=>n7search($db,(string)($argv[2]??'')),
+            'source_count'=>$count,'page_count'=>$pageCount]);
+    }
     else {
         $id=(string)($argv[2]??'');$scan=filter_var($argv[3]??null,FILTER_VALIDATE_INT,['options'=>['min_range'=>1]]);
         if (!preg_match('/^[a-f0-9]{64}$/D',$id)||$scan===false) n7fail('INVALID_PAGE_REFERENCE');

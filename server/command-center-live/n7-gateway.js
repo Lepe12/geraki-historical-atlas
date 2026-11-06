@@ -183,6 +183,8 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
         if(p==="/n7/library/search" && req.method==="POST"){
           json(res,200,{schema:"n7-library-read-v1",
             matches:Array.isArray(data.matches)?data.matches:[],
+            source_count:Number.isSafeInteger(data.source_count)?data.source_count:null,
+            page_count:Number.isSafeInteger(data.page_count)?data.page_count:null,
             historically_verified:false});
         }else{
           json(res,200,{schema:"n7-private-library-read-v1",operation:command,
