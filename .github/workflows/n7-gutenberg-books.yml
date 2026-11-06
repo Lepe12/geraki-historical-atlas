@@ -1,0 +1,76 @@
+name: N7 historical public-domain books import
+on:
+  pull_request:
+    paths:
+      - 'tools/library/import_gutenberg_public_domain.py'
+      - 'server/command-center-live/n7-gateway.js'
+      - 'server/command-center-live/n7-library-bridge.js'
+      - '.github/workflows/n7-gutenberg-books.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'ops_ftps_requests/n7-gutenberg-import.json'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/library
+            server/command-center-live
+            ops_ftps_requests
+      - name: Check code and security tests
+        run: |
+          set -e
+          node --check server/command-center-live/n7-gateway.js
+          node --check server/command-center-live/n7-library-bridge.js
+          node --test server/command-center-live/n7-gateway.test.js
+          python3 -m py_compile tools/library/import_gutenberg_public_domain.py
+      - name: Validate actual public-domain eBooks and printed-page markers
+        run: |
+          pip -q install beautifulsoup4
+          python3 - <<'PY'
+          import runpy,json
+          m=runpy.run_path('tools/library/import_gutenberg_public_domain.py')
+          for book in m['BOOKS']:
+              pages=m['pages_from_html'](m['download'](book['url']))
+              assert len(pages)>40,book['id']
+              print(json.dumps({'gutenberg_id':book['id'],'source_pages_verified':len(pages),
+               'printed_first':pages[0]['printed_page'],'printed_last':pages[-1]['printed_page']}))
+          PY
+  import-books:
+    needs: verify
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 15
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/library
+            ops_ftps_requests
+      - name: Check explicit rights, provenance and import authorization
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          obj=json.loads(Path('ops_ftps_requests/n7-gutenberg-import.json').read_text())
+          assert obj['authorization']=='IMPORT-22169-13689'
+          assert obj['scope']=='public-domain-secondary-historical-sources'
+          PY
+      - name: Install HTML parser
+        run: pip -q install beautifulsoup4
+      - name: Import scanned-page transcription into MariaDB via signed gateway
+        run: python3 tools/library/import_gutenberg_public_domain.py

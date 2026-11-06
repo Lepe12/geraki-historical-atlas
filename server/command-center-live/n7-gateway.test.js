@@ -316,3 +316,19 @@ test("existing N7 login can delegate read-only search with verified server signa
   await handler({...req,headers:{...req.headers,origin:"https://evil.test"}},{},"/n7/library/search");
   assert.equal(replies.at(-1).status,403);
 });
+
+
+test("signed public-domain import refuses anonymous requests and unlisted Gutenberg IDs",async()=>{
+  const replies=[];
+  let payload={gutenberg_id:"99999"};
+  const handler=createN7Gateway({
+    json:(_res,status,data)=>replies.push({status,data}),
+    operatorAuthorized:()=>false,sessionAuthorized:()=>false,
+    readBody:async()=>JSON.stringify(payload),
+    statusFor:async()=>({snapshot:null})
+  });
+  await handler({method:"POST",headers:{},url:"/pct-api/live/n7/library/import-signed"},{}, "/n7/library/import-signed");
+  assert.equal(replies.at(-1).status,401);
+  await handler({method:"GET",headers:{},url:"/pct-api/live/n7/library/import-signed"},{}, "/n7/library/import-signed");
+  assert.equal(replies.at(-1).status,405);
+});

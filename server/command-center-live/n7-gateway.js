@@ -2,6 +2,7 @@
 const crypto=require("node:crypto");
 const {execFile}=require("node:child_process");
 const path=require("node:path");
+const os=require("node:os");
 const fs=require("node:fs");
 const {verifyLibraryBridge}=require("./n7-library-bridge");
 
@@ -95,6 +96,64 @@ async function privateLibraryUpload(req){
 function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch,githubPrivateDispatch,libraryRunner=readPrivateLibrary,libraryUploadRunner=privateLibraryUpload,libraryBridgeVerifier=verifyLibraryBridge}) {
   let lastAccepted=0;
   return async function handleN7(req,res,p) {
+    // Import only two rights-verified, fixed Gutenberg works over the authenticated host bridge.
+    // This endpoint is not public and does not accept user-selected file paths or shell commands.
+    if(p==="/n7/library/import-signed"){
+      if(req.method!=="POST"){json(res,405,{error:"method_not_allowed"});return true;}
+      let raw;
+      try{raw=await readBody(req,650000);}
+      catch(_){json(res,413,{error:"import_payload_too_large"});return true;}
+      if(!verifyLibraryBridge(req,raw,Math.floor(Date.now()/1000),650000)){
+        json(res,401,{error:"signed_import_required"});return true;
+      }
+      let source;
+      try{source=JSON.parse(raw);}
+      catch(_){json(res,400,{error:"invalid_import_json"});return true;}
+      const allowlist={
+        "22169":{uri:"https://www.gutenberg.org/ebooks/22169",title:"The Story of the Barbary Corsairs",author:"Stanley Lane-Poole; J. D. Jerrold Kelley",year:"1890"},
+        "13689":{uri:"https://www.gutenberg.org/ebooks/13689",title:"Sea-Wolves of the Mediterranean",author:"E. Hamilton Currey",year:"1910"}
+      };
+      const book=allowlist[String(source?.gutenberg_id||"")];
+      const expectedId=book&&crypto.createHash("sha256").update("gutenberg:"+source.gutenberg_id).digest("hex");
+      if(!book||source.source_id!==expectedId||source.title!==book.title||
+         source.author!==book.author||source.publication_year!==book.year||
+         source.source_uri!==book.uri||!Array.isArray(source.pages)||
+         source.pages.length<1||source.pages.length>18||
+         source.pages.some(pg=>!Number.isSafeInteger(pg?.scan_index)||pg.scan_index<1||pg.scan_index>10000||
+           typeof pg.text!=="string"||pg.text.length<40||pg.text.length>60000||
+           pg.ocr_status!=="UNREVIEWED"||
+           !(pg.printed_page===null||typeof pg.printed_page==="string"&&pg.printed_page.length<=24))
+      ){
+        json(res,400,{error:"invalid_gutenberg_import_batch"});return true;
+      }
+      // Convert the signed transport record to the fixed existing CLI import schema.
+      const record={source_id:expectedId,title:book.title,author:book.author,
+        publication_year:book.year,source_uri:book.uri,
+        bibliographic_reference:book.author+". "+book.title+" ("+book.year+"). Project Gutenberg #"+source.gutenberg_id+".",
+        rights_note:"Historical secondary source; public-domain edition; Gutenberg HTML transcription, page labels where marked. NOT a primary historical source. UNREVIEWED.",
+        pages:source.pages};
+      let dir;
+      try{
+        dir=fs.mkdtempSync(path.join(os.tmpdir(),"n7-pg-"));
+        const file=path.join(dir,"batch.json");
+        fs.writeFileSync(file,JSON.stringify(record),{mode:0o600,flag:"wx"});
+        const result=await new Promise((resolve,reject)=>execFile(
+          process.env.PCT_PHP_BIN||"/opt/plesk/php/8.4/bin/php",
+          [path.resolve(__dirname,"../../tools/library/n7_library.php"),"import",file],
+          {timeout:30000,maxBuffer:65536,windowsHide:true},(error,stdout)=>{
+            if(error)return reject(error);
+            try{resolve(JSON.parse(stdout));}catch(e){reject(e);}
+          }));
+        if(result?.status!=="IMPORTED"||result.source_id!==expectedId||
+           result.page_count!==record.pages.length)
+          throw new Error("import_not_confirmed");
+        json(res,201,{status:"IMPORTED",source_id:expectedId,page_count:result.page_count});
+      }catch(_){json(res,503,{error:"gutenberg_import_unavailable"});}
+      finally{
+        if(dir)try{fs.rmSync(dir,{recursive:true,force:true});}catch(_){}
+      }
+      return true;
+    }
     if (p!=="/n7/status" && p!=="/n7/dispatch" && p!=="/n7/code" && p!=="/n7/brain/task" && p!=="/n7/library/search" && p!=="/n7/library/page" && p!=="/n7/library/upload") return false;
     if (p==="/n7/status") {
       if(req.method!=="GET") {json(res,405,{error:"method_not_allowed"});return true;}
