@@ -137,7 +137,7 @@ export function renderCountsDetails(counts, extraHtml = "") {
 /** Compact overview used by the right-hand «Το ερώτημα» panel. */
 export function renderOverviewStory(snapshot, data) {
   const narrative = data?.narrative || snapshot?.research_answer?.greek_narrative;
-  const story = renderStoryHtml(narrative, { mode: "default", heading: true });
+  const story = renderStoryHtml(narrative, { mode: "default", heading: false });
   const question = escapeHtml(
     snapshot?.mission?.purpose ||
       snapshot?.mission?.target ||
