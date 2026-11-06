@@ -5,8 +5,10 @@ on:
     paths:
       - tools/n7/stream-attachments.js
       - tools/n7/public-web-search.js
+      - tools/n7/europeana-api.js
+      - tools/n7/test_europeana_api.cjs
       - tools/n7/test_source_evidence.cjs
-      - tools/n7/test_historical_source_audit.cjs
+      - tools/n7/test_historical_source_audit.cjs tools/n7/test_europeana_api.cjs
       - tools/n7/stream-upload-ui.js
       - tools/n7/test_stream_attachments.cjs
       - tools/n7/deploy_live_stream_progress.py
@@ -49,6 +51,7 @@ jobs:
         run: |
           node --check tools/n7/stream-attachments.js
           node --check tools/n7/public-web-search.js
+          node --check tools/n7/europeana-api.js
           node --check tools/n7/stream-upload-ui.js
           grep -q 'N7_VISIBLE_PROGRESS_BUBBLE_V1' tools/n7/stream-upload-ui.js
           grep -q 'bubble.textContent=label' tools/n7/stream-upload-ui.js
