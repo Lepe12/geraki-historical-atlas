@@ -42,7 +42,7 @@ try:
     bot_server=read(BOT+"/server.js")
     if b"independent-ai-bot" not in read(BOT+"/package.json"):
         raise RuntimeError("WRONG_BOT")
-    if b"/api/library/search" not in bot_server or b"x-n7-library-signature" not in bot_server:
+    if b"/api/library/search" not in bot_server or (b"x-n7-library-signature" not in bot_server and b"X-N7-Library-Signature" not in bot_server):
         raise RuntimeError("AUTHENTICATED_BOT_PROXY_MISSING")
     old=b"matches:result.matches.slice(0,15),historically_verified:false"
     new=b"matches:result.matches.slice(0,15),source_count:Number.isSafeInteger(result.source_count)?result.source_count:null,page_count:Number.isSafeInteger(result.page_count)?result.page_count:null,historically_verified:false"
