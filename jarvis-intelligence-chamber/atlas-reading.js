@@ -136,9 +136,13 @@
    event.preventDefault();event.stopImmediatePropagation();show('research');return;
   }
   if(target.id==='focusButton'){
-   // Preserve chamber.js's original aim action; reveal the real map afterwards.
-   detailReturn='map';
-   setTimeout(()=>{$('closeDetail')?.click();show('map',{focus:false});},0);return;
+   event.preventDefault();event.stopImmediatePropagation();
+   const agent=$('detailPanel')?.dataset.agentId;detailReturn='map';
+   show('map',{focus:false});
+   requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    if(agent)window.dispatchEvent(new CustomEvent('jarvis:focus-agent',{detail:{agent_id:agent}}));
+    $('closeDetail')?.click();
+   }));return;
   }
   if(target.id==='closeDetail'){
    if(routing)return;
