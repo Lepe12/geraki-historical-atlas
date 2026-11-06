@@ -156,9 +156,11 @@ export function renderOverviewStory(snapshot, data) {
     question +
     "</dd></div><div><dt>Περίοδος</dt><dd>" +
     period +
-    "</dd></div></dl><p>" +
-    escapeHtml(data?.message || "") +
-    '</p><p class="overview-next"><strong>Επόμενο βήμα:</strong> ' +
+    "</dd></div></dl>" +
+    (story
+      ? ""
+      : "<p>" + escapeHtml(data?.message || "") + "</p>") +
+    '<p class="overview-next"><strong>Επόμενο βήμα:</strong> ' +
     escapeHtml(data?.next || "") +
     "</p>";
   return (
