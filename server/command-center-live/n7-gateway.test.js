@@ -354,3 +354,36 @@ test("signed private full-page request returns source page, rejects unsigned req
   await handler({method:"POST",url:p,headers:{"x-n7-library-signature":"valid",origin:"https://evil.test"}},{},p);
   assert.equal(replies.at(-1).status,403);
 });
+
+
+test("N7 PDF ingestion requires a signed host bridge and preserves original PDF bytes",async()=>{
+  const responses=[],chunks=[];
+  const pdf=Buffer.from("%PDF-1.7\nhistorical sample only\n");
+  const req=(headers={},payload=pdf)=>({
+    method:"POST",url:"/pct-api/live/n7/library/upload-signed",headers,
+    async *[Symbol.asyncIterator](){yield payload;}
+  });
+  const handler=createN7Gateway({
+    json:(_res,status,payload)=>responses.push({status,payload}),
+    operatorAuthorized:()=>false,sessionAuthorized:()=>false,
+    readBody:async()=>{throw Error("must not parse binary as JSON")},
+    libraryBridgeVerifier:(request,digest)=>request.headers["x-n7-library-signature"]==="signed"&&
+      digest===require("node:crypto").createHash("sha256").update(pdf).digest("hex"),
+    libraryUploadRunner:async (_req,raw)=>{
+      chunks.push(raw);
+      return {status:"DATABASE_COMMITTED",source_id:"a".repeat(64),imported_pages:1};
+    }
+  });
+  const path="/n7/library/upload-signed";
+  await handler(req({"content-type":"application/pdf"}),{},path);
+  assert.equal(responses.at(-1).status,401);
+  await handler(req({"content-type":"application/pdf","x-n7-library-signature":"signed",origin:"https://evil.example"}),{},path);
+  assert.equal(responses.at(-1).status,403);
+  await handler(req({"content-type":"application/pdf","x-n7-library-signature":"signed"}),{},path);
+  assert.equal(responses.at(-1).status,201);
+  assert.equal(responses.at(-1).payload.imported_pages,1);
+  assert.deepEqual(chunks[0],pdf);
+  await handler(req({"content-type":"application/pdf","x-n7-library-signature":"signed"},Buffer.from("not pdf")),{},path);
+  assert.equal(responses.at(-1).status,415);
+  assert.equal(chunks.length,1);
+});
