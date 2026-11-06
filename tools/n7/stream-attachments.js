@@ -173,7 +173,8 @@ async function readGroqStream(response,onDelta){
  }finally{reader.releaseLock();}
  return {text,reason};
 }
-function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publicSearch,fetcher=fetch}){
+function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publicSearch,fetcher=fetch,
+  researchDeadlineMs=8500,articleDeadlineMs=8500,modelDeadlineMs=25000}){
  return async function handle(req,res,id){
   if(!API_KEY||!MODEL)return writeError(res,503,'Το μοντέλο δεν είναι συνδεδεμένο');
   let all,item,input,attachments;
@@ -213,7 +214,7 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
    try{
     evidence=await Promise.race([
       publicSearch.researchMessages(history),
-      new Promise(resolve=>{researchTimer=setTimeout(()=>resolve(researchTimeout),8500);})
+      new Promise(resolve=>{researchTimer=setTimeout(()=>resolve(researchTimeout),researchDeadlineMs);})
     ]);
    }finally{clearTimeout(researchTimer);}
    if(evidence===researchTimeout){
@@ -227,7 +228,7 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
      try{
       const augmented=await Promise.race([
         publicSearch.enrichPublisherArticles(evidence),
-        new Promise(resolve=>{articleTimer=setTimeout(()=>resolve(articleTimeout),8500);})
+        new Promise(resolve=>{articleTimer=setTimeout(()=>resolve(articleTimeout),articleDeadlineMs);})
       ]);
       if(augmented!==articleTimeout)evidence=augmented;
       else emit('status',{stage:'read_timeout',message:'Η ανάγνωση πηγών καθυστέρησε. Προχωρώ στην απάντηση…'});
@@ -268,7 +269,7 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
       ...messages,{role:'assistant',content:final.slice(-4500)},
       {role:'user',content:'Συνέχισε ακριβώς από εκεί που σταμάτησες, χωρίς επανάληψη.'}
     ]:messages;
-    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),25000);
+    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),modelDeadlineMs);
     const request={model:MODEL,messages:ask,temperature:0.3,stream:true,
       max_completion_tokens:1800};
     if(BASE==='https://api.groq.com/openai/v1'&&MODEL==='qwen/qwen3.8-27b'){
