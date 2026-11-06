@@ -43,6 +43,8 @@ test('new chat route streams and preserves only private attachment metadata',asy
  });
  await handler(req,res,id);
  assert.equal(status,200);
+ assert.match(responseText,/"type":"status"/);
+ assert.ok(responseText.indexOf('"type":"status"')<responseText.indexOf('"type":"delta"'));
  assert.match(responseText,/"type":"delta"/);
  assert.match(responseText,/"type":"done"/);
  assert.equal(db[0].messages[1].content,'Βλέπω εικόνα.');

@@ -127,13 +127,19 @@
    const bubble=pane.lastElementChild;
    input.value='';pending=[];showFiles();
    window.N7Presence?.setState('work',{source:'chat'});
+   if(notice)notice.textContent='Συνδέομαι με το N7…';
    const response=await fetch('/api/conversations/'+active+'/stream',{
     method:'POST',credentials:'same-origin',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({message:content,attachments:files})
    });
    await readNdjson(response,event=>{
+    if(event.type==='status'){
+     if(notice)notice.textContent=event.message||'Το N7 εργάζεται…';
+     return;
+    }
     if(event.type==='delta'){
+     if(notice)notice.textContent='Το N7 γράφει…';
      streamed+=event.text||'';bubble.textContent=streamed;
      pane.scrollTop=pane.scrollHeight;
     }
@@ -141,6 +147,7 @@
     if(event.type==='done')confirmed=true;
    });
    if(!confirmed)throw Error('Δεν επιβεβαιώθηκε η αποθήκευση της απάντησης.');
+   if(notice)notice.textContent='Η απάντηση ολοκληρώθηκε.';
    const updated=await api('/api/conversations/'+active);
    render(updated.conversation.messages);
    document.getElementById('currenttitle').textContent=updated.conversation.title;
