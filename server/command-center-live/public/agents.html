@@ -141,6 +141,15 @@ footer{color:#6d94a5;font-size:.77rem;margin-top:24px}
     <div class="console" id="n7PrivateConsole" role="status" aria-live="polite">Καμία νέα εργασία N7 Skills.</div>
     <p class="notes">Απαιτείται σύνδεση GitHub. Τα αποτελέσματα δεν προβάλλονται δημόσια στην Agent Room. Η λειτουργία δεν τροποποιεί τον τρισδιάστατο NABOU.</p>
   </section>
+  <section class="panel" id="n7LibraryPanel" aria-label="Μόνιμη βιβλιοθήκη N7" style="margin-top:22px">
+    <div class="mini">N7 HISTORICAL LIBRARY · PRIVATE PAGE SEARCH</div>
+    <h2>Αναζήτηση σε ιστορικές πηγές</h2>
+    <p>Αναζήτησε τα αποθηκευμένα κείμενα ανά σελίδα. Τα ευρήματα παραμένουν μη επαληθευμένα μέχρι να ελεγχθεί το πρωτότυπο.</p>
+    <label for="n7LibraryTerm">Λέξη ή ιστορικό όνομα</label>
+    <input id="n7LibraryTerm" type="search" placeholder="π.χ. Λάντζας" maxlength="150" style="width:min(100%,600px);padding:12px;border:1px solid #3a7184;border-radius:8px;background:#071723;color:#ebfbff">
+    <div class="actions"><button type="button" id="n7LibrarySubmit" class="primary">Αναζήτηση βιβλιοθήκης</button></div>
+    <div class="console" id="n7LibraryResults" role="status" aria-live="polite">Συνδέσου με GitHub για να αναζητήσεις ιδιωτικές πηγές.</div>
+  </section>
   <footer>PROJECT NABOU · TWO AGENTS · VERIFIED STATUS, NOT SIMULATED AI</footer>
 </main>
 <script>
@@ -268,6 +277,55 @@ $("submit").addEventListener("click",async()=>{
     }else{$("console").textContent="N7: HTTP "+r.status+" · "+String(data.error||"Η εντολή απορρίφθηκε.").slice(0,130);}
   }catch(e){$("console").textContent="N7: αποτυχία σύνδεσης ή χρονικό όριο.";}
   finally{$("submit").disabled=false;refresh();}
+});
+
+$("n7LibrarySubmit").addEventListener("click",async()=>{
+  const q=$("n7LibraryTerm").value.trim();
+  const out=$("n7LibraryResults");
+  if(!authenticated){out.textContent="Χρειάζεται σύνδεση με GitHub.";return;}
+  if(q.length<2||q.length>150){out.textContent="Η αναζήτηση απαιτεί 2–150 χαρακτήρες.";return;}
+  $("n7LibrarySubmit").disabled=true;
+  out.textContent="Αναζήτηση στις αποθηκευμένες σελίδες…";
+  try{
+    const url=API_BASE+"/pct-api/live/n7/library/search?q="+encodeURIComponent(q);
+    const response=await fetch(url,{credentials:"include",cache:"no-store",signal:AbortSignal.timeout(18000)});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok){out.textContent="Η βιβλιοθήκη δεν απάντησε: HTTP "+response.status+". Επανέλεγξε τη σύνδεση.";return;}
+    const hits=Array.isArray(data.result?.matches)?data.result.matches:[];
+    out.replaceChildren();
+    if(!hits.length){out.textContent="Δεν υπάρχουν ακόμη αποθηκευμένες σελίδες με αυτό το κείμενο.";return;}
+    for(const hit of hits){
+      const box=document.createElement("div");
+      box.style.cssText="padding:12px 0;border-bottom:1px solid #204252";
+      const label=document.createElement("strong");
+      label.textContent=String(hit.title||"Άγνωστη πηγή")+" · σελίδα "+String(hit.printed_page||"χωρίς τυπωμένη αρίθμηση")+" (σάρωση "+String(hit.scan_index)+")";
+      const excerpt=document.createElement("p");
+      excerpt.textContent=String(hit.excerpt||"");
+      const btn=document.createElement("button");
+      btn.type="button";btn.textContent="Πλήρες κείμενο σελίδας";
+      btn.addEventListener("click",async()=>{
+        btn.disabled=true;
+        try{
+          const u=API_BASE+"/pct-api/live/n7/library/page?source_id="+encodeURIComponent(String(hit.source_id))+"&scan_index="+encodeURIComponent(String(hit.scan_index));
+          const res=await fetch(u,{credentials:"include",signal:AbortSignal.timeout(18000)});
+          const data=await res.json();
+          if(!res.ok)throw Error("http_"+res.status);
+          const content=document.createElement("pre");
+          content.style.cssText="white-space:pre-wrap;overflow-wrap:anywhere";
+          content.textContent=String(data.result?.ocr_text||"");
+          box.appendChild(content);
+          btn.remove();
+        }catch(_){btn.textContent="Αποτυχία ανάκτησης σελίδας";}
+        finally{btn.disabled=false;}
+      });
+      box.append(label,excerpt,btn);
+      out.appendChild(box);
+    }
+  }catch(_){out.textContent="Αδυναμία πρόσβασης στη βιβλιοθήκη.";}
+  finally{$("n7LibrarySubmit").disabled=false;}
+});
+$("n7LibraryTerm").addEventListener("keydown",event=>{
+  if(event.key==="Enter"){$("n7LibrarySubmit").click();}
 });
 refresh();
 checkLogin();
