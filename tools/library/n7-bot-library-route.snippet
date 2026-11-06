@@ -24,7 +24,7 @@
         if(!upstream.ok)return json(res,503,{error:'Library search service unavailable'});
         if(result.schema!=='n7-library-read-v1'||!Array.isArray(result.matches))
           return json(res,503,{error:'Library response invalid'});
-        return json(res,200,{schema:'n7-library-read-v1',matches:result.matches.slice(0,15),historically_verified:false});
+        return json(res,200,{schema:'n7-library-read-v1',matches:result.matches.slice(0,15),source_count:Number.isSafeInteger(result.source_count)?result.source_count:null,page_count:Number.isSafeInteger(result.page_count)?result.page_count:null,historically_verified:false});
       }catch(_){return json(res,503,{error:'Library service connection failed'});}
       finally{clearTimeout(timer);}
     }
