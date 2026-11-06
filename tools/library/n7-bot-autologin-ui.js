@@ -17,7 +17,7 @@ async function n7LibraryPage(hit){
   if(!response.ok)throw new Error("Αδυναμία ανάγνωσης πλήρους σελίδας: HTTP "+response.status);
   const value=await response.json();
   if(value.schema!=="n7-library-page-v1"||!value.page)throw new Error("Μη έγκυρη σελίδα πηγής");
-  return value.page;
+  return {...value.page,source_type:value.source_type};
 }
 window.N7Library={search:n7LibrarySearch,page:n7LibraryPage};
 
@@ -92,14 +92,14 @@ document.addEventListener("DOMContentLoaded",()=>{
         heading.textContent=String(hit.title||"Άγνωστη πηγή").slice(0,250)+(hit.printed_page==null?"":" · Τυπωμένη σελίδα "+hit.printed_page)+" · Τμήμα ψηφιακού κειμένου "+hit.scan_index;
         const excerpt=document.createElement("p");excerpt.textContent=String(hit.excerpt||"");
         const sourceDetails=document.createElement("p");sourceDetails.style.cssText="font-size:12px;opacity:.85";
-        sourceDetails.textContent=(hit.author||"Άγνωστος συγγραφέας")+(hit.publication_year?" ("+hit.publication_year+")":"")+" · Δευτερογενής ιστοριογραφία · μη επαληθευμένη ιστορικά";
+        sourceDetails.textContent=(hit.author||"Άγνωστος συγγραφέας")+(hit.publication_year?" ("+hit.publication_year+")":"")+" · "+(hit.source_type==="SECONDARY_HISTORIOGRAPHY"?"Δευτερογενής ιστοριογραφία":"Πηγή προς ταξινόμηση") +" · μη επαληθευμένη ιστορικά";
         const showPage=document.createElement("button");showPage.type="button";showPage.textContent="Πλήρες κείμενο σελίδας";
         showPage.onclick=async()=>{
           showPage.disabled=true;
           try{
             const pg=await n7LibraryPage(hit);
             pageTitle.textContent=pg.title+(pg.printed_page?" · Τυπωμένη σελίδα "+pg.printed_page:"");
-            pageMeta.textContent=(pg.author||"Άγνωστος συγγραφέας")+" · Δευτερογενής ιστορική μελέτη · ψηφιακή μεταγραφή χωρίς ανεξάρτητη επαλήθευση";
+            pageMeta.textContent=(pg.author||"Άγνωστος συγγραφέας")+" · "+(pg.source_type==="SECONDARY_HISTORIOGRAPHY"?"Δευτερογενής ιστορική μελέτη":"Πηγή προς ταξινόμηση")+" · ψηφιακή μεταγραφή χωρίς ανεξάρτητη επαλήθευση";
             const uri=String(pg.source_uri||"");
             pageSource.style.display=uri.startsWith("https://www.gutenberg.org/ebooks/")?"inline":"none";
             if(pageSource.style.display!=="none")pageSource.href=uri;
@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded",()=>{
         const use=document.createElement("button");use.textContent="Προσθήκη στη συνομιλία";use.type="button";
         use.onclick=()=>{
           const input=document.querySelector("#message");
-          const cite="Δευτερογενής ιστοριογραφία, μη επαληθευμένη: "+String(hit.author||"")+" · "+String(hit.title||"")+" · ψηφιακό τμήμα "+hit.scan_index+
+          const cite=(hit.source_type==="SECONDARY_HISTORIOGRAPHY"?"Δευτερογενής ιστοριογραφία":"Πηγή προς ταξινόμηση")+", μη επαληθευμένη: "+String(hit.author||"")+" · "+String(hit.title||"")+" · ψηφιακό τμήμα "+hit.scan_index+
             (hit.printed_page==null?"":" · τυπωμένη σελίδα "+hit.printed_page)+" · OCR "+String(hit.ocr_status||"UNREVIEWED");
           input.value+=(input.value?"\n\n":"")+"Παρακαλώ εξέτασε το ακόλουθο μη επαληθευμένο ιστορικό απόσπασμα, χωρίς να επινοήσεις γεγονότα.\n"+cite+"\nΑπόσπασμα: "+String(hit.excerpt||"").slice(0,360);
           overlay.style.display="none";input.focus();
