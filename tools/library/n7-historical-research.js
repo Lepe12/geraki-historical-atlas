@@ -13,7 +13,7 @@ const GROUPS=[
   {id:"corsair",keys:["κουρσάρ","κουρσαρ","πειρατ","corsair","pirat"],terms:["corsair","pirate"]},
   {id:"malta",keys:["μάλτα","μαλτα","malta"],terms:["Malta"]}
 ];
-const HISTORICAL=/ιστορ|πηγ[ήες]|βιβλιογραφ|αρχε[ίι]|μελετ|έρευν|ερευν|πειρατ|κουρσ|αιγα|οθωμαν|βαρβαρ|barbar|dragut|lanza|lantza|doria|preves|corfu|malta|ναυμαχ|ναυτικ|τεκμηρι|χρονολογ|τουρκικ|μεσόγ|μεσογ|τι γνωρίζουμε|τι ξέρουμε/i;
+const HISTORICAL=/ιστορ|πηγ[ήες]|βιβλιογραφ|αρχε[ίι]|μελετ|έρευν|ερευν|πειρατ|κουρσ|αιγα|οθωμαν|βαρβαρ|μπαρμπαρ|χαιρεντιν|ντραγουτ|δραγουτ|λαντζ|barbar|dragut|lanza|lantza|doria|preves|corfu|malta|ναυμαχ|ναυτικ|τεκμηρι|χρονολογ|τουρκικ|μεσόγ|μεσογ|τι γνωρίζουμε|τι ξέρουμε/i;
 function fold(s){return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();}
 function clean(s){return String(s||"").replace(/[\u0000-\u001f]/g," ").trim().slice(0,12000);}
 function historicalIntent(q){return HISTORICAL.test(fold(clean(q)));}
@@ -94,13 +94,14 @@ function cite(hit){return String(hit.author||"Χωρίς συγγραφέα")+
 }
 function evidenceSummary(hits){
   const bibliographies=new Set(hits.map(h=>h.source_id));
+  const hasUnclassified=hits.some(h=>h.source_type!=="SECONDARY_HISTORIOGRAPHY");
   return {source_count:bibliographies.size,claim_status:"UNVERIFIED",
-    caveat:"Οι δευτερογενείς πηγές αποτελούν ιστοριογραφικές αφηγήσεις. Η συμφωνία τους δεν αποτελεί ανεξάρτητη επαλήθευση γεγονότος."};
+    caveat:hasUnclassified?"Περιλαμβάνονται πηγές που απαιτούν ταξινόμηση και έλεγχο. Η συμφωνία πηγών δεν αποδεικνύει ιστορική ακρίβεια.":"Οι δευτερογενείς πηγές αποτελούν ιστοριογραφικές αφηγήσεις. Η συμφωνία τους δεν αποτελεί ανεξάρτητη επαλήθευση γεγονότος."};
 }
 function formatEvidenceAnswer(question,hits,catalog={},errors=[]){
   const lines=[];
   if(hits.length){
-    lines.push("Βρήκα "+hits.length+" σχετικά αποσπάσματα στη μόνιμη βιβλιοθήκη. Τα παρακάτω είναι μαρτυρίες των ιστοριογράφων και όχι ανεξάρτητα επαληθευμένα γεγονότα:");
+    lines.push("Βρήκα "+hits.length+" σχετικά αποσπάσματα στη μόνιμη βιβλιοθήκη. Τα παρακάτω είναι κείμενα πηγών, ορισμένες από τις οποίες μπορεί να είναι αταξινόμητες. Δεν αποτελούν ανεξάρτητα επαληθευμένα γεγονότα:");
     hits.forEach((h,i)=>{
       lines.push("\n["+("S"+(i+1))+"] "+cite(h));
       lines.push("«"+String(h.excerpt||"").trim().slice(0,310)+"»");
