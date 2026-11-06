@@ -98,7 +98,7 @@ test('closed surface is only article + Πηγές + map; not-found never sits be
     not_found: [{ note_el: 'Δεν βρέθηκε τόπος ταφής.' }],
   };
   const story = renderStoryHtml(narrative, { heading: true });
-  assert.match(story, /<h3>Πέτρος Λάντζας \(Pietro \/ Pedro Lanza, 1530–1613\)<\/h3>/);
+  assert.match(story, /<h3>Πέτρος Λάντζας \(Pietro \/ Pedro Lanza,\s*1530–1613\)<\/h3>/);
   assert.match(story, /Πηγές/);
   assert.match(story, /τόπους του άρθρου: Πάργα/);
   assert.doesNotMatch(story, /Τι δεν βρέθηκε/);
@@ -165,7 +165,7 @@ test('in-progress title uses typed query, not run id; question visible; Πορε
   assert.doesNotMatch(data.title, /Έρευνα/);
   assert.doesNotMatch(data.title, /42176932029/);
   const html = renderOverviewStory(snapshot, data, { knownQuery: typed });
-  assert.match(html, new RegExp('<h2>' + typed + '</h2>'));
+  assert.match(html, /<h2>Κίμωλος πειρατεία[\s\u00a0]1700<\/h2>/);
   assert.match(html, /Το ερώτημά σας/);
   assert.match(html, new RegExp(typed));
   assert.doesNotMatch(html, /δεν είναι ακόμη διαθέσιμο/);
@@ -217,4 +217,16 @@ test('in-progress without known query still warns; with known query never invent
   const withQuery = overview(bare, { knownQuery: named });
   assert.equal(withQuery.title, named);
   assert.doesNotMatch(withQuery.title, /1530|1613|\d{4}/);
+});
+
+
+test('title wrap binds year with nbsp; empty story uses unread wording', async () => {
+  const { wrapTitleHtml, renderStoryHtml } = await viewPromise;
+  assert.match(wrapTitleHtml('Πέτρος Λάντζας 1613'), /\u00a01613/);
+  const empty = renderStoryHtml({
+    status: 'NO_USABLE_EVIDENCE',
+    title_el: 'Πέτρος Λάντζας',
+    paragraphs: [],
+  }, { heading: true });
+  assert.match(empty, /Δεν μπόρεσα να διαβάσω τις πηγές/);
 });

@@ -14,6 +14,44 @@ export const statusLabel = (status) =>
     IDLE: "Ανενεργή",
   })[String(status || "").toUpperCase()] || "Άγνωστη κατάσταση";
 
+/** Plain reading-list status — never «Ολοκληρώθηκε με εκκρεμότητες» or researcher counts. */
+export function historyStatusLabel(status, narrative = null) {
+  const code = String(status || "").toUpperCase();
+  if (["RUNNING", "PREPARING", "QUEUED", "STARTING", "ACTIVE"].includes(code)) {
+    return "σε εξέλιξη";
+  }
+  const narrStatus = String(narrative?.status || "").toUpperCase();
+  if (narrStatus === "NO_USABLE_EVIDENCE") return "δεν μπόρεσα να διαβάσω τις πηγές";
+  if (narrative && ["NARRATIVE_PENDING_HUMAN_REVIEW", "NO_USABLE_EVIDENCE"].includes(narrStatus)) {
+    const paras = Array.isArray(narrative.paragraphs) ? narrative.paragraphs : [];
+    if (!paras.some((p) => String(p?.text_el || "").trim())) {
+      return "δεν μπόρεσα να διαβάσω τις πηγές";
+    }
+  }
+  if (code === "COMPLETED") return "άρθρο έτοιμο";
+  if (
+    [
+      "PARTIAL",
+      "INSUFFICIENT_EVIDENCE",
+      "FAILED",
+      "BLOCKED",
+      "BLOCKED_CONFIGURATION",
+      "CANCELLED",
+      "CANCELED",
+    ].includes(code)
+  ) {
+    return "δεν μπόρεσα να διαβάσω τις πηγές";
+  }
+  return "σε εξέλιξη";
+}
+
+/** Waiting copy for the open reading surface. */
+export function waitingPhrase(topic = "") {
+  const name = String(topic || "").trim();
+  if (!name || /^έρευνα\s+\d+$/i.test(name)) return "Διαβάζονται οι πηγές.";
+  return "Διαβάζονται οι πηγές για «" + name + "».";
+}
+
 /** Mission still working (not a terminal outcome). */
 export function isMissionInProgress(snapshot) {
   return ["RUNNING", "PREPARING", "QUEUED", "STARTING", "ACTIVE"].includes(
@@ -111,7 +149,7 @@ export function historyEntry(snapshot, knownQuery = "") {
   if (!/^\d+$/.test(id)) return null;
   return {
     run_id: id,
-    target: String(resolveResearchQuery(snapshot, knownQuery) || "Έρευνα " + id),
+    target: String(resolveResearchQuery(snapshot, knownQuery) || ""),
     date_range: String(snapshot.mission?.date_range || ""),
     generated_utc: String(snapshot.generated_utc || ""),
     status: String(snapshot.mission?.status || "UNKNOWN"),

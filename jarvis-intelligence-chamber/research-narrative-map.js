@@ -75,8 +75,9 @@
         maxLon = Math.max(...lons),
         minLat = Math.min(...lats),
         maxLat = Math.max(...lats);
-      const padLon = pts.length > 1 ? Math.max(0.6, (maxLon - minLon) * 0.25) : 1.2;
-      const padLat = pts.length > 1 ? Math.max(0.5, (maxLat - minLat) * 0.25) : 1.0;
+      // Extra pad so pin labels and the «Τόποι του άρθρου» caption stay inside the frame.
+      const padLon = pts.length > 1 ? Math.max(1.2, (maxLon - minLon) * 0.35) : 2.0;
+      const padLat = pts.length > 1 ? Math.max(1.0, (maxLat - minLat) * 0.35) : 1.6;
       b = {
         min_lon: minLon - padLon,
         max_lon: maxLon + padLon,

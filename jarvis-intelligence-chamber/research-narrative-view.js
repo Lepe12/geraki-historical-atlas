@@ -108,6 +108,17 @@ export function articleTitle(narrative, fallback = "") {
   return String(fallback || "").trim();
 }
 
+/** Keep a trailing year (e.g. 1613) from falling alone on the next line. */
+export function wrapTitleHtml(title) {
+  const raw = String(title || "").trim();
+  if (!raw) return "";
+  // Bind year / year–year ranges to the preceding word with a non-breaking space.
+  const glued = raw
+    .replace(/(\S)\s+(\d{3,4}(?:\s*[–—-]\s*\d{3,4})?)/g, "$1\u00a0$2")
+    .replace(/(\d{3,4})\s*[–—-]\s*(\d{3,4})/g, "$1–$2");
+  return escapeHtml(glued);
+}
+
 /**
  * Closed «Πορεία έρευνας»: found / passed / cut and why, plus «Τι δεν βρέθηκε».
  * Legacy dashboard numbers (ιστορικοί ισχυρισμοί, αντιφάσεις, εμπόδια πρόσβασης)
@@ -147,6 +158,10 @@ export function renderResearchPath(narrative, extraHtml = "", { open = false } =
   }
   body += notFoundHtml(narrative);
   body += extraHtml || "";
+  // While running (#221) keep Πορεία open even before tallies arrive.
+  if (!body && open) {
+    body = "<p>Η πορεία ενημερώνεται καθώς διαβάζονται οι πηγές.</p>";
+  }
   if (!body) return "";
   return (
     '<details class="overview-details research-path"' +
@@ -179,14 +194,14 @@ export function renderStoryHtml(narrative, { mode = "default", heading = true, f
   // Default mode never shows a mechanical kicker; the name/years heading carries the article.
   const kickerHtml =
     mode === "default" ? "" : '<p class="narrative-kicker">' + escapeHtml(modeLabel) + "</p>";
-  const headingHtml = heading && title ? "<h3>" + escapeHtml(title) + "</h3>" : heading ? "" : kickerHtml;
+  const headingHtml = heading && title ? "<h3>" + wrapTitleHtml(title) + "</h3>" : heading ? "" : kickerHtml;
   if (empty) {
     return (
       '<section class="research-narrative" aria-label="' +
       escapeHtml(modeLabel) +
       '">' +
       headingHtml +
-      '<p class="narrative-empty">Δεν προέκυψε τεκμηριωμένη αφήγηση από τις εξετασθείσες πηγές. Αυτό δεν αποδεικνύει ιστορική απουσία.</p>' +
+      '<p class="narrative-empty">Δεν μπόρεσα να διαβάσω τις πηγές.</p>' +
       mapNoteHtml(narrative, mode) +
       "</section>"
     );
@@ -250,15 +265,34 @@ export function renderOverviewStory(snapshot, data, { knownQuery = "" } = {}) {
     '<p class="overview-next"><strong>Επόμενο βήμα:</strong> ' +
     escapeHtml(data?.next || "") +
     "</p>";
-  // Open Πορεία while the research is still working; close it again when finished.
+  // #221: typed query as title while running; Πορεία open while running, closed when finished.
   const pathOpen = inProgress && !isNarrativeReady(narrative);
+  if (inProgress && !isNarrativeReady(narrative)) {
+    const topic = queryText || String(data?.title || "").trim();
+    const wait =
+      topic && !/^έρευνα\s+\d+$/i.test(topic)
+        ? "Διαβάζονται οι πηγές για «" + topic + "»."
+        : "Διαβάζονται οι πηγές.";
+    return (
+      '<div class="overview-heading"><h2>' +
+      wrapTitleHtml(topic) +
+      '</h2><span>σε εξέλιξη</span></div>' +
+      '<dl class="dossier-question"><div><dt>Το ερώτημά σας</dt><dd>' +
+      question +
+      "</dd></div></dl>" +
+      '<p class="reader-waiting" role="status">' +
+      escapeHtml(wait) +
+      "</p>" +
+      renderResearchPath(narrative, "", { open: pathOpen })
+    );
+  }
   return (
     '<div class="overview-heading"><h2>' +
-    escapeHtml(data?.title || queryText || "") +
+    wrapTitleHtml(data?.title || queryText || "") +
     "</h2><span>" +
     escapeHtml(data?.status || "") +
     "</span></div>" +
     (story || "<p>" + escapeHtml(data?.message || "") + "</p>") +
-    renderResearchPath(narrative, extras, { open: pathOpen })
+    renderResearchPath(narrative, extras, { open: false })
   );
 }
