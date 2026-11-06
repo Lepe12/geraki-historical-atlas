@@ -1,0 +1,6 @@
+'use strict';
+// N7_HISTORICAL_NAME_VARIANTS_V1 — discovery variants are not identity proof.
+function lanzaQueries(){return ['("Pietro Lanza" OR "Petros Lantzas" OR "Pedro Lanza" OR "Πέτρος Λάντζας") AND (Corfu OR Parga OR corsair OR "16th century")','"Petros Lantzas" OR "Pedro Lanza" OR "Πέτρος Λάντζας"'];}
+function identity(record){const text=[record.title,record.excerpt,record.source].join(' ').normalize('NFD').replace(/\p{M}/gu,'').toLowerCase();if(/mario\s+lanza|lanza\s+di\s+trabia|risorgimento.*(?:18\d{2}|19\d{2})/.test(text))return 'different_person';if(/corfu|corfu|parga|corsair|κερκυρ|παργα|κουρσαρ/.test(text)&&/lanza|lantzas|λαντζ/.test(text))return 'context_match';return 'identity_unverified';}
+async function searchLanza(search,options){const results=await Promise.all(lanzaQueries().map(q=>search(q,options)));const items=[],seen=new Set();let rejected=0;for(const r of results)for(const x of r.items||[]){if(seen.has(x.url))continue;seen.add(x.url);const state=identity(x);if(state==='different_person'){rejected++;continue}items.push({...x,identityStatus:state});}const ok=results.find(r=>r.reason==='ok'),first=results[0];return {...(ok||first),items:items.slice(0,7),rejectedDifferentPeople:rejected,queryVariants:lanzaQueries().length};}
+module.exports={lanzaQueries,identity,searchLanza};

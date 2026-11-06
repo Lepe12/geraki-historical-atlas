@@ -1,6 +1,7 @@
 'use strict';
 // N7_PUBLIC_SEARCH_V1: private server-side read-only retrieval, no API key.
 // Bounded public search feeds and Wikimedia reference material; not a full browser.
+const identities=require('./research-identities'); // N7_HISTORICAL_NAME_VARIANTS_V1
 const documentReader=require('./document-reader'); // N7_GENERAL_READING_V1
 const DEFAULT_UA='N7PublicResearch/1.0 (https://piratecartography.com)';
 const n7Europeana=require('./europeana-api'); // N7_EUROPEANA_SEARCH_INTEGRATION_V1
@@ -65,14 +66,14 @@ function classify(messages,at=new Date()){
   const context=isContinuation?compact(prior+' '+last,550):last;
   const explicit=/(?:ψάξε|αναζήτησε|βρες\s+(?:στο\s+)?(?:διαδίκτυο|πηγές|online)|έλεγξε\s+(?:στο\s+)?(?:ίντερνετ|διαδίκτυο)|search\s+(?:the\s+)?web|look\s+up|πηγές\s+στο\s+διαδίκτυο)/iu.test(last);
   const current=/(?:χθεσιν|χθες|σήμερα|προχθές|φέτος|πρόσφατ|τελευταί|τρέχον|τωριν|αυτή\s+την\s+εβδομάδα|εξελίξε|είδησ|νέα\s+για|εκλογ|πρόεδρ|κυβέρνησ|αποτελέσματ|latest|recent|breaking|yesterday|today|now|current|election|midterm|president|news|result)/iu.test(context);
-  const history=/(?:τι\s+ξέρεις\s+για|ποιος\s+(?:ήταν|είναι)|ποια\s+(?:ήταν|είναι)|ιστορικ|κουρσάρ|πειρατ|μεσαιων|αναγέννησ|16(?:ος|ου)|17(?:ος|ου)|archiv|historical|corsair|pirat|history|lanz|λάντζ|πετρο\s+λαντζ|pietro\s+lanza|πέτρο\s+λάντζ)/iu.test(context);
+  const history=/(?:τι\s+ξέρεις\s+για|ποιος\s+(?:ήταν|είναι)|ποια\s+(?:ήταν|είναι)|ιστορικ|κουρσάρ|πειρατ|μεσαιων|αναγέννησ|16(?:ος|ου)|17(?:ος|ου)|archiv|historical|corsair|pirat|history|lanz|lantz|λάντζ|πετρο\s+λαντζ|pietro\s+lanza|πέτρο\s+λάντζ)/iu.test(context);
   const directUrls=[...last.matchAll(/https:\/\/[^\s<>"'\[\]]+/gu)].map(x=>safeLink(x[0].replace(/[).,;]+$/,''))).filter(Boolean).slice(0,3);
   if(!explicit&&!current&&!history&&!directUrls.length)return null;
   const year=Number(new Intl.DateTimeFormat('en',{timeZone:'Europe/Athens',year:'numeric'}).format(at));
   let query=compact(context,MAX_QUERY),kind=history&&!current?'historical':(current?'news':'general');
   const election=/(?:εκλογ|election|midterm)/iu.test(context);
   const us=/(?:ΗΠΑ|αμερικ|Ηνωμένων\s+Πολιτειών|Τραμπ|Trump|United\s+States|\bUSA\b|\bUS\b)/iu.test(context);
-  const lanza=/(?:λάντζ|λαντζ|pietro\s+lanza|pedro\s+lanza|peter\s+lanza)/iu.test(context);
+  const lanza=/(?:λάντζ|λαντζ|pietro\s+lanza|pedro\s+lanza|peter\s+lanza|petros\s+lantza[sz]?)/iu.test(context);
   if(lanza){
     kind='historical';
     query='Pietro Lanza Corfu corsair Parga 1573 Spanish Naples 1608 history';
@@ -144,11 +145,12 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
     {name:'Bing Web',url:'https://www.bing.com/search?q='+q+'&format=rss',rss:true},
     {name:'Wikipedia',url:'https://en.wikipedia.org/w/rest.php/v1/search/page?q='+q+'&limit=4',rss:false}
   ];
+  if(request.historicalLanza)targets.push({name:'Bing name variants',url:'https://www.bing.com/search?q='+encodeURIComponent(identities.lanzaQueries()[1])+'&format=rss',rss:true});
   // Historical research uses general search, not short-lived news feeds.
   // Europeana is metadata-only. Query in parallel with legacy sources so
   // configured European heritage discovery does not introduce sequential latency.
   const europeanaJob=request.kind==='historical'
-    ?n7Europeana.searchEuropeana(request.historicalLanza?'Pietro Lanza':request.userText,{transport})
+    ?(request.historicalLanza?identities.searchLanza(n7Europeana.searchEuropeana,{transport}):n7Europeana.searchEuropeana(request.userText,{transport}))
     :Promise.resolve({configured:false,queried:false,items:[],reason:'not_historical'});
   const [results,europeana]=await Promise.all([
     Promise.allSettled(targets.map(async x=>{
@@ -161,6 +163,7 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
   for(const r of results){
     if(r.status!=='fulfilled')continue;successful++;
     for(const x of r.value) {
+      if(request.historicalLanza&&identities.identity(x)==='different_person')continue;
       const fingerprint=x.title.toLocaleLowerCase().replace(/[^a-z0-9α-ωάέήίόύώϊϋ]/giu,'').slice(0,70);
       if(!fingerprint||seen.has(fingerprint))continue;
       seen.add(fingerprint);merged.push(x);
@@ -186,7 +189,7 @@ async function researchMessages(messages,{now=new Date(),transport=fetch}={}){
   const items=merged.slice(0,9);
   return {searched:true,query:request.query,kind:request.kind,items,
     europeana:{configured:europeana.configured,queried:europeana.queried,
-      found:(europeana.items||[]).length,reason:europeana.reason},
+      found:(europeana.items||[]).length,reason:europeana.reason,rejectedDifferentPeople:europeana.rejectedDifferentPeople||0,queryVariants:europeana.queryVariants||1},
     availableProviders:successful+(europeana.reason==='ok'?1:0),
     failedProviders:results.length-successful+(europeana.queried&&europeana.reason!=='ok'?1:0)};
 }
@@ -314,13 +317,13 @@ function contextForResearch(research){
   const audit=n7HistoricalAudit.historicalAuditContext(research);
   const europeanaNote=research.europeana?.configured
     ?('Europeana Search API: '+research.europeana.found+
-      ' bibliographic metadata records returned; NEVER claim their content was read. '+
+      ' bibliographic metadata records returned; NEVER claim their content was read. '+(research.europeana.rejectedDifferentPeople||0)+' clear namesakes filtered. Name variants tried: '+(research.europeana.queryVariants||1)+'. '+
       (research.europeana.reason==='ok'?'':'Provider status: '+research.europeana.reason))
     :'Europeana Search API: NOT CONFIGURED (EUROPEANA_API_KEY missing). Never claim that Europeana was queried.';
   const isHistory=research.kind==='historical';
   const items=research.items.slice(0,9).map((x,i)=>{
     const metadata='[S'+(i+1)+'] '+x.title+' | '+x.source+' | '+x.url+
-      (x.published?' | '+x.published:'');
+      (x.published?' | '+x.published:'')+(x.identityStatus?' | identity: '+x.identityStatus:'');
     if(!x.articleRead)return metadata+' | ONLY SEARCH METADATA. NOT READ. '+(x.readStatus?'Read status: '+x.readStatus:'');
     const source=String(x.articleText||'');
     const cap=x.direct?6500:(isHistory&&/piratecartography\.com/i.test(x.url)?6500:1400);
