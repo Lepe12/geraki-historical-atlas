@@ -17,8 +17,9 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
  await page.locator('#atlasExplore').hover();
  assert.equal(await page.locator('#atlasExplore').evaluate(e=>getComputedStyle(e).backdropFilter),'none');
  assert.equal(await page.locator('#atlasExplore').evaluate(e=>getComputedStyle(e).backgroundImage),'none');
- await page.locator('#atlasHome [data-atlas-nav="map"]').hover();
- assert.equal(await page.locator('#atlasHome [data-atlas-nav="map"]').evaluate(e=>getComputedStyle(e).backgroundImage),'none');
+ await page.locator('#atlasResearch [data-atlas-nav="map"]').hover();
+ assert.equal(await page.locator('#atlasResearch [data-atlas-nav="map"]').evaluate(e=>getComputedStyle(e).backgroundImage),'none');
+ await page.screenshot({path:path.join(process.env.NABOU_SCREENSHOT_DIR||__dirname,'unified-home.png')});
  await page.locator('#atlasExplore').click();
  await page.waitForFunction(()=>document.body.dataset.readerView==='map');
  assert.equal(await page.locator('#atlasHome').isVisible(),false);
