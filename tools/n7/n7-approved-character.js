@@ -54,6 +54,10 @@ function mount(parent,small){if(!parent||parent.querySelector('.n7-live-presence
 }
 function ensureMounted(){
  const messages=document.getElementById('messages');if(!messages)return;
+ const welcome=messages.querySelector(':scope > .welcome');
+ if(welcome)mount(welcome,false);
+ const header=document.querySelector('#application header');
+ if(header)mount(header,true);
  const nearBottom=messages.scrollHeight-messages.scrollTop-messages.clientHeight<100;
  for(const bubble of messages.querySelectorAll('.bubble.assistant')){
   if(bubble.querySelector(':scope > .n7-answer-identity'))continue;
