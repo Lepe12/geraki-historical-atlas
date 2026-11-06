@@ -27,12 +27,20 @@ jobs:
           sparse-checkout: |
             server/command-center-live
             tools/library
+            ops_ftps_requests
       - name: Syntax and gateway regression
         run: |
           set -euo pipefail
           node --check server/command-center-live/n7-gateway.js
           node --test server/command-center-live/n7-gateway.test.js
           python3 -m py_compile tools/library/deploy_n7_library_bridge_ftps.py
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          actual=json.loads(Path("ops_ftps_requests/n7-library-bridge.json").read_text())
+          expected={"schema":"n7-library-bridge-deploy-v1","mode":"deploy","scope":"read-only-library","confirmation":"DEPLOY-N7-LIBRARY-READONLY"}
+          assert actual==expected, "UNAUTHORIZED_DEPLOY_REQUEST"
+          PY
   deploy:
     needs: validate
     if: github.event_name == 'push'
