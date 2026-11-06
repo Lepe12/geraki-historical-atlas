@@ -76,12 +76,16 @@ function render() {
     : 0;
   body.innerHTML =
     renderStoryHtml(narrative, { mode: meta.storyMode, heading: false }) +
-    renderCountsDetails([
-      [related, "Σχετικές αναφορές"],
-      [claims, "Ιστορικοί ισχυρισμοί"],
-      [contradictions, "Καταγεγραμμένες αντιφάσεις"],
-      [blockers, "Εμπόδια πρόσβασης"],
-    ]);
+    renderCountsDetails(
+      [
+        [related, "Σχετικές αναφορές"],
+        [claims, "Ιστορικοί ισχυρισμοί"],
+        [contradictions, "Καταγεγραμμένες αντιφάσεις"],
+        [blockers, "Εμπόδια πρόσβασης"],
+      ],
+      "",
+      narrative,
+    );
   if (window.NABOU_FACT_PINS) window.NABOU_FACT_PINS.fromSnapshot(snapshot);
 }
 

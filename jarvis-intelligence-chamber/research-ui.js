@@ -459,7 +459,7 @@ function renderResults() {
   }
   const narrativeReady = isNarrativeReady(snapshot?.research_answer?.greek_narrative);
   meta.textContent = narrativeReady
-    ? "Αφήγηση και χάρτης · οι αριθμοί στις Λεπτομέρειες"
+    ? "Αφήγηση και χάρτης · τα πλήθη στην Πορεία έρευνας"
     : related.length +
       " πιθανές σχετικές αναφορές · " +
       supporting.length +

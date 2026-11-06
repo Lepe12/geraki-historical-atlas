@@ -25,7 +25,7 @@ test('greek narrative leads the overview and keeps counts for details', async ()
   });
   assert.equal(r.title, 'Ιωάννης Καψής');
   assert.match(r.message, /Μήλο/);
-  assert.match(r.next, /Λεπτομέρειες/);
+  assert.match(r.next, /Πορεία έρευνας/);
   assert.equal(r.related, 1);
   assert.equal(r.claims, 1);
 });

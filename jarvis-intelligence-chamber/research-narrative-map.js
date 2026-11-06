@@ -1,5 +1,5 @@
-/* Plot accepted Greek-narrative places on the portolan chart.
-   Does not modify the locked chamber.js core; uses NABOU_CHART projection. */
+/* Plot accepted Greek-narrative places on the portolan chart and frame the view
+   on those places (not the whole Mediterranean). Does not modify locked chamber.js. */
 (function () {
   const LAYER_ID = "nabouFactPins";
   function project(lon, lat) {
@@ -60,10 +60,61 @@
       layer.appendChild(pin);
     }
   }
-  function fromSnapshot(snapshot) {
-    const places = snapshot?.research_answer?.greek_narrative?.map_places || [];
-    setFactPins(places);
+  function frameBounds(bounds, places) {
+    const C = window.NABOU_CHART;
+    if (!C) return;
+    let b = bounds;
+    if (!b || b.min_lon == null) {
+      const pts = (Array.isArray(places) ? places : []).filter(
+        (p) => p && p.status === "RESOLVED" && Number.isFinite(Number(p.lon)) && Number.isFinite(Number(p.lat)),
+      );
+      if (!pts.length) return;
+      const lons = pts.map((p) => Number(p.lon));
+      const lats = pts.map((p) => Number(p.lat));
+      const minLon = Math.min(...lons),
+        maxLon = Math.max(...lons),
+        minLat = Math.min(...lats),
+        maxLat = Math.max(...lats);
+      const padLon = pts.length > 1 ? Math.max(0.6, (maxLon - minLon) * 0.25) : 1.2;
+      const padLat = pts.length > 1 ? Math.max(0.5, (maxLat - minLat) * 0.25) : 1.0;
+      b = {
+        min_lon: minLon - padLon,
+        max_lon: maxLon + padLon,
+        min_lat: minLat - padLat,
+        max_lat: maxLat + padLat,
+        center_lon: (minLon + maxLon) / 2,
+        center_lat: (minLat + maxLat) / 2,
+      };
+    }
+    // Prefer a documented chart API when present; otherwise pan via center helpers.
+    if (typeof window.NABOU_CHART.fitBounds === "function") {
+      try {
+        window.NABOU_CHART.fitBounds(b);
+        return;
+      } catch (_) {}
+    }
+    if (typeof window.NABOU_CHART.setView === "function") {
+      try {
+        window.NABOU_CHART.setView({
+          lon: b.center_lon,
+          lat: b.center_lat,
+          bounds: b,
+        });
+        return;
+      } catch (_) {}
+    }
+    // Last resort: expose bounds for chamber/dashboard consumers without touching locked core.
+    window.NABOU_FACT_BOUNDS = b;
+    try {
+      window.dispatchEvent(new CustomEvent("nabou:fact-bounds", { detail: b }));
+    } catch (_) {}
   }
-  window.NABOU_FACT_PINS = { setFactPins, clear, fromSnapshot };
+  function fromSnapshot(snapshot) {
+    const narrative = snapshot?.research_answer?.greek_narrative || {};
+    const places = narrative.map_places || [];
+    setFactPins(places);
+    if (places.length) frameBounds(narrative.map_bounds, places);
+  }
+  window.NABOU_FACT_PINS = { setFactPins, clear, fromSnapshot, frameBounds };
   window.addEventListener("jarvis:snapshot", (e) => fromSnapshot(e.detail));
 })();

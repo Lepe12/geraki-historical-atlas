@@ -173,6 +173,7 @@ export function dossierMarkup(snapshot) {
             [blockers.length, "Εμπόδια πρόσβασης"],
           ],
           pendingExtras,
+          narrative,
         )
       : pendingExtras);
   const events = Array.isArray(snapshot.events) ? snapshot.events : [];

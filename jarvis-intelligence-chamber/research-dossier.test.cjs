@@ -27,6 +27,8 @@ test('dossier embeds the greek narrative instead of a pointer', async () => {
         status: 'NARRATIVE_PENDING_HUMAN_REVIEW',
         title_el: 'Δείγμα προσώπου',
         paragraphs: [{ text_el: 'Το 1600 περίπου εμφανίζεται σε νησί *(ΠΑΡΑΔΕΙΓΜΑ, σελ. 1)*', claim_ids: ['c1'] }],
+        sources: [{ label_el: 'ΠΑΡΑΔΕΙΓΜΑ, τόπος 1600, σ. 1' }],
+        research_path: { found: 5, passed: 1, cut: 4, summary_el: 'Βρέθηκαν 5 τεκμήρια· Πέρασαν 1· Κόπηκαν 4.' },
         not_found: [{ note_el: 'Δεν βρέθηκε ημερομηνία θανάτου στις εξετασθείσες πηγές.' }],
       },
     },
@@ -35,6 +37,6 @@ test('dossier embeds the greek narrative instead of a pointer', async () => {
   assert.match(html, /εμφανίζεται σε νησί/);
   assert.match(html, /ΠΑΡΑΔΕΙΓΜΑ, σελ\. 1/);
   assert.doesNotMatch(html, /Η αφήγηση είναι διαθέσιμη στο ερώτημα/);
-  assert.match(html, /Λεπτομέρειες/);
+  assert.match(html, /Πορεία έρευνας/);
   assert.match(html, /Εμπόδια πρόσβασης/);
 });

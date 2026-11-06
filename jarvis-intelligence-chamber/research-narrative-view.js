@@ -1,5 +1,5 @@
-/* Shared Greek research narrative rendering for overview, findings, dossier, and map tabs.
-   Story + citations first; counts stay behind Λεπτομέρειες. Does not invent biography. */
+/* Shared Greek research narrative: continuous article + Πηγές + map + closed Πορεία έρευνας.
+   Tone/order mold only — every accepted fact belongs in the article. No invented biography. */
 const ESC = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
 export const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ESC[c]);
 
@@ -34,15 +34,33 @@ function paragraphHtml(row) {
   );
 }
 
-function notFoundHtml(narrative, { open = false } = {}) {
+function notFoundHtml(narrative) {
   const rows = Array.isArray(narrative?.not_found) ? narrative.not_found : [];
   if (!rows.length) return "";
   return (
-    '<section class="narrative-not-found"' +
-    (open ? "" : "") +
-    '><h3>Τι δεν βρέθηκε</h3><ul>' +
+    '<section class="narrative-not-found"><h3>Τι δεν βρέθηκε</h3><ul>' +
     rows.map((row) => "<li>" + escapeHtml(row.note_el || row.facet_el || "") + "</li>").join("") +
     '</ul><small>«Δεν βρέθηκε στις εξετασθείσες πηγές» δεν σημαίνει «δεν συνέβη».</small></section>'
+  );
+}
+
+function sourcesHtml(narrative) {
+  const rows = Array.isArray(narrative?.sources) ? narrative.sources : [];
+  if (rows.length) {
+    return (
+      '<section class="narrative-sources" aria-label="Πηγές"><h3>Πηγές</h3><ol>' +
+      rows
+        .map((s) => "<li>" + escapeHtml(s.label_el || s.title || "") + "</li>")
+        .join("") +
+      "</ol></section>"
+    );
+  }
+  const block = String(narrative?.sources_el || "").trim();
+  if (!block) return "";
+  return (
+    '<section class="narrative-sources" aria-label="Πηγές"><p>' +
+    escapeHtml(block) +
+    "</p></section>"
   );
 }
 
@@ -50,6 +68,18 @@ function placeNames(narrative) {
   return (narrative?.map_places || [])
     .map((p) => String(p.label || p.surface || "").trim())
     .filter(Boolean);
+}
+
+function mapNoteHtml(narrative, mode) {
+  const names = placeNames(narrative);
+  if (!names.length) return "";
+  const lead =
+    mode === "territory"
+      ? "Στον χάρτη δίπλα σημειώνονται οι τόποι του άρθρου: "
+      : "Ο χάρτης δίπλα εστιάζει στους τόπους του άρθρου: ";
+  return (
+    '<p class="narrative-place-note">' + lead + escapeHtml(names.join(" · ")) + "</p>"
+  );
 }
 
 function filterParagraphs(narrative, mode) {
@@ -61,12 +91,67 @@ function filterParagraphs(narrative, mode) {
     const text = String(row?.text_el || "").toLocaleLowerCase("el");
     return places.some((p) => text.includes(p.toLocaleLowerCase("el")));
   });
+  // Place page = historical note: prefer place-bearing sentences, but never hide
+  // the rest of the accepted findings if filtering would empty the article.
   return matched.length ? matched : rows;
+}
+
+function researchPathHtml(narrative, counts, extraHtml = "") {
+  const path = narrative?.research_path || null;
+  const rows = Array.isArray(counts) ? counts : [];
+  let body = "";
+  if (path && (path.found != null || path.passed != null || path.cut != null)) {
+    body +=
+      '<p class="research-path-summary">' +
+      escapeHtml(
+        path.summary_el ||
+          `Βρέθηκαν ${path.found} τεκμήρια· Πέρασαν ${path.passed}· Κόπηκαν ${path.cut}.`,
+      ) +
+      "</p>";
+    const groups = Array.isArray(path.groups) ? path.groups : [];
+    if (groups.length) {
+      body +=
+        '<ul class="research-path-groups">' +
+        groups
+          .map(
+            (g) =>
+              "<li><strong>" +
+              escapeHtml(g.label_el || g.key || "") +
+              ":</strong> " +
+              escapeHtml(g.count) +
+              "</li>",
+          )
+          .join("") +
+        "</ul>";
+    }
+    if (path.omission_note_el) {
+      body += "<p>" + escapeHtml(path.omission_note_el) + "</p>";
+    }
+  }
+  if (rows.length) {
+    body +=
+      '<dl class="overview-counts">' +
+      rows
+        .map(
+          ([n, label]) =>
+            "<div><dt>" + escapeHtml(label) + "</dt><dd>" + escapeHtml(n) + "</dd></div>",
+        )
+        .join("") +
+      "</dl>";
+  }
+  body += extraHtml || "";
+  if (!body) return "";
+  return (
+    '<details class="overview-details research-path"><summary>Πορεία έρευνας</summary>' +
+    body +
+    "</details>"
+  );
 }
 
 /**
  * Researcher-facing story block.
  * mode: "default" | "history" | "territory" | "people"
+ * Person page = biography; place page = historical note; not a control panel.
  */
 export function renderStoryHtml(narrative, { mode = "default", heading = true } = {}) {
   if (!isNarrativeReady(narrative)) return "";
@@ -76,9 +161,9 @@ export function renderStoryHtml(narrative, { mode = "default", heading = true } 
   const title = narrative.title_el || "Αφήγηση έρευνας";
   const modeLabel =
     mode === "territory"
-      ? "Τόποι στην αφήγηση"
+      ? "Ιστορικό σημείωμα τόπου"
       : mode === "people"
-        ? "Πρόσωπο"
+        ? "Βιογραφικό"
         : mode === "history"
           ? "Χρονολογική αφήγηση"
           : "Αφήγηση";
@@ -90,6 +175,7 @@ export function renderStoryHtml(narrative, { mode = "default", heading = true } 
       (heading ? "<h3>" + escapeHtml(title) + "</h3>" : "") +
       '<p class="narrative-empty">Δεν προέκυψε τεκμηριωμένη αφήγηση από τις εξετασθείσες πηγές. Αυτό δεν αποδεικνύει ιστορική απουσία.</p>' +
       notFoundHtml(narrative) +
+      mapNoteHtml(narrative, mode) +
       "</section>"
     );
   }
@@ -97,41 +183,26 @@ export function renderStoryHtml(narrative, { mode = "default", heading = true } 
     .map(paragraphHtml)
     .filter(Boolean)
     .join("");
-  const placeNote =
-    mode === "territory" && placeNames(narrative).length
-      ? '<p class="narrative-place-note">Στον χάρτη σημειώνονται: ' +
-        escapeHtml(placeNames(narrative).join(" · ")) +
-        "</p>"
-      : "";
   return (
     '<section class="research-narrative" aria-label="' +
     escapeHtml(modeLabel) +
     '">' +
-    (heading ? "<h3>" + escapeHtml(title) + "</h3>" : '<p class="narrative-kicker">' + escapeHtml(modeLabel) + "</p>") +
-    placeNote +
+    (heading
+      ? "<h3>" + escapeHtml(title) + "</h3>"
+      : '<p class="narrative-kicker">' + escapeHtml(modeLabel) + "</p>") +
+    '<div class="narrative-article">' +
     paragraphs +
+    "</div>" +
+    sourcesHtml(narrative) +
     notFoundHtml(narrative) +
+    mapNoteHtml(narrative, mode) +
     "</section>"
   );
 }
 
-export function renderCountsDetails(counts, extraHtml = "") {
-  const rows = Array.isArray(counts) ? counts : [];
-  return (
-    '<details class="overview-details"><summary>Λεπτομέρειες</summary>' +
-    (rows.length
-      ? '<dl class="overview-counts">' +
-        rows
-          .map(
-            ([n, label]) =>
-              "<div><dt>" + escapeHtml(label) + "</dt><dd>" + escapeHtml(n) + "</dd></div>",
-          )
-          .join("") +
-        "</dl>"
-      : "") +
-    (extraHtml || "") +
-    "</details>"
-  );
+/** @deprecated name kept for callers; summary label is now Πορεία έρευνας */
+export function renderCountsDetails(counts, extraHtml = "", narrative = null) {
+  return researchPathHtml(narrative, counts, extraHtml);
 }
 
 /** Compact overview used by the right-hand «Το ερώτημα» panel. */
@@ -157,9 +228,7 @@ export function renderOverviewStory(snapshot, data) {
     "</dd></div><div><dt>Περίοδος</dt><dd>" +
     period +
     "</dd></div></dl>" +
-    (story
-      ? ""
-      : "<p>" + escapeHtml(data?.message || "") + "</p>") +
+    (story ? "" : "<p>" + escapeHtml(data?.message || "") + "</p>") +
     '<p class="overview-next"><strong>Επόμενο βήμα:</strong> ' +
     escapeHtml(data?.next || "") +
     "</p>";
@@ -170,7 +239,8 @@ export function renderOverviewStory(snapshot, data) {
     escapeHtml(data?.status || "") +
     "</span></div>" +
     (story || "<p>" + escapeHtml(data?.message || "") + "</p>") +
-    renderCountsDetails(
+    researchPathHtml(
+      narrative,
       [
         [data?.related, "Σχετικές αναφορές"],
         [data?.claims, "Ιστορικοί ισχυρισμοί"],
