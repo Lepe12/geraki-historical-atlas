@@ -95,7 +95,16 @@
  }
  $('atlasCloseResearch')?.setAttribute('aria-label','Επιστροφή στον χάρτη');
  document.addEventListener('click',event=>{
-  const target=event.target.closest('button');if(!target)return;
+  let target=event.target.closest('button');
+  // Transparent poster navigation can retarget a touch to its nav container.
+  // Resolve that touch to the nearest visible labelled button.
+  if(!target&&event.target.matches('#atlasHome .atlas-topnav')){
+   target=[...event.target.querySelectorAll('[data-atlas-nav]')].reduce((best,button)=>{
+    const r=button.getBoundingClientRect(),distance=Math.abs(event.clientX-(r.left+r.width/2));
+    return !best||distance<best.distance?{button,distance}:best;
+   },null)?.button;
+  }
+  if(!target)return;
   const nav=target.closest('[data-atlas-nav]');
   if(nav){
    const dest=nav.dataset.atlasNav;if(!['map','research','sources','agents','tools'].includes(dest))return;
