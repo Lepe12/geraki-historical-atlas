@@ -1,0 +1,93 @@
+name: N7 large historical PDF upload
+on:
+  pull_request:
+    paths:
+      - 'tools/library/n7-large-pdf-upload.js'
+      - 'tools/library/test/n7-large-pdf-upload.test.js'
+      - 'tools/library/n7-bot-autologin-ui.js'
+      - 'tools/library/n7_library.php'
+      - 'tools/library/deploy_n7_large_pdf_ftps.py'
+      - 'server/command-center-live/n7-gateway.js'
+      - 'server/command-center-live/n7-gateway.test.js'
+      - 'server/command-center-live/pdf-evidence.py'
+      - '.github/workflows/n7-large-pdf.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'ops_ftps_requests/n7-large-pdf.json'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/library
+            tools/n7
+            server/command-center-live
+            ops_ftps_requests
+      - name: Validate app, gateway, PDF extraction and private session security
+        run: |
+          set -e
+          node --check tools/library/n7-large-pdf-upload.js
+          node --check tools/library/n7-bot-autologin-ui.js
+          node --check tools/n7/n7-approved-character.js
+          node --check server/command-center-live/n7-gateway.js
+          node --test tools/library/test/n7-large-pdf-upload.test.js
+          node --test server/command-center-live/n7-gateway.test.js
+          php -l tools/library/n7_library.php
+          php tools/library/n7_library.php self-test
+          python3 -m py_compile tools/library/deploy_n7_large_pdf_ftps.py server/command-center-live/pdf-evidence.py
+  deploy:
+    needs: validate
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 12
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/library
+            server/command-center-live
+            ops_ftps_requests
+      - name: Verify scoped operation
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          q=json.loads(Path('ops_ftps_requests/n7-large-pdf.json').read_text())
+          assert q['authorization']=='DEPLOY-N7-LARGE-PDF'
+          assert q['scope']=='private-chunked-pdf-and-ocr-pending'
+          PY
+      - name: Install 200 MB PDF upload and secure OCR pending status
+        run: python3 tools/library/deploy_n7_large_pdf_ftps.py
+      - name: Verify existing 646 book pages, ranked search and full-page retrieval
+        run: python3 tools/library/probe_n7_library_quality.py
+      - name: Verify auth boundaries and HTTP health
+        run: |
+          python3 - <<'PY'
+          import urllib.request,urllib.error
+          for url in ['https://bot.piratecartography.com/health','https://pct-live.piratecartography.com/pct-api/live/health']:
+              with urllib.request.urlopen(url,timeout=30) as response:
+                  assert response.status==200
+          request=urllib.request.Request('https://bot.piratecartography.com/api/library/large-pdf/start',
+             data=b'{}',method='POST',headers={'Content-Type':'application/json'})
+          try:
+              urllib.request.urlopen(request,timeout=25)
+              raise AssertionError('PUBLIC_UNAUTHENTICATED_LARGE_PDF_UPLOAD')
+          except urllib.error.HTTPError as e:
+              assert e.code==401,e.code
+          print('N7_LARGE_PDF_AUTH_AND_HEALTH_PASS')
+          PY
