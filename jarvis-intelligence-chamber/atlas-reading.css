@@ -95,3 +95,54 @@ body.atlas-ui.atlas-reading .chart .coastwash{stroke:#bda879!important;stroke-op
 body.atlas-ui.atlas-reading .chart .rh{stroke:#b8a879!important;stroke-opacity:.38!important}
 body.atlas-ui.atlas-reading .chart .sea{fill:#d4c59e!important;opacity:.8}
 body.atlas-ui.atlas-reading #atlasResearch{background:radial-gradient(ellipse at center,#081e1e55,#071919aa)!important}
+
+/* One active workspace; hidden modules must never intercept map/home clicks. */
+body.atlas-reading[data-atlas-page="home"] #nxsAgentsPage,
+body.atlas-reading[data-atlas-page="home"] #learningPanel,
+body.atlas-reading[data-atlas-page="home"] #activityStrip,
+body.atlas-reading[data-atlas-page="home"] #detailPanel{display:none!important;pointer-events:none!important}
+body.atlas-reading[data-reader-view="sources"] #resultsDrawer .v2-scroll>#researchOverview{display:none!important}
+body.atlas-reading #readerSources[hidden]{display:none!important}
+body.atlas-reading #readerSources{font:16px/1.8 'Noto Serif',Georgia,serif;color:#423e32}
+body.atlas-reading #readerSources h2{font-size:36px!important;margin:18px 0}
+body.atlas-reading #readerSources label{display:block;margin-bottom:8px}
+body.atlas-reading #readerSourceSearch{box-sizing:border-box;width:100%;padding:12px 14px;background:#fff5;border:1px solid #947a50;color:#423e32;font:inherit}
+body.atlas-reading #readerSources li{margin:20px 0;padding-bottom:16px;border-bottom:1px solid #947a5033}
+body.atlas-reading #readerSources small{display:block;font-size:12px;line-height:1.6}
+body.atlas-reading .atlas-topnav button:focus-visible,
+body.atlas-reading .atlas-close:focus-visible{outline:2px solid #d3b67b;outline-offset:4px}
+body.atlas-reading #atlasResearch .atlas-topnav button[aria-current="page"]{box-shadow:inset 0 -2px #c4a574}
+body.atlas-reading #atlasHome .atlas-topnav{left:78%;right:1%;top:3.2%;height:5.5%;display:grid;grid-template-columns:repeat(3,1fr);gap:0;font-size:clamp(10px,1.3vw,18px)}
+body.atlas-reading #atlasHome .atlas-topnav button{min-width:0;width:100%;height:100%;padding:0}
+body.atlas-reading #atlasHome .atlas-home-frame{cursor:default;overflow:hidden}
+body.atlas-reading #atlasHome .atlas-explore{cursor:pointer}
+body.atlas-reading #atlasHome .atlas-home-poster{transform:scale(var(--reader-home-zoom,1));transition:transform .25s}
+body.atlas-reading .reader-home-zoom{position:absolute;z-index:4;right:1.1%;top:37.8%;width:3%;height:12%;display:grid;grid-template-rows:1fr 1fr;gap:0}
+body.atlas-reading .reader-home-zoom button{border:0;padding:0;min-width:0;background:transparent;color:transparent;cursor:pointer}
+body.atlas-reading .reader-home-zoom button:focus-visible{outline:2px solid #d3b67b}
+body.atlas-reading #nxsAgentsPage .nxs-agent{min-width:0}
+body.atlas-reading #nxsAgentsPage .nxs-agent-name{min-width:0;overflow-wrap:anywhere}
+body.atlas-reading #nxsAgentsPage .nxs-agent-state{white-space:normal;text-align:right}
+@media(max-width:760px){
+ body.atlas-reading #atlasResearch>.atlas-brand{top:9px;left:12px}
+ body.atlas-reading #atlasResearch .atlas-brand .atlas-n7{font-size:24px}
+ body.atlas-reading #atlasResearch .atlas-brand .atlas-sub{font-size:10px;margin-top:2px}
+ body.atlas-reading #atlasResearch>.atlas-topnav{top:17px;left:76px;right:8px;gap:9px;justify-content:flex-end;font-size:12px!important}
+ body.atlas-reading #nxsAgentsPage .nxs-agent-list{grid-template-columns:1fr}
+}
+
+body.atlas-reading #readerCommandNotice{position:fixed;z-index:24;left:50%;bottom:72px;transform:translateX(-50%);box-sizing:border-box;width:min(750px,calc(100vw - 24px));margin:0;padding:9px 16px;background:#102625f5;border:1px solid #bea47766;color:#f1dfb9;font:14px/1.6 'Noto Serif',Georgia,serif}
+body.atlas-reading #readerCommandNotice[hidden]{display:none!important}
+
+/* Keep button hit boxes above the poster at narrow widths, including transparent labels. */
+body.atlas-reading #atlasHome .atlas-topnav{min-height:32px;pointer-events:auto!important}
+body.atlas-reading #atlasHome .atlas-topnav button{position:relative!important;display:block!important;pointer-events:auto!important;z-index:2;box-sizing:border-box;min-height:32px;touch-action:manipulation}
+body.atlas-reading #atlasResearch .atlas-topnav button{pointer-events:auto!important;touch-action:manipulation}
+body.atlas-reading .reader-home-zoom{width:max(28px,3%);height:max(64px,12%)}
+
+body.atlas-reading #readerHistoryOpen{position:relative;z-index:1;border:0;background:none;color:#6c532f;font:12px/1.5 'Noto Serif',Georgia,serif;text-decoration:underline;cursor:pointer;margin:8px 0 0;padding:4px 0;display:block}
+body.atlas-reading[data-reader-view="history"] #resultsDrawer #researchOverview{display:none!important}
+body.atlas-reading[data-reader-view="history"] #resultsDrawer #researchHistory{display:block!important;margin:20px 0;padding:16px;background:transparent;color:#423e32;border:1px solid #9c7f5066}
+body.atlas-reading[data-reader-view="history"] #researchHistory summary{font:26px/1.4 'GFS Didot',Georgia,serif;cursor:pointer}
+body.atlas-reading[data-reader-view="history"] #researchHistory input{width:100%;box-sizing:border-box;background:#fff5;color:#423e32;padding:12px;border:1px solid #9c7f5066}
+body.atlas-reading[data-reader-view="history"] #researchHistory button{background:#efe1bf;color:#423e32;border-color:#9c7f5066;cursor:pointer}

@@ -79,14 +79,17 @@ async function navTo(page,view){
     }
    }
    if(view==='findings'){
-    await page.locator('.dossier-navigation [data-dossier-section="researchFindings"]').click();
-    await page.locator('#resultSearch').scrollIntoViewIfNeeded();
-    await page.locator('#resultSearch').fill('Ανύπαρκτο');assert.match(await page.locator('#resultsList').innerText(),/Δεν υπάρχουν/);
-    await page.locator('#resultSearch').fill('ιστορικη δοκιμαστικη');assert.match(await page.locator('#resultsList').innerText(),/Δοκιμαστική ιστορική πηγή/);
-    await page.locator('#resultSearch').fill('');assert.match(await page.locator('#resultsList').innerText(),/Δοκιμαστική ιστορική πηγή/);
-    await page.locator('[data-result-filter="blockers"]').click({force:true});assert.match(await page.locator('#resultsList').innerText(),/εμπόδιο πρόσβασης/);
-    await page.locator('[data-result-filter="all"]').click({force:true});
-    await page.locator('.result-options summary').click();assert.ok(await page.locator('#researchRunId').isVisible());await page.locator('.result-options summary').click();await page.locator('.inspect-result').click();await page.locator('#focusDiscovery').click();await page.locator('#detailPanel').waitFor({state:'visible'});await page.locator('#closeDetail').click();await navTo(page,'findings');
+    await page.locator('#atlasResearch [data-atlas-nav="sources"]').click();
+    await page.locator('#readerSources').waitFor({state:'visible'});
+    await page.locator('#readerSourceSearch').fill('Ανύπαρκτο');
+    assert.equal(await page.locator('#readerSources li').count(),0);
+    await page.locator('#readerSourceSearch').fill('ιστορικη δοκιμαστικη');
+    await page.waitForFunction(()=>document.querySelector('#readerSources ol').textContent.includes('Δοκιμαστική ιστορική πηγή'));
+    assert.match(await page.locator('#readerSources ol').innerText(),/Δοκιμαστική ιστορική πηγή/);
+    await page.locator('#readerSourceSearch').fill('');
+    await page.locator('#atlasResearch [data-atlas-nav="research"]').click();
+    assert.equal(await page.locator('#researchOverview').isVisible(),true);
+    assert.equal(await page.locator('#researchFindings').isVisible(),false,'Technical findings remain hidden in article view');
    }
    if(view==='pdf'){assert.equal(await page.locator('#learningAnalyze').isDisabled(),true);assert.equal(await page.locator('#learningSave').isDisabled(),true);assert.equal(await page.locator('.learning-panel pre').isVisible(),false);}
    if(shotDir)await page.screenshot({path:path.join(shotDir,width+'-'+view+'.png'),animations:'disabled'});

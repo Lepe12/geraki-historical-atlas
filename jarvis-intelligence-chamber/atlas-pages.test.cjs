@@ -52,7 +52,7 @@ const path = require("node:path");
             agents: [],
             claims: [],
             blockers: [],
-            discoveries: [],
+            discoveries: [{title:'Δοκιμαστική ιστορική πηγή',url:'https://example.org/source',repository:'Δοκιμαστικό αρχείο'}],
             events: [],
             safety: { automatic_verified: false },
           },
@@ -98,6 +98,67 @@ const path = require("node:path");
     assert.equal(await page.locator("#atlasHome").isVisible(), true);
     assert.equal(await page.locator("#atlasResearch").isVisible(), false);
 
+
+    const nav = key => page.locator('.atlas-page:not([hidden]) [data-atlas-nav="'+key+'"]');
+    const go = async key => { await nav(key).click(); };
+    for(const width of [1440,390,360]){
+      await page.setViewportSize({width,height:900});
+      await go('sources');
+      await page.locator('#readerSources').waitFor({state:'visible'});
+      await page.waitForFunction(()=>document.querySelector('#readerSources ol')?.textContent.includes('Δοκιμαστική ιστορική πηγή'));
+      assert.equal(await nav('sources').getAttribute('aria-current'),'page');
+      await page.locator('#readerSourceSearch').fill('ανύπαρκτο');
+      assert.equal(await page.locator('#readerSources li').count(),0);
+      await page.locator('#readerSourceSearch').fill('ιστορικη');
+      assert.equal(await page.locator('#readerSources li').count(),1);
+      assert.equal(await page.locator('#readerSources a').getAttribute('href'),'https://example.org/source');
+      await page.locator('#readerSourceSearch').fill('');
+      if(process.env.NABOU_SCREENSHOT_DIR){fs.mkdirSync(process.env.NABOU_SCREENSHOT_DIR,{recursive:true});await page.screenshot({path:path.join(process.env.NABOU_SCREENSHOT_DIR,width+'-sources-navigation.png')});}
+      await go('agents');
+      assert.equal(await nav('agents').getAttribute('aria-current'),'page');
+      await page.locator('#nxsAgentsPage').waitFor({state:'visible'});
+      for(const [filter,count]of [['analysis',6],['archive',11],['all',17]]){
+        await page.locator('[data-agent-filter="'+filter+'"]').click();
+        assert.equal(await page.locator('.nxs-agent-group:not([hidden]) [data-agent]').count(),count);
+      }
+      // Every researcher opens its inspector and Close returns to the researchers.
+      for(const agent of (width===1440?['greek','spanish_simancas','venetian','french','british','dutch','german','italian_states','ottoman','north_african','travellers','source_genealogy','identity_resolution','contradiction','relationship_network','timeline','pirate_base']:['greek'])){
+        await page.locator('#nxsAgentGroups [data-agent="'+agent+'"]').click();
+        await page.locator('#detailPanel').waitFor({state:'visible'});
+        await page.locator('#closeDetail').click();
+        await page.locator('#nxsAgentsPage').waitFor({state:'visible'});
+      }
+      await page.locator('#nxsCloseAgents').click();
+      assert.equal(await page.locator('#resultsDrawer').isVisible(),true);
+      await go('tools');
+      await page.locator('#learningPanel').waitFor({state:'visible'});
+      assert.equal(await nav('tools').getAttribute('aria-current'),'page');
+      assert.equal(await page.locator('#learningAnalyze').isEnabled(),false);
+      assert.equal(await page.locator('#learningSave').isEnabled(),false);
+      await page.locator('#closeLearning').click();
+      assert.equal(await page.locator('#resultsDrawer').isVisible(),true);
+      await go('tools');await go('map');
+      assert.equal(await page.locator('#learningPanel').isVisible(),false);
+      await go('research');
+      assert.equal(await page.locator('#resultsDrawer').isVisible(),true);
+      await go('agents');await go('map');
+      assert.equal(await page.locator('#nxsAgentsPage').isVisible(),false);
+      await page.getByRole('button',{name:'Μεγέθυνση αρχικού χάρτη',exact:true}).click();
+      assert.equal(await page.locator('#atlasHome').isVisible(),true);
+      assert.ok(Number(await page.locator('.atlas-home-frame').evaluate(el=>el.style.getPropertyValue('--reader-home-zoom')))>1);
+      await page.getByRole('button',{name:'Σμίκρυνση αρχικού χάρτη',exact:true}).click();
+      await go('sources');await page.keyboard.press('Escape');
+      assert.equal(await page.locator('#resultsDrawer').isVisible(),true);
+      assert.equal(await page.locator('#readerSources').isVisible(),false);
+      await page.keyboard.press('Escape');
+      await page.locator('#atlasHome').waitFor({state:'visible'});
+      // Clicking the map picture no longer accidentally opens research.
+      await page.locator('.atlas-home-frame').click({position:{x:100,y:100}});
+      assert.equal(await page.locator('#atlasHome').isVisible(),true);
+      await page.locator('#atlasExplore').click();
+      await page.locator('#atlasCloseResearch').click();
+      assert.equal(await page.locator('#atlasHome').isVisible(),true);
+    }
     assert.deepEqual(errors, []);
     console.log("PASS atlas home/research page states; lab chrome not visible underneath");
   } finally {
