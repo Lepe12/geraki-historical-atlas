@@ -96,7 +96,65 @@ test('a hung research provider times out and model answers without waiting forev
   assert.equal(ended,true);
   assert.ok(output.includes('"stage":"research_timeout"'),output);
   assert.ok(output.includes('"type":"done"'),output);
-  assert.equal(modelBody.max_completion_tokens,1800);
+  assert.equal(modelBody.max_completion_tokens,2400);
   assert.equal(db[0].messages[1].content,'Δεν βρέθηκαν πηγές.');
+ }finally{fs.rmSync(dir,{recursive:true,force:true});}
+});
+
+
+test('when continuation Groq fails, save partial text and return a completed stream instead of losing answer',async()=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'n7-partial-history-'));
+ try{
+  const id='11111111-1111-4111-8111-111111111111';
+  const db=[{id,title:'Νέα συνομιλία',messages:[],updated:''}];
+  const {Readable}=require('node:stream');
+  const req=Readable.from([Buffer.from(JSON.stringify({message:'Τεκμηρίωσε τον Πέτρο Λάντζα και τη βιβλιογραφία του.'}))]);
+  let data='',calls=0;
+  const res={destroyed:false,writableEnded:false,writeHead(){},write(x){data+=x;},end(){this.writableEnded=true;}};
+  const handler=makeHandler({
+   API_KEY:'mock',MODEL:'qwen/qwen3.8-27b',BASE:'https://api.groq.com/openai/v1',DATA_DIR:dir,
+   promptMessages:h=>[{role:'system',content:'history'},...h],load:()=>db,save:()=>{},
+   publicSearch:{researchMessages:async()=>({searched:false,items:[]}),contextForResearch:()=>'',sourceFooter:()=>''},
+   fetcher:async()=>{
+    calls++;
+    if(calls===2)throw Error('429 rate limit on continuation');
+    return new Response('data: {"choices":[{"delta":{"content":"Ο Λάντζας ήταν Κερκυραίος κουρσάρος."},"finish_reason":"length"}]}\n\n'+'data: [DONE]\n\n');
+   }
+  });
+  await handler(req,res,id);
+  assert.equal(calls,2);
+  assert.match(data,/"type":"done"/);
+  assert.doesNotMatch(data,/"type":"error"/);
+  assert.match(db[0].messages[1].content,/Γράψε «συνέχισε»/);
+  assert.match(db[0].messages[1].content,/Ο Λάντζας/);
+ }finally{fs.rmSync(dir,{recursive:true,force:true});}
+});
+test('long answer prioritizes bibliography in system context before first model request',async()=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'n7-bibliography-'));
+ try{
+  const id='11111111-1111-4111-8111-111111111111';
+  const db=[{id,title:'Νέα συνομιλία',messages:[],updated:''}];
+  const {Readable}=require('node:stream');
+  const req=Readable.from([Buffer.from(JSON.stringify({message:'Πέτρος Λάντζας: πηγές, βιβλιογραφία, χρονολογία'}))]);
+  const res={destroyed:false,writableEnded:false,writeHead(){},write(){},end(){this.writableEnded=true;}};
+  let payload;
+  const handler=makeHandler({
+   API_KEY:'mock',MODEL:'qwen/qwen3.8-27b',BASE:'https://api.groq.com/openai/v1',DATA_DIR:dir,
+   promptMessages:h=>[{role:'system',content:'history'},...h],load:()=>db,save:()=>{},
+   publicSearch:{
+    researchMessages:async()=>({searched:true,kind:'historical',items:[{title:'author article',url:'https://www.piratecartography.com/archives/114'}]}),
+    enrichPublisherArticles:async d=>(d.items[0].articleRead=true,d.items[0].articleText='α'.repeat(19000),d),
+    cleanHistoryForTopic:h=>h,
+    contextForResearch:()=>('BIBLIOGRAPHY VERIFIED FROM ARTICLE: Laskaris; Ioannou; '+('λ'.repeat(19000))),
+    sourceFooter:()=>''},
+   fetcher:async(_,opts)=>{
+    payload=JSON.parse(opts.body);
+    return new Response('data: {"choices":[{"delta":{"content":"Βιβλιογραφία: Λάσκαρις."},"finish_reason":"stop"}]}\n\n');
+   }
+  });
+  await handler(req,res,id);
+  assert.match(payload.messages[0].content,/Laskaris; Ioannou/);
+  assert.ok(payload.messages[0].content.length<15000);
+  assert.match(db[0].messages[1].content,/Βιβλιογραφία/);
  }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
