@@ -7,7 +7,7 @@ PUB=ROOT+'/public'
 BASE='https://bot.piratecartography.com'
 TLS='linux3087.grserver.gr'
 HERE=Path(__file__).resolve().parent
-FILES=[(ROOT,'n7-stream-attachments.js','stream-attachments.js'),(ROOT,'n7-public-web-search.js','public-web-search.js'),(PUB,'app.js','stream-upload-ui.js')]
+FILES=[(ROOT,'n7-europeana-api.js','europeana-api.js'),(ROOT,'n7-stream-attachments.js','stream-attachments.js'),(ROOT,'n7-public-web-search.js','public-web-search.js'),(PUB,'app.js','stream-upload-ui.js')]
 MARKER=b'N7_GROQ_TRUE_STREAM_AND_UPLOADS_V1'
 def sha(b):return hashlib.sha256(b).hexdigest()
 def read(f,folder,name):
@@ -69,6 +69,11 @@ def make_ui(old,addon):
  if b"el('chat').onsubmit" not in old or b'/api/conversations/' not in old:
   raise RuntimeError('N7_PROGRESS_NEW_UI_UNRECOGNIZED')
  return old+b'\n'+addon+b'\n'
+def read_or_missing(f,folder,name):
+ try:return read(f,folder,name)
+ except ftplib.error_perm as ex:
+  if str(ex).startswith('550'):return None
+  raise
 def main():
  dry=os.getenv('N7_DRY_RUN','1')!='0'
  f=connect();token=secrets.token_hex(6);changes=[];stages=[];backups=[]
@@ -77,8 +82,9 @@ def main():
   if b'N7_STREAM_ATTACHMENTS_ROUTE_V1' not in server:
    raise RuntimeError('N7_PROGRESS_STREAM_ROUTE_NOT_INSTALLED')
   for folder,name,local in FILES:
-   previous=read(f,folder,name)
+   previous=read_or_missing(f,folder,name)
    data=(HERE/local).read_bytes()
+   if previous is None and name!='n7-europeana-api.js':raise RuntimeError('N7_PROGRESS_MISSING_EXISTING_FILE_'+name)
    if name=='app.js':
     data=make_ui(previous,data)
     if len(data)<len(previous)-10000:raise RuntimeError('N7_PROGRESS_LIVE_UI_TRUNCATION')
@@ -86,8 +92,10 @@ def main():
     if b'N7_STREAM_ATTACHMENTS_V1' not in previous or b'N7_RESEARCH_PROGRESS_STREAM_V1' not in data:
      raise RuntimeError('N7_PROGRESS_BACKEND_UNEXPECTED')
    elif name=='n7-public-web-search.js':
-    if b'N7_HISTORICAL_DEEP_READING_V1' not in previous or b'N7_SOURCE_PRIORITY_CONTEXT_V2' not in data:
+    if b'N7_HISTORICAL_DEEP_READING_V1' not in previous or b'N7_SOURCE_PRIORITY_CONTEXT_V2' not in data or b'N7_EUROPEANA_SEARCH_INTEGRATION_V1' not in data:
      raise RuntimeError('N7_PROGRESS_RESEARCH_HELPER_UNEXPECTED')
+   elif name=='n7-europeana-api.js':
+    if b'N7_EUROPEANA_API_V1' not in data:raise RuntimeError('N7_EUROPEANA_MODULE_INVALID')
    check(data)
    if previous!=data:changes.append((folder,name,previous,data))
   print('N7_PROGRESS_PREFLIGHT_OK dry_run='+str(dry)+' changed='+','.join(v[1] for v in changes))
@@ -105,16 +113,19 @@ def main():
 
   if dry:return
   for folder,name,previous,data in changes:
-   if sha(read(f,folder,name))!=sha(previous):raise RuntimeError('N7_PROGRESS_CONCURRENT_UPDATE')
+   if read_or_missing(f,folder,name)!=previous:raise RuntimeError('N7_PROGRESS_CONCURRENT_UPDATE')
    stage='.n7-progress-stage-'+token+'-'+name
    backup='.n7-progress-backup-'+token+'-'+name
    f.cwd(folder);f.storbinary('STOR '+stage,io.BytesIO(data));stages.append((folder,stage))
    f.sendcmd('SITE CHMOD 644 '+stage)
    if sha(read(f,folder,stage))!=sha(data):raise RuntimeError('N7_PROGRESS_STAGE_MISMATCH')
-   f.cwd(folder);f.rename(name,backup)
+   f.cwd(folder)
+   if previous is not None:f.rename(name,backup)
    try:f.rename(stage,name)
-   except BaseException:f.rename(backup,name);raise
-   stages.remove((folder,stage));backups.append((folder,name,backup))
+   except BaseException:
+    if previous is not None:f.rename(backup,name)
+    raise
+   stages.remove((folder,stage));backups.append((folder,name,backup if previous is not None else None))
    if sha(read(f,folder,name))!=sha(data):raise RuntimeError('N7_PROGRESS_FINAL_HASH_MISMATCH')
   restart(f,'activate')
   verify(read(f,PUB,'app.js'))
@@ -122,7 +133,9 @@ def main():
  except BaseException:
   if not dry and backups:
    for folder,name,backup in reversed(backups):
-    try:f.cwd(folder);f.delete(name);f.rename(backup,name)
+    try:
+     f.cwd(folder);f.delete(name)
+     if backup is not None:f.rename(backup,name)
     except ftplib.all_errors:print('N7_PROGRESS_MANUAL_ROLLBACK_NEEDED='+name)
    try:restart(f,'rollback')
    except ftplib.all_errors:pass
