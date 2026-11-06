@@ -1,0 +1,70 @@
+name: N7 permanent source library
+on:
+  pull_request:
+    paths:
+      - 'tools/n7/**'
+      - '.github/workflows/n7-source-library.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/n7/source-library.js'
+      - 'tools/n7/source-library-ui.js'
+      - 'tools/n7/library-pdf-worker.cjs'
+      - 'tools/n7/research-identities.js'
+      - 'tools/n7/deploy_source_library.py'
+      - '.github/workflows/n7-source-library.yml'
+permissions:
+  contents: read
+concurrency:
+  group: n7-live-stream-progress-restore
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/n7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare pinned PDF test runtime without native executables
+        run: |
+          npm install --prefix "$RUNNER_TEMP/n7-pdf" --ignore-scripts --omit=optional --no-audit --no-fund pdfjs-dist@5.6.205 @napi-rs/canvas@0.1.100
+          mkdir -p tools/n7/vendor
+          cp "$RUNNER_TEMP/n7-pdf/node_modules/pdfjs-dist/legacy/build/pdf.mjs" tools/n7/vendor/
+          cp "$RUNNER_TEMP/n7-pdf/node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs" tools/n7/vendor/
+          cp "$RUNNER_TEMP/n7-pdf/node_modules/@napi-rs/canvas/geometry.js" tools/n7/vendor/geometry.cjs
+      - name: Test resumable library, actual 120-page PDF, OCR progress, provenance and research regressions
+        run: |
+          node --check tools/n7/source-library-ui.js
+          node --check tools/n7/stream-attachments.js
+          node --test --test-concurrency=1 tools/n7/test_source_library.cjs tools/n7/test_document_reader.cjs tools/n7/test_europeana_api.cjs tools/n7/test_stream_attachments.cjs tools/n7/test_source_evidence.cjs tools/n7/test_historical_source_audit.cjs tools/n7/test_public_web_search.cjs tools/n7/test_historical_topic_isolation.cjs
+          python3 -m py_compile tools/n7/deploy_source_library.py
+  deploy:
+    if: github.event_name == 'push'
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 10
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/n7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify existing authenticated route and PDF runtime before changes
+        env:
+          N7_DRY_RUN: '1'
+        run: python3 tools/n7/deploy_source_library.py
+      - name: Install private library, preserve data, verify health and authentication, roll back on failure
+        env:
+          N7_DRY_RUN: '0'
+        run: python3 tools/n7/deploy_source_library.py
