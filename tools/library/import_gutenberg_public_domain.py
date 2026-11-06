@@ -30,7 +30,7 @@ def pages_from_html(blob):
     count=0
     for marker in markers:
         label=marker.get_text(" ",strip=True)
-        clean=re.sub(r"(?i)\\b(pg|page|p)\\.?\\s*","",label).strip(" []\\u00a0.")
+        clean=re.sub(r"(?i)\b(pg|page|p)\.?\s*","",label).strip(" []\u00a0.")
         m=re.fullmatch(r"([0-9]{1,4}|[ivxlcdmIVXLCDM]{1,9})",clean)
         if not m:marker.decompose();continue
         count+=1
