@@ -108,6 +108,10 @@
   explore?.addEventListener("click", () =>
     setPage("research", { focusSearch: true, openDrawer: true }),
   );
+  home.querySelector(".atlas-home-frame")?.addEventListener("click", (e) => {
+    if (e.target.closest("[data-atlas-nav]")) return;
+    setPage("research", { focusSearch: true, openDrawer: true });
+  });
   closeBtn?.addEventListener("click", () => setPage("home"));
 
   document.addEventListener("click", (e) => {
