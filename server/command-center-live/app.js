@@ -198,9 +198,7 @@ function atomicJson(filename,value){
   finally{if(fs.existsSync(temporary))fs.unlinkSync(temporary);}
 }
 function knowledgeMutationAuthorized(req){
-  const oauthOperator=ALLOWED_BROWSER_ORIGINS.has(String(req.headers.origin||"")) &&
-    req.headers["x-nabou-agent-room"]==="1" && oauth.sessionAuthorized(req);
-  return operatorAuthorized(req)||(sessionAuthorized(req)&&trustedWebOrigin(req))||oauthOperator;
+  return operatorAuthorized(req)||(sessionAuthorized(req)&&trustedWebOrigin(req));
 }
 function syncLearningEvidence(sourceId){
   const cli=process.env.PCT_EVIDENCE_STORAGE_CLI||path.resolve(__dirname,"../../tools/storage/pct_research_store.php");
@@ -210,45 +208,6 @@ function syncLearningEvidence(sourceId){
       let result;try{result=JSON.parse(stdout.trim());}catch(_){return resolve({status:"STAGED",reason:"HOST_LOCAL_STORAGE_UNAVAILABLE"});}
       resolve(!error&&result.status==="PASS"?{status:"DATABASE_COMMITTED",result:result.result}:{status:"STAGED",reason:"DATABASE_IMPORT_BLOCKED"});
     }));
-}
-// Preserve page-level transcriptions in the dedicated MariaDB library.
-// Every 20-page batch is durable before the CLI write; failed batches remain retryable.
-async function syncPageLibrary(meta,replay){
-  const cli=path.resolve(__dirname,"../../tools/library/n7_library.php");
-  if(!fs.existsSync(cli))return {status:"STAGED",reason:"LIBRARY_CLI_NOT_DEPLOYED"};
-  const sourceHash=String(replay?.source_sha256||"");
-  if(!/^[a-f0-9]{64}$/.test(sourceHash)||!Array.isArray(replay?.pages)||!replay.pages.length)
-    return {status:"STAGED",reason:"INVALID_REPLAY_PAGES"};
-  const dir=path.join(KNOWLEDGE_DIR,"library-batches",sourceHash);
-  fs.mkdirSync(dir,{recursive:true,mode:0o700});
-  let imported=0;
-  for(let offset=0;offset<replay.pages.length;offset+=20){
-    const chosen=replay.pages.slice(offset,offset+20);
-    const pages=chosen.map(pg=>({
-      scan_index:Number(pg.page),printed_page:pg.printed_page==null?null:String(pg.printed_page),
-      text:String(pg.text||""),ocr_status:"UNREVIEWED"
-    }));
-    if(pages.some(pg=>!Number.isInteger(pg.scan_index)||pg.scan_index<1))
-      return {status:"STAGED",reason:"INVALID_PAGE_INDEX",imported_pages:imported};
-    const envelope={source_id:sourceHash,title:String(meta.original_name||"Historical source"),
-      source_uri:"private://n7-knowledge/"+String(meta.source_id)+".pdf",
-      rights_note:"Private operator upload; do not publish original scans.",pages};
-    const filename=path.join(dir,"pages-"+String(pages[0].scan_index).padStart(6,"0")+".json");
-    atomicJson(filename,envelope);
-    const outcome=await new Promise(resolve=>execFile(
-      process.env.PCT_PHP_BIN||"/opt/plesk/php/8.4/bin/php",
-      [cli,"import",filename],{timeout:30000,maxBuffer:65536},(error,stdout)=>{
-        if(error)return resolve(null);
-        try{resolve(JSON.parse(stdout.trim()));}catch(_){resolve(null);}
-      }
-    ));
-    if(outcome?.status!=="IMPORTED"||outcome.source_id!==sourceHash)
-      return {status:"STAGED",reason:"LIBRARY_IMPORT_NOT_CONFIRMED",
-        imported_pages:imported,source_id:sourceHash};
-    imported+=pages.length;
-  }
-  return {status:"DATABASE_COMMITTED",source_id:sourceHash,imported_pages:imported,
-    original_page_labels_inferred:false,historically_verified:false};
 }
 function safeFileName(name){
   return String(name||"source.pdf").replace(/[^A-Za-z0-9._() -]+/g,"_").slice(0,180)||"source.pdf";
@@ -363,8 +322,7 @@ const server=http.createServer(async(req,res)=>{
       const currentIndex=readKnowledgeIndex(),currentMeta=currentIndex.find(x=>x.source_id===sourceId);
       currentMeta.state="LEARNED";currentMeta.reviewed_at=record.reviewed_at;currentMeta.accepted_items=record.items.length;currentMeta.attested_quotes=record.historical_evidence.attestations.length;writeKnowledgeIndex(currentIndex);
       const storage=await syncLearningEvidence(sourceId);
-      const library_storage=await syncPageLibrary(meta,replay);
-      return json(res,200,{storage,library_storage,status:"LEARNED",source_id:sourceId,accepted_items:record.items.length,pages:pages.length,attested_quotes:record.historical_evidence.attestations.length,unresolved_quotes:record.historical_evidence.unresolved.length,historically_verified:false});
+      return json(res,200,{storage,status:"LEARNED",source_id:sourceId,accepted_items:record.items.length,pages:pages.length,attested_quotes:record.historical_evidence.attestations.length,unresolved_quotes:record.historical_evidence.unresolved.length,historically_verified:false});
     }
     if(req.method==="POST"&&p==="/knowledge/agent-search"){
       const auth=String(req.headers.authorization||"");

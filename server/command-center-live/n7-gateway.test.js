@@ -238,3 +238,36 @@ test("N7 library reads exact pages only for authenticated operators",async()=>{
   assert.equal((await request("/n7/library/search?q=a","/n7/library/search")).status,400);
   assert.equal(calls.length,2);
 });
+
+test("private library PDF upload is OAuth and origin protected",async()=>{
+  const replies=[],invoked=[];
+  let allowed=false;
+  const handle=createN7Gateway({
+    json:(_res,status,payload)=>replies.push({status,payload}),
+    operatorAuthorized:()=>false,
+    sessionAuthorized:()=>allowed,
+    statusFor:async()=>({run_id:"latest",snapshot:null}),
+    libraryUploadRunner:async req=>{
+      invoked.push(req.headers["content-type"]);
+      return {status:"DATABASE_COMMITTED",imported_pages:2,
+        source_id:"b".repeat(64),historically_verified:false};
+    }
+  });
+  async function call(method,headers){
+    await handle({method,headers},{}, "/n7/library/upload");
+    return replies.at(-1);
+  }
+  const headers={origin:"https://bot.piratecartography.com",
+    "x-nabou-agent-room":"1","content-type":"application/pdf"};
+  assert.equal((await call("POST",headers)).status,401);
+  allowed=true;
+  assert.equal((await call("POST",{...headers,origin:"https://untrusted.example"})).status,403);
+  assert.equal((await call("POST",{...headers,"x-nabou-agent-room":""})).status,403);
+  assert.equal((await call("POST",{...headers,"content-type":"text/plain"})).status,415);
+  assert.equal((await call("GET",headers)).status,405);
+  const result=await call("POST",headers);
+  assert.equal(result.status,201);
+  assert.equal(result.payload.imported_pages,2);
+  assert.equal(result.payload.historically_verified,false);
+  assert.deepEqual(invoked,["application/pdf"]);
+});

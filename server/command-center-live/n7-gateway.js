@@ -2,6 +2,7 @@
 const crypto=require("node:crypto");
 const {execFile}=require("node:child_process");
 const path=require("node:path");
+const fs=require("node:fs");
 
 // Fixed local CLI, no shell or client-specified paths. All reads require authenticated operator.
 function readPrivateLibrary(command,arg) {
@@ -16,12 +17,84 @@ function readPrivateLibrary(command,arg) {
   }));
 }
 
+
+// Dedicated OAuth-protected PDF ingestion; avoids changing the existing app.js upload code.
+async function privateLibraryUpload(req){
+  const max=25*1024*1024;
+  const chunks=[];let bytes=0;
+  for await(const part of req){
+    bytes+=part.length;
+    if(bytes>max)throw new Error("PDF_TOO_LARGE");
+    chunks.push(part);
+  }
+  const raw=Buffer.concat(chunks);
+  if(raw.length<5||raw.subarray(0,5).toString("ascii")!=="%PDF-")
+    throw new Error("INVALID_PDF");
+  const digest=crypto.createHash("sha256").update(raw).digest("hex");
+  const dataRoot=process.env.PCT_KNOWLEDGE_DIR||path.join(__dirname,"knowledge-data");
+  const originals=path.join(dataRoot,"uploads");
+  fs.mkdirSync(originals,{recursive:true,mode:0o700});
+  const full=path.join(originals,"n7-library-"+digest+".pdf");
+  try{fs.writeFileSync(full,raw,{flag:"wx",mode:0o600});}
+  catch(error){if(error.code!=="EEXIST")throw error;}
+  if(crypto.createHash("sha256").update(fs.readFileSync(full)).digest("hex")!==digest)
+    throw new Error("SOURCE_CHECKSUM_FAILED");
+  const replay=await new Promise((resolve,reject)=>execFile(
+    process.env.PCT_PYTHON_BIN||"python3",
+    [path.join(__dirname,"pdf-evidence.py"),full],
+    {timeout:150000,maxBuffer:32*1024*1024},(error,stdout)=>{
+      let parsed;try{parsed=JSON.parse(stdout);}catch(_){return reject(new Error("PDF_EXTRACTION_FAILED"));}
+      if(error||parsed.error)return reject(new Error("PDF_EXTRACTION_LIMIT_OR_FAILURE"));
+      resolve(parsed);
+    }
+  ));
+  if(replay.source_sha256!==digest||!Array.isArray(replay.pages)||!replay.pages.length)
+    throw new Error("SOURCE_REPLAY_MISMATCH");
+  let title;
+  try{title=decodeURIComponent(String(req.headers["x-file-name"]||"Historical source.pdf"));}
+  catch(_){title="Historical source.pdf";}
+  title=path.basename(title).slice(0,180)||"Historical source.pdf";
+  const batches=path.join(dataRoot,"library-batches",digest);
+  fs.mkdirSync(batches,{recursive:true,mode:0o700});
+  const cli=path.resolve(__dirname,"../../tools/library/n7_library.php");
+  let imported=0;
+  for(let i=0;i<replay.pages.length;i+=20){
+    const pageGroup=replay.pages.slice(i,i+20);
+    const pageRows=pageGroup.map(pg=>({
+      scan_index:Number(pg.page),printed_page:pg.printed_page==null?null:String(pg.printed_page),
+      text:String(pg.text||""),ocr_status:"UNREVIEWED"
+    }));
+    if(pageRows.some(p=>!Number.isSafeInteger(p.scan_index)||p.scan_index<1))
+      throw new Error("PAGE_INDEX_INVALID");
+    const record={source_id:digest,title,
+      source_uri:"private://n7-knowledge/uploads/n7-library-"+digest+".pdf",
+      rights_note:"Private operator upload; never publish the original PDF.",pages:pageRows};
+    const target=path.join(batches,"pages-"+String(pageRows[0].scan_index).padStart(6,"0")+".json");
+    const tmp=target+"."+crypto.randomBytes(5).toString("hex")+".tmp";
+    fs.writeFileSync(tmp,JSON.stringify(record),{flag:"wx",mode:0o600});
+    fs.renameSync(tmp,target);
+    const db=await new Promise(resolve=>execFile(
+      process.env.PCT_PHP_BIN||"/opt/plesk/php/8.4/bin/php",
+      [cli,"import",target],{timeout:30000,maxBuffer:65536},(error,stdout)=>{
+        if(error)return resolve(null);
+        try{resolve(JSON.parse(stdout.trim()));}catch(_){resolve(null);}
+      }
+    ));
+    if(db?.status!=="IMPORTED"||db.source_id!==digest)
+      return {status:"STAGED",source_id:digest,imported_pages:imported,
+        reason:"LIBRARY_DB_IMPORT_NOT_CONFIRMED",historically_verified:false};
+    imported+=pageRows.length;
+  }
+  return {status:"DATABASE_COMMITTED",source_id:digest,imported_pages:imported,
+    printed_pages_inferred:false,historically_verified:false};
+}
+
 // Routes are explicitly scoped to the existing live service. No shell,
 // database writer, privileged host action, or arbitrary workflow selection.
-function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch,githubPrivateDispatch,libraryRunner=readPrivateLibrary}) {
+function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch,githubPrivateDispatch,libraryRunner=readPrivateLibrary,libraryUploadRunner=privateLibraryUpload}) {
   let lastAccepted=0;
   return async function handleN7(req,res,p) {
-    if (p!=="/n7/status" && p!=="/n7/dispatch" && p!=="/n7/code" && p!=="/n7/brain/task" && p!=="/n7/library/search" && p!=="/n7/library/page") return false;
+    if (p!=="/n7/status" && p!=="/n7/dispatch" && p!=="/n7/code" && p!=="/n7/brain/task" && p!=="/n7/library/search" && p!=="/n7/library/page" && p!=="/n7/library/upload") return false;
     if (p==="/n7/status") {
       if(req.method!=="GET") {json(res,405,{error:"method_not_allowed"});return true;}
       const state=await statusFor("latest");
@@ -37,6 +110,26 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
         can_dispatch:false, // Public clients must never receive credentials.
         historical_verification:false
       });
+      return true;
+    }
+    if(p==="/n7/library/upload"){
+      if(req.method!=="POST"){json(res,405,{error:"method_not_allowed"});return true;}
+      const origin=String(req.headers.origin||"");
+      if(!["https://bot.piratecartography.com","https://pct-live.piratecartography.com"].includes(origin)
+         ||req.headers["x-nabou-agent-room"]!=="1"){
+        json(res,403,{error:"origin_not_allowed"});return true;
+      }
+      if(!operatorAuthorized(req)&&!sessionAuthorized(req)){
+        json(res,401,{error:"operator_authorization_required"});return true;
+      }
+      if(!String(req.headers["content-type"]||"").toLowerCase().includes("application/pdf")){
+        json(res,415,{error:"pdf_required"});return true;
+      }
+      try{
+        const outcome=await libraryUploadRunner(req);
+        json(res,outcome.status==="DATABASE_COMMITTED"?201:503,{
+          schema:"n7-private-library-ingest-v1",...outcome});
+      }catch(_){json(res,422,{error:"pdf_ingestion_failed_or_unsupported"});}
       return true;
     }
     if(p==="/n7/library/search" || p==="/n7/library/page"){
