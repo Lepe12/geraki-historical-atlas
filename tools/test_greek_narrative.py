@@ -217,6 +217,51 @@ class GreekNarrativeTests(unittest.TestCase):
         )
         self.assertIn("research_path", answer["greek_narrative"])
 
+    def test_finished_title_strips_search_command(self):
+        from greek_narrative import _title_from, build
+        answer = {
+            "question": "ψάξε για πετρο λάνζτα τον κερκυραίο κορσάρο",
+            "normalized_request": {
+                "target": "πετρο λάνζτα τον κερκυραιο κορσάρο",
+                "aliases": [],
+                "purpose": "ψάξε για πετρο λάνζτα τον κερκυραίο κορσάρο",
+            },
+            "claims": [],
+            "review": {},
+            "answer_sections": [],
+            "coverage": {"unique_passages": 0, "reading_batches": 0},
+        }
+        title = _title_from(answer)
+        self.assertNotRegex(title.casefold(), r"ψ[άα]ξε")
+        import unicodedata
+        folded = "".join(
+            c for c in unicodedata.normalize("NFD", title.casefold())
+            if not unicodedata.combining(c) and c.isalpha()
+        )
+        self.assertTrue("λανζ" in folded or "lantz" in folded, title)
+        out = build(answer, use_llm=False)
+        self.assertEqual(out["status"], "NO_USABLE_EVIDENCE")
+        self.assertEqual(out["generation"]["method"], "SOURCES_UNREAD")
+        body = out["paragraphs"][0]["text_el"].casefold()
+        self.assertIn("δεν μπόρεσα να διαβάσω", body)
+        self.assertNotIn("τεκμηριωμένη βιογραφία", body)
+
+    def test_honest_empty_when_sources_were_read_but_no_events(self):
+        from greek_narrative import build
+        answer = {
+            "question": "Άγνωστος πειρατής;",
+            "normalized_request": {"target": "Άγνωστος πειρατής", "aliases": []},
+            "claims": [],
+            "review": {},
+            "answer_sections": [],
+            "coverage": {"unique_passages": 3, "reading_batches": 1},
+            "evidence": [{"evidence_id": "e1"}],
+        }
+        out = build(answer, use_llm=False)
+        self.assertEqual(out["generation"]["method"], "HONEST_EMPTY")
+        self.assertIn("τεκμηριωμένη βιογραφία", out["paragraphs"][0]["text_el"].casefold())
+
+
 
 if __name__ == "__main__":
     unittest.main()

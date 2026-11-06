@@ -222,6 +222,11 @@ jobs:
             !/evidence/specialist_runs/
             /evidence/specialist_runs/${{ github.run_id }}/
             !/backups/
+      # Private owned library (Ioannou/Laskaris/…): mount when PCT_OWNED_LIBRARY_TOKEN
+      # exists. Absent token = no-op. Never upload those files as artifacts.
+      - uses: ./.github/actions/owned-library-checkout
+        with:
+          token: ${{ secrets.PCT_OWNED_LIBRARY_TOKEN }}
       - uses: actions/download-artifact@v4
         if: matrix.lane == 'travellers' && needs.specialist-research.result != 'skipped'
         continue-on-error: true

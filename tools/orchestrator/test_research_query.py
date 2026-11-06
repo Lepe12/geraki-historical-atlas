@@ -61,5 +61,13 @@ class ResearchQueryTests(unittest.TestCase):
             split_research_query(q, '1500-1550')
         self.assertEqual(split_research_query('Unknown prose with dates 1600-1700')[1], '')
 
+    def test_corsair_query_keeps_person_phrase_after_command(self):
+        q = "ψάξε για πετρο λάνζτα τον κερκυραίο κορσάρο"
+        target, dates, purpose = split_research_query(q)
+        self.assertEqual(purpose, q)
+        self.assertEqual(dates, "")
+        self.assertNotRegex(target.casefold(), r"^ψ[άα]ξε")
+        self.assertIn("λάνζ", target.casefold())
+
 if __name__=="__main__":unittest.main()
 
