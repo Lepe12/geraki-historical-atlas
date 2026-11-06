@@ -235,12 +235,17 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
   emit('status',{stage:'research',message:'Ελέγχω πηγές και προετοιμάζω την ιστορική έρευνα…'});
   let evidence=null,messages,libraryHits=[];
   try{
+   const priorLibraryUser=history.filter(m=>m.role==='user').at(-2)?.content||'';
+   const libraryQuery=content.length<200&&/σελ(?:ίδα|ίδες|\.)|\bpage\b|συνέχισε/iu.test(content)?String(priorLibraryUser).slice(-800)+' '+content:content;
+   libraryHits=await library.search(libraryQuery,{limit:4});
+   const wantsExternal=/διαδίκτυο|ίντερνετ|internet|\bweb\b|σήμερα|χθες|τρέχον|τελευταί|πρόσφατ/iu.test(content);
+   const libraryOnly=!wantsExternal&&(libraryHits.length>0||/βιβλιοθήκ|βιβλιοθηκ|συνημμέν|συνημμεν/iu.test(content));
    // Cap research phase even if a provider hangs, while preserving available sources.
    const researchTimeout=Symbol('research-timeout');
    let researchTimer;
    try{
     evidence=await Promise.race([
-      publicSearch.researchMessages(history),
+      libraryOnly?Promise.resolve({searched:false,items:[],reason:'private_library_scope'}):publicSearch.researchMessages(history),
       new Promise(resolve=>{researchTimer=setTimeout(()=>resolve(researchTimeout),researchDeadlineMs);})
     ]);
    }finally{clearTimeout(researchTimer);}
@@ -279,9 +284,6 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
      }
      console.log('N7_VISION_GROUNDING attachments='+n7ImageCount+' forwarded='+sent);
    }
-   const priorUser=history.filter(m=>m.role==='user').at(-2)?.content||'';
-   const libraryQuery=content.length<200&&/σελ(?:ίδα|ίδες|\.)|\bpage\b|συνέχισε/iu.test(content)?String(priorUser).slice(-800)+' '+content:content;
-   libraryHits=await library.search(libraryQuery,{limit:4});
    await library.rememberWeb(evidence);
    const libraryContext=library.evidenceContext(libraryHits,content);
    const rawContext=libraryContext+'\n\n'+publicSearch.contextForResearch(evidence);
