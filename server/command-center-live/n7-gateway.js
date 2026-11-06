@@ -53,7 +53,7 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
       let command,argument;
       if(p==="/n7/library/search"){
         const term=String(params.get("q")||"").trim();
-        if(term.length<2||term.length>150||/[\\x00-\\x1F]/.test(term)){
+        if(term.length<2||term.length>150||[...term].some(x=>x.codePointAt(0)<32)){
           json(res,400,{error:"invalid_library_query"});return true;
         }
         command="search";argument=[term];
