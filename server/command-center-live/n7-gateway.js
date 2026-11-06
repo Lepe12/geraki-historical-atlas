@@ -193,7 +193,7 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
       return true;
     }
     if(p==="/n7/library/search" || p==="/n7/library/page"){
-      if(req.method!=="GET" && !(p==="/n7/library/search" && req.method==="POST")){
+      if(req.method!=="GET" && req.method!=="POST"){
         json(res,405,{error:"method_not_allowed"});return true;
       }
       // Public pages and untrusted origins are forbidden even when the URL is known.
@@ -203,7 +203,7 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
       }
       let bridgeBody=null;
       const normalAuthorized=operatorAuthorized(req)||sessionAuthorized(req);
-      if(!normalAuthorized && p==="/n7/library/search" && req.method==="POST"){
+      if(!normalAuthorized && req.method==="POST"){
         try{
           const raw=await readBody(req,4096);
           if(libraryBridgeVerifier(req,raw))bridgeBody=JSON.parse(raw);
@@ -230,8 +230,14 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
         }
         command="search";argument=[term];
       }else{
-        const id=String(params.get("source_id")||"");
-        const scan=String(params.get("scan_index")||"");
+        let id=String(params.get("source_id")||"");
+        let scan=String(params.get("scan_index")||"");
+        if(req.method==="POST"){
+          let request;
+          try{request=bridgeBody!==null?bridgeBody:JSON.parse(await readBody(req,4096));}
+          catch(_){json(res,400,{error:"invalid_json"});return true;}
+          id=String(request?.source_id||"");scan=String(request?.scan_index||"");
+        }
         if(!/^[a-f0-9]{64}$/.test(id)||!(/^[1-9][0-9]{0,9}$/.test(scan))||Number(scan)>4294967295){
           json(res,400,{error:"invalid_page_reference"});return true;
         }
@@ -245,6 +251,10 @@ function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,re
             source_count:Number.isSafeInteger(data.source_count)?data.source_count:null,
             page_count:Number.isSafeInteger(data.page_count)?data.page_count:null,
             historically_verified:false});
+        }else if(p==="/n7/library/page" && req.method==="POST"){
+          if(!data||data.status==="NOT_FOUND"){json(res,404,{error:"page_not_found"});return true;}
+          json(res,200,{schema:"n7-library-page-v1",page:data,
+            source_type:"SECONDARY_HISTORIOGRAPHY",historically_verified:false});
         }else{
           json(res,200,{schema:"n7-private-library-read-v1",operation:command,
             result:data,historically_verified:false});
