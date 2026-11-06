@@ -1,0 +1,88 @@
+name: N7 research suite and private PDF upload
+on:
+  pull_request:
+    paths:
+      - 'tools/library/**'
+      - 'server/command-center-live/n7-gateway.js'
+      - 'server/command-center-live/n7-gateway.test.js'
+      - '.github/workflows/n7-research-suite.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'ops_ftps_requests/n7-research-suite.json'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            server/command-center-live
+            tools/library
+            ops_ftps_requests
+      - name: Check PHP, server scripts and secure research agent tests
+        run: |
+          set -e
+          php -l tools/library/n7_library.php
+          php tools/library/n7_library.php self-test
+          node --check tools/library/n7-historical-research.js
+          node --check tools/library/n7-bot-autologin-ui.js
+          node --check server/command-center-live/n7-gateway.js
+          node --test tools/library/test/historical-research.test.js
+          node --test server/command-center-live/n7-gateway.test.js
+          python3 -m py_compile tools/library/deploy_n7_research_suite_ftps.py
+  deploy:
+    needs: validate
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: nabou-production
+    timeout-minutes: 12
+    env:
+      PCT_FTPS_HOST: ${{ secrets.PCT_FTPS_HOST }}
+      PCT_FTPS_USER: ${{ secrets.PCT_FTPS_USER }}
+      PCT_FTPS_PASSWORD: ${{ secrets.PCT_FTPS_PASSWORD }}
+      PCT_FTPS_PORT: ${{ vars.PCT_FTPS_PORT || '21' }}
+      PCT_FTPS_TLS_SERVER_NAME: ${{ vars.PCT_FTPS_TLS_SERVER_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            server/command-center-live
+            tools/library
+            ops_ftps_requests
+      - name: Verify scoped user-authorized production change
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          j=json.loads(Path('ops_ftps_requests/n7-research-suite.json').read_text())
+          assert j['authorization']=='INSTALL-N7-RESEARCH-SUITE'
+          assert j['scope']=='authenticated-research-and-private-pdf'
+          PY
+      - name: Patch existing bot and historical gateway with verified rollback
+        run: python3 tools/library/deploy_n7_research_suite_ftps.py
+      - name: Verify existing indexed historical evidence is intact
+        run: python3 tools/library/probe_n7_library_quality.py
+      - name: Check public assets, both health endpoints, and protected routes
+        run: |
+          python3 - <<'PY'
+          import urllib.request,urllib.error
+          for address in ['https://bot.piratecartography.com/health',
+                  'https://pct-live.piratecartography.com/pct-api/live/health']:
+              with urllib.request.urlopen(address,timeout=20) as response:
+                  assert response.status==200,address
+          with urllib.request.urlopen('https://bot.piratecartography.com/historical-library.js',timeout=20) as r:
+              source=r.read(200000)
+              assert b'/api/library/upload' in source and b'n7LibrarySearch' in source
+          for suffix in ['/api/research/capabilities','/api/library/upload']:
+              try:
+                  urllib.request.urlopen('https://bot.piratecartography.com'+suffix,timeout=20)
+                  raise RuntimeError('UNAUTHORIZED_ROUTE_ACCESSIBLE')
+              except urllib.error.HTTPError as error:
+                  assert error.code==401,(suffix,error.code)
+          print('N7_RESEARCH_PRODUCTION_HEALTH_AND_AUTH_PASS')
+          PY
