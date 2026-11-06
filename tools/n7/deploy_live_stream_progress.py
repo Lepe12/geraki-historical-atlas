@@ -33,10 +33,23 @@ def verify(expected_ui):
   with urllib.request.urlopen(urllib.request.Request(BASE+route,headers={'Cache-Control':'no-cache'}),timeout=18,context=ctx) as r:
    v=json.loads(r.read(18000))
    if r.status!=200 or not v.get('modelConfigured'):raise RuntimeError('N7_PROGRESS_MODEL_UNAVAILABLE')
- with urllib.request.urlopen(urllib.request.Request(BASE+'/app.js',headers={'Cache-Control':'no-cache'}),timeout=18,context=ctx) as r:
-  data=r.read(700000)
-  if sha(data)!=sha(expected_ui) or MARKER not in data or b"event.type==='status'" not in data:
-   raise RuntimeError('N7_PROGRESS_UI_NOT_SERVED')
+ import time
+ verified=False
+ for attempt in range(1,7):
+  query='?n7progress='+secrets.token_hex(7)
+  req=urllib.request.Request(BASE+'/app.js'+query,headers={'Cache-Control':'no-cache','Pragma':'no-cache'})
+  with urllib.request.urlopen(req,timeout=18,context=ctx) as r:
+   data=r.read(900000)
+  hash_match=sha(data)==sha(expected_ui)
+  marker_ok=MARKER in data
+  status_ok=b"event.type==='status'" in data
+  print('N7_PROGRESS_SERVE_CHECK attempt='+str(attempt)+' hashMatch='+str(hash_match)+
+    ' marker='+str(marker_ok)+' status='+str(status_ok)+
+    ' length='+str(len(data))+' expected='+str(len(expected_ui)))
+  if hash_match and marker_ok and status_ok:
+   verified=True;break
+  if attempt<6:time.sleep(2)
+ if not verified:raise RuntimeError('N7_PROGRESS_UI_NOT_SERVED')
  for route,method in (('/api/n7/approved-lessons','GET'),
   ('/api/conversations/11111111-1111-4111-8111-111111111111/stream','POST')):
   try:
@@ -75,6 +88,18 @@ def main():
    check(data)
    if previous!=data:changes.append((folder,name,previous,data))
   print('N7_PROGRESS_PREFLIGHT_OK dry_run='+str(dry)+' changed='+','.join(v[1] for v in changes))
+  # Compare public static /app.js to exact FTPS file before changing anything.
+  public_origin=next((x[2] for x in changes if x[1]=='app.js'),read(f,PUB,'app.js'))
+  ctx=ssl.create_default_context()
+  try:
+   req=urllib.request.Request(BASE+'/app.js?audit='+token,headers={'Cache-Control':'no-cache','Pragma':'no-cache'})
+   with urllib.request.urlopen(req,timeout=16,context=ctx) as res:public_data=res.read(900000)
+   print('N7_PROGRESS_ORIGIN_COMPARE ftpsLen='+str(len(public_origin))+
+    ' webLen='+str(len(public_data))+' ftpsSha='+sha(public_origin)[:16]+
+    ' webSha='+sha(public_data)[:16]+' same='+str(sha(public_origin)==sha(public_data)))
+  except Exception as e:
+   print('N7_PROGRESS_ORIGIN_COMPARE_ERROR='+type(e).__name__)
+
   if dry:return
   for folder,name,previous,data in changes:
    if sha(read(f,folder,name))!=sha(previous):raise RuntimeError('N7_PROGRESS_CONCURRENT_UPDATE')
