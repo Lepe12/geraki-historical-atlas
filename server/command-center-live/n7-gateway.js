@@ -21,15 +21,18 @@ function readPrivateLibrary(command,arg) {
 
 
 // Dedicated OAuth-protected PDF ingestion; avoids changing the existing app.js upload code.
-async function privateLibraryUpload(req){
+async function privateLibraryUpload(req,rawOverride=null){
   const max=25*1024*1024;
   const chunks=[];let bytes=0;
-  for await(const part of req){
-    bytes+=part.length;
-    if(bytes>max)throw new Error("PDF_TOO_LARGE");
-    chunks.push(part);
+  if(!rawOverride){
+    for await(const part of req){
+      bytes+=part.length;
+      if(bytes>max)throw new Error("PDF_TOO_LARGE");
+      chunks.push(part);
+    }
   }
-  const raw=Buffer.concat(chunks);
+  const raw=rawOverride||Buffer.concat(chunks);
+  if(raw.length>max)throw new Error("PDF_TOO_LARGE");
   if(raw.length<5||raw.subarray(0,5).toString("ascii")!=="%PDF-")
     throw new Error("INVALID_PDF");
   const digest=crypto.createHash("sha256").update(raw).digest("hex");
@@ -96,6 +99,42 @@ async function privateLibraryUpload(req){
 function createN7Gateway({json,operatorAuthorized,sessionAuthorized=()=>false,readBody,statusFor,githubWorkflowDispatch,githubCodingDispatch,githubPrivateDispatch,libraryRunner=readPrivateLibrary,libraryUploadRunner=privateLibraryUpload,libraryBridgeVerifier=verifyLibraryBridge}) {
   let lastAccepted=0;
   return async function handleN7(req,res,p) {
+    // PDF ingestion requires the existing N7 session on the bot and a fresh
+    // server-to-server HMAC signature of the raw PDF SHA-256. No public direct upload.
+    if(p==="/n7/library/upload-signed"){
+      if(req.method!=="POST"){json(res,405,{error:"method_not_allowed"});return true;}
+      if(req.headers.origin){json(res,403,{error:"server_bridge_only"});return true;}
+      if(!String(req.headers["content-type"]||"").toLowerCase().startsWith("application/pdf")){
+        json(res,415,{error:"pdf_required"});return true;
+      }
+      const chunks=[];let total=0;const max=25*1024*1024;
+      try{
+        for await(const part of req){
+          total+=part.length;
+          if(total>max){json(res,413,{error:"pdf_exceeds_limit"});return true;}
+          chunks.push(part);
+        }
+      }catch(_){json(res,400,{error:"invalid_pdf_body"});return true;}
+      const raw=Buffer.concat(chunks);
+      if(raw.length<5||raw.subarray(0,5).toString("ascii")!=="%PDF-"){
+        json(res,415,{error:"invalid_pdf_magic"});return true;
+      }
+      const digest=crypto.createHash("sha256").update(raw).digest("hex");
+      if(!libraryBridgeVerifier(req,digest)){
+        json(res,401,{error:"signed_upload_required"});return true;
+      }
+      try{
+        const outcome=await libraryUploadRunner(req,raw);
+        const committed=outcome?.status==="DATABASE_COMMITTED";
+        json(res,committed?201:503,{
+          schema:"n7-private-pdf-import-v1",
+          status:outcome.status,source_id:outcome.source_id||null,
+          imported_pages:outcome.imported_pages||0,historically_verified:false,
+          ...(committed?{}:{reason:outcome.reason||"import_not_confirmed"})
+        });
+      }catch(_){json(res,503,{error:"pdf_extraction_or_import_unavailable"});}
+      return true;
+    }
     // Import only two rights-verified, fixed Gutenberg works over the authenticated host bridge.
     // This endpoint is not public and does not accept user-selected file paths or shell commands.
     if(p==="/n7/library/import-signed"){
