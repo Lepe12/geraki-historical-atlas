@@ -156,6 +156,7 @@ async function readGroqStream(response,onDelta){
   while(true){
    const part=await reader.read();if(part.done)break;
    pending+=decoder.decode(part.value,{stream:true});
+   pending=pending.replace(/\r\n/g,'\n'); // Groq can send SSE over CRLF
    if(pending.length>500000)throw Error('Groq stream buffer exceeded');
    let ix;
    while((ix=pending.indexOf('\n\n'))!==-1){
@@ -172,7 +173,8 @@ async function readGroqStream(response,onDelta){
  }finally{reader.releaseLock();}
  return {text,reason};
 }
-function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publicSearch,fetcher=fetch}){
+function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publicSearch,fetcher=fetch,
+  researchDeadlineMs=8500,articleDeadlineMs=8500,modelDeadlineMs=25000}){
  return async function handle(req,res,id){
   if(!API_KEY||!MODEL)return writeError(res,503,'Το μοντέλο δεν είναι συνδεδεμένο');
   let all,item,input,attachments;
@@ -189,6 +191,8 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
   let metadata;
   try{metadata=privateStore(DATA_DIR,id,attachments);}catch(e){return writeError(res,400,e.message);}
   const history=[...item.messages,{role:'user',content,attachments:metadata}];
+  // N7_STALL_RECOVERY_V1: bound research/prompt size and model call duration.
+  // Never allow slow public sites or large bibliographies to starve the reply.
   // N7_RESEARCH_PROGRESS_STREAM_V1: acknowledge before slow web fetching.
   let started=false,final='',done=false;
   const emit=(type,value)=>{
@@ -204,10 +208,31 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
   emit('status',{stage:'research',message:'Ελέγχω πηγές και προετοιμάζω την ιστορική έρευνα…'});
   let evidence=null,messages;
   try{
-   evidence=await publicSearch.researchMessages(history);
-   if(typeof publicSearch.enrichPublisherArticles==='function'){
+   // Cap research phase even if a provider hangs, while preserving available sources.
+   const researchTimeout=Symbol('research-timeout');
+   let researchTimer;
+   try{
+    evidence=await Promise.race([
+      publicSearch.researchMessages(history),
+      new Promise(resolve=>{researchTimer=setTimeout(()=>resolve(researchTimeout),researchDeadlineMs);})
+    ]);
+   }finally{clearTimeout(researchTimer);}
+   if(evidence===researchTimeout){
+     evidence={searched:true,items:[],reason:'research_timeout'};
+     emit('status',{stage:'research_timeout',message:'Η αναζήτηση καθυστέρησε. Συνεχίζω με όσα γνωρίζει το N7…'});
+   }
+   if(typeof publicSearch.enrichPublisherArticles==='function'&&evidence.items?.length){
      if(evidence?.searched)emit('status',{stage:'reading',message:'Διαβάζω διαθέσιμα άρθρα και ελέγχω βιβλιογραφία…'});
-     evidence=await publicSearch.enrichPublisherArticles(evidence);
+     const articleTimeout=Symbol('article-timeout');
+     let articleTimer;
+     try{
+      const augmented=await Promise.race([
+        publicSearch.enrichPublisherArticles(evidence),
+        new Promise(resolve=>{articleTimer=setTimeout(()=>resolve(articleTimeout),articleDeadlineMs);})
+      ]);
+      if(augmented!==articleTimeout)evidence=augmented;
+      else emit('status',{stage:'read_timeout',message:'Η ανάγνωση πηγών καθυστέρησε. Προχωρώ στην απάντηση…'});
+     }finally{clearTimeout(articleTimer);}
    }
    messages=buildPrompt(typeof publicSearch.cleanHistoryForTopic==='function'?publicSearch.cleanHistoryForTopic(history):history,id,DATA_DIR,promptMessages);
    const n7ImageCount=attachments.filter(a=>a.type.startsWith('image/')).length;
@@ -227,7 +252,11 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
      }
      console.log('N7_VISION_GROUNDING attachments='+n7ImageCount+' forwarded='+sent);
    }
-   const context=publicSearch.contextForResearch(evidence);
+   const rawContext=publicSearch.contextForResearch(evidence);
+   // 13k characters max evidence budget: prevent context overflow and provider stalls.
+   const context=rawContext.length>13000
+     ?rawContext.slice(0,13000)+'\n[Η υπόλοιπη έρευνα παραλείφθηκε λόγω ορίου μήκους.]'
+     :rawContext;
    if(context&&messages[0]?.role==='system')messages[0].content+='\n\n'+context;
   }catch(e){emit('error',{error:'Η προετοιμασία της έρευνας απέτυχε: '+String(e.message||e).slice(0,160)});if(!res.writableEnded)res.end();return;}
   const url=BASE.replace(/\/$/,'')+'/chat/completions';
@@ -235,15 +264,16 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
 
   emit('status',{stage:'model',message:'Οι πηγές ελέγχθηκαν. Το N7 συντάσσει την απάντηση…'});
   try{
-   for(let pass=0;pass<3;pass++){
+   for(let pass=0;pass<2;pass++){
     const ask=pass?[
       ...messages,{role:'assistant',content:final.slice(-4500)},
       {role:'user',content:'Συνέχισε ακριβώς από εκεί που σταμάτησες, χωρίς επανάληψη.'}
     ]:messages;
-    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),65000);
-    const request={model:MODEL,messages:ask,temperature:0.3,stream:true};
+    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),modelDeadlineMs);
+    const request={model:MODEL,messages:ask,temperature:0.3,stream:true,
+      max_completion_tokens:1800};
     if(BASE==='https://api.groq.com/openai/v1'&&MODEL==='qwen/qwen3.8-27b'){
-      request.reasoning_effort='none';request.max_completion_tokens=4096;
+      request.reasoning_effort='none';request.max_completion_tokens=1800;
     }
     let completion;
     try{
@@ -254,6 +284,7 @@ function makeHandler({API_KEY,MODEL,BASE,DATA_DIR,promptMessages,load,save,publi
       completion=await readGroqStream(response,part=>{final+=part;emit('delta',{text:part})});
     }finally{clearTimeout(timeout);}
     if(completion.reason!=='length'){done=true;break;}
+    emit('status',{stage:'continuation',message:'Η απάντηση συνεχίζεται…'});
    }
    if(!final)throw Error('Το μοντέλο δεν έστειλε κείμενο');
    const footer=publicSearch.sourceFooter(evidence);

@@ -114,7 +114,7 @@
   if(!content)return;
   sending=true;busy=true;send.disabled=true;add.disabled=true;
   input.disabled=true;
-  let streamed='',confirmed=false;
+  let streamed='',confirmed=false,watchdog=null;
   if(notice)notice.textContent='';
   window.N7Presence?.setState('think',{source:'chat'});
   try{
@@ -128,8 +128,10 @@
    input.value='';pending=[];showFiles();
    window.N7Presence?.setState('work',{source:'chat'});
    if(notice)notice.textContent='Συνδέομαι με το N7…';
+   const controller=new AbortController();
+   watchdog=setTimeout(()=>controller.abort(),85000);
    const response=await fetch('/api/conversations/'+active+'/stream',{
-    method:'POST',credentials:'same-origin',
+    method:'POST',credentials:'same-origin',signal:controller.signal,
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({message:content,attachments:files})
    });
@@ -154,7 +156,7 @@
    await list();
   }catch(error){
    window.N7Presence?.setState('error',{source:'chat'});
-   if(notice)notice.textContent='Σφάλμα: '+error.message;
+   if(notice)notice.textContent='Σφάλμα: '+(error.name==='AbortError'?'Η αναμονή ξεπέρασε τα 85 δευτερόλεπτα. Το αίτημα ακυρώθηκε στον browser. Δοκίμασε μικρότερη ερώτηση ή επανάληψη.':error.message);
    if(streamed){
     const pane=document.getElementById('messages');
     if(pane.lastElementChild?.classList.contains('assistant'))
@@ -163,6 +165,7 @@
     input.value=content;
    }
   }finally{
+   if(watchdog!==null)clearTimeout(watchdog);
    sending=false;busy=false;send.disabled=false;add.disabled=false;input.disabled=false;
    if(!notice?.textContent.startsWith('Σφάλμα:'))
      window.N7Presence?.setState('idle',{source:'chat'});
