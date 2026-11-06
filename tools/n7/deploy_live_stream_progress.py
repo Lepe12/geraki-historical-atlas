@@ -75,6 +75,18 @@ def main():
    check(data)
    if previous!=data:changes.append((folder,name,previous,data))
   print('N7_PROGRESS_PREFLIGHT_OK dry_run='+str(dry)+' changed='+','.join(v[1] for v in changes))
+  # Compare public static /app.js to exact FTPS file before changing anything.
+  public_origin=next((x[2] for x in changes if x[1]=='app.js'),read(f,PUB,'app.js'))
+  ctx=ssl.create_default_context()
+  try:
+   req=urllib.request.Request(BASE+'/app.js?audit='+token,headers={'Cache-Control':'no-cache','Pragma':'no-cache'})
+   with urllib.request.urlopen(req,timeout=16,context=ctx) as res:public_data=res.read(900000)
+   print('N7_PROGRESS_ORIGIN_COMPARE ftpsLen='+str(len(public_origin))+
+    ' webLen='+str(len(public_data))+' ftpsSha='+sha(public_origin)[:16]+
+    ' webSha='+sha(public_data)[:16]+' same='+str(sha(public_origin)==sha(public_data)))
+  except Exception as e:
+   print('N7_PROGRESS_ORIGIN_COMPARE_ERROR='+type(e).__name__)
+
   if dry:return
   for folder,name,previous,data in changes:
    if sha(read(f,folder,name))!=sha(previous):raise RuntimeError('N7_PROGRESS_CONCURRENT_UPDATE')
