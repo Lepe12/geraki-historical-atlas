@@ -24,7 +24,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: n7-library-ftps
+  group: n7-library-ftps-${{ github.event_name }}
   cancel-in-progress: false
 jobs:
   validate:
@@ -32,6 +32,11 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/library
+            ops_ftps_requests
       - name: Syntax and parser tests
         run: |
           set -euo pipefail
@@ -61,5 +66,10 @@ jobs:
       PCT_FTPS_APP_ROOT: /piratecartography-gateway/server/command-center-live
     steps:
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            tools/library
+            ops_ftps_requests
       - name: Stage library files over existing FTPS connection
         run: python3 tools/library/deploy_library_ftps.py
