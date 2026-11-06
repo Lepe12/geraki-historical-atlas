@@ -125,6 +125,8 @@
    render([...original.conversation.messages,{role:'user',content:visible},{role:'assistant',content:''}]);
    const pane=document.getElementById('messages');
    const bubble=pane.lastElementChild;
+   // N7_VISIBLE_PROGRESS_BUBBLE_V1: show the current stage where the user reads replies.
+   bubble.textContent='Το N7 συνδέεται…';
    input.value='';pending=[];showFiles();
    window.N7Presence?.setState('work',{source:'chat'});
    if(notice)notice.textContent='Συνδέομαι με το N7…';
@@ -137,7 +139,9 @@
    });
    await readNdjson(response,event=>{
     if(event.type==='status'){
-     if(notice)notice.textContent=event.message||'Το N7 εργάζεται…';
+     const label=event.message||'Το N7 εργάζεται…';
+     if(notice)notice.textContent=label;
+     if(!streamed)bubble.textContent=label;
      return;
     }
     if(event.type==='delta'){
@@ -156,7 +160,13 @@
    await list();
   }catch(error){
    window.N7Presence?.setState('error',{source:'chat'});
-   if(notice)notice.textContent='Σφάλμα: '+(error.name==='AbortError'?'Η αναμονή ξεπέρασε τα 85 δευτερόλεπτα. Το αίτημα ακυρώθηκε στον browser. Δοκίμασε μικρότερη ερώτηση ή επανάληψη.':error.message);
+   const detail=error.name==='AbortError'?'Η αναμονή ξεπέρασε τα 85 δευτερόλεπτα. Το αίτημα ακυρώθηκε στον browser.':error.message;
+   if(notice)notice.textContent='Σφάλμα: '+detail;
+   if(!streamed){
+    const pane=document.getElementById('messages');
+    if(pane.lastElementChild?.classList.contains('assistant'))
+      pane.lastElementChild.textContent='Η απάντηση δεν ολοκληρώθηκε. '+detail;
+   }
    if(streamed){
     const pane=document.getElementById('messages');
     if(pane.lastElementChild?.classList.contains('assistant'))
